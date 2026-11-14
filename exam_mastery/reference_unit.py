@@ -517,6 +517,24 @@ def _page(unit: dict, mode: str, part: str = '') -> str:
 <script id="unit-data" type="application/json">{payload}</script><script>{js}</script></body></html>"""
 
 
+LAB_JS = ('lab_math.js', 'lab_ui.js', 'lab_seq.js', 'lab_boot.js')
+
+
+def _lab_page(unit: dict) -> str:
+    """Interaktives Labor: eigene Seite, vollständig offline (MathJax lokal, kein Netz)."""
+    data = {k: v for k, v in unit.items() if k in ('id', 'title', 'chapter', 'course', 'lab')}
+    payload = json.dumps(data, ensure_ascii=False).replace('</', '<\\/')
+    css = (TEMPLATES / 'unit_app.css').read_text(encoding='utf-8') + (TEMPLATES / 'lab.css').read_text(encoding='utf-8')
+    js = '\n'.join((TEMPLATES / f).read_text(encoding='utf-8') for f in LAB_JS if (TEMPLATES / f).exists())
+    return f"""<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Interaktives Labor – {unit['title']}</title><style>{css}</style>
+<script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]}},svg:{{fontCache:'global'}}}};</script>
+<script src="assets/tex-svg-full.js" defer></script></head>
+<body class="lab"><noscript>Das Labor benötigt JavaScript.</noscript>
+<script id="unit-data" type="application/json">{payload}</script><script>{js}</script></body></html>"""
+
+
 def _print_pdf(html_path: Path, pdf_path: Path):
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
@@ -552,6 +570,7 @@ def build(unit_dir: Path, out: Path, pdf: bool = True, anki: bool = True) -> dic
     tmp = out / '.build'
     tmp.mkdir(exist_ok=True)
     (tmp / 'index.html').write_text(_page(unit, 'app'), encoding='utf-8')
+    (tmp / 'labor.html').write_text(_lab_page(unit), encoding='utf-8')
     for part in PARTS:
         (tmp / f'{part}.html').write_text(_page(unit, 'print', part), encoding='utf-8')
     (tmp / 'anki_import.txt').write_text(anki_tsv(unit), encoding='utf-8')
