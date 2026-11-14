@@ -628,12 +628,12 @@ function renderTask(task, ctx = {}) {
   });
   box.append(...inputs);
   if (ctx.exam) return box;
-  const fb = el('div', {}), hintBox = el('div', {}), sol = el('div', {class: 'sol', hidden: true, html: `<b>Musterlösung.</b> ${task.solution}` + (task.rubric ? '<p class="mute">Bewertung: ' + task.rubric.join(' · ') + '</p>' : '')});
+  const fb = el('div', {}), hintBox = el('div', {}), sol = el('div', {class: 'sol', hidden: true}, ...solutionBlocks(task));
   const hasHints = (task.hints || []).length > 0;
   const bHint = el('button', {disabled: true, onclick: () => { if (hintsShown < task.hints.length) { hintBox.append(el('p', {class: 'fb hint', html: 'Hinweis: ' + task.hints[hintsShown++]})); tex(hintBox); } bHint.disabled = hintsShown >= task.hints.length; }}, 'Hinweis');
   const bSol = el('button', {onclick: () => { if (!tries().length && !confirm('Lösung ansehen, ohne es versucht zu haben? Die Aufgabe zählt dann als unterstützt.')) return; revealed = true; sol.hidden = false; tex(sol); if (!tries().length) record(task, false, {revealed: true, hints: hintsShown}); }}, 'Lösung anzeigen');
   const bCheck = el('button', {class: 'primary', onclick: check}, task.answers[0].type === 'self' ? 'Abgeben' : 'Prüfen');
-  box.append(el('div', {class: 'ctl'}, bCheck, hasHints ? bHint : null, bSol), fb, hintBox, sol);
+  box.append(el('div', {class: 'ctl'}, bCheck, hasHints ? bHint : null, bSol), fb, hintBox, sol, labLink(task));
   if (hasHints) box.append(el('p', {class: 'mute small'}, 'Hinweise werden nach Ihrem ersten eigenen Versuch freigeschaltet.'));
   box.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type === 'text') check(); });
   function check() {
@@ -658,6 +658,22 @@ function renderTask(task, ctx = {}) {
   return box;
 }
 
+
+// ---------- v5: Kurzschlüssel vs. ausführliche Lösung; Verknüpfung ins Labor ----------
+function labHref(lab, item) { return `labor.html#lab=${lab}` + (item ? `&ziel=${item}` : ''); }
+function labLink(t) { return t.lab ? el('p', {class: 'lab-link'}, el('a', {href: labHref(t.lab.lab, t.lab.item)}, '⚗ Im Labor ausprobieren: ' + t.lab.label)) : null; }
+function solutionBlocks(t) {
+  const out = [el('div', {class: 'sol key', html: `<b>${t.worked ? 'Bewertungsschlüssel (kurz).' : 'Lösung.'}</b> ${t.solution}`})];
+  if (t.worked) out.push(el('div', {class: 'sol worked', html: '<b>Ausführliche Lösung.</b> ' + t.worked}));
+  if (t.rubric) out.push(el('p', {class: 'mute', html: '<b>Bewertung.</b> ' + t.rubric.join(' · ')}));
+  return out;
+}
+function labRefs(scope, print) {
+  scope.querySelectorAll('.lab-ref').forEach(n => { const m = (U.lab || {})[n.dataset.kc]; if (!m) return n.remove();
+    n.replaceChildren(el('div', {class: 'lab-card'}, el('b', {}, print ? 'Im Interaktiven Labor (labor.html) – ' + ({attention: 'Self-Attention', crf: 'CRF & Viterbi', birnn: 'BiRNN', spans: 'Spannen & F1'}[m.lab]) : '⚗ Selbst erforschen im Interaktiven Labor'),
+      el('ul', {}, m.items.map(([id, label]) => el('li', {}, print ? label : el('a', {href: labHref(m.lab, id)}, label)))),
+      el('p', {class: 'mute small'}, 'Erst vorhersagen, dann verändern, dann die Begründung lesen. Jede Station ist mit einem Satz dieses Abschnitts verknüpft.'))); });
+}
 
 // ---------- citations: every provenance marker links into the bibliography ----------
 const SOURCE_MATCH = [['SLP3', 'slp3'], ['Ratinov', 'ratinov'], ['Lample', 'lample'], ['Vaswani', 'vaswani'], ['Andor', 'andor'], ['Lafferty', 'lafferty'], ['Huang', 'huang'],
@@ -698,6 +714,7 @@ function home() {
   return [topbar('home'), el('main', {}, noticeBar(), el('h1', {}, U.title), el('p', {class: 'lead mute'}, U.subtitle),
     el('div', {class: 'cards'},
       el('div', {class: 'card hero'}, el('h3', {}, 'Heute lernen'), el('p', {}, n.d), el('button', {class: 'primary', onclick: n.a}, n.t)),
+      el('div', {class: 'card'}, el('h3', {}, 'Interaktives Labor'), el('p', {}, 'Self-Attention, CRF/Viterbi, BiRNN, Spannen & F1: frei experimentieren, Hypothesen prüfen, Challenges lösen.'), el('a', {class: 'btn', href: 'labor.html'}, 'Labor öffnen')),
       el('div', {class: 'card'}, el('h3', {}, 'Fortsetzen'), el('p', {}, st.last ? 'Zurück zur letzten Stelle.' : 'Mit dem Washington-Experiment beginnen.'), el('button', {onclick: () => go('learn', st.last || 'orientierung')}, 'Öffnen')),
       el('div', {class: 'card'}, el('h3', {}, 'Wiederholen'), el('p', {}, `${dueCards().length} fällig · ${Object.keys(st.cards).length} von ${U.cards.length} Karten aktiv`), el('button', {onclick: () => go('review')}, 'Öffnen')),
       el('div', {class: 'card'}, el('h3', {}, 'Schwächen'), el('p', {}, weak.length ? weak.map(k => KCS[k]).join(' · ') : 'Keine aus Prüfungen bekannt.'), weak.length ? el('button', {onclick: () => go('learn', Object.keys(SECTION_KC).find(s => SECTION_KC[s] === weak[0]))}, 'Gezielt üben') : null),
@@ -721,7 +738,7 @@ function learn(anchor) {
   if (rest.length) { toc.append(el('a', {href: '#learn/weitere'}, 'Weitere Aufgaben')); main.append(el('h2', {id: 'weitere'}, 'Weitere Aufgaben'), ...rest.map(t => renderTask(t))); }
   toc.append(el('a', {href: '#learn/literatur'}, 'Literatur')); main.append(el('h2', {id: 'literatur'}, 'Literatur'), bibliography());
   main.append(el('div', {class: 'card hero', style: 'margin-top:30px'}, el('h3', {}, 'Abschluss'), el('p', {}, `Prüfung ohne Hilfe, Form ${nextForm()}. Nach mindestens 24 h ohne Üben folgt die andere Form – erst sie zählt für „wahrscheinlich sicher“.`), el('button', {class: 'primary', onclick: () => go('exam')}, 'Zur Prüfung')));
-  mountScenes(main, false); linkCitations(main);
+  mountScenes(main, false); labRefs(main, false); linkCitations(main);
   setTimeout(() => {
     const target = anchor && document.getElementById(anchor); if (target) target.scrollIntoView();
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { const id = e.target.id; st.visited[id] = 1; st.last = id; if (SECTION_KC[id]) introduceCards(SECTION_KC[id]); save(); toc.querySelectorAll('a').forEach(a => a.classList.toggle('cur', a.dataset.id === id)); } }), {rootMargin: '0px 0px -70% 0px'});
@@ -834,22 +851,22 @@ function taskBlock(t, withSolution) {
   if (t.steps && (!withSolution || t.stage === 'worked')) b.append(el('ol', {class: 'steps'}, t.steps.map(x => el('li', {class: x.blank ? 'blank' : ''}, el('span', {html: x.s}), el('span', {class: 'why', html: x.why})))));
   if (!withSolution) {
     t.answers.filter(a => a.type === 'choice').forEach(a => b.append(el('p', {html: a.label + ':'}), el('ol', {type: 'a'}, a.options.map(o => el('li', {html: o})))));
-    if (t.stage !== 'worked') b.append(el('div', {class: 'space', style: `height:${t.stage === 'transfer' ? 70 : 40}mm`}));
+    if (t.stage !== 'worked') b.append(el('div', {class: 'space', style: `height:${t.stage === 'transfer' ? 62 : 36}mm`}));
+    if ((t.hints || []).length) b.append(el('details', {class: 'hints-inline', open: true}, el('summary', {}, 'Gestufte Hinweise – erst nach eigenem Versuch lesen'), el('ol', {}, t.hints.map(x => el('li', {html: x})))));
+    if (t.lab) b.append(el('p', {class: 'mute small'}, '⚗ Experiment dazu: ' + t.lab.label));
     return b;
   }
-  b.append(el('div', {class: 'sol', html: '<b>Lösung.</b> ' + t.solution}));
+  b.append(...solutionBlocks(t));
   const diags = t.answers.flatMap(a => (a.diagnoses || []).map(d => a.type === 'choice' ? `Option ${'abcdefg'[+d.value]}: ${d.msg}` : `Antwort ${d.value}: ${d.msg}`));
   if (diags.length) b.append(el('p', {class: 'mute', html: '<b>Typische Fehler.</b> ' + diags.join(' · ')}));
-  if (t.rubric) b.append(el('p', {class: 'mute', html: '<b>Bewertung.</b> ' + t.rubric.join(' · ')}));
   return b;
 }
 function bookArbeitsbuch(m, sol) {
-  m.append(el('p', {}, sol ? 'Zu jeder Aufgabe des Arbeitsbuchs: vollständige Lösung, typische Fehler mit Diagnose und Bewertungsschema.' : 'Die Aufgaben sind nach Abschnitten des Lehrbuchs geordnet und gestuft: durchgerechnet → Lückenschritt → mit Hinweisen → selbstständig → Fehleranalyse → Transfer. Hinweise stehen am Ende; schlagen Sie sie erst nach einem eigenen Versuch nach.'));
+  m.append(el('p', {}, sol ? 'Zu jeder Aufgabe: Bewertungsschlüssel (kurz) bzw. vollständige Lösung, ausführliche Herleitung wo vorhanden, typische Fehler mit Diagnose und Bewertungsschema.' : 'Die Aufgaben sind nach Abschnitten des Lehrbuchs geordnet und gestuft: durchgerechnet → Lückenschritt → mit Hinweisen → selbstständig → Fehleranalyse → Transfer. Gestufte Hinweise stehen direkt unter jeder Aufgabe; lesen Sie sie erst nach einem eigenen Versuch. Zu vielen Aufgaben gibt es ein passendes Experiment im Interaktiven Labor.'));
   let cur = null;
   const ORDER = ['recall', 'worked', 'guided', 'faded', 'hint', 'independent', 'error', 'proof', 'transfer'];
   const tasks = [...U.tasks].sort((a, b) => (sectionIndex(a.id) - sectionIndex(b.id)) || (ORDER.indexOf(a.stage) - ORDER.indexOf(b.stage)));
   for (const t of tasks) { const sec = sectionOf(t.id); if (sec !== cur) { m.append(el('h2', {}, sec)); cur = sec; } m.append(taskBlock(t, sol)); }
-  if (!sol) m.append(el('h2', {}, 'Hinweise'), el('dl', {}, U.tasks.filter(t => (t.hints || []).length).flatMap(t => [el('dt', {}, t.id), el('dd', {html: t.hints.join(' · ')})])));
 }
 function bookKlausur(m, sol) {
   const pts = x => x.answers.length * 2;
@@ -859,14 +876,14 @@ function bookKlausur(m, sol) {
     m.append(el('h2', {}, `Form ${f}` + (sol ? ' – Lösungen' : '')), el('p', {class: 'mute small'}, `Summe: ${items.reduce((a, x) => a + pts(x), 0)} Punkte.`));
     items.forEach(x => { const b = el('div', {class: 'task'}, el('header', {}, el('b', {}, `${x.id}`), el('span', {class: 'mute small'}, `${KCS[x.kc]}${x.transfer ? ' · Transfer' : ''} · ${pts(x)} P.`)), el('div', {html: x.prompt}));
       x.answers.filter(a => a.type === 'choice').forEach(a => b.append(el('ol', {type: 'a'}, a.options.map((o, k) => el('li', {html: o + (sol && k === a.correct ? ' <b>✓</b>' : '')})))));
-      if (sol) b.append(el('div', {class: 'sol', html: '<b>Lösung.</b> ' + x.solution})); else b.append(el('div', {class: 'space', style: 'height:28mm'}));
+      if (sol) b.append(...solutionBlocks(x)); else b.append(el('div', {class: 'space', style: 'height:28mm'}));
       m.append(b); });
   }
 }
 function book() {
   const m = el('main', {class: 'print-' + PART}); app.replaceChildren(m); titlePage(m);
   ({lehrbuch: () => bookLehrbuch(m), arbeitsbuch: () => bookArbeitsbuch(m, false), loesungen: () => bookArbeitsbuch(m, true), klausur: () => bookKlausur(m, false), klausur_loesungen: () => bookKlausur(m, true)})[PART]();
-  mountScenes(m, true);
+  mountScenes(m, true); labRefs(m, true);
   const done = () => { document.body.dataset.ready = '1'; };
   const wait = () => window.MathJax && MathJax.startup && MathJax.startup.promise ? MathJax.startup.promise.then(() => MathJax.typesetPromise([m])).then(done, done) : setTimeout(wait, 50);
   wait();

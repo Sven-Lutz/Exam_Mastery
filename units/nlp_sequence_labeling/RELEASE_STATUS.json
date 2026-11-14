@@ -72,7 +72,8 @@
    "status": "HUMAN_REVIEW_PENDING",
    "date": "2026-11-14",
    "ref": "Issue #8 implementation; docs/reference_unit/V5_REPORT.md",
-   "note": "No self-release. Owner re-rates all 17 dimensions."
+   "note": "No self-release. Owner re-rates all 17 dimensions.",
+   "evidence": "docs/reference_unit/review_v5/"
   }
  ],
  "rule": "Only a human rating changes a status. CI and agent checks never do."

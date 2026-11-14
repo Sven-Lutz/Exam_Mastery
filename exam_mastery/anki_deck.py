@@ -283,6 +283,31 @@ def diagrams(out: Path, unit: dict):
                  f'<rect x="130" y="{y}" width="{pr * 600:.1f}" height="12" rx="2" fill="{"#15803d" if n == 0 else "#b8c0cc"}"/>'
                  f'<text x="{136 + pr * 600:.1f}" y="{y + 10}" font-size="10.5" fill="#555">{str(round(pr, 4)).replace(".", ",")}</text>')
     (out / 'crf_probabilities.svg').write_text(_svg(460, 262, body), encoding='utf-8')
+    # 7 (v5) fokussiert: konvexe Hülle – erreichbar innen, unerreichbar außen (Karte attention/hull-impossible, attention/convex)
+    ox, oy, sc = 50, 205, 140
+    P = lambda x, y: (ox + x * sc, oy - y * sc)
+    tri = [P(1, 0), P(0, 1), P(0, 0)]
+    body = (f'<polygon points="{" ".join(f"{a},{b}" for a, b in tri)}" fill="#e3ecff" stroke="#2756c4" stroke-width="1.5"/>'
+            f'<text x="{P(0.12, 0.25)[0]}" y="{P(0.12, 0.25)[1]}" font-size="12" fill="#2756c4">alle Konvex-</text>'
+            f'<text x="{P(0.12, 0.25)[0]}" y="{P(0.12, 0.25)[1] + 15}" font-size="12" fill="#2756c4">kombinationen</text>')
+    for (x, y), lab, dx in zip(((1, 0), (0, 1), (0, 0)), ('v1 = (1,0)', 'v2 = (0,1)', 'v3 = (0,0)'), (8, 10, -44)):
+        a, b = P(x, y); body += f'<circle cx="{a}" cy="{b}" r="5" fill="#2756c4"/><text x="{a + dx}" y="{b + (18 if y == 0 else 4)}" font-size="12" fill="#1d1f24">{lab}</text>'
+    a, b = P(1, 1)
+    body += (f'<line x1="{P(1, 0)[0]}" y1="{P(1, 0)[1]}" x2="{P(0, 1)[0]}" y2="{P(0, 1)[1]}" stroke="#b91c1c" stroke-dasharray="4 3"/>'
+             f'<text x="{P(0.55, 0.52)[0]}" y="{P(0.55, 0.52)[1]}" font-size="12" fill="#b91c1c">o1 + o2 = 1</text>'
+             f'<circle cx="{a}" cy="{b}" r="7" fill="none" stroke="#b91c1c" stroke-width="2.5"/>'
+             f'<text x="{a + 14}" y="{b - 2}" font-size="12" fill="#b91c1c">(1,1): o1 + o2 = 2</text><text x="{a + 14}" y="{b + 14}" font-size="12" fill="#b91c1c">außerhalb – nie</text>')
+    (out / 'attention_hull.svg').write_text(_svg(360, 235, body), encoding='utf-8')
+    # 8 (v5) fokussiert: Verschiebung aller Scores lässt Gewichte unverändert (Karte attention/shift-invariance)
+    s0 = [0.8485, -0.891, 0.1909]
+    ex = [math.exp(x) for x in s0]; w = [x / sum(ex) for x in ex]
+    body = '<text x="10" y="18" font-size="12" fill="#555">Scores s (links) und s + 2 (Mitte) → gleiche Gewichte w (rechts)</text>'
+    for k, (sv, wv, col) in enumerate(zip(s0, w, ('#2756c4', '#c2410c', '#15803d'))):
+        y = 40 + k * 44
+        for x0, val in ((20, sv), (130, sv + 2)):
+            body += f'<rect x="{x0 + 40}" y="{y}" width="{max(2, (val + 1) * 18):.1f}" height="18" rx="3" fill="{col}" opacity=".55"/><text x="{x0}" y="{y + 14}" font-size="12" fill="#333">{str(round(val, 2)).replace(".", ",").replace("-", "−")}</text>'
+        body += f'<rect x="250" y="{y}" width="{wv * 100:.1f}" height="18" rx="3" fill="{col}"/><text x="{256 + wv * 100:.1f}" y="{y + 14}" font-size="12" fill="#333">{str(round(wv, 3)).replace(".", ",")}</text>'
+    (out / 'softmax_shift.svg').write_text(_svg(380, 175, body), encoding='utf-8')
     return sorted(p.name for p in out.glob('*.svg'))
 
 

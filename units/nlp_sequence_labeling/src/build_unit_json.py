@@ -4,7 +4,12 @@ TeX is written in raw strings; the generated JSON is the build input. Numbers in
 exam_mastery.reference_unit.verify; a mismatch fails the build.
 """
 import json
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import v5_attention as V5  # noqa: E402
+import v5_exam_worked as V5W  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / 'unit.json'
 L3 = ['O', 'B-LOC', 'I-LOC']
@@ -461,15 +466,26 @@ KC_MAP = {
     'micro-macro': dict(sections=['mittelung'], lecture='– (Vertiefung)', textbook='SLP3 §4.9.1 S. 114–115', research=['opitz'], scenes=['micromacro']),
 }
 
+# ---- v5 (Issue #8): Attention-Mikrosequenz, ausführliche Lösungen, Anki-Anreicherung, Labor-Verknüpfung ----
+T.extend(V5.TASKS)
+for it in A + B:
+    it['worked'] = V5W.W[it['id']]; it['rubric'] = V5W.R[it['id']]
+CARDS.extend(V5.CARDS)
+for c in CARDS:
+    for k, v in V5.CARD_EXTRAS.get(c['key'], {}).items():
+        c[k] = v
+KC_MAP['attention']['research'] = KC_MAP['attention']['research'] + ['jain', 'wiegreffe']
+
 unit = {
-    'id': 'nlp-sequence-labeling', 'version': '4.0.0', 'course': 'Natural Language Processing', 'chapter': '09 Neural Sequence Labeling',
+    'id': 'nlp-sequence-labeling', 'version': '5.0.0', 'course': 'Natural Language Processing', 'chapter': '09 Neural Sequence Labeling',
     'title': 'Neuronale Sequenzmarkierung',
     'subtitle': 'NER und Spannen · RNN, BiRNN, Self-Attention, Positionen · CRF und Viterbi · Precision, Recall, F1 · Fallstudie',
-    'status': 'Status: HUMAN_REVIEW_PENDING. Frühere Fassungen v1–v3: HUMAN_REJECTED bzw. nicht freigabefähig.',
+    'status': 'Status v5: HUMAN_REVIEW_PENDING (keine Selbstfreigabe). v1, v3, v4: HUMAN_REJECTED; v2: nicht freigabefähig.',
     'text': 'text.html', 'kcs': KCS, 'kc_map': KC_MAP,
     'toy': {'emb': {'Washington': [1, 0], 'signed': [0, 1], 'state': [0, -1]}, 'a_fw': 0.5, 'a_bw': 0.8},
     'tasks': T, 'exam_forms': {'A': A, 'B': B}, 'case': CASE, 'cards': CARDS,
-    'sources': json.loads((OUT.parent / 'src' / 'sources.json').read_text(encoding='utf-8')),
+    'sources': json.loads((OUT.parent / 'src' / 'sources.json').read_text(encoding='utf-8')) + V5.SOURCES,
+    'lab': V5.LAB, 'numeric_examples': [V5.BANK],
 }
 OUT.write_text(json.dumps(unit, ensure_ascii=False, indent=1), encoding='utf-8')
 print('wrote', OUT, len(T), 'tasks', len(A) + len(B), 'exam items', len(CARDS), 'cards')

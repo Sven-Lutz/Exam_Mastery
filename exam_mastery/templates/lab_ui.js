@@ -33,7 +33,7 @@ const store = {get(k, d) { try { const v = localStorage.getItem('emlab:' + k); r
 function links(ref) {
   if (!ref) return null;
   const parts = [];
-  if (ref.book) parts.push(h('a', {href: `index.html#learn/${ref.book}`}, 'Lehrbuch ' + (ref.bookLabel || ref.book)));
+  if (ref.book) { const sec = ((UNIT.kc_map || {})[ref.book] || {sections: [ref.book]}).sections[0]; parts.push(h('a', {href: `index.html#learn/${sec}`}, 'Lehrbuch ' + (ref.bookLabel || ref.book))); }
   (ref.tasks || []).forEach(t => parts.push(h('a', {href: `index.html#learn/task-${t}`}, 'Aufgabe ' + t)));
   (ref.cards || []).forEach(c => parts.push(h('span', {}, 'Karte „' + c + '“')));
   return h('div', {class: 'links'}, 'Weiter: ', ...parts.flatMap((p, i) => i ? [' · ', p] : [p]));
@@ -119,7 +119,8 @@ function Shell(lab) {
   let R = lab.compute(S);
   const progress = store.get(lab.id, {steps: {}, chal: {}, preds: {}, hints: {}, log: []});
   const stage = h('div', {class: 'lab-stage'}), side = h('div', {class: 'side'});
-  let panel = 'path', anim = null, hyp = null;
+  const ziel = (location.hash.match(/ziel=([\w-]+)/) || [])[1];
+  let panel = ziel && lab.challenges.some(c => c.id === ziel) ? 'chal' : 'path', anim = null, hyp = null;
   const api = {
     get S() { return S; }, get R() { return R; },
     set(patch, opts = {}) {
@@ -162,7 +163,7 @@ function Shell(lab) {
   function drawPath() {
     body.append(h('p', {class: 'note'}, 'Geführter Weg: Jede Station stellt eine Frage, lässt Sie zuerst vorhersagen und dann am Modell selbst handeln. Die Bühne links bleibt jederzeit frei bedienbar.'));
     lab.path.forEach((st, i) => {
-      const done = !!progress.steps[st.id], box = h('div', {class: 'step' + (done ? ' done' : '')});
+      const done = !!progress.steps[st.id], box = h('div', {class: 'step' + (done ? ' done' : ''), 'data-id': st.id});
       const goalEl = h('div', {class: 'goal-state no'});
       const rev = h('div', {});
       const showReveal = () => { rev.replaceChildren(h('div', {class: 'reveal', html: st.reveal}), links(st.links)); typeset(rev); };
@@ -255,6 +256,7 @@ function Shell(lab) {
   }
   function updateSide() { live.forEach(fn => fn()); }
   drawTabs(); drawPanel(); refresh();
+  if (ziel) setTimeout(() => { const n = side.querySelector(`[data-id="${ziel}"]`); if (n) { n.scrollIntoView({block: 'center'}); n.classList.add('target'); } }, 50);
   return {stage, side, api};
 }
 function typeset(node) {

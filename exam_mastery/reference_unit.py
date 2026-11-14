@@ -70,6 +70,24 @@ def toy_states(unit, sentence, direction):
     return [(comps[0][i], comps[1][i]) for i in range(len(xs))]
 
 
+def attn_full(spec: dict) -> dict:
+    """Unabhängige Python-Referenz für Attention-Beispiele (q, K, V, T, scale, lambdas) inkl. Zwischengrößen."""
+    q, K, V = spec['q'], spec['K'], spec['V']
+    T = spec.get('T', 1); c = math.sqrt(len(q)) if spec.get('scale', True) else 1
+    raw = [sum(a * b for a, b in zip(q, k)) for k in K]
+    e = [r / c / T for r in raw]
+    ex = [math.exp(x) for x in e]; Z = sum(ex); w = [x / Z for x in ex]
+    o = [sum(w[j] * V[j][i] for j in range(len(V))) for i in range(len(V[0]))]
+    H = -sum(x * math.log2(x) for x in w if x > 0)
+    J = math.sqrt(sum(((w[i] if i == j else 0) - w[i] * w[j]) ** 2 for i in range(len(w)) for j in range(len(w))))
+    out = {'raw': raw, 'e': e, 'exp': ex, 'Z': [Z], 'w': w, 'o': o, 'H': [H, math.log2(len(w))], 'J': [J],
+           'jac': [w[i] * (1 - w[i]) for i in range(len(w))], 'contrib': [w[j] * v for j in range(len(V)) for v in V[j]]}
+    for lam in spec.get('lambdas', []):
+        el = [lam * x for x in e]; exl = [math.exp(x) for x in el]; wl = [x / sum(exl) for x in exl]
+        out[f'w{lam}'] = wl; out[f'H{lam}'] = [-sum(x * math.log2(x) for x in wl if x > 0)]; out[f'e{lam}'] = el
+    return out
+
+
 def compute(check: str, unit: dict):
     """Evaluate a check key to an exact value (Fraction, int, float or sorted list)."""
     kind, _, arg = check.partition(':')
@@ -163,6 +181,9 @@ def compute(check: str, unit: dict):
     if kind == 'weighted':                  # support-weighted macro F1
         cs = list(_counts(arg).values()); sup = [c.tp + c.fn for c in cs]
         return sum(Fraction(s_) * (S.f1(c) or 0) for s_, c in zip(sup, cs)) / sum(sup)
+    if kind == 'attnd':                     # attnd:<taskid>:<what>:<idx>  (data.attn der Aufgabe)
+        tid, what, idx = arg.split(':')
+        return attn_full(data[tid]['attn'])[what][int(idx)]
     if kind == 'birnn_b1':
         return S.rnn_scalar([1, 0, -1], 0.8, 0.5, reverse=True)[0]
     raise UnitError(f'unknown check {check!r}')
@@ -286,6 +307,19 @@ def _known_decimals(unit):
         for a in it['answers']:
             if a.get('check', '').startswith('fbeta:'):
                 p_, r_, b_ = (Fraction(x) for x in a['check'][6:].split(':')); add(b_ ** 2 * p_ + r_); add((1 + b_ ** 2) * p_ * r_); add(S.f_beta(p_, r_, 1))
+    specs = list(unit.get('numeric_examples', [])) + [it['data']['attn'] for it in items if (it.get('data') or {}).get('attn')] + \
+        [c['attn'] for c in unit['cards'] if c.get('attn')]
+    for spec in specs:                                                # v5 Attention-Beispiele: alle Zwischengrößen
+        for k in ('q',):
+            for v in spec[k]:
+                add(v)
+        for vec in spec['K'] + spec['V']:
+            for v in vec:
+                add(v)
+        add(spec.get('T', 1))
+        for series_ in attn_full(spec).values():
+            for v in series_:
+                add(v)
     sc0, w0, o0 = S.attention_row([1, 0], [[1, 0], [0, 1]], [[2, 0], [0, 4]])   # AT0 worked example
     for v in sc0 + w0 + o0 + [math.exp(x) for x in sc0] + [sum(math.exp(x) for x in sc0)]:
         add(v)
@@ -437,7 +471,8 @@ def verify(unit: dict) -> dict:
                 errors.append(f'KC {k}: scene {sc} not embedded in text')
     known = _known_decimals(unit)
     prose = unit['text_html'] + json.dumps([t.get('steps', []) for t in unit['tasks']], ensure_ascii=False) + \
-        json.dumps([t.get('solution', '') for t in items], ensure_ascii=False) + json.dumps(unit['cards'], ensure_ascii=False)
+        json.dumps([t.get('solution', '') for t in items], ensure_ascii=False) + json.dumps([t.get('worked', '') for t in items], ensure_ascii=False) + \
+        json.dumps(unit['cards'], ensure_ascii=False)
     prose = prose.replace('\\\\', '\\')
     for m in sorted(set(re.findall(r'-?\d+\{,\}\d+|(?<![(\d])-?\d+,\d+(?![)\d])', prose))):
         n = m.replace('{,}', ',').lstrip('-')
@@ -522,7 +557,7 @@ LAB_JS = ('lab_math.js', 'lab_ui.js', 'lab_seq.js', 'lab_boot.js')
 
 def _lab_page(unit: dict) -> str:
     """Interaktives Labor: eigene Seite, vollständig offline (MathJax lokal, kein Netz)."""
-    data = {k: v for k, v in unit.items() if k in ('id', 'title', 'chapter', 'course', 'lab')}
+    data = {k: v for k, v in unit.items() if k in ('id', 'title', 'chapter', 'course', 'lab', 'kc_map')}
     payload = json.dumps(data, ensure_ascii=False).replace('</', '<\\/')
     css = (TEMPLATES / 'unit_app.css').read_text(encoding='utf-8') + (TEMPLATES / 'lab.css').read_text(encoding='utf-8')
     js = '\n'.join((TEMPLATES / f).read_text(encoding='utf-8') for f in LAB_JS if (TEMPLATES / f).exists())

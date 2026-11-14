@@ -79,3 +79,5 @@ details.numbers{margin-top:10px;border:1px solid var(--line);border-radius:10px;
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:9px;font-size:14px;z-index:20}
 .reduced *{transition:none!important;animation:none!important}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.step.target,.chal.target{outline:3px solid var(--accent);outline-offset:2px}
+@media (max-width:560px){.lab-top{position:static}.lab-top>.mute{display:none}.lab-top .right .btn,.lab-top .right button{padding:5px 9px;font-size:13px}.lab-top nav button{padding:5px 9px;font-size:13px}}
