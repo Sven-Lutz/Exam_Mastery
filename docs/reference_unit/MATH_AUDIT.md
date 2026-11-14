@@ -1,23 +1,31 @@
-# Mathematical audit: NLP reference unit, version 2 (2026-11-14)
+# Mathematical audit: NLP reference unit v3 (2026-11-14)
 
-Scope: every theorem, derivation and quantitative claim in `units/nlp_sequence_labeling/`. The machine checks are listed exactly as run. **This audit is the author's own; it does not replace the independent expert review requested in Issue #4.**
+This is the author's own audit; it does **not** replace the independent expert review. Machine checks are listed exactly as they were run.
 
-| # | Claim (where) | Argument in the text | Independent check actually run | Assumptions / limits stated | Source |
-|---|---|---|---|---|---|
-| 1 | Satz 1: $h^{\rightarrow}_t = F_t(x_1..x_t)$ (§2) | Induction, aligned, one justification per line | Toy experiment: $h^{\rightarrow}_1$ identical in both sentences (`test_toy_experiment…`). The argument holds for any recurrence $f$, not only tanh. | $h_0$ does not depend on the input; Elman form | SLP3 §14.4.2, Eq. 14.16, p. 313; lecture PDF p. 78 |
-| 2 | Satz 2: $h^{\leftarrow}_t$ depends on $x_t..x_T$, $h^{bi}_t$ on all inputs (§3) | Reversal → Satz 1; union of index sets | Toy experiment: backward state changes sign with word 2. SymPy: with $W'=0$, $\partial h^{\leftarrow}_1/\partial x_2=0$. | **Corrected in v2:** "depends on" means "can be written as a function of". An actual change is not guaranteed (counterexample $W'=0$ is in the text). v1 claimed "im Allgemeinen tatsächlich von jedem $x_s$". | SLP3 §14.4.2, Eq. 14.17, pp. 313–314; lecture PDF pp. 79–80 |
-| 3 | Classifier on $h^{\rightarrow}_1$ gives the same output for A and B "for every choice of weights" (scene step 5) | Equal input ⇒ equal output of a deterministic function | Follows from #1 | Deterministic classifier, no dropout at test time | — |
-| 4 | Parameter count $2(d_h^2+d_hd+d_h)+\lvert\mathcal L\rvert(2d_h+1)$ (§5, B1, A1, B-1) | Counted matrix by matrix | SymPy expansion; recomputed for 4 configurations by the verifier | Elman cell without embedding matrix; an LSTM has 4 gates and about 4× the recurrent parameters (not part of this unit) | lecture PDF p. 11 (CoNLL types) |
-| 5 | $F_1$ as the inverse mean of "effort per hit" $= 2TP/(2TP+FP+FN)$ (§7) | Aligned four-line derivation | SymPy: identity simplifies to 0. 2,000 random count triples with exact fractions. | $TP>0$ (division by TP) | SLP3 §4.9, Eq. 4.43–4.44, p. 114 |
-| 6 | Satz 3 incl. $TP=0$: harmonic form never defined, count form defined except in case (v) (§8) | Case table (i)–(v) plus aligned proof | SymPy for $TP>0$. Each case (ii)–(v) tested in Python **and** in the app's JS (`test_tp_zero_cases…`, `test_js_metrics…`). | **Corrected in v2:** v1's table showed case (ii) and did not state that $2PR/(P+R)$ is undefined for *every* $TP=0$ | lecture PDF p. 20 (formula); scikit-learn 1.9.1 `zero_division` |
-| 7 | Satz 4: $\min\le F_1\le\max$, $F_1\le(P+R)/2$, $F_1\le 2\min$ (§8) | Equivalence chains, every division justified | SymPy: $F_1-P=P(R-P)/(P+R)$, $2P-F_1=2P^2/(P+R)$, mean difference $=(P-R)^2/(2(P+R))$. 2,000 random cases. | $P,R\in(0,1]$ | — (own) |
-| 8 | Number of candidate spans $T(T+1)/2$, $T=30$ gives 465 (§6) | Spans = pairs $i\le j$ | Verifier recomputes the prose number | Contiguous spans only | — |
-| 9 | Phrase/token counts of the lecture example (§9, scene 3) | Explicit TP/FP/FN lists | Verifier (exact fractions). Python/JS parity on 150 random BIO pairs. | conlleval reading of BIO | lecture PDF pp. 21–22 (values match the slide) |
-| 10 | Micro/macro numbers, "without MISC 0.76 / 0.7405" (§10) | Aligned computation | Verifier, exact fractions | Macro = mean of per-type F1. The second definition (0.5926) is stated. | SLP3 §4.9.1, pp. 114–115; Opitz & Burst 2019 (preprint) |
-| 11 | Satz 5: micro-F1 = accuracy under single-label, all-classes pooling (§10) | Each error is exactly one FP and one FN | SymPy on the final ratio. 300 random label sequences. | Exactly one gold and one system label per token; O pooled | — (own) |
-| 12 | Label bias of locally normalised step-wise taggers; CRF avoids it (§4c) | Prose, no derivation | **Not machine-checkable.** Literature claim. | Lafferty et al. page range not verified | Lafferty et al. 2001; Andor et al. 2016 (DOI checked) |
-| 13 | Scene numbers (toy states, score ±0.5436, micro/macro deltas) | Computed at runtime from the same formulas | Verifier recomputes the prose decimals (71 checks). Scene captions with deltas are computed, not typed (a v2 draft had typed "+0.21/+0.05"; correct is +0.175/+0.042). | — | — |
+| Claim (section) | Argument in the text | Independent check | Assumptions / limits stated | Source |
+|---|---|---|---|---|
+| Satz A: IO not injective, BIO injective on valid sequences (§2) | counterexample + decoding argument | `seqlab.spans` round trip; JS/Python parity on 150 random BIO pairs | validity = no `I-X` without a preceding B/I of type X | SLP3 §9.5.2 p. 239; slides PDF pp. 15–18 |
+| Receptive field $L(w-1)+1$ (§3) | induction over $L$ | SymPy induction step | stride 1 | – |
+| Satz 1: $h^{\rightarrow}_t=F_t(x_{1:t})$ (§4) | aligned induction | toy experiment ($h^{\rightarrow}_1$ equal in A and B); holds for any recurrence $f$ | $h_0$ independent of the input | SLP3 §14.4.2 Eq. 14.16 p. 313 |
+| Satz 2: BiRNN depends on the whole sentence (§5) | reversal + union | toy backward state flips sign; counterexample $W'=0$ | "function of" ≠ actual sensitivity (stated) | SLP3 §14.4.2 pp. 313–314 |
+| Latency / independent outputs (§5) | conditional statements | – | **standard** full-sentence BiRNN; **independent** per-token softmax (conditions in the text and cards) | slides PDF p. 83 |
+| Parameter count (§5, W1, B1, A3, B-3) | matrix by matrix | SymPy expansion; verifier for 4 configurations; givens rule | Elman cell, no embedding matrix; LSTM ≈ 4× (stated) | – |
+| Satz 3: $\operatorname{Var}(q^\top k)=d_k$ (§6) | aligned variance computation | Monte Carlo $d_k=64$: 63.77 (scaled 0.996) | independent components, mean 0, variance 1 (stated: learned projections do not satisfy this exactly) | Vaswani et al. 2017 §3.2.1 fn. 1 |
+| Attention example AT1, scene (§6) | numbers | verifier (128 values incl. 0.2483/0.5035/0.7517) | $W=I$ | – |
+| Multi-head parameters unchanged (§6, B-5) | count | verifier | **without** output matrix $W_O$ (stated; Transformer adds $d^2$) | slides PDF p. 58; SLP3 Eq. 7.35 p. 188 |
+| Satz 4: permutation equivariance (§7) | aligned matrix argument | 50 random property tests (exact up to 1e-12); attention scene step 8 | no positional encoding; row-wise softmax | slides PDF pp. 60–62 |
+| Sinusoid: $PE(i+\Delta)$ linear in $PE(i)$ (§7) | addition theorems | SymPy identity; 50 numeric cases | per frequency pair | Vaswani et al. 2017 §3.5 |
+| RoPE: depends only on $n-m$ (§7) | rotation group | SymPy identity; 50 numeric cases | 2D pairs | slides PDF p. 69 (Su et al. 2024) |
+| Residual gradient $\prod(I+J_l)$ (§8) | chain rule | scalar example $1.1^{10}\approx2.5937$ (verifier) | illustration, not a bound for matrix products | SLP3 §7.2 pp. 184–187 |
+| CRF score / Viterbi (§9, C1, A9, B-9, case study) | definition | `seqlab.viterbi` (exhaustive path scores in the verifier); JS Viterbi in scene and case study | hard constraints give validity only (shown in the case study) | SLP3 §18.4.5–18.5 |
+| Label bias vs. exposure bias (§9) | prose | **not machine-checkable** | – | Lafferty et al. 2001; Andor et al. 2016 abstract p. 2442 |
+| Greedy decoding comparable to Viterbi (§9) | literature claim | page read | their system only | Ratinov & Roth 2009 p. 148 |
+| $F_1$ as harmonic mean of effort; Satz 5 (count form incl. $TP=0$) (§10) | aligned derivations, case table (i)–(v) | SymPy; 2,000 random cases; JS definedness per case | – | SLP3 §4.9 Eq. 4.42–4.44 p. 114 |
+| Satz 6: bounds of $F_1$ (§10) | equivalence chains | SymPy factorisations; 2,000 random cases | $P,R\in(0,1]$ | – |
+| Phrase/token counting (§11, scene) | explicit lists | verifier; JS/Python parity | conlleval convention | slides PDF pp. 21–22 (values match) |
+| Micro-$F_1$ = $D_k$-weighted mean of type $F_1$ (§12, B6, B-18) | aligned identity | SymPy identity; 200 random exact cases | $D_k>0$; types with $D_k=0$ drop out | – (own derivation; SLP3 §4.9.1 for micro/macro) |
+| Satz 7: micro-$F_1$ = accuracy (§12) | aligned proof | 300 random sequences | one label per token, O pooled | – |
+| Case study numbers (§13, F1) | panel | verifier recomputes greedy/Viterbi decoding and taxonomy | synthetic emissions | – |
 
-**Every decimal in the prose and solutions** is matched by `reference_unit.verify` against a recomputed value or a declared input (`GIVEN_DECIMALS`). A changed digit fails the build (`test_rejects_ambiguous_or_wrong_items`).
-
-**Not covered by any machine check:** the correctness of explanations in prose (e.g. "Ein Fehler kostet gleich viel") and the didactic adequacy of the examples. These need the human expert review.
+**Every decimal** in the text, the solutions and the cards is recomputed or declared as an input (`GIVEN_DECIMALS`); a changed digit fails the build.
+**Not machine-checkable:** prose explanations, the didactic adequacy of examples, and literature interpretations beyond the quoted passages.

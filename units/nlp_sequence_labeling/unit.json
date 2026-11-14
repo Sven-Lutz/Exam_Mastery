@@ -5,7 +5,7 @@
  "chapter": "09 Neural Sequence Labeling",
  "title": "Neuronale Sequenzmarkierung",
  "subtitle": "NER und Spannen · RNN, BiRNN, Self-Attention, Positionen · CRF und Viterbi · Precision, Recall, F1 · Fallstudie",
- "status": "Fassung 3: HUMAN_REVIEW_PENDING. Fassungen 1 und 2: HUMAN_REJECTED bzw. wegen offener Mängel nicht freigabefähig.",
+ "status": "Status: HUMAN_REVIEW_PENDING. Frühere Fassungen: v1 HUMAN_REJECTED, v2 wegen offener Mängel nicht freigabefähig.",
  "text": "text.html",
  "kcs": {
   "spans": "Spannenkodierung (IO, BIO, BILOU)",
@@ -17,6 +17,134 @@
   "prf-edge": "Grenzfälle mit Nenner 0",
   "prf-level": "Phrasen- vs. Token-Zählung",
   "micro-macro": "Micro- und Macro-Mittelung"
+ },
+ "kc_map": {
+  "spans": {
+   "sections": [
+    "spannen",
+    "ner"
+   ],
+   "lecture": "PDF-S. 4–18",
+   "textbook": "SLP3 §9.5.2 S. 239; §18.3 S. 405",
+   "research": [
+    "ratinov",
+    "lample",
+    "conll"
+   ],
+   "scenes": []
+  },
+  "birnn": {
+   "sections": [
+    "tagger",
+    "rnn",
+    "birnn"
+   ],
+   "lecture": "PDF-S. 24–29, 77–80",
+   "textbook": "SLP3 §14.4–14.4.2 S. 312–314",
+   "research": [
+    "schuster"
+   ],
+   "scenes": [
+    "birnn"
+   ]
+  },
+  "attention": {
+   "sections": [
+    "attention",
+    "architektur"
+   ],
+   "lecture": "PDF-S. 31–58, 72–76",
+   "textbook": "SLP3 §7.1–7.3 S. 179–188",
+   "research": [
+    "vaswani"
+   ],
+   "scenes": [
+    "attention"
+   ]
+  },
+  "position": {
+   "sections": [
+    "position"
+   ],
+   "lecture": "PDF-S. 60–70",
+   "textbook": "SLP3 §7.4 S. 191–193",
+   "research": [
+    "vaswani",
+    "su"
+   ],
+   "scenes": [
+    "attention"
+   ]
+  },
+  "decoding": {
+   "sections": [
+    "struktur",
+    "fallstudie"
+   ],
+   "lecture": "PDF-S. 82–85",
+   "textbook": "SLP3 §18.4.5–18.5 S. 411–419; §9.5.3 S. 239–241",
+   "research": [
+    "lafferty",
+    "andor",
+    "ratinov",
+    "huang",
+    "lample"
+   ],
+   "scenes": [
+    "viterbi"
+   ]
+  },
+  "prf": {
+   "sections": [
+    "prf"
+   ],
+   "lecture": "PDF-S. 20–21",
+   "textbook": "SLP3 §4.9 S. 112–114",
+   "research": [],
+   "scenes": [
+    "f1"
+   ]
+  },
+  "prf-edge": {
+   "sections": [
+    "prf"
+   ],
+   "lecture": "– (Vertiefung)",
+   "textbook": "SLP3 §4.9; scikit-learn zero_division",
+   "research": [
+    "sklearn"
+   ],
+   "scenes": [
+    "f1"
+   ]
+  },
+  "prf-level": {
+   "sections": [
+    "einheit"
+   ],
+   "lecture": "PDF-S. 21–22",
+   "textbook": "SLP3 §9.5.4 S. 241",
+   "research": [
+    "conll",
+    "manning"
+   ],
+   "scenes": [
+    "counter"
+   ]
+  },
+  "micro-macro": {
+   "sections": [
+    "mittelung"
+   ],
+   "lecture": "– (Vertiefung)",
+   "textbook": "SLP3 §4.9.1 S. 114–115",
+   "research": [
+    "opitz"
+   ],
+   "scenes": [
+    "micromacro"
+   ]
+  }
  },
  "toy": {
   "emb": {

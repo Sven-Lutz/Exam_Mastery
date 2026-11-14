@@ -2,37 +2,42 @@
   "updated": "2026-11-14",
   "repo": "Sven-Lutz/Exam_Mastery",
   "main": "PR #2 squash-merged (engine snapshot, CI green on ubuntu-latest)",
-  "branch": "feat/nlp-reference-unit (PR #3: DO NOT MERGE until human acceptance)",
+  "branch": "feat/nlp-reference-unit (PR #3: DRAFT, DO NOT MERGE)",
   "release_status": {
     "engine_rc_v0.21.0-rc1_products_incl_nlp_baseline": "HUMAN_REJECTED",
     "nlp_reference_unit_v1": "HUMAN_REJECTED (Issue #4)",
-    "nlp_reference_unit_v2": "HUMAN_REVIEW_PENDING"
+    "nlp_reference_unit_v2": "NOT RELEASABLE (Issues #4-#6)",
+    "nlp_reference_unit_v3": "HUMAN_REVIEW_PENDING"
   },
   "product": {
-    "source": "units/nlp_sequence_labeling/",
+    "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
     "build": "python -m exam_mastery.reference_unit build units/nlp_sequence_labeling --out ~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling",
+    "anki_preview": "python -m exam_mastery.reference_unit anki-preview units/nlp_sequence_labeling --out ~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling",
     "open": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling/index.html",
+    "v2_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v2_snapshot/",
     "reports": [
-      "docs/reference_unit/ISSUE4_CORRECTIONS.md",
-      "docs/reference_unit/MATH_AUDIT.md"
+      "docs/reference_unit/V3_REPORT.md",
+      "docs/reference_unit/MATH_AUDIT.md",
+      "docs/reference_unit/CURRICULUM_MAP.md"
     ]
   },
   "verified": [
-    "unit verify: 71 recomputed values incl. every prose decimal",
-    "tests/test_reference_unit.py: 16 passed",
-    "SymPy identities for Satz 3/4/5 and parameter formula",
-    "screenshots desktop+mobile and PDF pages inspected"
+    "verify: 128 recomputed values + structural rules",
+    "tests/test_reference_unit.py: 25 passed (incl. real Anki reimport in disposable collection)",
+    "SymPy/Monte-Carlo checks of new theorems",
+    "visual inspection: all PDF pages, app (Chromium, WebKit mobile), 108 Anki card renderings"
   ],
   "not_verified": [
-    "independent human expert review (Issue #4 C)",
+    "real Anki desktop/AnkiMobile apps",
+    "independent expert review",
     "learning effect",
-    "import into a real Anki profile"
+    "Anki versions other than 26.09.3"
   ],
-  "next_action": "Wait for the human rating of v2. If rejected: work only on the named defects. If accepted: fold the scene/unit format into the engine author contract, then a second contrasting unit (Analysis 1 convergence).",
+  "next_action": "Wait for human review of v3 (textbook depth, visuals, didactics, Anki). If accepted: move unit format and Anki builder into the engine author contract; then one contrasting course (Analysis 1).",
   "open_decisions_for_owner": [
-    "Human rating of the v2 reference unit",
-    "Pilot budget for engine production runs (none authorised)",
-    "Sunday launchd job (not activated)"
+    "Human review of v3",
+    "Pilot budget for engine runs (none authorised)",
+    "Weekly launchd job (not activated)"
   ],
   "cleanup_candidates_not_touched": [
     "Exam_Mastery_Studio/runs_v0_5_1_p0_dev (876M)",
@@ -41,7 +46,7 @@
   ],
   "budget": {
     "paid_calls_authorised": 0,
-    "engine_provider_calls_this_session": 0,
+    "engine_provider_calls": 0,
     "claude_code_session_tokens": "not exposed to the session; not measured"
   }
 }

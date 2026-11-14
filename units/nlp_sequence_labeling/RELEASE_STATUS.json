@@ -17,9 +17,15 @@
   },
   {
    "version": 2,
-   "status": "HUMAN_REVIEW_PENDING",
+   "status": "NOT RELEASABLE (open defects documented in Issues #4-#6)",
    "date": "2026-11-14",
    "ref": "docs/reference_unit/ISSUE4_CORRECTIONS.md"
+  },
+  {
+   "version": 3,
+   "status": "HUMAN_REVIEW_PENDING",
+   "date": "2026-11-14",
+   "ref": "docs/reference_unit/V3_REPORT.md"
   }
  ],
  "rule": "Only a human rating changes a status. CI and agent checks never do."

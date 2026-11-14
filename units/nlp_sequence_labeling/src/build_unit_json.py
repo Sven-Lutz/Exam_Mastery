@@ -243,12 +243,24 @@ CARDS = [
  card('micro-macro/accuracy', 'micro-macro', 'concept', 'Unter welcher Bedingung ist Micro-F1 gleich der Accuracy?', 'Jedes Token genau ein Gold- und ein System-Label und alle Klassen einschließlich O gepoolt.', 'Dann ist jeder Fehler genau ein FP und ein FN (Satz 7).', 'Satz 7'),
 ]
 
+KC_MAP = {
+    'spans': dict(sections=['spannen', 'ner'], lecture='PDF-S. 4–18', textbook='SLP3 §9.5.2 S. 239; §18.3 S. 405', research=['ratinov', 'lample', 'conll'], scenes=[]),
+    'birnn': dict(sections=['tagger', 'rnn', 'birnn'], lecture='PDF-S. 24–29, 77–80', textbook='SLP3 §14.4–14.4.2 S. 312–314', research=['schuster'], scenes=['birnn']),
+    'attention': dict(sections=['attention', 'architektur'], lecture='PDF-S. 31–58, 72–76', textbook='SLP3 §7.1–7.3 S. 179–188', research=['vaswani'], scenes=['attention']),
+    'position': dict(sections=['position'], lecture='PDF-S. 60–70', textbook='SLP3 §7.4 S. 191–193', research=['vaswani', 'su'], scenes=['attention']),
+    'decoding': dict(sections=['struktur', 'fallstudie'], lecture='PDF-S. 82–85', textbook='SLP3 §18.4.5–18.5 S. 411–419; §9.5.3 S. 239–241', research=['lafferty', 'andor', 'ratinov', 'huang', 'lample'], scenes=['viterbi']),
+    'prf': dict(sections=['prf'], lecture='PDF-S. 20–21', textbook='SLP3 §4.9 S. 112–114', research=[], scenes=['f1']),
+    'prf-edge': dict(sections=['prf'], lecture='– (Vertiefung)', textbook='SLP3 §4.9; scikit-learn zero_division', research=['sklearn'], scenes=['f1']),
+    'prf-level': dict(sections=['einheit'], lecture='PDF-S. 21–22', textbook='SLP3 §9.5.4 S. 241', research=['conll', 'manning'], scenes=['counter']),
+    'micro-macro': dict(sections=['mittelung'], lecture='– (Vertiefung)', textbook='SLP3 §4.9.1 S. 114–115', research=['opitz'], scenes=['micromacro']),
+}
+
 unit = {
     'id': 'nlp-sequence-labeling', 'version': '3.0.0', 'course': 'Natural Language Processing', 'chapter': '09 Neural Sequence Labeling',
     'title': 'Neuronale Sequenzmarkierung',
     'subtitle': 'NER und Spannen · RNN, BiRNN, Self-Attention, Positionen · CRF und Viterbi · Precision, Recall, F1 · Fallstudie',
-    'status': 'Fassung 3: HUMAN_REVIEW_PENDING. Fassungen 1 und 2: HUMAN_REJECTED bzw. wegen offener Mängel nicht freigabefähig.',
-    'text': 'text.html', 'kcs': KCS,
+    'status': 'Status: HUMAN_REVIEW_PENDING. Frühere Fassungen: v1 HUMAN_REJECTED, v2 wegen offener Mängel nicht freigabefähig.',
+    'text': 'text.html', 'kcs': KCS, 'kc_map': KC_MAP,
     'toy': {'emb': {'Washington': [1, 0], 'signed': [0, 1], 'state': [0, -1]}, 'a_fw': 0.5, 'a_bw': 0.8},
     'tasks': T, 'exam_forms': {'A': A, 'B': B}, 'case': CASE, 'cards': CARDS,
     'sources': json.loads((OUT.parent / 'src' / 'sources.json').read_text(encoding='utf-8')),

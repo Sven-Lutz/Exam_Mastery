@@ -426,22 +426,25 @@ function sceneAttention() {
   const draw = (fig, s) => {
     const order = s.perm || [0, 1, 2], Xp = order.map(i => X[i]), qi = s.q ?? 2;
     const r = attnRow(Xp[qi], Xp, Xp, s.scale !== false);
-    const svg = sv('svg', {viewBox: '0 0 760 250', class: 'plot', role: 'img', 'aria-label': `Gewichte ${r.w.map(x => de(x, 3)).join(', ')}`});
-    const X0 = i => 110 + i * 200;
+    const svg = sv('svg', {viewBox: '0 0 760 270', class: 'plot', role: 'img', 'aria-label': `Gewichte ${r.w.map(x => de(x, 3)).join(', ')}`});
+    const X0 = i => 130 + i * 250, boxTop = 180;
+    // arcs first, so that all labels are drawn on top of them
+    if (s.show >= 2) order.forEach((src, i) => svg.append(sv('path', {d: `M${X0(i)},${boxTop} C${X0(i)},${boxTop - 60} ${X0(qi)},${boxTop - 90} ${X0(qi)},66`, fill: 'none', stroke: 'var(--accent2)', 'stroke-width': 1 + 14 * r.w[i], opacity: .55})));
     order.forEach((src, i) => {
-      const isQ = i === qi, w = s.show >= 2 ? r.w[i] : null;
-      svg.append(sv('rect', {x: X0(i) - 60, y: 170, width: 120, height: 50, rx: 10, fill: isQ ? 'var(--fw-bg)' : 'var(--panel)', stroke: isQ ? 'var(--fw)' : 'var(--line)', 'stroke-width': isQ ? 2.5 : 1.2, 'data-link': 'k' + (i + 1)}));
-      svg.append(sv('text', {x: X0(i), y: 191, 'text-anchor': 'middle', 'font-size': 14, fill: 'var(--ink)'}, `${words[src]} = (${X[src].join(', ')})`));
-      svg.append(sv('text', {x: X0(i), y: 210, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--mute)'}, isQ ? 'Anfrage q und Schlüssel k' : 'Schlüssel k = Wert v'));
-      if (s.show >= 1) svg.append(sv('text', {x: X0(i), y: 160, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--mute)', 'font-family': 'var(--mono)'}, `e = ${de(r.e[i], 4)}`));
-      if (w != null) {
-        svg.append(sv('path', {d: `M${X0(i)},166 C${X0(i)},110 ${X0(qi)},90 ${X0(qi)},62`, fill: 'none', stroke: 'var(--accent2)', 'stroke-width': 1 + 14 * w, opacity: .75}));
-        svg.append(sv('text', {x: (X0(i) + X0(qi)) / 2 + (i === qi ? 40 : 0), y: 120, 'text-anchor': 'middle', 'font-size': 13, fill: 'var(--accent2)', 'font-weight': 600, 'data-link': 'a' + (i + 1)}, `α = ${de(w, 4)}`));
+      const isQ = i === qi;
+      svg.append(sv('rect', {x: X0(i) - 85, y: boxTop, width: 170, height: 76, rx: 10, fill: isQ ? 'var(--fw-bg)' : 'var(--panel)', stroke: isQ ? 'var(--fw)' : 'var(--line)', 'stroke-width': isQ ? 2.5 : 1.2, 'data-link': 'k' + (i + 1)}));
+      svg.append(sv('text', {x: X0(i), y: boxTop + 22, 'text-anchor': 'middle', 'font-size': 15, fill: 'var(--ink)'}, `${words[src]} = (${X[src].join(', ')})`));
+      svg.append(sv('text', {x: X0(i), y: boxTop + 42, 'text-anchor': 'middle', 'font-size': 11.5, fill: 'var(--mute)'}, isQ ? 'Anfrage, Schlüssel, Wert' : 'Schlüssel und Wert'));
+      if (s.show >= 1) svg.append(sv('text', {x: X0(i), y: boxTop + 64, 'text-anchor': 'middle', 'font-size': 12.5, fill: 'var(--ink)', 'font-family': 'var(--mono)'}, `e = ${de(r.e[i], 4)}`));
+      if (s.show >= 2) {
+        const lx = X0(i) + (i === qi ? 0 : (i < qi ? 40 : -40)), ly = i === qi ? 130 : 150;
+        svg.append(sv('rect', {x: lx - 58, y: ly - 15, width: 116, height: 22, rx: 6, fill: 'var(--panel)', stroke: 'var(--accent2)', 'stroke-width': .8}));
+        svg.append(sv('text', {x: lx, y: ly + 1, 'text-anchor': 'middle', 'font-size': 13, fill: 'var(--accent2)', 'font-weight': 600, 'data-link': 'a' + (i + 1)}, `α = ${de(r.w[i], 4)}`));
       }
     });
     if (s.show >= 3) {
-      svg.append(sv('rect', {x: X0(qi) - 95, y: 22, width: 190, height: 38, rx: 8, fill: 'none', stroke: 'var(--accent2)', 'stroke-width': 2, 'data-link': 'o'}));
-      svg.append(sv('text', {x: X0(qi), y: 46, 'text-anchor': 'middle', 'font-size': 14, fill: 'var(--accent2)', 'font-weight': 600}, `o = (${de(r.o[0], 4)}; ${de(r.o[1], 4)})`));
+      svg.append(sv('rect', {x: X0(qi) - 100, y: 26, width: 200, height: 40, rx: 8, fill: 'var(--panel)', stroke: 'var(--accent2)', 'stroke-width': 2, 'data-link': 'o'}));
+      svg.append(sv('text', {x: X0(qi), y: 51, 'text-anchor': 'middle', 'font-size': 14, fill: 'var(--accent2)', 'font-weight': 600}, `o = (${de(r.o[0], 4)}; ${de(r.o[1], 4)})`));
     }
     fig.replaceChildren(svg);
   };
@@ -721,7 +724,7 @@ const PART_TITLE = {lehrbuch: 'Lehrbuch', arbeitsbuch: 'Arbeitsbuch', loesungen:
 const sectionOf = id => { const sec = sections().find(x => x.innerHTML.includes(`data-task="${id}"`)); return sec ? sec.dataset.title : 'Weitere Aufgaben'; };
 function titlePage(m) {
   m.append(el('div', {class: 'titlepage'}, el('p', {class: 'kicker'}, `${U.course} · Kapitel ${U.chapter}`), el('h1', {}, U.title), el('p', {class: 'lead'}, PART_TITLE[PART]),
-    el('p', {class: 'mute small'}, `Fassung ${U.version} · ${U.status}`)));
+    el('p', {class: 'mute small'}, `Fassung ${U.version}. ${U.status}`)));
 }
 function bookLehrbuch(m) {
   for (const s of sections()) {

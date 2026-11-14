@@ -57,7 +57,7 @@ mjx-container[display=true]{overflow-x:auto;overflow-y:hidden;max-width:100%}
 body[data-mode=print]{font-size:11pt;background:#fff;color:#111}
 body[data-mode=print] header.top,body[data-mode=print] .ctl button,body[data-mode=print] .ans,body[data-mode=print] .viz .ctl,body[data-mode=print] .viz .cap{display:none}
 body[data-mode=print] .frame svg.plot{max-height:62mm}body[data-mode=print] .frame .formula{font-size:10pt;min-height:0}
-body[data-mode=print] main{max-width:none;padding:0}body[data-mode=print] h2{break-before:page}body[data-mode=print] .task,body[data-mode=print] .viz,body[data-mode=print] .proof{break-inside:avoid}
+body[data-mode=print] main{max-width:none;padding:0}body[data-mode=print] .task,body[data-mode=print] .viz,body[data-mode=print] .proof{break-inside:avoid}
 @media print{header.top{display:none}}
 .layout>*{min-width:0}main{overflow-wrap:break-word}
 mjx-container:not([display]){display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}
@@ -90,3 +90,24 @@ body[data-mode=print] .scene{padding:8px 10px}body[data-mode=print] .keyframe sv
 body[data-mode=print] .scene-text{min-height:0}
 body[data-mode=print] mjx-container[display=true]{font-size:90%;overflow:visible}
 @media (max-width:640px){mjx-container[display=true]>svg{max-width:100%;height:auto}}
+
+/* print typography v3: flowing layout, headings kept with their content, no forced section breaks */
+body[data-mode=print]{font-size:10.5pt;line-height:1.5}
+body[data-mode=print] h2{break-before:auto;break-after:avoid;margin:1.6em 0 .4em;font-size:15pt;border-bottom:1px solid #ccc;padding-bottom:3px}
+body[data-mode=print] h3{break-after:avoid;font-size:12pt;margin:1.1em 0 .3em}
+body[data-mode=print] .thm,body[data-mode=print] .proof,body[data-mode=print] table,body[data-mode=print] .remark,body[data-mode=print] .misconception,body[data-mode=print] .keyframe{break-inside:avoid}
+body[data-mode=print] p{orphans:3;widows:3}
+body[data-mode=print] .titlepage{border-bottom:2px solid #2756c4;padding-bottom:10px;margin-bottom:12px}
+body[data-mode=print] .titlepage h1{font-size:24pt;margin:.1em 0}.kicker{font:600 10pt var(--sans);color:#2756c4;text-transform:uppercase;letter-spacing:.05em;margin:0}
+body[data-mode=print] .task{padding:8px 12px;margin:10px 0}
+body[data-mode=print] .space{border:1px dashed #bbb;border-radius:6px;margin-top:6px;background:repeating-linear-gradient(#fff 0 7.5mm,#eee 7.5mm calc(7.5mm + 1px))}
+body[data-mode=print] .xref{font:9pt var(--sans);color:#2756c4;margin:4px 0}
+body[data-mode=print] .layers ul{margin:4px 0}
+.layer{display:inline-block;font:600 11px/1.5 var(--sans);padding:1px 8px;border-radius:9px;margin-right:6px}
+.layer[data-layer=core]{background:#e3ecff;color:#1d4ed8}.layer[data-layer=deep]{background:#e7f6ec;color:#166534}.layer[data-layer=research]{background:#fdecdf;color:#9a3412}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .layer[data-layer=core]{background:#1e2b4d;color:#a9c1ff}:root:not([data-theme=light]) .layer[data-layer=deep]{background:#173022;color:#86efac}:root:not([data-theme=light]) .layer[data-layer=research]{background:#3b2414;color:#fdba74}}
+.casestudy{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin:20px 0;font-family:var(--sans)}
+.casestudy [role=tab][aria-selected=true]{border-color:var(--accent);color:var(--accent)}
+.cloze{color:var(--accent);font-weight:600}.cloze-a{color:var(--ok);font-weight:600}.canon{font-size:1.05em}.carddiag{max-width:100%;border:1px solid var(--line);border-radius:8px;background:#fff}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+body[data-mode=print] .print-loesungen .task,body[data-mode=print] .print-klausur_loesungen .task{break-inside:auto}body[data-mode=print] .print-loesungen .sol{break-inside:auto}

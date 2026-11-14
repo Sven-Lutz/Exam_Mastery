@@ -343,6 +343,21 @@ def verify(unit: dict) -> dict:
             errors.append(f'card {c["key"]}: answer leaks into front')
         if not c.get('source'):
             errors.append(f'card {c["key"]}: no source')
+    secs = set(re.findall(r'data-id="([^"]+)"', unit['text_html'])); src_ids = {x['id'] for x in unit['sources']}
+    scenes = set(re.findall(r'data-scene="([^"]+)"', unit['text_html']))
+    for k in kcs:
+        m = unit.get('kc_map', {}).get(k)
+        if not m:
+            errors.append(f'KC {k}: missing in kc_map'); continue
+        for sid in m['sections']:
+            if sid not in secs:
+                errors.append(f'KC {k}: section {sid} not in text')
+        for rid in m['research']:
+            if rid not in src_ids:
+                errors.append(f'KC {k}: unknown source {rid}')
+        for sc in m['scenes']:
+            if sc not in scenes:
+                errors.append(f'KC {k}: scene {sc} not embedded in text')
     known = _known_decimals(unit)
     prose = unit['text_html'] + json.dumps([t.get('steps', []) for t in unit['tasks']], ensure_ascii=False) + \
         json.dumps([t.get('solution', '') for t in items], ensure_ascii=False) + json.dumps(unit['cards'], ensure_ascii=False)
@@ -364,6 +379,19 @@ def verify(unit: dict) -> dict:
     if errors:
         raise UnitError(json.dumps(report, ensure_ascii=False, indent=1))
     return report
+
+
+def curriculum_map(unit: dict) -> str:
+    """Reproducible source-competency-task mapping extract (Markdown)."""
+    src = {s['id']: s['ref'].split(':')[0] for s in unit['sources']}
+    rows = ['| Kompetenz | Vorlesung | Lehrbuch | Forschung/Vertiefung | Szene | Arbeitsbuch | Prüfung A | Prüfung B | Anki |', '|' + '---|' * 9]
+    for k, label in unit['kcs'].items():
+        m = unit['kc_map'][k]
+        ex = lambda f: ', '.join(it['id'] + (' (T)' if it.get('transfer') else '') for it in unit['exam_forms'][f] if it['kc'] == k)
+        rows.append('| ' + ' | '.join([f'{label} (`{k}`)', m['lecture'], m['textbook'], '; '.join(src[r] for r in m['research']) or '–',
+                                       ', '.join(m['scenes']) or '–', ', '.join(t['id'] for t in unit['tasks'] if t['kc'] == k),
+                                       ex('A'), ex('B'), ', '.join(c['key'].split('/')[1] for c in unit['cards'] if c['kc'] == k)]) + ' |')
+    return '\n'.join(rows) + '\n'
 
 
 def _strings(x):
@@ -473,12 +501,14 @@ def anki_tsv(unit: dict) -> str:
 
 def main(argv=None):
     ap = argparse.ArgumentParser(prog='exam-mastery-unit')
-    ap.add_argument('cmd', choices=['build', 'verify', 'anki-preview'])
+    ap.add_argument('cmd', choices=['build', 'verify', 'anki-preview', 'map'])
     ap.add_argument('unit_dir', type=Path)
     ap.add_argument('--out', type=Path)
     ap.add_argument('--no-pdf', action='store_true')
     a = ap.parse_args(argv)
     try:
+        if a.cmd == 'map':
+            u = load(a.unit_dir); verify(u); print(curriculum_map(u)); return 0
         if a.cmd == 'verify':
             r = verify(load(a.unit_dir))
         elif a.cmd == 'anki-preview':

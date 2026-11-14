@@ -46,6 +46,28 @@ class Math(unittest.TestCase):
                                sum(a == k != b for a, b in zip(g, p))) for k in labels}
             self.assertEqual(S.micro(per)['F1'], Fraction(sum(a == b for a, b in zip(g, p)), 40))
 
+    def test_attention_permutation_equivariance_rope_and_sinusoid(self):   # Satz 4, RoPE, Sinus-Verschiebung
+        import math
+        rng = random.Random(7)
+        for _ in range(50):
+            X = [[rng.uniform(-1, 1) for _ in range(3)] for _ in range(4)]
+            perm = rng.sample(range(4), 4)
+            out = [S.attention_row(X[i], X, X)[2] for i in range(4)]
+            Xp = [X[j] for j in perm]
+            outp = [S.attention_row(Xp[i], Xp, Xp)[2] for i in range(4)]
+            for i, j in enumerate(perm):
+                self.assertTrue(all(abs(a - b) < 1e-12 for a, b in zip(outp[i], out[j])))
+        rot = lambda a, v: (math.cos(a) * v[0] - math.sin(a) * v[1], math.sin(a) * v[0] + math.cos(a) * v[1])
+        for _ in range(50):
+            q, k = (rng.uniform(-1, 1), rng.uniform(-1, 1)), (rng.uniform(-1, 1), rng.uniform(-1, 1))
+            th, m, n, sh = rng.uniform(0, 1), rng.randint(0, 20), rng.randint(0, 20), rng.randint(0, 50)
+            dot = lambda a, b: a[0] * b[0] + a[1] * b[1]
+            self.assertAlmostEqual(dot(rot(m * th, q), rot(n * th, k)), dot(rot((m + sh) * th, q), rot((n + sh) * th, k)))
+            w, i, dlt = rng.uniform(0, 1), rng.uniform(0, 30), rng.uniform(0, 10)
+            sv, cv = math.sin(w * i), math.cos(w * i)
+            self.assertAlmostEqual(math.sin(w * (i + dlt)), math.cos(w * dlt) * sv + math.sin(w * dlt) * cv)
+            self.assertAlmostEqual(math.cos(w * (i + dlt)), -math.sin(w * dlt) * sv + math.cos(w * dlt) * cv)
+
     def test_toy_experiment_forward_state_identical_backward_differs(self):
         u = RU.load(UNIT)
         a, b = RU.toy_states(u, 'signed', 'fw'), RU.toy_states(u, 'state', 'fw')

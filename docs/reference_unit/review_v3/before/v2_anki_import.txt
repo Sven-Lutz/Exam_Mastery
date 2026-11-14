@@ -1,0 +1,21 @@
+#separator:tab
+#html:true
+#notetype:Basic
+#deck:Exam Mastery::Natural Language Processing::Was ein Tagger sieht und wie man ihn misst
+#guid column:1
+#tags column:4
+1db91b53a060855a	Von welchen Eingaben hängt \(h_t^{\rightarrow}\) eines Vorwärts-RNN ab?	Nur von \(x_1,\dots,x_t\) (Induktion über die Rekursion).	exam-mastery birnn
+1f30411504170b14	„Washington signed“ vs. „Washington state“: Warum ist \(h_1^{\rightarrow}\) gleich?	\(h_1^{\rightarrow}=\tanh(Ue_1+b)\) enthält \(e_2\) nicht.	exam-mastery birnn
+9bf18b4445e90c93	Wie ist \(h_t^{\mathrm{bi}}\) definiert?	\([h_t^{\rightarrow};h_t^{\leftarrow}]\), zwei RNNs mit eigenen Parametern, verkettet.	exam-mastery birnn
+c519fed1f5394c42	Warum kein BiRNN für Live-Tagging?	\(h_t^{\leftarrow}\) hängt vom Satzende ab.	exam-mastery birnn
+1fba9605069d54e1	Was koppelt die Labels eines BiRNN-Softmax-Taggers?	Nichts; erst ein CRF mit Übergangsgewichten und Viterbi.	exam-mastery birnn
+09f029c4a4c44739	\(F_1\) in TP, FP, FN?	\(2\mathrm{TP}/(2\mathrm{TP}+\mathrm{FP}+\mathrm{FN})\).	exam-mastery prf
+2b312520b0b6304f	Wie erhält man \(F_1\) aus „Aufwand pro Treffer“?	Kehrwert des Mittels von \(1/P\) (Ausgaben pro Treffer) und \(1/R\) (Gold pro Treffer).	exam-mastery prf
+42a4c37fb13df2c3	Welche obere Schranke hat \(F_1\) über \(\min(P,R)\)?	\(F_1\le2\min(P,R)\).	exam-mastery prf
+a594ba5aba03d7a6	Gold 3, System nichts: P, R, F1?	\(P=0/0\), \(R=0\), \(F_1=0\).	exam-mastery prf-edge
+85648bb09ce70d0f	TP = 0, FP > 0, FN > 0: was liefert \(2PR/(P+R)\)?	\(0/0\); die Zählform liefert 0.	exam-mastery prf-edge
+2af5d3d50b08305e	Gold und System leer: \(F_1\)?	\(0/0\), nur per genannter Konvention.	exam-mastery prf-edge
+82c8718a4ae0a709	Wie zählt ein Typfehler auf Phrasen-Ebene?	Als ein FP und ein FN.	exam-mastery prf-level
+ea5251bd8b9ae445	Welche Ebene belohnt Teilüberlappungen?	Die Token-Ebene; sie gewichtet lange Entitäten stärker.	exam-mastery prf-level
+69f6e8bb7e619cfb	Was gewichten Micro- und Macro-F1 gleich?	Micro: jede Entität. Macro: jeden Typ.	exam-mastery micro-macro
+fa8e18fe445d7d72	Wann ist Micro-F1 gleich der Accuracy?	Jedes Token genau ein Gold- und System-Label, alle Klassen inkl. O gepoolt.	exam-mastery micro-macro
