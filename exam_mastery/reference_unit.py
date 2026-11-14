@@ -48,6 +48,16 @@ def case_predictions(unit, mode):
     return gold, pred
 
 
+def _crf_z(d):
+    import itertools
+    L, E = d['labels'], d['emissions']; z = 0.0
+    for p in itertools.product(range(len(L)), repeat=len(E)):
+        lab = [L[k] for k in p]
+        if all(S.bio_allowed(lab[t - 1] if t else None, lab[t]) for t in range(len(lab))):
+            z += math.exp(sum(E[t][k] for t, k in enumerate(p)))
+    return z
+
+
 def exam_items(unit):
     return [it for form in unit.get('exam_forms', {}).values() for it in form] + unit.get('exam', [])
 
@@ -122,6 +132,37 @@ def compute(check: str, unit: dict):
         if metric == 'token_f1':
             return S.f1(S.token_counts(g, p))
         return S.error_taxonomy(g, p)[metric]
+    if kind == 'bio':                       # bio:<n>:<a-b-TYPE,...>:<SCHEME>  -> tag list
+        n, spec, scheme = arg.split(':')
+        tags = ['O'] * int(n)
+        for sp in spec.split(','):
+            a, b, typ = sp.split('-'); a, b = int(a), int(b)
+            for i in range(a, b):
+                if scheme == 'BIO':
+                    tags[i] = ('B-' if i == a else 'I-') + typ
+                else:
+                    tags[i] = ('U-' if b - a == 1 else 'B-' if i == a else 'L-' if i == b - 1 else 'I-') + typ
+        return tags
+    if kind == 'deplook':                   # forward RNN with k-word lookahead window: label at t sees x_1..x_{t+k}
+        T, t, k = (int(x) for x in arg.split(':'))
+        return list(range(1, min(T, t + k) + 1))
+    if kind == 'attno':
+        spec, idx = arg.rsplit(':', 1)
+        q, keys = spec.split('|')
+        q = [float(x) for x in q.split(',')]; keys = [[float(x) for x in k.split(',')] for k in keys.split(';')]
+        return S.attention_row(q, keys, keys)[2][int(idx)]
+    if kind == 'fbeta':
+        p_, r_, b_ = arg.split(':')
+        return S.f_beta(Fraction(p_), Fraction(r_), Fraction(b_))
+    if kind in ('crfprob', 'crfz', 'crflogp'):
+        d = data[arg]; z, best = _crf_z(d), S.viterbi(d['emissions'], d['labels'])[0]
+        return {'crfprob': math.exp(best) / z, 'crfz': z, 'crflogp': best - math.log(z)}[kind]
+    if kind == 'mean':
+        vals = [Fraction(x) for x in arg.split(',')]
+        return sum(vals, Fraction(0)) / len(vals)
+    if kind == 'weighted':                  # support-weighted macro F1
+        cs = list(_counts(arg).values()); sup = [c.tp + c.fn for c in cs]
+        return sum(Fraction(s_) * (S.f1(c) or 0) for s_, c in zip(sup, cs)) / sum(sup)
     if kind == 'birnn_b1':
         return S.rnn_scalar([1, 0, -1], 0.8, 0.5, reverse=True)[0]
     raise UnitError(f'unknown check {check!r}')
@@ -161,6 +202,7 @@ def _ex():
 def load(unit_dir: Path) -> dict:
     unit = json.loads((unit_dir / 'unit.json').read_text(encoding='utf-8'))
     unit['text_html'] = (unit_dir / unit['text']).read_text(encoding='utf-8')
+    unit['_dir'] = str(unit_dir)
     return unit
 
 
@@ -230,11 +272,31 @@ def _known_decimals(unit):
         for c in (S.span_counts(g, pr), S.token_counts(g, pr)):
             add(S.f1(c)); add(S.precision(c)); add(S.recall(c))
         per = S.per_type(g, pr); add(S.micro(per)['F1']); add(S.macro(per))
+    for it in items:                                                  # CRF forward intermediates, Fbeta parts
+        d = it.get('data') or {}
+        if 'emissions' in d:
+            L, E = d['labels'], d['emissions']
+            al = [[math.exp(E[0][k]) if S.bio_allowed(None, c) else 0 for k, c in enumerate(L)]]
+            for t in range(1, len(E)):
+                al.append([sum(al[-1][j] for j, p_ in enumerate(L) if S.bio_allowed(p_, c)) * math.exp(E[t][k]) for k, c in enumerate(L)])
+            for row in al:
+                for v in row:
+                    add(v)
+            z = sum(al[-1]); add(z); add(math.log(z))
+        for a in it['answers']:
+            if a.get('check', '').startswith('fbeta:'):
+                p_, r_, b_ = (Fraction(x) for x in a['check'][6:].split(':')); add(b_ ** 2 * p_ + r_); add((1 + b_ ** 2) * p_ * r_); add(S.f_beta(p_, r_, 1))
+    sc0, w0, o0 = S.attention_row([1, 0], [[1, 0], [0, 1]], [[2, 0], [0, 4]])   # AT0 worked example
+    for v in sc0 + w0 + o0 + [math.exp(x) for x in sc0] + [sum(math.exp(x) for x in sc0)]:
+        add(v)
     add(math.exp(2 / math.sqrt(2))); add(2 / math.sqrt(2))
     add(1.1 ** 10); add(0.1)                                           # residual example
     for th, m, n in ((0.5, 2, 5), (0.25, 1, 5)):
         add(math.cos((n - m) * th)); add((n - m) * th); add(math.cos(n * th))
     add(0.03)
+    for x in (1, 2):
+        add(math.sin(x)); add(math.cos(x))
+    add(2 * math.sin(1) * math.cos(1)); add(math.cos(1) ** 2 - math.sin(1) ** 2)
     return vals
 
 
@@ -280,6 +342,12 @@ def verify(unit: dict) -> dict:
             if _fmt_int(v) not in item['solution'] and _fmt_int(v) not in json.dumps(item.get('steps', []), ensure_ascii=False):
                 errors.append(f'{item["id"]}: worked result {v} not stated in its own solution/steps')
         for a in item['answers']:
+            if a['type'] == 'seq':
+                v = compute(a['check'], unit); a['value'] = v
+                checked.append(f'{item["id"]}/{a["label"][:30]} = {" ".join(v)}')
+                if ' '.join(v) not in item['solution'] and ' '.join(v) not in item['solution'].replace('<code>', '').replace('</code>', ''):
+                    errors.append(f'{item["id"]}: solution does not state the tag sequence {" ".join(v)}')
+                continue
             if a['type'] in ('num', 'set'):
                 v = compute(a['check'], unit)
                 a['value'] = [int(x) for x in v] if a['type'] == 'set' else str(v)
@@ -324,6 +392,15 @@ def verify(unit: dict) -> dict:
             errors.append(f'KC {k}: no workbook task')
         if sum(c['kc'] == k for c in unit['cards']) < 2:
             errors.append(f'KC {k}: fewer than 2 cards')
+    lock_p = unit.get('_dir') and Path(unit['_dir']) / 'anki_identity.json'
+    if lock_p and lock_p.exists():                                   # published Anki identities are permanent
+        lock = json.loads(lock_p.read_text(encoding='utf-8'))
+        cur = {c['key']: ('math' if c['type'] == 'math' else 'cloze' if c['type'] == 'cloze' else 'concept') for c in unit['cards']}
+        for k, ntk in lock['published'].items():
+            if k not in cur and k not in lock.get('retired', []):
+                errors.append(f'card {k}: published card removed (users keep it; list it in retired instead)')
+            elif k in cur and cur[k] != ntk:
+                errors.append(f'card {k}: notetype changed {ntk} -> {cur[k]} (Anki would refuse the update)')
     # Anki card rules (exam_mastery/knowledge/specs.json anki_card AC-C1)
     seen = set()
     for c in unit['cards']:
@@ -362,12 +439,20 @@ def verify(unit: dict) -> dict:
     prose = unit['text_html'] + json.dumps([t.get('steps', []) for t in unit['tasks']], ensure_ascii=False) + \
         json.dumps([t.get('solution', '') for t in items], ensure_ascii=False) + json.dumps(unit['cards'], ensure_ascii=False)
     prose = prose.replace('\\\\', '\\')
-    for m in sorted(set(re.findall(r'-?\d+\{,\}\d+|-?\d+,\d+', prose))):
+    for m in sorted(set(re.findall(r'-?\d+\{,\}\d+|(?<![(\d])-?\d+,\d+(?![)\d])', prose))):
         n = m.replace('{,}', ',').lstrip('-')
         if n not in known and n not in GIVEN_DECIMALS:
             errors.append(f'prose decimal {n} is neither recomputed nor a declared input')
         else:
             checked.append(f'prose {n}')
+    for x in list(_strings({k: v for k, v in unit.items() if not k.startswith('_')})):
+        for seg in re.findall(r'\\\((.*?)\\\)', x, flags=re.S) + re.findall(r'\\\[(.*?)\\\]', x, flags=re.S):
+            core = seg.replace('\\{', '').replace('\\}', '')
+            if core.count('{') != core.count('}'):
+                errors.append(f'unbalanced braces in formula: {seg[:60]}')
+                break
+        if x.count('\\(') != x.count('\\)'):
+            errors.append(f'unbalanced inline TeX delimiters: {x[:60]}')
     html = unit['text_html']
     for ref in re.findall(r'data-task="([A-Z0-9-]+)"', html):
         if ref not in ids:
@@ -418,7 +503,7 @@ PARTS = {'lehrbuch': 'Lehrbuch', 'arbeitsbuch': 'Arbeitsbuch', 'loesungen': 'Mus
 
 
 def _page(unit: dict, mode: str, part: str = '') -> str:
-    data = {k: v for k, v in unit.items()}
+    data = {k: v for k, v in unit.items() if not k.startswith('_')}   # never publish local paths
     payload = json.dumps(data, ensure_ascii=False).replace('</', '<\\/')
     css = (TEMPLATES / 'unit_app.css').read_text(encoding='utf-8')
     js = (TEMPLATES / 'unit_app.js').read_text(encoding='utf-8')
@@ -493,7 +578,7 @@ def anki_tsv(unit: dict) -> str:
     lines = ['#separator:tab', '#html:true', f'#deck:{A.deck_name(unit)}', '#guid column:1', '#notetype column:2', '#tags column:3']
     for c in unit['cards']:
         f = A.note_fields(unit, c, unit.get('version', '0'))
-        nt = A.NOTETYPES['math' if c['type'] == 'math' else c['type']]['name']
+        nt = A.NOTETYPES[A.nt_key(c)]['name']
         vals = [f[k] for k in (A.CLOZE_FIELDS if c['type'] == 'cloze' else A.FIELDS)]
         lines.append('\t'.join([A.guid(unit['id'], c['key']), nt, ' '.join(A.tags(unit, c))] + [v.replace('\t', ' ').replace('\n', ' ') for v in vals]))
     return '\n'.join(lines) + '\n'

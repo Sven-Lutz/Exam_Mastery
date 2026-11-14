@@ -168,7 +168,7 @@ class AnkiPackage(unittest.TestCase):
         opt = ImportAnkiPackageOptions(update_notes=cond, update_notetypes=cond, with_scheduling=False)   # Anki's default dialog choices
         col.import_anki_package(ImportAnkiPackageRequest(package_path=str(tmp / 'v1.apkg'), options=opt))
         self.assertEqual(col.note_count(), len(u['cards']))
-        self.assertEqual(len(list(Path(col.media.dir()).glob('em_*.svg'))), 4)
+        self.assertEqual(len(list(Path(col.media.dir()).glob('em_*.svg'))), len(list((tmp / 'm').glob('*.svg'))))
         col.decks.select(col.decks.id(A.deck_name(u)))
         reviewed = []
         for _ in range(5):
@@ -193,6 +193,43 @@ class AnkiPackage(unittest.TestCase):
         self.assertIn('upgrade-test', col.models.get(A.NOTETYPES['concept']['id'])['css'])
         self.assertEqual(sum(m.name.startswith('Exam Mastery') for m in col.models.all_names_and_ids()), 3)
         col.close()
+
+    def test_upgrade_from_published_v3_package(self):
+        """Real v3 deck (commit a1d1aa7) -> current deck with Anki's default import options keeps history, no conflicts."""
+        import subprocess, sys, time
+        from anki.collection import Collection
+        from anki.import_export_pb2 import ImportAnkiPackageRequest, ImportAnkiPackageOptions, ImportAnkiPackageUpdateCondition as C
+        from exam_mastery import anki_deck as A
+        root = Path(__file__).resolve().parents[1]
+        if subprocess.run(['git', '-C', str(root), 'cat-file', '-e', 'a1d1aa7^{commit}'], capture_output=True).returncode:
+            self.skipTest('v3 commit not in this checkout (shallow clone)')
+        tmp = Path(tempfile.mkdtemp())
+        subprocess.run(['git', '-C', str(root), 'worktree', 'add', '-q', '--detach', str(tmp / 'v3'), 'a1d1aa7'], check=True)
+        try:
+            code = (f'import sys; sys.path.insert(0, {str(tmp / "v3")!r}); from pathlib import Path; '
+                    'from exam_mastery import reference_unit as RU, anki_deck as A; '
+                    f'u = RU.load(Path({str(tmp / "v3" / "units" / "nlp_sequence_labeling")!r})); RU.verify(u); '
+                    f'A.diagrams(Path({str(tmp / "m3")!r}), u); A.build_apkg(u, Path({str(tmp / "m3")!r}), Path({str(tmp / "v3.apkg")!r}))')
+            subprocess.run([sys.executable, '-c', code], check=True, capture_output=True)
+            u = RU.load(UNIT); RU.verify(u); A.diagrams(tmp / 'm', u)
+            col = Collection(str(tmp / 'user.anki2'))
+            cond = C.Value('IMPORT_ANKI_PACKAGE_UPDATE_CONDITION_IF_NEWER')
+            opt = ImportAnkiPackageOptions(update_notes=cond, update_notetypes=cond)
+            col.import_anki_package(ImportAnkiPackageRequest(package_path=str(tmp / 'v3.apkg'), options=opt))
+            col.decks.select(col.decks.id(A.deck_name(u))); rev = []
+            for _ in range(4):
+                c = col.sched.getCard(); col.sched.answerCard(c, 3); rev.append(c.id)
+            snap = lambda: {cid: (col.get_card(cid).reps, col.get_card(cid).due, col.get_card(cid).ivl) for cid in rev}
+            before = snap(); time.sleep(1.1)
+            A.build_apkg(u, tmp / 'm', tmp / 'v4.apkg')
+            log = col.import_anki_package(ImportAnkiPackageRequest(package_path=str(tmp / 'v4.apkg'), options=opt)).log
+            self.assertEqual(len(log.conflicting), 0)
+            self.assertEqual(snap(), before)
+            n = col.get_note(col.find_notes('StableID:decoding/crf-score')[0])
+            self.assertIn('nicht', n['CanonicalAnswer'])                                   # Issue #7 card fix arrives
+            col.close()
+        finally:
+            subprocess.run(['git', '-C', str(root), 'worktree', 'remove', '--force', str(tmp / 'v3')], capture_output=True)
 
     def test_card_html_has_no_answer_leak_and_no_script(self):
         from exam_mastery import anki_deck as A
@@ -379,9 +416,10 @@ class Browser(unittest.TestCase):
     def test_attention_scene_and_case_study_match_reference(self):
         pg, errs = self.open('#learn/attention')
         sc = pg.locator('.scene[data-scene=attention]')
-        sc.get_by_role('button', name='Weiter →').click(); sc.get_by_role('button', name='Weiter →').click()
+        sc.get_by_role('button', name='Weiter →').click()
         self.assertTrue(sc.get_by_role('button', name='Weiter →').is_disabled())       # prediction blocks
-        sc.locator('.opt').first.click(); sc.get_by_role('button', name='Weiter →').click()
+        sc.locator('.opt').first.click(); sc.get_by_role('button', name='Weiter →').click(); sc.get_by_role('button', name='Weiter →').click()
+        pg.wait_for_timeout(1700)
         _, w, _ = S.attention_row([1, 1], [[1, 0], [0, 1], [1, 1]], [[1, 0], [0, 1], [1, 1]])
         self.assertIn(f'{w[2]:.3f}'.replace('.', ','), sc.locator('svg.plot').get_attribute('aria-label'))
         cs = pg.locator('.casestudy')
@@ -389,6 +427,31 @@ class Browser(unittest.TestCase):
         self.assertAlmostEqual(float(cs.locator('[data-mode]').get_attribute('data-span-f1')), float(RU.compute('case:greedy:span_f1', u)))
         cs.get_by_role('tab', name='Viterbi mit BIO-Regeln').click()
         self.assertAlmostEqual(float(cs.locator('[data-mode]').get_attribute('data-span-f1')), float(RU.compute('case:viterbi:span_f1', u)))
+        self.assertEqual(errs, [])
+
+    def test_animation_tweens_and_crf_numbers(self):
+        """Step changes animate through intermediate values; CRF scene shows reference Viterbi score and Z."""
+        pg, errs = self.open('#learn/rnn')
+        sc = pg.locator('.scene[data-scene=birnn]')
+        sc.get_by_role('button', name='Weiter →').click(); sc.locator('.opt').first.click(); sc.get_by_role('button', name='Weiter →').click()
+        pg.wait_for_timeout(500)
+        mid = sc.locator('svg.plot').inner_html()
+        pg.wait_for_timeout(1600)
+        end = sc.locator('svg.plot').inner_html()
+        self.assertNotEqual(mid, end)                                                   # genuine in-between frame
+        self.assertIn('0,7616', end)
+        pg2, _ = self.open('#learn/struktur')
+        v = pg2.locator('.scene[data-scene=viterbi]')
+        v.get_by_role('button', name='Weiter →').click(); v.locator('.opt').first.click(); v.get_by_role('button', name='Weiter →').click()
+        pg2.wait_for_timeout(2900)
+        self.assertIn('4,5', v.locator('svg.plot').get_attribute('aria-label'))
+        for _ in range(3):
+            if v.locator('.opt').count():
+                v.locator('.opt').first.click()
+            v.get_by_role('button', name='Weiter →').click()
+        pg2.wait_for_timeout(2900)
+        u = RU.load(UNIT); z = RU._crf_z(next(t for t in u['tasks'] if t['id'] == 'C2')['data'])
+        self.assertIn(f'{z:.2f}'.replace('.', ','), v.locator('svg.plot').get_attribute('aria-label'))
         self.assertEqual(errs, [])
 
     def test_formula_glyphs_sane_in_chromium_and_webkit(self):

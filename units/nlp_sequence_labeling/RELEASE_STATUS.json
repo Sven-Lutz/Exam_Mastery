@@ -23,9 +23,26 @@
   },
   {
    "version": 3,
+   "status": "HUMAN_REJECTED",
+   "date": "2026-11-14",
+   "ref": "Issue #7",
+   "ratings": {
+    "textbook": "2/4",
+    "mathematics_derivations": "0/4",
+    "literature_research_cases": "1/4",
+    "visuals_animations": "1/4",
+    "design_pdf_formulas": "1/4",
+    "workbook": "0/4",
+    "anki_academic": "1/4",
+    "anki_design": "0/4"
+   },
+   "commit": "a1d1aa7"
+  },
+  {
+   "version": 4,
    "status": "HUMAN_REVIEW_PENDING",
    "date": "2026-11-14",
-   "ref": "docs/reference_unit/V3_REPORT.md"
+   "ref": "docs/reference_unit/V4_REPORT.md"
   }
  ],
  "rule": "Only a human rating changes a status. CI and agent checks never do."

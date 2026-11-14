@@ -1,4 +1,4 @@
-# Mathematical audit: NLP reference unit v3 (2026-11-14)
+# Mathematical audit: NLP reference unit v4 (2026-11-14)
 
 This is the author's own audit; it does **not** replace the independent expert review. Machine checks are listed exactly as they were run.
 
@@ -18,6 +18,8 @@ This is the author's own audit; it does **not** replace the independent expert r
 | RoPE: depends only on $n-m$ (§7) | rotation group | SymPy identity; 50 numeric cases | 2D pairs | slides PDF p. 69 (Su et al. 2024) |
 | Residual gradient $\prod(I+J_l)$ (§8) | chain rule | scalar example $1.1^{10}\approx2.5937$ (verifier) | illustration, not a bound for matrix products | SLP3 §7.2 pp. 184–187 |
 | CRF score / Viterbi (§9, C1, A9, B-9, case study) | definition | `seqlab.viterbi` (exhaustive path scores in the verifier); JS Viterbi in scene and case study | hard constraints give validity only (shown in the case study) | SLP3 §18.4.5–18.5 |
+| CRF probability (9.2), forward algorithm, $Z\approx200{,}2664$, $p\approx0{,}4495$, $\log p=S-\log Z$ (§9, C2, C3, cards) | definition + recursion | full enumeration of all 27 paths = forward value (`_crf_z`); app scene compares with the reference (test) | hard BIO constraints; transitions 0 | SLP3 §18.4.5–18.5 |
+| Sinusoid shift as rotation, worked example (§7) | matrix–vector product | verifier recomputes sin/cos(1), sin/cos(2) and the product | $\omega=1$, $\Delta=1$ | – |
 | Label bias vs. exposure bias (§9) | prose | **not machine-checkable** | – | Lafferty et al. 2001; Andor et al. 2016 abstract p. 2442 |
 | Greedy decoding comparable to Viterbi (§9) | literature claim | page read | their system only | Ratinov & Roth 2009 p. 148 |
 | $F_1$ as harmonic mean of effort; Satz 5 (count form incl. $TP=0$) (§10) | aligned derivations, case table (i)–(v) | SymPy; 2,000 random cases; JS definedness per case | – | SLP3 §4.9 Eq. 4.42–4.44 p. 114 |

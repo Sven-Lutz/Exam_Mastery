@@ -111,3 +111,15 @@ body[data-mode=print] .layers ul{margin:4px 0}
 .cloze{color:var(--accent);font-weight:600}.cloze-a{color:var(--ok);font-weight:600}.canon{font-size:1.05em}.carddiag{max-width:100%;border:1px solid var(--line);border-radius:8px;background:#fff}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 body[data-mode=print] .print-loesungen .task,body[data-mode=print] .print-klausur_loesungen .task{break-inside:auto}body[data-mode=print] .print-loesungen .sol{break-inside:auto}
+
+.research{background:color-mix(in srgb,var(--accent2) 6%,var(--panel));border:1px solid color-mix(in srgb,var(--accent2) 35%,var(--line));border-radius:12px;padding:6px 18px 10px;margin:22px 0}
+.research h4{font-family:var(--sans);color:var(--accent2);margin:10px 0 4px}.research p{margin:6px 0}
+a.cite{color:inherit;text-decoration:none;border-bottom:1px dotted currentColor}a.cite:hover{color:var(--accent)}
+.refs li{margin:6px 0;scroll-margin-top:80px}.refs a{word-break:break-all}.flash-ref{background:var(--warn);transition:background .3s}
+.scene-q{font-family:var(--serif);font-size:16.5px;margin:4px 0 8px}
+figure.keyframe{margin:8px 0}figure.keyframe figcaption{font-size:.95em}
+body[data-mode=print] a{color:#1d4ed8;text-decoration:none}body[data-mode=print] .research{break-inside:avoid}
+.ans input.wide{width:min(100%,420px);font-family:var(--mono)}h3.more-tasks{margin-top:2em;color:var(--mute)}
+pre{background:var(--soft);padding:10px 12px;border-radius:8px;overflow-x:auto;font-size:14px}pre code{background:none;padding:0}
+.worked{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:6px 18px 10px;margin:20px 0}.worked h4{font-family:var(--sans);color:var(--accent);margin:10px 0 4px}body[data-mode=print] .worked{break-inside:avoid}
+mjx-container[display=true]{min-width:0!important}@media (max-width:640px){mjx-container[display=true][width=full]>svg{width:100%!important}}

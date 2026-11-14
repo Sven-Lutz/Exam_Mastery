@@ -17,51 +17,64 @@ import shutil
 import tempfile
 from pathlib import Path
 
-TEMPLATE_VERSION = '1.0.0'
+TEMPLATE_VERSION = '2.0.0'
 FIELDS = ['StableID', 'Course', 'Chapter', 'KC', 'Prerequisites', 'Prompt', 'CanonicalAnswer', 'Why',
-          'MicroExample', 'Misconception', 'Source', 'DiagramMedia', 'Version']
+          'MicroExample', 'Misconception', 'Source', 'DiagramMedia', 'Version']   # schema frozen since v1: new fields would break updates
+KIND_LABEL = {'concept': 'Begriff', 'math': 'Formel', 'cloze': 'Lückentext', 'case': 'Mini-Fall', 'error': 'Fehler finden', 'research': 'Forschung'}
+FAMILY = {'spans': 'model', 'birnn': 'model', 'attention': 'model', 'position': 'model', 'decoding': 'struct',
+          'prf': 'metric', 'prf-edge': 'metric', 'prf-level': 'metric', 'micro-macro': 'metric'}
 CLOZE_FIELDS = ['Text'] + [f for f in FIELDS if f not in ('Prompt', 'CanonicalAnswer')]
 
 CSS = r"""
-/* Exam Mastery card design v{v}. Tokens mirror the offline app. No JavaScript, no web fonts. */
-.card{--bg:#fbfaf7;--panel:#ffffff;--ink:#1d1f24;--mute:#5d6470;--line:#e2ded5;--accent:#2756c4;--accent2:#c2410c;--ok:#15803d;--soft:#eef2fb;
- font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:19px;line-height:1.55;color:var(--ink);background:var(--bg);text-align:left;margin:0;padding:0}
-.card.nightMode,.nightMode .card{--bg:#15171b;--panel:#1d2026;--ink:#e8e6e1;--mute:#a3a8b2;--line:#323640;--accent:#7aa2ff;--accent2:#ff9b5e;--ok:#4ade80;--soft:#232a3a}
-.em{max-width:680px;margin:0 auto;padding:18px 18px 22px}
-.em-ctx{font:600 12px/1.3 -apple-system,"Segoe UI",system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
-.em-ctx .kc{color:var(--mute);font-weight:500;text-transform:none;letter-spacing:0}
-.em-q{font-size:1.06em}
-.em-type{display:inline-block;font:600 11px -apple-system,system-ui,sans-serif;padding:2px 8px;border-radius:9px;background:var(--soft);color:var(--accent);margin-bottom:8px}
-.em-a{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:10px;padding:10px 14px;margin:14px 0 10px;font-size:1.04em}
-.em-why{margin:8px 0}.em-why b,.em-ex b,.em-mis b{font:600 13px -apple-system,system-ui,sans-serif;color:var(--mute);margin-right:4px}
-.em-ex{background:var(--soft);border-radius:8px;padding:6px 12px;margin:8px 0}
-.em-mis{border-left:3px solid var(--accent2);padding:2px 0 2px 10px;margin:8px 0}
-.em-diag{margin:10px 0;text-align:center}.em-diag img{max-width:100%;height:auto;background:#fff;border-radius:8px;border:1px solid var(--line)}
-.em-src{font:12px/1.4 -apple-system,system-ui,sans-serif;color:var(--mute);border-top:1px solid var(--line);padding-top:6px;margin-top:12px}
-.em-meta{font:10px -apple-system,system-ui,sans-serif;color:var(--mute);opacity:.7;margin-top:2px}
-code{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:var(--soft);padding:1px 4px;border-radius:4px}
-.cloze{font-weight:600;color:var(--accent)}
+/* Exam Mastery card design v{v} — semantic blocks, family colours, light/dark, mobile. No JavaScript, no web fonts. */
+.card{--paper:#fbfaf7;--panel:#ffffff;--ink:#1b1d22;--mute:#5b6270;--line:#e3dfd6;--soft:#f2f0ea;--fam:#2756c4;--famsoft:#e8eefc;--ok:#15803d;--warn:#b45309;
+ font-family:"Iowan Old Style","Charter","Georgia",serif;font-size:19px;line-height:1.55;color:var(--ink);background:var(--paper);text-align:left;margin:0;padding:0;-webkit-text-size-adjust:100%}
+.card.nightMode,.nightMode .card{--paper:#14161a;--panel:#1c1f25;--ink:#ebe8e2;--mute:#a4a9b3;--line:#30343d;--soft:#22262e;--famsoft:#1f2a44;--ok:#4ade80;--warn:#fbbf24}
+.em{max-width:640px;margin:0 auto;padding:22px 20px 26px}
+.fam-model{--fam:#2756c4}.fam-struct{--fam:#7c3aed}.fam-metric{--fam:#0f766e}
+.nightMode .fam-model{--fam:#86a8ff}.nightMode .fam-struct{--fam:#c4a5ff}.nightMode .fam-metric{--fam:#5eead4}
+.fam-struct{--famsoft:#f1ebfe}.fam-metric{--famsoft:#e3f4f1}.nightMode .fam-struct{--famsoft:#2a2140}.nightMode .fam-metric{--famsoft:#15302c}
+.em-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-bottom:2px solid var(--fam);padding-bottom:6px;margin-bottom:14px;
+ font:600 11.5px/1.3 -apple-system,"Segoe UI",system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--mute)}
+.em-kc{color:var(--fam);text-transform:none;letter-spacing:0;font-size:12.5px;text-align:right}
+.em-kind{display:inline-block;font:700 11px/1 -apple-system,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--fam);background:var(--famsoft);
+ border-radius:999px;padding:5px 10px;margin-bottom:10px}
+.em-q{font-size:1.12em;line-height:1.45}
+hr#answer{border:none;height:0;margin:18px 0}
+.em-label{font:700 11px/1.2 -apple-system,system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);margin-bottom:4px}
+.em-answer{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--fam);border-radius:12px;padding:12px 16px;margin:0 0 14px;box-shadow:0 1px 0 rgba(0,0,0,.03)}
+.em-answer .em-a{font-size:1.06em}
+.em-block{padding:2px 0 2px 16px;margin:12px 0;border-left:2px solid var(--line)}
+.em-ex{border-left-color:var(--fam);background:var(--famsoft);border-radius:0 10px 10px 0;padding:8px 14px}
+.em-mis{border-left-color:var(--warn)}.em-mis .em-label{color:var(--warn)}
+.em-fig{margin:16px 0 6px;text-align:center}.em-fig img{max-width:100%;height:auto;background:#fff;border-radius:10px;border:1px solid var(--line);padding:4px}
+.em-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;margin-top:18px;padding-top:8px;border-top:1px solid var(--line);
+ font:12px/1.4 -apple-system,system-ui,sans-serif;color:var(--mute)}.em-id{opacity:.65;font-size:10.5px}
+code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.84em;background:var(--soft);padding:1px 5px;border-radius:5px}
+.cloze{font-weight:700;color:var(--fam);background:var(--famsoft);border-radius:5px;padding:0 4px}
 mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
-hr#answer{border:none;border-top:1px dashed var(--line);margin:14px 0}
-.mobile .card,.card.mobile{font-size:17px}.mobile .em{padding:12px 12px 16px}
+.kind-concept .em-kind::before{content:'Begriff'}.kind-math .em-kind::before{content:'Formel'}.kind-cloze .em-kind::before{content:'Lückentext'}.kind-case .em-kind::before{content:'Mini-Fall'}.kind-error .em-kind::before{content:'Fehler finden'}.kind-research .em-kind::before{content:'Forschung'}
+.mobile .card,.card.mobile{font-size:17px}.mobile .em{padding:14px 12px 18px}.mobile .em-head{flex-direction:column;gap:2px}.mobile .em-kc{text-align:left}
 """.replace('{v}', TEMPLATE_VERSION)
 
-CTX = '<div class="em-ctx">{{Course}} · {{Chapter}}<br><span class="kc">{{KC}}</span></div>'
-BACK_TAIL = ('<div class="em-why"><b>Warum</b>{{Why}}</div>'
-             '{{#MicroExample}}<div class="em-ex"><b>Beispiel</b>{{MicroExample}}</div>{{/MicroExample}}'
-             '{{#Misconception}}<div class="em-mis"><b>Häufiger Fehler</b>{{Misconception}}</div>{{/Misconception}}'
-             '{{#DiagramMedia}}<div class="em-diag">{{DiagramMedia}}</div>{{/DiagramMedia}}'
-             '<div class="em-src">Quelle: {{Source}}</div><div class="em-meta">{{StableID}} · v{{Version}}</div></div>')
+HEAD = ('<header class="em-head"><span class="em-course">{{Course}} · {{Chapter}}</span><span class="em-kc">{{KC}}</span></header>'
+        '<div class="em-kind" aria-hidden="true"></div>')
+BACK_TAIL = ('<section class="em-block em-why"><div class="em-label">Warum</div><div>{{Why}}</div></section>'
+             '{{#MicroExample}}<section class="em-block em-ex"><div class="em-label">Beispiel</div><div>{{MicroExample}}</div></section>{{/MicroExample}}'
+             '{{#Misconception}}<section class="em-block em-mis"><div class="em-label">Häufiger Fehler</div><div>{{Misconception}}</div></section>{{/Misconception}}'
+             '{{#DiagramMedia}}<figure class="em-fig">{{DiagramMedia}}</figure>{{/DiagramMedia}}'
+             '<footer class="em-foot"><span class="em-src">Quelle: {{Source}}</span><span class="em-id">{{StableID}} · v{{Version}}</span></footer></div>')
+ANSWER = '<hr id="answer"><section class="em-answer"><div class="em-label">Antwort</div><div class="em-a">{{CanonicalAnswer}}</div></section>'
 NOTETYPES = {
     'concept': dict(id=1794600000001, name='Exam Mastery · Concept',
-                    qfmt='<div class="em">' + CTX + '<div class="em-type">Begriff</div><div class="em-q">{{Prompt}}</div></div>',
-                    afmt='<div class="em">' + CTX + '<div class="em-type">Begriff</div><div class="em-q">{{Prompt}}</div><hr id="answer"><div class="em-a">{{CanonicalAnswer}}</div>' + BACK_TAIL),
+                    qfmt='<div class="em {{Tags}}">' + HEAD + '<div class="em-q">{{Prompt}}</div></div>',
+                    afmt='<div class="em {{Tags}}">' + HEAD + '<div class="em-q">{{Prompt}}</div>' + ANSWER + BACK_TAIL),
     'math': dict(id=1794600000002, name='Exam Mastery · Math & Diagram',
-                 qfmt='<div class="em">' + CTX + '<div class="em-type">Formel</div><div class="em-q">{{Prompt}}</div></div>',
-                 afmt='<div class="em">' + CTX + '<div class="em-type">Formel</div><div class="em-q">{{Prompt}}</div><hr id="answer"><div class="em-a">{{CanonicalAnswer}}</div>' + BACK_TAIL),
+                 qfmt='<div class="em {{Tags}}">' + HEAD + '<div class="em-q">{{Prompt}}</div></div>',
+                 afmt='<div class="em {{Tags}}">' + HEAD + '<div class="em-q">{{Prompt}}</div>' + ANSWER + BACK_TAIL),
     'cloze': dict(id=1794600000003, name='Exam Mastery · Cloze',
-                  qfmt='<div class="em">' + CTX + '<div class="em-type">Lücke</div><div class="em-q">{{cloze:Text}}</div></div>',
-                  afmt='<div class="em">' + CTX + '<div class="em-type">Lücke</div><div class="em-q">{{cloze:Text}}</div><hr id="answer">' + BACK_TAIL),
+                  qfmt='<div class="em {{Tags}}">' + HEAD + '<div class="em-q">{{cloze:Text}}</div></div>',
+                  afmt='<div class="em {{Tags}}">' + HEAD + '<div class="em-q">{{cloze:Text}}</div><hr id="answer">' + BACK_TAIL),
 }
 DECK_ID = 1794600000100
 
@@ -78,6 +91,10 @@ def media_name(unit_id: str, fname: str) -> str:
     return f'em_{re.sub(r"[^a-z0-9]+", "_", unit_id)}_{fname}'
 
 
+def nt_key(c):
+    return 'math' if c['type'] == 'math' else 'cloze' if c['type'] == 'cloze' else 'concept'
+
+
 def note_fields(unit: dict, c: dict, version: str) -> dict:
     base = {'StableID': c['key'], 'Course': unit['course'], 'Chapter': unit['chapter'], 'KC': unit['kcs'][c['kc']],
             'Prerequisites': c.get('prereq', ''), 'Why': c['why'], 'MicroExample': c.get('example', ''),
@@ -88,11 +105,11 @@ def note_fields(unit: dict, c: dict, version: str) -> dict:
     return {'Prompt': c['prompt'], 'CanonicalAnswer': c['answer'], **base}
 
 
-def inspectable(unit: dict) -> dict:
+def inspectable(unit: dict) -> dict:  # noqa: D401
     """Transparent intermediate representation (JSON) of exactly what goes into the package."""
     version = unit.get('version', '0')
     return {'template_version': TEMPLATE_VERSION, 'deck': deck_name(unit), 'notetypes': {k: {kk: v for kk, v in n.items()} for k, n in NOTETYPES.items()},
-            'css': CSS, 'notes': [{'guid': guid(unit['id'], c['key']), 'type': NOTETYPES['math' if c['type'] == 'math' else c['type']]['name'],
+            'css': CSS, 'notes': [{'guid': guid(unit['id'], c['key']), 'type': NOTETYPES[nt_key(c)]['name'],
                                    'tags': tags(unit, c), 'fields': note_fields(unit, c, version)} for c in unit['cards']]}
 
 
@@ -101,7 +118,9 @@ def deck_name(unit):
 
 
 def tags(unit, c):
-    return ['exam-mastery', f'em::{re.sub(r"[^A-Za-z0-9]+", "-", unit["id"])}', f'kc::{c["kc"]}', f'type::{c["type"]}']
+    # fam-* and kind-* double as CSS classes in the templates ({{Tags}}); no schema change needed
+    return ['exam-mastery', f'em::{re.sub(r"[^A-Za-z0-9]+", "-", unit["id"])}', f'kc::{c["kc"]}', f'type::{c["type"]}',
+            f'fam-{FAMILY.get(c["kc"], "model")}', f'kind-{c["type"]}']
 
 
 def _make_notetype(col, spec, cloze=False):
@@ -142,7 +161,7 @@ def build_apkg(unit: dict, media_dir: Path, out: Path) -> dict:
         did = col.decks.id(deck_name(unit))
         deck = col.decks.get(did)
         for c in unit['cards']:
-            nt = nts['math' if c['type'] == 'math' else c['type']]
+            nt = nts[nt_key(c)]
             note = col.new_note(nt)
             for k, v in note_fields(unit, c, version).items():
                 note[k] = v
@@ -234,6 +253,36 @@ def diagrams(out: Path, unit: dict):
             body += f'<rect x="{Xl(t) - 28}" y="{Yl(k) - 18}" width="56" height="36" rx="7" fill="#fff" stroke="#999"/><text x="{Xl(t)}" y="{Yl(k) + 5}" font-size="14" text-anchor="middle">{str(v).replace(".", ",")}</text>'
     body += '<text x="10" y="248" font-size="12" fill="#b91c1c">gestrichelt rot: gierig (O I-LOC I-LOC, ungültig)</text><text x="300" y="248" font-size="12" fill="#15803d">grün: Viterbi (O B-LOC I-LOC, Score 4,5)</text>'
     (out / 'viterbi_lattice.svg').write_text(_svg(560, 260, body), encoding='utf-8')
+    # 5 attention geometry: keys/values as arrows, output as weighted average
+    X3 = [[1, 0], [0, 1], [1, 1]]
+    _, w3, o3 = S.attention_row(X3[2], X3, X3)
+    ox, oy, sc = 50, 230, 150
+    P = lambda x, y: (ox + x * sc, oy - y * sc)
+    body = f'<line x1="{ox - 10}" y1="{oy}" x2="{ox + 1.4 * sc}" y2="{oy}" stroke="#ccc"/><line x1="{ox}" y1="{oy + 10}" x2="{ox}" y2="{oy - 1.4 * sc}" stroke="#ccc"/>'
+    for (x, y), col, lab in zip(X3, ('#2756c4', '#15803d', '#c2410c'), ('x1', 'x2', 'x3 = q')):
+        a, b = P(x, y); body += f'<line x1="{ox}" y1="{oy}" x2="{a}" y2="{b}" stroke="{col}" stroke-width="3"/><circle cx="{a}" cy="{b}" r="4" fill="{col}"/><text x="{a + 6}" y="{b - 6}" font-size="13" fill="{col}">{lab}</text>'
+    a, b = P(*o3)
+    body += f'<line x1="{ox}" y1="{oy}" x2="{a:.1f}" y2="{b:.1f}" stroke="#7c3aed" stroke-width="3" stroke-dasharray="6 3"/><circle cx="{a:.1f}" cy="{b:.1f}" r="5" fill="#7c3aed"/>'
+    body += f'<text x="{a + 8:.1f}" y="{b + 18:.1f}" font-size="13" fill="#7c3aed">o3 = ({o3[0]:.4f}; {o3[1]:.4f})</text>'.replace('.', ',', 0)
+    for k, (wk, col) in enumerate(zip(w3, ('#2756c4', '#15803d', '#c2410c'))):
+        body += f'<rect x="300" y="{50 + k * 40}" width="{wk * 200:.1f}" height="22" rx="4" fill="{col}"/><text x="{306 + wk * 200:.1f}" y="{66 + k * 40}" font-size="13" fill="#333">α{k + 1} = {str(round(wk, 4)).replace(".", ",")}</text>'
+    body += '<text x="300" y="34" font-size="12" fill="#555">Softmax-Gewichte der Anfrage x3 (d_k = 2)</text><text x="300" y="200" font-size="12" fill="#555">o3 = Σ αj xj liegt in der konvexen Hülle</text>'
+    (out / 'attention_geometry.svg').write_text(_svg(560, 250, body), encoding='utf-8')
+    # 6 CRF probabilities of all valid paths (score vs normalised probability)
+    import itertools
+    paths = []
+    for p_ in itertools.product(range(3), repeat=3):
+        lab = [L[k] for k in p_]
+        if all(S.bio_allowed(lab[t - 1] if t else None, lab[t]) for t in range(3)):
+            paths.append((''.join(l[0] for l in lab), sum(E[t][k] for t, k in enumerate(p_))))
+    Z = sum(math.exp(s_) for _, s_ in paths); paths.sort(key=lambda x: -x[1])
+    body = '<text x="10" y="20" font-size="12" fill="#555">13 gültige Pfade: Score S (links) und p = exp(S)/Z (Balken), Z ≈ ' + f'{Z:.2f}'.replace('.', ',') + '</text>'
+    for n, (name, s_) in enumerate(paths):
+        y = 34 + n * 17; pr = math.exp(s_) / Z
+        body += (f'<text x="10" y="{y + 11}" font-size="11" font-family="Menlo,monospace" fill="#333">{name}  S={str(round(s_, 1)).replace(".", ",")}</text>'
+                 f'<rect x="130" y="{y}" width="{pr * 600:.1f}" height="12" rx="2" fill="{"#15803d" if n == 0 else "#b8c0cc"}"/>'
+                 f'<text x="{136 + pr * 600:.1f}" y="{y + 10}" font-size="10.5" fill="#555">{str(round(pr, 4)).replace(".", ",")}</text>')
+    (out / 'crf_probabilities.svg').write_text(_svg(460, 262, body), encoding='utf-8')
     return sorted(p.name for p in out.glob('*.svg'))
 
 

@@ -7,7 +7,8 @@
     "engine_rc_v0.21.0-rc1_products_incl_nlp_baseline": "HUMAN_REJECTED",
     "nlp_reference_unit_v1": "HUMAN_REJECTED (Issue #4)",
     "nlp_reference_unit_v2": "NOT RELEASABLE (Issues #4-#6)",
-    "nlp_reference_unit_v3": "HUMAN_REVIEW_PENDING"
+    "nlp_reference_unit_v3": "HUMAN_REJECTED (Issue #7, mean 0.75/4 over 8 dimensions)",
+    "nlp_reference_unit_v4": "HUMAN_REVIEW_PENDING"
   },
   "product": {
     "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
@@ -16,16 +17,16 @@
     "open": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling/index.html",
     "v2_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v2_snapshot/",
     "reports": [
-      "docs/reference_unit/V3_REPORT.md",
+      "docs/reference_unit/V4_REPORT.md",
       "docs/reference_unit/MATH_AUDIT.md",
       "docs/reference_unit/CURRICULUM_MAP.md"
     ]
   },
   "verified": [
-    "verify: 128 recomputed values + structural rules",
-    "tests/test_reference_unit.py: 25 passed (incl. real Anki reimport in disposable collection)",
-    "SymPy/Monte-Carlo checks of new theorems",
-    "visual inspection: all PDF pages, app (Chromium, WebKit mobile), 108 Anki card renderings"
+    "verify: 178 recomputed values + structural rules incl. Anki identity lock",
+    "tests/test_reference_unit.py: 27 passed (incl. real v3->v4 Anki upgrade)",
+    "180 Anki card renderings (Chromium/WebKit, light/dark/mobile)",
+    "all PDF pages and scenes inspected"
   ],
   "not_verified": [
     "real Anki desktop/AnkiMobile apps",
@@ -33,7 +34,7 @@
     "learning effect",
     "Anki versions other than 26.09.3"
   ],
-  "next_action": "Wait for human review of v3 (textbook depth, visuals, didactics, Anki). If accepted: move unit format and Anki builder into the engine author contract; then one contrasting course (Analysis 1).",
+  "next_action": "Wait for human review of v4 (Issue #7). Do not merge PR #3.",
   "open_decisions_for_owner": [
     "Human review of v3",
     "Pilot budget for engine runs (none authorised)",

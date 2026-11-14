@@ -3,7 +3,9 @@
 const U = JSON.parse(document.getElementById('unit-data').textContent);
 const MODE = document.body.dataset.mode;
 const KEY = 'em-unit-' + U.id, DAY = 864e5, BOX = [0, 1, 3, 7, 16, 35];
-const STAGE = {guided: 'Geführt', worked: 'Durchgerechnetes Beispiel', faded: 'Lückenschritt', hint: 'Mit Hinweisen', independent: 'Selbstständig', error: 'Fehleranalyse', transfer: 'Transfer'};
+const STAGE = {recall: 'Abruf und Selbsterklärung', guided: 'Geführt', worked: 'Durchgerechnetes Beispiel', faded: 'Lückenschritt', hint: 'Mit Hinweisen', independent: 'Selbstständig', error: 'Fehleranalyse', proof: 'Beweis', transfer: 'Transfer'};
+const KC_SECTION = Object.fromEntries(Object.entries(U.kc_map || {}).map(([k, m]) => [k, m.sections[0]]));
+const seqOf = v => String(v).trim().split(/\s+/).filter(Boolean).map(x => x.toUpperCase().replace(/^0$/, 'O'));
 const SUPPORTED_STAGES = ['worked', 'faded'];
 const KCS = U.kcs;
 const SECTION_KC = {spannen: 'spans', rnn: 'birnn', birnn: 'birnn', attention: 'attention', position: 'position', struktur: 'decoding', prf: 'prf', einheit: 'prf-level', mittelung: 'micro-macro', fallstudie: 'decoding'};
@@ -174,54 +176,70 @@ function linkify(root) {
 }
 
 // ---------- scene engine: example -> prediction -> mechanism -> counterexample -> verification ----------
+// ---------- scene engine v4: tweened steps, play/pause, reduced motion, predictions, print keyframes ----------
+const REDUCED = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) || MODE === 'print';
+function lerp(a, b, u) {
+  if (typeof a === 'number' && typeof b === 'number') return a + (b - a) * u;
+  if (Array.isArray(a) && Array.isArray(b) && a.length === b.length) return a.map((x, i) => lerp(x, b[i], u));
+  if (a && b && typeof a === 'object' && typeof b === 'object' && !Array.isArray(a)) { const o = {...b}; for (const k in b) if (k in a) o[k] = lerp(a[k], b[k], u); return o; }
+  return b;
+}
+const ease = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
 function Scene(root, spec, print) {
-  let i = 0;
+  let i = 0, cur = spec.steps[0].v || {}, raf = null, timer = null, playing = false;
   const fig = el('div', {class: 'scene-fig'}), cap = el('div', {class: 'scene-cap', 'aria-live': 'polite'}), eq = el('div', {class: 'scene-eq'});
   const dots = el('div', {class: 'dots', 'aria-hidden': 'true'}), pred = el('div', {class: 'predict'}), extra = el('div', {});
-  const back = el('button', {onclick: () => go(i - 1)}, '← Zurück'), fwd = el('button', {class: 'primary', onclick: () => go(i + 1)}, 'Weiter →');
-  const restart = el('button', {onclick: () => go(0)}, 'Neu starten');
-  root.replaceChildren(el('div', {class: 'scene-head'}, el('span', {class: 'stage'}, 'Erklärung in Schritten'), el('h4', {}, spec.title)),
-    fig, el('div', {class: 'scene-text'}, cap, eq, pred), extra, el('div', {class: 'ctl'}, back, fwd, restart, dots));
+  const back = el('button', {onclick: () => { stop(); go(i - 1, false); }}, '← Zurück'), fwd = el('button', {class: 'primary', onclick: () => { stop(); go(i + 1); }}, 'Weiter →');
+  const playB = el('button', {onclick: () => playing ? stop() : play(), 'aria-pressed': 'false'}, '▶ Abspielen');
+  const restart = el('button', {onclick: () => { stop(); go(0, false); }}, 'Neu starten');
+  const draw = (v, s, u = 1) => spec.legacy ? spec.draw(fig, s, extra) : spec.draw(fig, v, s, extra, u);
+  if (print) {
+    root.replaceChildren(el('h4', {}, spec.title));
+    spec.steps.forEach((s, k) => { if (!s.key) return; const f = el('div', {class: 'scene-fig'}), x = el('div', {});
+      (spec.legacy ? spec.draw(f, s, x) : spec.draw(f, s.v || {}, s, x, 1));
+      root.append(el('figure', {class: 'keyframe'}, el('div', {class: 'kf-n'}, `${spec.fig || 'Abb.'} – Schritt ${k + 1} von ${spec.steps.length}`), f,
+        el('figcaption', {}, el('div', {class: 'scene-cap', html: s.cap}), el('div', {class: 'scene-eq', html: s.eq || ''}),
+          s.predict ? el('p', {class: 'q', html: `<b>Erst vorhersagen:</b> ${s.predict.q} <i>(Auflösung: ${s.predict.options[s.predict.correct]})</i>`}) : null))); });
+    return;
+  }
+  root.replaceChildren(el('div', {class: 'scene-head'}, el('span', {class: 'stage'}, 'Erklärung in Schritten'), el('h4', {}, spec.title), spec.question ? el('p', {class: 'scene-q', html: '<b>Leitfrage:</b> ' + spec.question}) : null),
+    fig, el('div', {class: 'scene-text'}, cap, eq, pred), extra, el('div', {class: 'ctl'}, back, fwd, playB, restart, dots));
   root.tabIndex = 0;
-  root.addEventListener('keydown', e => { if (e.target !== root) return; if (e.key === 'ArrowRight' && !fwd.disabled) go(i + 1); if (e.key === 'ArrowLeft') go(i - 1); });
+  root.addEventListener('keydown', e => { if (e.target !== root) return; if (e.key === 'ArrowRight' && !fwd.disabled) { stop(); go(i + 1); } if (e.key === 'ArrowLeft') { stop(); go(i - 1, false); } if (e.key === ' ') { e.preventDefault(); playing ? stop() : play(); } });
   const answered = {};
-  function go(k) {
-    i = Math.max(0, Math.min(spec.steps.length - 1, k));
-    const s = spec.steps[i];
-    spec.draw(fig, s, extra);
+  function stop() { playing = false; clearTimeout(timer); playB.textContent = '▶ Abspielen'; playB.setAttribute('aria-pressed', 'false'); }
+  function play() { playing = true; playB.textContent = '❚❚ Pause'; playB.setAttribute('aria-pressed', 'true'); tick(); }
+  function tick() { if (!playing) return; const s = spec.steps[i]; if (i >= spec.steps.length - 1 || (s.predict && !(i in answered))) return stop(); go(i + 1); timer = setTimeout(tick, (spec.steps[i].dur || 900) + 1800); }
+  function go(k, animate = true) {
+    k = Math.max(0, Math.min(spec.steps.length - 1, k));
+    const s = spec.steps[k], from = cur, to = s.v || {};
+    i = k; cancelAnimationFrame(raf);
+    const dur = (!animate || REDUCED) ? 0 : (s.dur || 900), t0 = performance.now();
+    const frame = t => { const u = dur ? Math.min(1, (t - t0) / dur) : 1; draw(lerp(from, to, ease(u)), s, u); if (u < 1) raf = requestAnimationFrame(frame); else { cur = to; linkify(root); } };
+    raf = requestAnimationFrame(frame); if (!dur) { draw(to, s, 1); cur = to; }
     cap.innerHTML = s.cap; eq.innerHTML = s.eq || '';
     dots.replaceChildren(...spec.steps.map((_, j) => el('span', {class: j === i ? 'on' : j < i ? 'done' : ''})));
-    dots.setAttribute('aria-label', `Schritt ${i + 1} von ${spec.steps.length}`);
     back.disabled = i === 0; fwd.disabled = i === spec.steps.length - 1;
     pred.replaceChildren();
     if (s.predict) {
       const p = s.predict, res = el('div', {});
       fwd.disabled = !(i in answered);
       pred.append(el('p', {class: 'q', html: '<b>Ihre Vorhersage:</b> ' + p.q}),
-        el('div', {class: 'opts'}, p.options.map((o, k) => el('button', {class: 'opt', html: o, onclick: () => {
-          answered[i] = k; st.predictions.push({scene: spec.id, step: i, choice: k, correct: k === p.correct, ts: now()}); save();
-          res.innerHTML = `<p class="fb ${k === p.correct ? 'ok' : 'bad'}">${k === p.correct ? 'Richtig.' : 'Nicht ganz.'} ${p.explain}</p>`;
+        el('div', {class: 'opts'}, p.options.map((o, k2) => el('button', {class: 'opt', html: o, onclick: () => {
+          answered[i] = k2; st.predictions.push({scene: spec.id, step: i, choice: k2, correct: k2 === p.correct, ts: now()}); save();
+          res.innerHTML = `<p class="fb ${k2 === p.correct ? 'ok' : 'bad'}">${k2 === p.correct ? 'Richtig.' : 'Nicht ganz.'} ${p.explain}</p>`;
           fwd.disabled = i === spec.steps.length - 1; tex(res);
         }}))), res);
       if (i in answered) res.innerHTML = `<p class="fb ${answered[i] === p.correct ? 'ok' : 'bad'}">${p.explain}</p>`;
     }
     tex(root).then(() => linkify(root));
   }
-  if (print) {
-    root.replaceChildren(el('h4', {}, spec.title));
-    spec.steps.forEach((s, k) => {
-      if (!s.key) return;
-      const f = el('div', {class: 'scene-fig'}), x = el('div', {});
-      spec.draw(f, s, x);
-      root.append(el('div', {class: 'keyframe'}, el('div', {class: 'kf-n'}, `Bild ${k + 1}`), f, el('div', {class: 'scene-cap', html: s.cap}), el('div', {class: 'scene-eq', html: s.eq || ''}),
-        s.predict ? el('p', {class: 'q', html: `<b>Vorhersage vor dem Weiterlesen:</b> ${s.predict.q} <i>(Auflösung: ${s.predict.options[s.predict.correct]})</i>`}) : null));
-    });
-    return;
-  }
-  go(0);
+  go(0, false);
 }
+const C_FW = 'var(--fw)', C_BW = 'var(--bw)', C_W1 = '#2756c4', C_W2 = '#c2410c';
+const clamp01 = x => Math.max(0, Math.min(1, x));
 
-// ---- scene 1: the Washington experiment ----
+// ---- storyboard 1: BiRNN information flow (Washington signed / state) ----
 function toyRun(sentence) {
   const E = U.toy.emb, xs = [E.Washington, E[sentence]];
   const step = (a, h, x) => [Math.tanh(a * h[0] + x[0]), Math.tanh(a * h[1] + x[1])];
@@ -230,67 +248,208 @@ function toyRun(sentence) {
   return {xs, f: [f1, f2], b: [b1, b2]};
 }
 const vec = v => `(${dt(v[0])};\\ ${dt(v[1])})`;
-const vtxt = v => `(${de(v[0])}; ${de(v[1])})`;
 function sceneBirnn() {
   const A = toyRun('signed'), B = toyRun('state');
-  const draw = (fig, s) => {
-    const svg = sv('svg', {viewBox: '0 0 760 330', class: 'plot', role: 'img', 'aria-label': s.alt || ''});
-    [['signed', A, 20], ['state', B, 400]].forEach(([w, R, x0]) => {
-      svg.append(sv('rect', {x: x0, y: 8, width: 340, height: 314, rx: 12, fill: 'var(--panel)', stroke: 'var(--line)'}));
-      svg.append(sv('text', {x: x0 + 14, y: 30, 'font-size': 14, 'font-weight': 600, fill: 'var(--ink)'}, `Satz ${w === 'signed' ? 'A' : 'B'}: „Washington ${w}“`));
-      const X = t => x0 + 90 + t * 170, yIn = 285, yF = 205, yB = 130, yL = 60;
-      ['Washington', w].forEach((word, t) => {
-        const diff = t === 1;
-        svg.append(sv('rect', {x: X(t) - 62, y: yIn - 18, width: 124, height: 34, rx: 7, fill: diff ? 'var(--soft)' : 'transparent', stroke: diff ? 'var(--accent2)' : 'var(--line)', 'data-link': 'e' + (t + 1)}));
-        svg.append(sv('text', {x: X(t), y: yIn - 1, 'text-anchor': 'middle', 'font-size': 14, fill: 'var(--ink)'}, word));
-        svg.append(sv('text', {x: X(t), y: yIn + 13, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--mute)', 'font-family': 'var(--mono)'}, `e=(${R.xs[t].join(', ')})`));
-        const showF = s.fw > t, showB = s.bw && s.bw > (1 - t);
-        svg.append(sv('line', {x1: X(t) - 30, y1: yIn - 18, x2: X(t) - 30, y2: yF + 20, stroke: showF ? 'var(--fw)' : 'var(--line)', 'stroke-width': showF ? 2.5 : 1}));
-        if (s.bw !== undefined) svg.append(sv('line', {x1: X(t) + 30, y1: yIn - 18, x2: X(t) + 30, y2: yB + 20, stroke: showB ? 'var(--bw)' : 'var(--line)', 'stroke-width': showB ? 2.5 : 1}));
-        const nodeF = sv('g', {'data-link': `h${t + 1}f`});
-        nodeF.append(sv('rect', {x: X(t) - 70, y: yF - 20, width: 140, height: 40, rx: 20, fill: showF ? 'var(--fw-bg)' : 'var(--panel)', stroke: 'var(--fw)', 'stroke-width': s.hl === `h${t + 1}f` ? 3.5 : 1.5}));
-        nodeF.append(sv('text', {x: X(t), y: yF - 4, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--fw)'}, `h${t + 1}→`));
-        nodeF.append(sv('text', {x: X(t), y: yF + 12, 'text-anchor': 'middle', 'font-size': 12, 'font-family': 'var(--mono)', fill: 'var(--ink)'}, showF ? vtxt(R.f[t]) : '?'));
-        svg.append(nodeF);
-        if (s.bw !== undefined) {
-          const nodeB = sv('g', {'data-link': `h${t + 1}b`});
-          nodeB.append(sv('rect', {x: X(t) - 70, y: yB - 20, width: 140, height: 40, rx: 20, fill: showB ? 'var(--bw-bg)' : 'var(--panel)', stroke: 'var(--bw)', 'stroke-width': s.hl === `h${t + 1}b` ? 3.5 : 1.5}));
-          nodeB.append(sv('text', {x: X(t), y: yB - 4, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--bw)'}, `h${t + 1}←`));
-          nodeB.append(sv('text', {x: X(t), y: yB + 12, 'text-anchor': 'middle', 'font-size': 12, 'font-family': 'var(--mono)', fill: 'var(--ink)'}, showB ? vtxt(R.b[t]) : '?'));
-          svg.append(nodeB);
-        }
-      });
-      // recurrent arrows
-      if (s.fw > 1) svg.append(sv('path', {d: `M${X(0) + 70},${yF} L${X(1) - 72},${yF}`, stroke: 'var(--fw)', 'stroke-width': 2.5, 'marker-end': 'url(#ar)'}));
-      if (s.bw > 1) svg.append(sv('path', {d: `M${X(1) - 70},${yB} L${X(0) + 72},${yB}`, stroke: 'var(--bw)', 'stroke-width': 2.5, 'marker-end': 'url(#ar)'}));
-      // label box for position 1
-      const sc = R.b[0][1], lab = s.label === 'fw' ? 'gleich in A und B' : s.label === 'bi' ? `${sc > 0 ? 'PER' : 'LOC'} · s = ${sc > 0 ? '+' : '−'}${de(Math.abs(sc))}` : '';
-      if (lab) {
-        svg.append(sv('rect', {x: X(0) - 78, y: yL - 18, width: 156, height: 32, rx: 7, fill: 'none', stroke: 'var(--accent2)', 'stroke-width': 2}));
-        svg.append(sv('text', {x: X(0), y: yL + 3, 'text-anchor': 'middle', 'font-size': 12.5, fill: 'var(--accent2)', 'font-weight': 600}, 'y₁: ' + lab));
-        svg.append(sv('line', {x1: X(0) - 45, y1: yL + 14, x2: X(0) - 45, y2: yF - 20, stroke: 'var(--accent2)', 'stroke-dasharray': '4 3'}));
-        if (s.label === 'bi') svg.append(sv('line', {x1: X(0) + 45, y1: yL + 14, x2: X(0) + 45, y2: yB - 20, stroke: 'var(--accent2)', 'stroke-dasharray': '4 3'}));
+  const draw = (fig, v) => {
+    const svg = sv('svg', {viewBox: '0 0 780 360', class: 'plot', role: 'img'});
+    const defs = sv('defs'); [['gW', C_W1], ['gS', C_W2]].forEach(([id, c]) => { const g = sv('linearGradient', {id, x1: 0, x2: 1}); g.append(sv('stop', {offset: 0, 'stop-color': c}), sv('stop', {offset: 1, 'stop-color': c})); defs.append(g); });
+    const mk = sv('marker', {id: 'ar4', viewBox: '0 0 8 8', refX: 7, refY: 4, markerWidth: 7, markerHeight: 7, orient: 'auto'}); mk.append(sv('path', {d: 'M0,0L8,4L0,8z', fill: 'var(--mute)'})); defs.append(mk); svg.append(defs);
+    const alt = [];
+    [['signed', A, 18], ['state', B, 402]].forEach(([w, R, x0]) => {
+      svg.append(sv('rect', {x: x0, y: 8, width: 360, height: 344, rx: 14, fill: 'var(--panel)', stroke: 'var(--line)'}));
+      svg.append(sv('text', {x: x0 + 16, y: 32, 'font-size': 14, 'font-weight': 600, fill: 'var(--ink)'}, `Satz ${w === 'signed' ? 'A' : 'B'}: „Washington ${w}“`));
+      const X = t => x0 + 95 + t * 170, yIn = 312, yF = 230, yB = 150, yL = 72;
+      const node = (cx, cy, val, prog, srcs, label, color, hl) => {
+        const g = sv('g', {'data-link': label}); const wdt = 150, h = 46;
+        g.append(sv('rect', {x: cx - wdt / 2, y: cy - h / 2, width: wdt, height: h, rx: 23, fill: 'var(--panel)', stroke: color, 'stroke-width': hl ? 3.2 : 1.6}));
+        // provenance stripes: which inputs this state can depend on (fill grows with computation progress)
+        srcs.forEach((c, k) => g.append(sv('rect', {x: cx - wdt / 2 + 14 + k * 10, y: cy - h / 2 + 6, width: 7, height: (h - 12) * prog, rx: 2, fill: c})));
+        g.append(sv('text', {x: cx + 12, y: cy - 6, 'text-anchor': 'middle', 'font-size': 11, fill: color}, label.replace('f', '→').replace('b', '←').replace('h', 'h')));
+        g.append(sv('text', {x: cx + 12, y: cy + 12, 'text-anchor': 'middle', 'font-size': 12.5, 'font-family': 'var(--mono)', fill: 'var(--ink)'}, prog > 0 ? `(${de(val[0] * prog)}; ${de(val[1] * prog)})` : '?'));
+        svg.append(g);
+      };
+      // edges + travelling pulses
+      const pulse = (x1, y1, x2, y2, u, c) => { if (u > 0 && u < 1) svg.append(sv('circle', {cx: x1 + (x2 - x1) * u, cy: y1 + (y2 - y1) * u, r: 6, fill: c, opacity: .9})); };
+      for (let t = 0; t < 2; t++) {
+        const pf = clamp01(v.fw - t), pb = clamp01(v.bw - (1 - t));
+        svg.append(sv('line', {x1: X(t) - 30, y1: yIn - 18, x2: X(t) - 30, y2: yF + 23, stroke: pf > 0 ? C_FW : 'var(--line)', 'stroke-width': pf > 0 ? 2.5 : 1}));
+        if (v.bw > 0 || v.showBw) svg.append(sv('line', {x1: X(t) + 30, y1: yIn - 18, x2: X(t) + 30, y2: yB + 23, stroke: pb > 0 ? C_BW : 'var(--line)', 'stroke-width': pb > 0 ? 2.5 : 1}));
+        pulse(X(t) - 30, yIn - 18, X(t) - 30, yF + 23, pf * 1.3, t === 0 ? C_W1 : C_W2);
+        if (v.bw > 0) pulse(X(t) + 30, yIn - 18, X(t) + 30, yB + 23, pb * 1.3, t === 0 ? C_W1 : C_W2);
       }
+      const pf2 = clamp01(v.fw - 1), pb1 = clamp01(v.bw - 1);
+      svg.append(sv('line', {x1: X(0) + 75, y1: yF, x2: X(1) - 77, y2: yF, stroke: pf2 > 0 ? C_FW : 'var(--line)', 'stroke-width': 2.5, 'marker-end': 'url(#ar4)'}));
+      pulse(X(0) + 75, yF, X(1) - 77, yF, pf2 * 1.3, C_W1);
+      if (v.bw > 0 || v.showBw) { svg.append(sv('line', {x1: X(1) - 75, y1: yB, x2: X(0) + 77, y2: yB, stroke: pb1 > 0 ? C_BW : 'var(--line)', 'stroke-width': 2.5, 'marker-end': 'url(#ar4)'})); pulse(X(1) - 75, yB, X(0) + 77, yB, pb1 * 1.3, C_W2); }
+      ['Washington', w].forEach((word, t) => {
+        svg.append(sv('rect', {x: X(t) - 66, y: yIn - 18, width: 132, height: 38, rx: 8, fill: 'var(--panel)', stroke: t === 0 ? C_W1 : C_W2, 'stroke-width': 2, 'data-link': 'e' + (t + 1)}));
+        svg.append(sv('text', {x: X(t), y: yIn, 'text-anchor': 'middle', 'font-size': 14, fill: 'var(--ink)'}, word));
+        svg.append(sv('text', {x: X(t), y: yIn + 14, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--mute)', 'font-family': 'var(--mono)'}, `e=(${R.xs[t].join(', ')})`));
+      });
+      node(X(0), yF, R.f[0], clamp01(v.fw), [C_W1], 'h1f', C_FW, v.hl === 1);
+      node(X(1), yF, R.f[1], clamp01(v.fw - 1), [C_W1, C_W2], 'h2f', C_FW, v.hl === 2);
+      if (v.bw > 0 || v.showBw) { node(X(0), yB, R.b[0], clamp01(v.bw - 1), [C_W1, C_W2], 'h1b', C_BW, v.hl === 3); node(X(1), yB, R.b[1], clamp01(v.bw), [C_W2], 'h2b', C_BW, v.hl === 4); }
+      if (v.label > 0) {
+        const bi = v.bi || 0, sc = R.b[0][1] * bi, txt = bi > .02 ? `${sc > 0 ? 'PER' : 'LOC'} · s = ${sc > 0 ? '+' : '−'}${de(Math.abs(sc))}` : 'gleich in A und B';
+        svg.append(sv('rect', {x: X(0) - 82, y: yL - 20, width: 164, height: 36, rx: 8, fill: 'var(--panel)', stroke: 'var(--accent2)', 'stroke-width': 2, opacity: v.label}));
+        svg.append(sv('text', {x: X(0), y: yL + 3, 'text-anchor': 'middle', 'font-size': 13, fill: 'var(--accent2)', 'font-weight': 600, opacity: v.label}, 'ŷ₁: ' + txt));
+        svg.append(sv('line', {x1: X(0) - 45, y1: yL + 16, x2: X(0) - 45, y2: yF - 23, stroke: 'var(--accent2)', 'stroke-dasharray': '4 3', opacity: v.label}));
+        if (bi > 0) svg.append(sv('line', {x1: X(0) + 45, y1: yL + 16, x2: X(0) + 45, y2: yB - 23, stroke: 'var(--accent2)', 'stroke-dasharray': '4 3', opacity: bi}));
+      }
+      alt.push(`Satz ${w}: Vorwärts ${de(v.fw, 1)} von 2, Rückwärts ${de(v.bw, 1)} von 2`);
     });
-    const defs = sv('defs'), mk = sv('marker', {id: 'ar', viewBox: '0 0 8 8', refX: 7, refY: 4, markerWidth: 7, markerHeight: 7, orient: 'auto'});
-    mk.append(sv('path', {d: 'M0,0L8,4L0,8z', fill: 'var(--mute)'})); defs.append(mk); svg.prepend(defs);
+    svg.append(sv('text', {x: 20, y: 356, 'font-size': 11, fill: 'var(--mute)'}, 'Farbstreifen im Zustand = Wörter, von denen er abhängen kann (blau: Washington, orange: Wort 2).'));
+    svg.setAttribute('aria-label', alt.join('; ')); fig.replaceChildren(svg);
+  };
+  const steps = [
+    {key: true, v: {fw: 0, bw: 0, label: 0, bi: 0}, cap: 'Zwei Sätze, ein mehrdeutiges Wort. Nur Wort 2 unterscheidet sich (orange). Blau und Orange markieren ab jetzt, <em>woher</em> Information in einem Zustand stammen kann.', eq: '<span data-link="e1">\\(e_1=(1,0)\\)</span> in A und B; <span data-link="e2">\\(e_2=(0,1)\\)</span> in A, \\((0,-1)\\) in B.'},
+    {v: {fw: 0, bw: 0, label: 0, bi: 0}, cap: 'Das Vorwärts-RNN berechnet gleich \\(h^{\\rightarrow}_1\\) aus \\(h^{\\rightarrow}_0=0\\) und \\(e_1\\).', eq: '\\(h^{\\rightarrow}_1=\\tanh(0{,}5\\cdot h^{\\rightarrow}_0+e_1)\\)',
+      predict: {q: 'Wird \\(h^{\\rightarrow}_1\\) in Satz A und Satz B gleich sein?', options: ['gleich', 'verschieden', 'hängt von den Trainingsdaten ab'], correct: 0, explain: 'In der Formel für \\(h^{\\rightarrow}_1\\) kommt \\(e_2\\) nicht vor. Beobachten Sie gleich den Farbstreifen: nur Blau.'}},
+    {key: true, dur: 1600, v: {fw: 1, bw: 0, label: 0, bi: 0, hl: 1}, cap: 'Ein Impuls läuft von „Washington“ nach <span data-link="h1f">\\(h^{\\rightarrow}_1\\)</span>. Der Zustand trägt nur einen blauen Streifen – und hat in A und B exakt denselben Wert.', eq: `\\(h^{\\rightarrow}_1=\\tanh\\big((1,0)\\big)=${vec(A.f[0])}\\) in A und B`},
+    {key: true, dur: 1600, v: {fw: 2, bw: 0, label: 0, bi: 0, hl: 2}, cap: 'Jetzt fließt Information von \\(h^{\\rightarrow}_1\\) und vom zweiten Wort in <span data-link="h2f">\\(h^{\\rightarrow}_2\\)</span>: zwei Streifen. Erst hier unterscheiden sich die Sätze – im Vorzeichen der zweiten Komponente.', eq: `\\(h^{\\rightarrow}_2=\\tanh\\big(0{,}5\\,h^{\\rightarrow}_1+e_2\\big)=${vec(A.f[1])}\\) bzw. \\(${vec(B.f[1])}\\)`},
+    {key: true, dur: 900, v: {fw: 2, bw: 0, label: 1, bi: 0}, cap: '<b>Gegenbeispiel.</b> Der Klassifikator für Wort 1 liest nur <span data-link="h1f">\\(h^{\\rightarrow}_1\\)</span>. Gleiche Eingabe heißt gleiche Ausgabe – für jede Wahl der Gewichte. Einer der beiden Sätze wird zwangsläufig falsch markiert.', eq: '\\(p(y_1\\mid\\text{A})=\\operatorname{softmax}(W_oh^{\\rightarrow}_1+b_o)=p(y_1\\mid\\text{B})\\)'},
+    {v: {fw: 2, bw: 0, label: 1, bi: 0, showBw: 1}, cap: 'Was müsste der Zustand an Position 1 zusätzlich enthalten?', eq: '',
+      predict: {q: 'Welche Farbe fehlt dem Zustand an Position 1?', options: ['Orange – Information über Wort 2', 'Blau', 'Keine; es fehlt Training'], correct: 0, explain: 'Wir brauchen einen Rechenweg von Wort 2 nach Position 1. Den liefert ein zweites RNN, das von rechts nach links liest.'}},
+    {key: true, dur: 1600, v: {fw: 2, bw: 1, label: 1, bi: 0, hl: 4, showBw: 1}, cap: 'Das Rückwärts-RNN beginnt beim letzten Wort: <span data-link="h2b">\\(h^{\\leftarrow}_2\\)</span> trägt nur Orange.', eq: `\\(h^{\\leftarrow}_2=\\tanh(0{,}8\\cdot0+e_2)=${vec(A.b[1])}\\) bzw. \\(${vec(B.b[1])}\\)`},
+    {key: true, dur: 1600, v: {fw: 2, bw: 2, label: 1, bi: 0, hl: 3, showBw: 1}, cap: 'Der Impuls läuft nach links: <span data-link="h1b">\\(h^{\\leftarrow}_1\\)</span> trägt Blau <em>und</em> Orange. Das Vorzeichen von Wort 2 ist bei Wort 1 angekommen.', eq: `\\(h^{\\leftarrow}_1=\\tanh\\big(0{,}8\\,h^{\\leftarrow}_2+e_1\\big)=${vec(A.b[0])}\\) bzw. \\(${vec(B.b[0])}\\)`},
+    {key: true, dur: 1200, v: {fw: 2, bw: 2, label: 1, bi: 1, showBw: 1}, cap: 'Verketten und bewerten: Mit \\(v=(0,0,0,1)\\) liest der Score genau die zweite Komponente von \\(h^{\\leftarrow}_1\\). Beide Sätze werden richtig markiert.', eq: `\\(s=v^{\\top}[h^{\\rightarrow}_1;h^{\\leftarrow}_1]=${dt(A.b[0][1])}\\ (\\text{A: PER}),\\quad ${dt(B.b[0][1])}\\ (\\text{B: LOC})\\)`},
+    {key: true, v: {fw: 2, bw: 2, label: 1, bi: 1, showBw: 1}, cap: '<b>Verallgemeinerung.</b> Die Farbstreifen sind genau die Abhängigkeitsmengen aus Satz 1 und 2: vorwärts \\(\\{1,\\dots,t\\}\\), rückwärts \\(\\{t,\\dots,T\\}\\), verkettet \\(\\{1,\\dots,T\\}\\).', eq: '\\(h^{\\rightarrow}_1=F_1(x_1),\\quad h^{\\leftarrow}_1=G_1(x_1,x_2)\\)'}
+  ];
+  return {id: 'birnn', fig: 'Abb. 4.1', title: 'Das Washington-Experiment: woher Information in einem Zustand stammt', question: 'Kann ein Tagger „Washington“ richtig markieren, wenn das entscheidende Wort erst danach kommt?', steps, draw};
+}
+
+// ---- storyboard 2: self-attention as geometry ----
+function attnRow(q, K, V, scale = true, c = null) {
+  const d = q.length, f = c != null ? c : (scale ? 1 / Math.sqrt(d) : 1);
+  const e = K.map(k => k.reduce((a, x, i) => a + x * q[i], 0) * f);
+  const m = Math.max(...e), ex = e.map(x => Math.exp(x - m)), z = ex.reduce((a, b) => a + b, 0), w = ex.map(x => x / z);
+  return {e, w, o: V[0].map((_, j) => V.reduce((a, v, i) => a + w[i] * v[j], 0))};
+}
+function sceneAttention() {
+  const X = [[1, 0], [0, 1], [1, 1]], cols = [C_W1, '#15803d', C_W2], names = ['x₁', 'x₂', 'x₃'];
+  const draw = (fig, v) => {
+    const svg = sv('svg', {viewBox: '0 0 780 340', class: 'plot', role: 'img'});
+    const ox = 70, oy = 290, sc = 150, P = (x, y) => [ox + x * sc, oy - y * sc];
+    const arrow = (a, b, c, wdt = 3, op = 1, lab = '', link = '') => { const [x1, y1] = P(...a), [x2, y2] = P(...b); const g = sv('g', {'data-link': link});
+      g.append(sv('line', {x1, y1, x2, y2, stroke: c, 'stroke-width': wdt, opacity: op, 'marker-end': 'url(#ar5)'})); if (lab) g.append(sv('text', {x: x2 + 6, y: y2 - 6, 'font-size': 13, fill: c, opacity: op}, lab)); svg.append(g); };
+    const defs = sv('defs'), mk = sv('marker', {id: 'ar5', viewBox: '0 0 8 8', refX: 7, refY: 4, markerWidth: 6, markerHeight: 6, orient: 'auto-start-reverse'}); mk.append(sv('path', {d: 'M0,0L8,4L0,8z', fill: 'context-stroke'})); defs.append(mk); svg.append(defs);
+    // axes
+    svg.append(sv('line', {x1: ox - 20, y1: oy, x2: ox + 1.6 * sc, y2: oy, stroke: 'var(--line2)'}), sv('line', {x1: ox, y1: oy + 20, x2: ox, y2: oy - 1.6 * sc, stroke: 'var(--line2)'}));
+    // swapped token order only affects the bar order (geometry is identical)
+    const order = v.swap > .5 ? [1, 0, 2] : [0, 1, 2];
+    const r = attnRow(X[2], X, X, true, v.c);
+    X.forEach((x, j) => arrow([0, 0], x, cols[j], j === 2 ? 3.5 : 2.5, 1, `${names[j]} = (${x.join(', ')})`, 'k' + (j + 1)));
+    // projections of q onto keys (dot products)
+    if (v.proj > 0) X.forEach((k, j) => { if (j === 2) return; const t = (k[0] * X[2][0] + k[1] * X[2][1]) / (k[0] ** 2 + k[1] ** 2); const [px, py] = P(k[0] * t, k[1] * t), [qx, qy] = P(...X[2]);
+      svg.append(sv('line', {x1: qx, y1: qy, x2: qx + (px - qx) * v.proj, y2: qy + (py - qy) * v.proj, stroke: cols[j], 'stroke-dasharray': '4 3', opacity: .8})); });
+    // weighted sum tip-to-tail
+    if (v.chain > 0) { let p = [0, 0]; X.forEach((x, j) => { const u = clamp01(v.chain * 3 - j); if (u <= 0) return; const q = [p[0] + r.w[j] * x[0] * u, p[1] + r.w[j] * x[1] * u]; arrow(p, q, cols[j], 4, .85); p = q; });
+      if (v.chain >= 1) { arrow([0, 0], r.o, 'var(--accent2)', 3, 1, '', 'o'); const [lx, ly] = P(...r.o); svg.append(sv('text', {x: lx + 14, y: ly + 22, 'font-size': 13, 'font-weight': 600, fill: 'var(--accent2)'}, `o₃ = (${de(r.o[0])}; ${de(r.o[1])})`)); } }
+    // right panel: energies and softmax bars
+    const bx = 430, bw = 300;
+    svg.append(sv('text', {x: bx, y: 30, 'font-size': 13, 'font-weight': 600, fill: 'var(--ink)'}, `Anfrage q = x₃ · Skalierung c = ${de(v.c, 3)}`));
+    order.forEach((j, row) => { const y = 60 + row * 80;
+      svg.append(sv('text', {x: bx, y: y + 14, 'font-size': 13, fill: cols[j]}, names[j]));
+      if (v.proj > 0) svg.append(sv('text', {x: bx + 34, y: y + 14, 'font-size': 12, 'font-family': 'var(--mono)', fill: 'var(--mute)', opacity: v.proj}, `e = q·k·c = ${de(r.e[j])}`));
+      if (v.soft > 0) { svg.append(sv('rect', {x: bx, y: y + 24, width: bw * r.w[j] * v.soft, height: 22, rx: 4, fill: cols[j], opacity: .85, 'data-link': 'a' + (j + 1)}));
+        svg.append(sv('text', {x: bx + bw * r.w[j] * v.soft + 8, y: y + 40, 'font-size': 13, 'font-weight': 600, fill: cols[j]}, `α = ${de(r.w[j])}`)); } });
+    if (v.swap > 0) svg.append(sv('text', {x: bx, y: 315, 'font-size': 12, fill: 'var(--accent2)'}, 'x₁ und x₂ vertauscht – o₃ unverändert'));
+    svg.setAttribute('aria-label', `Skalierung ${de(v.c, 3)}; Gewichte ${r.w.map(x => de(x, 3)).join(', ')}`);
+    fig.replaceChildren(svg);
+  };
+  const c0 = 1 / Math.sqrt(2), base = attnRow(X[2], X, X, true), sharp = attnRow(X[2], X, X, true, 4);
+  const steps = [
+    {key: true, v: {c: c0, proj: 0, soft: 0, chain: 0, swap: 0}, cap: 'Drei Token als Pfeile in der Ebene. Mit \\(W_Q=W_K=W_V=I\\) ist jeder Pfeil zugleich Schlüssel und Wert; \\(x_3=(1,1)\\) stellt die Anfrage.', eq: '\\(q=x_3,\\ k_j=v_j=x_j\\)'},
+    {v: {c: c0, proj: 0, soft: 0, chain: 0, swap: 0}, cap: 'Ähnlichkeit ist das Skalarprodukt: wie weit \\(q\\) in Richtung \\(k_j\\) zeigt.', predict: {q: 'Welcher Schlüssel bekommt das größte Skalarprodukt mit \\(q=(1,1)\\)?', options: ['\\(x_3\\) selbst', '\\(x_1\\)', 'alle gleich'], correct: 0, explain: '\\(q\\cdot x_1=q\\cdot x_2=1\\), aber \\(q\\cdot x_3=2\\): Der Pfeil zeigt genau in die eigene Richtung und ist länger.'}},
+    {key: true, dur: 1400, v: {c: c0, proj: 1, soft: 0, chain: 0, swap: 0}, cap: 'Die gestrichelten Lote zeigen die Projektionen. Skalarprodukt mal \\(c=1/\\sqrt{d_k}\\) ergibt die Energien.', eq: `\\(e_{3j}=q^\\top k_j/\\sqrt2=${base.e.map(x => dt(x)).join(';\\ ')}\\)`},
+    {key: true, dur: 1400, v: {c: c0, proj: 1, soft: 1, chain: 0, swap: 0}, cap: 'Die Softmax macht aus Energien Gewichte, die sich zu 1 summieren. Die Reihenfolge bleibt erhalten, die Abstände werden exponentiell betont.', eq: `\\(\\alpha_{3j}=\\dfrac{e^{e_{3j}}}{\\sum_l e^{e_{3l}}}=${base.w.map(x => dt(x)).join(';\\ ')}\\)`},
+    {key: true, dur: 2200, v: {c: c0, proj: 1, soft: 1, chain: 1, swap: 0}, cap: 'Die Ausgabe entsteht Pfeil an Pfeil: \\(\\alpha_{31}x_1\\), dann \\(\\alpha_{32}x_2\\), dann \\(\\alpha_{33}x_3\\). <span data-link="o">\\(o_3\\)</span> liegt innerhalb der konvexen Hülle der Werte – ein gewichteter Durchschnitt, kein Auswahlvorgang.', eq: `\\(o_3=\\sum_j\\alpha_{3j}v_j=(${dt(base.o[0])};\\ ${dt(base.o[1])})\\)`},
+    {v: {c: c0, proj: 1, soft: 1, chain: 1, swap: 0}, cap: 'Was passiert, wenn die Skalarprodukte größer werden – etwa weil \\(d_k\\) wächst und nicht skaliert wird?', predict: {q: 'Wie verändern sich die Gewichte bei viermal größeren Energien?', options: ['Sie werden spitzer: fast alles Gewicht auf \\(x_3\\)', 'Sie bleiben gleich', 'Sie werden gleichmäßiger'], correct: 0, explain: 'Die Softmax vergrößert Unterschiede exponentiell: \\(e^{4\\Delta}\\) statt \\(e^{\\Delta}\\). Ohne Skalierung wächst \\(\\operatorname{Var}(q^\\top k)\\) mit \\(d_k\\) (Satz 3).'}},
+    {key: true, dur: 2000, v: {c: 4, proj: 1, soft: 1, chain: 1, swap: 0}, cap: '<b>Gegenprobe ohne passende Skalierung.</b> Mit \\(c=4\\) liegt fast das ganze Gewicht auf \\(x_3\\); die Softmax nähert sich einem \\(\\arg\\max\\), und ihr Gradient nach den übrigen Energien wird klein. Genau das verhindert \\(1/\\sqrt{d_k}\\).', eq: `\\(\\alpha_{33}=${dt(sharp.w[2])}\\) statt \\(${dt(base.w[2])}\\)`},
+    {dur: 1200, v: {c: c0, proj: 1, soft: 1, chain: 1, swap: 0}, cap: 'Zurück zu \\(c=1/\\sqrt2\\). Nun vertauschen wir die Reihenfolge von \\(x_1\\) und \\(x_2\\) im Satz.', predict: {q: 'Ändert sich \\(o_3\\)?', options: ['nein', 'ja'], correct: 0, explain: 'Die Gewichte hängen nur von den Vektoren ab, nicht von ihrer Position in der Folge.'}},
+    {key: true, dur: 1500, v: {c: c0, proj: 1, soft: 1, chain: 1, swap: 1}, cap: '<b>Verifikation.</b> Die Balken tauschen die Plätze, der Pfeil \\(o_3\\) bleibt, wo er war. Self-Attention ohne Positionskodierung sieht keine Reihenfolge (Satz 4) – deshalb braucht man Abschnitt 7.', eq: '\\(\\operatorname{Att}(PX)=P\\operatorname{Att}(X)\\)'}
+  ];
+  return {id: 'attention', fig: 'Abb. 6.1', title: 'Self-Attention als Geometrie: Projektion, Softmax, gewichtete Summe', question: 'Wie entsteht aus drei Vektoren eine neue Darstellung von Token 3 – und warum braucht man \\(1/\\sqrt{d_k}\\) und Positionen?', steps, draw};
+}
+
+// ---- storyboard 3: CRF — Viterbi (max) vs forward (sum), score vs probability ----
+function sceneViterbi() {
+  const L = ['O', 'B-LOC', 'I-LOC'], W = ['in', 'New', 'York'], E = [[2, 0, 0.5], [0.3, 1.0, 1.2], [0, 0.2, 1.5]];
+  const ok = (p, c) => !c.startsWith('I-') || (p !== null && p !== 'O' && p.slice(2) === c.slice(2));
+  const dp = mode => { const T = [L.map((c, k) => ok(null, c) ? {v: mode === 'max' ? E[0][k] : Math.exp(E[0][k]), bp: null} : null)];
+    for (let t = 1; t < 3; t++) T.push(L.map((c, k) => { const prev = T[t - 1].map((x, j) => x && ok(L[j], c) ? j : -1).filter(j => j >= 0); if (!prev.length) return null;
+      if (mode === 'max') { const j = prev.reduce((a, b) => T[t - 1][b].v > T[t - 1][a].v ? b : a); return {v: T[t - 1][j].v + E[t][k], bp: j}; }
+      return {v: prev.reduce((a, j) => a + T[t - 1][j].v, 0) * Math.exp(E[t][k]), bp: null}; })); return T; };
+  const MX = dp('max'), SM = dp('sum'), Z = SM[2].reduce((a, x) => a + (x ? x.v : 0), 0);
+  const best = [2]; for (let t = 2; t > 0; t--) best.unshift(MX[t][best[0]].bp);
+  const paths = []; for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) for (let c = 0; c < 3; c++) { const p = [a, b, c]; if (p.every((k, t) => ok(t ? L[p[t - 1]] : null, L[k]))) paths.push({p, s: p.reduce((s, k, t) => s + E[t][k], 0)}); }
+  paths.forEach(x => x.prob = Math.exp(x.s) / Z); paths.sort((a, b) => b.s - a.s);
+  const draw = (fig, v) => {
+    const svg = sv('svg', {viewBox: '0 0 780 330', class: 'plot', role: 'img'});
+    const X = t => 120 + t * 170, Y = k => 50 + k * 72, sumMode = v.mode > .5, T = sumMode ? SM : MX;
+    L.forEach((l, k) => svg.append(sv('text', {x: 8, y: Y(k) + 5, 'font-size': 13, fill: 'var(--mute)', 'font-family': 'var(--mono)'}, l)));
+    W.forEach((w, t) => svg.append(sv('text', {x: X(t), y: 272, 'text-anchor': 'middle', 'font-size': 15, fill: 'var(--ink)'}, w)));
+    for (let t = 1; t < 3; t++) L.forEach((c, k) => L.forEach((p, j) => { const allowed = ok(p, c) && !!T[t - 1][j], shown = clamp01(v.col - t) > 0;
+      const isBp = !sumMode && MX[t][k] && MX[t][k].bp === j, back = !sumMode && v.back > 0 && best[t] === k && best[t - 1] === j && v.back * 2 >= (3 - t);
+      svg.append(sv('line', {x1: X(t - 1) + 30, y1: Y(j), x2: X(t) - 30, y2: Y(k), stroke: back ? 'var(--ok)' : !allowed ? 'var(--bad)' : (shown && (sumMode || isBp)) ? 'var(--accent)' : 'var(--line2)',
+        'stroke-width': back ? 5 : (shown && isBp) ? 2.5 : 1, 'stroke-dasharray': allowed ? '' : '4 3', opacity: allowed ? (shown || back ? 1 : .5) : .7})); }));
+    E.forEach((row, t) => row.forEach((e, k) => { const cell = T[t][k], done = clamp01(v.col - t);
+      svg.append(sv('rect', {x: X(t) - 30, y: Y(k) - 24, width: 60, height: 48, rx: 8, fill: !cell ? 'var(--soft)' : 'var(--panel)', stroke: (v.back > 0 && best[t] === k && !sumMode) ? 'var(--ok)' : 'var(--line)', 'stroke-width': (v.back > 0 && best[t] === k && !sumMode) ? 2.5 : 1}));
+      svg.append(sv('text', {x: X(t), y: Y(k) - 6, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--mute)', 'font-family': 'var(--mono)'}, `s=${de(e, 1)}`));
+      svg.append(sv('text', {x: X(t), y: Y(k) + 13, 'text-anchor': 'middle', 'font-size': 13.5, 'font-weight': 600, 'font-family': 'var(--mono)', fill: sumMode ? 'var(--accent2)' : 'var(--accent)', opacity: done}, !cell ? '—' : sumMode ? `α=${de(cell.v * done, 2)}` : `δ=${de(cell.v * done, 1)}`)); }));
+    // right: path probabilities
+    const px = 610;
+    svg.append(sv('text', {x: px - 40, y: 24, 'font-size': 12.5, 'font-weight': 600, fill: 'var(--ink)'}, v.probs > 0 ? 'p(y | x) aller 13 gültigen Pfade' : (sumMode ? `Z = Σ α₃ = ${de(Z * clamp01(v.col - 2), 2)}` : 'δ: bester Score bis hier')));
+    if (v.probs > 0) paths.forEach((x, n) => { const y = 38 + n * 18, isB = x.p.join() === best.join();
+      svg.append(sv('rect', {x: px - 40, y, width: 150 * x.prob / paths[0].prob * v.probs * .9, height: 13, rx: 2, fill: isB ? 'var(--ok)' : 'var(--line2)'}));
+      svg.append(sv('text', {x: px + 100, y: y + 11, 'font-size': 10.5, 'font-family': 'var(--mono)', fill: 'var(--mute)', opacity: v.probs}, `${x.p.map(k => L[k][0]).join('')} ${de(x.prob, 3)}`)); });
+    svg.setAttribute('aria-label', sumMode ? `Forward-Algorithmus, Z ${de(Z, 2)}` : `Viterbi, bester Score ${de(MX[2][2].v, 1)}`);
     fig.replaceChildren(svg);
   };
   const steps = [
-    {key: true, fw: 0, cap: 'Zwei Sätze, ein mehrdeutiges Wort. Satz A meint die Person, Satz B den Bundesstaat. Unter jedem Wort steht seine Einbettung \\(e_t\\). Nur Wort 2 ist verschieden (orange).', eq: '<span data-link="e1">\\(e_1=(1,0)\\)</span> in beiden Sätzen; <span data-link="e2">\\(e_2=(0,1)\\)</span> in A, \\((0,-1)\\) in B.', alt: 'Zwei Sätze, Einbettungen sichtbar'},
-    {fw: 0, cap: 'Das Vorwärts-RNN berechnet zuerst \\(h^{\\rightarrow}_1\\) aus \\(h^{\\rightarrow}_0=0\\) und \\(e_1\\).', eq: '\\(h^{\\rightarrow}_1=\\tanh(0{,}5\\cdot h^{\\rightarrow}_0+e_1)\\)',
-      predict: {q: 'Wird \\(h^{\\rightarrow}_1\\) in Satz A und Satz B gleich sein?', options: ['gleich', 'verschieden', 'hängt von den Trainingsdaten ab'], correct: 0, explain: 'In der Formel für \\(h^{\\rightarrow}_1\\) kommt \\(e_2\\) nicht vor. Nur \\(e_1\\) geht ein, und das ist in beiden Sätzen \\((1,0)\\).'}},
-    {key: true, fw: 1, hl: 'h1f', cap: '<span data-link="h1f">\\(h^{\\rightarrow}_1\\)</span> ist in beiden Sätzen exakt derselbe Vektor.', eq: `\\[\\begin{aligned}h^{\\rightarrow}_1&=\\tanh\\big(0{,}5\\cdot(0,0)+(1,0)\\big)=(\\tanh 1,\\ \\tanh 0)\\\\&=${vec(A.f[0])}\\quad\\text{in A und B}\\end{aligned}\\]`, alt: 'Vorwärtszustand 1 in beiden Sätzen gleich'},
-    {key: true, fw: 2, hl: 'h2f', cap: 'Erst bei Position 2 liest das Vorwärts-RNN das unterschiedliche Wort. <span data-link="h2f">\\(h^{\\rightarrow}_2\\)</span> unterscheidet sich im Vorzeichen der zweiten Komponente.', eq: `\\[\\begin{aligned}\\text{A: }h^{\\rightarrow}_2&=\\tanh\\big(0{,}5\\cdot${vec(A.f[0])}+(0,1)\\big)=${vec(A.f[1])}\\\\ \\text{B: }h^{\\rightarrow}_2&=\\tanh\\big(0{,}5\\cdot${vec(B.f[0])}+(0,-1)\\big)=${vec(B.f[1])}\\end{aligned}\\]`},
-    {key: true, fw: 2, label: 'fw', cap: '<b>Gegenbeispiel zur Intuition „das RNN kennt den Satz“.</b> Der Klassifikator für Wort 1 erhält nur <span data-link="h1f">\\(h^{\\rightarrow}_1\\)</span>. Weil seine Eingabe in A und B identisch ist, ist auch seine Ausgabe identisch – für <em>jede</em> Wahl der Gewichte. Mindestens einer der beiden Sätze wird falsch markiert.', eq: '\\(p(y_1\\mid\\text{A})=\\operatorname{softmax}(W_oh^{\\rightarrow}_1+b_o)=p(y_1\\mid\\text{B})\\)'},
-    {fw: 2, label: 'fw', cap: 'Was müsste die Darstellung von Wort 1 enthalten, damit A → PER und B → LOC möglich wird?', eq: '',
-      predict: {q: 'Was fehlt \\(h^{\\rightarrow}_1\\)?', options: ['Information über Wort 2', 'mehr Trainingsdaten', 'eine größere Dimension \\(d_h\\)'], correct: 0, explain: 'Daten und Dimension ändern nichts daran, dass \\(e_2\\) nicht in \\(h^{\\rightarrow}_1\\) eingeht. Man braucht einen Rechenweg von Wort 2 zu Position 1.'}},
-    {key: true, fw: 2, bw: 1, hl: 'h2b', cap: 'Ein zweites RNN liest von rechts. Es beginnt bei Wort 2: <span data-link="h2b">\\(h^{\\leftarrow}_2\\)</span> hängt nur von \\(e_2\\) ab.', eq: `\\[\\text{A: }h^{\\leftarrow}_2=\\tanh\\big(0{,}8\\cdot0+(0,1)\\big)=${vec(A.b[1])},\\qquad \\text{B: }${vec(B.b[1])}\\]`},
-    {key: true, fw: 2, bw: 2, hl: 'h1b', cap: 'Dann Position 1: <span data-link="h1b">\\(h^{\\leftarrow}_1\\)</span> mischt \\(e_1\\) mit dem Zustand von rechts. Das Vorzeichen von Wort 2 erreicht damit Wort 1.', eq: `\\[\\begin{aligned}\\text{A: }h^{\\leftarrow}_1&=\\tanh\\big(0{,}8\\cdot${vec(A.b[1])}+(1,0)\\big)=${vec(A.b[0])}\\\\ \\text{B: }h^{\\leftarrow}_1&=\\tanh\\big(0{,}8\\cdot${vec(B.b[1])}+(1,0)\\big)=${vec(B.b[0])}\\end{aligned}\\]`},
-    {key: true, fw: 2, bw: 2, label: 'bi', cap: 'Verketten und klassifizieren. Mit \\(v=(0,0,0,1)\\) liest der Score genau die zweite Komponente von \\(h^{\\leftarrow}_1\\): positiv in A, negativ in B. Beide Sätze werden richtig markiert.', eq: `\\[s=v^{\\top}\\big[h^{\\rightarrow}_1;h^{\\leftarrow}_1\\big]=\\begin{cases}${dt(A.b[0][1])}&\\text{A: PER}\\\\${dt(B.b[0][1])}&\\text{B: LOC}\\end{cases}\\]`},
-    {key: true, fw: 2, bw: 2, label: 'bi', cap: '<b>Überprüfung am Satz.</b> Was die Zahlen zeigen, gilt allgemein: \\(h^{\\rightarrow}_t\\) ist eine Funktion von \\(x_1,\\dots,x_t\\) (Satz 1), \\(h^{\\leftarrow}_t\\) von \\(x_t,\\dots,x_T\\) (Satz 2). Für \\(t=1,T=2\\): \\(h^{\\rightarrow}_1=F_1(x_1)\\), \\(h^{\\leftarrow}_1=G_1(x_1,x_2)\\).', eq: '\\(\\{1\\}\\cup\\{1,2\\}=\\{1,2\\}\\): erst die Verkettung sieht beide Wörter.'}
+    {key: true, v: {col: 0, mode: 0, back: 0, probs: 0}, cap: 'Emissionswerte \\(s_t(\\ell)\\) eines BiRNN für „in New York“. Rot gestrichelt: verbotene Übergänge (I-LOC ohne vorheriges B-/I-LOC). Erlaubte Übergänge haben hier den Wert 0.', eq: '\\(S(x,y)=\\sum_{t}\\big(s_t(y_t)+A_{y_{t-1},y_t}\\big),\\quad A_{\\text{verboten}}=-\\infty\\)'},
+    {v: {col: 0, mode: 0, back: 0, probs: 0}, cap: 'Gierig je Wort das Maximum: O, I-LOC, I-LOC – ungültig.', predict: {q: 'Welcher gültige Pfad hat den größten Score?', options: ['O B-LOC I-LOC', 'O B-LOC B-LOC', 'O O O'], correct: 0, explain: 'Scores 4,5 gegen 3,2 und 2,3. Viterbi findet das, ohne alle 27 Pfade aufzuzählen.'}},
+    {key: true, dur: 2600, v: {col: 3, mode: 0, back: 0, probs: 0}, cap: '<b>Viterbi, Spalte für Spalte.</b> \\(\\delta_t(\\ell)\\) ist der beste Score eines gültigen Präfixes, das bei Label \\(\\ell\\) endet. Blau: der jeweils beste Vorgänger (Rückzeiger).', eq: '\\(\\delta_t(\\ell)=s_t(\\ell)+\\max_{\\ell\\prime}\\big(\\delta_{t-1}(\\ell\\prime)+A_{\\ell\\prime,\\ell}\\big)\\)'},
+    {key: true, dur: 1800, v: {col: 3, mode: 0, back: 1, probs: 0}, cap: `Rückverfolgung ab dem besten Endwert \\(\\delta_3(\\text{I-LOC})=${dt(MX[2][2].v, 1)}\\): O → B-LOC → I-LOC. Der Algorithmus kostet \\(O(T|\\mathcal L|^2)\\) statt \\(|\\mathcal L|^T\\).`, eq: ''},
+    {v: {col: 3, mode: 0, back: 1, probs: 0}, cap: 'Score 4,5 ist eine unnormierte Zahl. Wie sicher ist das Modell?', predict: {q: 'Welche Wahrscheinlichkeit \\(p(y^\\ast\\mid x)\\) hat der beste Pfad?', options: ['etwa 0,45', 'fast 1', 'etwa 0,1'], correct: 0, explain: 'Die Wahrscheinlichkeit normiert über <em>alle</em> gültigen Pfade. Mehrere Konkurrenten liegen nur 1,3 bis 2 Score-Punkte dahinter.'}},
+    {key: true, dur: 2600, v: {col: 3, mode: 1, back: 0, probs: 0}, cap: `<b>Forward-Algorithmus:</b> dieselbe Rekursion, nur mit Summe statt Maximum und mit \\(e^{\\text{Score}}\\) statt Score. \\(\\alpha_t(\\ell)\\) summiert über alle gültigen Präfixe. Ergebnis: \\(Z=${dt(Z, 2)}\\) – ohne 13 Pfade einzeln aufzuzählen.`, eq: '\\(\\alpha_t(\\ell)=e^{s_t(\\ell)}\\sum_{\\ell\\prime}\\alpha_{t-1}(\\ell\\prime)\\,e^{A_{\\ell\\prime,\\ell}},\\qquad Z(x)=\\sum_{\\ell}\\alpha_T(\\ell)\\)'},
+    {key: true, dur: 1600, v: {col: 3, mode: 1, back: 0, probs: 1}, cap: `<b>Score gegen Wahrscheinlichkeit.</b> Der beste Pfad hat \\(S=4{,}5\\), aber nur \\(p=e^{4{,}5}/Z=${dt(paths[0].prob, 4)}\\). Normiert wird die Wahrscheinlichkeit, nie der Score.`, eq: '\\(p(y\\mid x)=\\dfrac{\\exp S(x,y)}{Z(x)},\\qquad Z(x)=\\sum_{y\\prime\\text{ gültig}}\\exp S(x,y\\prime)\\)'},
+    {key: true, v: {col: 3, mode: 1, back: 0, probs: 1}, cap: '<b>Gültig ist nicht richtig.</b> Die Regeln schließen nur ungültige Folgen aus. Lägen die Emissionen von „York“ höher bei O, gewänne O B-LOC O – gültig, aber falsch abgegrenzt. Die Fallstudie (Abschnitt 13) zeigt genau solche Fehler.', eq: ''}
   ];
-  return {id: 'birnn', title: 'Das Washington-Experiment: was ein Zustand sehen kann', steps, draw};
+  return {id: 'viterbi', fig: 'Abb. 9.1', title: 'Linear-chain-CRF: bester Pfad (Viterbi) und Wahrscheinlichkeit (Forward)', question: 'Wie findet man die beste gültige Labelfolge – und wie sicher ist sie?', steps, draw};
+}
+
+// ---- storyboard 4: span encodings (IO, BIO, BILOU) ----
+function sceneSpans() {
+  const tok = ['Flüge', 'am', 'Montag', 'Dienstag', 'und', 'Freitag'], gold = [[2, 3], [3, 4], [5, 6]];
+  const enc = {IO: ['O', 'O', 'DAY', 'DAY', 'O', 'DAY'], BIO: ['O', 'O', 'B-DAY', 'B-DAY', 'O', 'B-DAY'], BILOU: ['O', 'O', 'U-DAY', 'U-DAY', 'O', 'U-DAY']};
+  const decodeIO = [[2, 4], [5, 6]];
+  const draw = (fig, v, s) => {
+    const svg = sv('svg', {viewBox: '0 0 780 260', class: 'plot', role: 'img'});
+    const X = i => 70 + i * 120, scheme = s.scheme || 'IO';
+    tok.forEach((w, i) => { svg.append(sv('rect', {x: X(i) - 54, y: 150, width: 108, height: 36, rx: 7, fill: 'var(--panel)', stroke: 'var(--line)'}), sv('text', {x: X(i), y: 173, 'text-anchor': 'middle', 'font-size': 14, fill: 'var(--ink)'}, w)); });
+    // gold spans as brackets (top)
+    const bracket = (a, b, y, c, op, lab) => { const x1 = X(a) - 50, x2 = X(b - 1) + 50; svg.append(sv('path', {d: `M${x1},${y + 10} L${x1},${y} L${x2},${y} L${x2},${y + 10}`, fill: 'none', stroke: c, 'stroke-width': 3, opacity: op})); if (lab) svg.append(sv('text', {x: (x1 + x2) / 2, y: y - 6, 'text-anchor': 'middle', 'font-size': 12, fill: c, opacity: op}, lab)); };
+    gold.forEach(([a, b]) => bracket(a, b, 120, 'var(--ok)', 1, 'DAY'));
+    // labels drop in
+    tok.forEach((_, i) => { const y = 200 + (1 - v.lab) * 30; svg.append(sv('text', {x: X(i), y: y + 18, 'text-anchor': 'middle', 'font-size': 14, 'font-family': 'var(--sans)', 'font-weight': 600, fill: enc[scheme][i] === 'O' ? 'var(--mute)' : 'var(--accent)', opacity: v.lab}, enc[scheme][i])); });
+    // decoded spans (bottom, morphing)
+    if (v.dec > 0) { const dec = scheme === 'IO' ? decodeIO : gold; dec.forEach(([a, b]) => { const x1 = X(a) - 50, x2 = X(b - 1) + 50, y = 236;
+      svg.append(sv('path', {d: `M${x1},${y - 8} L${x1},${y} L${x2},${y} L${x2},${y - 8}`, fill: 'none', stroke: scheme === 'IO' ? 'var(--bad)' : 'var(--ok)', 'stroke-width': 3, opacity: v.dec})); }); }
+    svg.append(sv('text', {x: 16, y: 30, 'font-size': 13, 'font-weight': 600, fill: 'var(--ink)'}, `Kodierung: ${scheme} · Labels für K Typen: ${scheme === 'IO' ? 'K+1' : scheme === 'BIO' ? '2K+1' : '4K+1'}`));
+    svg.append(sv('text', {x: 16, y: 52, 'font-size': 12, fill: 'var(--mute)'}, 'oben: Gold-Spannen · Mitte: Wörter · unten: Labels und die daraus zurückgelesenen Spannen'));
+    svg.setAttribute('aria-label', `${scheme}: ${enc[scheme].join(' ')}`); fig.replaceChildren(svg);
+  };
+  const steps = [
+    {key: true, scheme: 'IO', v: {lab: 0, dec: 0}, cap: 'Drei Gold-Spannen vom Typ DAY. „Montag“ und „Dienstag“ sind zwei <em>benachbarte</em> Spannen gleichen Typs.', eq: ''},
+    {key: true, scheme: 'IO', dur: 1000, v: {lab: 1, dec: 0}, cap: 'IO-Kodierung: jedes Wort einer Spanne bekommt das Typlabel.', eq: '\\(|\\mathcal L|=K+1\\)'},
+    {scheme: 'IO', v: {lab: 1, dec: 0}, cap: 'Jetzt lesen wir die Spannen aus den Labels zurück.', predict: {q: 'Erhält man wieder drei Spannen?', options: ['nein – Montag und Dienstag verschmelzen', 'ja'], correct: 0, explain: 'DAY DAY sieht genauso aus wie eine einzige zweiwortige Spanne. Die Grenze ist verloren.'}},
+    {key: true, scheme: 'IO', dur: 1200, v: {lab: 1, dec: 1}, cap: '<b>Gegenbeispiel:</b> Rückgelesen entsteht [Montag Dienstag] (rot) – IO ist nicht umkehrbar (Satz A).', eq: ''},
+    {key: true, scheme: 'BIO', dur: 1000, v: {lab: 1, dec: 0}, cap: 'BIO markiert jeden Spannenanfang mit B-.', eq: '\\(|\\mathcal L|=2K+1\\)'},
+    {key: true, scheme: 'BIO', dur: 1200, v: {lab: 1, dec: 1}, cap: '<b>Verifikation:</b> Jedes B- eröffnet eine neue Spanne; die drei Gold-Spannen kommen exakt zurück.', eq: ''},
+    {key: true, scheme: 'BILOU', dur: 1000, v: {lab: 1, dec: 1}, cap: 'BILOU markiert zusätzlich Ende (L-) und Einwortspannen (U-): \\(4K+1\\) Labels. Mehr Grenzinformation, weniger Beispiele je Label – Ratinov &amp; Roth (2009) fanden BILOU in ihrem System besser.', eq: '\\(|\\mathcal L|=4K+1\\)'}
+  ];
+  return {id: 'spans', fig: 'Abb. 2.1', title: 'Spannen als Labels: was IO verliert und BIO bewahrt', question: 'Kann man aus einem Label pro Wort die Spannen eindeutig zurückgewinnen?', steps, draw};
 }
 
 // ---- scene 2: F1 from counts, with every boundary case ----
@@ -346,7 +505,7 @@ F_1&=\\tfrac{2\\mathrm{TP}}{2\\mathrm{TP}+\\mathrm{FP}+\\mathrm{FN}}=${frac(2 * 
     {key: true, c: {tp: 0, fp: 0, fn: 0}, cap: '<b>Grenzfall (v):</b> Weder Gold noch Ausgaben. Auch die Zählform ist \\(0/0\\). Jede Zahl wäre eine Konvention (scikit-learn: <code>zero_division</code> = 0, 1 oder NaN) und muss genannt werden.', eq: ''},
     {c: {tp: 3, fp: 1, fn: 2}, free: true, cap: '<b>Jetzt Sie.</b> Verändern Sie TP, FP, FN mit den Tasten (auch auf 0) und beobachten Sie, wann welche Größe undefiniert wird.', eq: ''}
   ];
-  return {id: 'f1', title: 'F1 aus Zählungen – inklusive aller Fälle mit Nenner 0', steps, draw};
+  return {legacy: true, id: 'f1', title: 'F1 aus Zählungen – inklusive aller Fälle mit Nenner 0', steps, draw};
 }
 
 // ---- scene 3: phrase vs token counting ----
@@ -379,7 +538,7 @@ function sceneCounter() {
     {key: true, preset: 's1', cap: 'System 1 findet nur den Geldbetrag. Phrasen \\(F_1=\\tfrac23\\) – <em>besser</em> als System 2 –, Token \\(F_1=\\tfrac13\\). Die Rangfolge der Systeme dreht sich mit der Zähleinheit um.', eq: '\\(\\text{Phrasen: }\\tfrac{2}{2+0+1}=\\tfrac23,\\qquad \\text{Token: }\\tfrac{2}{2+0+4}=\\tfrac13\\)'},
     {preset: 's2', free: true, cap: '<b>Jetzt Sie.</b> Bauen Sie ein System, das auf Phrasen-Ebene \\(F_1=0\\), auf Token-Ebene aber über 0,5 erreicht.', eq: ''}
   ];
-  return {id: 'counter', title: 'Dieselbe Vorhersage, zwei Urteile', steps, draw};
+  return {legacy: true, id: 'counter', title: 'Dieselbe Vorhersage, zwei Urteile', steps, draw};
 }
 
 // ---- scene 4: micro vs macro ----
@@ -413,94 +572,8 @@ function sceneMicroMacro() {
     {key: true, misc: 10, cap: `MISC vollständig erkannt: Macro steigt um ${de(hi.macro - lo.macro, 3)}, Micro nur um ${de(hi.micro - lo.micro, 3)}.`, eq: ''},
     {misc: 1, free: true, cap: '<b>Jetzt Sie.</b> Verschieben Sie den Regler und beobachten Sie die beiden Linien.', eq: ''}
   ];
-  return {id: 'micromacro', title: 'Was eine seltene Klasse mit Micro und Macro macht', steps, draw};
+  return {legacy: true, id: 'micromacro', title: 'Was eine seltene Klasse mit Micro und Macro macht', steps, draw};
 }
-// ---- scene 5: self-attention as soft lookup, then permutation counterexample ----
-function attnRow(q, K, V, scale = true) {
-  const d = q.length, e = K.map(k => k.reduce((a, x, i) => a + x * q[i], 0) / (scale ? Math.sqrt(d) : 1));
-  const m = Math.max(...e), ex = e.map(x => Math.exp(x - m)), z = ex.reduce((a, b) => a + b, 0), w = ex.map(x => x / z);
-  return {e, w, o: V[0].map((_, j) => V.reduce((a, v, i) => a + w[i] * v[j], 0))};
-}
-function sceneAttention() {
-  const words = ['x₁', 'x₂', 'x₃'], X = [[1, 0], [0, 1], [1, 1]];
-  const draw = (fig, s) => {
-    const order = s.perm || [0, 1, 2], Xp = order.map(i => X[i]), qi = s.q ?? 2;
-    const r = attnRow(Xp[qi], Xp, Xp, s.scale !== false);
-    const svg = sv('svg', {viewBox: '0 0 760 270', class: 'plot', role: 'img', 'aria-label': `Gewichte ${r.w.map(x => de(x, 3)).join(', ')}`});
-    const X0 = i => 130 + i * 250, boxTop = 180;
-    // arcs first, so that all labels are drawn on top of them
-    if (s.show >= 2) order.forEach((src, i) => svg.append(sv('path', {d: `M${X0(i)},${boxTop} C${X0(i)},${boxTop - 60} ${X0(qi)},${boxTop - 90} ${X0(qi)},66`, fill: 'none', stroke: 'var(--accent2)', 'stroke-width': 1 + 14 * r.w[i], opacity: .55})));
-    order.forEach((src, i) => {
-      const isQ = i === qi;
-      svg.append(sv('rect', {x: X0(i) - 85, y: boxTop, width: 170, height: 76, rx: 10, fill: isQ ? 'var(--fw-bg)' : 'var(--panel)', stroke: isQ ? 'var(--fw)' : 'var(--line)', 'stroke-width': isQ ? 2.5 : 1.2, 'data-link': 'k' + (i + 1)}));
-      svg.append(sv('text', {x: X0(i), y: boxTop + 22, 'text-anchor': 'middle', 'font-size': 15, fill: 'var(--ink)'}, `${words[src]} = (${X[src].join(', ')})`));
-      svg.append(sv('text', {x: X0(i), y: boxTop + 42, 'text-anchor': 'middle', 'font-size': 11.5, fill: 'var(--mute)'}, isQ ? 'Anfrage, Schlüssel, Wert' : 'Schlüssel und Wert'));
-      if (s.show >= 1) svg.append(sv('text', {x: X0(i), y: boxTop + 64, 'text-anchor': 'middle', 'font-size': 12.5, fill: 'var(--ink)', 'font-family': 'var(--mono)'}, `e = ${de(r.e[i], 4)}`));
-      if (s.show >= 2) {
-        const lx = X0(i) + (i === qi ? 0 : (i < qi ? 40 : -40)), ly = i === qi ? 130 : 150;
-        svg.append(sv('rect', {x: lx - 58, y: ly - 15, width: 116, height: 22, rx: 6, fill: 'var(--panel)', stroke: 'var(--accent2)', 'stroke-width': .8}));
-        svg.append(sv('text', {x: lx, y: ly + 1, 'text-anchor': 'middle', 'font-size': 13, fill: 'var(--accent2)', 'font-weight': 600, 'data-link': 'a' + (i + 1)}, `α = ${de(r.w[i], 4)}`));
-      }
-    });
-    if (s.show >= 3) {
-      svg.append(sv('rect', {x: X0(qi) - 100, y: 26, width: 200, height: 40, rx: 8, fill: 'var(--panel)', stroke: 'var(--accent2)', 'stroke-width': 2, 'data-link': 'o'}));
-      svg.append(sv('text', {x: X0(qi), y: 51, 'text-anchor': 'middle', 'font-size': 14, fill: 'var(--accent2)', 'font-weight': 600}, `o = (${de(r.o[0], 4)}; ${de(r.o[1], 4)})`));
-    }
-    fig.replaceChildren(svg);
-  };
-  const base = attnRow(X[2], X, X), raw = attnRow(X[2], X, X, false);
-  const steps = [
-    {key: true, show: 0, cap: 'Drei Token als Vektoren. Mit \\(W_Q=W_K=W_V=I\\) ist jedes Token zugleich Anfrage, Schlüssel und Wert. Wir berechnen die Ausgabe für Token 3, die Anfrage \\(q_3=(1,1)\\).', eq: ''},
-    {key: true, show: 1, cap: 'Ähnlichkeit: Skalarprodukt mit jedem Schlüssel, geteilt durch \\(\\sqrt{d_k}=\\sqrt2\\).', eq: `\\(e_{3j}=q_3^\\top k_j/\\sqrt2=${base.e.map(x => dt(x)).join(';\\ ')}\\)`},
-    {show: 1, cap: 'Gleich wird die Softmax angewandt.', eq: '',
-      predict: {q: 'Welches Token bekommt das größte Gewicht?', options: ['Token 3 selbst', 'alle gleich', 'Token 1'], correct: 0, explain: '\\(q_3\\) hat mit \\(k_3=(1,1)\\) das größte Skalarprodukt (2 gegenüber 1). Die Softmax erhält die Reihenfolge der Energien.'}},
-    {key: true, show: 2, cap: 'Softmax: <span data-link="a3">\\(\\alpha_{33}\\)</span> ist das größte Gewicht. Die Gewichte summieren sich zu 1 – die Ausgabe ist ein Durchschnitt der Werte, kein Auswahlvorgang.', eq: `\\(\\alpha_{3\\cdot}=(${base.w.map(x => dt(x)).join(';\\ ')})\\)`},
-    {key: true, show: 3, cap: 'Gewichtete Summe der Werte: die neue Darstellung <span data-link="o">\\(o_3\\)</span> von Token 3 ist eine Mischung aller drei Token.', eq: `\\(o_3=\\sum_j\\alpha_{3j}v_j=(${dt(base.o[0])};\\ ${dt(base.o[1])})\\)`},
-    {show: 3, scale: false, cap: '<b>Gegenprobe ohne Skalierung.</b> Energien 1, 1, 2: Die Softmax wird spitzer. Bei großen \\(d_k\\) wachsen die Energien mit (Satz 3), und die Softmax nähert sich einem harten \\(\\arg\\max\\).', eq: `\\(\\alpha_{33}=${dt(raw.w[2])}\\) statt \\(${dt(base.w[2])}\\)`},
-    {show: 3, perm: [1, 0, 2], cap: 'Jetzt vertauschen wir Token 1 und 2. Token 3 steht weiter an Position 3.', eq: '',
-      predict: {q: 'Ändert sich \\(o_3\\)?', options: ['nein', 'ja, weil sich die Reihenfolge geändert hat', 'nur die Gewichte, nicht die Ausgabe'], correct: 0, explain: 'Die Gewichte wandern mit den Token mit, die gewichtete Summe bleibt dieselbe (Satz 4). Self-Attention ohne Positionskodierung sieht keine Reihenfolge.'}},
-    {key: true, show: 3, perm: [1, 0, 2], cap: '<b>Verifikation.</b> \\(o_3\\) ist exakt gleich – die Reihenfolge der anderen Token ist für Self-Attention unsichtbar. Genau deshalb braucht man Positionskodierungen (Abschnitt 7).', eq: `\\(o_3=(${dt(base.o[0])};\\ ${dt(base.o[1])})\\) vor und nach der Vertauschung`}
-  ];
-  return {id: 'attention', title: 'Self-Attention als weiche Suche', steps, draw};
-}
-
-// ---- scene 6: Viterbi repairs an invalid greedy sequence ----
-function sceneViterbi() {
-  const L = ['O', 'B-LOC', 'I-LOC'], W = ['in', 'New', 'York'], E = [[2, 0, 0.5], [0.3, 1.0, 1.2], [0, 0.2, 1.5]];
-  const allowed = (p, c) => !c.startsWith('I-') || (p !== null && p !== 'O' && p.slice(2) === c.slice(2));
-  const greedyPath = E.map(r => r.indexOf(Math.max(...r)));
-  function vit() { let best = L.map((c, k) => allowed(null, c) ? {s: E[0][k], p: [k]} : null);
-    for (let t = 1; t < E.length; t++) best = L.map((c, k) => { let b = null; best.forEach((x, j) => { if (x && allowed(L[j], c)) { const v = x.s + E[t][k]; if (!b || v > b.s) b = {s: v, p: [...x.p, k]}; } }); return b; });
-    return best.filter(Boolean).reduce((a, b) => b.s > a.s ? b : a); }
-  const V = vit();
-  const draw = (fig, s) => {
-    const svg = sv('svg', {viewBox: '0 0 760 280', class: 'plot', role: 'img'});
-    const X = t => 150 + t * 230, Y = k => 60 + k * 80;
-    L.forEach((l, k) => svg.append(sv('text', {x: 20, y: Y(k) + 5, 'font-size': 14, fill: 'var(--mute)', 'font-family': 'var(--mono)'}, l)));
-    W.forEach((w, t) => svg.append(sv('text', {x: X(t), y: 270, 'text-anchor': 'middle', 'font-size': 15, fill: 'var(--ink)'}, w)));
-    if (s.edges) for (let t = 1; t < 3; t++) L.forEach((c, k) => L.forEach((p, j) => { const ok = allowed(p, c);
-      svg.append(sv('line', {x1: X(t - 1) + 34, y1: Y(j), x2: X(t) - 34, y2: Y(k), stroke: ok ? 'var(--line2)' : 'var(--bad)', 'stroke-width': ok ? 1 : 1.5, 'stroke-dasharray': ok ? '' : '4 3', opacity: ok ? 1 : .8})); }));
-    const path = s.path === 'greedy' ? greedyPath : s.path === 'viterbi' ? V.p : null;
-    if (path) for (let t = 1; t < 3; t++) svg.append(sv('line', {x1: X(t - 1) + 34, y1: Y(path[t - 1]), x2: X(t) - 34, y2: Y(path[t]), stroke: s.path === 'greedy' ? 'var(--bad)' : 'var(--ok)', 'stroke-width': 4}));
-    E.forEach((row, t) => row.forEach((v, k) => { const on = path && path[t] === k;
-      svg.append(sv('rect', {x: X(t) - 34, y: Y(k) - 20, width: 68, height: 40, rx: 8, fill: on ? (s.path === 'greedy' ? 'var(--bw-bg)' : 'var(--fw-bg)') : 'var(--panel)', stroke: on ? 'var(--ink)' : 'var(--line)', 'stroke-width': on ? 2 : 1}));
-      svg.append(sv('text', {x: X(t), y: Y(k) + 5, 'text-anchor': 'middle', 'font-size': 14, 'font-family': 'var(--mono)', fill: 'var(--ink)'}, de(v, 1))); }));
-    if (s.edges) svg.append(sv('text', {x: 400, y: 20, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--bad)'}, 'rot gestrichelt: verbotene Übergänge (… → I-LOC ohne vorheriges B-/I-LOC)'));
-    fig.replaceChildren(svg);
-  };
-  const gs = greedyPath.reduce((a, k, t) => a + E[t][k], 0);
-  const steps = [
-    {key: true, cap: 'Emissionswerte \\(s_t(\\ell)\\) eines BiRNN für „in New York“: je Wort und Label eine Zahl. Höher heißt: passender.', eq: ''},
-    {path: 'greedy', cap: 'Gierige Dekodierung nimmt je Wort das Maximum.', eq: '',
-      predict: {q: 'Ist die gierige Folge gültiges BIO?', options: ['nein', 'ja'], correct: 0, explain: '<code>O I-LOC I-LOC</code>: Ein I-LOC darf nicht auf O folgen.'}},
-    {key: true, path: 'greedy', cap: `Gierig: <code>${greedyPath.map(k => L[k]).join(' ')}</code> mit Score ${de(gs, 1)} – höchster Score, aber ungültig.`, eq: ''},
-    {key: true, edges: true, cap: 'Das CRF bewertet ganze Pfade: Emissionen plus Übergänge. Verbotene Übergänge (rot) haben den Wert \\(-\\infty\\), erlaubte hier 0.', eq: '\\(\\operatorname{score}(y)=\\sum_t s_t(y_t)+A_{y_{t-1},y_t}\\)'},
-    {key: true, edges: true, path: 'viterbi', cap: `Viterbi findet den besten <em>erlaubten</em> Pfad: <code>${V.p.map(k => L[k]).join(' ')}</code> mit Score ${de(V.s, 1)}. Er gibt bei „New“ das schwächere B-LOC (1,0 statt 1,2) in Kauf, weil nur so ein gültiger Pfad durch York/I-LOC führt.`, eq: `\\(2+1{,}0+1{,}5=${dt(V.s, 1)}\\)`},
-    {edges: true, path: 'viterbi', cap: '<b>Grenze.</b> Die Regeln verbieten nur ungültige Folgen. Eine gültige, aber falsche Folge – etwa <code>B-LOC I-LOC</code> über „Berlin .“ – bleibt erlaubt; das zeigt die Fallstudie (Abschnitt 13).', eq: ''}
-  ];
-  return {id: 'viterbi', title: 'Viterbi: der beste gültige Pfad', steps, draw};
-}
-
 // ---- case study panel ----
 function caseStudy(root) {
   const C = U.case, Lb = C.labels;
@@ -529,7 +602,7 @@ function caseStudy(root) {
   }
   draw();
 }
-const SCENES = {birnn: sceneBirnn, f1: sceneF1, counter: sceneCounter, micromacro: sceneMicroMacro, attention: sceneAttention, viterbi: sceneViterbi};
+const SCENES = {birnn: sceneBirnn, f1: sceneF1, counter: sceneCounter, micromacro: sceneMicroMacro, attention: sceneAttention, viterbi: sceneViterbi, spans: sceneSpans};
 function mountScenes(scope, print) { scope.querySelectorAll('.scene[data-scene]').forEach(n => Scene(n, SCENES[n.dataset.scene](), print)); scope.querySelectorAll('.casestudy').forEach(n => { n.replaceChildren(); caseStudy(n); }); }
 
 // ---------- tasks ----------
@@ -547,7 +620,8 @@ function renderTask(task, ctx = {}) {
   const inputs = task.answers.map((a, i) => {
     const wrap = el('div', {class: 'ans'}), id = `${task.id}-a${i}`;
     wrap.append(el('label', {for: id, html: a.label + ':'}));
-    if (a.type === 'num' || a.type === 'set') wrap.append(el('input', {type: 'text', id, inputmode: a.type === 'set' ? 'text' : 'decimal', placeholder: a.type === 'set' ? 'z. B. 1, 2, 3' : 'Bruch (2/7) oder Dezimalzahl', autocomplete: 'off', enterkeyhint: 'done'}));
+    if (a.type === 'seq') wrap.append(el('input', {type: 'text', id, class: 'wide', placeholder: 'Labels mit Leerzeichen, z. B. O B-CITY I-CITY', autocomplete: 'off', spellcheck: 'false'}));
+    else if (a.type === 'num' || a.type === 'set') wrap.append(el('input', {type: 'text', id, inputmode: a.type === 'set' ? 'text' : 'decimal', placeholder: a.type === 'set' ? 'z. B. 1, 2, 3' : 'Bruch (2/7) oder Dezimalzahl', autocomplete: 'off', enterkeyhint: 'done'}));
     else if (a.type === 'choice') wrap.append(el('div', {role: 'radiogroup', id, 'aria-label': a.label}, a.options.map((o, k) => el('label', {class: 'radio'}, el('input', {type: 'radio', name: id, value: k}), ' ', el('span', {html: o})))));
     else wrap.append(el('textarea', {id, rows: 5, placeholder: 'Ihr Beweis bzw. Ihre Begründung'}));
     return wrap;
@@ -567,6 +641,9 @@ function renderTask(task, ctx = {}) {
     task.answers.forEach((a, i) => {
       const id = `${task.id}-a${i}`;
       if (a.type === 'num') { const v = $(`#${id}`, box).value, ok = numOk(v, a); if (ok === null) { all = false; msgs.push(['bad', `${a.label}: bitte eine Zahl oder einen Bruch eingeben.`]); return; } all &&= ok; msgs.push(ok ? ['ok', `${a.label}: richtig.`] : ['bad', `${a.label}: noch nicht. ` + (diagnose(v, a) || 'Schreiben Sie die Zwischenwerte einzeln auf und vergleichen Sie mit der Definition.')]); }
+      else if (a.type === 'seq') { const got = seqOf($(`#${id}`, box).value), want = a.value; const ok = JSON.stringify(got) === JSON.stringify(want); all &&= ok;
+        const pos = want.findIndex((w, k) => got[k] !== w);
+        msgs.push(ok ? ['ok', 'richtig.'] : ['bad', got.length !== want.length ? `noch nicht: Sie haben ${got.length} Labels für ${want.length} Wörter angegeben.` : `noch nicht: erste Abweichung bei Wort ${pos + 1} (${got[pos]}). Prüfen Sie dort Spannenanfang und Typ.`]); }
       else if (a.type === 'set') { const ok = JSON.stringify(parseSet($(`#${id}`, box).value)) === JSON.stringify(a.value); all &&= ok; msgs.push(ok ? ['ok', 'richtig.'] : ['bad', 'noch nicht – welche Eingaben erreichen den Zustand über die Rekursion?']); }
       else if (a.type === 'choice') { const c = box.querySelector(`input[name="${id}"]:checked`); if (!c) { all = false; msgs.push(['bad', 'bitte eine Option wählen.']); return; } const k = +c.value, ok = k === a.correct; all &&= ok; msgs.push(ok ? ['ok', 'richtig.'] : ['bad', 'noch nicht. ' + (((a.diagnoses || []).find(d => +d.value === k) || {}).msg || '')]); }
       else all = null;
@@ -581,6 +658,19 @@ function renderTask(task, ctx = {}) {
   return box;
 }
 
+
+// ---------- citations: every provenance marker links into the bibliography ----------
+const SOURCE_MATCH = [['SLP3', 'slp3'], ['Ratinov', 'ratinov'], ['Lample', 'lample'], ['Vaswani', 'vaswani'], ['Andor', 'andor'], ['Lafferty', 'lafferty'], ['Huang', 'huang'],
+  ['Opitz', 'opitz'], ['Manning', 'manning'], ['scikit', 'sklearn'], ['Tjong', 'conll'], ['CoNLL', 'conll'], ['Su et al', 'su'], ['Schuster', 'schuster'], ['Folie', 'kurs'], ['PDF-S', 'kurs'], ['Vorlesung', 'kurs']];
+function linkCitations(scope) {
+  scope.querySelectorAll('.prov').forEach(n => { if (n.querySelector('a')) return; const m = SOURCE_MATCH.find(([k]) => n.textContent.includes(k)); if (!m) return;
+    const a = el('a', {href: '#ref-' + m[1], class: 'cite'}); while (n.firstChild) a.append(n.firstChild); n.append(a); });
+  scope.querySelectorAll('a.cite').forEach(a => a.addEventListener('click', e => { const t = document.getElementById(a.getAttribute('href').slice(1)); if (t) { e.preventDefault(); t.scrollIntoView({block: 'center'}); t.classList.add('flash-ref'); setTimeout(() => t.classList.remove('flash-ref'), 1600); } }));
+}
+function bibliography() {
+  return el('ol', {class: 'refs'}, U.sources.map(s => el('li', {id: 'ref-' + s.id}, el('span', {class: 'prov', 'data-kind': s.kind}), ' ', s.ref, ' ',
+    s.doi ? el('a', {href: 'https://doi.org/' + s.doi, target: '_blank', rel: 'noopener'}, 'doi:' + s.doi) : s.url ? el('a', {href: s.url, target: '_blank', rel: 'noopener'}, s.url) : null)));
+}
 // ---------- views ----------
 const app = document.getElementById('app');
 function topbar(cur) {
@@ -624,11 +714,14 @@ function learn(anchor) {
     main.append(el('h2', {id: s.dataset.id}, s.dataset.title));
     s.querySelectorAll('.task-ref').forEach(r => r.replaceWith(renderTask(U.tasks.find(x => x.id === r.dataset.task))));
     main.append(...s.childNodes);
+    const more = U.tasks.filter(t => KC_SECTION[t.kc] === s.dataset.id && !U.text_html.includes(`data-task="${t.id}"`));
+    if (more.length) main.append(el('h3', {class: 'more-tasks'}, `Weitere Übungen zu ${KCS[more[0].kc]}`), ...more.map(t => renderTask(t)));
   }
-  const rest = U.tasks.filter(t => !U.text_html.includes(`data-task="${t.id}"`));
+  const rest = U.tasks.filter(t => !U.text_html.includes(`data-task="${t.id}"`) && !KC_SECTION[t.kc]);
   if (rest.length) { toc.append(el('a', {href: '#learn/weitere'}, 'Weitere Aufgaben')); main.append(el('h2', {id: 'weitere'}, 'Weitere Aufgaben'), ...rest.map(t => renderTask(t))); }
+  toc.append(el('a', {href: '#learn/literatur'}, 'Literatur')); main.append(el('h2', {id: 'literatur'}, 'Literatur'), bibliography());
   main.append(el('div', {class: 'card hero', style: 'margin-top:30px'}, el('h3', {}, 'Abschluss'), el('p', {}, `Prüfung ohne Hilfe, Form ${nextForm()}. Nach mindestens 24 h ohne Üben folgt die andere Form – erst sie zählt für „wahrscheinlich sicher“.`), el('button', {class: 'primary', onclick: () => go('exam')}, 'Zur Prüfung')));
-  mountScenes(main, false);
+  mountScenes(main, false); linkCitations(main);
   setTimeout(() => {
     const target = anchor && document.getElementById(anchor); if (target) target.scrollIntoView();
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { const id = e.target.id; st.visited[id] = 1; st.last = id; if (SECTION_KC[id]) introduceCards(SECTION_KC[id]); save(); toc.querySelectorAll('a').forEach(a => a.classList.toggle('cur', a.dataset.id === id)); } }), {rootMargin: '0px 0px -70% 0px'});
@@ -675,6 +768,7 @@ function exam() {
       x.answers.forEach((a, k) => { const id = `${x.id}-a${k}`;
         if (a.type === 'num') ok &&= !!numOk($(`#${id}`, box).value, a);
         else if (a.type === 'set') ok &&= JSON.stringify(parseSet($(`#${id}`, box).value)) === JSON.stringify(a.value);
+        else if (a.type === 'seq') ok &&= JSON.stringify(seqOf($(`#${id}`, box).value)) === JSON.stringify(a.value);
         else if (a.type === 'choice') { const c = box.querySelector(`input[name="${id}"]:checked`); ok &&= !!c && +c.value === a.correct; } });
       return {id: x.id, kc: x.kc, correct: ok, conf: +box._conf.value, transfer: !!x.transfer};
     });
@@ -721,7 +815,8 @@ function render() {
 // ---------- print products: one model, five purpose-built documents ----------
 const PART = document.body.dataset.part || 'lehrbuch';
 const PART_TITLE = {lehrbuch: 'Lehrbuch', arbeitsbuch: 'Arbeitsbuch', loesungen: 'Musterlösungen zum Arbeitsbuch', klausur: 'Probeklausur', klausur_loesungen: 'Probeklausur – Lösungen und Bewertung'};
-const sectionOf = id => { const sec = sections().find(x => x.innerHTML.includes(`data-task="${id}"`)); return sec ? sec.dataset.title : 'Weitere Aufgaben'; };
+const sectionOf = id => { const t = U.tasks.find(x => x.id === id); const secs = sections(); const sec = secs.find(x => x.innerHTML.includes(`data-task="${id}"`)) || secs.find(x => x.dataset.id === KC_SECTION[t.kc]); return sec ? sec.dataset.title : 'Weitere Aufgaben'; };
+const sectionIndex = id => { const t = U.tasks.find(x => x.id === id); const secs = sections(); const i = secs.findIndex(x => x.innerHTML.includes(`data-task="${id}"`)); return i >= 0 ? i : secs.findIndex(x => x.dataset.id === KC_SECTION[t.kc]); };
 function titlePage(m) {
   m.append(el('div', {class: 'titlepage'}, el('p', {class: 'kicker'}, `${U.course} · Kapitel ${U.chapter}`), el('h1', {}, U.title), el('p', {class: 'lead'}, PART_TITLE[PART]),
     el('p', {class: 'mute small'}, `Fassung ${U.version}. ${U.status}`)));
@@ -732,7 +827,7 @@ function bookLehrbuch(m) {
     s.querySelectorAll('.task-ref').forEach(r => { const t = U.tasks.find(x => x.id === r.dataset.task); r.replaceWith(el('p', {class: 'xref'}, `→ Arbeitsbuch, Aufgabe ${t.id}: ${t.title}`)); });
     m.append(...s.childNodes);
   }
-  m.append(el('h2', {}, 'Literatur'), el('ol', {class: 'refs'}, U.sources.map(s => el('li', {}, s.ref, s.doi ? ` doi:${s.doi}` : s.url ? ` ${s.url}` : ''))));
+  m.append(el('h2', {id: 'literatur'}, 'Literatur'), bibliography()); linkCitations(m);
 }
 function taskBlock(t, withSolution) {
   const b = el('div', {class: 'task'}, el('header', {}, el('span', {class: 'stage'}, STAGE[t.stage] || ''), el('b', {}, `${t.id} · ${t.title}`), el('span', {class: 'mute small'}, KCS[t.kc])), el('div', {html: t.prompt}));
@@ -751,7 +846,9 @@ function taskBlock(t, withSolution) {
 function bookArbeitsbuch(m, sol) {
   m.append(el('p', {}, sol ? 'Zu jeder Aufgabe des Arbeitsbuchs: vollständige Lösung, typische Fehler mit Diagnose und Bewertungsschema.' : 'Die Aufgaben sind nach Abschnitten des Lehrbuchs geordnet und gestuft: durchgerechnet → Lückenschritt → mit Hinweisen → selbstständig → Fehleranalyse → Transfer. Hinweise stehen am Ende; schlagen Sie sie erst nach einem eigenen Versuch nach.'));
   let cur = null;
-  for (const t of U.tasks) { const sec = sectionOf(t.id); if (sec !== cur) { m.append(el('h2', {}, sec)); cur = sec; } m.append(taskBlock(t, sol)); }
+  const ORDER = ['recall', 'worked', 'guided', 'faded', 'hint', 'independent', 'error', 'proof', 'transfer'];
+  const tasks = [...U.tasks].sort((a, b) => (sectionIndex(a.id) - sectionIndex(b.id)) || (ORDER.indexOf(a.stage) - ORDER.indexOf(b.stage)));
+  for (const t of tasks) { const sec = sectionOf(t.id); if (sec !== cur) { m.append(el('h2', {}, sec)); cur = sec; } m.append(taskBlock(t, sol)); }
   if (!sol) m.append(el('h2', {}, 'Hinweise'), el('dl', {}, U.tasks.filter(t => (t.hints || []).length).flatMap(t => [el('dt', {}, t.id), el('dd', {html: t.hints.join(' · ')})])));
 }
 function bookKlausur(m, sol) {
