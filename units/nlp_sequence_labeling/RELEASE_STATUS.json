@@ -1,0 +1,26 @@
+{
+ "unit": "nlp-sequence-labeling",
+ "history": [
+  {
+   "version": 1,
+   "commit": "e01232e",
+   "status": "HUMAN_REJECTED",
+   "date": "2026-11-14",
+   "ratings": {
+    "textbook": "1/4",
+    "mathematics": "0/4",
+    "visuals": "0/4",
+    "learning_process": "1/4",
+    "exam_readiness": "1/4"
+   },
+   "ref": "Issue #4"
+  },
+  {
+   "version": 2,
+   "status": "HUMAN_REVIEW_PENDING",
+   "date": "2026-11-14",
+   "ref": "docs/reference_unit/ISSUE4_CORRECTIONS.md"
+  }
+ ],
+ "rule": "Only a human rating changes a status. CI and agent checks never do."
+}

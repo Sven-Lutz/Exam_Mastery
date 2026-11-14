@@ -1,6 +1,6 @@
 # NLP reference unit: BiRNN tagging and its evaluation
 
-Status: **new version NOT_REVIEWED** · rejected baseline stays **HUMAN_REJECTED** (human rating 1/5, NLP 1.34/4).
+Status: **version 1 of this unit HUMAN_REJECTED on 2026-11-14 (Issue #4: 1/4, 0/4, 0/4, 1/4, 1/4)**. Version 2: HUMAN_REVIEW_PENDING, see `ISSUE4_CORRECTIONS.md`. The engine baseline stays HUMAN_REJECTED (1/5). The sections below describe version 1 and are kept as history.
 Built 2026-11-14 from `units/nlp_sequence_labeling/` with `python -m exam_mastery.reference_unit build`.
 
 ## 1. Why the old engine could not deliver (root causes, with evidence)

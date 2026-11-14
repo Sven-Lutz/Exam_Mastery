@@ -32,10 +32,22 @@ def _counts(spec):
     return {f'k{i}': S.Counts(*map(int, part.split(','))) for i, part in enumerate(spec.split(';'))}
 
 
+def exam_items(unit):
+    return [it for form in unit.get('exam_forms', {}).values() for it in form] + unit.get('exam', [])
+
+
+def toy_states(unit, sentence, direction):
+    toy = unit['toy']
+    xs = [toy['emb'][w] for w in ('Washington', sentence)]
+    a = toy['a_fw'] if direction == 'fw' else toy['a_bw']
+    comps = [S.rnn_scalar([x[k] for x in xs], a, 1.0, reverse=direction == 'bw') for k in range(2)]
+    return [(comps[0][i], comps[1][i]) for i in range(len(xs))]
+
+
 def compute(check: str, unit: dict):
-    """Evaluate a check key to an exact value (Fraction, int, or sorted list)."""
+    """Evaluate a check key to an exact value (Fraction, int, float or sorted list)."""
     kind, _, arg = check.partition(':')
-    data = {t['id']: t.get('data') for t in unit['tasks'] + unit['exam']}
+    data = {t['id']: t.get('data') for t in unit['tasks'] + exam_items(unit)}
     if kind == 'params':
         d, h, L = map(int, arg.split(':'))
         return S.birnn_tagger_param_count(d, h, L)
@@ -52,6 +64,12 @@ def compute(check: str, unit: dict):
     if kind == 'dep':
         T, t, direction = arg.split(':')
         return sorted(S.dependence(int(T), direction)[int(t)])
+    if kind == 'toy':
+        direction, sentence, t, comp = arg.split(':')
+        return toy_states(unit, sentence, direction)[int(t) - 1][int(comp)]
+    if kind == 'fpr':
+        p, r = (Fraction(x) for x in arg.split(':'))
+        return S.f_beta(p, r, 1)
     if kind == 'birnn_b1':
         return S.rnn_scalar([1, 0, -1], 0.8, 0.5, reverse=True)[0]
     raise UnitError(f'unknown check {check!r}')
@@ -94,18 +112,62 @@ def load(unit_dir: Path) -> dict:
     return unit
 
 
+# Inputs that appear as decimals in the prose but are given, not computed (value, why).
+GIVEN_DECIMALS = {'0,5': 'W = 0,5 I and toy damping', '0,8': "W' = 0,8 I", '0,1': 'illustrative P', '0,2': 'given P',
+                  '0,9': 'given P / PER F1', '0,3': 'given R', '0,6': 'arithmetic mean of 0,9 and 0,3 (exam B-4)',
+                  '200,000': 'currency literal $200,000,000 from the lecture example'}
+
+
+def _known_decimals(unit):
+    """Every decimal (4 and fewer places) the prose may show, derived from recomputation."""
+    vals = set()
+    def add(x):
+        for d in (1, 2, 3, 4):
+            vals.add(f'{float(x):.{d}f}'.replace('.', ','))
+            vals.add(f'{abs(float(x)):.{d}f}'.replace('.', ','))
+    for sentence in ('signed', 'state'):
+        for direction in ('fw', 'bw'):
+            for h in toy_states(unit, sentence, direction):
+                for v in h:
+                    add(v)
+    a = unit['toy']['a_bw']
+    for sentence in ('signed', 'state'):
+        add(a * toy_states(unit, sentence, 'bw')[1][1])      # argument before tanh in B2
+        add(unit['toy']['a_fw'] * toy_states(unit, sentence, 'fw')[0][0])   # 0,3808 in G1
+    for _, fn, exp in TEXT_CLAIMS:
+        add(fn()) if not isinstance(exp, int) else None
+    ex = _ex()
+    for c in ex.values():
+        add(S.f1(c))
+    add(S.micro({k: v for k, v in ex.items() if k != 'k3'})['F1'])
+    add(S.macro({k: v for k, v in ex.items() if k != 'k3'}))
+    add(S.f_beta(Fraction(1, 10), Fraction(1), 1)); add(Fraction(11, 20))
+    for it in unit['tasks'] + exam_items(unit):
+        for a_ in it['answers']:
+            if a_['type'] == 'num':
+                add(compute(a_['check'], unit))
+    for spec in ('80,10,20;50,25,5;0,3,7', '60,15,10;40,20,30;70,5,5', '50,10,10;10,30,10;90,10,10'):
+        for c in _counts(spec).values():
+            add(S.f1(c))
+    add(Fraction(9, 10) * Fraction(3, 10)); add(Fraction(6, 5)); add(Fraction(1, 10) + 1)  # P*R, P+R in B-4 and section 7
+    return vals
+
+
 def verify(unit: dict) -> dict:
     errors, checked = [], []
     for name, fn, expected in TEXT_CLAIMS:
         got = fn()
         (checked if got == expected else errors).append(f'text: {name}: {got}')
+    items = unit['tasks'] + exam_items(unit)
     ids = set()
-    for item in unit['tasks'] + unit['exam']:
+    for item in items:
         if item['id'] in ids:
             errors.append(f'duplicate id {item["id"]}')
         ids.add(item['id'])
         if not item.get('solution'):
             errors.append(f'{item["id"]}: no worked solution')
+        if 'accept' in item:
+            errors.append(f'{item["id"]}: multiple accepted answers are not allowed (ambiguity)')
         for a in item['answers']:
             if a['type'] in ('num', 'set'):
                 v = compute(a['check'], unit)
@@ -116,15 +178,36 @@ def verify(unit: dict) -> dict:
                     if abs(_num(d['value']) - float(v)) <= tol:
                         errors.append(f'{item["id"]}: diagnosis {d["value"]} equals the correct answer')
                 checked.append(f'{item["id"]}/{a["label"][:30]} = {v}')
-            elif a['type'] == 'choice' and not (0 <= a['correct'] < len(a['options'])):
-                errors.append(f'{item["id"]}: choice index out of range')
-        for step in item.get('steps', []):
-            for m in re.findall(r'(-?\d+\{,\}\d{4})', step['s']):
-                pass  # step decimals are covered by the B2 check below
-    b2 = S.rnn_scalar([1, 0, -1], 0.8, 0.5, reverse=True)
-    for want, got in (('-0{,}4621', b2[2]), ('-0{,}3537', b2[1]), ('0{,}2137', b2[0])):
-        if f'{got:.4f}'.replace('.', '{,}') != want:
-            errors.append(f'B2 step value {want} != {got:.4f}')
+            elif a['type'] == 'choice':
+                if not isinstance(a.get('correct'), int) or not 0 <= a['correct'] < len(a['options']):
+                    errors.append(f'{item["id"]}: choice needs exactly one valid correct index')
+                if len(set(a['options'])) != len(a['options']):
+                    errors.append(f'{item["id"]}: duplicate options')
+                for d in a.get('diagnoses', []):
+                    if int(d['value']) == a['correct']:
+                        errors.append(f'{item["id"]}: diagnosis attached to the correct option')
+    kcs = set(unit['kcs'])
+    for name, form in unit.get('exam_forms', {}).items():
+        per = {k: [it for it in form if it['kc'] == k] for k in kcs}
+        for k, its in per.items():
+            if len(its) < 2:
+                errors.append(f'exam form {name}: KC {k} has {len(its)} items (need >= 2)')
+        for k in ('birnn', 'prf', 'prf-level'):
+            if not any(it.get('transfer') for it in per.get(k, [])):
+                errors.append(f'exam form {name}: KC {k} lacks a transfer item')
+    for t in unit['tasks'] + exam_items(unit):
+        if t['kc'] not in kcs:
+            errors.append(f'{t["id"]}: unknown KC {t["kc"]}')
+    known = _known_decimals(unit)
+    prose = unit['text_html'] + json.dumps([t.get('steps', []) for t in unit['tasks']], ensure_ascii=False) + \
+        json.dumps([t.get('solution', '') for t in items], ensure_ascii=False)
+    prose = prose.replace('\\\\', '\\')
+    for m in sorted(set(re.findall(r'-?\d+\{,\}\d+', prose))):
+        n = m.replace('{,}', ',')
+        if n.lstrip('-') not in known and n.lstrip('-') not in GIVEN_DECIMALS:
+            errors.append(f'prose decimal {n} is neither recomputed nor a declared input')
+        else:
+            checked.append(f'prose {n}')
     seen = set()
     for c in unit['cards']:
         if c['key'] in seen or not re.fullmatch(r'[a-z0-9-]+/[a-z0-9-]+', c['key']):
@@ -136,7 +219,8 @@ def verify(unit: dict) -> dict:
             errors.append(f'text references unknown task {ref}')
     if html.count('\\(') != html.count('\\)') or html.count('\\[') != html.count('\\]'):
         errors.append('unbalanced TeX delimiters in text')
-    report = {'ok': not errors, 'errors': errors, 'checked': checked}
+    report = {'ok': not errors, 'errors': errors, 'checked': checked,
+              'scope': 'Recomputes numbers only. Proofs and prose arguments are audited by hand: docs/reference_unit/MATH_AUDIT.md'}
     if errors:
         raise UnitError(json.dumps(report, ensure_ascii=False, indent=1))
     return report

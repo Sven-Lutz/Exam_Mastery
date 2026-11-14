@@ -1,0 +1,23 @@
+# Mathematical audit: NLP reference unit, version 2 (2026-11-14)
+
+Scope: every theorem, derivation and quantitative claim in `units/nlp_sequence_labeling/`. The machine checks are listed exactly as run. **This audit is the author's own; it does not replace the independent expert review requested in Issue #4.**
+
+| # | Claim (where) | Argument in the text | Independent check actually run | Assumptions / limits stated | Source |
+|---|---|---|---|---|---|
+| 1 | Satz 1: $h^{\rightarrow}_t = F_t(x_1..x_t)$ (§2) | Induction, aligned, one justification per line | Toy experiment: $h^{\rightarrow}_1$ identical in both sentences (`test_toy_experiment…`). The argument holds for any recurrence $f$, not only tanh. | $h_0$ does not depend on the input; Elman form | SLP3 §14.4.2, Eq. 14.16, p. 313; lecture PDF p. 78 |
+| 2 | Satz 2: $h^{\leftarrow}_t$ depends on $x_t..x_T$, $h^{bi}_t$ on all inputs (§3) | Reversal → Satz 1; union of index sets | Toy experiment: backward state changes sign with word 2. SymPy: with $W'=0$, $\partial h^{\leftarrow}_1/\partial x_2=0$. | **Corrected in v2:** "depends on" means "can be written as a function of". An actual change is not guaranteed (counterexample $W'=0$ is in the text). v1 claimed "im Allgemeinen tatsächlich von jedem $x_s$". | SLP3 §14.4.2, Eq. 14.17, pp. 313–314; lecture PDF pp. 79–80 |
+| 3 | Classifier on $h^{\rightarrow}_1$ gives the same output for A and B "for every choice of weights" (scene step 5) | Equal input ⇒ equal output of a deterministic function | Follows from #1 | Deterministic classifier, no dropout at test time | — |
+| 4 | Parameter count $2(d_h^2+d_hd+d_h)+\lvert\mathcal L\rvert(2d_h+1)$ (§5, B1, A1, B-1) | Counted matrix by matrix | SymPy expansion; recomputed for 4 configurations by the verifier | Elman cell without embedding matrix; an LSTM has 4 gates and about 4× the recurrent parameters (not part of this unit) | lecture PDF p. 11 (CoNLL types) |
+| 5 | $F_1$ as the inverse mean of "effort per hit" $= 2TP/(2TP+FP+FN)$ (§7) | Aligned four-line derivation | SymPy: identity simplifies to 0. 2,000 random count triples with exact fractions. | $TP>0$ (division by TP) | SLP3 §4.9, Eq. 4.43–4.44, p. 114 |
+| 6 | Satz 3 incl. $TP=0$: harmonic form never defined, count form defined except in case (v) (§8) | Case table (i)–(v) plus aligned proof | SymPy for $TP>0$. Each case (ii)–(v) tested in Python **and** in the app's JS (`test_tp_zero_cases…`, `test_js_metrics…`). | **Corrected in v2:** v1's table showed case (ii) and did not state that $2PR/(P+R)$ is undefined for *every* $TP=0$ | lecture PDF p. 20 (formula); scikit-learn 1.9.1 `zero_division` |
+| 7 | Satz 4: $\min\le F_1\le\max$, $F_1\le(P+R)/2$, $F_1\le 2\min$ (§8) | Equivalence chains, every division justified | SymPy: $F_1-P=P(R-P)/(P+R)$, $2P-F_1=2P^2/(P+R)$, mean difference $=(P-R)^2/(2(P+R))$. 2,000 random cases. | $P,R\in(0,1]$ | — (own) |
+| 8 | Number of candidate spans $T(T+1)/2$, $T=30$ gives 465 (§6) | Spans = pairs $i\le j$ | Verifier recomputes the prose number | Contiguous spans only | — |
+| 9 | Phrase/token counts of the lecture example (§9, scene 3) | Explicit TP/FP/FN lists | Verifier (exact fractions). Python/JS parity on 150 random BIO pairs. | conlleval reading of BIO | lecture PDF pp. 21–22 (values match the slide) |
+| 10 | Micro/macro numbers, "without MISC 0.76 / 0.7405" (§10) | Aligned computation | Verifier, exact fractions | Macro = mean of per-type F1. The second definition (0.5926) is stated. | SLP3 §4.9.1, pp. 114–115; Opitz & Burst 2019 (preprint) |
+| 11 | Satz 5: micro-F1 = accuracy under single-label, all-classes pooling (§10) | Each error is exactly one FP and one FN | SymPy on the final ratio. 300 random label sequences. | Exactly one gold and one system label per token; O pooled | — (own) |
+| 12 | Label bias of locally normalised step-wise taggers; CRF avoids it (§4c) | Prose, no derivation | **Not machine-checkable.** Literature claim. | Lafferty et al. page range not verified | Lafferty et al. 2001; Andor et al. 2016 (DOI checked) |
+| 13 | Scene numbers (toy states, score ±0.5436, micro/macro deltas) | Computed at runtime from the same formulas | Verifier recomputes the prose decimals (71 checks). Scene captions with deltas are computed, not typed (a v2 draft had typed "+0.21/+0.05"; correct is +0.175/+0.042). | — | — |
+
+**Every decimal in the prose and solutions** is matched by `reference_unit.verify` against a recomputed value or a declared input (`GIVEN_DECIMALS`). A changed digit fails the build (`test_rejects_ambiguous_or_wrong_items`).
+
+**Not covered by any machine check:** the correctness of explanations in prose (e.g. "Ein Fehler kostet gleich viel") and the didactic adequacy of the examples. These need the human expert review.
