@@ -1,0 +1,6 @@
+{"schema": "em-tutor-context-v1", "created": "2026-11-10T10:00:00Z",
+ "track": {"id": "ml/backprop-track", "title": "Wie ein Netz aus einem Fehler lernt – adaptiv", "objective": "Gradient eines Gewichts der verdeckten Schicht herleiten.", "domain": "machine_learning", "lab": "ml/backprop-2-2-1"},
+ "competency": {"id": "ml/backpropagation", "type": "derivation", "label": "Gradienten mit der Kettenregel herleiten"},
+ "task": {"id": "ml-core", "role": "core", "type": "expression", "prompt": "Leiten Sie ∂L/∂w₁₁ als Produkt her."},
+ "attempts": [{"t": "2026-11-10T10:00:00Z", "task": "ml-core", "observed": "δ_o·v₁·a₁(1−a₁)", "result": "incorrect", "error_category": "missing_input_factor", "method": "expression", "evidence": "RANDOMIZED_IDENTITY_TEST"}],
+ "hints_used": 0, "solution_viewed": false, "support_level": "none", "learner_question": "Was fehlt mir?"}

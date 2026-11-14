@@ -1,0 +1,11 @@
+#!/bin/zsh
+set -eu
+engine_dir="${0:A:h}"
+python_runtime="${EXAM_MASTERY_PYTHON:-$HOME/.cache/exam-mastery-v05-runtime/bin/python}"
+if [[ ! -x "$python_runtime" ]]; then
+  print 'Lokale Laufzeit fehlt; siehe README der Engine.' >&2
+  exit 2
+fi
+export PYTHONPYCACHEPREFIX="${PYTHONPYCACHEPREFIX:-$HOME/.cache/exam-mastery-v05-pycache}"
+cd "$engine_dir"
+exec "$python_runtime" -m exam_mastery.onepath "$@"

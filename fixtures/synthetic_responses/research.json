@@ -1,0 +1,24 @@
+{
+  "evidence_items": [
+    {
+      "id": "E1",
+      "finding": "The simplified pretax-profit tax-rate and share-count relationship is explicitly defined in the synthetic course source.",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "E2",
+      "finding": "The source distinguishes percentage-point changes from relative earnings-per-share changes.",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "contradictions": [],
+  "external_research_needed": [],
+  "visual_review_needed": [],
+  "exam_scope_uncertainty": []
+}

@@ -1,0 +1,26 @@
+{
+  "updated": "2026-11-14",
+  "repo": "Sven-Lutz/Exam_Mastery",
+  "branch": "import/engine-snapshot",
+  "pr": 2,
+  "local_engine_checkout": "~/Documents/02_Projekte/01_GitHub_Projekte/Exam_Mastery_Studio/engine/Exam_Mastery_Engine_v0_5_1_p0_dev (feat/v0.18-learning-engine @ 913db7b, full history bundled in ~/Projects/Exam_Mastery_Backups)",
+  "release_status": {"nlp_neural_sequence_labeling_and_rc_v0.21.0-rc1_products": "HUMAN_REJECTED"},
+  "done": [
+    "A: inventory (clean tree, no active runs, no launchd job)",
+    "B: curated snapshot imported, SHA-256 verified, fresh venv 715 passed / 6 skipped",
+    "D (partial): 67,448 derived images/caches in unreferenced runs deleted, ~5.3 GiB freed (log: ~/Projects/Exam_Mastery_Backups/cleanup-2026-11-14-deleted.tsv)"
+  ],
+  "next_action": "C: reference unit NLP 'Neural Sequence Labeling' (BiRNN, token/span F1 incl. zero-denominator, micro/macro). First locate the reported critical defect in the archived rejected run course-0e03a5f311fb/ch-20261113T185317Z-22ffdf83; fix root causes in author prompt/schema/visual/math path; regenerate only this chapter via the engine.",
+  "open_decisions_for_owner": [
+    "Merge PR #2 (snapshot without history) or request history publication after author rewrite",
+    "Authorised budget for the next production run (agent provider: ledger 32/50 used)",
+    "Authorise the Sunday launchd job",
+    "Concrete location of the 'critical error' in the NLP rating, if known"
+  ],
+  "cleanup_candidates_not_touched": [
+    "Exam_Mastery_Studio/runs_v0_5_1_p0_dev (876M, old engine runs)",
+    "Exam_Mastery_Studio/output (223M), review_exports (85M), release_candidates (19M)",
+    "Referenced runs kept intact as baselines"
+  ],
+  "budget": {"paid_calls_authorised": 0}
+}

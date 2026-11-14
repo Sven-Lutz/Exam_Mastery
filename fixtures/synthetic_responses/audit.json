@@ -1,0 +1,19 @@
+{
+  "findings": [
+    {
+      "description": "Development fixture is internally consistent; this is not independent model verification.",
+      "object_id": "U1",
+      "severity": "info",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ]
+    }
+  ],
+  "reviewed_competencies": [
+    "C1",
+    "C2",
+    "C3"
+  ],
+  "unverified_claims": [],
+  "verdict": "PASS"
+}

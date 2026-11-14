@@ -1,0 +1,19 @@
+{
+ "schema": "em-subject-sources-v1",
+ "subject": "patentrecht",
+ "version": "1.0.0",
+ "date": "2026-11-13",
+ "note": "Primärquellen für fachliche Ergänzungen in Patentrecht-Kapiteln. Nur Quellen, deren Text am angegebenen Datum im Wortlaut gelesen wurde.",
+ "sources": [
+  {
+   "id": "epo-guidelines-g-vii-5",
+   "kind": "official_guideline",
+   "cite": "Europäisches Patentamt, Richtlinien für die Prüfung im EPA (Guidelines for Examination), Ausgabe 2026, Teil G, Kapitel VII, Abschnitt 5 (Aufgabe-Lösungs-Ansatz), 5.1–5.3.",
+   "url": "https://www.epo.org/en/legal/guidelines-epc/2026/g_vii_5.html",
+   "year": "2026",
+   "accessed": "2026-11-13",
+   "access": "fulltext",
+   "use": "Gliederung des Aufgabe-Lösungs-Ansatzes: drei Hauptstufen (nächstliegender Stand der Technik, objektive technische Aufgabe, Naheliegen); Aufgabe aus Unterscheidungsmerkmalen und technischer Wirkung, ohne Lösungshinweise (5.2, sonst ex-post-facto-Betrachtung); could-would-Prüfung (5.3). Keine Aussage über deutsches Recht."
+  }
+ ]
+}

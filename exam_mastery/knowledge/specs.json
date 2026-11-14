@@ -1,0 +1,515 @@
+{
+ "schema": "em-kb-specs-v1",
+ "version": "KB-1.0.0",
+ "note": "Wiederverwendbare didaktische Spezifikationen. Die Engine gibt dem Agenten nur die passende Spezifikation (knowledge.context_for), statt die Didaktik pro Kurs neu herleiten zu lassen. Status gilt für die Spezifikation als Ganzes; die einzelnen Bausteine verweisen auf principles.json.",
+ "specs": [
+  {
+   "id": "worked_example_fading",
+   "version": "1.0.0",
+   "status": "DESIGN_HYPOTHESIS",
+   "derived_from": [
+    "worked_examples",
+    "productive_failure",
+    "self_explanation",
+    "cognitive_load"
+   ],
+   "when_full_example": [
+    "Neue Prozedur oder neuer Beweistyp, den die Lernenden noch nicht selbstständig gelöst haben.",
+    "Hohe Elementinteraktivität: viele Größen, die gleichzeitig betrachtet werden müssen."
+   ],
+   "when_exploration_first": [
+    "Konzept mit mehreren naheliegenden, aber unvollständigen Lösungsideen (z. B. Mittelwert vs. Median, Gewinn vs. Liquidität): kurzes Vorhersageproblem (≤ 5 min), danach vollständige Instruktion, die die Lösungsideen vergleicht."
+   ],
+   "visible_steps": [
+    "Jeder Schritt: Operation + Begründung (Regel, Satz, Norm, Modellannahme).",
+    "Teilziele als Überschriften der Schrittgruppen (Segmentierung).",
+    "Mindestens eine Selbsterklärungsfrage 'Warum ist dieser Schritt zulässig?' mit aufklappbarer Antwort."
+   ],
+   "fading_sequence": [
+    {
+     "stage": 1,
+     "form": "Vollständiges Beispiel mit Begründungen und Selbsterklärungsfrage."
+    },
+    {
+     "stage": 2,
+     "form": "Gleiche Struktur, neue Oberfläche; der LETZTE Schritt ist offen (Rückwärts-Fading nach Renkl & Atkinson)."
+    },
+    {
+     "stage": 3,
+     "form": "Mehrere Schritte offen; Teilziele bleiben sichtbar."
+    },
+    {
+     "stage": 4,
+     "form": "Selbstständige Aufgabe ohne Teilziele, mit neuer Oberfläche oder umgekehrter Fragerichtung."
+    }
+   ],
+   "adaptivity": [
+    "Stufe 4 ohne Hilfe gelöst → weitere Beispiele dieses Typs überspringen (Expertise Reversal).",
+    "Fehler in Stufe 2–3 → Diagnose nach error_taxonomy, gezieltes Beispiel für genau den fehlerhaften Schritt, nicht das ganze Beispiel erneut."
+   ],
+   "limits": [
+    "Optimale Zahl der Beispiele und Fading-Geschwindigkeit sind nicht allgemein bekannt; die Stufen sind eine begründete Heuristik."
+   ],
+   "checks": [
+    {
+     "id": "WEF-C1",
+     "check": "Jeder Schritt hat ein nicht leeres Begründungsfeld.",
+     "mode": "deterministic"
+    },
+    {
+     "id": "WEF-C2",
+     "check": "Zu jedem Beispiel existiert mindestens eine Aufgabe derselben Kompetenz mit Stufe ≥ 2.",
+     "mode": "deterministic"
+    },
+    {
+     "id": "WEF-C3",
+     "check": "Begründungen sind fachlich zutreffend.",
+     "mode": "agent_judgement"
+    }
+   ]
+  },
+  {
+   "id": "error_taxonomy",
+   "version": "1.0.0",
+   "status": "DESIGN_HYPOTHESIS",
+   "derived_from": [
+    "feedback",
+    "intelligent_tutoring",
+    "worked_examples"
+   ],
+   "classes": [
+    {
+     "id": "missing_prerequisite",
+     "label": "Fehlende Voraussetzung",
+     "signal": "Fehler in einem Schritt, der eine frühere Kompetenz nutzt; diese Kompetenz ebenfalls nicht gelöst.",
+     "response": "Rückverweis auf die Voraussetzung mit kurzer Abrufaufgabe, dann zurück."
+    },
+    {
+     "id": "misconception",
+     "label": "Konzeptuelle Fehlvorstellung",
+     "signal": "Antwort entspricht einem bekannten Fehlermuster (in der Aufgabe als distractor/misconception hinterlegt).",
+     "response": "Kontrastbeispiel, das die Fehlvorstellung widerlegt; Selbsterklärungsfrage."
+    },
+    {
+     "id": "calculation_slip",
+     "label": "Rechenfehler",
+     "signal": "Ansatz richtig, numerisches Ergebnis aus richtigem Ansatz mit Rechenfehler reproduzierbar.",
+     "response": "Auf den Schritt zeigen, nicht auf das Konzept; keine Wiederholung der Theorie."
+    },
+    {
+     "id": "wrong_model_assumption",
+     "label": "Falsche Modellannahme",
+     "signal": "Rechnung konsistent, aber mit falscher Annahme (z. B. nominal statt real, Periodenende statt -anfang).",
+     "response": "Annahme explizit machen und mit Aufgabentext abgleichen lassen."
+    },
+    {
+     "id": "argument_gap",
+     "label": "Argumentationsfehler",
+     "signal": "Ergebnis richtig, Begründung fehlt oder nutzt eine Voraussetzung nicht/falsch.",
+     "response": "Frage nach der fehlenden Voraussetzung; Beweis-/Subsumtionsschritt einzeln prüfen lassen."
+    },
+    {
+     "id": "transfer_failure",
+     "label": "Unzureichender Transfer",
+     "signal": "Standardaufgabe gelöst, Transferaufgabe derselben Kompetenz nicht.",
+     "response": "Strukturvergleich beider Aufgaben (was ist gleich, was anders?), dann weitere Transferaufgabe."
+    },
+    {
+     "id": "unknown",
+     "label": "Unklare Ursache",
+     "signal": "Keine deterministische Zuordnung möglich.",
+     "response": "Nicht raten. Nachfrage an Lernende oder agentische Einschätzung, als solche markiert."
+    }
+   ],
+   "rule": "Nur Klassen mit deterministischem Signal werden automatisch vergeben; alle anderen bleiben 'unknown' oder werden als agent_judgement markiert.",
+   "checks": [
+    {
+     "id": "ET-C1",
+     "check": "Jede automatisch vergebene Fehlerklasse hat ein im Event-Log gespeichertes Signal.",
+     "mode": "deterministic"
+    }
+   ]
+  },
+  {
+   "id": "tutor_hints",
+   "version": "1.0.0",
+   "status": "DESIGN_HYPOTHESIS",
+   "derived_from": [
+    "ai_tutoring",
+    "intelligent_tutoring",
+    "feedback",
+    "retrieval_practice"
+   ],
+   "inputs": [
+    "Kompetenz-ID und Aufgabe",
+    "bisherige Versuche der Lernenden (Event-Log)",
+    "Quellenstellen des Kurses",
+    "Fehlerklasse nach error_taxonomy"
+   ],
+   "hint_levels": [
+    {
+     "level": 1,
+     "name": "Orientierung",
+     "content": "Welche Größe ist gesucht, welche gegeben? Welcher Abschnitt ist einschlägig (mit Quellenverweis)?"
+    },
+    {
+     "level": 2,
+     "name": "Strategie",
+     "content": "Welche Methode/Norm/welcher Satz passt und warum; keine Rechnung."
+    },
+    {
+     "level": 3,
+     "name": "Konkreter Schritt",
+     "content": "Der nächste einzelne Schritt mit Begründung; die Lernenden führen ihn aus."
+    },
+    {
+     "level": 4,
+     "name": "Lösung",
+     "content": "Nur auf ausdrückliche Anforderung NACH eigenem Versuch; danach Status 'mit Lösung' und neue Aufgabe derselben Kompetenz später."
+    }
+   ],
+   "must": [
+    "Erst fragen, was die Lernenden bisher versucht haben.",
+    "Auf die konkrete Abweichung zeigen (Schritt, Größe).",
+    "Agentische Einschätzungen als solche kennzeichnen.",
+    "Mit einer Verständnisfrage oder neuen Aufgabe enden."
+   ],
+   "must_not": [
+    "Ungefragt vollständige Lösungen ausgeben.",
+    "Personenlob oder Bewertung der Person.",
+    "Mastery-Prozentwerte nennen.",
+    "Prüfungsrelevanz behaupten, die nicht aus offiziellen Quellen hervorgeht."
+   ],
+   "evidence_note": "Die Gestaltung folgt den Moderatoren aus bastani2025 und kestin2025; die Wirksamkeit dieses Tutors ist nicht untersucht.",
+   "checks": [
+    {
+     "id": "TH-C1",
+     "check": "Level-4-Ereignis nur nach mindestens einem attempt-Ereignis derselben Aufgabe.",
+     "mode": "deterministic"
+    }
+   ]
+  },
+  {
+   "id": "assessment_item",
+   "version": "1.0.0",
+   "status": "DESIGN_HYPOTHESIS",
+   "derived_from": [
+    "assessment_alignment",
+    "transfer",
+    "retrieval_practice",
+    "interleaving"
+   ],
+   "json_schema": {
+    "type": "object",
+    "required": [
+     "id",
+     "competency",
+     "operator",
+     "process_level",
+     "purpose",
+     "transfer_dimension",
+     "minutes",
+     "prompt",
+     "solution",
+     "rubric"
+    ],
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "competency": {
+      "type": "string"
+     },
+     "operator": {
+      "type": "string",
+      "description": "Operator der Aufgabe (z. B. berechnen, begründen, beweisen, beurteilen, prüfen)"
+     },
+     "process_level": {
+      "enum": [
+       "remember",
+       "understand",
+       "apply",
+       "analyze",
+       "evaluate",
+       "create"
+      ]
+     },
+     "purpose": {
+      "enum": [
+       "retrieval",
+       "fading_stage_2",
+       "fading_stage_3",
+       "independent",
+       "discrimination",
+       "transfer",
+       "exam"
+      ]
+     },
+     "transfer_dimension": {
+      "enum": [
+       "none",
+       "new_context",
+       "reversed_question",
+       "new_representation",
+       "combination",
+       "new_domain"
+      ]
+     },
+     "minutes": {
+      "type": "number",
+      "exclusiveMinimum": 0
+     },
+     "prompt": {
+      "type": "string",
+      "minLength": 20
+     },
+     "given_data_complete": {
+      "type": "boolean"
+     },
+     "solution": {
+      "type": "object",
+      "required": [
+       "strategy",
+       "steps",
+       "result"
+      ],
+      "properties": {
+       "strategy": {
+        "type": "string",
+        "minLength": 10
+       },
+       "steps": {
+        "type": "array",
+        "minItems": 1
+       },
+       "result": {},
+       "alternatives": {
+        "type": "array"
+       },
+       "typical_errors": {
+        "type": "array"
+       }
+      }
+     },
+     "rubric": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+       "type": "object",
+       "required": [
+        "criterion",
+        "points"
+       ],
+       "properties": {
+        "criterion": {
+         "type": "string"
+        },
+        "points": {
+         "type": "number",
+         "minimum": 0
+        }
+       }
+      }
+     },
+     "points": {
+      "type": "number"
+     },
+     "source_basis": {
+      "enum": [
+       "official_task",
+       "official_content",
+       "verified_supplement",
+       "own_example"
+      ]
+     }
+    }
+   },
+   "rules": [
+    "Summe der Rubrik-Punkte = points (falls points gesetzt).",
+    "purpose 'transfer' verlangt transfer_dimension ≠ 'none'.",
+    "Keine Aufgabe, die sich von einer anderen derselben Kompetenz nur durch Zahlen unterscheidet, außer purpose = retrieval."
+   ],
+   "subject_formats": {
+    "mathematics": [
+     "Beweis mit Rubrik (Idee / Voraussetzungen / Vollständigkeit)",
+     "Gegenbeispiel finden",
+     "Rechnung mit Begründung",
+     "Aussage prüfen: wahr/falsch mit Beweis oder Gegenbeispiel"
+    ],
+    "statistics": [
+     "Annahmen prüfen",
+     "Schätzung + Interpretation",
+     "Simulation vorhersagen",
+     "Fehlschluss identifizieren"
+    ],
+    "ml": [
+     "Gradient von Hand berechnen",
+     "Implementierungsfehler finden",
+     "Hyperparameter-Effekt vorhersagen",
+     "Evaluation interpretieren"
+    ],
+    "finance": [
+     "Zahlungsstrom aufstellen",
+     "Bewertung mit Annahmenwahl",
+     "Sensitivität",
+     "Entscheidung begründen"
+    ],
+    "law": [
+     "Fallgutachten mit Subsumtion",
+     "Streitstand darstellen und entscheiden",
+     "Normkette aufbauen"
+    ],
+    "information_systems": [
+     "Modell erstellen (z. B. BPMN/ER)",
+     "Designentscheidung begründen",
+     "Methode auf Szenario anwenden"
+    ],
+    "business": [
+     "Planungsrechnung aufstellen",
+     "Annahmen kritisch beurteilen",
+     "Konzept auf Fall anwenden"
+    ]
+   },
+   "checks": [
+    {
+     "id": "AI-C1",
+     "check": "Schema gültig, Rubriksumme stimmt, Transferdimension gesetzt.",
+     "mode": "deterministic:knowledge.check_item"
+    },
+    {
+     "id": "AI-C2",
+     "check": "Musterlösung fachlich richtig und vollständig.",
+     "mode": "deterministic where numeric; else agent_judgement"
+    }
+   ]
+  },
+  {
+   "id": "exam_blueprint",
+   "version": "1.0.0",
+   "status": "DESIGN_HYPOTHESIS",
+   "derived_from": [
+    "assessment_alignment"
+   ],
+   "json_schema": {
+    "type": "object",
+    "required": [
+     "minutes",
+     "total_points",
+     "rows"
+    ],
+    "properties": {
+     "minutes": {
+      "type": "number"
+     },
+     "total_points": {
+      "type": "number"
+     },
+     "points_per_minute": {
+      "type": "number"
+     },
+     "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+       "type": "object",
+       "required": [
+        "competency",
+        "operator",
+        "points"
+       ],
+       "properties": {
+        "competency": {
+         "type": "string"
+        },
+        "operator": {
+         "type": "string"
+        },
+        "points": {
+         "type": "number"
+        },
+        "basis": {
+         "type": "string"
+        }
+       }
+      }
+     }
+    }
+   },
+   "rules": [
+    "Blueprint-Zeilen stammen aus offiziellen Lernzielen/Aufgaben; ergänzte Transferzeilen tragen basis = 'own_transfer'.",
+    "Klausurpunkte je Kompetenz weichen höchstens ±10 % vom Blueprint ab.",
+    "Summe der erwarteten Bearbeitungszeiten ≤ Klausurzeit.",
+    "Keine Teilaufgabe hängt vom Ergebnis einer anderen ab, ohne Ersatzwert anzugeben."
+   ],
+   "checks": [
+    {
+     "id": "EB-C1",
+     "check": "Klausur gegen Blueprint: Punkte je Kompetenz, Gesamtzeit, Rubriksummen.",
+     "mode": "deterministic:knowledge.check_exam_against_blueprint"
+    }
+   ]
+  },
+  {
+   "id": "anki_card",
+   "version": "1.0.0",
+   "status": "DESIGN_HYPOTHESIS",
+   "derived_from": [
+    "retrieval_practice",
+    "spacing",
+    "feedback"
+   ],
+   "rules": [
+    "Eine Karte fragt genau eine abrufbare Einheit (minimum information principle, Praxisregel; empirisch nicht eigenständig geprüft).",
+    "Vorderseite verlangt Produktion (recall), keine Ja/Nein-Fragen.",
+    "Kontextzeile (Kapitel, Kompetenz), damit der Abruf eindeutig ist.",
+    "Rückseite: knappe Antwort + ein Satz Begründung + Quellenverweis.",
+    "Keine Aufzählungen mit mehr als 4 Elementen auf einer Karte; stattdessen Lückenkarten oder Aufteilung.",
+    "Formeln mit derselben Notation wie das Lehrbuch.",
+    "Stabile Note-ID aus Kompetenz + Inhaltsschlüssel; Änderungen aktualisieren die Note, Lernhistorie bleibt."
+   ],
+   "checks": [
+    {
+     "id": "AC-C1",
+     "check": "Vorderseite ohne Antworttext, Rückseite ≤ 60 Wörter, Listen ≤ 4.",
+     "mode": "deterministic:anki_qa"
+    },
+    {
+     "id": "AC-C2",
+     "check": "Update in isolierter Anki-Kopie erhält Reviews und Intervalle.",
+     "mode": "deterministic:isolated anki test"
+    }
+   ]
+  },
+  {
+   "id": "visualization",
+   "version": "1.0.0",
+   "status": "DESIGN_HYPOTHESIS",
+   "derived_from": [
+    "multimedia",
+    "cognitive_load",
+    "productive_failure",
+    "prediction_simulation"
+   ],
+   "rules": [
+    "Interaktion folgt dem Lernziel: jede Steuerung verändert eine Größe, über die eine Vorhersage verlangt wird.",
+    "Ablauf Guided: Vorhersage → Manipulation → Vergleich mit Vorhersage → Erklärung → Transferfrage.",
+    "Explore: alle Parameter, Modellannahmen und Formeln sichtbar; gleiche Referenzimplementierung wie Guided.",
+    "Symbole, Farben und Namen identisch in Formel, Grafik und Text.",
+    "Jede numerische Ausgabe gegen unabhängig berechnete Referenzfälle getestet.",
+    "Modellannahmen und Gültigkeitsgrenzen stehen neben der Grafik, nicht in einer Fußnote."
+   ],
+   "checks": [
+    {
+     "id": "VZ-C1",
+     "check": "Referenzfälle des Modells stimmen mit unabhängiger Rechnung überein.",
+     "mode": "deterministic"
+    },
+    {
+     "id": "VZ-C2",
+     "check": "Vorhersagefrage existiert vor der ersten Manipulation.",
+     "mode": "deterministic"
+    }
+   ]
+  }
+ ]
+}

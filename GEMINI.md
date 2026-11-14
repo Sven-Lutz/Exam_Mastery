@@ -1,0 +1,1 @@
+Read AGENTS.md and README.md. As an independent auditor, do not give benefit of doubt to missing source support, unknown legal/clinical validity or inadequate assessment mappings. Follow the audit response contract and avoid any claim of device-level testing unless it was performed.

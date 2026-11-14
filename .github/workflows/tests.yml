@@ -1,0 +1,16 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - run: pip install -r requirements-math-tested.txt -r requirements-gemini-tested.txt pytest
+      - run: npm install --prefix ~/.cache/exam-mastery-v05-node --save-exact mathjax-full@3.2.2 @fontsource/source-sans-3@5.1.0 @fontsource/source-serif-4@5.1.0 @fontsource/jetbrains-mono@5.1.0
+      - run: python -m playwright install --with-deps chromium
+      - run: python -m unittest discover -s tests
+      - run: bash -n release/install.sh && bash -n release/skill/exam-mastery/scripts/check_host.sh

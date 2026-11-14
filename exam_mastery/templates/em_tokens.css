@@ -1,0 +1,90 @@
+/* Exam Mastery design tokens – "Bühne" (v0.19; replaces "Paper & Ink" of v0.17). Shared by labs, reference gallery and learning environment.
+   Course-neutral: no subject is hard-coded here. Layers: tokens -> base -> shared components; pages add their layout.
+   Breakpoints (CSS cannot take variables in media queries; use these numbers everywhere):
+     sm 560px (phone)   md 820px (tablet, sidebar collapses)   lg 1180px (context column)   xl 1440px */
+:root{
+ /* type */
+ --font-display:"Source Serif 4","Iowan Old Style",Georgia,serif;
+ --font-text:"Source Serif 4","Iowan Old Style",Georgia,serif;
+ --font-ui:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+ --font-math:"STIX Two Math","Cambria Math","Latin Modern Math","Source Serif 4",Georgia,serif;
+ --font-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+ --fs-xs:.8125rem; --fs-0:.8125rem; --fs-1:.9375rem; --fs-2:1.0625rem; --fs-3:1.25rem; --fs-4:1.625rem;
+ --fs-5:clamp(1.9rem,3.4vw,2.6rem); --fs-6:clamp(2.4rem,5.6vw,4.4rem);
+ --lh-tight:1.12; --lh-ui:1.45; --lh-text:1.68; --measure:66ch;
+ --tracking-caps:.14em;
+ /* space (4px grid) */
+ --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px; --sp-7:48px; --sp-8:72px;
+ --gutter:clamp(16px,4vw,48px); --page:1240px;
+ /* shape */
+ --r-1:4px; --r-2:8px; --r-3:12px; --r-pill:999px; --hair:1px;
+ /* motion */
+ --t-fast:120ms; --t-base:220ms; --t-slow:420ms; --ease:cubic-bezier(.3,.0,.2,1);
+ /* colour roles: light (v0.19 "Bühne": cool neutral base, no cream paper) */
+ --paper:#f3f4f6; --plate:#ffffff; --surface:#ffffff; --surface-2:#eceff3; --surface-3:#e1e6ec;
+ --ink:#151c26; --ink-2:#364152; --muted:#5a6473; --rule:#dce1e7; --rule-strong:#c0c8d2;
+ --accent:#1d5fa8; --accent-ink:#ffffff; --accent-soft:#e4edf7;
+ --signal:#b4472a; --signal-soft:#f7e6e0;
+ --focus:#d9971f;
+ --ok:#16795a; --ok-soft:#e0f1ea; --bad:#b3372b; --bad-soft:#f8e3e0; --warn:#8a5a00; --warn-soft:#f6edd8;
+ --shadow-1:0 1px 2px rgba(17,25,35,.06); --shadow-2:0 18px 40px -22px rgba(17,25,35,.35);
+ --plate-grid:rgba(21,28,38,.05);
+ /* the stage: one dark instrument canvas for every mathematical object, in light AND dark mode */
+ --stage:#111923; --stage-2:#0c131b; --stage-grid:#1a2430; --stage-line:#2b3949; --stage-ink:#e4eaf1; --stage-mut:#94a3b5;
+ --card:var(--plate); --line:var(--rule); --line-2:var(--rule-strong);
+ color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+ --paper:#0b1016; --plate:#121922; --surface:#141c26; --surface-2:#1a2330; --surface-3:#222d3b;
+ --ink:#e7ecf2; --ink-2:#c2ccd7; --muted:#95a2b1; --rule:#243040; --rule-strong:#354355;
+ --accent:#8cc3ff; --accent-ink:#0b1016; --accent-soft:#16283b; --signal:#f09a78; --signal-soft:#3a2218; --focus:#f0bb55;
+ --ok:#6fd7a8; --ok-soft:#12302a; --bad:#ff9a8c; --bad-soft:#3b1d1a; --warn:#eccb73; --warn-soft:#352c16;
+ --shadow-1:none; --shadow-2:0 18px 40px -24px rgba(0,0,0,.7); --plate-grid:rgba(255,255,255,.035);
+ --stage:#0e151e; --stage-2:#0a1017; --stage-grid:#18212c; --stage-line:#2a3746; color-scheme:dark}}
+:root[data-theme=dark]{
+ --paper:#0b1016; --plate:#121922; --surface:#141c26; --surface-2:#1a2330; --surface-3:#222d3b;
+ --ink:#e7ecf2; --ink-2:#c2ccd7; --muted:#95a2b1; --rule:#243040; --rule-strong:#354355;
+ --accent:#8cc3ff; --accent-ink:#0b1016; --accent-soft:#16283b; --signal:#f09a78; --signal-soft:#3a2218; --focus:#f0bb55;
+ --ok:#6fd7a8; --ok-soft:#12302a; --bad:#ff9a8c; --bad-soft:#3b1d1a; --warn:#eccb73; --warn-soft:#352c16;
+ --shadow-1:none; --shadow-2:0 18px 40px -24px rgba(0,0,0,.7); --plate-grid:rgba(255,255,255,.035);
+ --stage:#0e151e; --stage-2:#0a1017; --stage-grid:#18212c; --stage-line:#2a3746; color-scheme:dark}
+:root[data-theme=light]{color-scheme:light}
+
+/* stage scope: inside it every token describes the dark canvas, and the mathematical roles glow.
+   Role colours (same meaning everywhere): input blue, weight amber, bias violet, activation teal, loss coral,
+   gradient pink, update yellow; cash: inflow teal, outflow coral, investment amber, balance blue, need gold. */
+.ds-stage{--paper:var(--stage);--plate:var(--stage);--surface:var(--stage-2);--surface-2:#18222e;--surface-3:#202c3a;
+ --ink:var(--stage-ink);--ink-2:#c5d0dc;--muted:var(--stage-mut);--rule:var(--stage-line);--rule-strong:#3b4b5e;--plate-grid:rgba(255,255,255,.045);
+ --accent:#8cc3ff;--accent-ink:#0b1016;--accent-soft:#17293c;--signal:#ff9b7a;--ok:#5fe0b0;--ok-soft:#0f2c26;--bad:#ff8d7e;--bad-soft:#3a1d1a;--warn:#f5cf6b;--warn-soft:#2f2814;--focus:#ffd166;
+ --r-input:#7cb7ff;--r-weight:#ffb547;--r-neg:#ff9a6b;--r-bias:#b79bff;--r-sum:#c9d4e0;--r-activation:#3ed6b5;--r-output:#8cc8ff;--r-target:#a9b4c2;--r-loss:#ff7a62;--r-gradient:#ff8fc7;--r-update:#ffe066;
+ --r-point_p:#7cb7ff;--r-point_q:#ff8fc7;--r-point_u:#ffb547;--r-midpoint:#3ed6b5;--r-distance:#b79bff;--r-lift:#ffe066;--r-curve:#e4eaf1;
+ --r-sale:#b79bff;--r-term:#94a3b5;--r-inflow:#3ed6b5;--r-outflow:#ff7a62;--r-invest:#ffb547;--r-balance:#8cc8ff;--r-need:#ffd166;
+ color-scheme:dark;background-color:var(--stage);color:var(--stage-ink);
+ background-image:linear-gradient(var(--stage-grid) 1px,transparent 1px),linear-gradient(90deg,var(--stage-grid) 1px,transparent 1px);background-size:32px 32px;background-position:-1px -1px}
+
+/* base */
+*,*::before,*::after{box-sizing:border-box} [hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:var(--fs-1)/var(--lh-ui) var(--font-ui);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--accent);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:2px}
+::selection{background:color-mix(in srgb,var(--accent) 22%,transparent)}
+
+/* shared components */
+.ds-eyebrow{font:600 var(--fs-0)/1.3 var(--font-ui);color:var(--signal)}
+.ds-kicker{display:flex;justify-content:space-between;gap:var(--sp-3);align-items:baseline}
+.ds-kicker>:last-child{color:var(--muted)}
+.ds-rule{border:0;border-top:var(--hair) solid var(--rule);margin:var(--sp-5) 0}
+.ds-plate{background:var(--plate);border:var(--hair) solid var(--rule);border-radius:var(--r-2);box-shadow:var(--shadow-1)}
+.ds-plate-grid{background-color:var(--plate);background-image:linear-gradient(var(--plate-grid) 1px,transparent 1px),linear-gradient(90deg,var(--plate-grid) 1px,transparent 1px);background-size:24px 24px;background-position:-1px -1px}
+.ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:8px 18px;border:var(--hair) solid var(--rule-strong);border-radius:var(--r-2);background:var(--surface);color:var(--ink);font:600 var(--fs-1)/1.2 var(--font-ui);text-decoration:none;cursor:pointer;transition:background var(--t-fast),border-color var(--t-fast),transform var(--t-fast)}
+.ds-btn:hover{border-color:var(--accent)} .ds-btn:active{transform:translateY(1px)}
+.ds-btn-primary{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.ds-btn-primary:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ds-chip{display:inline-flex;align-items:center;gap:6px;font:600 var(--fs-xs)/1.2 var(--font-ui);padding:3px 9px;border-radius:var(--r-pill);border:var(--hair) solid var(--rule-strong);color:var(--ink-2);background:var(--surface)}
+.ds-chip-ok{border-color:color-mix(in srgb,var(--ok) 55%,transparent);color:var(--ok);background:var(--ok-soft)}
+.ds-chip-warn{border-color:color-mix(in srgb,var(--warn) 55%,transparent);color:var(--warn);background:var(--warn-soft)}
+.ds-chip-accent{border-color:color-mix(in srgb,var(--accent) 50%,transparent);color:var(--accent);background:var(--accent-soft)}
+.ds-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0s!important;animation-duration:0s!important;scroll-behavior:auto!important}}

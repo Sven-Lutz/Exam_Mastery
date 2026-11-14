@@ -1,0 +1,252 @@
+{
+ "schema": "em-evidence-matrix-v1",
+ "date": "2026-11-10 (v0.19 ergänzt)",
+ "classes": {
+  "A": "gut gestützter, replizierter Befund",
+  "B": "kontextabhängige Empfehlung",
+  "C": "plausible, ungeprüfte Produktentscheidung / perspektivisch",
+  "D": "eigene Hypothese"
+ },
+ "verification": "Bibliografie und Kernaussage über Abstracts/Verlagsseiten/Sekundärquellen geprüft (10.11.2026); Volltexte nur teilweise. Rohrer & Taylor 2007 und Ohlsson (CBM) nur indirekt bestätigt.",
+ "not_claimed": "Keine empirische Lernwirksamkeit von Exam Mastery; nicht untersucht.",
+ "rows": [
+  {
+   "principle": "Retrieval practice / testing effect",
+   "evidence_class": "A",
+   "sources": [
+    "Roediger & Karpicke (2006) Psychological Science 17(3)",
+    "Dunlosky et al. (2013) PSPI 14(1)",
+    "Carpenter, Pan & Butler (2022) Nat Rev Psychol 1(9) 496-511",
+    "Pan & Rickard (2018) Psychol Bull 144(7) 710-756"
+   ],
+   "mechanism": "Abruf stärkt Gedächtnisspuren mehr als erneutes Lesen; Transfer des Testeffekts mittelgroß und abhängig von Bedingungen (Pan & Rickard).",
+   "function": "Jede Aufgabe verlangt eine eigene Antwort; Lösung erst nach eigenem Versuch; Wiederholungsaufgaben mit neuen Zahlen; Anki-Karten als Abrufe.",
+   "observable": "Antwort eingereicht vor Hinweis/Lösung (Ereignis attempt vor hint/solution).",
+   "limits": "Laborbefunde v. a. mit Wortlisten und Texten; Effekt auf komplexe Problemlösung kleiner und heterogen.",
+   "check": "Ereignislog: Anteil Antworten vor Hilfe; später Vergleich im Evaluationsprotokoll.",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Distributed practice (spacing)",
+   "evidence_class": "A",
+   "sources": [
+    "Cepeda et al. (2006) Psychol Bull 132(3)",
+    "Carpenter, Pan & Butler (2022)"
+   ],
+   "mechanism": "Verteilte Wiederholung verbessert langfristiges Behalten gegenüber massiertem Üben.",
+   "function": "Keine eigene Planung: Anki plant; Engine verweist nach Fehlern auf Schlagwörter; Prüfaufgabe frühestens am Folgetag (RETEST_DUE).",
+   "observable": "Richtige Lösung an einem späteren Tag (RETAINED_ON_LATER_DAY).",
+   "limits": "Optimale Abstände hängen vom Prüfzeitpunkt ab; Engine misst Behalten nur punktuell.",
+   "check": "kc_status-Tests; spätere Evaluation mit verzögertem Nachtest.",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Worked examples and fading; expertise reversal",
+   "evidence_class": "B",
+   "sources": [
+    "Sweller (1988) Cognitive Science 12(2)",
+    "Renkl & Atkinson (2003) Educational Psychologist 38(1)",
+    "Kalyuga, Ayres, Chandler & Sweller (2003) Educational Psychologist 38(1)"
+   ],
+   "mechanism": "Novizen profitieren von ausgearbeiteten Beispielen (geringere Belastung); bei Fortgeschrittenen kehrt sich der Vorteil um.",
+   "function": "Regel RA: Beispiel nur bei fehlender Voraussetzung; RF: nach Hilfe ähnliche Aufgabe ohne Hinweise (Ausblenden); RD: selbstständig Lösende überspringen Übung.",
+   "observable": "Lösung der Parallelaufgabe ohne Hilfe nach einem Beispiel.",
+   "limits": "Die Engine misst Vorwissen nur mit 1-2 Aufgaben; Regel-Schwellen sind gesetzt, nicht kalibriert.",
+   "check": "Policy-Tests Fall A, D, Fading.",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Elaborated, error-specific feedback",
+   "evidence_class": "B",
+   "sources": [
+    "Hattie & Timperley (2007) Rev Educ Res 77(1)",
+    "Wisniewski, Zierer & Hattie (2020) Front Psychol 10:3087"
+   ],
+   "mechanism": "Feedback wirkt im Mittel, sehr heterogen; Information zu Aufgabe und Prozess wirkt stärker als Lob.",
+   "function": "Diagnoseobjekt mit Fehlerkategorie; Rückmeldung benennt den Unterschied, nicht die Lösung; korrekte Teilschritte werden genannt.",
+   "observable": "Korrektur im nächsten Versuch ohne Lösungsansicht.",
+   "limits": "Kategorie ist Hypothese; gleicher Wert kann anders entstehen.",
+   "check": "Bug-Library-Validierung (validate); Browser-E2E.",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Step-based tutoring (model tracing, reduced)",
+   "evidence_class": "B",
+   "sources": [
+    "Anderson, Corbett, Koedinger & Pelletier (1995) J Learn Sci 4(2) 167-207",
+    "VanLehn (2011) Educational Psychologist 46(4) 197-221"
+   ],
+   "mechanism": "Rückmeldung auf Schritt-Ebene; VanLehn: schrittbasierte Tutoren nahe an menschlicher Einzelbetreuung (d≈0,76 vs 0,79), nicht 2 Sigma.",
+   "function": "Steps-Aufgaben: erster abweichender Schritt wird lokalisiert; Ausdrucksprüfung mit Fehlerbibliothek.",
+   "observable": "Lokalisierter Fehler und anschließende Korrektur dieses Schritts.",
+   "limits": "Keine vollständige Produktionsregel-Modellierung; nur vorgegebene Schritte.",
+   "check": "Diagnosis-Tests steps; Parität JS/Python.",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Constraint-based modelling",
+   "evidence_class": "B",
+   "sources": [
+    "Mitrovic, Martin & Suraweera (2007) IEEE Intelligent Systems 22(4) 38-45",
+    "Ohlsson (Constraint-based student modelling; Jahr 1992/1994 nicht eindeutig verifiziert)"
+   ],
+   "mechanism": "Statt Lösungswege zu modellieren, werden verletzte Bedingungen (Relevanz → Erfüllung) diagnostiziert.",
+   "function": "Argument-Aufgabe der Mathematik-Lernstrecke: gewählte Voraussetzungen gegen requires/forbids-Bedingungen.",
+   "observable": "Verletzte Bedingung wird in der nächsten Antwort behoben.",
+   "limits": "Nur Auswahl aus vorgegebenen Prämissen, kein freier Beweistext.",
+   "check": "Constraint-Tests.",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Self-explanation / generative learning; ICAP",
+   "evidence_class": "B",
+   "sources": [
+    "Chi & Wylie (2014) Educational Psychologist 49(4)",
+    "Bisra et al. (2018) Educ Psychol Rev 30(3)",
+    "Fiorella & Mayer (2016) Educ Psychol Rev 28(4)"
+   ],
+   "mechanism": "Konstruktive Aktivitäten (eigene Erklärung) übertreffen aktive und passive.",
+   "function": "Offene Aufgaben „In eigenen Worten“; Bewertung nur durch Tutor als Modelleinschätzung (UNVERIFIED in der Engine).",
+   "observable": "Freitext eingereicht.",
+   "limits": "Qualität der Erklärung wird nicht automatisch geprüft.",
+   "check": "Diagnosis-Test open → UNVERIFIED.",
+   "status": "IMPLEMENTED_PARTIAL"
+  },
+  {
+   "principle": "Interleaving and transfer",
+   "evidence_class": "B",
+   "sources": [
+    "Rohrer & Taylor (2007) Instructional Science 35 (nur indirekt verifiziert)",
+    "Pan & Rickard (2018)"
+   ],
+   "mechanism": "Gemischtes Üben fördert Unterscheidung von Aufgabentypen; Transfer braucht strukturelle Variation.",
+   "function": "Transferaufgaben mit veränderter Struktur (andere Aktivierung, anderes Zahlungsziel, Zusatzbedingung); Kontrastaufgabe.",
+   "observable": "Selbstständige Lösung der Transferaufgabe.",
+   "limits": "Kein lernstreckenübergreifendes Interleaving implementiert.",
+   "check": "Policy-Test RD.",
+   "status": "IMPLEMENTED_PARTIAL"
+  },
+  {
+   "principle": "Multimedia: signalling, contiguity, coherence",
+   "evidence_class": "B",
+   "sources": [
+    "Mayer (2021) Multimedia Learning, 3. Aufl., Cambridge University Press"
+   ],
+   "mechanism": "Hervorhebung relevanter Teile und räumliche Nähe von Bild und Text senken irrelevante Belastung.",
+   "function": "Diagnose steuert die Visualisierung: markierter Pfad, Faktorkette, Tiefpunkt/Endsaldo; Guided-Ansicht zeigt nur einen Parameter.",
+   "observable": "—",
+   "limits": "Gestaltungsprinzipien, Effekte je Prinzip unterschiedlich gut repliziert.",
+   "check": "Screenshots, Browser-Tests der Fokuselemente.",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Cognitive load: reduce element interactivity for novices",
+   "evidence_class": "B",
+   "sources": [
+    "Sweller (1988)",
+    "Kalyuga et al. (2003)"
+   ],
+   "mechanism": "Begrenztes Arbeitsgedächtnis; zu viele gleichzeitige Elemente behindern Schemabildung.",
+   "function": "Guided-/Explore-Ansicht desselben Modells.",
+   "observable": "Wechsel zu Erkunden (nicht erfasst).",
+   "limits": "Keine Messung der Belastung im Produkt; Paas-Skala nur im Evaluationsprotokoll.",
+   "check": "Browser-Test Guided/Explore.",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Knowledge tracing (BKT)",
+   "evidence_class": "C",
+   "sources": [
+    "Corbett & Anderson (1994) User Modeling and User-Adapted Interaction 4(4) 253-278"
+   ],
+   "mechanism": "Bayessche Schätzung des Beherrschungszustands aus Antwortfolgen.",
+   "function": "Nicht implementiert: ohne kalibrierte Parameter (Raten, Ausrutscher, Lernrate) wäre jede Wahrscheinlichkeit Scheinpräzision.",
+   "observable": "—",
+   "limits": "Benötigt viele Antworten je Kompetenz und Kalibrierung.",
+   "check": "—",
+   "status": "DEFERRED"
+  },
+  {
+   "principle": "LLM tutoring: guardrails against crutch use",
+   "evidence_class": "B",
+   "sources": [
+    "Bastani et al. (2025) PNAS 122(26) e2422633122",
+    "Kestin et al. (2025) Scientific Reports, doi 10.1038/s41598-025-97652-6"
+   ],
+   "mechanism": "Ungeschützter KI-Zugang als Krücke senkte spätere Leistung ohne KI (Bastani); ein schrittweise helfender, auf Lernziele gepromteter Tutor zeigte Lerngewinne (Kestin; eine Universität, ein Fach).",
+   "function": "Tutor nur explizit, mit Protokoll: erst fragen, gestuft helfen, Lösung nur auf Wunsch, Abschluss mit neuer Aufgabe; Kontext enthält Fehlerhistorie.",
+   "observable": "Selbstständige Lösung der Folgeaufgabe nach Tutorgespräch (nicht automatisch erfasst).",
+   "limits": "Einzelstudien, Schul- bzw. Einführungskontext; Übertragbarkeit offen.",
+   "check": "Tutor-Brief-Test; keine Wirksamkeitsprüfung.",
+   "status": "IMPLEMENTED_PARTIAL"
+  },
+  {
+   "principle": "Kein Mastery-Prozentwert",
+   "evidence_class": "D",
+   "sources": [
+    "eigene Produktentscheidung"
+   ],
+   "mechanism": "Ein Prozentwert suggeriert Messgenauigkeit, die bei wenigen Aufgaben nicht besteht.",
+   "function": "Statusvokabular aus beobachteten Ereignissen.",
+   "observable": "—",
+   "limits": "Hypothese; Wirkung auf Motivation ungeprüft.",
+   "check": "Test: Status ohne Ziffern.",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Metakognition: Sicherheit vor der Rückmeldung angeben",
+   "evidence_class": "B",
+   "sources": [
+    "Butterfield & Metcalfe (2001) JEP:LMC 27(6) (Hypercorrection)",
+    "Hattie & Timperley (2007)"
+   ],
+   "mechanism": "Sicher gemeinte Fehler werden nach Feedback eher korrigiert; Vergleich von Erwartung und Ergebnis macht Fehleinschätzungen sichtbar.",
+   "function": "Labs: Vorhersage mit Sicherheitsangabe (sicher/eher sicher/geraten) und kalibrierter Rückmeldung; Lernstand trennt „heute ohne Hilfe“ von „an späterem Tag“.",
+   "observable": "Sicherheitsangabe vor Auflösung.",
+   "limits": "Übertragung auf Simulationen ungeprüft; keine Kalibrierungsmessung im Produkt.",
+   "check": "bestehende Lab-Tests (Vorhersagevertrag).",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Adaptives Scaffolding (Hilfe nach beobachtetem Bedarf, Ausblenden)",
+   "evidence_class": "B",
+   "sources": [
+    "VanLehn (2011)",
+    "Renkl & Atkinson (2003)",
+    "Kalyuga et al. (2003)"
+   ],
+   "mechanism": "Unterstützung, die auf den beobachteten Fehler zielt und danach zurückgenommen wird, verhindert Abhängigkeit und Überlastung.",
+   "function": "Regeln RA/RB/RC/RF: Beispiel → Parallelaufgabe; Hervorhebung → ähnliche Aufgabe ohne Hinweise; Hilfe genutzt → Aufgabe ohne Hinweise.",
+   "observable": "Selbstständige Lösung der Folgeaufgabe.",
+   "limits": "Regel-Schwellen gesetzt, nicht empirisch kalibriert.",
+   "check": "Policy-Tests, E2E im Kapitel (test_b19).",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Signalisierung durch konsistente Farbrollen (Bild ↔ Formel)",
+   "evidence_class": "B",
+   "sources": [
+    "Mayer (2021) Multimedia Learning, 3. Aufl."
+   ],
+   "mechanism": "Gleiche Farbe für dasselbe mathematische Objekt in Grafik und Formel unterstützt die Zuordnung (Signalisierung, räumliche Nähe).",
+   "function": "v0.19 „Bühne“: feste Rollenfarben (Eingabe blau, Gewicht amber, Aktivierung türkis, Verlust koralle, Gradient rosa; Zufluss/Abfluss/Bedarf) in Szene, Formelband und Lernstrecke.",
+   "observable": "—",
+   "limits": "Effekt der konkreten Farbwahl ungeprüft; Farben werden nie allein als Bedeutungsträger genutzt (immer mit Beschriftung).",
+   "check": "Screenshots, Kontrastprüfung.",
+   "status": "IMPLEMENTED"
+  },
+  {
+   "principle": "Dunkle „Bühne“ für mathematische Objekte",
+   "evidence_class": "D",
+   "sources": [
+    "eigene Gestaltungsentscheidung"
+   ],
+   "mechanism": "Hypothese: Ein eigener, gleichbleibender Darstellungsraum lenkt die Aufmerksamkeit auf das Modell und trennt Erklären (Text) von Untersuchen (Bühne).",
+   "function": "Labs, Lernstrecken, eingebettete Simulationen im Kapitel.",
+   "observable": "—",
+   "limits": "Unvalidierte Produktentscheidung; Nutzerabnahme offen.",
+   "check": "Vorher-Nachher-Screenshots; Nutzerurteil ausstehend.",
+   "status": "IMPLEMENTED"
+  }
+ ]
+}

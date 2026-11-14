@@ -1,0 +1,98 @@
+{
+  "items": [
+    {
+      "competency_ids": [
+        "C1"
+      ],
+      "difficulty": "guided",
+      "id": "A1",
+      "points": 5,
+      "prompt": "In the simplified model with P=120 million, t=0.20 and N=30 million, calculate after-tax earnings and EPS. Show all steps.",
+      "required_operations": [
+        "calculate"
+      ],
+      "rubric": [
+        {
+          "criterion": "Compute tax expense correctly",
+          "points": 1
+        },
+        {
+          "criterion": "Compute after-tax profit with units",
+          "points": 2
+        },
+        {
+          "criterion": "Divide by share count with correct EPS and units",
+          "points": 2
+        }
+      ],
+      "solution": "Tax expense = 120×0.20 = 24 million; after-tax earnings = 120−24 = 96 million; EPS = 96/30 = 3.20 currency units per share.",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ]
+    },
+    {
+      "competency_ids": [
+        "C2"
+      ],
+      "difficulty": "independent",
+      "id": "A2",
+      "points": 5,
+      "prompt": "Explain why reducing t from 0.30 to 0.25 does not increase EPS by exactly 5%, and compute the actual relative increase with P and N fixed.",
+      "required_operations": [
+        "explain"
+      ],
+      "rubric": [
+        {
+          "criterion": "Distinguish percentage points from percent",
+          "points": 2
+        },
+        {
+          "criterion": "Compute 7.14% with correct denominator",
+          "points": 2
+        },
+        {
+          "criterion": "Explain fixed P and N assumptions",
+          "points": 1
+        }
+      ],
+      "solution": "The rate decreased by 0.05, which equals 5 percentage points. Relative change in EPS is (0.75−0.70)/0.70 = 0.05/0.70 ≈ 7.14%. The denominator is original after-tax earnings, not the original tax rate.",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ]
+    },
+    {
+      "competency_ids": [
+        "C3"
+      ],
+      "difficulty": "transfer",
+      "id": "A3",
+      "points": 6,
+      "prompt": "Two scenarios share pretax profit P=80 million and N=10 million shares: Scenario A has t=0.28; B has t=0.24. Compare EPS, identify which scenario has higher EPS and explain one reason this stylized ranking need not imply a larger real-world company valuation.",
+      "required_operations": [
+        "compare"
+      ],
+      "rubric": [
+        {
+          "criterion": "Calculate A EPS correctly",
+          "points": 2
+        },
+        {
+          "criterion": "Calculate B EPS correctly",
+          "points": 2
+        },
+        {
+          "criterion": "Identify B as higher",
+          "points": 1
+        },
+        {
+          "criterion": "Explain an explicit scope limitation",
+          "points": 1
+        }
+      ],
+      "solution": "EPS_A=80×0.72/10=5.76. EPS_B=80×0.76/10=6.08, so Scenario B has 0.32 more EPS. Valuation can depend on future growth, risk, financial-reporting assumptions and many other inputs, so EPS alone does not establish company value.",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ]
+    }
+  ]
+}
