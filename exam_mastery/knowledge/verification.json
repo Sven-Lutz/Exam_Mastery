@@ -1,0 +1,1012 @@
+{
+ "schema": "em-kb-verification-v1",
+ "checked_on": "2026-11-13",
+ "method": "Crossref /works and OpenLibrary /isbn; cached under knowledge/cache",
+ "sources": {
+  "roediger2006": {
+   "found": true,
+   "title": "Test-Enhanced Learning",
+   "container": "Psychological Science",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "dunlosky2013": {
+   "found": true,
+   "title": "Improving Students’ Learning With Effective Learning Techniques",
+   "container": "Psychological Science in the Public Interest",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "rowland2014": {
+   "found": true,
+   "title": "The effect of testing versus restudy on retention: A meta-analytic review of the testing effect.",
+   "container": "Psychological Bulletin",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "adesope2017": {
+   "found": true,
+   "title": "Rethinking the Use of Tests: A Meta-Analysis of Practice Testing",
+   "container": "Review of Educational Research",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "pan2018": {
+   "found": true,
+   "title": "Transfer of test-enhanced learning: Meta-analytic review and synthesis.",
+   "container": "Psychological Bulletin",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "carpenter2022": {
+   "found": true,
+   "title": "The science of effective learning with spacing and retrieval practice",
+   "container": "Nature Reviews Psychology",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "cepeda2006": {
+   "found": true,
+   "title": "Distributed practice in verbal recall tasks: A review and quantitative synthesis.",
+   "container": "Psychological Bulletin",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "cepeda2008": {
+   "found": true,
+   "title": "Spacing Effects in Learning",
+   "container": "Psychological Science",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "rawson2013": {
+   "found": true,
+   "title": "The Power of Successive Relearning: Improving Performance on Course Exams and Long-Term Retention",
+   "container": "Educational Psychology Review",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "ye2022": {
+   "found": true,
+   "title": "A Stochastic Shortest Path Algorithm for Optimizing Spaced Repetition Scheduling",
+   "container": "Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "rohrer2007": {
+   "found": true,
+   "title": "The shuffling of mathematics problems improves learning",
+   "container": "Instructional Science",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "brunmair2019": {
+   "found": true,
+   "title": "Similarity matters: A meta-analysis of interleaved learning and its moderators.",
+   "container": "Psychological Bulletin",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "sweller1988": {
+   "found": true,
+   "title": "Cognitive Load During Problem Solving: Effects on Learning",
+   "container": "Cognitive Science",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "sweller2019": {
+   "found": true,
+   "title": "Cognitive Architecture and Instructional Design: 20 Years Later",
+   "container": "Educational Psychology Review",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "kirschner2006": {
+   "found": true,
+   "title": "Why Minimal Guidance During Instruction Does Not Work: An Analysis of the Failure of Constructivist, Discovery, Problem-Based, Experiential, and Inquiry-Based Teaching",
+   "container": "Educational Psychologist",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "atkinson2000": {
+   "found": true,
+   "title": "Learning from Examples: Instructional Principles from the Worked Examples Research",
+   "container": "Review of Educational Research",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "renkl2003": {
+   "found": true,
+   "title": "Structuring the Transition From Example Study to Problem Solving in Cognitive Skill Acquisition: A Cognitive Load Perspective",
+   "container": "Educational Psychologist",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "renkl2014": {
+   "found": true,
+   "title": "Toward an Instructionally Oriented Theory of Example‐Based Learning",
+   "container": "Cognitive Science",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "kalyuga2003": {
+   "found": true,
+   "title": "The Expertise Reversal Effect",
+   "container": "Educational Psychologist",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "barbieri2023": {
+   "found": true,
+   "title": "A Meta-analysis of the Worked Examples Effect on Mathematics Performance",
+   "container": "Educational Psychology Review",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "kapur2016": {
+   "found": true,
+   "title": "Examining Productive Failure, Productive Success, Unproductive Failure, and Unproductive Success in Learning",
+   "container": "Educational Psychologist",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "sinha2021": {
+   "found": true,
+   "title": "When Problem Solving Followed by Instruction Works: Evidence for Productive Failure",
+   "container": "Review of Educational Research",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "chi2014": {
+   "found": true,
+   "title": "The ICAP Framework: Linking Cognitive Engagement to Active Learning Outcomes",
+   "container": "Educational Psychologist",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "bisra2018": {
+   "found": true,
+   "title": "Inducing Self-Explanation: a Meta-Analysis",
+   "container": "Educational Psychology Review",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "fiorella2016": {
+   "found": true,
+   "title": "Eight Ways to Promote Generative Learning",
+   "container": "Educational Psychology Review",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "mayer2020": {
+   "found": true,
+   "title": "Multimedia Learning",
+   "container": "",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "ainsworth2006": {
+   "found": true,
+   "title": "DeFT: A conceptual framework for considering learning with multiple representations",
+   "container": "Learning and Instruction",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "hattie2007": {
+   "found": true,
+   "title": "The Power of Feedback",
+   "container": "Review of Educational Research",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "kluger1996": {
+   "found": true,
+   "title": "The effects of feedback interventions on performance: A historical review, a meta-analysis, and a preliminary feedback intervention theory.",
+   "container": "Psychological Bulletin",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "shute2008": {
+   "found": true,
+   "title": "Focus on Formative Feedback",
+   "container": "Review of Educational Research",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "wisniewski2020": {
+   "found": true,
+   "title": "The Power of Feedback Revisited: A Meta-Analysis of Educational Feedback Research",
+   "container": "Frontiers in Psychology",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "black1998": {
+   "found": true,
+   "title": "Assessment and Classroom Learning",
+   "container": "Assessment in Education: Principles, Policy &amp; Practice",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "dunlosky2012": {
+   "found": true,
+   "title": "Overconfidence produces underachievement: Inaccurate self evaluations undermine students’ learning and retention",
+   "container": "Learning and Instruction",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "barnett2002": {
+   "found": true,
+   "title": "When and where do we apply what we learn?: A taxonomy for far transfer.",
+   "container": "Psychological Bulletin",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "bjork1994": {
+   "found": true,
+   "title": "Metacognition knowing about knowing",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "pashler2008": {
+   "found": true,
+   "title": "Learning Styles",
+   "container": "Psychological Science in the Public Interest",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "corbett1994": {
+   "found": true,
+   "title": "Knowledge tracing: Modeling the acquisition of procedural knowledge",
+   "container": "User Modelling and User-Adapted Interaction",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "anderson1995": {
+   "found": true,
+   "title": "Cognitive Tutors: Lessons Learned",
+   "container": "Journal of the Learning Sciences",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "koedinger2012": {
+   "found": true,
+   "title": "The Knowledge‐Learning‐Instruction Framework: Bridging the Science‐Practice Chasm to Enhance Robust Student Learning",
+   "container": "Cognitive Science",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "pelanek2017": {
+   "found": true,
+   "title": "Bayesian knowledge tracing, logistic models, and beyond: an overview of learner modeling techniques",
+   "container": "User Modeling and User-Adapted Interaction",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "vanlehn2011": {
+   "found": true,
+   "title": "The Relative Effectiveness of Human Tutoring, Intelligent Tutoring Systems, and Other Tutoring Systems",
+   "container": "Educational Psychologist",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "ma2014": {
+   "found": true,
+   "title": "Intelligent tutoring systems and learning outcomes: A meta-analysis.",
+   "container": "Journal of Educational Psychology",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "kulik2016": {
+   "found": true,
+   "title": "Effectiveness of Intelligent Tutoring Systems",
+   "container": "Review of Educational Research",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "aleven2016": {
+   "found": true,
+   "title": "Help Helps, But Only So Much: Research on Help Seeking with Intelligent Tutoring Systems",
+   "container": "International Journal of Artificial Intelligence in Education",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "bastani2025": {
+   "found": true,
+   "title": "Generative AI without guardrails can harm learning: Evidence from high school mathematics",
+   "container": "Proceedings of the National Academy of Sciences",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "kestin2025": {
+   "found": true,
+   "title": "AI tutoring outperforms in-class active learning: an RCT introducing a novel research-based design in an authentic educational setting",
+   "container": "Scientific Reports",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "biggs1996": {
+   "found": true,
+   "title": "Enhancing teaching through constructive alignment",
+   "container": "Higher Education",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "haladyna2002": {
+   "found": true,
+   "title": "A Review of Multiple-Choice Item-Writing Guidelines for Classroom Assessment",
+   "container": "Applied Measurement in Education",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "krathwohl2002": {
+   "found": true,
+   "title": "A Revision of Bloom's Taxonomy: An Overview",
+   "container": "Theory Into Practice",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "dehaene2020": {
+   "found": true,
+   "title": "How We Learn Why Brains Learn Better Than Any Machine . . . for Now",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "carey2014": {
+   "found": true,
+   "title": "How we learn the surprising truth about when, where, and why it happens",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "brod2021": {
+   "found": true,
+   "title": "Predicting as a learning strategy",
+   "container": "Psychonomic Bulletin &amp; Review",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "butterfield2001": {
+   "found": true,
+   "title": "Errors committed with high confidence are hypercorrected.",
+   "container": "Journal of Experimental Psychology: Learning, Memory, and Cognition",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "dejong1998": {
+   "found": true,
+   "title": "Scientific Discovery Learning with Computer Simulations of Conceptual Domains",
+   "container": "Review of Educational Research",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "kalyuga2007": {
+   "found": true,
+   "title": "Expertise Reversal Effect and Its Implications for Learner-Tailored Instruction",
+   "container": "Educational Psychology Review",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "brinckmann2010": {
+   "found": true,
+   "title": "Should entrepreneurs plan or just storm the castle? A meta-analysis on contextual factors impacting the business planning–performance relationship in small firms",
+   "container": "Journal of Business Venturing",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "delmar2003": {
+   "found": true,
+   "title": "Does business planning facilitate the development of new ventures?",
+   "container": "Strategic Management Journal",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "honig2004": {
+   "found": true,
+   "title": "Institutional forces and the written business plan",
+   "container": "Journal of Management",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "chwolka2012": {
+   "found": true,
+   "title": "The value of business planning before start-up — A decision-theoretical perspective",
+   "container": "Journal of Business Venturing",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "sarasvathy2001": {
+   "found": true,
+   "title": "Causation and Effectuation: Toward a Theoretical Shift from Economic Inevitability to Entrepreneurial Contingency",
+   "container": "The Academy of Management Review",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "read2009": {
+   "found": true,
+   "title": "A meta-analytic review of effectuation and venture performance",
+   "container": "Journal of Business Venturing",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "dew2009": {
+   "found": true,
+   "title": "Effectual versus predictive logics in entrepreneurial decision-making: Differences between experts and novices",
+   "container": "Journal of Business Venturing",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "chandler2011": {
+   "found": true,
+   "title": "Causation and effectuation processes: A validation study",
+   "container": "Journal of Business Venturing",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "arend2015": {
+   "found": true,
+   "title": "Effectuation As Ineffectual? Applying the 3E Theory-Assessment Framework to a Proposed New Theory of Entrepreneurship",
+   "container": "Academy of Management Review",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "read2016": {
+   "found": true,
+   "title": "Response to Arend, Sarooghi, and Burkemper (2015): Cocreating Effectual Entrepreneurship Research",
+   "container": "Academy of Management Review",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "richards1980": {
+   "found": true,
+   "title": "A Cash Conversion Cycle Approach to Liquidity Analysis",
+   "container": "Financial Management",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "cox2008": {
+   "found": true,
+   "title": "What's Wrong with Risk Matrices?",
+   "container": "Risk Analysis",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "kaplan1981": {
+   "found": true,
+   "title": "On The Quantitative Definition of Risk",
+   "container": "Risk Analysis",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "kelley1959": {
+   "found": true,
+   "title": "Critical-path planning and scheduling",
+   "container": "Papers presented at the December 1-3, 1959, eastern joint IRE-AIEE-ACM computer conference on - IRE-AIEE-ACM '59 (Eastern)",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED"
+  },
+  "moore2014": {
+   "found": true,
+   "title": "Crossing the Chasm",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "rogers2003": {
+   "found": true,
+   "title": "Diffusion of Innovations, 5th Edition",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "nagle2017": {
+   "found": true,
+   "title": "Strategy and Tactics of Pricing A Guide to Growing More Profitably",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "osterwalder2010": {
+   "found": true,
+   "title": "bUSINESS MODEL GENERATION",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "ries2011": {
+   "found": true,
+   "title": "The Lean Startup How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses",
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "VERIFIED"
+  },
+  "gmbhg": {
+   "verdict": "PRIMARY_TEXT_READ",
+   "url": "https://www.gesetze-im-internet.de/gmbhg/__5a.html",
+   "accessed": "2026-11-10",
+   "abstract_stored": false
+  },
+  "bgb721": {
+   "verdict": "PRIMARY_TEXT_READ",
+   "url": "https://www.gesetze-im-internet.de/bgb/__721.html",
+   "accessed": "2026-11-10",
+   "abstract_stored": false
+  },
+  "exist2026": {
+   "verdict": "PRIMARY_TEXT_READ",
+   "url": "https://www.exist.de/DE/Programm/Exist-Gruenderstipendium/inhalt.html",
+   "accessed": "2026-11-10",
+   "abstract_stored": false
+  },
+  "epo-guidelines-g-vii-5": {
+   "verdict": "PRIMARY_TEXT_READ",
+   "url": "https://www.epo.org/en/legal/guidelines-epc/2026/g_vii_5.html",
+   "accessed": "2026-11-13",
+   "abstract_stored": false
+  }
+ },
+ "claim_snippets": {
+  "rp.1": [
+   {
+    "source": "roediger2006",
+    "snippet": "on the delayed tests, prior testing produced substantially greater retention than studying",
+    "found_in_abstract": true
+   },
+   {
+    "source": "roediger2006",
+    "snippet": "repeated studying increased students' confidence",
+    "found_in_abstract": true
+   }
+  ],
+  "rp.2": [
+   {
+    "source": "rowland2014",
+    "snippet": "initial recall tests yielding larger testing benefits than recognition tests",
+    "found_in_abstract": true
+   }
+  ],
+  "rp.3": [
+   {
+    "source": "pan2018",
+    "snippet": "d = 0.40, 95% ci [0.31, 0.50]",
+    "found_in_abstract": true
+   },
+   {
+    "source": "pan2018",
+    "snippet": "to application and inference questions",
+    "found_in_abstract": true
+   }
+  ],
+  "rp.4": [
+   {
+    "source": "adesope2017",
+    "snippet": "practice tests are more beneficial for learning than restudying and all other comparison conditions",
+    "found_in_abstract": true
+   }
+  ],
+  "sp.1": [
+   {
+    "source": "cepeda2006",
+    "snippet": "the isi producing maximal retention increased as retention interval increased",
+    "found_in_abstract": true
+   }
+  ],
+  "sp.2": [
+   {
+    "source": "cepeda2008",
+    "snippet": "the optimal gap declined from about 20 to 40% of a 1-week test delay to about 5 to 10% of a 1-year test delay",
+    "found_in_abstract": true
+   }
+  ],
+  "sp.3": [
+   {
+    "source": "ye2022",
+    "snippet": "spaced repetition scheduler guaranteed to minimize the review cost",
+    "found_in_abstract": true
+   }
+  ],
+  "il.1": [
+   {
+    "source": "brunmair2019",
+    "snippet": "stronger interleaving effects for learning material more similar between categories",
+    "found_in_abstract": true
+   },
+   {
+    "source": "brunmair2019",
+    "snippet": "especially for expository texts and words",
+    "found_in_abstract": true
+   }
+  ],
+  "we.1": [
+   {
+    "source": "renkl2003",
+    "snippet": "in later stages, however, solving problems is superior",
+    "found_in_abstract": true
+   }
+  ],
+  "we.2": [
+   {
+    "source": "renkl2003",
+    "snippet": "problem-solving elements are successively integrated into example study",
+    "found_in_abstract": true
+   }
+  ],
+  "we.3": [
+   {
+    "source": "atkinson2000",
+    "snippet": "employs multiple examples for each conceptual problem type",
+    "found_in_abstract": true
+   },
+   {
+    "source": "atkinson2000",
+    "snippet": "examples should be presented in close proximity to matched practice problems",
+    "found_in_abstract": true
+   }
+  ],
+  "we.4": [
+   {
+    "source": "kalyuga2003",
+    "snippet": "can lose their effectiveness and even have negative consequences when used with more experienced learners",
+    "found_in_abstract": true
+   }
+  ],
+  "pf.1": [
+   {
+    "source": "sinha2021",
+    "snippet": "hedge’s g 0.36 [95% confidence interval 0.20; 0.51]",
+    "found_in_abstract": true
+   },
+   {
+    "source": "sinha2021",
+    "snippet": "effect sizes favored i-ps",
+    "found_in_abstract": true
+   }
+  ],
+  "pf.2": [
+   {
+    "source": "kirschner2006",
+    "snippet": "the advantage of guidance begins to recede only when learners have sufficiently high prior knowledge",
+    "found_in_abstract": true
+   }
+  ],
+  "cl.1": [
+   {
+    "source": "sweller2019",
+    "snippet": "all novel information first is processed by a capacity and duration limited working memory",
+    "found_in_abstract": true
+   }
+  ],
+  "cl.2": [
+   {
+    "source": "sweller1988",
+    "snippet": "requires a relatively large amount of cognitive processing capacity",
+    "found_in_abstract": true
+   }
+  ],
+  "pr.1": [
+   {
+    "source": "brod2021",
+    "snippet": "active retrieval as such does not suffice to explain beneficial effects of predicting",
+    "found_in_abstract": true
+   },
+   {
+    "source": "brod2021",
+    "snippet": "predicting boosts surprise about unexpected answers",
+    "found_in_abstract": true
+   }
+  ],
+  "pr.2": [
+   {
+    "source": "butterfield2001",
+    "snippet": "highly confident errors were the most likely to be corrected in a subsequent retest",
+    "found_in_abstract": true
+   }
+  ],
+  "pr.3": [
+   {
+    "source": "dejong1998",
+    "snippet": "simulations may be combined with instructional support in order to overcome these problems",
+    "found_in_abstract": true
+   }
+  ],
+  "mm.1": [
+   {
+    "source": "mayer2020",
+    "snippet": "coherence principle, signaling principle, redundancy principle, spatial contiguity principle, and temporal contiguity principle",
+    "found_in_abstract": true
+   },
+   {
+    "source": "mayer2020",
+    "snippet": "pre-training principle, segmenting principle, and modality principle",
+    "found_in_abstract": true
+   }
+  ],
+  "se.3": [
+   {
+    "source": "chi2014",
+    "snippet": "from passive to active to constructive to interactive, their learning will increase",
+    "found_in_abstract": true
+   }
+  ],
+  "fb.1": [
+   {
+    "source": "kluger1996",
+    "snippet": "(d =.41)",
+    "found_in_abstract": true
+   },
+   {
+    "source": "kluger1996",
+    "snippet": "fi effectiveness decreases as attention moves up the hierarchy closer to the self",
+    "found_in_abstract": true
+   }
+  ],
+  "fb.2": [
+   {
+    "source": "wisniewski2020",
+    "snippet": "a medium effect (d = 0.48)",
+    "found_in_abstract": true
+   },
+   {
+    "source": "wisniewski2020",
+    "snippet": "substantially influenced by the information content conveyed",
+    "found_in_abstract": true
+   }
+  ],
+  "fb.3": [
+   {
+    "source": "shute2008",
+    "snippet": "formative feedback should be nonevaluative, supportive, timely, and specific",
+    "found_in_abstract": true
+   }
+  ],
+  "mc.2": [
+   {
+    "source": "roediger2006",
+    "snippet": "even though repeated studying increased students' confidence",
+    "found_in_abstract": true
+   }
+  ],
+  "tr.1": [
+   {
+    "source": "barnett2002",
+    "snippet": "estimation of a single effect size for far transfer is misguided",
+    "found_in_abstract": true
+   }
+  ],
+  "its.1": [
+   {
+    "source": "vanlehn2011",
+    "snippet": "the effect size of human tutoring was much lower: d = 0.79",
+    "found_in_abstract": true
+   },
+   {
+    "source": "vanlehn2011",
+    "snippet": "the effect size of intelligent tutoring systems was 0.76",
+    "found_in_abstract": true
+   }
+  ],
+  "its.2": [
+   {
+    "source": "ma2014",
+    "snippet": "teacher-led, large-group instruction (g .42)",
+    "found_in_abstract": true
+   }
+  ],
+  "its.3": [
+   {
+    "source": "kulik2016",
+    "snippet": "raise test scores 0.66 standard deviations",
+    "found_in_abstract": true
+   },
+   {
+    "source": "kulik2016",
+    "snippet": "locally developed or standardized tests",
+    "found_in_abstract": true
+   }
+  ],
+  "its.4": [
+   {
+    "source": "anderson1995",
+    "snippet": "immediate feedback, consisting of short and directed error messages",
+    "found_in_abstract": true
+   }
+  ],
+  "its.5": [
+   {
+    "source": "aleven2016",
+    "snippet": "but not to achieve better learning outcomes",
+    "found_in_abstract": true
+   }
+  ],
+  "its.7": [
+   {
+    "source": "koedinger2012",
+    "snippet": "memory and fluency processes, (b) induction and refinement processes, and (c) understanding and sense-making processes",
+    "found_in_abstract": true
+   }
+  ],
+  "ai.1": [
+   {
+    "source": "bastani2025",
+    "snippet": "when access is subsequently taken away, students actually perform worse than those who never had access",
+    "found_in_abstract": true
+   },
+   {
+    "source": "bastani2025",
+    "snippet": "17% reduction",
+    "found_in_abstract": true
+   }
+  ],
+  "ai.2": [
+   {
+    "source": "kestin2025",
+    "snippet": "students learn significantly more in less time when using the ai tutor",
+    "found_in_abstract": true
+   }
+  ],
+  "as.2": [
+   {
+    "source": "haladyna2002",
+    "snippet": "a taxonomy of 31 multiple-choice item-writing guidelines",
+    "found_in_abstract": true
+   }
+  ],
+  "as.4": [
+   {
+    "source": "black1998",
+    "snippet": "yield substantial learning gains",
+    "found_in_abstract": true
+   }
+  ]
+ },
+ "problems": [],
+ "summary": {
+  "sources": 78,
+  "verified": 74,
+  "primary_text_read": 4,
+  "with_abstract": 48,
+  "snippets_checked": 48,
+  "snippets_found": 48
+ }
+}

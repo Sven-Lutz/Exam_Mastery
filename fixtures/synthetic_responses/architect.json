@@ -1,0 +1,71 @@
+{
+  "competencies": [
+    {
+      "id": "C1",
+      "operation": "calculate",
+      "prerequisites": [
+        "arithmetic",
+        "percentage rates"
+      ],
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ],
+      "statement": "Compute EPS from pretax profit, effective tax rate and outstanding shares under the simplified model."
+    },
+    {
+      "id": "C2",
+      "operation": "explain",
+      "prerequisites": [
+        "relative percentage change"
+      ],
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ],
+      "statement": "Explain why a percentage point change in tax rate is not the same as a relative percentage change in EPS."
+    },
+    {
+      "id": "C3",
+      "operation": "compare",
+      "prerequisites": [
+        "C1",
+        "C2"
+      ],
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ],
+      "statement": "Compare alternative tax rates under a constant-profit and constant-share scenario and explain the scope limitations."
+    }
+  ],
+  "domain_summary": "A toy finance model integrating arithmetic with critical interpretation of simplifying assumptions.",
+  "interaction_choice": {
+    "kind": "numeric",
+    "reason": "Intervention on tax rate makes comparative effects and differences visible"
+  },
+  "knowledge_operations": [
+    "calculate",
+    "explain",
+    "compare",
+    "assumption-check"
+  ],
+  "risk": "low",
+  "skills": [
+    "numerical-verification",
+    "worked-examples",
+    "misconception-diagnosis"
+  ],
+  "title": "Synthetic finance: effective tax rate and EPS",
+  "units": [
+    {
+      "competency_ids": [
+        "C1",
+        "C2",
+        "C3"
+      ],
+      "id": "U1",
+      "title": "EPS and rate sensitivity"
+    }
+  ],
+  "unknowns": [
+    "Real tax/financial reporting standards are explicitly outside this toy model"
+  ]
+}

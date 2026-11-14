@@ -1,0 +1,1335 @@
+{
+ "schema": "em-kb-principles-v1",
+ "version": "1.1.0",
+ "status_scale": {
+  "EMPIRICAL_STRONG": "Repliziert, durch Meta-Analysen gestützt; Grenzen bekannt.",
+  "EMPIRICAL_CONDITIONAL": "Empirisch gestützt, aber stark von Material, Vorwissen oder Umsetzung abhängig.",
+  "THEORETICAL_MODEL": "Erklärendes Rahmenmodell mit Teilbelegen; Vorhersagen nicht durchgängig geprüft.",
+  "DESIGN_HYPOTHESIS": "Plausible Produktentscheidung, aus Befunden abgeleitet, selbst nicht geprüft.",
+  "UNVALIDATED_FEATURE": "Exam-Mastery-Funktion ohne eigene Wirksamkeitsprüfung.",
+  "REJECTED": "Populäre Annahme ohne tragfähige Evidenz; darf nicht umgesetzt werden."
+ },
+ "basis_scale": {
+  "abstract_checked": "Aussage am gespeicherten Abstract geprüft (abstract_evidence wird maschinell verglichen).",
+  "metadata_only": "Nur Bibliografie verifiziert; Aussage beruht auf Fachkenntnis des Autors der Wissensbasis und ist am Volltext zu prüfen.",
+  "fulltext_checked": "Volltext gelesen."
+ },
+ "principles": [
+  {
+   "id": "retrieval_practice",
+   "version": "1.0.0",
+   "title": "Abrufübung (Testeffekt)",
+   "status": "EMPIRICAL_STRONG",
+   "claims": [
+    {
+     "id": "rp.1",
+     "text": "Nach Verzögerung (2 Tage, 1 Woche) führt wiederholtes Abrufen zu besserem Behalten als wiederholtes Lesen; unmittelbar danach (5 min) ist Wiederlesen überlegen. Wiederlesen erhöht die Selbstsicherheit stärker als die Leistung.",
+     "sources": [
+      "roediger2006"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "roediger2006",
+       "snippet": "on the delayed tests, prior testing produced substantially greater retention than studying"
+      },
+      {
+       "source": "roediger2006",
+       "snippet": "repeated studying increased students' confidence"
+      }
+     ]
+    },
+    {
+     "id": "rp.2",
+     "text": "Rowland 2014 (k = 159, Labormaterial): g = 0.50 [0.42, 0.58]; Abruf mit Hinweisreiz g = 0.61, Wiedererkennen und freier Abruf je g = 0.29. Testeffekte sind nach ≥ 1 Tag (0.69) und mit Feedback (0.73) am größten; ohne Feedback und bei Erstabrufquote ≤ 50 % ist kein Effekt nachweisbar (0.03). Unveröffentlichte Studien: 0.25 (Publikationsbias).",
+     "sources": [
+      "rowland2014"
+     ],
+     "basis": "fulltext_checked",
+     "abstract_evidence": [
+      {
+       "source": "rowland2014",
+       "snippet": "initial recall tests yielding larger testing benefits than recognition tests"
+      }
+     ],
+     "fulltext_evidence": [
+      {
+       "source": "rowland2014",
+       "location": "Table 1"
+      }
+     ]
+    },
+    {
+     "id": "rp.3",
+     "text": "Testen erzeugt übertragbares Lernen (d = 0.40), am stärksten auf Anwendungs- und Inferenzfragen, am schwächsten bei Aufgaben mit Worked Examples.",
+     "sources": [
+      "pan2018"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "pan2018",
+       "snippet": "d = 0.40, 95% ci [0.31, 0.50]"
+      },
+      {
+       "source": "pan2018",
+       "snippet": "to application and inference questions"
+      }
+     ]
+    },
+    {
+     "id": "rp.4",
+     "text": "Übungstests sind wirksamer als Wiederlesen und alle anderen Vergleichsbedingungen; Effektgrößen hängen von Testmerkmalen ab.",
+     "sources": [
+      "adesope2017"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "adesope2017",
+       "snippet": "practice tests are more beneficial for learning than restudying and all other comparison conditions"
+      }
+     ]
+    },
+    {
+     "id": "rp.5",
+     "text": "Dunlosky et al. stufen Practice Testing und Distributed Practice als 'high utility' ein; Hervorheben und Wiederlesen als 'low utility'.",
+     "sources": [
+      "dunlosky2013"
+     ],
+     "basis": "metadata_only"
+    }
+   ],
+   "conditions": [
+    "Wirkung vor allem auf verzögerte Tests; Feedback nach dem Abruf nötig, wenn die Abrufquote niedrig ist.",
+    "Abruf muss erfolgreich möglich sein; zu schwere Abrufe ohne Feedback lernen Fehler ein."
+   ],
+   "limits": [
+    "Großteil der Befunde mit Texten, Wortlisten, Fakten; für komplexe Problemlösung kleinere, heterogenere Effekte (pan2018).",
+    "Unmittelbare Leistung kann schlechter wirken als bei Wiederlesen (roediger2006) — Selbsteinschätzung täuscht."
+   ],
+   "contradictions": [],
+   "engine_rules": [
+    {
+     "id": "RP-R1",
+     "rule": "Jede Lerneinheit endet mit Abrufaufgaben, die eine selbst erzeugte Antwort verlangen (recall vor recognition). Bevorzugt Abruf mit Hinweisreiz (Kurzantwort); Schwierigkeit so wählen, dass ein erheblicher Teil lösbar ist, sonst immer mit Feedback.",
+     "applies_to": [
+      "textbook",
+      "workbook",
+      "adaptive_track"
+     ],
+     "enforcement": "deterministic:didactic_rules.check_book"
+    },
+    {
+     "id": "RP-R2",
+     "rule": "Lösung und Hinweis werden erst nach einem eigenen Antwortversuch angezeigt; 'Lösung angesehen' zählt nicht als selbstständig gelöst.",
+     "applies_to": [
+      "learn_app",
+      "tutor"
+     ],
+     "enforcement": "deterministic:learning event log"
+    },
+    {
+     "id": "RP-R3",
+     "rule": "Nach jedem Abruf korrigierendes Feedback mit richtiger Antwort und Begründung.",
+     "applies_to": [
+      "learn_app",
+      "anki"
+     ],
+     "enforcement": "agent_checklist"
+    }
+   ],
+   "subject_adaptations": {
+    "mathematics": "Abruf von Definitionen UND Beweisideen (Warum gilt der Satz? Welche Voraussetzung wird wo genutzt?).",
+    "law": "Abruf von Tatbestandsmerkmalen mit Definition und Prüfungsreihenfolge, nicht nur Normnummern.",
+    "finance": "Abruf der Modellannahmen und der Formel mit Bedeutung jeder Größe; Rechnen mit neuen Zahlen.",
+    "ml": "Abruf von Gleichungen mit Dimensionen der Tensoren; Vorhersage des Verhaltens bei Parameteränderung."
+   }
+  },
+  {
+   "id": "spacing",
+   "version": "1.0.0",
+   "title": "Verteiltes Üben (Spacing)",
+   "status": "EMPIRICAL_STRONG",
+   "claims": [
+    {
+     "id": "sp.1",
+     "text": "Der optimale Abstand zwischen Lerngelegenheiten wächst mit dem Behaltensintervall.",
+     "sources": [
+      "cepeda2006"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "cepeda2006",
+       "snippet": "the isi producing maximal retention increased as retention interval increased"
+      }
+     ]
+    },
+    {
+     "id": "sp.2",
+     "text": "Als Anteil der Testverzögerung sinkt der optimale Abstand von etwa 20–40 % (1 Woche) auf 5–10 % (1 Jahr).",
+     "sources": [
+      "cepeda2008"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "cepeda2008",
+       "snippet": "the optimal gap declined from about 20 to 40% of a 1-week test delay to about 5 to 10% of a 1-year test delay"
+      }
+     ]
+    },
+    {
+     "id": "sp.3",
+     "text": "Gedächtnismodell-basierte Scheduler (wie FSRS in Anki) optimieren Wiederholungsabstände aus Lernlogs.",
+     "sources": [
+      "ye2022"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "ye2022",
+       "snippet": "spaced repetition scheduler guaranteed to minimize the review cost"
+      }
+     ]
+    },
+    {
+     "id": "sp.4",
+     "text": "Successive Relearning (Abruf bis zum Kriterium, über mehrere Sitzungen verteilt) verbessert Kursprüfungsleistung und Langzeitbehalten.",
+     "sources": [
+      "rawson2013"
+     ],
+     "basis": "metadata_only"
+    }
+   ],
+   "conditions": [
+    "Prüfungsdatum bekannt: Abstände am Behaltensintervall bis zur Prüfung ausrichten."
+   ],
+   "limits": [
+    "Optimale Abstände wurden v. a. für Faktenlernen bestimmt; für Problemlöse-Fertigkeiten weniger genau bekannt."
+   ],
+   "contradictions": [],
+   "engine_rules": [
+    {
+     "id": "SP-R1",
+     "rule": "Exam Mastery plant keine eigenen Wiederholungsintervalle für Karten; Anki-Scheduling (SM-2/FSRS) und vorhandene Review-Logs bleiben unangetastet.",
+     "applies_to": [
+      "anki"
+     ],
+     "enforcement": "deterministic:anki_v2 stable ids + isolated update test"
+    },
+    {
+     "id": "SP-R2",
+     "rule": "Adaptive Lernstrecke plant eine spätere Prüfung derselben Kompetenz mit neuer Aufgabe (nicht derselben).",
+     "applies_to": [
+      "adaptive_track"
+     ],
+     "enforcement": "deterministic:learning policy"
+    }
+   ],
+   "subject_adaptations": {}
+  },
+  {
+   "id": "interleaving",
+   "version": "1.0.0",
+   "title": "Verschachteltes Üben (Interleaving)",
+   "status": "EMPIRICAL_CONDITIONAL",
+   "claims": [
+    {
+     "id": "il.1",
+     "text": "Brunmair & Richter 2019: g = 0.42 [0.34, 0.50], k = 238; Gemälde 0.67, Mathematikaufgaben 0.34 [0.11, 0.57], Sachtexte nicht signifikant, Wörter −0.39 (Blocken besser). Stärker bei hoher Ähnlichkeit zwischen und geringer Ähnlichkeit innerhalb der Kategorien.",
+     "sources": [
+      "brunmair2019"
+     ],
+     "basis": "fulltext_checked",
+     "abstract_evidence": [
+      {
+       "source": "brunmair2019",
+       "snippet": "stronger interleaving effects for learning material more similar between categories"
+      },
+      {
+       "source": "brunmair2019",
+       "snippet": "especially for expository texts and words"
+      }
+     ],
+     "fulltext_evidence": [
+      {
+       "source": "brunmair2019",
+       "location": "Table 3"
+      }
+     ]
+    },
+    {
+     "id": "il.2",
+     "text": "Gemischte Mathematikaufgaben verbessern die spätere Leistung gegenüber geblockten, weil die Wahl der Methode geübt wird. (Brunmair & Richter 2019 bewerten die Mathematik-Evidenz als gemischt.)",
+     "sources": [
+      "rohrer2007"
+     ],
+     "basis": "metadata_only"
+    }
+   ],
+   "conditions": [
+    "Erst nach erster Einübung jedes Aufgabentyps (Blocken für den Erwerb, Mischen für Diskrimination)."
+   ],
+   "limits": [
+    "Kein allgemeiner Vorteil; bei unähnlichen Kategorien oder Textlernen teils negativ (brunmair2019)."
+   ],
+   "contradictions": [
+    "brunmair2019 berichtet negative Effekte für Wörter/Sachtexte."
+   ],
+   "engine_rules": [
+    {
+     "id": "IL-R1",
+     "rule": "Gemischte Aufgabenblöcke nur zwischen leicht verwechselbaren Aufgabentypen derselben Kompetenzfamilie; Aufgabe verlangt zuerst die Wahl der Methode. Nicht für reine Sachtext- oder Begriffslisten-Einheiten (dort kein bzw. negativer Effekt).",
+     "applies_to": [
+      "workbook",
+      "mock_exam"
+     ],
+     "enforcement": "agent_checklist"
+    }
+   ],
+   "subject_adaptations": {
+    "mathematics": "Mischen z. B. Substitution / partielle Integration / Partialbruch.",
+    "finance": "Mischen NPV / IRR / Payback mit Entscheidung, welches Kriterium die Frage beantwortet.",
+    "law": "Mischen ähnlicher Anspruchsgrundlagen, Schwerpunkt Abgrenzung."
+   }
+  },
+  {
+   "id": "worked_examples",
+   "version": "1.0.0",
+   "title": "Worked Examples und Fading",
+   "status": "EMPIRICAL_CONDITIONAL",
+   "claims": [
+    {
+     "id": "we.1",
+     "text": "Lernen aus ausgearbeiteten Beispielen ist in frühen Phasen des Fertigkeitserwerbs wirksamer als Problemlösen; in späteren Phasen ist Problemlösen überlegen.",
+     "sources": [
+      "renkl2003"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "renkl2003",
+       "snippet": "in later stages, however, solving problems is superior"
+      }
+     ]
+    },
+    {
+     "id": "we.2",
+     "text": "Fading: Problemlöse-Elemente werden schrittweise in das Beispiel integriert, bis selbstständig gelöst wird.",
+     "sources": [
+      "renkl2003"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "renkl2003",
+       "snippet": "problem-solving elements are successively integrated into example study"
+      }
+     ]
+    },
+    {
+     "id": "we.3",
+     "text": "Gute Beispiele: integrierte Komponenten, Struktur durch Beschriftung/Segmentierung, mehrere Beispiele je Problemtyp mit variierten Oberflächen, unmittelbar gefolgt von passenden Übungsaufgaben, Anregung zur Selbsterklärung.",
+     "sources": [
+      "atkinson2000"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "atkinson2000",
+       "snippet": "employs multiple examples for each conceptual problem type"
+      },
+      {
+       "source": "atkinson2000",
+       "snippet": "examples should be presented in close proximity to matched practice problems"
+      }
+     ]
+    },
+    {
+     "id": "we.4",
+     "text": "Expertise Reversal (Kalyuga 2007, Review): Worked Examples vs. Problemlösen d = 1.20 bei Novizen, −0.36 bei Fortgeschrittenen (Kalyuga & Sweller 2004); langsames vs. schnelles Ausblenden d = 1.30 bei geringem, −0.47 bei hohem Vorwissen (Ingenieurstudierende). Adaptive Wahl der Unterstützung per Erste-Schritt-Schnelltest: d = 0.46. Meist kleine Stichproben in technischen Domänen.",
+     "sources": [
+      "kalyuga2007",
+      "kalyuga2003"
+     ],
+     "basis": "fulltext_checked",
+     "abstract_evidence": [
+      {
+       "source": "kalyuga2003",
+       "snippet": "can lose their effectiveness and even have negative consequences when used with more experienced learners"
+      }
+     ],
+     "fulltext_evidence": [
+      {
+       "source": "kalyuga2007",
+       "location": "Table 1; p. 532"
+      }
+     ]
+    },
+    {
+     "id": "we.5",
+     "text": "Meta-Analyse zum Worked-Example-Effekt in Mathematik (Barbieri et al. 2023): positiver mittlerer Effekt; Effektgröße am Volltext zu prüfen.",
+     "sources": [
+      "barbieri2023"
+     ],
+     "basis": "metadata_only"
+    }
+   ],
+   "conditions": [
+    "Niedriges Vorwissen, hohe Elementinteraktivität.",
+    "Diagnose des Vorwissens vor der Wahl der Unterstützung (kalyuga2003)."
+   ],
+   "limits": [
+    "Transfer des Testeffekts ist bei Worked-Example-Aufgaben am schwächsten (pan2018).",
+    "Productive Failure (sinha2021) zeigt, dass Problemlösen VOR Instruktion für konzeptuelles Wissen besser sein kann — Kontext beachten."
+   ],
+   "contradictions": [
+    "sinha2021 / kapur2016 versus kirschner2006: Reihenfolge Instruktion vs. Problemlösen. Auflösung in Spezifikation worked_example_fading.",
+    "Auflösung WE vs. PF nach Vorwissen und Ziel: neue Prozedur für Novizen → Worked Example + Fading; konzeptuelles Ziel mit generierbarem Vorwissen → Explorationsaufgabe vor Instruktion zulässig, wenn die Instruktion die Lösungsversuche vergleicht; Fortgeschrittene → Start bei Ausblend- oder Problemstufe (Kalyuga 2007)."
+   ],
+   "engine_rules": [
+    {
+     "id": "WE-R1",
+     "rule": "Jede neue Prozedur bietet: vollständiges Worked Example → teilweise ausgeblendete Schritte → selbstständige Aufgabe mit neuer Oberfläche. Lernende, die eine vorgeschaltete Kurzdiagnose (z. B. erster Lösungsschritt) bestehen, beginnen bei der Ausblend- oder Problemstufe; Ausblendtempo langsam bei geringem, schnell bei hohem Vorwissen.",
+     "applies_to": [
+      "textbook",
+      "workbook"
+     ],
+     "enforcement": "agent_checklist + spec:worked_example_fading"
+    },
+    {
+     "id": "WE-R2",
+     "rule": "Die adaptive Steuerung überspringt weitere Beispiele, wenn eine selbstständige Aufgabe oder ein Erste-Schritt-Schnelltest korrekt gelöst wird; bei einem späteren Fehler wird wieder auf Ausblendbeispiele zurückgestuft.",
+     "applies_to": [
+      "adaptive_track"
+     ],
+     "enforcement": "deterministic:learning policy"
+    }
+   ],
+   "subject_adaptations": {
+    "mathematics": "Beweise als Worked Examples mit markierter Beweisidee; Fading = Lücken in Begründungen, nicht nur in Rechnungen.",
+    "law": "Musterfall in Gutachtenstil; Fading = einzelne Tatbestandsmerkmale selbst subsumieren.",
+    "ml": "Code- und Rechenbeispiel parallel; Fading = Gradienten einzelner Schichten selbst berechnen.",
+    "finance": "Cashflow-Tabelle ausgefüllt, dann teilweise, dann leer."
+   }
+  },
+  {
+   "id": "productive_failure",
+   "version": "1.0.0",
+   "title": "Problemlösen vor Instruktion (Productive Failure)",
+   "status": "EMPIRICAL_CONDITIONAL",
+   "claims": [
+    {
+     "id": "pf.1",
+     "text": "PS-I ist I-PS im Mittel moderat überlegen (g = 0.36), stärker bei hoher Umsetzungstreue zu Productive Failure; bei jüngeren Lernenden und domänenübergreifenden Fertigkeiten ist I-PS überlegen. Vorteil vor allem für konzeptuelles Verständnis und Transfer; für prozedurale Fertigkeiten kein klarer Vorteil (Volltext nicht geprüft).",
+     "sources": [
+      "sinha2021"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "sinha2021",
+       "snippet": "hedge’s g 0.36 [95% confidence interval 0.20; 0.51]"
+      },
+      {
+       "source": "sinha2021",
+       "snippet": "effect sizes favored i-ps"
+      }
+     ]
+    },
+    {
+     "id": "pf.2",
+     "text": "Minimal angeleitetes Lernen ist für Novizen weniger wirksam; der Vorteil von Anleitung sinkt erst bei hohem Vorwissen.",
+     "sources": [
+      "kirschner2006"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "kirschner2006",
+       "snippet": "the advantage of guidance begins to recede only when learners have sufficiently high prior knowledge"
+      }
+     ]
+    }
+   ],
+   "conditions": [
+    "PS-I nur als kurze, gezielte Erkundung mit anschließender vollständiger Instruktion, die die Lösungsversuche aufgreift — nicht als unangeleitetes Entdecken."
+   ],
+   "limits": [
+    "Effekte vorwiegend auf konzeptuelles Wissen; Umsetzungstreue entscheidend."
+   ],
+   "contradictions": [
+    "kirschner2006 vs. sinha2021 — verträglich, weil PF strukturierte Instruktion danach verlangt."
+   ],
+   "engine_rules": [
+    {
+     "id": "PF-R1",
+     "rule": "Kapitel dürfen mit einem Vorhersage- oder Erkundungsproblem beginnen, wenn direkt danach die vollständige Instruktion die typischen Lösungsversuche vergleicht. Keine Bewertung dieser Versuche als Fehler. Nur wenn Lernende aus Vorwissen eigene Lösungsversuche erzeugen können; nicht bei völlig neuen, stark element-interaktiven Prozeduren für Novizen.",
+     "applies_to": [
+      "textbook",
+      "lab"
+     ],
+     "enforcement": "agent_checklist"
+    }
+   ],
+   "subject_adaptations": {}
+  },
+  {
+   "id": "cognitive_load",
+   "version": "1.0.0",
+   "title": "Cognitive Load Theory",
+   "status": "THEORETICAL_MODEL",
+   "claims": [
+    {
+     "id": "cl.1",
+     "text": "Neue Information wird in einem kapazitäts- und dauerbegrenzten Arbeitsgedächtnis verarbeitet; im Langzeitgedächtnis gespeicherte Schemata heben diese Grenze auf.",
+     "sources": [
+      "sweller2019"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "sweller2019",
+       "snippet": "all novel information first is processed by a capacity and duration limited working memory"
+      }
+     ]
+    },
+    {
+     "id": "cl.2",
+     "text": "Konventionelles Problemlösen (Means-Ends-Analyse) bindet Kapazität, die dann für den Schemaerwerb fehlt.",
+     "sources": [
+      "sweller1988"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "sweller1988",
+       "snippet": "requires a relatively large amount of cognitive processing capacity"
+      }
+     ]
+    }
+   ],
+   "conditions": [],
+   "limits": [
+    "Cognitive Load ist schwer direkt zu messen; viele Effekte sind theoretisch erklärt, nicht mit Load-Messungen belegt."
+   ],
+   "contradictions": [],
+   "engine_rules": [
+    {
+     "id": "CL-R1",
+     "rule": "Formel, Abbildung und erklärender Text stehen beieinander (keine Verweise auf entfernte Seiten für das Verständnis eines Schritts).",
+     "applies_to": [
+      "textbook",
+      "lab"
+     ],
+     "enforcement": "agent_checklist + layout_review"
+    },
+    {
+     "id": "CL-R2",
+     "rule": "Guided Mode zeigt nur die für den aktuellen Schritt nötigen Größen; Explore Mode zeigt alle.",
+     "applies_to": [
+      "lab"
+     ],
+     "enforcement": "agent_checklist"
+    }
+   ],
+   "subject_adaptations": {}
+  },
+  {
+   "id": "prediction_simulation",
+   "version": "1.0.0",
+   "title": "Vorhersage, Hyperkorrektur und Simulationslernen",
+   "status": "EMPIRICAL_CONDITIONAL",
+   "claims": [
+    {
+     "id": "pr.1",
+     "text": "Vorhersagen vor der Auflösung wirkt nicht nur über Abruf, sondern verändert die Verarbeitung des folgenden Feedbacks (Überraschung); Mechanismen noch nicht vollständig geklärt.",
+     "sources": [
+      "brod2021"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "brod2021",
+       "snippet": "active retrieval as such does not suffice to explain beneficial effects of predicting"
+      },
+      {
+       "source": "brod2021",
+       "snippet": "predicting boosts surprise about unexpected answers"
+      }
+     ]
+    },
+    {
+     "id": "pr.2",
+     "text": "Mit hoher Sicherheit begangene Fehler werden nach korrigierendem Feedback am ehesten korrigiert (Hyperkorrektur).",
+     "sources": [
+      "butterfield2001"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "butterfield2001",
+       "snippet": "highly confident errors were the most likely to be corrected in a subsequent retest"
+      }
+     ]
+    },
+    {
+     "id": "pr.3",
+     "text": "Entdeckendes Lernen mit Simulationen stößt auf typische Probleme (u. a. Hypothesenbildung, Experimentplanung) und braucht instruktionale Unterstützung.",
+     "sources": [
+      "dejong1998"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "dejong1998",
+       "snippet": "simulations may be combined with instructional support in order to overcome these problems"
+      }
+     ]
+    }
+   ],
+   "conditions": [
+    "Vorhersage muss vor dem Ergebnis festgelegt werden; Ergebnis danach mit Erklärung des Mechanismus."
+   ],
+   "limits": [
+    "Effektgrößen für Hochschul-Labs unbekannt; Einzelbefunde aus Laborstudien."
+   ],
+   "contradictions": [],
+   "engine_rules": [
+    {
+     "id": "PR-R1",
+     "rule": "Labs verlangen vor der ersten Manipulation eine Vorhersage mit Sicherheitsangabe und kurzer Begründung; Wiederholer dürfen überspringen (nicht als Leistung gewertet).",
+     "applies_to": [
+      "lab"
+     ],
+     "enforcement": "agent_checklist + spec:visualization VZ-C2"
+    },
+    {
+     "id": "PR-R2",
+     "rule": "Bei sicherer, aber falscher Vorhersage wird der Widerspruch ausdrücklich gezeigt und erklärt.",
+     "applies_to": [
+      "lab",
+      "learn_app"
+     ],
+     "enforcement": "agent_checklist"
+    },
+    {
+     "id": "PR-R3",
+     "rule": "Explore-Modus bietet Experimentierhilfen (Variable isolieren, Hypothese notieren), nicht nur Regler.",
+     "applies_to": [
+      "lab"
+     ],
+     "enforcement": "agent_checklist"
+    }
+   ],
+   "subject_adaptations": {
+    "ml": "Vorhersage des Gradientenvorzeichens/Verlustverlaufs vor Ausführung eines Schritts.",
+    "finance": "Vorhersage, in welchem Monat der Kassenbestand am tiefsten ist, bevor die Tabelle aufgedeckt wird.",
+    "mathematics": "Vorhersage des Extremums vor der Ableitungsrechnung."
+   }
+  },
+  {
+   "id": "multimedia",
+   "version": "1.0.0",
+   "title": "Multimedia-Gestaltungsprinzipien",
+   "status": "EMPIRICAL_CONDITIONAL",
+   "claims": [
+    {
+     "id": "mm.1",
+     "text": "Prinzipien zur Reduktion extrinsischer Verarbeitung: Kohärenz, Signalisierung, Redundanz, räumliche und zeitliche Kontiguität; zum Management essentieller Verarbeitung: Pre-Training, Segmentierung, Modalität.",
+     "sources": [
+      "mayer2020"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "mayer2020",
+       "snippet": "coherence principle, signaling principle, redundancy principle, spatial contiguity principle, and temporal contiguity principle"
+      },
+      {
+       "source": "mayer2020",
+       "snippet": "pre-training principle, segmenting principle, and modality principle"
+      }
+     ]
+    },
+    {
+     "id": "mm.2",
+     "text": "Mehrere Repräsentationen nützen nur, wenn Lernende sie aufeinander beziehen können; die Übersetzung zwischen Darstellungen muss unterstützt werden.",
+     "sources": [
+      "ainsworth2006"
+     ],
+     "basis": "metadata_only"
+    }
+   ],
+   "conditions": [
+    "Prinzipien wirken stärker bei geringem Vorwissen (Boundary Conditions nach Mayer)."
+   ],
+   "limits": [
+    "Viele Befunde aus kurzen Laborstudien mit Animationen/Narration."
+   ],
+   "contradictions": [],
+   "engine_rules": [
+    {
+     "id": "MM-R1",
+     "rule": "Keine dekorativen Grafiken; jede Abbildung trägt eine fachliche Aussage, die in der Bildunterschrift steht.",
+     "applies_to": [
+      "textbook",
+      "lab",
+      "anki"
+     ],
+     "enforcement": "agent_checklist + figure_status"
+    },
+    {
+     "id": "MM-R2",
+     "rule": "Symbole in Formel und Grafik sind identisch benannt und farblich verknüpft (Signalisierung, Kontiguität).",
+     "applies_to": [
+      "textbook",
+      "lab"
+     ],
+     "enforcement": "agent_checklist"
+    }
+   ],
+   "subject_adaptations": {}
+  },
+  {
+   "id": "self_explanation",
+   "version": "1.0.0",
+   "title": "Selbsterklärung und generatives Lernen",
+   "status": "EMPIRICAL_CONDITIONAL",
+   "claims": [
+    {
+     "id": "se.1",
+     "text": "Angeleitete Selbsterklärung verbessert das Lernen (Meta-Analyse Bisra et al. 2018; Effektgröße am Volltext prüfen).",
+     "sources": [
+      "bisra2018"
+     ],
+     "basis": "metadata_only"
+    },
+    {
+     "id": "se.2",
+     "text": "Generative Strategien (Zusammenfassen, Mapping, Zeichnen, Imaginieren, Selbsttesten, Selbsterklären, Lehren, Enacting) wirken, wenn sie richtig angeleitet werden.",
+     "sources": [
+      "fiorella2016"
+     ],
+     "basis": "metadata_only"
+    },
+    {
+     "id": "se.3",
+     "text": "ICAP-Hypothese: interaktiv > konstruktiv > aktiv > passiv.",
+     "sources": [
+      "chi2014"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "chi2014",
+       "snippet": "from passive to active to constructive to interactive, their learning will increase"
+      }
+     ]
+    }
+   ],
+   "conditions": [
+    "Selbsterklärungen brauchen Rückmeldung oder Vergleich mit einer Expertenerklärung, sonst bleiben Fehlvorstellungen bestehen."
+   ],
+   "limits": [
+    "ICAP ist eine Hypothese; Einordnung von Aktivitäten in Modi ist nicht eindeutig."
+   ],
+   "contradictions": [
+    "Barbieri et al. 2023 (nur Abstract): In Mathematik-Worked-Examples gingen Selbsterklärungs-Prompts mit kleineren Effekten einher; Prompts daher optional/aufklappbar statt verpflichtend, nicht mit fehlerhaften Beispielen für Novizen kombinieren. Volltextprüfung offen."
+   ],
+   "engine_rules": [
+    {
+     "id": "SE-R1",
+     "rule": "In Worked Examples an mindestens einer Stelle die Frage 'Warum ist dieser Schritt zulässig?' mit aufklappbarer Expertenbegründung.",
+     "applies_to": [
+      "textbook",
+      "workbook"
+     ],
+     "enforcement": "agent_checklist"
+    },
+    {
+     "id": "SE-R2",
+     "rule": "Freitext-Selbsterklärungen werden nicht automatisch als richtig bewertet; sie bleiben 'unverifiziert' oder werden vom Tutor als agentische Einschätzung markiert.",
+     "applies_to": [
+      "learn_app",
+      "tutor"
+     ],
+     "enforcement": "deterministic:learning diagnosis"
+    }
+   ],
+   "subject_adaptations": {}
+  },
+  {
+   "id": "feedback",
+   "version": "1.0.0",
+   "title": "Feedback und Fehlerkorrektur",
+   "status": "EMPIRICAL_CONDITIONAL",
+   "claims": [
+    {
+     "id": "fb.1",
+     "text": "Kluger & DeNisi 1996: d = 0.41 (607 Effekte), 38 % der Effekte negativ. Feedback mit korrekter Lösung 0.43 vs. 0.25 ohne; Lob 0.09; bei hoher Aufgabenkomplexität (oberes Quartil) d = 0.03, bei geringer 0.55.",
+     "sources": [
+      "kluger1996"
+     ],
+     "basis": "fulltext_checked",
+     "abstract_evidence": [
+      {
+       "source": "kluger1996",
+       "snippet": "(d =.41)"
+      },
+      {
+       "source": "kluger1996",
+       "snippet": "fi effectiveness decreases as attention moves up the hierarchy closer to the self"
+      }
+     ],
+     "fulltext_evidence": [
+      {
+       "source": "kluger1996",
+       "location": "Results; Table 2"
+      }
+     ]
+    },
+    {
+     "id": "fb.2",
+     "text": "Wisniewski, Zierer & Hattie 2020: d = 0.48 [0.44, 0.51] nach Ausreißerbereinigung (435 Studien); korrektives Feedback 0.46, hoch-informatives Feedback 0.99 (k = 42), Verstärkung/Strafe 0.24; Publikationsbias wahrscheinlich (Egger-Test signifikant).",
+     "sources": [
+      "wisniewski2020"
+     ],
+     "basis": "fulltext_checked",
+     "abstract_evidence": [
+      {
+       "source": "wisniewski2020",
+       "snippet": "a medium effect (d = 0.48)"
+      },
+      {
+       "source": "wisniewski2020",
+       "snippet": "substantially influenced by the information content conveyed"
+      }
+     ],
+     "fulltext_evidence": [
+      {
+       "source": "wisniewski2020",
+       "location": "Results"
+      }
+     ]
+    },
+    {
+     "id": "fb.3",
+     "text": "Formatives Feedback sollte nicht bewertend, unterstützend, zeitnah und spezifisch sein.",
+     "sources": [
+      "shute2008"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "shute2008",
+       "snippet": "formative feedback should be nonevaluative, supportive, timely, and specific"
+      }
+     ]
+    },
+    {
+     "id": "fb.4",
+     "text": "Feedback beantwortet: Wohin? Wie stehe ich? Was ist der nächste Schritt? — auf Aufgaben-, Prozess- und Selbstregulationsebene; Lob auf Personenebene ist wenig wirksam.",
+     "sources": [
+      "hattie2007"
+     ],
+     "basis": "metadata_only"
+    }
+   ],
+   "conditions": [],
+   "limits": [
+    "Kontextabhängig; schlecht gestaltetes Feedback kann schaden (kluger1996)."
+   ],
+   "contradictions": [],
+   "engine_rules": [
+    {
+     "id": "FB-R1",
+     "rule": "Feedback benennt die konkrete Abweichung (welcher Schritt, welche Größe) und den nächsten Schritt; kein Personenlob, keine Noten-Floskeln. Bei komplexen, mehrschrittigen Aufgaben Rückmeldung auf Teilschritt-Ebene statt nur zum Endergebnis; kein Lob als Ersatz für Information.",
+     "applies_to": [
+      "learn_app",
+      "tutor",
+      "solutions"
+     ],
+     "enforcement": "agent_checklist"
+    },
+    {
+     "id": "FB-R2",
+     "rule": "Für diagnostizierbare Fehler (Rechenfehler, falsches Vorzeichen, Einheitenfehler) deterministische Prüfung und fehlerspezifische Rückmeldung.",
+     "applies_to": [
+      "learn_app",
+      "lab"
+     ],
+     "enforcement": "deterministic:numeric_checks / learning diagnosis"
+    }
+   ],
+   "subject_adaptations": {}
+  },
+  {
+   "id": "metacognition",
+   "version": "1.0.0",
+   "title": "Metakognition und Selbsteinschätzung",
+   "status": "EMPIRICAL_CONDITIONAL",
+   "claims": [
+    {
+     "id": "mc.1",
+     "text": "Überschätzung des eigenen Lernstands führt zu vorzeitigem Beenden des Übens und schlechterer Leistung.",
+     "sources": [
+      "dunlosky2012"
+     ],
+     "basis": "metadata_only"
+    },
+    {
+     "id": "mc.2",
+     "text": "Wiederlesen erhöht die Zuversicht stärker als die spätere Leistung.",
+     "sources": [
+      "roediger2006"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "roediger2006",
+       "snippet": "even though repeated studying increased students' confidence"
+      }
+     ]
+    },
+    {
+     "id": "mc.3",
+     "text": "Desirable Difficulties: Bedingungen, die das Üben erschweren (Spacing, Variation, Abruf), können langfristiges Lernen fördern, obwohl sie die Übungsleistung senken.",
+     "sources": [
+      "bjork1994"
+     ],
+     "basis": "metadata_only"
+    }
+   ],
+   "conditions": [],
+   "limits": [],
+   "contradictions": [],
+   "engine_rules": [
+    {
+     "id": "MC-R1",
+     "rule": "Selbsteinschätzung vor dem Lösen erfassen und nach dem Lösen mit dem Ergebnis vergleichen; Abweichung sichtbar machen.",
+     "applies_to": [
+      "learn_app"
+     ],
+     "enforcement": "deterministic:learning event log"
+    },
+    {
+     "id": "MC-R2",
+     "rule": "Keine Fortschrittsanzeigen, die Lesen oder Anschauen als Lernfortschritt zählen.",
+     "applies_to": [
+      "learn_app"
+     ],
+     "enforcement": "agent_checklist"
+    }
+   ],
+   "subject_adaptations": {}
+  },
+  {
+   "id": "transfer",
+   "version": "1.0.0",
+   "title": "Transfer",
+   "status": "THEORETICAL_MODEL",
+   "claims": [
+    {
+     "id": "tr.1",
+     "text": "Transfer muss entlang benannter Dimensionen (Inhalt, Kontext: Wissensdomäne, physischer, zeitlicher, funktionaler, sozialer Kontext, Modalität) beschrieben werden; ein einziger Effekt für 'Ferntransfer' ist irreführend.",
+     "sources": [
+      "barnett2002"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "barnett2002",
+       "snippet": "estimation of a single effect size for far transfer is misguided"
+      }
+     ]
+    }
+   ],
+   "conditions": [],
+   "limits": [],
+   "contradictions": [],
+   "engine_rules": [
+    {
+     "id": "TR-R1",
+     "rule": "Jede Transferaufgabe deklariert, welche Dimension sich gegenüber den Übungsaufgaben ändert (z. B. neuer Anwendungskontext, umgekehrte Fragerichtung, neue Darstellung).",
+     "applies_to": [
+      "workbook",
+      "mock_exam"
+     ],
+     "enforcement": "deterministic:spec:assessment_item field transfer_dimension"
+    }
+   ],
+   "subject_adaptations": {}
+  },
+  {
+   "id": "intelligent_tutoring",
+   "version": "1.0.0",
+   "title": "Intelligente Tutorsysteme",
+   "status": "EMPIRICAL_CONDITIONAL",
+   "claims": [
+    {
+     "id": "its.1",
+     "text": "Schrittbasierte ITS erreichen nahezu die Wirkung menschlicher Einzeltutoren (d = 0.76 vs. 0.79); der verbreitete '2-Sigma'-Glaube wurde nicht bestätigt.",
+     "sources": [
+      "vanlehn2011"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "vanlehn2011",
+       "snippet": "the effect size of human tutoring was much lower: d = 0.79"
+      },
+      {
+       "source": "vanlehn2011",
+       "snippet": "the effect size of intelligent tutoring systems was 0.76"
+      }
+     ]
+    },
+    {
+     "id": "its.2",
+     "text": "ITS übertreffen lehrergeleiteten Großgruppenunterricht (g .42) und Lehrbücher/Arbeitshefte (g .35).",
+     "sources": [
+      "ma2014"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "ma2014",
+       "snippet": "teacher-led, large-group instruction (g .42)"
+      }
+     ]
+    },
+    {
+     "id": "its.3",
+     "text": "Median-Effekt 0.66 SD, aber stark abhängig davon, ob lokal entwickelte oder standardisierte Tests verwendet werden.",
+     "sources": [
+      "kulik2016"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "kulik2016",
+       "snippet": "raise test scores 0.66 standard deviations"
+      },
+      {
+       "source": "kulik2016",
+       "snippet": "locally developed or standardized tests"
+      }
+     ]
+    },
+    {
+     "id": "its.4",
+     "text": "Beste Interaktion in Cognitive Tutors: unmittelbares, kurzes, gerichtetes Fehlerfeedback; Tutoren wirken besser als nichtmenschliches Werkzeug.",
+     "sources": [
+      "anderson1995"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "anderson1995",
+       "snippet": "immediate feedback, consisting of short and directed error messages"
+      }
+     ]
+    },
+    {
+     "id": "its.5",
+     "text": "Feedback zum Hilfesuchverhalten verbesserte bewusstes Hilfesuchen, aber nicht die fachlichen Lernergebnisse.",
+     "sources": [
+      "aleven2016"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "aleven2016",
+       "snippet": "but not to achieve better learning outcomes"
+      }
+     ]
+    },
+    {
+     "id": "its.6",
+     "text": "Knowledge Tracing schätzt Beherrschung einzelner Wissenskomponenten aus Antwortsequenzen; Modelle (BKT, logistische Modelle) brauchen Parameterschätzung aus Daten.",
+     "sources": [
+      "corbett1994",
+      "pelanek2017"
+     ],
+     "basis": "metadata_only"
+    },
+    {
+     "id": "its.7",
+     "text": "KLI-Framework: Wissenskomponenten, Lernereignisse (Gedächtnis/Flüssigkeit, Induktion/Verfeinerung, Verstehen/Sinnbildung) und Instruktion müssen zueinander passen.",
+     "sources": [
+      "koedinger2012"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "koedinger2012",
+       "snippet": "memory and fluency processes, (b) induction and refinement processes, and (c) understanding and sense-making processes"
+      }
+     ]
+    }
+   ],
+   "conditions": [
+    "Wirkung abhängig von Passung zwischen Tutor und Test (kulik2016) und Umsetzungsqualität."
+   ],
+   "limits": [
+    "Exam Mastery hat keine Antwortdaten zur Parameterschätzung: Knowledge-Tracing-Werte wären unkalibriert."
+   ],
+   "contradictions": [],
+   "engine_rules": [
+    {
+     "id": "ITS-R1",
+     "rule": "Keine numerischen Mastery-Wahrscheinlichkeiten ohne kalibriertes Modell; stattdessen beobachtbare Zustände (gelöst ohne Hilfe / mit Hilfe / nicht gelöst / später erneut gelöst).",
+     "applies_to": [
+      "learn_app",
+      "adaptive_track"
+     ],
+     "enforcement": "deterministic:learning policy (no score fields)"
+    },
+    {
+     "id": "ITS-R2",
+     "rule": "Schrittbasierte Rückmeldung: Eingaben je Teilschritt prüfen, nicht nur das Endergebnis.",
+     "applies_to": [
+      "learn_app",
+      "lab"
+     ],
+     "enforcement": "agent_checklist"
+    }
+   ],
+   "subject_adaptations": {}
+  },
+  {
+   "id": "ai_tutoring",
+   "version": "1.0.0",
+   "title": "Generative KI im Lernprozess",
+   "status": "EMPIRICAL_CONDITIONAL",
+   "claims": [
+    {
+     "id": "ai.1",
+     "text": "Bastani et al. 2025 (Feldexperiment, ~1000 Schüler Kl. 9–11, Mathematik): Ungeschützter GPT-4-Zugang steigerte die Übungsleistung (+48 %), senkte aber die spätere Prüfungsleistung ohne KI um 17 %; ein Tutor mit lernschützenden Prompts und hinterlegten Lehrerlösungen verhinderte den Schaden (kein signifikanter Unterschied zur Kontrolle), verbesserte die Prüfungsleistung aber nicht. Population: Schüler, nicht Studierende.",
+     "sources": [
+      "bastani2025"
+     ],
+     "basis": "fulltext_checked",
+     "abstract_evidence": [
+      {
+       "source": "bastani2025",
+       "snippet": "when access is subsequently taken away, students actually perform worse than those who never had access"
+      },
+      {
+       "source": "bastani2025",
+       "snippet": "17% reduction"
+      }
+     ],
+     "fulltext_evidence": [
+      {
+       "source": "bastani2025",
+       "location": "Main Results; §4"
+      }
+     ]
+    },
+    {
+     "id": "ai.2",
+     "text": "Kestin et al. 2025 (Harvard-Physik, N = 194, Crossover über 2 Lektionen): KI-Tutor mit expertengeschriebenen Prompts und hinterlegten Musterlösungen ≈ 0.63 SD besser als aktiver Präsenzunterricht – nur unmittelbarer Nachtest, Erstbegegnung mit dem Stoff; Autoren übertragen das ausdrücklich nicht auf komplexe Synthese oder höheres kritisches Denken.",
+     "sources": [
+      "kestin2025"
+     ],
+     "basis": "fulltext_checked",
+     "abstract_evidence": [
+      {
+       "source": "kestin2025",
+       "snippet": "students learn significantly more in less time when using the ai tutor"
+      }
+     ],
+     "fulltext_evidence": [
+      {
+       "source": "kestin2025",
+       "location": "Results; Limitations"
+      }
+     ]
+    }
+   ],
+   "conditions": [
+    "Wirkung hängt am Tutordesign: Hinweise statt Lösungen, schrittweise Anleitung, Lernende müssen selbst denken."
+   ],
+   "limits": [
+    "Einzelstudien, einzelne Kurse; kurze Interventionsdauer; Übertragbarkeit auf andere Fächer offen."
+   ],
+   "contradictions": [
+    "bastani2025 (Schaden ohne Guardrails) vs. kestin2025 (Nutzen mit Design) — verträglich: Design ist der Moderator."
+   ],
+   "engine_rules": [
+    {
+     "id": "AI-R1",
+     "rule": "Tutor gibt gestufte Hinweise (Orientierung → Strategie → konkreter Schritt) und keine vollständige Lösung, solange kein eigener Versuch vorliegt oder die Lösung nicht ausdrücklich angefordert wird. Die Musterlösung wird dem Tutor als geprüfte Grundlage mitgegeben, nicht vom Sprachmodell erzeugt. Die Engine behauptet nur Schadensvermeidung, keinen nachgewiesenen Langzeitvorteil für Studierende.",
+     "applies_to": [
+      "tutor"
+     ],
+     "enforcement": "spec:tutor_hints + agent_checklist"
+    },
+    {
+     "id": "AI-R2",
+     "rule": "Jede agentische Bewertung wird im Lernstand als 'agent_judgement' markiert und nie mit deterministischen Prüfergebnissen vermischt.",
+     "applies_to": [
+      "tutor",
+      "learn_app"
+     ],
+     "enforcement": "deterministic:event source field"
+    }
+   ],
+   "subject_adaptations": {}
+  },
+  {
+   "id": "assessment_alignment",
+   "version": "1.0.0",
+   "title": "Assessment-Design und Constructive Alignment",
+   "status": "THEORETICAL_MODEL",
+   "claims": [
+    {
+     "id": "as.1",
+     "text": "Lernziele, Lernaktivitäten und Prüfungsaufgaben sollen auf dieselben Verben/Operatoren ausgerichtet sein (Constructive Alignment).",
+     "sources": [
+      "biggs1996"
+     ],
+     "basis": "metadata_only"
+    },
+    {
+     "id": "as.2",
+     "text": "31 validierte Leitlinien für Multiple-Choice-Items (u. a. plausible Distraktoren, keine 'alle/keine der obigen', keine Hinweise im Stamm).",
+     "sources": [
+      "haladyna2002"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "haladyna2002",
+       "snippet": "a taxonomy of 31 multiple-choice item-writing guidelines"
+      }
+     ]
+    },
+    {
+     "id": "as.3",
+     "text": "Revidierte Bloom-Taxonomie: Wissensdimension × kognitive Prozessdimension als Klassifikationsraster für Lernziele.",
+     "sources": [
+      "krathwohl2002"
+     ],
+     "basis": "metadata_only"
+    },
+    {
+     "id": "as.4",
+     "text": "Formative Assessment mit häufigem Feedback erzeugt substanzielle Lerngewinne.",
+     "sources": [
+      "black1998"
+     ],
+     "basis": "abstract_checked",
+     "abstract_evidence": [
+      {
+       "source": "black1998",
+       "snippet": "yield substantial learning gains"
+      }
+     ]
+    }
+   ],
+   "conditions": [],
+   "limits": [
+    "Bloom-Stufen sind keine Schwierigkeitsskala; Schwierigkeit muss separat begründet werden."
+   ],
+   "contradictions": [],
+   "engine_rules": [
+    {
+     "id": "AS-R1",
+     "rule": "Jede Aufgabe hat: Kompetenz-ID, Operator, kognitive Prozessstufe, Transferdimension, erwartete Bearbeitungszeit, vollständige Musterlösung, Bewertungsschema mit Punkten je Teilleistung.",
+     "applies_to": [
+      "workbook",
+      "mock_exam"
+     ],
+     "enforcement": "deterministic:spec:assessment_item schema"
+    },
+    {
+     "id": "AS-R2",
+     "rule": "Probeklausur wird aus einem Blueprint (Kompetenz × Operator × Punkte × Zeit) erzeugt; Abweichungen zwischen Blueprint und Klausur sind ein Gate-Fehler.",
+     "applies_to": [
+      "mock_exam"
+     ],
+     "enforcement": "deterministic:knowledge.check_exam_against_blueprint"
+    }
+   ],
+   "subject_adaptations": {
+    "law": "Operatoren nach Gutachtenstil (Prüfen Sie ...), Bewertung nach Schwerpunkten und Vertretbarkeit.",
+    "mathematics": "Beweisaufgaben: Punkte für Beweisidee, korrekte Nutzung jeder Voraussetzung, Vollständigkeit.",
+    "finance": "Punkte getrennt für Modellwahl, Rechnung und Interpretation; Folgefehler werden nicht doppelt abgezogen."
+   }
+  },
+  {
+   "id": "learning_styles",
+   "version": "1.0.0",
+   "title": "Lernstile (Meshing-Hypothese)",
+   "status": "REJECTED",
+   "claims": [
+    {
+     "id": "ls.1",
+     "text": "Die Meshing-Hypothese (Instruktion an bevorzugten 'Lernstil' anpassen) ist trotz großer Verbreitung nicht adäquat belegt.",
+     "sources": [
+      "pashler2008"
+     ],
+     "basis": "metadata_only"
+    }
+   ],
+   "conditions": [],
+   "limits": [],
+   "contradictions": [],
+   "engine_rules": [
+    {
+     "id": "LS-R1",
+     "rule": "Keine Anpassung nach 'visuell/auditiv'-Typen; Darstellung richtet sich nach Inhalt und Vorwissen.",
+     "applies_to": [
+      "learn_app",
+      "adaptive_track"
+     ],
+     "enforcement": "agent_checklist"
+    }
+   ],
+   "subject_adaptations": {}
+  },
+  {
+   "id": "popular_syntheses",
+   "version": "1.0.0",
+   "title": "Populärwissenschaftliche Synthesen",
+   "status": "THEORETICAL_MODEL",
+   "claims": [
+    {
+     "id": "ps.1",
+     "text": "Dehaene fasst vier 'Säulen' zusammen: Aufmerksamkeit, aktive Beteiligung, Fehlerrückmeldung, Konsolidierung. Nur als Einordnung, nicht als eigenständiger Beleg.",
+     "sources": [
+      "dehaene2020"
+     ],
+     "basis": "metadata_only"
+    },
+    {
+     "id": "ps.2",
+     "text": "Carey (Wissenschaftsjournalismus) popularisiert Spacing, Testing, Interleaving; keine Primärquelle — für Belege die Primärliteratur verwenden.",
+     "sources": [
+      "carey2014"
+     ],
+     "basis": "metadata_only"
+    }
+   ],
+   "conditions": [],
+   "limits": [
+    "Sekundärliteratur; nicht als Beleg zitieren."
+   ],
+   "contradictions": [],
+   "engine_rules": [],
+   "subject_adaptations": {}
+  }
+ ],
+ "changelog": [
+  {
+   "version": "1.1.0",
+   "date": "2026-11-10",
+   "changes": "Volltextprüfung von 7 Quellen (Rowland 2014, Brunmair & Richter 2019, Kalyuga 2007, Kluger & DeNisi 1996, Wisniewski 2020, Bastani 2025, Kestin 2025); Aussagen rp.2, il.1, we.4, fb.1, fb.2, ai.1, ai.2 auf fulltext_checked mit Ort; übergeneralisierte Regeln WE-R1, WE-R2, RP-R1, IL-R1, PF-R1, FB-R1, AI-R1 eingeschränkt; Widersprüche WE/PF und SE/Barbieri aufgelöst. Nicht zugänglich: Sinha & Kapur 2021, Adesope 2017, VanLehn 2011, Kulik & Fletcher 2016, Cepeda 2008, Butterfield & Metcalfe 2001, Dunlosky 2013, Pashler 2008, Hattie & Timperley 2007, Rohrer & Taylor 2007, Barbieri 2023, Bisra 2018, Renkl 2003."
+  }
+ ]
+}

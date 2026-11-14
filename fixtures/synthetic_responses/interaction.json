@@ -1,0 +1,28 @@
+{
+  "competency_ids": [
+    "C1",
+    "C2"
+  ],
+  "feedback": "With P and N held constant, EPS falls as t rises. Explain the sign using the EPS equation.",
+  "kind": "numeric",
+  "numeric": {
+    "constants": {
+      "profit": 100,
+      "shares": 20
+    },
+    "default": 0.3,
+    "expression": "profit*(1-tax)/shares",
+    "label": "Effective tax rate",
+    "max": 0.5,
+    "min": 0.1,
+    "reference_at_default": 3.5,
+    "step": 0.05,
+    "value_label": "EPS",
+    "variable": "tax",
+    "prediction_target": 0.5
+  },
+  "prediction_question": "Compared with baseline tax rate 0.30, does EPS rise or fall when tax changes to 0.50?",
+  "reason": "Supports prediction and immediate feedback about rate changes versus EPS changes.",
+  "title": "EPS sensitivity under fixed pretax profit and shares",
+  "transfer_question": "What changes if the firm also issues new shares?"
+}

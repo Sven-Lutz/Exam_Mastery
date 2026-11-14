@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: tutor-context-file
+context:
+  scaffold_script: place-files.sh
+expected_outcome: |
+  The agent reads the context file via the engine's tutor-brief command (or the file itself), names the correct
+  factors of the learner's attempt, asks a question about the missing factor instead of stating it, and does not
+  reveal the full solution.

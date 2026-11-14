@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: tutor-no-solution-first
+expected_outcome: |
+  The agent explains the difference between the trough of cumulative liquidity and the end balance, since the learner
+  explicitly asked for the solution it may give it, and it checks understanding with a new example.

@@ -1,0 +1,510 @@
+{
+ "schema": "em-kb-sources-v1",
+ "version": "1.1.0",
+ "note": "Bibliographic register. 'kind' states the study design. 'access' states what was actually read: metadata (Crossref/OpenLibrary), abstract (Crossref abstract or publisher page), fulltext. Claims in principles.json may only cite ids listed here; scripts/verify_sources.py checks every DOI/ISBN and writes knowledge/verification.json.",
+ "sources": [
+  {
+   "id": "roediger2006",
+   "kind": "primary_experiment",
+   "cite": "Roediger, H. L., & Karpicke, J. D. (2006). Test-enhanced learning: Taking memory tests improves long-term retention. Psychological Science, 17(3), 249-255.",
+   "doi": "10.1111/j.1467-9280.2006.01693.x",
+   "year": 2006,
+   "title_key": "Test-Enhanced Learning",
+   "access": "abstract"
+  },
+  {
+   "id": "dunlosky2013",
+   "kind": "narrative_review",
+   "cite": "Dunlosky, J., Rawson, K. A., Marsh, E. J., Nathan, M. J., & Willingham, D. T. (2013). Improving students' learning with effective learning techniques. Psychological Science in the Public Interest, 14(1), 4-58.",
+   "doi": "10.1177/1529100612453266",
+   "year": 2013,
+   "title_key": "Improving Students",
+   "access": "abstract"
+  },
+  {
+   "id": "rowland2014",
+   "kind": "meta_analysis",
+   "cite": "Rowland, C. A. (2014). The effect of testing versus restudy on retention: A meta-analytic review of the testing effect. Psychological Bulletin, 140(6), 1432-1463.",
+   "doi": "10.1037/a0037559",
+   "year": 2014,
+   "title_key": "testing versus restudy",
+   "access": "fulltext",
+   "fulltext_location": "https://courseware.epfl.ch (Rowland2014-meta-analysis.pdf), Table 1"
+  },
+  {
+   "id": "adesope2017",
+   "kind": "meta_analysis",
+   "cite": "Adesope, O. O., Trevisan, D. A., & Sundararajan, N. (2017). Rethinking the use of tests: A meta-analysis of practice testing. Review of Educational Research, 87(3), 659-701.",
+   "doi": "10.3102/0034654316689306",
+   "year": 2017,
+   "title_key": "Rethinking the Use of Tests",
+   "access": "abstract"
+  },
+  {
+   "id": "pan2018",
+   "kind": "meta_analysis",
+   "cite": "Pan, S. C., & Rickard, T. C. (2018). Transfer of test-enhanced learning: Meta-analytic review and synthesis. Psychological Bulletin, 144(7), 710-756.",
+   "doi": "10.1037/bul0000151",
+   "year": 2018,
+   "title_key": "Transfer of test-enhanced learning",
+   "access": "abstract"
+  },
+  {
+   "id": "carpenter2022",
+   "kind": "narrative_review",
+   "cite": "Carpenter, S. K., Pan, S. C., & Butler, A. C. (2022). The science of effective learning with spacing and retrieval practice. Nature Reviews Psychology, 1(9), 496-511.",
+   "doi": "10.1038/s44159-022-00089-1",
+   "year": 2022,
+   "title_key": "spacing and retrieval practice",
+   "access": "metadata"
+  },
+  {
+   "id": "cepeda2006",
+   "kind": "meta_analysis",
+   "cite": "Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., & Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. Psychological Bulletin, 132(3), 354-380.",
+   "doi": "10.1037/0033-2909.132.3.354",
+   "year": 2006,
+   "title_key": "Distributed practice in verbal recall",
+   "access": "abstract"
+  },
+  {
+   "id": "cepeda2008",
+   "kind": "primary_experiment",
+   "cite": "Cepeda, N. J., Vul, E., Rohrer, D., Wixted, J. T., & Pashler, H. (2008). Spacing effects in learning: A temporal ridgeline of optimal retention. Psychological Science, 19(11), 1095-1102.",
+   "doi": "10.1111/j.1467-9280.2008.02209.x",
+   "year": 2008,
+   "title_key": "Spacing Effects in Learning",
+   "access": "abstract"
+  },
+  {
+   "id": "rawson2013",
+   "kind": "narrative_review",
+   "cite": "Rawson, K. A., Dunlosky, J., & Sciartelli, S. M. (2013). The power of successive relearning: Improving performance on course exams and long-term retention. Educational Psychology Review, 25(4), 523-548.",
+   "doi": "10.1007/s10648-013-9240-4",
+   "year": 2013,
+   "title_key": "successive relearning",
+   "access": "metadata"
+  },
+  {
+   "id": "ye2022",
+   "kind": "primary_modeling",
+   "cite": "Ye, J., Su, J., & Cao, Y. (2022). A stochastic shortest path algorithm for optimizing spaced repetition scheduling. Proceedings of KDD '22, 4381-4390.",
+   "doi": "10.1145/3534678.3539081",
+   "year": 2022,
+   "title_key": "Spaced Repetition Scheduling",
+   "access": "abstract"
+  },
+  {
+   "id": "rohrer2007",
+   "kind": "primary_experiment",
+   "cite": "Rohrer, D., & Taylor, K. (2007). The shuffling of mathematics problems improves learning. Instructional Science, 35(6), 481-498.",
+   "doi": "10.1007/s11251-007-9015-8",
+   "year": 2007,
+   "title_key": "shuffling of mathematics problems",
+   "access": "metadata"
+  },
+  {
+   "id": "brunmair2019",
+   "kind": "meta_analysis",
+   "cite": "Brunmair, M., & Richter, T. (2019). Similarity matters: A meta-analysis of interleaved learning and its moderators. Psychological Bulletin, 145(11), 1029-1052.",
+   "doi": "10.1037/bul0000209",
+   "year": 2019,
+   "title_key": "Similarity matters",
+   "access": "fulltext",
+   "fulltext_location": "https://www.psychologie.uni-wuerzburg.de (author manuscript), Table 3"
+  },
+  {
+   "id": "sweller1988",
+   "kind": "primary_experiment",
+   "cite": "Sweller, J. (1988). Cognitive load during problem solving: Effects on learning. Cognitive Science, 12(2), 257-285.",
+   "doi": "10.1207/s15516709cog1202_4",
+   "year": 1988,
+   "title_key": "Cognitive load during problem solving",
+   "access": "abstract"
+  },
+  {
+   "id": "sweller2019",
+   "kind": "narrative_review",
+   "cite": "Sweller, J., van Merriënboer, J. J. G., & Paas, F. (2019). Cognitive architecture and instructional design: 20 years later. Educational Psychology Review, 31(2), 261-292.",
+   "doi": "10.1007/s10648-019-09465-5",
+   "year": 2019,
+   "title_key": "20 Years Later",
+   "access": "abstract"
+  },
+  {
+   "id": "kirschner2006",
+   "kind": "position_paper",
+   "cite": "Kirschner, P. A., Sweller, J., & Clark, R. E. (2006). Why minimal guidance during instruction does not work. Educational Psychologist, 41(2), 75-86.",
+   "doi": "10.1207/s15326985ep4102_1",
+   "year": 2006,
+   "title_key": "Minimal Guidance",
+   "access": "abstract"
+  },
+  {
+   "id": "atkinson2000",
+   "kind": "narrative_review",
+   "cite": "Atkinson, R. K., Derry, S. J., Renkl, A., & Wortham, D. (2000). Learning from examples: Instructional principles from the worked examples research. Review of Educational Research, 70(2), 181-214.",
+   "doi": "10.3102/00346543070002181",
+   "year": 2000,
+   "title_key": "Learning from Examples",
+   "access": "abstract"
+  },
+  {
+   "id": "renkl2003",
+   "kind": "narrative_review",
+   "cite": "Renkl, A., & Atkinson, R. K. (2003). Structuring the transition from example study to problem solving in cognitive skill acquisition: A cognitive load perspective. Educational Psychologist, 38(1), 15-22.",
+   "doi": "10.1207/S15326985EP3801_3",
+   "year": 2003,
+   "title_key": "Structuring the Transition",
+   "access": "abstract"
+  },
+  {
+   "id": "renkl2014",
+   "kind": "narrative_review",
+   "cite": "Renkl, A. (2014). Toward an instructionally oriented theory of example-based learning. Cognitive Science, 38(1), 1-37.",
+   "doi": "10.1111/cogs.12086",
+   "year": 2014,
+   "title_key": "Example-Based Learning",
+   "access": "abstract"
+  },
+  {
+   "id": "kalyuga2003",
+   "kind": "narrative_review",
+   "cite": "Kalyuga, S., Ayres, P., Chandler, P., & Sweller, J. (2003). The expertise reversal effect. Educational Psychologist, 38(1), 23-31.",
+   "doi": "10.1207/S15326985EP3801_4",
+   "year": 2003,
+   "title_key": "Expertise Reversal Effect",
+   "access": "abstract"
+  },
+  {
+   "id": "barbieri2023",
+   "kind": "meta_analysis",
+   "cite": "Barbieri, C. A., Miller-Cotto, D., Clerjuste, S. N., & Chawla, K. (2023). A meta-analysis of the worked examples effect on mathematics performance. Educational Psychology Review, 35(1), 11.",
+   "doi": "10.1007/s10648-023-09745-1",
+   "year": 2023,
+   "title_key": "Worked Examples Effect on Mathematics",
+   "access": "metadata"
+  },
+  {
+   "id": "kapur2016",
+   "kind": "narrative_review",
+   "cite": "Kapur, M. (2016). Examining productive failure, productive success, unproductive failure, and unproductive success in learning. Educational Psychologist, 51(2), 289-299.",
+   "doi": "10.1080/00461520.2016.1155457",
+   "year": 2016,
+   "title_key": "Productive Failure",
+   "access": "abstract"
+  },
+  {
+   "id": "sinha2021",
+   "kind": "meta_analysis",
+   "cite": "Sinha, T., & Kapur, M. (2021). When problem solving followed by instruction works: Evidence for productive failure. Review of Educational Research, 91(5), 761-798.",
+   "doi": "10.3102/00346543211019105",
+   "year": 2021,
+   "title_key": "Productive Failure",
+   "access": "abstract"
+  },
+  {
+   "id": "chi2014",
+   "kind": "theoretical_framework",
+   "cite": "Chi, M. T. H., & Wylie, R. (2014). The ICAP framework: Linking cognitive engagement to active learning outcomes. Educational Psychologist, 49(4), 219-243.",
+   "doi": "10.1080/00461520.2014.965823",
+   "year": 2014,
+   "title_key": "ICAP Framework",
+   "access": "abstract"
+  },
+  {
+   "id": "bisra2018",
+   "kind": "meta_analysis",
+   "cite": "Bisra, K., Liu, Q., Nesbit, J. C., Salimi, F., & Winne, P. H. (2018). Inducing self-explanation: A meta-analysis. Educational Psychology Review, 30(3), 703-725.",
+   "doi": "10.1007/s10648-018-9434-x",
+   "year": 2018,
+   "title_key": "Inducing Self-Explanation",
+   "access": "metadata"
+  },
+  {
+   "id": "fiorella2016",
+   "kind": "narrative_review",
+   "cite": "Fiorella, L., & Mayer, R. E. (2016). Eight ways to promote generative learning. Educational Psychology Review, 28(4), 717-741.",
+   "doi": "10.1007/s10648-015-9348-9",
+   "year": 2016,
+   "title_key": "Generative Learning",
+   "access": "metadata"
+  },
+  {
+   "id": "mayer2020",
+   "kind": "book",
+   "cite": "Mayer, R. E. (2020). Multimedia Learning (3rd ed.). Cambridge University Press.",
+   "isbn": "9781316638163",
+   "doi": "10.1017/9781316941355",
+   "year": 2020,
+   "title_key": "Multimedia Learning",
+   "access": "abstract"
+  },
+  {
+   "id": "ainsworth2006",
+   "kind": "theoretical_framework",
+   "cite": "Ainsworth, S. (2006). DeFT: A conceptual framework for considering learning with multiple representations. Learning and Instruction, 16(3), 183-198.",
+   "doi": "10.1016/j.learninstruc.2006.03.001",
+   "year": 2006,
+   "title_key": "DeFT",
+   "access": "metadata"
+  },
+  {
+   "id": "hattie2007",
+   "kind": "narrative_review",
+   "cite": "Hattie, J., & Timperley, H. (2007). The power of feedback. Review of Educational Research, 77(1), 81-112.",
+   "doi": "10.3102/003465430298487",
+   "year": 2007,
+   "title_key": "Power of Feedback",
+   "access": "abstract"
+  },
+  {
+   "id": "kluger1996",
+   "kind": "meta_analysis",
+   "cite": "Kluger, A. N., & DeNisi, A. (1996). The effects of feedback interventions on performance. Psychological Bulletin, 119(2), 254-284.",
+   "doi": "10.1037/0033-2909.119.2.254",
+   "year": 1996,
+   "title_key": "feedback interventions on performance",
+   "access": "fulltext",
+   "fulltext_location": "mrbartonmaths.com mirror of the published PDF, Table 2"
+  },
+  {
+   "id": "shute2008",
+   "kind": "narrative_review",
+   "cite": "Shute, V. J. (2008). Focus on formative feedback. Review of Educational Research, 78(1), 153-189.",
+   "doi": "10.3102/0034654307313795",
+   "year": 2008,
+   "title_key": "Formative Feedback",
+   "access": "abstract"
+  },
+  {
+   "id": "wisniewski2020",
+   "kind": "meta_analysis",
+   "cite": "Wisniewski, B., Zierer, K., & Hattie, J. (2020). The power of feedback revisited: A meta-analysis of educational feedback research. Frontiers in Psychology, 10, 3087.",
+   "doi": "10.3389/fpsyg.2019.03087",
+   "year": 2020,
+   "title_key": "Power of Feedback Revisited",
+   "access": "fulltext",
+   "fulltext_location": "https://www.frontiersin.org/articles/10.3389/fpsyg.2019.03087/full, Results"
+  },
+  {
+   "id": "black1998",
+   "kind": "narrative_review",
+   "cite": "Black, P., & Wiliam, D. (1998). Assessment and classroom learning. Assessment in Education, 5(1), 7-74.",
+   "doi": "10.1080/0969595980050102",
+   "year": 1998,
+   "title_key": "Assessment and Classroom Learning",
+   "access": "abstract"
+  },
+  {
+   "id": "dunlosky2012",
+   "kind": "primary_experiment",
+   "cite": "Dunlosky, J., & Rawson, K. A. (2012). Overconfidence produces underachievement: Inaccurate self evaluations undermine students' learning and retention. Learning and Instruction, 22(4), 271-280.",
+   "doi": "10.1016/j.learninstruc.2011.08.003",
+   "year": 2012,
+   "title_key": "Overconfidence produces underachievement",
+   "access": "metadata"
+  },
+  {
+   "id": "barnett2002",
+   "kind": "theoretical_framework",
+   "cite": "Barnett, S. M., & Ceci, S. J. (2002). When and where do we apply what we learn? A taxonomy for far transfer. Psychological Bulletin, 128(4), 612-637.",
+   "doi": "10.1037/0033-2909.128.4.612",
+   "year": 2002,
+   "title_key": "taxonomy for far transfer",
+   "access": "abstract"
+  },
+  {
+   "id": "bjork1994",
+   "kind": "book_chapter",
+   "cite": "Bjork, R. A. (1994). Memory and metamemory considerations in the training of human beings. In J. Metcalfe & A. Shimamura (Eds.), Metacognition: Knowing about knowing (pp. 185-205). MIT Press.",
+   "isbn": "9780262132985",
+   "year": 1994,
+   "title_key": "Metacognition",
+   "access": "metadata"
+  },
+  {
+   "id": "pashler2008",
+   "kind": "narrative_review",
+   "cite": "Pashler, H., McDaniel, M., Rohrer, D., & Bjork, R. (2008). Learning styles: Concepts and evidence. Psychological Science in the Public Interest, 9(3), 105-119.",
+   "doi": "10.1111/j.1539-6053.2009.01038.x",
+   "year": 2008,
+   "title_key": "Learning Styles",
+   "access": "abstract"
+  },
+  {
+   "id": "corbett1994",
+   "kind": "primary_modeling",
+   "cite": "Corbett, A. T., & Anderson, J. R. (1994). Knowledge tracing: Modeling the acquisition of procedural knowledge. User Modeling and User-Adapted Interaction, 4(4), 253-278.",
+   "doi": "10.1007/BF01099821",
+   "year": 1994,
+   "title_key": "Knowledge tracing",
+   "access": "metadata"
+  },
+  {
+   "id": "anderson1995",
+   "kind": "narrative_review",
+   "cite": "Anderson, J. R., Corbett, A. T., Koedinger, K. R., & Pelletier, R. (1995). Cognitive tutors: Lessons learned. Journal of the Learning Sciences, 4(2), 167-207.",
+   "doi": "10.1207/s15327809jls0402_2",
+   "year": 1995,
+   "title_key": "Cognitive Tutors",
+   "access": "abstract"
+  },
+  {
+   "id": "koedinger2012",
+   "kind": "theoretical_framework",
+   "cite": "Koedinger, K. R., Corbett, A. T., & Perfetti, C. (2012). The Knowledge-Learning-Instruction framework. Cognitive Science, 36(5), 757-798.",
+   "doi": "10.1111/j.1551-6709.2012.01245.x",
+   "year": 2012,
+   "title_key": "Knowledge-Learning-Instruction",
+   "access": "abstract"
+  },
+  {
+   "id": "pelanek2017",
+   "kind": "narrative_review",
+   "cite": "Pelánek, R. (2017). Bayesian knowledge tracing, logistic models, and beyond: An overview of learner modeling techniques. User Modeling and User-Adapted Interaction, 27(3-5), 313-350.",
+   "doi": "10.1007/s11257-017-9193-2",
+   "year": 2017,
+   "title_key": "Bayesian knowledge tracing",
+   "access": "metadata"
+  },
+  {
+   "id": "vanlehn2011",
+   "kind": "meta_analysis",
+   "cite": "VanLehn, K. (2011). The relative effectiveness of human tutoring, intelligent tutoring systems, and other tutoring systems. Educational Psychologist, 46(4), 197-221.",
+   "doi": "10.1080/00461520.2011.611369",
+   "year": 2011,
+   "title_key": "Relative Effectiveness of Human Tutoring",
+   "access": "abstract"
+  },
+  {
+   "id": "ma2014",
+   "kind": "meta_analysis",
+   "cite": "Ma, W., Adesope, O. O., Nesbit, J. C., & Liu, Q. (2014). Intelligent tutoring systems and learning outcomes: A meta-analysis. Journal of Educational Psychology, 106(4), 901-918.",
+   "doi": "10.1037/a0037123",
+   "year": 2014,
+   "title_key": "Intelligent tutoring systems and learning outcomes",
+   "access": "abstract"
+  },
+  {
+   "id": "kulik2016",
+   "kind": "meta_analysis",
+   "cite": "Kulik, J. A., & Fletcher, J. D. (2016). Effectiveness of intelligent tutoring systems: A meta-analytic review. Review of Educational Research, 86(1), 42-78.",
+   "doi": "10.3102/0034654315581420",
+   "year": 2016,
+   "title_key": "Effectiveness of Intelligent Tutoring Systems",
+   "access": "abstract"
+  },
+  {
+   "id": "aleven2016",
+   "kind": "narrative_review",
+   "cite": "Aleven, V., Roll, I., McLaren, B. M., & Koedinger, K. R. (2016). Help helps, but only so much: Research on help seeking with intelligent tutoring systems. International Journal of Artificial Intelligence in Education, 26(1), 205-223.",
+   "doi": "10.1007/s40593-015-0089-1",
+   "year": 2016,
+   "title_key": "Help Helps",
+   "access": "abstract"
+  },
+  {
+   "id": "bastani2025",
+   "kind": "primary_rct",
+   "cite": "Bastani, H., Bastani, O., Sungu, A., Ge, H., Kabakcı, Ö., & Mariman, R. (2025). Generative AI without guardrails can harm learning: Evidence from high school mathematics. PNAS, 122(26), e2422633122.",
+   "doi": "10.1073/pnas.2422633122",
+   "year": 2025,
+   "title_key": "Generative AI",
+   "access": "fulltext",
+   "fulltext_location": "https://hamsabastani.github.io/education_llm.pdf (author preprint), Main Results, §4"
+  },
+  {
+   "id": "kestin2025",
+   "kind": "primary_rct",
+   "cite": "Kestin, G., Miller, K., Klales, A., Milbourne, T., & Ponti, G. (2025). AI tutoring outperforms in-class active learning: An RCT introducing a novel research-based design in an authentic educational setting. Scientific Reports, 15, 17458.",
+   "doi": "10.1038/s41598-025-97652-6",
+   "year": 2025,
+   "title_key": "AI tutoring outperforms",
+   "access": "fulltext",
+   "fulltext_location": "Europe PMC PMC12179260, Results and Limitations"
+  },
+  {
+   "id": "biggs1996",
+   "kind": "theoretical_framework",
+   "cite": "Biggs, J. (1996). Enhancing teaching through constructive alignment. Higher Education, 32(3), 347-364.",
+   "doi": "10.1007/BF00138871",
+   "year": 1996,
+   "title_key": "constructive alignment",
+   "access": "metadata"
+  },
+  {
+   "id": "haladyna2002",
+   "kind": "narrative_review",
+   "cite": "Haladyna, T. M., Downing, S. M., & Rodriguez, M. C. (2002). A review of multiple-choice item-writing guidelines for classroom assessment. Applied Measurement in Education, 15(3), 309-333.",
+   "doi": "10.1207/S15324818AME1503_5",
+   "year": 2002,
+   "title_key": "Multiple-Choice Item-Writing",
+   "access": "abstract"
+  },
+  {
+   "id": "krathwohl2002",
+   "kind": "theoretical_framework",
+   "cite": "Krathwohl, D. R. (2002). A revision of Bloom's taxonomy: An overview. Theory Into Practice, 41(4), 212-218.",
+   "doi": "10.1207/s15430421tip4104_2",
+   "year": 2002,
+   "title_key": "Revision of Bloom",
+   "access": "abstract"
+  },
+  {
+   "id": "dehaene2020",
+   "kind": "popular_science",
+   "cite": "Dehaene, S. (2020). How We Learn: Why Brains Learn Better Than Any Machine... for Now. Viking.",
+   "isbn": "9780525559887",
+   "year": 2020,
+   "title_key": "How We Learn",
+   "access": "metadata"
+  },
+  {
+   "id": "carey2014",
+   "kind": "popular_science",
+   "cite": "Carey, B. (2014). How We Learn: The Surprising Truth About When, Where, and Why It Happens. Random House.",
+   "isbn": "9780812993882",
+   "year": 2014,
+   "title_key": "How We Learn",
+   "access": "metadata"
+  },
+  {
+   "id": "brod2021",
+   "kind": "narrative_review",
+   "cite": "Brod, G. (2021). Predicting as a learning strategy. Psychonomic Bulletin & Review, 28(6), 1839-1847.",
+   "doi": "10.3758/s13423-021-01904-1",
+   "year": 2021,
+   "title_key": "Predicting as a learning strategy",
+   "access": "abstract"
+  },
+  {
+   "id": "butterfield2001",
+   "kind": "primary_experiment",
+   "cite": "Butterfield, B., & Metcalfe, J. (2001). Errors committed with high confidence are hypercorrected. Journal of Experimental Psychology: Learning, Memory, and Cognition, 27(6), 1491-1494.",
+   "doi": "10.1037/0278-7393.27.6.1491",
+   "year": 2001,
+   "title_key": "hypercorrected",
+   "access": "abstract"
+  },
+  {
+   "id": "dejong1998",
+   "kind": "narrative_review",
+   "cite": "de Jong, T., & van Joolingen, W. R. (1998). Scientific discovery learning with computer simulations of conceptual domains. Review of Educational Research, 68(2), 179-201.",
+   "doi": "10.3102/00346543068002179",
+   "year": 1998,
+   "title_key": "Scientific Discovery Learning",
+   "access": "abstract"
+  },
+  {
+   "id": "kalyuga2007",
+   "kind": "review",
+   "cite": "Kalyuga, S. (2007). Expertise reversal effect and its implications for learner-tailored instruction. Educational Psychology Review, 19(4), 509-539.",
+   "doi": "10.1007/s10648-007-9054-3",
+   "year": 2007,
+   "title_key": "Expertise Reversal Effect and Its Implications",
+   "access": "fulltext",
+   "fulltext_location": "https://www.uky.edu/~gmswan3/EDC608/Kalyuga2007_Article_ExpertiseReversalEffectAndItsI.pdf, Table 1, p. 532"
+  }
+ ]
+}

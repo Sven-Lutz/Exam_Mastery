@@ -41,3 +41,16 @@ See [migration and retention policy](docs/MIGRATION_AND_RETENTION.md). The exist
 Work should happen through short-lived feature branches and reviewed pull requests. Maintain deterministic tests for correctness, integrity, rendering and offline behaviors. Human acceptance remains mandatory for learning-product release.
 
 **Documentation is not evidence of implementation.** Update this README only when the corresponding code and end-to-end evidence exist.
+
+## Engine
+
+The real engine (v0.21.0-rc1) is imported here: `exam_mastery/`, `tests/`, `fixtures/`. Setup:
+
+```bash
+python3.12 -m venv .venv && .venv/bin/pip install -e '.[qa]' pytest
+.venv/bin/python -m playwright install chromium
+.venv/bin/python -m pytest -q
+.venv/bin/exam-mastery <course-folder>
+```
+
+Details: `ENGINE_README.md`, import record `docs/migration/IMPORT_RECORD.md`. Status of previously generated learning products: **HUMAN_REJECTED**.

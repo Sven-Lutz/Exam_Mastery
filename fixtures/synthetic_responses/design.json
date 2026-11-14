@@ -1,0 +1,15 @@
+{
+  "theme": {
+    "ink": "#17324c",
+    "accent": "#246987",
+    "paper": "#ffffff",
+    "surface": "#f1f5f8"
+  },
+  "layout": {
+    "heading_family": "serif",
+    "density": "comfortable"
+  },
+  "visual_rationale": "Use conceptual flow with a numeric sensitivity diagram rather than ornamental illustrations.",
+  "anki_rationale": "Use a highly legible and uncluttered question and answer hierarchy with distinct feedback blocks.",
+  "book_rationale": "Use readable text blocks, ordered worked examples and a restrained, coherent editorial layout."
+}

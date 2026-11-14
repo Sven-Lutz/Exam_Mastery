@@ -1,0 +1,77 @@
+{
+  "cards": [
+    {
+      "answer": "EPS = P × (1 − t) / N.",
+      "competency_ids": [
+        "C1"
+      ],
+      "explanation": "First subtract taxes from profit; only then divide by the constant number of shares. Assumes N>0 and a proportional effective tax rate.",
+      "id": "SYN-EPS-001",
+      "question": "In a simplified EPS model, how are pretax profit P, effective tax rate t and share count N combined?",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ]
+    },
+    {
+      "answer": "Tax expense is 30% of pretax profit.",
+      "competency_ids": [
+        "C1"
+      ],
+      "explanation": "Do not confuse the modeled effective tax rate with a statutory marginal tax rate.",
+      "id": "SYN-EPS-002",
+      "question": "In the toy model, what does an effective tax rate of 0.30 mean?",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ]
+    },
+    {
+      "answer": "It falls by 5 percentage points.",
+      "competency_ids": [
+        "C2"
+      ],
+      "explanation": "The relative tax-rate decrease is 5/30 ≈ 16.67%, a different measure.",
+      "id": "SYN-EPS-003",
+      "question": "If t falls from 30% to 25%, by how many percentage points does it change?",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ]
+    },
+    {
+      "answer": "EPS = 100×0.75/20 = 3.75.",
+      "competency_ids": [
+        "C1"
+      ],
+      "explanation": "Units: P and N must be in consistent million units.",
+      "id": "SYN-EPS-004",
+      "question": "At P=100, N=20 and t=0.25, compute EPS mentally.",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ]
+    },
+    {
+      "answer": "The relative EPS change uses original after-tax EPS as its denominator.",
+      "competency_ids": [
+        "C2"
+      ],
+      "explanation": "At t=30% →25%, EPS rises 0.05/0.70 ≈7.14% if pretax profit and shares remain constant.",
+      "id": "SYN-EPS-005",
+      "question": "Why does a 5-percentage-point tax-rate reduction not automatically imply a 5% EPS increase?",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ]
+    },
+    {
+      "answer": "For instance, pretax profit and share count must remain constant.",
+      "competency_ids": [
+        "C3"
+      ],
+      "explanation": "If earnings, share counts, or reporting rules change, isolating the tax-rate effect alone is misleading.",
+      "id": "SYN-EPS-006",
+      "question": "Name one assumption required to compare EPS effects of different tax rates by holding other quantities fixed.",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ]
+    }
+  ],
+  "not_needed_reason": ""
+}

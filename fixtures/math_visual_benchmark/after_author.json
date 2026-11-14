@@ -1,0 +1,491 @@
+{
+  "claims": [
+    {
+      "id": "K1",
+      "kind": "official",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ],
+      "text": "Under fixed pretax profit P, effective tax rate t and shares N>0, EPS equals P(1-t)/N."
+    },
+    {
+      "id": "K2",
+      "kind": "inference",
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ],
+      "text": "A five-percentage-point tax rate decrease yields a different relative EPS percentage increase."
+    }
+  ],
+  "limitations": [
+    "This synthetic example does not model financial-reporting adjustments, dilutive securities or legal tax provisions."
+  ],
+  "mathematics": [
+    {
+      "alt": "Two full-hour steps imply second-hour loss equal to initial mass times retention times lost fraction.",
+      "assumptions": [
+        "Synthetic conditional example"
+      ],
+      "checks": [
+        {
+          "kind": "equivalence",
+          "lhs": "M*r-M*r**2",
+          "rhs": "M*r*(1-r)"
+        },
+        {
+          "expected": 1.6,
+          "expression": "M*r*(1-r)",
+          "kind": "numeric",
+          "values": {
+            "M": 10,
+            "r": 0.8
+          }
+        },
+        {
+          "expected": {
+            "M": 1
+          },
+          "expression": "M*r*(1-r)",
+          "kind": "dimensions"
+        }
+      ],
+      "domain": "Declared real-valued quantities",
+      "expression": "M*r*(1-r)",
+      "id": "retention",
+      "source_refs": [
+        "synthetic-contrast:p1"
+      ],
+      "symbols": [
+        {
+          "definition": "Initial mass",
+          "dimension": {
+            "M": 1
+          },
+          "domain": "nonnegative",
+          "name": "M",
+          "unit": "mg"
+        },
+        {
+          "definition": "Fixed retention",
+          "dimension": {},
+          "domain": "0 to 1",
+          "name": "r",
+          "unit": "1"
+        },
+        {
+          "definition": "Interval loss",
+          "dimension": {
+            "M": 1
+          },
+          "domain": "nonnegative",
+          "name": "L",
+          "unit": "mg"
+        }
+      ],
+      "tex": "\\begin{aligned}M_1&=rM\\\\M_2&=rM_1=r^2M\\\\L_1&=M_1-M_2=Mr(1-r)\\end{aligned}",
+      "used_symbols": [
+        "M",
+        "r",
+        "L"
+      ]
+    },
+    {
+      "alt": "A three by two design matrix maps the two coefficients to three fitted components.",
+      "assumptions": [
+        "Synthetic conditional example"
+      ],
+      "checks": [],
+      "domain": "Declared real-valued quantities",
+      "id": "matrix",
+      "source_refs": [
+        "synthetic-contrast:p1"
+      ],
+      "symbols": [
+        {
+          "definition": "Design matrix",
+          "dimension": {},
+          "domain": "real 3 by 2 matrix",
+          "name": "A",
+          "unit": "1"
+        },
+        {
+          "definition": "Parameter vector",
+          "dimension": {},
+          "domain": "real 2-vector",
+          "name": "x",
+          "unit": "1"
+        },
+        {
+          "definition": "Intercept",
+          "dimension": {},
+          "domain": "real",
+          "name": "a",
+          "unit": "1"
+        },
+        {
+          "definition": "Slope",
+          "dimension": {},
+          "domain": "real",
+          "name": "b",
+          "unit": "1"
+        }
+      ],
+      "tex": "A=\\begin{pmatrix}1&0\\\\1&1\\\\1&2\\end{pmatrix},\\quad x=\\begin{pmatrix}a\\\\b\\end{pmatrix},\\quad Ax=\\begin{pmatrix}a\\\\a+b\\\\a+2b\\end{pmatrix}",
+      "used_symbols": [
+        "A",
+        "x",
+        "a",
+        "b"
+      ]
+    },
+    {
+      "alt": "Full-column-rank least squares has normal equations obtained by differentiating its quadratic objective.",
+      "assumptions": [
+        "A has full column rank",
+        "Unconstrained finite-dimensional least squares"
+      ],
+      "checks": [],
+      "domain": "Declared real-valued quantities",
+      "id": "optimization",
+      "source_refs": [
+        "synthetic-contrast:p1"
+      ],
+      "symbols": [
+        {
+          "definition": "Parameter vector",
+          "dimension": {},
+          "domain": "real 2-vector",
+          "name": "x",
+          "unit": "1"
+        },
+        {
+          "definition": "Objective",
+          "dimension": {},
+          "domain": "real scalar function",
+          "name": "J",
+          "unit": "1"
+        },
+        {
+          "definition": "Full-column-rank design matrix",
+          "dimension": {},
+          "domain": "real 3 by 2 matrix",
+          "name": "A",
+          "unit": "1"
+        },
+        {
+          "definition": "Response vector",
+          "dimension": {},
+          "domain": "real 3-vector",
+          "name": "y",
+          "unit": "1"
+        }
+      ],
+      "tex": "\\begin{aligned}\\min_{x\\in\\mathbb{R}^2}J(x)&=\\frac12\\lVert Ax-y\\rVert_2^2\\\\\\nabla J(x)&=A^{\\top}(Ax-y)=0\\\\A^{\\top}Ax&=A^{\\top}y\\end{aligned}",
+      "used_symbols": [
+        "x",
+        "J",
+        "A",
+        "y"
+      ]
+    },
+    {
+      "alt": "Induction step for the sum of the first n positive integers, with separate base case n=1.",
+      "assumptions": [
+        "Synthetic conditional example"
+      ],
+      "checks": [
+        {
+          "kind": "equivalence",
+          "lhs": "n*(n+1)/2+(n+1)",
+          "rhs": "(n+1)*(n+2)/2"
+        }
+      ],
+      "domain": "Declared real-valued quantities",
+      "id": "induction",
+      "source_refs": [
+        "synthetic-contrast:p1"
+      ],
+      "symbols": [
+        {
+          "definition": "Partial sum",
+          "dimension": {},
+          "domain": "integer",
+          "name": "S",
+          "unit": "1"
+        },
+        {
+          "definition": "Upper index",
+          "dimension": {},
+          "domain": "integer at least one",
+          "name": "n",
+          "unit": "1"
+        },
+        {
+          "definition": "Summation index",
+          "dimension": {},
+          "domain": "integer 1 to n",
+          "name": "k",
+          "unit": "1"
+        }
+      ],
+      "tex": "\\begin{aligned}S_n&=\\sum_{k=1}^{n}k=\\frac{n(n+1)}2\\\\S_{n+1}&=\\frac{n(n+1)}2+(n+1)=\\frac{(n+1)(n+2)}2\\end{aligned}",
+      "used_symbols": [
+        "S",
+        "n",
+        "k"
+      ]
+    },
+    {
+      "alt": "The integral is one third; the derivative limit is twice t, after expansion with h nonzero.",
+      "assumptions": [
+        "Synthetic conditional example"
+      ],
+      "checks": [],
+      "domain": "Declared real-valued quantities",
+      "id": "calculus",
+      "source_refs": [
+        "synthetic-contrast:p1"
+      ],
+      "symbols": [
+        {
+          "definition": "Integration variable or evaluation point",
+          "dimension": {},
+          "domain": "real",
+          "name": "t",
+          "unit": "1"
+        },
+        {
+          "definition": "Nonzero increment approaching zero",
+          "dimension": {},
+          "domain": "real",
+          "name": "h",
+          "unit": "1"
+        }
+      ],
+      "tex": "\\int_0^1t^2\\,\\mathrm{d}t=\\left[\\frac{t^3}{3}\\right]_0^1=\\frac13,\\qquad\\lim_{h\\to0}\\frac{(t+h)^2-t^2}{h}=2t",
+      "used_symbols": [
+        "t",
+        "h"
+      ]
+    },
+    {
+      "alt": "An explicitly defined piecewise function with two disjoint exhaustive cases.",
+      "assumptions": [
+        "Synthetic conditional example"
+      ],
+      "checks": [],
+      "domain": "Declared real-valued quantities",
+      "id": "cases",
+      "source_refs": [
+        "synthetic-contrast:p1"
+      ],
+      "symbols": [
+        {
+          "definition": "Piecewise function",
+          "dimension": {},
+          "domain": "real",
+          "name": "f",
+          "unit": "1"
+        },
+        {
+          "definition": "Real input",
+          "dimension": {},
+          "domain": "real",
+          "name": "t",
+          "unit": "1"
+        }
+      ],
+      "tex": "f(t)=\\begin{cases}t^2&t\\ge0\\\\-t&t<0\\end{cases}",
+      "used_symbols": [
+        "f",
+        "t"
+      ]
+    },
+    {
+      "alt": "Kinetic-energy dimensional example: mass times squared speed.",
+      "assumptions": [
+        "Synthetic conditional example"
+      ],
+      "checks": [
+        {
+          "expected": {
+            "L": 2,
+            "M": 1,
+            "T": -2
+          },
+          "expression": "0.5*m*v**2",
+          "kind": "dimensions"
+        }
+      ],
+      "domain": "Declared real-valued quantities",
+      "expression": "0.5*m*v**2",
+      "id": "energy",
+      "source_refs": [
+        "synthetic-contrast:p1"
+      ],
+      "symbols": [
+        {
+          "definition": "Energy",
+          "dimension": {
+            "L": 2,
+            "M": 1,
+            "T": -2
+          },
+          "domain": "real",
+          "name": "E",
+          "unit": "J"
+        },
+        {
+          "definition": "Mass",
+          "dimension": {
+            "M": 1
+          },
+          "domain": "positive",
+          "name": "m",
+          "unit": "kg"
+        },
+        {
+          "definition": "Speed",
+          "dimension": {
+            "L": 1,
+            "T": -1
+          },
+          "domain": "nonnegative",
+          "name": "v",
+          "unit": "m/s"
+        }
+      ],
+      "tex": "E=\\frac12 m v^2",
+      "used_symbols": [
+        "E",
+        "m",
+        "v"
+      ]
+    },
+    {
+      "alt": "Nominal one-period accumulation with fixed dimensionless period rate.",
+      "assumptions": [
+        "Synthetic conditional example"
+      ],
+      "checks": [
+        {
+          "expected": {
+            "C": 1
+          },
+          "expression": "P*(1+i)",
+          "kind": "dimensions"
+        }
+      ],
+      "domain": "Declared real-valued quantities",
+      "expression": "P*(1+i)",
+      "id": "finance",
+      "source_refs": [
+        "synthetic-contrast:p1"
+      ],
+      "symbols": [
+        {
+          "definition": "Final nominal value",
+          "dimension": {
+            "C": 1
+          },
+          "domain": "real",
+          "name": "F",
+          "unit": "EUR"
+        },
+        {
+          "definition": "Principal",
+          "dimension": {
+            "C": 1
+          },
+          "domain": "real",
+          "name": "P",
+          "unit": "EUR"
+        },
+        {
+          "definition": "One-period rate",
+          "dimension": {},
+          "domain": "greater than minus one",
+          "name": "i",
+          "unit": "1"
+        }
+      ],
+      "tex": "F=P(1+i)",
+      "used_symbols": [
+        "F",
+        "P",
+        "i"
+      ]
+    },
+    {
+      "alt": "Formal balanced stoichiometric equation; not a practical procedure.",
+      "assumptions": [
+        "Synthetic conditional example"
+      ],
+      "checks": [],
+      "domain": "Declared real-valued quantities",
+      "id": "chemistry",
+      "notation_kind": "chemistry",
+      "source_refs": [
+        "synthetic-contrast:p1"
+      ],
+      "symbols": [
+        {
+          "definition": "Dihydrogen species",
+          "dimension": {},
+          "domain": "formal species",
+          "name": "H2",
+          "unit": "1"
+        },
+        {
+          "definition": "Dioxygen species",
+          "dimension": {},
+          "domain": "formal species",
+          "name": "O2",
+          "unit": "1"
+        },
+        {
+          "definition": "Water species",
+          "dimension": {},
+          "domain": "formal species",
+          "name": "H2O",
+          "unit": "1"
+        }
+      ],
+      "tex": "\\ce{2 H2 + O2 -> 2 H2O}",
+      "used_symbols": [
+        "H2",
+        "O2",
+        "H2O"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "formal": "[[math:matrix]]\n[[math:optimization]]",
+      "intuition": "A matrix records how parameters combine.",
+      "misconceptions": [
+        "Tax rate and earnings per share do not have the same units; one is a ratio and the other a currency amount per share."
+      ],
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ],
+      "title": "Linear models and derivation",
+      "visual_description": "Side-by-side bars for pretax profit, tax expense and after-tax profit at two effective tax rates, keeping the share count fixed.",
+      "worked_example": "[[math:retention]]"
+    },
+    {
+      "formal": "[[math:induction]]\n[[math:calculus]]\n[[math:cases]]",
+      "intuition": "Saying that the tax rate fell by five percentage points is different from saying that earnings per share increased by five percent. The two changes use different starting values as their denominators and therefore have different percentage interpretations.",
+      "misconceptions": [
+        "Five percentage points is not five percent.",
+        "A larger EPS number does not necessarily imply higher company value."
+      ],
+      "source_refs": [
+        "src-9b0c7b56ccbb:p1"
+      ],
+      "title": "Induction and calculus",
+      "visual_description": "A labeled number line showing the tax rate decrease and a separate EPS bar comparison with relative change annotated.",
+      "worked_example": "Contrasting conventions: [[math:energy]]\n[[math:finance]]\n[[math:chemistry]]"
+    }
+  ]
+}
