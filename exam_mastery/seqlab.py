@@ -153,3 +153,61 @@ def dependence(T, direction):
     if direction == 'backward':
         return {t: set(range(t, T + 1)) for t in range(1, T + 1)}
     return {t: set(range(1, T + 1)) for t in range(1, T + 1)}
+
+
+# ---------------- structured decoding, error taxonomy, attention (v3) ----------------
+
+def bio_allowed(prev, cur):
+    """BIO transition constraint: I-X may only follow B-X or I-X (prev=None marks sentence start)."""
+    if not cur.startswith('I-'):
+        return True
+    return prev is not None and prev != 'O' and prev[2:] == cur[2:]
+
+
+def greedy(emissions, labels):
+    return [labels[max(range(len(labels)), key=lambda k: row[k])] for row in emissions]
+
+
+def viterbi(emissions, labels, trans=None):
+    """Max-score label sequence; trans(prev, cur) -> additive score or None (forbidden). Default: BIO constraints."""
+    trans = trans or (lambda p, c: 0.0 if bio_allowed(p, c) else None)
+    best = [{c: (row0, [c]) for c, row0 in zip(labels, emissions[0]) if trans(None, c) is not None}]
+    for row in emissions[1:]:
+        cur = {}
+        for c, e in zip(labels, row):
+            cands = [(s + trans(p, c) + e, path + [c]) for p, (s, path) in best[-1].items() if trans(p, c) is not None]
+            if cands:
+                cur[c] = max(cands, key=lambda x: x[0])
+        best.append(cur)
+    return max(best[-1].values(), key=lambda x: x[0])
+
+
+def error_taxonomy(gold, pred):
+    """Classify span errors (Chinchor/MUC-style categories, simplified):
+    correct, type (same boundaries), boundary (same type, overlap), type+boundary (overlap), missed, spurious."""
+    G, P = spans(gold), spans(pred)
+    out = {k: 0 for k in ('correct', 'type', 'boundary', 'type+boundary', 'missed', 'spurious')}
+    used_g = set()
+    for p in sorted(P):
+        if p in G:
+            out['correct'] += 1; used_g.add(p); continue
+        ov = [g for g in G if g[0] < p[1] and p[0] < g[1]]
+        if not ov:
+            out['spurious'] += 1; continue
+        g = ov[0]; used_g.add(g)
+        same_b, same_t = (g[0], g[1]) == (p[0], p[1]), g[2] == p[2]
+        out['type' if same_b else 'boundary' if same_t else 'type+boundary'] += 1
+    out['missed'] = len([g for g in G if g not in used_g])
+    return out
+
+
+def softmax(xs):
+    m = max(xs); ex = [math.exp(x - m) for x in xs]; s = sum(ex)
+    return [e / s for e in ex]
+
+
+def attention_row(q, keys, values, scale=True):
+    d = len(q)
+    scores = [sum(a * b for a, b in zip(q, k)) / (math.sqrt(d) if scale else 1) for k in keys]
+    w = softmax(scores)
+    return scores, w, [sum(wi * v[j] for wi, v in zip(w, values)) for j in range(len(values[0]))]

@@ -73,11 +73,110 @@ class Verify(unittest.TestCase):
         bad = copy.deepcopy(u); bad['text_html'] = bad['text_html'].replace('0{,}5436', '0{,}5463', 1)
         self.assertRaises(RU.UnitError, RU.verify, bad)                                # unverified prose decimal
 
+    def test_rejects_v2_b1_problem_solution_mismatch(self):
+        """v2 defect: worked example asked for d=100,d_h=128,K=4 but its answer/solution was the d=50,d_h=64,K=3 follow-up."""
+        u = RU.load(UNIT)
+        bad = copy.deepcopy(u)
+        w1 = next(t for t in bad['tasks'] if t['id'] == 'W1')
+        w1['answers'] = [dict(label='Parameter', type='num', check='params:50:64:7')]
+        w1['solution'] = r'\(|\mathcal L|=7\). Summe \(15\,623\).'
+        with self.assertRaises(RU.UnitError) as e:
+            RU.verify(bad)
+        self.assertIn('does not match givens', str(e.exception))
+        bad = copy.deepcopy(u)
+        next(t for t in bad['tasks'] if t['id'] == 'W1')['solution'] = 'Siehe die fünf Schritte oben.'
+        self.assertRaises(RU.UnitError, RU.verify, bad)
+
+    def test_micro_weight_is_d_k_not_support(self):
+        u = RU.load(UNIT)
+        self.assertEqual(RU.compute('microweight:80,10,20;50,25,5;0,3,7:2', u), Fraction(10, 330))
+        b6 = next(t for t in u['tasks'] if t['id'] == 'B6')
+        self.assertIn('10/330', b6['solution']); self.assertNotIn('7 von 162', b6['solution'])
+        rng = random.Random(5)
+        for _ in range(200):
+            cs = {k: S.Counts(rng.randint(0, 30), rng.randint(0, 30), rng.randint(0, 30)) for k in 'abc'}
+            D = {k: 2 * c.tp + c.fp + c.fn for k, c in cs.items()}
+            if sum(D.values()) == 0 or 0 in D.values():
+                continue
+            self.assertEqual(S.micro(cs)['F1'], sum(Fraction(D[k], sum(D.values())) * S.f1(c) for k, c in cs.items()))
+
+    def test_case_study_viterbi_repairs_only_invalid_sequences(self):
+        u = RU.load(UNIT)
+        self.assertEqual(RU.compute('case:greedy:span_f1', u), Fraction(8, 17))
+        self.assertEqual(RU.compute('case:viterbi:span_f1', u), Fraction(5, 8))
+        g, p = RU.case_predictions(u, 'viterbi')
+        self.assertTrue(all(S.bio_allowed(a if i else None, b) or a == 'O' and False for i, (a, b) in enumerate(zip(['O'] + p[:-1], p))))
+        self.assertEqual(S.error_taxonomy(g, p)['boundary'], 2)                         # valid boundary errors survive
+
+    def test_exam_does_not_reuse_practice(self):
+        u = RU.load(UNIT)
+        bad = copy.deepcopy(u); bad['exam_forms']['A'][14]['data'] = next(t for t in bad['tasks'] if t['id'] == 'B4')['data']
+        self.assertRaises(RU.UnitError, RU.verify, bad)
+
     def test_anki_guids_stable_and_unique(self):
         a = RU.anki_tsv(RU.load(UNIT))
         self.assertEqual(a, RU.anki_tsv(RU.load(UNIT)))
         guids = [l.split('\t')[0] for l in a.splitlines() if not l.startswith('#')]
         self.assertEqual(len(guids), len(set(guids)))
+        self.assertNotIn('#notetype:Basic', a)
+
+
+try:
+    import anki  # noqa: F401
+    HAVE_ANKI = True
+except ImportError:
+    HAVE_ANKI = False
+
+
+@unittest.skipUnless(HAVE_ANKI, 'anki package required')
+class AnkiPackage(unittest.TestCase):
+    """Import, review and re-import in a disposable collection: identity, history, templates."""
+
+    def test_reimport_keeps_history_and_updates_content_and_style(self):
+        import time
+        from anki.collection import Collection
+        from anki.import_export_pb2 import ImportAnkiPackageRequest, ImportAnkiPackageOptions, ImportAnkiPackageUpdateCondition as C
+        from exam_mastery import anki_deck as A
+        tmp = Path(tempfile.mkdtemp())
+        u = RU.load(UNIT); RU.verify(u)
+        A.diagrams(tmp / 'm', u)
+        A.build_apkg(u, tmp / 'm', tmp / 'v1.apkg')
+        col = Collection(str(tmp / 'user.anki2'))
+        cond = C.Value('IMPORT_ANKI_PACKAGE_UPDATE_CONDITION_IF_NEWER')
+        opt = ImportAnkiPackageOptions(update_notes=cond, update_notetypes=cond, with_scheduling=False)   # Anki's default dialog choices
+        col.import_anki_package(ImportAnkiPackageRequest(package_path=str(tmp / 'v1.apkg'), options=opt))
+        self.assertEqual(col.note_count(), len(u['cards']))
+        self.assertEqual(len(list(Path(col.media.dir()).glob('em_*.svg'))), 4)
+        col.decks.select(col.decks.id(A.deck_name(u)))
+        reviewed = []
+        for _ in range(5):
+            c = col.sched.getCard(); col.sched.answerCard(c, 3); reviewed.append(c.id)
+        snap = lambda: {cid: (col.get_card(cid).reps, col.get_card(cid).due, col.get_card(cid).ivl, col.get_card(cid).type) for cid in reviewed}
+        before, ids_before = snap(), sorted(col.find_cards(''))
+        self.assertTrue(all(v[0] == 1 for v in before.values()))
+        time.sleep(1.1)
+        u2 = copy.deepcopy(u); u2['version'] = '3.0.1'; u2['cards'][0]['answer'] += ' (präzisiert)'
+        css_old = A.CSS
+        try:
+            A.CSS = css_old + '/* upgrade-test */'
+            A.build_apkg(u2, tmp / 'm', tmp / 'v2.apkg')
+        finally:
+            A.CSS = css_old
+        log = col.import_anki_package(ImportAnkiPackageRequest(package_path=str(tmp / 'v2.apkg'), options=opt)).log
+        self.assertEqual((len(log.new), len(log.updated), len(log.conflicting), len(log.duplicate)), (0, len(u['cards']), 0, 0))
+        self.assertEqual(snap(), before)                                                # reviews, due, interval, type kept
+        self.assertEqual(sorted(col.find_cards('')), ids_before)                        # same cards, no duplicates
+        note = col.get_note(col.find_notes(f'StableID:{u["cards"][0]["key"]}')[0])
+        self.assertTrue(note['CanonicalAnswer'].endswith('(präzisiert)'))
+        self.assertIn('upgrade-test', col.models.get(A.NOTETYPES['concept']['id'])['css'])
+        self.assertEqual(sum(m.name.startswith('Exam Mastery') for m in col.models.all_names_and_ids()), 3)
+        col.close()
+
+    def test_card_html_has_no_answer_leak_and_no_script(self):
+        from exam_mastery import anki_deck as A
+        for k, nt in A.NOTETYPES.items():
+            self.assertNotIn('<script', nt['qfmt'] + nt['afmt']); self.assertNotIn('http', nt['qfmt'] + nt['afmt'] + A.CSS)
+            self.assertNotIn('CanonicalAnswer', nt['qfmt']); self.assertNotIn('{{Why}}', nt['qfmt'])
 
 
 try:
@@ -213,7 +312,7 @@ class Browser(unittest.TestCase):
 
     def levels(self, st):
         pg, _ = self.open('', st)
-        return pg.evaluate('() => Object.fromEntries(["birnn","prf","prf-edge","prf-level","micro-macro"].map(k => [k, __emModel.kcLevel(k)]))')
+        return pg.evaluate('ks => Object.fromEntries(ks.map(k => [k, __emModel.kcLevel(k)]))', list(RU.load(UNIT)['kcs']))
 
     def test_mastery_levels_require_delayed_new_items_and_retention(self):
         base = {'v': 2, 'attempts': [], 'cards': {}, 'visited': {}, 'last': None, 'predictions': []}
@@ -221,7 +320,7 @@ class Browser(unittest.TestCase):
         self.assertEqual(set(self.levels({**base, 'exams': []}).values()), {'NICHT_GEPRUEFT'})
         self.assertEqual(set(self.levels({**base, 'exams': [self.exam(t0, 'A', False)]}).values()), {'SOFORT'})
         lv = self.levels({**base, 'exams': [self.exam(t0, 'A', False), self.exam(t0 + 2 * DAY, 'B', True, correct=False, kcs={'prf'})]})
-        self.assertEqual(lv['prf'], 'LUECKE'); self.assertEqual(lv['birnn'], 'VERZOEGERT')
+        self.assertEqual(lv['prf'], 'LUECKE'); self.assertEqual(lv['birnn'], 'VERZOEGERT'); self.assertEqual(lv['attention'], 'VERZOEGERT')
         lv = self.levels({**base, 'exams': [self.exam(t0, 'A', True), self.exam(t0 + 3 * DAY, 'B', True)]})
         self.assertEqual(set(lv.values()), {'VERZOEGERT'})                              # < 7 days apart
         lv = self.levels({**base, 'exams': [self.exam(t0, 'A', True), self.exam(t0 + 8 * DAY, 'A', True)]})
@@ -254,6 +353,39 @@ class Browser(unittest.TestCase):
         pg2.set_input_files('input[type=file]', files=[{'name': 'x.json', 'mimeType': 'application/json', 'buffer': b'{"attempts": 5}'}])
         pg2.wait_for_timeout(200)
         self.assertIn('Import abgelehnt', pg2.inner_text('main'))
+
+    def test_attention_scene_and_case_study_match_reference(self):
+        pg, errs = self.open('#learn/attention')
+        sc = pg.locator('.scene[data-scene=attention]')
+        sc.get_by_role('button', name='Weiter →').click(); sc.get_by_role('button', name='Weiter →').click()
+        self.assertTrue(sc.get_by_role('button', name='Weiter →').is_disabled())       # prediction blocks
+        sc.locator('.opt').first.click(); sc.get_by_role('button', name='Weiter →').click()
+        _, w, _ = S.attention_row([1, 1], [[1, 0], [0, 1], [1, 1]], [[1, 0], [0, 1], [1, 1]])
+        self.assertIn(f'{w[2]:.3f}'.replace('.', ','), sc.locator('svg.plot').get_attribute('aria-label'))
+        cs = pg.locator('.casestudy')
+        u = RU.load(UNIT)
+        self.assertAlmostEqual(float(cs.locator('[data-mode]').get_attribute('data-span-f1')), float(RU.compute('case:greedy:span_f1', u)))
+        cs.get_by_role('tab', name='Viterbi mit BIO-Regeln').click()
+        self.assertAlmostEqual(float(cs.locator('[data-mode]').get_attribute('data-span-f1')), float(RU.compute('case:viterbi:span_f1', u)))
+        self.assertEqual(errs, [])
+
+    def test_formula_glyphs_sane_in_chromium_and_webkit(self):
+        """Issue #5: oversized/clipped glyphs. Inline formulas must stay text-sized in both engines on every learn page."""
+        for engine in (self.pw.chromium, self.pw.webkit):
+            b = engine.launch()
+            for vw in (1280, 390):
+                pg = b.new_page(viewport={'width': vw, 'height': 900})
+                pg.goto((self.out / 'index.html').as_uri() + '#learn/orientierung')
+                pg.wait_for_function('document.body.dataset.ready === "1"', timeout=60000); pg.wait_for_timeout(1500)
+                r = pg.evaluate("""() => { const m = [...document.querySelectorAll('mjx-container')];
+                   return {n: m.length, inlineMax: Math.max(...m.filter(x => !x.hasAttribute('display')).map(x => x.getBoundingClientRect().height)),
+                           raw: document.querySelector('main').innerText.includes(String.fromCharCode(92, 40)), wide: document.documentElement.scrollWidth}; }""")
+                self.assertGreater(r['n'], 200, engine.name)
+                self.assertLess(r['inlineMax'], 60, (engine.name, vw))
+                self.assertFalse(r['raw'], (engine.name, vw))
+                self.assertLessEqual(r['wide'], vw, (engine.name, vw))
+                pg.close()
+            b.close()
 
     def test_mobile_no_horizontal_scroll(self):
         ctx = self.browser.new_context(viewport={'width': 390, 'height': 844})

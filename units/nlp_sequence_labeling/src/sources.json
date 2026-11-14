@@ -1,0 +1,83 @@
+[
+ {
+  "id": "kurs",
+  "kind": "KURS",
+  "ref": "Vorlesungsfolien Natural Language Processing, Kap. 09 „Neural Sequence Labeling“, WS 2025/26 (private Kursunterlagen, nicht veröffentlicht). Seitenangaben „PDF-S.“ = Seite im PDF; die Fußzeile der Folie zeigt diese Zahl minus 1."
+ },
+ {
+  "id": "slp3",
+  "kind": "LEHRBUCH",
+  "ref": "Jurafsky, D.; Martin, J. H.: Speech and Language Processing, 3. Aufl., Entwurf Aug. 2026 (lokale Kopie des Nutzers). Gelesen und verwendet (gedruckte Seiten): §4.9–4.9.1 S. 112–115; §7.1–7.4 S. 179–193; §9.5.1–9.5.4 S. 238–241; §14.4–14.4.2 S. 312–314; §18.3 S. 405; §18.4.5–18.5 S. 411–419.",
+  "url": "https://web.stanford.edu/~jurafsky/slp3/"
+ },
+ {
+  "id": "schuster",
+  "kind": "FORSCHUNG",
+  "ref": "Schuster, M.; Paliwal, K. K. (1997): Bidirectional recurrent neural networks. IEEE Transactions on Signal Processing 45(11), 2673–2681.",
+  "doi": "10.1109/78.650093"
+ },
+ {
+  "id": "lafferty",
+  "kind": "FORSCHUNG",
+  "ref": "Lafferty, J.; McCallum, A.; Pereira, F. (2001): Conditional Random Fields: Probabilistic Models for Segmenting and Labeling Sequence Data. Proc. ICML 2001 (Seitenangabe nicht geprüft)."
+ },
+ {
+  "id": "andor",
+  "kind": "FORSCHUNG",
+  "ref": "Andor, D. et al. (2016): Globally Normalized Transition-Based Neural Networks. Proc. ACL 2016, 2442–2452. Verwendet: Abstract (S. 2442).",
+  "doi": "10.18653/v1/P16-1231"
+ },
+ {
+  "id": "huang",
+  "kind": "FORSCHUNG",
+  "ref": "Huang, Z.; Xu, W.; Yu, K. (2015): Bidirectional LSTM-CRF Models for Sequence Tagging. arXiv:1508.01991 (Preprint).",
+  "url": "https://arxiv.org/abs/1508.01991"
+ },
+ {
+  "id": "lample",
+  "kind": "FORSCHUNG",
+  "ref": "Lample, G. et al. (2016): Neural Architectures for Named Entity Recognition. Proc. NAACL-HLT 2016, 260–270. Verwendet: Abstract (S. 260), Tagging-Schema IOBES (S. 263).",
+  "doi": "10.18653/v1/N16-1030"
+ },
+ {
+  "id": "conll",
+  "kind": "FORSCHUNG",
+  "ref": "Tjong Kim Sang, E. F.; De Meulder, F. (2003): Introduction to the CoNLL-2003 Shared Task. Proc. CoNLL-2003, 142–147.",
+  "doi": "10.3115/1119176.1119195"
+ },
+ {
+  "id": "opitz",
+  "kind": "FORSCHUNG",
+  "ref": "Opitz, J.; Burst, S. (2019): Macro F1 and Macro F1. arXiv:1911.03347 (Preprint).",
+  "url": "https://arxiv.org/abs/1911.03347"
+ },
+ {
+  "id": "manning",
+  "kind": "VERTIEFUNG",
+  "ref": "Manning, C. (2006): Doing Named Entity Recognition? Don't optimize for F1. Gastbeitrag im Blog NLPers, 25.08.2006 (nicht begutachtet).",
+  "url": "https://nlpers.blogspot.com/2006/08/doing-named-entity-recognition-dont.html"
+ },
+ {
+  "id": "sklearn",
+  "kind": "VERTIEFUNG",
+  "ref": "scikit-learn 1.9.1, sklearn.metrics.precision_recall_fscore_support, Parameter zero_division (Abruf 14.11.2026).",
+  "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html"
+ },
+ {
+  "id": "ratinov",
+  "kind": "FORSCHUNG",
+  "ref": "Ratinov, L.; Roth, D. (2009): Design Challenges and Misconceptions in Named Entity Recognition. Proc. CoNLL-2009, 147–155. Verwendet: S. 148 (BILOU vs. BIO; gierige Dekodierung vergleichbar mit Viterbi), S. 150 (Tabelle 2, Schemavergleich).",
+  "url": "https://aclanthology.org/W09-1119/"
+ },
+ {
+  "id": "vaswani",
+  "kind": "FORSCHUNG",
+  "ref": "Vaswani, A. et al. (2017): Attention Is All You Need. arXiv:1706.03762 (NeurIPS 2017). Verwendet: §3.2.1 mit Fußnote 1 (Skalierung, Varianz d_k), §3.5 (Positionskodierung, lineare Verschiebung).",
+  "url": "https://arxiv.org/abs/1706.03762"
+ },
+ {
+  "id": "su",
+  "kind": "FORSCHUNG",
+  "ref": "Su, J. et al. (2024): RoFormer: Enhanced Transformer with Rotary Position Embedding. Neurocomputing 568 (in der Vorlesung PDF-S. 69 zitiert; Volltext nicht gelesen, nur die Rotationseigenschaft wird verwendet und hier selbst bewiesen)."
+ }
+]

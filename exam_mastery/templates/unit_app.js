@@ -6,7 +6,7 @@ const KEY = 'em-unit-' + U.id, DAY = 864e5, BOX = [0, 1, 3, 7, 16, 35];
 const STAGE = {guided: 'Geführt', worked: 'Durchgerechnetes Beispiel', faded: 'Lückenschritt', hint: 'Mit Hinweisen', independent: 'Selbstständig', error: 'Fehleranalyse', transfer: 'Transfer'};
 const SUPPORTED_STAGES = ['worked', 'faded'];
 const KCS = U.kcs;
-const SECTION_KC = {rnn: 'birnn', birnn: 'birnn', prf: 'prf', einheit: 'prf-level', mittelung: 'micro-macro'};
+const SECTION_KC = {spannen: 'spans', rnn: 'birnn', birnn: 'birnn', attention: 'attention', position: 'position', struktur: 'decoding', prf: 'prf', einheit: 'prf-level', mittelung: 'micro-macro', fallstudie: 'decoding'};
 const FORMS = U.exam_forms;
 const EXAM = Object.values(FORMS).flat();
 
@@ -58,7 +58,9 @@ const el = (tag, attrs = {}, ...kids) => {
   return n;
 };
 const $ = (s, r = document) => r.querySelector(s);
-const tex = node => (window.MathJax && MathJax.typesetPromise) ? MathJax.typesetPromise([node]).catch(() => {}) : Promise.resolve();
+// Typeset only nodes attached to the document: MathJax measures font metrics from the live layout;
+// typesetting detached nodes can yield wrongly scaled glyphs (Issue #5).
+const tex = node => (window.MathJax && MathJax.typesetPromise && node && node.isConnected) ? MathJax.typesetPromise([node]).catch(() => {}) : Promise.resolve();
 const de = (x, d = 4) => x == null ? 'nicht definiert' : Number(x).toFixed(d).replace('.', ',');
 const dt = (x, d = 4) => (x < 0 ? '-' : '') + Math.abs(Number(x)).toFixed(d).replace('.', '{,}');
 function parseNum(s) {
@@ -413,8 +415,119 @@ function sceneMicroMacro() {
   ];
   return {id: 'micromacro', title: 'Was eine seltene Klasse mit Micro und Macro macht', steps, draw};
 }
-const SCENES = {birnn: sceneBirnn, f1: sceneF1, counter: sceneCounter, micromacro: sceneMicroMacro};
-function mountScenes(scope, print) { scope.querySelectorAll('.scene[data-scene]').forEach(n => Scene(n, SCENES[n.dataset.scene](), print)); }
+// ---- scene 5: self-attention as soft lookup, then permutation counterexample ----
+function attnRow(q, K, V, scale = true) {
+  const d = q.length, e = K.map(k => k.reduce((a, x, i) => a + x * q[i], 0) / (scale ? Math.sqrt(d) : 1));
+  const m = Math.max(...e), ex = e.map(x => Math.exp(x - m)), z = ex.reduce((a, b) => a + b, 0), w = ex.map(x => x / z);
+  return {e, w, o: V[0].map((_, j) => V.reduce((a, v, i) => a + w[i] * v[j], 0))};
+}
+function sceneAttention() {
+  const words = ['x₁', 'x₂', 'x₃'], X = [[1, 0], [0, 1], [1, 1]];
+  const draw = (fig, s) => {
+    const order = s.perm || [0, 1, 2], Xp = order.map(i => X[i]), qi = s.q ?? 2;
+    const r = attnRow(Xp[qi], Xp, Xp, s.scale !== false);
+    const svg = sv('svg', {viewBox: '0 0 760 250', class: 'plot', role: 'img', 'aria-label': `Gewichte ${r.w.map(x => de(x, 3)).join(', ')}`});
+    const X0 = i => 110 + i * 200;
+    order.forEach((src, i) => {
+      const isQ = i === qi, w = s.show >= 2 ? r.w[i] : null;
+      svg.append(sv('rect', {x: X0(i) - 60, y: 170, width: 120, height: 50, rx: 10, fill: isQ ? 'var(--fw-bg)' : 'var(--panel)', stroke: isQ ? 'var(--fw)' : 'var(--line)', 'stroke-width': isQ ? 2.5 : 1.2, 'data-link': 'k' + (i + 1)}));
+      svg.append(sv('text', {x: X0(i), y: 191, 'text-anchor': 'middle', 'font-size': 14, fill: 'var(--ink)'}, `${words[src]} = (${X[src].join(', ')})`));
+      svg.append(sv('text', {x: X0(i), y: 210, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--mute)'}, isQ ? 'Anfrage q und Schlüssel k' : 'Schlüssel k = Wert v'));
+      if (s.show >= 1) svg.append(sv('text', {x: X0(i), y: 160, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--mute)', 'font-family': 'var(--mono)'}, `e = ${de(r.e[i], 4)}`));
+      if (w != null) {
+        svg.append(sv('path', {d: `M${X0(i)},166 C${X0(i)},110 ${X0(qi)},90 ${X0(qi)},62`, fill: 'none', stroke: 'var(--accent2)', 'stroke-width': 1 + 14 * w, opacity: .75}));
+        svg.append(sv('text', {x: (X0(i) + X0(qi)) / 2 + (i === qi ? 40 : 0), y: 120, 'text-anchor': 'middle', 'font-size': 13, fill: 'var(--accent2)', 'font-weight': 600, 'data-link': 'a' + (i + 1)}, `α = ${de(w, 4)}`));
+      }
+    });
+    if (s.show >= 3) {
+      svg.append(sv('rect', {x: X0(qi) - 95, y: 22, width: 190, height: 38, rx: 8, fill: 'none', stroke: 'var(--accent2)', 'stroke-width': 2, 'data-link': 'o'}));
+      svg.append(sv('text', {x: X0(qi), y: 46, 'text-anchor': 'middle', 'font-size': 14, fill: 'var(--accent2)', 'font-weight': 600}, `o = (${de(r.o[0], 4)}; ${de(r.o[1], 4)})`));
+    }
+    fig.replaceChildren(svg);
+  };
+  const base = attnRow(X[2], X, X), raw = attnRow(X[2], X, X, false);
+  const steps = [
+    {key: true, show: 0, cap: 'Drei Token als Vektoren. Mit \\(W_Q=W_K=W_V=I\\) ist jedes Token zugleich Anfrage, Schlüssel und Wert. Wir berechnen die Ausgabe für Token 3, die Anfrage \\(q_3=(1,1)\\).', eq: ''},
+    {key: true, show: 1, cap: 'Ähnlichkeit: Skalarprodukt mit jedem Schlüssel, geteilt durch \\(\\sqrt{d_k}=\\sqrt2\\).', eq: `\\(e_{3j}=q_3^\\top k_j/\\sqrt2=${base.e.map(x => dt(x)).join(';\\ ')}\\)`},
+    {show: 1, cap: 'Gleich wird die Softmax angewandt.', eq: '',
+      predict: {q: 'Welches Token bekommt das größte Gewicht?', options: ['Token 3 selbst', 'alle gleich', 'Token 1'], correct: 0, explain: '\\(q_3\\) hat mit \\(k_3=(1,1)\\) das größte Skalarprodukt (2 gegenüber 1). Die Softmax erhält die Reihenfolge der Energien.'}},
+    {key: true, show: 2, cap: 'Softmax: <span data-link="a3">\\(\\alpha_{33}\\)</span> ist das größte Gewicht. Die Gewichte summieren sich zu 1 – die Ausgabe ist ein Durchschnitt der Werte, kein Auswahlvorgang.', eq: `\\(\\alpha_{3\\cdot}=(${base.w.map(x => dt(x)).join(';\\ ')})\\)`},
+    {key: true, show: 3, cap: 'Gewichtete Summe der Werte: die neue Darstellung <span data-link="o">\\(o_3\\)</span> von Token 3 ist eine Mischung aller drei Token.', eq: `\\(o_3=\\sum_j\\alpha_{3j}v_j=(${dt(base.o[0])};\\ ${dt(base.o[1])})\\)`},
+    {show: 3, scale: false, cap: '<b>Gegenprobe ohne Skalierung.</b> Energien 1, 1, 2: Die Softmax wird spitzer. Bei großen \\(d_k\\) wachsen die Energien mit (Satz 3), und die Softmax nähert sich einem harten \\(\\arg\\max\\).', eq: `\\(\\alpha_{33}=${dt(raw.w[2])}\\) statt \\(${dt(base.w[2])}\\)`},
+    {show: 3, perm: [1, 0, 2], cap: 'Jetzt vertauschen wir Token 1 und 2. Token 3 steht weiter an Position 3.', eq: '',
+      predict: {q: 'Ändert sich \\(o_3\\)?', options: ['nein', 'ja, weil sich die Reihenfolge geändert hat', 'nur die Gewichte, nicht die Ausgabe'], correct: 0, explain: 'Die Gewichte wandern mit den Token mit, die gewichtete Summe bleibt dieselbe (Satz 4). Self-Attention ohne Positionskodierung sieht keine Reihenfolge.'}},
+    {key: true, show: 3, perm: [1, 0, 2], cap: '<b>Verifikation.</b> \\(o_3\\) ist exakt gleich – die Reihenfolge der anderen Token ist für Self-Attention unsichtbar. Genau deshalb braucht man Positionskodierungen (Abschnitt 7).', eq: `\\(o_3=(${dt(base.o[0])};\\ ${dt(base.o[1])})\\) vor und nach der Vertauschung`}
+  ];
+  return {id: 'attention', title: 'Self-Attention als weiche Suche', steps, draw};
+}
+
+// ---- scene 6: Viterbi repairs an invalid greedy sequence ----
+function sceneViterbi() {
+  const L = ['O', 'B-LOC', 'I-LOC'], W = ['in', 'New', 'York'], E = [[2, 0, 0.5], [0.3, 1.0, 1.2], [0, 0.2, 1.5]];
+  const allowed = (p, c) => !c.startsWith('I-') || (p !== null && p !== 'O' && p.slice(2) === c.slice(2));
+  const greedyPath = E.map(r => r.indexOf(Math.max(...r)));
+  function vit() { let best = L.map((c, k) => allowed(null, c) ? {s: E[0][k], p: [k]} : null);
+    for (let t = 1; t < E.length; t++) best = L.map((c, k) => { let b = null; best.forEach((x, j) => { if (x && allowed(L[j], c)) { const v = x.s + E[t][k]; if (!b || v > b.s) b = {s: v, p: [...x.p, k]}; } }); return b; });
+    return best.filter(Boolean).reduce((a, b) => b.s > a.s ? b : a); }
+  const V = vit();
+  const draw = (fig, s) => {
+    const svg = sv('svg', {viewBox: '0 0 760 280', class: 'plot', role: 'img'});
+    const X = t => 150 + t * 230, Y = k => 60 + k * 80;
+    L.forEach((l, k) => svg.append(sv('text', {x: 20, y: Y(k) + 5, 'font-size': 14, fill: 'var(--mute)', 'font-family': 'var(--mono)'}, l)));
+    W.forEach((w, t) => svg.append(sv('text', {x: X(t), y: 270, 'text-anchor': 'middle', 'font-size': 15, fill: 'var(--ink)'}, w)));
+    if (s.edges) for (let t = 1; t < 3; t++) L.forEach((c, k) => L.forEach((p, j) => { const ok = allowed(p, c);
+      svg.append(sv('line', {x1: X(t - 1) + 34, y1: Y(j), x2: X(t) - 34, y2: Y(k), stroke: ok ? 'var(--line2)' : 'var(--bad)', 'stroke-width': ok ? 1 : 1.5, 'stroke-dasharray': ok ? '' : '4 3', opacity: ok ? 1 : .8})); }));
+    const path = s.path === 'greedy' ? greedyPath : s.path === 'viterbi' ? V.p : null;
+    if (path) for (let t = 1; t < 3; t++) svg.append(sv('line', {x1: X(t - 1) + 34, y1: Y(path[t - 1]), x2: X(t) - 34, y2: Y(path[t]), stroke: s.path === 'greedy' ? 'var(--bad)' : 'var(--ok)', 'stroke-width': 4}));
+    E.forEach((row, t) => row.forEach((v, k) => { const on = path && path[t] === k;
+      svg.append(sv('rect', {x: X(t) - 34, y: Y(k) - 20, width: 68, height: 40, rx: 8, fill: on ? (s.path === 'greedy' ? 'var(--bw-bg)' : 'var(--fw-bg)') : 'var(--panel)', stroke: on ? 'var(--ink)' : 'var(--line)', 'stroke-width': on ? 2 : 1}));
+      svg.append(sv('text', {x: X(t), y: Y(k) + 5, 'text-anchor': 'middle', 'font-size': 14, 'font-family': 'var(--mono)', fill: 'var(--ink)'}, de(v, 1))); }));
+    if (s.edges) svg.append(sv('text', {x: 400, y: 20, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--bad)'}, 'rot gestrichelt: verbotene Übergänge (… → I-LOC ohne vorheriges B-/I-LOC)'));
+    fig.replaceChildren(svg);
+  };
+  const gs = greedyPath.reduce((a, k, t) => a + E[t][k], 0);
+  const steps = [
+    {key: true, cap: 'Emissionswerte \\(s_t(\\ell)\\) eines BiRNN für „in New York“: je Wort und Label eine Zahl. Höher heißt: passender.', eq: ''},
+    {path: 'greedy', cap: 'Gierige Dekodierung nimmt je Wort das Maximum.', eq: '',
+      predict: {q: 'Ist die gierige Folge gültiges BIO?', options: ['nein', 'ja'], correct: 0, explain: '<code>O I-LOC I-LOC</code>: Ein I-LOC darf nicht auf O folgen.'}},
+    {key: true, path: 'greedy', cap: `Gierig: <code>${greedyPath.map(k => L[k]).join(' ')}</code> mit Score ${de(gs, 1)} – höchster Score, aber ungültig.`, eq: ''},
+    {key: true, edges: true, cap: 'Das CRF bewertet ganze Pfade: Emissionen plus Übergänge. Verbotene Übergänge (rot) haben den Wert \\(-\\infty\\), erlaubte hier 0.', eq: '\\(\\operatorname{score}(y)=\\sum_t s_t(y_t)+A_{y_{t-1},y_t}\\)'},
+    {key: true, edges: true, path: 'viterbi', cap: `Viterbi findet den besten <em>erlaubten</em> Pfad: <code>${V.p.map(k => L[k]).join(' ')}</code> mit Score ${de(V.s, 1)}. Er gibt bei „New“ das schwächere B-LOC (1,0 statt 1,2) in Kauf, weil nur so ein gültiger Pfad durch York/I-LOC führt.`, eq: `\\(2+1{,}0+1{,}5=${dt(V.s, 1)}\\)`},
+    {edges: true, path: 'viterbi', cap: '<b>Grenze.</b> Die Regeln verbieten nur ungültige Folgen. Eine gültige, aber falsche Folge – etwa <code>B-LOC I-LOC</code> über „Berlin .“ – bleibt erlaubt; das zeigt die Fallstudie (Abschnitt 13).', eq: ''}
+  ];
+  return {id: 'viterbi', title: 'Viterbi: der beste gültige Pfad', steps, draw};
+}
+
+// ---- case study panel ----
+function caseStudy(root) {
+  const C = U.case, Lb = C.labels;
+  const allowed = (p, c) => !c.startsWith('I-') || (p !== null && p !== 'O' && p.slice(2) === c.slice(2));
+  const emis = snt => snt.emissions.map(row => Lb.map(l => +(row[l] || 0)));
+  const greedy = E => E.map(r => Lb[r.indexOf(Math.max(...r))]);
+  const viterbi = E => { let best = Lb.map((c, k) => allowed(null, c) ? {s: E[0][k], p: [c]} : null);
+    for (let t = 1; t < E.length; t++) best = Lb.map((c, k) => { let b = null; best.forEach((x, j) => { if (x && allowed(Lb[j], c)) { const v = x.s + E[t][k]; if (!b || v > b.s) b = {s: v, p: [...x.p, c]}; } }); return b; });
+    return best.filter(Boolean).reduce((a, b) => b.s > a.s ? b : a).p; };
+  let mode = 'greedy';
+  const body = el('div', {});
+  const tabs = el('div', {class: 'ctl', role: 'tablist'}, ['greedy', 'viterbi'].map(m => el('button', {role: 'tab', 'aria-selected': m === mode ? 'true' : 'false', onclick: () => { mode = m; draw(); }}, m === 'greedy' ? 'Gierige Dekodierung' : 'Viterbi mit BIO-Regeln')));
+  root.append(el('h4', {}, 'Fallstudie: drei Sätze, zwei Dekodierungen'), tabs, body);
+  function draw() {
+    tabs.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', b.textContent.startsWith(mode === 'greedy' ? 'Gierig' : 'Viterbi') ? 'true' : 'false'));
+    let G = [], P = [];
+    const rows = C.sentences.map(snt => { const p = mode === 'greedy' ? greedy(emis(snt)) : viterbi(emis(snt)); G = G.concat(snt.gold, ['O']); P = P.concat(p, ['O']);
+      return el('div', {class: 'tokrow'}, snt.tokens.map((w, i) => { const ty = x => x === 'O' ? 'O' : x.slice(2), ok = snt.gold[i] === p[i];
+        return el('div', {class: 'tok ' + (snt.gold[i] === 'O' && p[i] === 'O' ? '' : ok ? 'tp' : 'err')}, el('small', {class: 'g'}, 'Gold ' + snt.gold[i]), w, el('small', {class: 'p'}, 'Sys ' + p[i])); })); });
+    const sc = spanCounts(G, P), tc = tokenCounts(G, P), a = prf(sc), b = prf(tc);
+    body.replaceChildren(...rows, el('table', {}, el('tr', {}, el('th', {}, ''), el('th', {}, 'TP / FP / FN'), el('th', {}, 'P'), el('th', {}, 'R'), el('th', {}, 'F1')),
+      el('tr', {}, el('td', {}, 'Phrasen'), el('td', {}, `${sc.tp} / ${sc.fp} / ${sc.fn}`), el('td', {}, de(a.P, 4)), el('td', {}, de(a.R, 4)), el('td', {}, de(a.F, 4))),
+      el('tr', {}, el('td', {}, 'Token'), el('td', {}, `${tc.tp} / ${tc.fp} / ${tc.fn}`), el('td', {}, de(b.P, 4)), el('td', {}, de(b.R, 4)), el('td', {}, de(b.F, 4)))),
+      el('p', {class: 'mute small'}, 'Grün umrandet: Label stimmt; rot: Label weicht vom Gold ab. Spannen werden nach der conlleval-Konvention gelesen.'));
+    body.dataset.mode = mode; body.dataset.spanF1 = a.F;
+  }
+  draw();
+}
+const SCENES = {birnn: sceneBirnn, f1: sceneF1, counter: sceneCounter, micromacro: sceneMicroMacro, attention: sceneAttention, viterbi: sceneViterbi};
+function mountScenes(scope, print) { scope.querySelectorAll('.scene[data-scene]').forEach(n => Scene(n, SCENES[n.dataset.scene](), print)); scope.querySelectorAll('.casestudy').forEach(n => { n.replaceChildren(); caseStudy(n); }); }
 
 // ---------- tasks ----------
 function renderTask(task, ctx = {}) {
@@ -526,9 +639,14 @@ function review() {
   const q = dueCards(), m = el('main', {}, el('h1', {}, 'Wiederholen'));
   if (!q.length) m.append(el('p', {}, Object.keys(st.cards).length ? 'Nichts fällig. Nächste Karte: ' + new Date(Math.min(...Object.values(st.cards).map(c => c.due))).toLocaleString('de-DE') : 'Karten werden aktiv, sobald Sie den zugehörigen Abschnitt lesen oder eine Aufgabe lösen.'));
   else {
-    const c = q[0], back = el('div', {hidden: true}, el('hr'), el('p', {html: c.back}), el('div', {class: 'ctl'},
+    const c = q[0], isCloze = c.type === 'cloze';
+    const front = isCloze ? c.cloze.replace(/\{\{c\d::(.*?)\}\}/g, '<span class="cloze">[…]</span>') : c.prompt;
+    const ans = isCloze ? c.cloze.replace(/\{\{c\d::(.*?)\}\}/g, '<span class="cloze-a">$1</span>') : c.answer;
+    const back = el('div', {hidden: true}, el('hr'), el('p', {class: 'canon', html: ans}), el('p', {html: '<b>Warum:</b> ' + c.why}),
+      c.example ? el('p', {html: '<b>Beispiel:</b> ' + c.example}) : null, c.mistake ? el('p', {html: '<b>Häufiger Fehler:</b> ' + c.mistake}) : null,
+      c.diagram ? el('img', {src: 'media/' + c.diagram, alt: 'Diagramm zur Karte', class: 'carddiag'}) : null, el('p', {class: 'mute small', html: 'Quelle: ' + c.source}), el('div', {class: 'ctl'},
       el('button', {onclick: () => grade(false)}, 'Nicht gewusst'), el('button', {class: 'primary', onclick: () => grade(true)}, 'Gewusst')));
-    m.append(el('p', {class: 'mute'}, `${q.length} fällig. Erst selbst antworten, dann aufdecken.`), el('div', {class: 'flash'}, el('p', {class: 'pill'}, KCS[c.kc] || c.kc), el('p', {html: c.front}),
+    m.append(el('p', {class: 'mute'}, `${q.length} fällig. Erst selbst antworten, dann aufdecken.`), el('div', {class: 'flash'}, el('p', {class: 'pill'}, KCS[c.kc] || c.kc), el('p', {html: front}),
       el('button', {onclick: e => { back.hidden = false; e.target.remove(); tex(back); }}, 'Antwort zeigen'), back));
     function grade(ok) { const s = st.cards[c.key]; s.box = ok ? Math.min(BOX.length - 1, s.box + 1) : 0; s.due = now() + BOX[s.box] * DAY + (ok ? 0 : 10 * 60e3); save(); render(); }
   }
@@ -594,29 +712,63 @@ function sources() {
 function render() {
   const [v, arg] = (location.hash.slice(1) || 'home').split('/');
   const view = {home, learn, review, exam, progress, sources}[v] || home;
-  app.replaceChildren(...view(arg).filter(Boolean)); if (v !== 'learn') tex(app);
+  app.replaceChildren(...view(arg).filter(Boolean)); tex(app).then(() => linkify(app));
 }
 
-// ---------- print book: same content and scene keyframes ----------
-function book() {
-  const m = el('main', {}, el('h1', {}, U.title), el('p', {class: 'lead'}, U.subtitle), el('p', {class: 'mute'}, 'Lehrbuch mit Schlüsselbildern der Erklärungen · Arbeitsbuch · Musterlösungen · Probeprüfung (Form A und B) mit Lösungen. ' + U.status));
+// ---------- print products: one model, five purpose-built documents ----------
+const PART = document.body.dataset.part || 'lehrbuch';
+const PART_TITLE = {lehrbuch: 'Lehrbuch', arbeitsbuch: 'Arbeitsbuch', loesungen: 'Musterlösungen zum Arbeitsbuch', klausur: 'Probeklausur', klausur_loesungen: 'Probeklausur – Lösungen und Bewertung'};
+const sectionOf = id => { const sec = sections().find(x => x.innerHTML.includes(`data-task="${id}"`)); return sec ? sec.dataset.title : 'Weitere Aufgaben'; };
+function titlePage(m) {
+  m.append(el('div', {class: 'titlepage'}, el('p', {class: 'kicker'}, `${U.course} · Kapitel ${U.chapter}`), el('h1', {}, U.title), el('p', {class: 'lead'}, PART_TITLE[PART]),
+    el('p', {class: 'mute small'}, `Fassung ${U.version} · ${U.status}`)));
+}
+function bookLehrbuch(m) {
   for (const s of sections()) {
     m.append(el('h2', {}, s.dataset.title));
-    s.querySelectorAll('.task-ref').forEach(r => r.replaceWith(renderTask(U.tasks.find(x => x.id === r.dataset.task), {print: true})));
+    s.querySelectorAll('.task-ref').forEach(r => { const t = U.tasks.find(x => x.id === r.dataset.task); r.replaceWith(el('p', {class: 'xref'}, `→ Arbeitsbuch, Aufgabe ${t.id}: ${t.title}`)); });
     m.append(...s.childNodes);
   }
-  const rest = U.tasks.filter(t => !U.text_html.includes(`data-task="${t.id}"`));
-  if (rest.length) m.append(el('h2', {}, 'Weitere Aufgaben'), ...rest.map(t => renderTask(t, {print: true})));
-  m.append(el('h2', {}, 'Musterlösungen'), ...U.tasks.map(t => el('div', {class: 'task'}, el('b', {}, `${t.id} · ${t.title}`), el('div', {html: t.solution}), t.rubric ? el('p', {class: 'mute', html: 'Bewertung: ' + t.rubric.join(' · ')}) : null)));
-  for (const [f, items] of Object.entries(FORMS)) {
-    m.append(el('h2', {}, `Probeprüfung Form ${f} (ohne Hilfsmittel)`), ...items.map(x => el('div', {class: 'task'}, el('b', {}, `${x.id} · ${KCS[x.kc]}${x.transfer ? ' · Transfer' : ''}`), el('div', {html: x.prompt}),
-      ...x.answers.filter(a => a.type === 'choice').map(a => el('ol', {type: 'a'}, a.options.map(o => el('li', {html: o})))))));
+  m.append(el('h2', {}, 'Literatur'), el('ol', {class: 'refs'}, U.sources.map(s => el('li', {}, s.ref, s.doi ? ` doi:${s.doi}` : s.url ? ` ${s.url}` : ''))));
+}
+function taskBlock(t, withSolution) {
+  const b = el('div', {class: 'task'}, el('header', {}, el('span', {class: 'stage'}, STAGE[t.stage] || ''), el('b', {}, `${t.id} · ${t.title}`), el('span', {class: 'mute small'}, KCS[t.kc])), el('div', {html: t.prompt}));
+  if (t.steps && (!withSolution || t.stage === 'worked')) b.append(el('ol', {class: 'steps'}, t.steps.map(x => el('li', {class: x.blank ? 'blank' : ''}, el('span', {html: x.s}), el('span', {class: 'why', html: x.why})))));
+  if (!withSolution) {
+    t.answers.filter(a => a.type === 'choice').forEach(a => b.append(el('p', {html: a.label + ':'}), el('ol', {type: 'a'}, a.options.map(o => el('li', {html: o})))));
+    if (t.stage !== 'worked') b.append(el('div', {class: 'space', style: `height:${t.stage === 'transfer' ? 70 : 40}mm`}));
+    return b;
   }
-  m.append(el('h2', {}, 'Lösungen der Probeprüfungen'), ...EXAM.map(x => el('div', {class: 'task'}, el('b', {}, x.id), el('div', {html: x.solution}))));
-  m.append(el('h2', {}, 'Literatur'), el('ol', {}, U.sources.map(s => el('li', {}, s.ref, s.doi ? ' doi:' + s.doi : s.url ? ' ' + s.url : ''))));
-  app.replaceChildren(m); mountScenes(m, true);
+  b.append(el('div', {class: 'sol', html: '<b>Lösung.</b> ' + t.solution}));
+  const diags = t.answers.flatMap(a => (a.diagnoses || []).map(d => a.type === 'choice' ? `Option ${'abcdefg'[+d.value]}: ${d.msg}` : `Antwort ${d.value}: ${d.msg}`));
+  if (diags.length) b.append(el('p', {class: 'mute', html: '<b>Typische Fehler.</b> ' + diags.join(' · ')}));
+  if (t.rubric) b.append(el('p', {class: 'mute', html: '<b>Bewertung.</b> ' + t.rubric.join(' · ')}));
+  return b;
+}
+function bookArbeitsbuch(m, sol) {
+  m.append(el('p', {}, sol ? 'Zu jeder Aufgabe des Arbeitsbuchs: vollständige Lösung, typische Fehler mit Diagnose und Bewertungsschema.' : 'Die Aufgaben sind nach Abschnitten des Lehrbuchs geordnet und gestuft: durchgerechnet → Lückenschritt → mit Hinweisen → selbstständig → Fehleranalyse → Transfer. Hinweise stehen am Ende; schlagen Sie sie erst nach einem eigenen Versuch nach.'));
+  let cur = null;
+  for (const t of U.tasks) { const sec = sectionOf(t.id); if (sec !== cur) { m.append(el('h2', {}, sec)); cur = sec; } m.append(taskBlock(t, sol)); }
+  if (!sol) m.append(el('h2', {}, 'Hinweise'), el('dl', {}, U.tasks.filter(t => (t.hints || []).length).flatMap(t => [el('dt', {}, t.id), el('dd', {html: t.hints.join(' · ')})])));
+}
+function bookKlausur(m, sol) {
+  const pts = x => x.answers.length * 2;
+  m.append(el('h2', {}, 'Aufbau'), el('p', {}, 'Zwei gleichwertige, voneinander unabhängige Formen A und B mit neuen Daten (keine Aufgabe des Arbeitsbuchs wird wiederverwendet). Je Kompetenz zwei Aufgaben, davon eine Transferaufgabe bei sieben der neun Kompetenzen. Bewertung: 2 Punkte je Teilantwort. Offizielle Angaben zu Dauer und Hilfsmitteln der Klausur liegen nicht vor; die Form ist ohne Hilfsmittel gedacht.'),
+    el('table', {}, el('tr', {}, el('th', {}, 'Kompetenz'), el('th', {}, 'Form A'), el('th', {}, 'Form B')), Object.entries(KCS).map(([k, l]) => el('tr', {}, el('td', {}, l), ...['A', 'B'].map(f => el('td', {}, FORMS[f].filter(x => x.kc === k).map(x => x.id + (x.transfer ? ' (T)' : '')).join(', ')))))));
+  for (const [f, items] of Object.entries(FORMS)) {
+    m.append(el('h2', {}, `Form ${f}` + (sol ? ' – Lösungen' : '')), el('p', {class: 'mute small'}, `Summe: ${items.reduce((a, x) => a + pts(x), 0)} Punkte.`));
+    items.forEach(x => { const b = el('div', {class: 'task'}, el('header', {}, el('b', {}, `${x.id}`), el('span', {class: 'mute small'}, `${KCS[x.kc]}${x.transfer ? ' · Transfer' : ''} · ${pts(x)} P.`)), el('div', {html: x.prompt}));
+      x.answers.filter(a => a.type === 'choice').forEach(a => b.append(el('ol', {type: 'a'}, a.options.map((o, k) => el('li', {html: o + (sol && k === a.correct ? ' <b>✓</b>' : '')})))));
+      if (sol) b.append(el('div', {class: 'sol', html: '<b>Lösung.</b> ' + x.solution})); else b.append(el('div', {class: 'space', style: 'height:28mm'}));
+      m.append(b); });
+  }
+}
+function book() {
+  const m = el('main', {class: 'print-' + PART}); app.replaceChildren(m); titlePage(m);
+  ({lehrbuch: () => bookLehrbuch(m), arbeitsbuch: () => bookArbeitsbuch(m, false), loesungen: () => bookArbeitsbuch(m, true), klausur: () => bookKlausur(m, false), klausur_loesungen: () => bookKlausur(m, true)})[PART]();
+  mountScenes(m, true);
   const done = () => { document.body.dataset.ready = '1'; };
-  const wait = () => window.MathJax && MathJax.typesetPromise ? MathJax.startup.promise.then(() => MathJax.typesetPromise([m])).then(done, done) : setTimeout(wait, 50);
+  const wait = () => window.MathJax && MathJax.startup && MathJax.startup.promise ? MathJax.startup.promise.then(() => MathJax.typesetPromise([m])).then(done, done) : setTimeout(wait, 50);
   wait();
 }
 

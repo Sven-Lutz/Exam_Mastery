@@ -1,160 +1,287 @@
 <section data-id="orientierung" data-title="Worum es geht">
-<p class="lead">Ein NER-System liest „<b>Washington</b> signed the bill“ und muss entscheiden: Person oder Ort? Das Wort selbst verrät es nicht. Erst das <em>nächste</em> Wort – „signed“ (eine Person unterschreibt) oder „state“ (ein Bundesstaat) – entscheidet. Dieses Kapitel klärt zwei Fragen, die in der Klausur zusammen auftreten:</p>
-<ol class="big">
-<li><b>Welche Wörter kann ein Netz „sehen“, wenn es das Label von Wort \(t\) bestimmt?</b> Wir rechnen ein winziges RNN von Hand durch und sehen, dass ein vorwärts laufendes RNN „Washington“ in beiden Sätzen <em>exakt gleich</em> darstellt – und warum ein bidirektionales RNN das ändert.</li>
-<li><b>Wie misst man, wie gut ein System Entitäten findet?</b> Wir leiten \(F_1\) aus einer einfachen Frage her („Wie viel Aufwand kostet ein Treffer?“), klären jeden Fall, in dem ein Nenner 0 wird, und sehen, warum dieselbe Vorhersage je nach Zähleinheit gut oder schlecht aussieht.</li></ol>
-<div class="goals"><h4>Am Ende können Sie – ohne Unterlagen –</h4><ol>
-<li>für Vorwärts-, Rückwärts- und Bi-RNN angeben und begründen, von welchen Eingaben der Zustand \(h_t\) abhängt, und es an Zahlen nachweisen;</li>
-<li>die Parameterzahl eines BiRNN-Taggers herleiten;</li>
-<li>\(P\), \(R\) und \(F_1\) aus TP/FP/FN berechnen, auch wenn Nenner 0 werden, und die Formel \(2\mathrm{TP}/(2\mathrm{TP}+\mathrm{FP}+\mathrm{FN})\) herleiten;</li>
-<li>Phrasen- und Token-Zählung an einem neuen Satz durchführen und Micro- und Macro-\(F_1\) berechnen und deuten.</li></ol></div>
-<div class="kurs"><b>Was davon ist Vorlesungsstoff?</b> Die Vorlesung (Kap. 09) behandelt Precision, Recall, \(F_1\) und Phrasen- gegen Token-Zählung auf PDF-S. 20–22 (Foliennummern 19–21) sowie Vorwärts-, Rückwärts- und Bi-RNN auf PDF-S. 78–80 (Foliennr. 77–79). Alles, was als <span class="prov" data-kind="ERLAEUTERUNG"></span> oder <span class="prov" data-kind="VERTIEFUNG"></span> markiert ist, geht darüber hinaus und dient dem Verständnis.</div>
-<p><b>Sie brauchen:</b> Vektoren und Matrix-Vektor-Produkt; \(\tanh\) (mit \(\tanh(0)=0\), \(\tanh\) streng monoton, Werte in \((-1,1)\)); Softmax; die BIO-Kodierung (Vorlesung 9.2.1).</p>
+<p class="lead">Ein NER-System liest „<b>Washington</b> signed the bill“ und muss entscheiden: Person oder Ort? Das Wort selbst verrät es nicht; erst das <em>nächste</em> Wort entscheidet. Kapitel 09 der Vorlesung baut von dieser Aufgabe aus die Werkzeuge der neuronalen Sequenzmarkierung auf – und die Frage, wie man misst, ob sie funktionieren.</p>
+<div class="layers"><p><b>Drei Ebenen.</b> Jeder Abschnitt ist gekennzeichnet:</p><ul>
+<li><span class="layer" data-layer="core">Klausurkern</span> – Stoff der Vorlesungsfolien, ausgearbeitet bis zur Rechen- und Beweisfähigkeit.</li>
+<li><span class="layer" data-layer="deep">Vertiefung</span> – Lehrbuchwissen, das den Kern erklärt (Herleitungen, Grenzfälle, Gegenbeispiele).</li>
+<li><span class="layer" data-layer="research">Forschung &amp; Praxis</span> – belegte Befunde aus Primärarbeiten und die Fallstudie.</li></ul></div>
+<table class="sym"><tr><th>Abschnitt</th><th>Vorlesung (PDF-Seiten)</th><th>Lehrbuch (SLP3, gedruckte Seiten)</th></tr>
+<tr><td>1 NER als Aufgabe</td><td>4–11</td><td>§18.3, S. 405; §9.5.1, S. 238</td></tr>
+<tr><td>2 Spannen als Labels</td><td>13–18</td><td>§9.5.2, S. 239</td></tr>
+<tr><td>3 Neuronale Tagger, Fenster</td><td>24–29</td><td>§14.4, S. 312–314</td></tr>
+<tr><td>4–5 RNN und BiRNN</td><td>29, 77–80</td><td>§14.4.2, S. 313–314</td></tr>
+<tr><td>6 Self-Attention</td><td>31–58</td><td>§7.1–7.3, S. 179–188</td></tr>
+<tr><td>7 Positionsinformation</td><td>60–70</td><td>§7.4, S. 191–193</td></tr>
+<tr><td>8 Tiefe Architekturen</td><td>72–77</td><td>§7.2, S. 184–187</td></tr>
+<tr><td>9 Abhängigkeiten zwischen Labels</td><td>82–85</td><td>§18.4.5–18.5, S. 411–419</td></tr>
+<tr><td>10–12 Evaluation</td><td>20–22</td><td>§4.9–4.9.1, S. 112–115; §9.5.4, S. 241</td></tr>
+<tr><td>13 Fallstudie</td><td>–</td><td>Vertiefung mit Primärquellen</td></tr></table>
+<p class="mute small">„PDF-S.“ meint die Seite im Folien-PDF; die Fußzeile der Folie zeigt diese Zahl minus 1. SLP3: Jurafsky &amp; Martin, <i>Speech and Language Processing</i>, 3. Aufl., Entwurf Aug. 2026.</p>
+<p><b>Vorwissen:</b> Vektoren und Matrix-Vektor-Produkt; \(\tanh\) (ungerade, streng monoton, Werte in \((-1,1)\)); Softmax; Kreuzentropie.</p>
 </section>
 
-<section data-id="rnn" data-title="Was ein RNN sehen kann">
-<h3>1. Ein Experiment zuerst</h3>
-<p>Wir bauen das kleinstmögliche RNN, das man noch von Hand rechnen kann: Jedes Wort ist ein Vektor mit zwei Zahlen, der Zustand auch.</p>
+<section data-id="ner" data-title="1 · NER als Aufgabe">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p><b>Definition.</b> Eine <em>benannte Entität</em> (named entity) ist ein Objekt, auf das der Text mit einem Namen verweist – Person, Organisation, Ort, nach Annotationsrichtlinie auch Zahlen, Daten, Produkte. <em>Named Entity Recognition</em> (NER) heißt: alle solchen Erwähnungen im Text finden (Grenzen) und klassifizieren (Typ). <span class="prov" data-kind="KURS">PDF-S. 4–6</span></p>
+<p><b>Wozu.</b> Indizes und Hyperlinks, Informationsextraktion (Beziehungen zwischen Entitäten, Wissensbasen), Question Answering (Antworten sind oft Entitäten) und maschinelle Übersetzung: Namen werden meist nicht übersetzt, aber transliteriert; Zahlen mit Einheiten müssen erkannt und umgerechnet werden („7917.5 mi“ → „12 742 km“). <span class="prov" data-kind="KURS">PDF-S. 9</span></p>
+<p><b>Warum schwer.</b> Annotierte Daten sind teuer; Weltwissen ist nötig („Sheffield Wednesday F.C.“ ist ein Verein, „Wednesday“ allein ein Wochentag); entscheidender Kontext kann weit entfernt stehen; Modelle übertragen sich schlecht zwischen Domänen. <span class="prov" data-kind="KURS">PDF-S. 10</span> Derselbe Name hat mehrere Typen: SLP3 zeigt „Washington“ als Person, Ort, Organisation und Ereignis (Abb. 18.6). <span class="prov" data-kind="LEHRBUCH">SLP3 §18.3, S. 405</span></p>
+<p><b>Daten und Richtlinien.</b> CoNLL-2003 (Ausschnitt des Reuters-Korpus 1996) annotiert vier Typen: PER, ORG, LOC, MISC. Richtlinien legen Grenzfälle fest, die ein Modell nicht „verstehen“, sondern nur lernen kann: „North and South America“ sind <em>zwei</em> Orte; „U.S. Fish and Wildlife Service“ ist <em>eine</em> Organisation; bei „California’s“ gehört „’s“ nicht zum Ort, bei „McDonald’s“ gehört es zum Namen. <span class="prov" data-kind="KURS">PDF-S. 11</span> <span class="prov" data-kind="FORSCHUNG">Tjong Kim Sang &amp; De Meulder 2003</span></p>
+<div class="remark"><p><b>Folge für die Evaluation.</b> Was eine „richtige“ Entität ist, definiert die Richtlinie. Zwei Datensätze mit verschiedenen Richtlinien liefern nicht vergleichbare \(F_1\)-Werte – auch bei identischem System.</p></div>
+</section>
+
+<section data-id="spannen" data-title="2 · Spannen als Labels">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>NER sucht <em>Spannen</em>, ein Tagger gibt <em>ein Label pro Wort</em> aus. Eine Spannenkodierung übersetzt zwischen beiden. Mit \(K\) Entitätstypen: <span class="prov" data-kind="KURS">PDF-S. 15–18</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §9.5.2, S. 239</span></p>
+<table class="sym"><tr><th>Schema</th><th>Labels je Typ</th><th>Anzahl</th><th>„Show flights from Boston to New York City today“</th></tr>
+<tr><td>IO</td><td>I</td><td>\(K+1\)</td><td>O O O CITY O CITY CITY CITY O</td></tr>
+<tr><td>BIO</td><td>B, I</td><td>\(2K+1\)</td><td>O O O B-CITY O B-CITY I-CITY I-CITY O</td></tr>
+<tr><td>BILOU</td><td>B, I, L, U</td><td>\(4K+1\)</td><td>O O O U-CITY O B-CITY I-CITY L-CITY O</td></tr></table>
+<div class="thm"><b>Satz A (IO ist nicht umkehrbar, BIO schon).</b> Die Abbildung von Spannenmengen auf IO-Folgen ist nicht injektiv. Auf gültige BIO-Folgen (kein <code>I-X</code> am Anfang, nach <code>O</code> oder nach einem anderen Typ) ist sie injektiv.</div>
+<div class="proof"><p><em>Beweis.</em> Nicht injektiv: „flights on <u>Monday Tuesday</u>“ mit zwei Spannen [Monday]DAY, [Tuesday]DAY und mit einer Spanne [Monday Tuesday]DAY ergeben beide <code>DAY DAY</code>. Injektiv für BIO: Jede Spanne beginnt mit genau einem <code>B-</code>-Label und setzt sich mit <code>I-</code>-Labels desselben Typs fort; aus einer gültigen Folge liest man die Spannen eindeutig ab (Beginn bei jedem <code>B-</code>, Ende vor dem nächsten Label, das nicht <code>I-</code> desselben Typs ist). Verschiedene Spannenmengen unterscheiden sich in einem Anfang, Ende oder Typ und erzeugen dort verschiedene Labels. \(\square\)</p></div>
+<p><b>Ungültige BIO-Folgen.</b> Ein Tagger, der Labels einzeln wählt, kann <code>O I-LOC</code> ausgeben. Das CoNLL-Auswertungsskript <code>conlleval</code> liest ein solches <code>I-X</code> als Beginn einer neuen Spanne; diese Konvention gilt in diesem Kapitel durchgehend.</p>
+<div class="misconception"><h4>Achtung, Folie PDF-S. 17</h4><p>In der BIO-Spalte dieser Folie sind „Boston“ und „New York City“ mit <code>B-COMP</code>/<code>I-COMP</code> beschriftet; richtig ist <code>CITY</code>, wie die nächste Folie (PDF-S. 18) zeigt.</p></div>
+<p><span class="layer" data-layer="research">Forschung</span> Mehr Labels heißen feinere Grenzinformation, aber weniger Trainingsbeispiele je Label. Ratinov &amp; Roth (2009) berichten, dass BILOU in ihrem NER-System „signifikant“ besser abschneidet als BIO; Lample et al. (2016) verwenden deshalb das gleichwertige IOBES-Schema. Das ist ein Befund zu den dort untersuchten Systemen, kein allgemeiner Satz. <span class="prov" data-kind="FORSCHUNG">Ratinov &amp; Roth 2009, S. 148 und 150; Lample et al. 2016, S. 263</span></p>
+<div class="task-ref" data-task="S1"></div>
+</section>
+
+<section data-id="tagger" data-title="3 · Neuronale Tagger">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>Ein neuronaler Tagger hat vier Bausteine: 1-hot-Kodierung jedes Wortes, Einbettung \(e_t\in\mathbb R^d\), eine <b>Sequenzschicht</b>, die Kontext einmischt und Zustände \(z_t\) liefert, und einen Klassifikator je Position, \(p(y_t\mid x)=\operatorname{softmax}(W_o z_t+b_o)\). Trainiert wird mit der Kreuzentropie \(\mathcal J=-\sum_t\log p(y^\ast_t\mid x)\). <span class="prov" data-kind="KURS">PDF-S. 26–27</span></p>
+<p>Die ganze Architekturfrage lautet: <em>Welche Eingaben darf \(z_t\) sehen?</em></p>
+<p><b>Fenster (CNN/TDNN).</b> \(z_t\) sieht die \(n\) vorherigen und \(m\) folgenden Wörter, also \(m+n+1\) Eingaben, mit denselben Gewichten an jeder Position. Daraus folgen die drei Eigenschaften der Folie: verschiebungsinvariant (gleiche Wörter in gleicher Umgebung ergeben an jeder Stelle dieselbe Ausgabe), nur lokaler Kontext, Vorhersagen beeinflussen einander nicht. <span class="prov" data-kind="KURS">PDF-S. 28</span></p>
+<p><span class="layer" data-layer="deep">Vertiefung</span> <b>Stapeln vergrößert das Fenster nur linear.</b> \(L\) Faltungsschichten mit Fensterbreite \(w\) (Schrittweite 1) sehen \(L(w-1)+1\) Wörter: Jede Schicht verlängert den Bereich um \(w-1\) (Induktion über \(L\)). Mit \(w=3\) und \(L=4\) sind das 9 Wörter – endlich, egal wie lang der Satz ist.</p>
+<p><b>RNN.</b> Die Vorgeschichte steckt in einem Zustandsvektor; trainiert wird mit Backpropagation durch die Zeit. Was „globaler Kontext“ hier genau heißt, rechnen wir im nächsten Abschnitt aus. <span class="prov" data-kind="KURS">PDF-S. 29</span></p>
+</section>
+
+<section data-id="rnn" data-title="4 · Was ein RNN sehen kann">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<h3>Ein Experiment zuerst</h3>
+<p>Wir bauen das kleinste RNN, das man von Hand rechnen kann: Jedes Wort ist ein Vektor mit zwei Zahlen, der Zustand auch.</p>
 <table class="sym"><tr><th>Symbol</th><th>Bedeutung im Beispiel</th></tr>
-<tr><td>\(e_t\in\mathbb R^2\)</td><td>Einbettung des Wortes an Position \(t\): \(e(\text{Washington})=(1,0)\), \(e(\text{signed})=(0,1)\), \(e(\text{state})=(0,-1)\)</td></tr>
-<tr><td>\(h^{\rightarrow}_t\in\mathbb R^2\)</td><td>Vorwärtszustand nach dem Lesen von Wort \(t\); Start \(h^{\rightarrow}_0=(0,0)\)</td></tr>
-<tr><td>\(W=0{,}5\,I\)</td><td>wie stark der alte Zustand nachwirkt (\(I\) = Einheitsmatrix)</td></tr>
-<tr><td>\(U=I,\ b=0\)</td><td>Eingabegewichte und Bias (so gewählt, dass man im Kopf rechnen kann)</td></tr></table>
+<tr><td>\(e_t\in\mathbb R^2\)</td><td>Einbettung: \(e(\text{Washington})=(1,0)\), \(e(\text{signed})=(0,1)\), \(e(\text{state})=(0,-1)\)</td></tr>
+<tr><td>\(h^{\rightarrow}_t\in\mathbb R^2\)</td><td>Vorwärtszustand nach Wort \(t\); Start \(h^{\rightarrow}_0=(0,0)\)</td></tr>
+<tr><td>\(W=0{,}5\,I\), \(U=I\), \(b=0\)</td><td>Rückkopplung, Eingabegewichte, Bias (zum Kopfrechnen gewählt)</td></tr></table>
 \[ h^{\rightarrow}_t=\tanh\!\big(W\,h^{\rightarrow}_{t-1}+U\,e_t+b\big)\qquad(\tanh\text{ komponentenweise}) \]
-<p>Lesen Sie die Gleichung als Rezept: <em>alten Zustand dämpfen, neues Wort dazugeben, durch \(\tanh\) in \((-1,1)\) drücken.</em> Die Szene unten rechnet beide Sätze Schritt für Schritt. Bevor Sie weiterklicken, werden Sie um eine Vorhersage gebeten.</p>
+<p>Lesen Sie die Gleichung als Rezept: <em>alten Zustand dämpfen, neues Wort dazugeben, in \((-1,1)\) drücken.</em> Die Szene rechnet beide Sätze Schritt für Schritt; vor dem Weiterklicken sagen Sie das Ergebnis voraus.</p>
 <div class="scene" data-scene="birnn"></div>
-<h3>2. Was das Experiment beweist – und was nicht</h3>
-<p>Das Ergebnis \(h^{\rightarrow}_1=(0{,}7616;\ 0)\) in <em>beiden</em> Sätzen ist kein Zufall der gewählten Zahlen. Es folgt aus der Bauweise: Bei der Berechnung von \(h^{\rightarrow}_1\) kommt \(e_2\) schlicht nicht vor. Allgemein:</p>
+<h3>Was das Experiment beweist</h3>
 <div class="thm"><b>Satz 1 (Was der Vorwärtszustand sieht).</b> Für jedes Vorwärts-RNN der obigen Form und jedes \(t\) gibt es eine Funktion \(F_t\) mit \(h^{\rightarrow}_t=F_t(x_1,\dots,x_t)\). Ändert man nur Wörter an Positionen \(s&gt;t\), bleibt \(h^{\rightarrow}_t\) exakt gleich.</div>
 <div class="proof"><p><em>Beweis (Induktion über \(t\)).</em></p>
 \[\begin{aligned}
-t=1:\quad h^{\rightarrow}_1&amp;=\tanh(W\cdot 0+Ue_1+b)=\tanh(Ue_1+b) &amp;&amp;\text{nur }e_1\text{, also nur }x_1\\
-t-1\to t:\quad h^{\rightarrow}_{t-1}&amp;=F_{t-1}(x_1,\dots,x_{t-1}) &amp;&amp;\text{Induktionsannahme}\\
-h^{\rightarrow}_t&amp;=\tanh\big(W\,F_{t-1}(x_1,\dots,x_{t-1})+Ue_t+b\big) &amp;&amp;\text{einsetzen}\\
-&amp;=:F_t(x_1,\dots,x_t) &amp;&amp;\text{kein }x_s\text{ mit }s&gt;t\text{ kommt vor}\qquad\square
+t=1:\quad h^{\rightarrow}_1&amp;=\tanh(W\cdot 0+Ue_1+b) &amp;&amp;\text{nur }x_1\\
+t-1\to t:\quad h^{\rightarrow}_{t-1}&amp;=F_{t-1}(x_1,\dots,x_{t-1}) &amp;&amp;\text{Annahme}\\
+h^{\rightarrow}_t&amp;=\tanh\big(W\,F_{t-1}(x_1,\dots,x_{t-1})+Ue_t+b\big)=:F_t(x_1,\dots,x_t) &amp;&amp;\square
 \end{aligned}\]</div>
-<p><b>Konsequenz für Klausur und Praxis.</b> Ein Tagger, der das Label an Position \(t\) nur aus \(h^{\rightarrow}_t\) berechnet, gibt für „Washington“ in beiden Sätzen <em>dieselbe</em> Wahrscheinlichkeitsverteilung aus – egal wie lange man trainiert. Das ist eine Grenze der Architektur, nicht der Daten. <span class="prov" data-kind="LEHRBUCH">SLP3 §14.4.2, S. 313: \(h^f_t=\mathrm{RNN}_{\text{forward}}(x_1,\dots,x_t)\), Gl. 14.16</span></p>
-<div class="misconception"><h4>Denkfehler: „Ein RNN hat globalen Kontext, also sieht es den ganzen Satz.“</h4><p>Die Vorlesung nennt das RNN „global context“ (PDF-S. 29) im Vergleich zum <em>Fenster</em>-Netz, das nur \(n\) Wörter links und \(m\) rechts sieht: Das RNN sieht die <em>gesamte Vorgeschichte</em>. Den ganzen Satz sieht nur der letzte Zustand \(h^{\rightarrow}_T\). Die abgelehnte Engine-Fassung vom 13.11.2026 (§19.7) enthielt genau diesen Fehler („hängt von der ganzen Eingabe ab“).</p></div>
+<p>Das Argument benutzt nur die Form der Rekursion, nicht \(\tanh\): Es gilt ebenso für LSTM- und GRU-Zellen. <span class="prov" data-kind="LEHRBUCH">SLP3 §14.4.2, S. 313, Gl. 14.16</span></p>
+<div class="misconception"><h4>Denkfehler: „Ein RNN hat globalen Kontext, also sieht es den ganzen Satz.“</h4><p>„Global context“ (PDF-S. 29) steht im Vergleich zum Fenster: Das RNN sieht die <em>gesamte Vorgeschichte</em>. Den ganzen Satz sieht nur der letzte Zustand \(h^{\rightarrow}_T\). Die abgelehnte Engine-Fassung vom 13.11.2026 enthielt genau diesen Fehler.</p></div>
 <div class="task-ref" data-task="G1"></div>
 </section>
 
-<section data-id="birnn" data-title="Bidirektionale RNNs">
-<h3>3. Die Lösung: ein zweites RNN, das von rechts liest</h3>
-<p>Wenn der Vorwärtszustand das nächste Wort nicht sehen kann, lassen wir ein <em>zweites</em> RNN von rechts nach links laufen und geben dem Klassifikator beide Zustände. Die Vorlesung schreibt das als \(h_t^{b}=f(h_{t+1}^{b},x_t,\theta)\) und \(h_t^{bi}=[h_t,h_t^{b}]\) (PDF-S. 79–80).</p>
+<section data-id="birnn" data-title="5 · Bidirektionale RNNs">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>Ein zweites RNN läuft von rechts nach links, der Klassifikator erhält beide Zustände (PDF-S. 79–80):</p>
 \[\begin{aligned}
-h^{\leftarrow}_{T+1}&amp;=0, \qquad h^{\leftarrow}_t=\tanh\!\big(W'h^{\leftarrow}_{t+1}+U'e_t+b'\big),\ t=T,\dots,1 &amp;&amp;\text{eigene Parameter }W',U',b'\\
-h^{\mathrm{bi}}_t&amp;=\big[h^{\rightarrow}_t;\,h^{\leftarrow}_t\big]\in\mathbb R^{2d_h} &amp;&amp;\text{Verkettung (Vektoren übereinander)}
+h^{\leftarrow}_{T+1}&amp;=0,\qquad h^{\leftarrow}_t=\tanh\!\big(W'h^{\leftarrow}_{t+1}+U'e_t+b'\big) &amp;&amp;\text{eigene Parameter}\\
+h^{\mathrm{bi}}_t&amp;=\big[h^{\rightarrow}_t;\,h^{\leftarrow}_t\big]\in\mathbb R^{2d_h} &amp;&amp;\text{Verkettung}
 \end{aligned}\]
-<p>Im Experiment (letzter Teil der Szene) ist \(W'=0{,}8\,I\), \(U'=I\), \(b'=0\). Der Rückwärtszustand an Position 1 ist \((0{,}7616;\ +0{,}5436)\) nach „signed“ und \((0{,}7616;\ -0{,}5436)\) nach „state“: Das Vorzeichen der zweiten Komponente trägt die Information des Folgeworts zurück zu „Washington“. Ein Klassifikator mit Score \(s=v^\top h^{\mathrm{bi}}_1\), \(v=(0,0,0,1)\), entscheidet daher PER für \(s&gt;0\) und LOC für \(s&lt;0\) – richtig in beiden Sätzen. Mit \(h^{\rightarrow}_1\) allein ist das für <em>kein</em> \(v\) möglich, weil der Eingabevektor in beiden Sätzen derselbe ist.</p>
-<div class="thm"><b>Satz 2.</b> \(h^{\leftarrow}_t\) hängt nur von \(x_t,\dots,x_T\) ab; \(h^{\mathrm{bi}}_t\) hängt von \(x_1,\dots,x_T\) ab, also vom ganzen Satz.</div>
-<div class="proof"><p><em>Beweis.</em> Liest man den Satz rückwärts, \((x_T,\dots,x_1)\), ist das Rückwärts-RNN ein Vorwärts-RNN. Position \(t\) des Originals ist Position \(T-t+1\) der umgekehrten Folge; nach Satz 1 hängt der Zustand dort von den ersten \(T-t+1\) Wörtern der umgekehrten Folge ab, das sind \(x_T,\dots,x_t\). Die Verkettung hängt von der Vereinigung ab: \(\{1,\dots,t\}\cup\{t,\dots,T\}=\{1,\dots,T\}\). \(\square\)</p>
-<p class="mute"><em>Präzisierung:</em> „hängt ab von“ heißt hier „ist als Funktion von … darstellbar“. Dass sich der Zustand bei einer Änderung von \(x_s\) <em>tatsächlich</em> ändert, ist eine zusätzliche Aussage; das Experiment zeigt es für \(s=2,\ t=1\). Bei Parametern wie \(W'=0\) würde die Information nicht weitergereicht – Satz 2 gibt nur an, was <em>möglich</em> ist.</p></div>
-<h3>4. Was das BiRNN nicht löst</h3>
-<div class="remark"><p><b>(a) Es braucht den ganzen Satz.</b> \(h^{\leftarrow}_1\) hängt vom letzten Wort ab. Ein BiRNN kann also nicht Wort für Wort „live“ taggen, und es kann nicht als Sprachmodell das nächste Wort vorhersagen – dort wäre das nächste Wort Teil der Eingabe. <span class="prov" data-kind="LEHRBUCH">SLP3 §14.4.2, S. 313: „in many applications we have access to the entire input sequence“</span></p>
-<p><b>(b) Die Labels werden einzeln gewählt.</b> Der Tagger berechnet für jede Position \(p(y_t\mid x)=\operatorname{softmax}(W_o h^{\mathrm{bi}}_t+b_o)\) und nimmt das Maximum – unabhängig von den Nachbarlabels. Nichts verhindert die ungültige BIO-Folge <code>O I-LOC</code>. Die Vorlesung nennt das „non consistent labels“ (PDF-S. 83) und setzt eine CRF-Schicht auf das RNN (PDF-S. 85). Das CRF bewertet ganze Labelfolgen mit Übergangsgewichten \(A_{y_{t-1},y_t}\) und dekodiert mit Viterbi. <span class="prov" data-kind="LEHRBUCH">SLP3 §18.5, S. 414–419</span> <span class="prov" data-kind="FORSCHUNG">Huang, Xu &amp; Yu 2015 (Preprint); Lample et al. 2016</span></p>
-<p><b>(c) Label Bias – was die Folie meint.</b> Ein <em>autoregressiver</em> Tagger (PDF-S. 84) gibt in jedem Schritt eine lokal auf 1 normierte Verteilung \(p(y_t\mid y_{&lt;t},x)\) aus. Weil jeder Zustand seine ganze Wahrscheinlichkeitsmasse an Nachfolger weitergeben muss, kann späte Evidenz eine frühe Entscheidung nicht abwerten: Das ist Label Bias (Lafferty et al. 2001). Global normierte Modelle wie das CRF haben ihn nicht (für neuronale Modelle: Andor et al. 2016). Davon verschieden ist Exposure Bias: Training mit Gold-Vorgängern, Test mit eigenen Vorhersagen (PDF-S. 84: „use correct label“ / „use predicted label“). <span class="prov" data-kind="FORSCHUNG">Lafferty, McCallum &amp; Pereira 2001; Andor et al. 2016</span></p></div>
-<h3>5. Wie groß ist ein BiRNN-Tagger?</h3>
-<p>Wir zählen Matrix für Matrix. Mit Einbettungsdimension \(d\), Zustandsdimension \(d_h\) je Richtung und \(|\mathcal L|\) Labels (BIO mit \(K\) Typen: \(|\mathcal L|=2K+1\)):</p>
+<p>Im Experiment (\(W'=0{,}8\,I\)) ist \(h^{\leftarrow}_1=(0{,}7616;\ +0{,}5436)\) nach „signed“ und \((0{,}7616;\ -0{,}5436)\) nach „state“. Ein Score \(s=v^\top h^{\mathrm{bi}}_1\) mit \(v=(0,0,0,1)\) trennt die Sätze; mit \(h^{\rightarrow}_1\) allein ist das für kein \(v\) möglich.</p>
+<div class="thm"><b>Satz 2.</b> \(h^{\leftarrow}_t\) ist eine Funktion von \(x_t,\dots,x_T\); \(h^{\mathrm{bi}}_t\) ist eine Funktion des ganzen Satzes \(x_1,\dots,x_T\).</div>
+<div class="proof"><p><em>Beweis.</em> Rückwärts gelesen, \((x_T,\dots,x_1)\), ist das Rückwärts-RNN ein Vorwärts-RNN; Satz 1 an Position \(T-t+1\) der umgekehrten Folge liefert \(x_T,\dots,x_t\). Die Verkettung hängt von \(\{1,\dots,t\}\cup\{t,\dots,T\}=\{1,\dots,T\}\) ab. \(\square\)</p>
+<p class="mute">„Funktion von“ heißt: darstellbar. Ob sich der Zustand bei Änderung von \(x_s\) tatsächlich ändert, hängt von den Parametern ab; mit \(W'=0\) erreicht keine Information von rechts Position \(t\).</p></div>
+<h3>Was das BiRNN nicht löst – mit genauen Bedingungen</h3>
+<div class="remark"><p><b>(a) Latenz.</b> Im <em>Standardaufbau</em> läuft das Rückwärts-RNN über den vollständigen Satz; \(h^{\leftarrow}_1\) hängt dann vom letzten Wort ab. Ein solches Modell kann das Label von Wort \(t\) erst ausgeben, wenn der Satz zu Ende ist. Wer nach Wort \(t\) sofort antworten muss, braucht ein Vorwärtsmodell oder eine Variante mit begrenzter Vorausschau – etwa eine Rückwärtsrichtung über Abschnitte von \(k\) Wörtern: Latenz höchstens \(k\) Wörter, rechter Kontext höchstens \(k\). <span class="prov" data-kind="LEHRBUCH">SLP3 §14.4.2, S. 313</span></p>
+<p><b>(b) Unabhängige Ausgaben.</b> <em>Wenn</em> der Tagger jedes Label einzeln per Softmax und \(\arg\max\) wählt, hängen die Labels nur über die gemeinsamen Eingaben zusammen; nichts verhindert <code>O I-LOC</code> (PDF-S. 83: „non consistent labels“). Ein strukturierter Decoder (CRF, Abschnitt 9) koppelt sie.</p></div>
+<h3>Wie groß ist ein BiRNN-Tagger?</h3>
 \[\begin{aligned}
-\text{eine Richtung:}\quad &amp; \underbrace{d_h^2}_{W}+\underbrace{d_h\,d}_{U}+\underbrace{d_h}_{b} \\
-\text{zwei Richtungen:}\quad &amp; 2\,(d_h^2+d_h d+d_h) &amp;&amp;\text{keine geteilten Parameter}\\
-\text{Ausgabe:}\quad &amp; \underbrace{|\mathcal L|\cdot 2d_h}_{W_o}+\underbrace{|\mathcal L|}_{b_o} &amp;&amp;W_o\text{ liest den verketteten Zustand}
+\text{eine Richtung:}\quad &amp; d_h^2+d_h\,d+d_h &amp;&amp;W,\ U,\ b\\
+\text{beide Richtungen:}\quad &amp; 2\,(d_h^2+d_h d+d_h) &amp;&amp;\text{getrennte Parameter}\\
+\text{Ausgabe:}\quad &amp; |\mathcal L|\cdot 2d_h+|\mathcal L| &amp;&amp;W_o\text{ liest }h^{\mathrm{bi}}
 \end{aligned}\]
+<p class="mute small">Gilt für Elman-Zellen ohne Einbettungsmatrix. LSTM-Zellen haben vier Torbausteine und damit etwa viermal so viele rekurrente Parameter.</p>
+<div class="task-ref" data-task="W1"></div>
 <div class="task-ref" data-task="B1"></div>
 <div class="task-ref" data-task="B2"></div>
 </section>
 
-<section data-id="prf" data-title="Precision, Recall, F1">
-<h3>6. Drei Zahlen aus zwei Mengen</h3>
-<p>Ein System gibt eine Menge \(S\) von Entitäten aus, die Annotation enthält die Menge \(G\) (Gold). Jede Entität landet in genau einem von drei Fächern:</p>
-<table class="sym"><tr><th>Fach</th><th>Definition</th><th>in Worten</th></tr>
-<tr><td>TP</td><td>\(|S\cap G|\)</td><td>gefunden und richtig</td></tr>
-<tr><td>FP</td><td>\(|S\setminus G|\)</td><td>gefunden, aber falsch (falscher Alarm)</td></tr>
-<tr><td>FN</td><td>\(|G\setminus S|\)</td><td>vorhanden, aber nicht gefunden</td></tr></table>
+<section data-id="attention" data-title="6 · Self-Attention">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p><b>Motivation.</b> Ein RNN muss die gesamte Vorgeschichte in einen Vektor fester Größe pressen; weit entfernte Information muss viele Rechenschritte überstehen (schwierig für Backpropagation); und \(h_t\) braucht \(h_{t-1}\), die Positionen lassen sich nicht parallel berechnen. Idee: an jeder Position eine <em>eigene</em> Zusammenfassung bilden, die je nach aktuellem Wort andere Teile der Sequenz gewichtet. <span class="prov" data-kind="KURS">PDF-S. 31–37</span></p>
+<p><b>Datenbank-Analogie (PDF-S. 38–40).</b> Anfrage „burger“, Schlüssel Cheeseburger, Fries, Hamburger, Ice cream mit Werten 12, 5, 10, 6. Bei Ähnlichkeiten 0,5; 0; 0,5; 0 ist die Antwort die gewichtete Summe \(0{,}5\cdot12+0{,}5\cdot10=11\). Self-Attention tut dasselbe mit gelernten Vektoren.</p>
+<p><b>Definition.</b> Eingaben als Zeilen \(X\in\mathbb R^{N\times n}\) (\(N\) Token). Mit gelernten \(W_Q,W_K\in\mathbb R^{n\times d_k}\), \(W_V\in\mathbb R^{n\times d_v}\):</p>
+\[\begin{aligned}
+Q&amp;=XW_Q,\ K=XW_K,\ V=XW_V &amp;&amp;\text{Anfrage, Schlüssel, Wert je Token}\\
+e_{ij}&amp;=\tfrac{q_i^\top k_j}{\sqrt{d_k}} &amp;&amp;\text{skaliertes Skalarprodukt}\\
+\alpha_{ij}&amp;=\tfrac{\exp e_{ij}}{\sum_{l}\exp e_{il}} &amp;&amp;\text{Softmax über }j\\
+o_i&amp;=\textstyle\sum_j\alpha_{ij}v_j &amp;&amp;\text{gewichtete Summe}
+\end{aligned}\]
+<p>Kompakt: \(\operatorname{Att}(Q,K,V)=\operatorname{softmax}\!\big(QK^\top/\sqrt{d_k}\big)V\). Gelernt werden nur \(W_Q,W_K,W_V\) (PDF-S. 46); die Gewichte \(\alpha_{ij}\) werden für jede Eingabe neu berechnet. Alternativen zur Ähnlichkeit: multiplikativ \(q^\top Wk\) oder ein Feed-Forward-Netz auf \([q;k]\) (PDF-S. 49–50). <span class="prov" data-kind="KURS">PDF-S. 42–53</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §7.1.1, S. 180; §7.3, S. 188, Gl. 7.34</span></p>
+<p class="mute small">Notation: Die Folie schreibt Token als Spalten (\(X\in\mathbb R^{n\times N}\)) und \(q_i=W_Qx_i\) mit \(W_Q\in\mathbb R^{n\times h}\); passend wäre dort \(W_Q\in\mathbb R^{h\times n}\). Hier gilt durchgehend die Zeilenkonvention.</p>
+<div class="scene" data-scene="attention"></div>
+<p><span class="layer" data-layer="deep">Vertiefung</span> <b>Warum durch \(\sqrt{d_k}\) teilen?</b></p>
+<div class="thm"><b>Satz 3.</b> Sind die Komponenten von \(q,k\in\mathbb R^{d_k}\) unabhängig mit Erwartungswert 0 und Varianz 1, dann hat \(q^\top k\) Erwartungswert 0 und Varianz \(d_k\); \(q^\top k/\sqrt{d_k}\) hat Varianz 1.</div>
+<div class="proof">\[\begin{aligned}
+\mathbb E[q_ik_i]&amp;=\mathbb E[q_i]\,\mathbb E[k_i]=0 &amp;&amp;\text{Unabhängigkeit}\\
+\operatorname{Var}(q_ik_i)&amp;=\mathbb E[q_i^2]\,\mathbb E[k_i^2]-0=1 &amp;&amp;\mathbb E[q_i^2]=\operatorname{Var}(q_i)\\
+\operatorname{Var}\big(\textstyle\sum_{i}q_ik_i\big)&amp;=\textstyle\sum_i\operatorname{Var}(q_ik_i)=d_k &amp;&amp;\text{Summanden unkorreliert}\\
+\operatorname{Var}\big(q^\top k/\sqrt{d_k}\big)&amp;=d_k/d_k=1 &amp;&amp;\square
+\end{aligned}\]</div>
+<p>Ohne Skalierung wachsen die Energien mit \(d_k\), die Softmax wird fast zum \(\arg\max\) und ihre Gradienten werden klein. Das ist die Begründung der Originalarbeit unter denselben Annahmen (§3.2.1, Fußnote 1). Gelernte Projektionen erfüllen diese Annahmen nicht genau; Satz 3 begründet die Größenordnung, keinen exakten Wert. <span class="prov" data-kind="FORSCHUNG">Vaswani et al. 2017, §3.2.1</span></p>
+<p><b>Mehrere Köpfe.</b> Ein \(d\)-dimensionaler Zustand wird als \(h\) Teilvektoren der Länge \(d/h\) gelesen; jeder Kopf rechnet eigene Attention, die Ergebnisse werden verkettet (PDF-S. 54–58). Die Parameterzahl bleibt gleich: \(h\) Projektionen der Größe \(n\times(d/h)\) haben zusammen \(n\cdot d\) Einträge wie eine Projektion \(n\times d\). Das gilt für die Verkettung ohne zusätzliche Ausgabematrix; der Transformer fügt danach \(W_O\in\mathbb R^{d\times d}\) hinzu (SLP3 Gl. 7.35, S. 188).</p>
+<div class="task-ref" data-task="AT1"></div>
+</section>
+
+<section data-id="position" data-title="7 · Positionsinformation">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>Ein RNN-Zustand hängt von der Reihenfolge ab; Self-Attention ohne Zusatz nicht – die Vorlesung nennt das eine „Bag-of-words-Repräsentation“ („Marry kills John“ / „John kills Marry“, PDF-S. 60–62). Präzise:</p>
+<div class="thm"><b>Satz 4 (Permutations-Äquivarianz).</b> Für jede Permutationsmatrix \(P\) gilt \(\operatorname{Att}(PX)=P\,\operatorname{Att}(X)\): Vertauscht man die Token, vertauschen sich die Ausgaben genauso – jedes Token erhält denselben Ausgabevektor wie vorher.</div>
+<div class="proof">\[\begin{aligned}
+Q'&amp;=PXW_Q=PQ,\quad K'=PK,\quad V'=PV &amp;&amp;\text{zeilenweise Projektion}\\
+Q'K'^\top&amp;=PQK^\top P^\top &amp;&amp;(PK)^\top=K^\top P^\top\\
+\operatorname{softmax}(PSP^\top)&amp;=P\operatorname{softmax}(S)P^\top &amp;&amp;\text{Softmax je Zeile; Spalten nur umgeordnet}\\
+\operatorname{Att}(PX)&amp;=P\operatorname{softmax}(S)P^\top PV=P\,\operatorname{Att}(X) &amp;&amp;P^\top P=I\qquad\square
+\end{aligned}\]</div>
+<p>„John“ bekommt in beiden Sätzen denselben Vektor – das Modell kann Subjekt und Objekt nicht unterscheiden. Deshalb wird Position in die Eingabe kodiert (PDF-S. 63).</p>
+<p><b>Gelernte Positionsvektoren</b> werden zur Worteinbettung addiert oder angehängt; Nachteil: begrenzte Länge, große Positionen kommen im Training selten vor (PDF-S. 64–67). <b>Trigonometrische Kodierung</b> (PDF-S. 68):</p>
+\[ \mathrm{POS}(i,d)=\begin{cases}\sin\!\big(i/10000^{d/d_{\text{model}}}\big)&amp;d\text{ gerade}\\ \cos\!\big(i/10000^{(d-1)/d_{\text{model}}}\big)&amp;d\text{ ungerade}\end{cases} \]
+<p><span class="layer" data-layer="deep">Vertiefung</span> Jedes Paar \((d,d+1)\) mit geradem \(d\) hat eine Frequenz \(\omega=10000^{-d/d_{\text{model}}}\). Für einen festen Abstand \(\Delta\) gilt nach den Additionstheoremen</p>
+\[ \begin{pmatrix}\sin\omega(i+\Delta)\\ \cos\omega(i+\Delta)\end{pmatrix}=\begin{pmatrix}\cos\omega\Delta&amp;\sin\omega\Delta\\ -\sin\omega\Delta&amp;\cos\omega\Delta\end{pmatrix}\begin{pmatrix}\sin\omega i\\ \cos\omega i\end{pmatrix}, \]
+<p>also ist die Kodierung von \(i+\Delta\) eine lineare Funktion der Kodierung von \(i\), die nur von \(\Delta\) abhängt – die Eigenschaft, die die Originalarbeit als Motivation nennt (§3.5). <span class="prov" data-kind="FORSCHUNG">Vaswani et al. 2017, §3.5</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §7.4, S. 191–193</span></p>
+<p><b>RoPE</b> (PDF-S. 69–70) dreht Query und Key in jedem 2D-Paar um den Winkel \(m\theta\) bzw. \(n\theta\). Mit der Drehmatrix \(R(\varphi)\):</p>
+\[ \big(R(m\theta)q\big)^\top R(n\theta)k=q^\top R(-m\theta)R(n\theta)k=q^\top R\big((n-m)\theta\big)k, \]
+<p>weil \(R(\varphi)^\top=R(-\varphi)\) und \(R(a)R(b)=R(a+b)\). Die Ähnlichkeit hängt nur vom <em>Abstand</em> \(n-m\) ab, obwohl jede Position absolut kodiert wird. <span class="prov" data-kind="FORSCHUNG">Su et al. 2024 (RoFormer), zitiert auf PDF-S. 69</span></p>
+<div class="task-ref" data-task="PO1"></div>
+</section>
+
+<section data-id="architektur" data-title="8 · Tiefe Architekturen">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p><b>Stapeln.</b> Schicht \(l\) eines mehrschichtigen RNN rechnet \(h^l_t=f(h^l_{t-1},h^{l-1}_t,\theta^l)\) mit \(h^0_t=x_t\); die Parameter werden zwischen Schichten meist nicht geteilt, bei fester Parameterzahl wägt man Tiefe gegen Breite ab. CNNs mit Schrittweite größer 1 verkürzen zusätzlich die Sequenz (PDF-S. 72–73).</p>
+<p><b>Residualverbindung</b> \(h=F(x)+x\) (PDF-S. 75). <span class="layer" data-layer="deep">Vertiefung</span> Warum hilft sie dem Gradientenfluss (PDF-S. 74)?</p>
+\[\begin{aligned}
+\frac{\partial h}{\partial x}&amp;=I+\frac{\partial F}{\partial x} &amp;&amp;\text{Kettenregel}\\
+\frac{\partial h_L}{\partial x_0}&amp;=\prod_{l=L}^{1}\big(I+J_l\big) &amp;&amp;J_l=\partial F_l/\partial h_{l-1}
+\end{aligned}\]
+<p>Ausmultipliziert enthält das Produkt den Summanden \(I\): einen Pfad, auf dem der Gradient ungeschwächt zurückfließt. Skalar mit \(J_l=0{,}1\) und \(L=10\): ohne Residual \(0{,}1^{10}=10^{-10}\), mit Residual \(1{,}1^{10}\approx2{,}5937\). Im Transformer bildet sie den „Residual Stream“, in den jede Teilschicht addiert. <span class="prov" data-kind="LEHRBUCH">SLP3 §7.2, S. 184–187, Gl. 7.29 und 7.32</span></p>
+<p><b>Rezeptives Feld und Richtung</b> (PDF-S. 76–77):</p>
+<table class="sym"><tr><th>Sequenzschicht</th><th>\(z_t\) sieht</th><th>Richtung</th></tr>
+<tr><td>CNN/TDNN</td><td>lokales Fenster; gestapelt \(L(w-1)+1\) Wörter</td><td>keine</td></tr>
+<tr><td>RNN/SSM</td><td>\(x_1,\dots,x_t\) (Satz 1)</td><td>links → rechts</td></tr>
+<tr><td>BiRNN</td><td>ganzer Satz (Satz 2)</td><td>beide</td></tr>
+<tr><td>Self-Attention</td><td>ganzer Satz; Reihenfolge nur über Positionskodierung (Satz 4)</td><td>keine</td></tr></table>
+</section>
+
+<section data-id="struktur" data-title="9 · Abhängigkeiten zwischen Labels">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>Gegenüber HMM und CRF arbeiten neuronale Tagger mit kontinuierlichen Repräsentationen; zu vergleichen sind Markov- und Unabhängigkeitsannahmen (PDF-S. 82). Drei Arten, Labels auszugeben:</p>
+<ul><li><b>Nicht autoregressiv</b> (PDF-S. 83): jedes Label aus \(z_t\) allein. Probleme: wiederholte und inkonsistente Labels.</li>
+<li><b>Autoregressiv</b> (PDF-S. 84): das vorige Label geht in die nächste Vorhersage ein – im Training das korrekte, im Test das vorhergesagte (Beam Search). Problem laut Folie: Label Bias.</li>
+<li><b>RNN + CRF</b> (PDF-S. 85): ein CRF über den Ausgaben bewertet ganze Labelfolgen.</li></ul>
+<p><span class="layer" data-layer="deep">Vertiefung</span> Ein linear-chain-CRF bewertet eine Folge mit</p>
+\[ \operatorname{score}(y_{1:T})=\sum_{t=1}^T\Big(s_t(y_t)+A_{y_{t-1},y_t}\Big),\qquad p(y_{1:T}\mid x)=\frac{\exp\operatorname{score}(y_{1:T})}{\sum_{y'}\exp\operatorname{score}(y'_{1:T})}. \]
+<p>\(s_t\) sind die Emissionswerte des BiRNN, \(A\) gelernte Übergangswerte. Die Normierung läuft über <em>alle</em> Folgen (global); die beste Folge findet der Viterbi-Algorithmus in \(O(T|\mathcal L|^2)\). Setzt man verbotene Übergänge wie <code>O → I-LOC</code> auf \(-\infty\), kann keine ungültige Folge mehr gewinnen. <span class="prov" data-kind="LEHRBUCH">SLP3 §18.4.5 und §18.5, S. 411–419</span> <span class="prov" data-kind="FORSCHUNG">Lafferty et al. 2001; Lample et al. 2016</span></p>
+<div class="scene" data-scene="viterbi"></div>
+<p><b>Label Bias – was die Folie meint.</b> Ein autoregressiver Tagger mit <em>lokal</em> auf 1 normierten Schrittverteilungen \(p(y_t\mid y_{&lt;t},x)\) muss in jedem Zustand die ganze Masse an Nachfolger weitergeben; späte Evidenz kann eine frühe Entscheidung nicht abwerten (Lafferty et al. 2001). Andor et al. (2016) schließen daraus, dass global normierte Modelle „strictly more expressive“ sein können als lokal normierte (Abstract, S. 2442). Davon verschieden ist <b>Exposure Bias</b>: Training mit Gold-Vorgängern, Test mit eigenen Vorhersagen.</p>
+<div class="remark"><p><span class="layer" data-layer="research">Forschung</span> <b>Braucht man das CRF immer?</b> Nicht zwingend. Ratinov &amp; Roth (2009) fanden für ihr NER-System, dass gierige Dekodierung „comparably to beamsearch or Viterbi“ abschneidet und dabei viel schneller ist (S. 148). Lample et al. (2016) kombinieren dagegen BiLSTM und CRF. Welche Variante besser ist, ist eine empirische Frage des Systems. Konstruktiv garantiert ein CRF mit harten Übergangsregeln nur, dass keine <em>ungültige</em> BIO-Folge ausgegeben wird – nicht, dass Grenzen und Typen stimmen (siehe Fallstudie).</p></div>
+<div class="task-ref" data-task="C1"></div>
+</section>
+
+<section data-id="prf" data-title="10 · Precision, Recall, F1">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>Ein System gibt eine Menge \(S\) von Entitäten aus, Gold enthält \(G\). TP \(=|S\cap G|\) (gefunden und richtig), FP \(=|S\setminus G|\) (falscher Alarm), FN \(=|G\setminus S|\) (verpasst).</p>
 \[ P=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FP}},\qquad R=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}} \]
-<p><b>Precision</b> \(P\) ist der Anteil richtiger unter den Ausgaben, <b>Recall</b> \(R\) der Anteil gefundener unter den Gold-Entitäten.</p>
-<p><span class="prov" data-kind="KURS">PDF-S. 21: „# correct labels / # hypothesized labels“, „/ # reference labels“</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §4.9, S. 112–114</span></p>
-<p><b>Warum keine True Negatives?</b> Ein TN wäre eine Spanne, die weder vorhanden noch vorhergesagt ist. In einem Satz mit \(T\) Wörtern gibt es \(T(T+1)/2\) mögliche Spannen – bei 30 Wörtern 465, von denen fast alle „korrekt nicht vorhergesagt“ sind. Eine Kennzahl mit TN würde von dieser Zahl erdrückt. Deshalb stehen in \(P\), \(R\) und \(F_1\) nur TP, FP, FN.</p>
-<h3>7. \(F_1\) herleiten statt auswendig lernen</h3>
-<p>Fragen wir so: <em>Wie viel „Aufwand“ kostet ein Treffer?</em></p>
+<p><b>Precision</b> ist der Anteil richtiger unter den Ausgaben, <b>Recall</b> der Anteil gefundener unter den Gold-Entitäten. <span class="prov" data-kind="KURS">PDF-S. 20–21</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §4.9, S. 112–114</span></p>
+<p><b>Warum keine True Negatives?</b> Ein TN wäre eine Spanne, die weder vorhanden noch vorhergesagt ist. Ein Satz mit \(T\) Wörtern hat \(T(T+1)/2\) mögliche Spannen – bei 30 Wörtern 465. Eine Kennzahl mit TN würde von dieser Zahl erdrückt.</p>
+<h3>\(F_1\) herleiten</h3>
+<p>Wie viel „Aufwand“ kostet ein Treffer?</p>
 \[\begin{aligned}
 \frac1P&amp;=\frac{\mathrm{TP}+\mathrm{FP}}{\mathrm{TP}} &amp;&amp;\text{Ausgaben pro Treffer}\\
-\frac1R&amp;=\frac{\mathrm{TP}+\mathrm{FN}}{\mathrm{TP}} &amp;&amp;\text{Gold-Entitäten pro Treffer}\\
-\frac12\Big(\frac1P+\frac1R\Big)&amp;=\frac{2\mathrm{TP}+\mathrm{FP}+\mathrm{FN}}{2\,\mathrm{TP}} &amp;&amp;\text{Mittelwert der beiden Aufwände}\\
-F_1:=\Big[\frac12\Big(\frac1P+\frac1R\Big)\Big]^{-1}&amp;=\frac{2\,\mathrm{TP}}{2\,\mathrm{TP}+\mathrm{FP}+\mathrm{FN}} &amp;&amp;\text{Kehrwert: Treffer pro Aufwand}
+\frac1R&amp;=\frac{\mathrm{TP}+\mathrm{FN}}{\mathrm{TP}} &amp;&amp;\text{Gold pro Treffer}\\
+F_1:=\Big[\frac12\Big(\frac1P+\frac1R\Big)\Big]^{-1}&amp;=\frac{2\,\mathrm{TP}}{2\,\mathrm{TP}+\mathrm{FP}+\mathrm{FN}} &amp;&amp;\text{Kehrwert des mittleren Aufwands}
 \end{aligned}\]
-<p>Das ist das <b>harmonische Mittel</b> von \(P\) und \(R\); ausmultipliziert ist es die Formel der Folie, \(F_1=\frac{2PR}{P+R}\) (PDF-S. 20). Die letzte Zeile – die <b>Zählform</b> – ist die, mit der Sie rechnen sollten: Zähler „doppelte Treffer“, Nenner „doppelte Treffer plus alle Fehler“. Jeder Fehler, gleich welcher Art, kostet gleich viel. <span class="prov" data-kind="LEHRBUCH">SLP3 §4.9, S. 114, Gl. 4.42–4.44 (harmonisches Mittel, \(F_\beta\))</span></p>
-<p><b>Warum das harmonische und nicht das gewöhnliche Mittel?</b> Ein System, das <em>jedes</em> Wort als Entität markiert, findet alles (\(R=1\)), aber z. B. nur \(P=0{,}1\). Gewöhnliches Mittel: \(0{,}55\). \(F_1=\frac{2\cdot0{,}1\cdot1}{1{,}1}\approx0{,}18\). Allgemein gilt (Beweis unten): \(F_1\le 2\min(P,R)\). Eine schwache Größe lässt sich durch eine starke nicht ausgleichen.</p>
+<p>Das ist das harmonische Mittel; ausmultipliziert \(F_1=\frac{2PR}{P+R}\) (PDF-S. 20). Die <b>Zählform</b> rechts ist die Formel zum Rechnen. Allgemeiner \(F_\beta=\frac{(1+\beta^2)PR}{\beta^2P+R}\). <span class="prov" data-kind="LEHRBUCH">SLP3 §4.9, S. 114, Gl. 4.42–4.44</span></p>
+<p><b>Warum das harmonische Mittel?</b> Ein System, das fast alles markiert, hat etwa \(R=1\), \(P=0{,}1\): gewöhnliches Mittel \(0{,}55\), \(F_1\approx0{,}182\). Satz 6 zeigt: \(F_1\le2\min(P,R)\).</p>
 <div class="scene" data-scene="f1"></div>
-<h3>8. Wenn Nenner 0 werden – exakt</h3>
-<p>Die Herleitung oben teilt durch TP. Was gilt, wenn es keine Treffer gibt? Wir gehen die Fälle systematisch durch. Grundsatz: <b>\(0/0\) ist keine Zahl.</b> Ein Wert entsteht dort nur durch eine Konvention, die man nennen muss.</p>
-<table class="edge"><tr><th>Fall</th><th>\(P\)</th><th>\(R\)</th><th>\(2PR/(P+R)\)</th><th>Zählform \(2\mathrm{TP}/(2\mathrm{TP}+\mathrm{FP}+\mathrm{FN})\)</th></tr>
-<tr><td>(i) TP &gt; 0</td><td>definiert, &gt; 0</td><td>definiert, &gt; 0</td><td>definiert</td><td>gleicher Wert (Satz 3)</td></tr>
-<tr><td>(ii) TP = 0, FP &gt; 0, FN &gt; 0</td><td>\(0\)</td><td>\(0\)</td><td>\(0/0\) – nicht definiert</td><td>\(0/(\mathrm{FP}+\mathrm{FN})=0\)</td></tr>
-<tr><td>(iii) System gibt nichts aus: TP = FP = 0, FN &gt; 0</td><td>\(0/0\)</td><td>\(0\)</td><td>nicht anwendbar</td><td>\(0/\mathrm{FN}=0\)</td></tr>
-<tr><td>(iv) Gold leer: TP = FN = 0, FP &gt; 0</td><td>\(0\)</td><td>\(0/0\)</td><td>nicht anwendbar</td><td>\(0/\mathrm{FP}=0\)</td></tr>
-<tr><td>(v) beides leer: TP = FP = FN = 0</td><td>\(0/0\)</td><td>\(0/0\)</td><td>nicht anwendbar</td><td>\(0/0\) – nur per Konvention</td></tr></table>
-<div class="thm"><b>Satz 3 (Zählform, exakt).</b> Für \(\mathrm{TP}&gt;0\) gilt \(\frac{2PR}{P+R}=\frac{2\mathrm{TP}}{2\mathrm{TP}+\mathrm{FP}+\mathrm{FN}}\). Für \(\mathrm{TP}=0\) ist \(\frac{2PR}{P+R}\) in keinem Fall definiert, die Zählform dagegen in allen Fällen außer (v) und dort gleich 0.</div>
-<div class="proof"><p><em>Beweis.</em> Für \(\mathrm{TP}&gt;0\) setzen wir \(a=\mathrm{TP}+\mathrm{FP}&gt;0\) und \(c=\mathrm{TP}+\mathrm{FN}&gt;0\); dann ist \(a+c=2\mathrm{TP}+\mathrm{FP}+\mathrm{FN}\).</p>
+<h3>Wenn Nenner 0 werden</h3>
+<table class="edge"><tr><th>Fall</th><th>\(P\)</th><th>\(R\)</th><th>\(2PR/(P+R)\)</th><th>Zählform</th></tr>
+<tr><td>(i) TP &gt; 0</td><td>&gt; 0</td><td>&gt; 0</td><td>definiert</td><td>gleicher Wert (Satz 5)</td></tr>
+<tr><td>(ii) TP = 0, FP &gt; 0, FN &gt; 0</td><td>\(0\)</td><td>\(0\)</td><td>\(0/0\)</td><td>\(0\)</td></tr>
+<tr><td>(iii) keine Ausgabe, FN &gt; 0</td><td>\(0/0\)</td><td>\(0\)</td><td>nicht anwendbar</td><td>\(0\)</td></tr>
+<tr><td>(iv) Gold leer, FP &gt; 0</td><td>\(0\)</td><td>\(0/0\)</td><td>nicht anwendbar</td><td>\(0\)</td></tr>
+<tr><td>(v) beides leer</td><td>\(0/0\)</td><td>\(0/0\)</td><td>nicht anwendbar</td><td>\(0/0\), nur per Konvention</td></tr></table>
+<div class="thm"><b>Satz 5 (Zählform).</b> Für \(\mathrm{TP}&gt;0\) gilt \(\frac{2PR}{P+R}=\frac{2\mathrm{TP}}{2\mathrm{TP}+\mathrm{FP}+\mathrm{FN}}\). Für \(\mathrm{TP}=0\) ist \(\frac{2PR}{P+R}\) in keinem Fall definiert, die Zählform in allen Fällen außer (v), dort mit Wert 0.</div>
+<div class="proof"><p><em>Beweis.</em> Für \(\mathrm{TP}&gt;0\) seien \(a=\mathrm{TP}+\mathrm{FP}\), \(c=\mathrm{TP}+\mathrm{FN}\); dann \(a+c=2\mathrm{TP}+\mathrm{FP}+\mathrm{FN}\).</p>
 \[\begin{aligned}
-2PR&amp;=2\cdot\frac{\mathrm{TP}}{a}\cdot\frac{\mathrm{TP}}{c}=\frac{2\,\mathrm{TP}^2}{ac} &amp;&amp;\text{Definitionen einsetzen}\\
-P+R&amp;=\frac{\mathrm{TP}\,c+\mathrm{TP}\,a}{ac}=\frac{\mathrm{TP}\,(2\mathrm{TP}+\mathrm{FP}+\mathrm{FN})}{ac} &amp;&amp;\text{Hauptnenner, }a+c\\
-\frac{2PR}{P+R}&amp;=\frac{2\,\mathrm{TP}^2}{ac}\cdot\frac{ac}{\mathrm{TP}\,(2\mathrm{TP}+\mathrm{FP}+\mathrm{FN})}=\frac{2\,\mathrm{TP}}{2\mathrm{TP}+\mathrm{FP}+\mathrm{FN}} &amp;&amp;\text{kürzen (}\mathrm{TP}&gt;0)
+2PR&amp;=\frac{2\,\mathrm{TP}^2}{ac},\qquad P+R=\frac{\mathrm{TP}\,(a+c)}{ac} &amp;&amp;\text{Hauptnenner}\\
+\frac{2PR}{P+R}&amp;=\frac{2\,\mathrm{TP}^2}{ac}\cdot\frac{ac}{\mathrm{TP}\,(a+c)}=\frac{2\,\mathrm{TP}}{a+c} &amp;&amp;\text{kürzen (}\mathrm{TP}&gt;0)
 \end{aligned}\]
-<p>Für \(\mathrm{TP}=0\): In (ii) ist \(P=R=0\), also \(2PR/(P+R)=0/0\); in (iii)–(v) ist \(P\) oder \(R\) selbst undefiniert. Die Zählform hat den Nenner \(\mathrm{FP}+\mathrm{FN}\), der nur in (v) verschwindet. \(\square\)</p></div>
-<p><b>Konvention in der Praxis.</b> scikit-learn (1.9.1) setzt bei \(0/0\) über den Parameter <code>zero_division</code> den Wert 0 (Standard, mit Warnung), 1 oder <code>np.nan</code> (dann wird die Klasse aus Mittelwerten ausgelassen). Für ein ganzes Testkorpus tritt (v) praktisch nie ein, für einen einzelnen Satz oder eine seltene Klasse oft – und dann bestimmt die Konvention den Macro-Mittelwert. <span class="prov" data-kind="VERTIEFUNG">scikit-learn-Dokumentation, precision_recall_fscore_support</span></p>
-<div class="thm"><b>Satz 4 (Lage von \(F_1\)).</b> Für \(P,R\in(0,1]\): \(\min(P,R)\le F_1\le\max(P,R)\), \(F_1\le\tfrac{P+R}{2}\) und \(F_1\le 2\min(P,R)\).</div>
-<div class="proof"><p><em>Beweis.</em> Ohne Einschränkung \(P\le R\) (sonst Rollen tauschen; \(F_1\) ist symmetrisch). Jede Zeile ist eine Äquivalenzumformung nach Multiplikation mit \(P+R&gt;0\):</p>
+<p>Für \(\mathrm{TP}=0\): in (ii) \(P=R=0\), also \(0/0\); in (iii)–(v) ist \(P\) oder \(R\) undefiniert. Die Zählform hat den Nenner \(\mathrm{FP}+\mathrm{FN}\), der nur in (v) verschwindet. \(\square\)</p></div>
+<p><b>Konvention.</b> scikit-learn 1.9.1 setzt bei \(0/0\) über <code>zero_division</code> 0 (Standard, mit Warnung), 1 oder <code>np.nan</code> (die Klasse fällt aus Mittelwerten heraus). Nennen Sie die Konvention, wenn Fall (v) auftreten kann. <span class="prov" data-kind="VERTIEFUNG">scikit-learn-Dokumentation</span></p>
+<div class="thm"><b>Satz 6 (Lage von \(F_1\)).</b> Für \(P,R\in(0,1]\): \(\min(P,R)\le F_1\le\max(P,R)\), \(F_1\le\tfrac{P+R}{2}\), \(F_1\le 2\min(P,R)\).</div>
+<div class="proof"><p><em>Beweis.</em> O. B. d. A. \(P\le R\) (\(F_1\) ist symmetrisch); multipliziert wird mit \(P+R&gt;0\):</p>
 \[\begin{aligned}
-F_1\ge P &amp;\iff 2PR\ge P^2+PR \iff PR\ge P^2 \iff R\ge P &amp;&amp;\text{wahr (}P&gt;0)\\
+F_1\ge P &amp;\iff 2PR\ge P^2+PR \iff R\ge P &amp;&amp;\text{wahr (}P&gt;0)\\
 F_1\le R &amp;\iff 2PR\le PR+R^2 \iff P\le R &amp;&amp;\text{wahr (}R&gt;0)\\
-\tfrac{P+R}{2}-F_1&amp;=\tfrac{(P+R)^2-4PR}{2(P+R)}=\tfrac{(P-R)^2}{2(P+R)}\ge0 &amp;&amp;\text{binomische Formel}\\
-F_1\le 2P &amp;\iff 2PR\le 2P^2+2PR \iff 0\le 2P^2 &amp;&amp;\text{wahr}\qquad\square
+\tfrac{P+R}{2}-F_1&amp;=\tfrac{(P-R)^2}{2(P+R)}\ge0 &amp;&amp;\text{binomische Formel}\\
+F_1\le 2P &amp;\iff 2PR\le 2P^2+2PR &amp;&amp;\text{wahr}\qquad\square
 \end{aligned}\]</div>
 <div class="task-ref" data-task="B3"></div>
 </section>
 
-<section data-id="einheit" data-title="Was wird gezählt?">
-<h3>9. Dieselbe Vorhersage, zwei Urteile</h3>
-<p>Bisher war offen, was eine „Einheit“ in \(S\) und \(G\) ist. Die Vorlesung (PDF-S. 21–22) vergleicht zwei Antworten:</p>
-<ul><li><b>Phrasen-Ebene:</b> Einheit = Spanne (Anfang, Ende, Typ). Ein Treffer zählt nur bei <em>exakt</em> gleichen Grenzen und gleichem Typ. Das ist die Konvention der CoNLL-2003-Auswertung. <span class="prov" data-kind="FORSCHUNG">Tjong Kim Sang &amp; De Meulder 2003</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §9.5.4, S. 241: „the entity rather than the word is the unit of response“</span></li>
-<li><b>Token-Ebene:</b> Einheit = Wort mit Entitätstyp (B-/I- ignoriert). Wörter, die in Gold <em>und</em> System O sind, zählen nicht.</li></ul>
-<p>Folienbeispiel: <code>First Bank of Chicago announced earnings of $200,000,000</code>, Gold: <code>[First Bank of Chicago]ORG</code>, <code>[$200,000,000]MONEY</code>. Ein System findet nur <code>[Bank of Chicago]ORG</code> und <code>[$200,000,000]MONEY</code>.</p>
+<section data-id="einheit" data-title="11 · Was wird gezählt?">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<ul><li><b>Phrasen-Ebene:</b> Einheit = Spanne (Anfang, Ende, Typ); ein Treffer nur bei exakt gleichen Grenzen und gleichem Typ. Konvention der CoNLL-2003-Auswertung. <span class="prov" data-kind="LEHRBUCH">SLP3 §9.5.4, S. 241</span></li>
+<li><b>Token-Ebene:</b> Einheit = Wort mit Entitätstyp (B-/I- ignoriert); Wörter, die in Gold und System O sind, zählen nicht.</li></ul>
+<p>Folienbeispiel (PDF-S. 21–22): Gold <code>[First Bank of Chicago]ORG</code>, <code>[$200,000,000]MONEY</code>; ein System findet <code>[Bank of Chicago]ORG</code> und den Betrag.</p>
 \[\begin{aligned}
-\text{Phrasen:}\quad&amp;\mathrm{TP}=1\ (\$200{,}000{,}000),\ \mathrm{FP}=1\ ([\text{Bank of Chicago}]),\ \mathrm{FN}=1\ ([\text{First Bank of Chicago}]) &amp;&amp;F_1=\tfrac{2}{2+1+1}=\tfrac12\\
-\text{Token:}\quad&amp;\mathrm{TP}=4\ (\text{Bank, of, Chicago, \$200,000,000}),\ \mathrm{FP}=0,\ \mathrm{FN}=1\ (\text{First}) &amp;&amp;F_1=\tfrac{8}{8+0+1}=\tfrac89
+\text{Phrasen:}\quad&amp;\mathrm{TP}=1,\ \mathrm{FP}=1,\ \mathrm{FN}=1 &amp;&amp;F_1=\tfrac{2}{2+1+1}=\tfrac12\\
+\text{Token:}\quad&amp;\mathrm{TP}=4,\ \mathrm{FP}=0,\ \mathrm{FN}=1 &amp;&amp;F_1=\tfrac{8}{8+0+1}=\tfrac89
 \end{aligned}\]
-<p>Ein Wort falsch abgegrenzt – auf Phrasen-Ebene ein Fehler, der <b>doppelt</b> zählt (FP für die falsche, FN für die verpasste Spanne). Auf Token-Ebene kostet er ein FN. Die Folie zieht den Schluss: Phrasen-Zählung bestraft Teilüberlappung, Token-Zählung belohnt sie, gewichtet aber lange Entitäten stärker. <span class="prov" data-kind="KURS">PDF-S. 21–22; Zahlen dort: Phrasen \(P=R=\tfrac12\), Token \(P=1,R=\tfrac45\)</span></p>
+<p>Ein falsch gesetzter Spannenanfang kostet auf Phrasen-Ebene zwei Zählungen (FP und FN), auf Token-Ebene eine. Die Folie: Phrasen-Zählung bestraft Teilüberlappung, Token-Zählung belohnt sie, gewichtet aber lange Entitäten stärker.</p>
 <div class="scene" data-scene="counter"></div>
-<p><b>Kritik.</b> Weil ein knapp verfehlter Versuch zwei Fehler kostet, das Weglassen aber nur einen, kann ein System \(F_1\) verbessern, indem es unsichere Entitäten gar nicht ausgibt. Manning (2006) hat das als Argument gegen reines \(F_1\)-Optimieren formuliert; die von der Folie erwähnte MUC-Bewertung vergibt dagegen Teilpunkte für Typ und Grenze. <span class="prov" data-kind="VERTIEFUNG">Manning 2006, Blogbeitrag (nicht begutachtet)</span></p>
+<p><span class="layer" data-layer="research">Kritik</span> Weil ein knapp verfehlter Versuch zwei Fehler kostet, das Weglassen nur einen, kann ein System sein \(F_1\) verbessern, indem es unsichere Entitäten gar nicht ausgibt (Manning 2006, Blogbeitrag). Die MUC-Bewertung, die die Folie erwähnt, vergibt deshalb Teilpunkte für Typ und Grenzen.</p>
 <div class="task-ref" data-task="B4"></div>
 <div class="task-ref" data-task="B5"></div>
 </section>
 
-<section data-id="mittelung" data-title="Micro und Macro">
-<h3>10. Mehrere Typen, eine Zahl?</h3>
-<p>Mit Zählungen \(\mathrm{TP}_k,\mathrm{FP}_k,\mathrm{FN}_k\) je Typ \(k=1,\dots,K\) gibt es zwei Wege:</p>
-\[ F_1^{\text{micro}}=\frac{2\sum_k\mathrm{TP}_k}{2\sum_k\mathrm{TP}_k+\sum_k\mathrm{FP}_k+\sum_k\mathrm{FN}_k}\quad\text{(erst summieren)},\qquad F_1^{\text{macro}}=\frac1K\sum_{k=1}^K F_{1,k}\quad\text{(erst je Typ rechnen)}. \]
-<p><b>Micro</b> zählt jede Entität gleich, häufige Typen dominieren. <b>Macro</b> zählt jeden Typ gleich, ein seltener schlechter Typ zieht stark nach unten. <span class="prov" data-kind="LEHRBUCH">SLP3 §4.9.1, S. 114–115 (Abb. 4.9)</span></p>
+<section data-id="mittelung" data-title="12 · Micro und Macro">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>Mit Zählungen je Typ \(k=1,\dots,K\):</p>
+\[ F_1^{\text{micro}}=\frac{2\sum_k\mathrm{TP}_k}{\sum_k\big(2\mathrm{TP}_k+\mathrm{FP}_k+\mathrm{FN}_k\big)},\qquad F_1^{\text{macro}}=\frac1K\sum_{k=1}^K F_{1,k}. \]
+<p><span class="layer" data-layer="deep">Vertiefung</span> <b>Wie stark zählt ein Typ in Micro-\(F_1\)?</b> Setze \(D_k=2\mathrm{TP}_k+\mathrm{FP}_k+\mathrm{FN}_k\), den Nenner von \(F_{1,k}\). Für \(\sum_kD_k&gt;0\) und über alle Typen mit \(D_k&gt;0\):</p>
+\[ F_1^{\text{micro}}=\frac{\sum_k 2\mathrm{TP}_k}{\sum_l D_l}=\sum_k\frac{D_k}{\sum_lD_l}\cdot\frac{2\mathrm{TP}_k}{D_k}=\sum_k w_k\,F_{1,k},\qquad w_k=\frac{D_k}{\sum_l D_l}. \]
+<p>Micro-\(F_1\) ist ein gewichtetes Mittel der Typ-\(F_1\)-Werte – gewichtet mit \(D_k\), also mit Treffern <em>und</em> Fehlern des Typs, <b>nicht</b> mit seinem Gold-Anteil (Support) \(\mathrm{TP}_k+\mathrm{FN}_k\). Ein Typ mit vielen Fehlalarmen bekommt mehr Gewicht, als sein Gold-Anteil hergibt. Davon zu unterscheiden ist das <b>support-gewichtete Macro-\(F_1\)</b> (scikit-learn <code>average='weighted'</code>) mit Gewichten \(\mathrm{TP}_k+\mathrm{FN}_k\). Typen mit \(D_k=0\) (Gold leer, nichts vorhergesagt) tragen zu Micro nichts bei; bei Macro entscheidet die Konvention für \(0/0\).</p>
 <p><b>Durchgerechnet.</b> PER: TP 45, FP 5, FN 5 · LOC: 30, 10, 10 · ORG: 20, 15, 15 · MISC: 1, 4, 9.</p>
 \[\begin{aligned}
-F_{1,\mathrm{PER}}&amp;=\tfrac{90}{100}=0{,}9,\quad F_{1,\mathrm{LOC}}=\tfrac{60}{80}=0{,}75,\quad F_{1,\mathrm{ORG}}=\tfrac{40}{70}\approx0{,}5714,\quad F_{1,\mathrm{MISC}}=\tfrac{2}{15}\approx0{,}1333\\
-F_1^{\text{macro}}&amp;=\tfrac14(0{,}9+0{,}75+0{,}5714+0{,}1333)=\tfrac{989}{1680}\approx0{,}5887\\
-\textstyle\sum\mathrm{TP}&amp;=96,\ \sum\mathrm{FP}=34,\ \sum\mathrm{FN}=39\ \Rightarrow\ F_1^{\text{micro}}=\tfrac{192}{192+34+39}=\tfrac{192}{265}\approx0{,}7245
+D&amp;=(100,\ 80,\ 70,\ 15),\quad \textstyle\sum D=265 &amp;&amp;D_k=2\mathrm{TP}_k+\mathrm{FP}_k+\mathrm{FN}_k\\
+F_{1,k}&amp;=\big(0{,}9;\ 0{,}75;\ 0{,}5714;\ 0{,}1333\big) &amp;&amp;2\mathrm{TP}_k/D_k\\
+F_1^{\text{micro}}&amp;=\tfrac{90+60+40+2}{265}=\tfrac{192}{265}\approx0{,}7245 &amp;&amp;\text{Gewichte }D_k/265\\
+F_1^{\text{macro}}&amp;=\tfrac14(0{,}9+0{,}75+0{,}5714+0{,}1333)=\tfrac{989}{1680}\approx0{,}5887 &amp;&amp;\text{Gewicht je Typ }\tfrac14
 \end{aligned}\]
-<p>MISC stellt nur 10 von 135 Gold-Entitäten, bestimmt aber den größten Teil der Lücke: Ohne MISC wären Micro 0,76 und Macro 0,7405.</p>
+<p>MISC hat in Micro das Gewicht \(15/265\approx0{,}0566\), in Macro \(0{,}25\). Ohne MISC wären Micro 0,76 und Macro 0,7405.</p>
 <div class="scene" data-scene="micromacro"></div>
-<div class="thm"><b>Satz 5 (wann Micro-\(F_1\) = Accuracy).</b> Hat jedes Token genau ein Gold- und ein System-Label und werden <em>alle</em> Labels einschließlich O als Klassen gepoolt, dann ist \(F_1^{\text{micro}}\) gleich dem Anteil richtig markierter Token.</div>
+<div class="thm"><b>Satz 7 (wann Micro-\(F_1\) = Accuracy).</b> Hat jedes Token genau ein Gold- und ein System-Label und werden <em>alle</em> Labels einschließlich O als Klassen gepoolt, so ist \(F_1^{\text{micro}}\) der Anteil richtig markierter Token.</div>
 <div class="proof">\[\begin{aligned}
-&amp;\text{Token mit Gold }a\ne\text{System }b\ \Rightarrow\ \text{genau ein FP (für }b)\text{ und ein FN (für }a) &amp;&amp;\text{ein Label je Token}\\
-&amp;\textstyle\sum_k\mathrm{FP}_k=\sum_k\mathrm{FN}_k=E,\quad \sum_k\mathrm{TP}_k=N-E &amp;&amp;E\text{ Fehler unter }N\text{ Token}\\
+&amp;\text{Fehler mit Gold }a\ne\text{System }b\ \Rightarrow\ \text{ein FP (für }b)\text{ und ein FN (für }a) &amp;&amp;\text{ein Label je Token}\\
+&amp;\textstyle\sum_k\mathrm{FP}_k=\sum_k\mathrm{FN}_k=E,\quad \sum_k\mathrm{TP}_k=N-E &amp;&amp;E\text{ Fehler, }N\text{ Token}\\
 &amp;F_1^{\text{micro}}=\frac{2(N-E)}{2(N-E)+2E}=\frac{N-E}{N} &amp;&amp;\square
 \end{aligned}\]</div>
-<p>Deshalb lässt die NER-Auswertung O weg: Mit O wäre Micro-\(F_1\) die Token-Accuracy, und die ist bei Texten, die zu 80–90 % aus O bestehen, schon für ein System hoch, das nur O ausgibt.</p>
-<div class="remark"><p><b>Achtung, zwei „Macro-F1“.</b> Manche Arbeiten berechnen stattdessen \(F_1\) aus dem Mittel der Typ-Precisions und dem Mittel der Typ-Recalls. Im Beispiel: \(\approx0{,}5926\) statt \(0{,}5887\). Nennen Sie die Definition. <span class="prov" data-kind="FORSCHUNG">Opitz &amp; Burst 2019 (Preprint)</span></p></div>
+<p>Deshalb lässt die NER-Auswertung O weg. <b>Zwei „Macro-F1“:</b> Manche Arbeiten bilden \(F_1\) aus gemitteltem \(P\) und gemitteltem \(R\); im Beispiel \(\approx0{,}5926\) statt \(0{,}5887\). Nennen Sie die Definition. <span class="prov" data-kind="FORSCHUNG">Opitz &amp; Burst 2019 (Preprint)</span></p>
 <div class="task-ref" data-task="B6"></div>
 </section>
 
+<section data-id="fallstudie" data-title="13 · Fallstudie: ein NER-System von Ende zu Ende">
+<p><span class="layer" data-layer="research">Fallstudie</span> Alle Daten sind synthetisch, für diese Einheit erstellt. Die Emissionswerte stehen für die Ausgabe eines trainierten BiRNN; sie sind vorgegeben, nicht gelernt. Der Ablauf ist der eines echten Systems:</p>
+<ol class="big">
+<li><b>Daten und Tokenisierung.</b> Drei Sätze, wortweise tokenisiert; Gold nach den Richtlinien aus Abschnitt 1 in BIO annotiert.</li>
+<li><b>Modell.</b> Einbettung → BiRNN → Emissionswerte \(s_t(\ell)\) je Wort und Label (Abschnitt 5).</li>
+<li><b>Dekodierung, zweimal:</b> gierig (\(\arg\max\) je Wort) und Viterbi mit BIO-Übergangsregeln (Abschnitt 9).</li>
+<li><b>Auswertung</b> auf Phrasen- und Token-Ebene, Micro und Macro (Abschnitte 10–12).</li>
+<li><b>Fehleranalyse</b> nach Fehlerart: Typfehler (gleiche Grenzen, falscher Typ), Grenzfehler (gleicher Typ, überlappend), beides, verpasst, erfunden.</li></ol>
+<div class="casestudy" data-case="ner"></div>
+<p><b>Was die Fallstudie zeigt.</b> Viterbi repariert genau den Fehler, den eine BIO-Regel ausschließt: Gierig steht bei „New York“ <code>B-LOC I-ORG</code>, was <code>conlleval</code> als zwei falsche Spannen [New]LOC und [York]ORG liest; Viterbi verbietet <code>B-LOC → I-ORG</code> und wählt <code>I-LOC</code>. Phrasen-\(F_1\) steigt von \(8/17\approx0{,}4706\) auf \(5/8=0{,}625\). Nicht repariert werden der gültige Grenzfehler bei „Berlin .“, die verkürzte Spanne „Barack“ und der Typfehler bei „Siemens“. Dafür braucht es bessere Emissionen: mehr Kontext, Weltwissen, Daten aus der Zieldomäne.</p>
+<p><b>Feinheit der Auswertung.</b> Weil <code>conlleval</code> ein ungültiges <code>I-X</code> als neue Spanne liest, ändert die Reparatur das Ergebnis nur dann, wenn sie andere Spannen ergibt. Ein <code>O I-ORG</code>, das ohnehin als [ORG] gelesen wird, hätte dieselbe Bewertung wie <code>O B-ORG</code>.</p>
+<p><b>Was moderne Tagger ändern.</b> Heute ersetzt meist ein vortrainierter bidirektionaler Transformer-Encoder das BiRNN (Vorlesung Kap. 10). Zwei praktische Unterschiede: Self-Attention sieht den ganzen Satz in einer Schicht (Abschnitt 8), und die Eingabe besteht aus <em>Subwort</em>-Token. Das Training überträgt das Wort-Label auf alle Subwörter; dekodiert wird etwa mit dem Label des ersten Subworts. <span class="prov" data-kind="LEHRBUCH">SLP3 §9.5.3, S. 239–241</span> Die Evaluationslogik dieses Kapitels gilt unverändert.</p>
+<div class="task-ref" data-task="F1"></div>
+</section>
+
 <section data-id="summary" data-title="Zusammenfassung">
-<p>Welche Information ein Tagger an Position \(t\) nutzen kann, legt seine Architektur fest. Ein Vorwärts-RNN rechnet \(h^{\rightarrow}_t\) nur aus \(x_1,\dots,x_t\) (Satz 1) – das Experiment zeigt es an „Washington“ mit identischen Zahlen. Ein zweites RNN von rechts und die Verkettung geben jeder Position den ganzen Satz (Satz 2); dafür muss der Satz vollständig vorliegen, und die Labels bleiben ohne CRF unabhängig gewählt. Ob ein Tagger gut ist, misst \(F_1\), das harmonische Mittel von \(P\) und \(R\): Treffer pro durchschnittlichem Aufwand, in Zählform \(2\mathrm{TP}/(2\mathrm{TP}+\mathrm{FP}+\mathrm{FN})\), definiert, sobald es überhaupt eine Gold- oder System-Entität gibt (Satz 3). Was als Treffer zählt – exakte Spanne oder einzelnes Wort – kann die Rangfolge zweier Systeme umdrehen, und Micro und Macro beantworten verschiedene Fragen: „wie viele Entitäten?“ gegen „wie gut je Typ?“.</p>
+<p>NER sucht Spannen; BIO macht daraus eindeutig ein Label pro Wort (Satz A). Welche Information ein Tagger an Position \(t\) nutzen kann, legt seine Sequenzschicht fest: Fenster sehen lokal, ein Vorwärts-RNN genau \(x_1,\dots,x_t\) (Satz 1), ein BiRNN den ganzen Satz um den Preis der Latenz (Satz 2), Self-Attention den ganzen Satz, aber ohne Reihenfolge (Satz 4) – daher Positionskodierungen, deren Sinus- und RoPE-Varianten relative Abstände linear bzw. exakt sichtbar machen. Die Skalierung mit \(\sqrt{d_k}\) hält die Energien bei Varianz 1 (Satz 3); Residualverbindungen geben dem Gradienten einen direkten Pfad. Ob Labels zueinander passen, sichert erst ein strukturierter Decoder, und auch der nur für ungültige Folgen. Gemessen wird mit \(F_1\), dem harmonischen Mittel von \(P\) und \(R\), in Zählform definiert, sobald es überhaupt eine Gold- oder System-Entität gibt (Satz 5); die Zähleinheit kann Rangfolgen umdrehen, und Micro-\(F_1\) ist ein mit \(2\mathrm{TP}_k+\mathrm{FP}_k+\mathrm{FN}_k\) gewichtetes Mittel – nicht mit dem Gold-Anteil.</p>
 </section>
