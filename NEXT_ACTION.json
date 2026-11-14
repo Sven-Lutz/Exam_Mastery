@@ -1,26 +1,26 @@
 {
   "updated": "2026-11-14",
   "repo": "Sven-Lutz/Exam_Mastery",
-  "branch": "import/engine-snapshot",
-  "pr": 2,
-  "local_engine_checkout": "~/Documents/02_Projekte/01_GitHub_Projekte/Exam_Mastery_Studio/engine/Exam_Mastery_Engine_v0_5_1_p0_dev (feat/v0.18-learning-engine @ 913db7b, full history bundled in ~/Projects/Exam_Mastery_Backups)",
-  "release_status": {"nlp_neural_sequence_labeling_and_rc_v0.21.0-rc1_products": "HUMAN_REJECTED"},
-  "done": [
-    "A: inventory (clean tree, no active runs, no launchd job)",
-    "B: curated snapshot imported, SHA-256 verified, fresh venv 715 passed / 6 skipped",
-    "D (partial): 67,448 derived images/caches in unreferenced runs deleted, ~5.3 GiB freed (log: ~/Projects/Exam_Mastery_Backups/cleanup-2026-11-14-deleted.tsv)"
-  ],
-  "next_action": "C: reference unit NLP 'Neural Sequence Labeling' (BiRNN, token/span F1 incl. zero-denominator, micro/macro). First locate the reported critical defect in the archived rejected run course-0e03a5f311fb/ch-20261113T185317Z-22ffdf83; fix root causes in author prompt/schema/visual/math path; regenerate only this chapter via the engine.",
+  "main": "PR #2 squash-merged (engine snapshot, CI green on ubuntu-latest)",
+  "branch": "feat/nlp-reference-unit",
+  "release_status": {
+    "rc_v0.21.0-rc1_products_incl_nlp_baseline": "HUMAN_REJECTED",
+    "nlp_reference_unit_2026-11-14": "NOT_REVIEWED (awaits human rating)"
+  },
+  "product": {
+    "source": "units/nlp_sequence_labeling/",
+    "build": "python -m exam_mastery.reference_unit build units/nlp_sequence_labeling --out ~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling",
+    "open": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling/index.html",
+    "report": "docs/reference_unit/NLP_REFERENCE_UNIT.md"
+  },
+  "verified": ["unit verify (33 recomputed values)", "tests/test_reference_unit.py 13 passed", "screenshots desktop+mobile, PDF pages inspected"],
+  "not_verified": ["human subject review", "learning effect", "Anki import into a real Anki profile"],
+  "next_action": "After human rating of the reference unit: (1) fold the unit format into the engine author contract (chapter_author emits unit.json + text.html); (2) per-KC textbook retrieval; (3) second and third contrasting units (Analysis 1 convergence; Entrepreneurship funding) to prove the format is not NLP-specific.",
   "open_decisions_for_owner": [
-    "Merge PR #2 (snapshot without history) or request history publication after author rewrite",
-    "Authorised budget for the next production run (agent provider: ledger 32/50 used)",
-    "Authorise the Sunday launchd job",
-    "Concrete location of the 'critical error' in the NLP rating, if known"
+    "Human rating of the reference unit (the only regular sign-off)",
+    "Pilot budget for the next production run: plan = 3-4 calls/chapter, ~70-90k in + 20-25k out tokens (docs/reference_unit/NLP_REFERENCE_UNIT.md §4)",
+    "Authorise the Sunday launchd job"
   ],
-  "cleanup_candidates_not_touched": [
-    "Exam_Mastery_Studio/runs_v0_5_1_p0_dev (876M, old engine runs)",
-    "Exam_Mastery_Studio/output (223M), review_exports (85M), release_candidates (19M)",
-    "Referenced runs kept intact as baselines"
-  ],
-  "budget": {"paid_calls_authorised": 0}
+  "cleanup_candidates_not_touched": ["Exam_Mastery_Studio/runs_v0_5_1_p0_dev (876M)", "Exam_Mastery_Studio/output (223M)", "review_exports (85M)"],
+  "budget": {"paid_calls_authorised": 0, "engine_provider_calls_this_session": 0}
 }

@@ -1,0 +1,122 @@
+<section data-id="orientierung" data-title="Orientierung">
+<p class="lead">Ein Named-Entity-Recognizer entscheidet für jedes Wort, ob es zu einem Eigennamen gehört und zu welchem Typ. Ob „Washington“ eine Person oder ein Ort ist, entscheidet oft erst ein Wort, das <em>danach</em> kommt. Dieses Kapitel beantwortet zwei Fragen, die in der Prüfung und in der Praxis zusammengehören: <strong>Wie baut man ein Netz, das an jeder Position den ganzen Satz sieht?</strong> und <strong>Wie misst man ehrlich, wie gut es Entitäten findet?</strong></p>
+<div class="goals"><h4>Nach diesem Kapitel können Sie</h4><ol>
+<li>für unidirektionale, rückwärts laufende und bidirektionale RNNs angeben und beweisen, von welchen Eingaben der Zustand an Position \(t\) abhängt;</li>
+<li>einen BiRNN-Tagger mit Dimensionen und Parameterzahl vollständig spezifizieren;</li>
+<li>Precision, Recall und \(F_1\) auf Phrasen- und Token-Ebene aus BIO-Folgen berechnen, einschließlich der Fälle mit Nenner 0;</li>
+<li>Micro- und Macro-Mittelung berechnen, ihren Unterschied begründen und die passende Kennzahl für eine Fragestellung wählen.</li></ol></div>
+<p><strong>Voraussetzungen.</strong> Softmax und Kreuzentropie; das Elman-RNN \(h_t=f(h_{t-1},x_t;\theta)\); die Spannenkodierungen IO, BIO und BILOU aus Abschnitt 9.2.1 der Vorlesung. <span class="prov" data-kind="KURS">Vorlesung 09, Folien 15–22, 29, 76–80, 82–85</span></p>
+</section>
+
+<section data-id="aufgabe" data-title="Sequenzmarkierung als Abbildung">
+<h3>Die Aufgabe formal</h3>
+<p><strong>Definition 1 (Sequenzmarkierung).</strong> Gegeben seien ein Vokabular \(\mathcal V\), eine endliche Labelmenge \(\mathcal L\) und eine Eingabefolge \(x_{1:T}=(x_1,\dots,x_T)\in\mathcal V^T\) beliebiger Länge \(T\ge 1\). Ein Sequenzmarkierer ist eine Abbildung, die jeder solchen Folge eine Labelfolge \(y_{1:T}\in\mathcal L^T\) <em>derselben Länge</em> zuordnet. Für NER mit BIO-Kodierung und \(K\) Entitätstypen ist \(\mathcal L=\{\mathrm O\}\cup\{\text{B-}k,\text{I-}k : k=1,\dots,K\}\), also \(|\mathcal L|=2K+1\). <span class="prov" data-kind="KURS">Folien 13, 17, 24</span></p>
+<p>Ein neuronaler Tagger berechnet dafür an jeder Position eine Wahrscheinlichkeitsverteilung über \(\mathcal L\):</p>
+\[ p(y_t=\ell\mid x_{1:T}) = \operatorname{softmax}\big(W_o\,z_t + b_o\big)_\ell ,\qquad \ell\in\mathcal L, \]
+<p>wobei \(z_t\in\mathbb R^{d_z}\) die Kontextrepräsentation der Position \(t\) ist, \(W_o\in\mathbb R^{|\mathcal L|\times d_z}\) und \(b_o\in\mathbb R^{|\mathcal L|}\). Trainiert wird mit der summierten Kreuzentropie \(\mathcal J=-\sum_{t=1}^T\log p(y_t^\ast\mid x_{1:T})\) über die Gold-Labels \(y_t^\ast\). <span class="prov" data-kind="KURS">Folie 26</span></p>
+<p>Die ganze Modellierungsfrage steckt in \(z_t\): <em>Welche Teile der Eingabe darf \(z_t\) überhaupt sehen?</em> Ein Fenster-Netz (CNN/TDNN) sieht \(n\) Wörter links und \(m\) rechts; ein RNN sieht, wie wir jetzt beweisen, genau die linke Vorgeschichte.</p>
+</section>
+
+<section data-id="rnn" data-title="Was ein RNN sehen kann">
+<h3>Abhängigkeitsbereich eines vorwärts laufenden RNN</h3>
+<p><strong>Definition 2 (Elman-RNN, vorwärts).</strong> Mit \(e_t\in\mathbb R^{d}\) als Einbettung von \(x_t\), \(h_0^{\rightarrow}=0\in\mathbb R^{d_h}\) und Parametern \(W\in\mathbb R^{d_h\times d_h}\), \(U\in\mathbb R^{d_h\times d}\), \(b\in\mathbb R^{d_h}\) sei
+\[ h_t^{\rightarrow}=\tanh\!\big(W h_{t-1}^{\rightarrow}+U e_t+b\big),\qquad t=1,\dots,T. \]
+Dieselben Parameter werden an jeder Position verwendet. <span class="prov" data-kind="KURS">Folien 29, 78</span> <span class="prov" data-kind="LEHRBUCH">Jurafsky &amp; Martin, SLP3, §14.4.2</span></p>
+<p><strong>Satz 1 (linker Abhängigkeitsbereich).</strong> Für jedes \(t\in\{1,\dots,T\}\) gibt es eine Funktion \(F_t\) mit \(h_t^{\rightarrow}=F_t(x_1,\dots,x_t)\). Insbesondere ist \(h_t^{\rightarrow}\) bei festen \(x_1,\dots,x_t\) unabhängig von \(x_{t+1},\dots,x_T\).</p>
+<div class="proof"><p><em>Beweis</em> durch Induktion über \(t\). <em>Anfang</em> \(t=1\): \(h_1^{\rightarrow}=\tanh(W\cdot 0+Ue_1+b)\) hängt nur von \(e_1\), also nur von \(x_1\) ab. <em>Schritt</em> \(t-1\to t\): Nach Induktionsannahme ist \(h_{t-1}^{\rightarrow}=F_{t-1}(x_1,\dots,x_{t-1})\). Einsetzen in Definition 2 ergibt \(h_t^{\rightarrow}=\tanh\big(W F_{t-1}(x_1,\dots,x_{t-1})+Ue_t+b\big)=:F_t(x_1,\dots,x_t)\). In dieser Rekursion kommt kein \(x_s\) mit \(s&gt;t\) vor. \(\square\)</p></div>
+<p><strong>Folgerung.</strong> Ein Tagger mit \(z_t=h_t^{\rightarrow}\) muss das Label von „Washington“ in „Washington <u>signed</u> the bill“ und „Washington <u>state</u> is rainy“ an Position 1 identisch vorhersagen, denn \(h_1^{\rightarrow}\) ist in beiden Sätzen derselbe Vektor. Kein Training kann das beheben; es ist eine Eigenschaft der Architektur, nicht der Daten. <span class="prov" data-kind="ERLAEUTERUNG">eigene Herleitung</span></p>
+<div class="viz" data-viz="flow"></div>
+<div class="misconception"><h4>Fehlvorstellung: „Der RNN-Zustand fasst den ganzen Satz zusammen.“</h4><p>Das gilt nur für den <em>letzten</em> Zustand \(h_T^{\rightarrow}\). Für \(t&lt;T\) fehlt nach Satz 1 der rechte Kontext vollständig. Die Folie „Global context“ (Folie 29) bezieht sich auf den Vergleich mit dem festen Fenster: Das RNN sieht die <em>gesamte Vorgeschichte</em>, nicht ein Fenster der Breite \(n+m+1\).</p></div>
+</section>
+
+<section data-id="birnn" data-title="Bidirektionale RNNs">
+<h3>Rückwärts-RNN und BiRNN</h3>
+<p><strong>Definition 3.</strong> Ein Rückwärts-RNN läuft mit eigenen Parametern \(W',U',b'\) von rechts nach links: \(h_{T+1}^{\leftarrow}=0\) und
+\[ h_t^{\leftarrow}=\tanh\!\big(W' h_{t+1}^{\leftarrow}+U' e_t+b'\big),\qquad t=T,\dots,1. \]
+Der <strong>bidirektionale</strong> Zustand ist die Verkettung \(h_t^{\mathrm{bi}}=\big[h_t^{\rightarrow};\,h_t^{\leftarrow}\big]\in\mathbb R^{2d_h}\). <span class="prov" data-kind="KURS">Folien 79–80</span> <span class="prov" data-kind="FORSCHUNG">Schuster &amp; Paliwal 1997</span></p>
+<p><strong>Satz 2.</strong> \(h_t^{\leftarrow}\) hängt nur von \(x_t,\dots,x_T\) ab, und \(h_t^{\mathrm{bi}}\) ist eine Funktion der gesamten Eingabe \(x_{1:T}\); für \(1&lt;t&lt;T\) hängt \(h_t^{\mathrm{bi}}\) im Allgemeinen tatsächlich von jedem \(x_s\) ab.</p>
+<div class="proof"><p><em>Beweis.</em> Der erste Teil folgt aus Satz 1, angewendet auf die umgekehrte Folge \((x_T,\dots,x_1)\): Position \(t\) der Originalfolge ist Position \(T-t+1\) der umgekehrten, und die „linke Vorgeschichte“ dort ist \(x_T,\dots,x_t\). Die Verkettung vereinigt die Argumentmengen \(\{1,\dots,t\}\cup\{t,\dots,T\}=\{1,\dots,T\}\). Dass die Abhängigkeit „im Allgemeinen“ echt ist, genügt ein Beispiel: Mit skalaren Zuständen, \(W=\tfrac12\), \(U=1\), \(b=0\) und \(e_s=x_s\in\mathbb R\) ist \(\partial h_t^{\rightarrow}/\partial x_s=\big(\prod_{r=s+1}^{t} W\,(1-(h_r^{\rightarrow})^2)\big)(1-(h_s^{\rightarrow})^2)\ne 0\) für \(s\le t\), weil \(\tanh'&gt;0\) und \(W\ne0\); analog für die Rückwärtsrichtung. \(\square\)</p></div>
+<p>Satz 2 ist genau die Antwort auf die Frage der Vorlesung „How to add bidirectional information?“ (Folie 78). Er hat eine Kehrseite, die oft übersehen wird:</p>
+<div class="remark"><p><strong>Grenze 1 – Kausalität.</strong> Weil \(h_t^{\mathrm{bi}}\) von \(x_T\) abhängt, kann ein BiRNN erst ausgewertet werden, wenn die Eingabe vollständig vorliegt. Für Tagging eines fertigen Satzes ist das unproblematisch; für Streaming-Erkennung oder für ein Sprachmodell, das das nächste Wort vorhersagt, ist es ausgeschlossen – dort wäre \(x_{t+1}\) die Zielgröße selbst. <span class="prov" data-kind="LEHRBUCH">SLP3 §14.4.2: „in many applications we have access to the entire input sequence“</span></p>
+<p><strong>Grenze 2 – Ausgaben bleiben bedingt unabhängig.</strong> Das Softmax-Modell oben wählt jedes \(y_t\) einzeln aus \(h_t^{\mathrm{bi}}\). Gegeben \(x_{1:T}\) sind die Labels unabhängig; nichts verhindert die ungültige BIO-Folge <code>O I-LOC</code>. Die Vorlesung nennt das Problem „non consistent labels“ und als Abhilfe eine CRF-Schicht auf dem RNN (Folien 83, 85): Ein linear-chain-CRF bewertet die ganze Folge mit \(\mathrm{score}(y_{1:T})=\sum_t \big(s_t(y_t)+A_{y_{t-1},y_t}\big)\) aus Emissionswerten \(s_t\) des BiRNN und gelernten Übergangswerten \(A\), normiert global über alle Folgen und dekodiert mit Viterbi. <span class="prov" data-kind="FORSCHUNG">Huang, Xu &amp; Yu 2015 (Preprint); Lample et al. 2016</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §18.5 (CRF, Viterbi)</span></p>
+<p><strong>Label Bias.</strong> Ein <em>autoregressiver</em> Tagger, der in jedem Schritt eine lokal normierte Verteilung \(p(y_t\mid y_{&lt;t},x)\) ausgibt, kann späte Evidenz nicht nutzen, um eine frühe Entscheidung zu revidieren: Die Wahrscheinlichkeitsmasse eines Zustands muss vollständig an die Nachfolger weitergegeben werden. Das ist der von Lafferty et al. (2001) beschriebene Label-Bias; global normierte Modelle wie das CRF vermeiden ihn (Andor et al. 2016 zeigen dies auch für neuronale Modelle). Die Folien-Aussage „Problems: Label bias“ zum autoregressiven Modell (Folie 84) ist also zutreffend. Davon zu unterscheiden ist der <em>Exposure Bias</em>: Im Training sieht das Modell Gold-Vorgänger, im Test eigene Vorhersagen (ebenfalls Folie 84: „Use correct Label“ vs. „Use predicted Label“). <span class="prov" data-kind="FORSCHUNG">Lafferty, McCallum &amp; Pereira 2001; Andor et al. 2016</span></p></div>
+<h3>Ein BiRNN-Tagger vollständig spezifiziert</h3>
+<p>Für einen Tagger mit Einbettungsdimension \(d\), Zustandsdimension \(d_h\) je Richtung und \(|\mathcal L|\) Labels:</p>
+<table class="dims"><tr><th>Größe</th><th>Form</th><th>Parameter</th></tr>
+<tr><td>\(W,\,W'\)</td><td>\(d_h\times d_h\)</td><td>\(2d_h^2\)</td></tr>
+<tr><td>\(U,\,U'\)</td><td>\(d_h\times d\)</td><td>\(2d_hd\)</td></tr>
+<tr><td>\(b,\,b'\)</td><td>\(d_h\)</td><td>\(2d_h\)</td></tr>
+<tr><td>\(W_o\)</td><td>\(|\mathcal L|\times 2d_h\)</td><td>\(2d_h|\mathcal L|\)</td></tr>
+<tr><td>\(b_o\)</td><td>\(|\mathcal L|\)</td><td>\(|\mathcal L|\)</td></tr></table>
+<p>Die Einbettungsmatrix (\(|\mathcal V|\times d\)) ist hier nicht mitgezählt. Beispiel 1 im Arbeitsbuch rechnet das für CoNLL-2003 (vier Typen, BIO, \(|\mathcal L|=9\)) mit \(d=100\), \(d_h=128\) durch: \(2\cdot(128^2+128\cdot100+128)+9\cdot256+9=60\,937\) Parameter. <span class="prov" data-kind="KURS">Folie 11 (CoNLL03: PER, ORG, LOC, MISC)</span></p>
+<div class="task-ref" data-task="B1"></div>
+<div class="task-ref" data-task="B2"></div>
+</section>
+
+<section data-id="prf" data-title="Precision, Recall, F1">
+<h3>Definitionen</h3>
+<p>Ausgewertet wird eine Menge \(G\) von Gold-Einheiten und eine Menge \(S\) von Systemeinheiten; was eine „Einheit“ ist (Phrase oder Token), legen wir im nächsten Abschnitt fest. Mit \(\mathrm{TP}=|G\cap S|\), \(\mathrm{FP}=|S\setminus G|\), \(\mathrm{FN}=|G\setminus S|\):</p>
+\[ P=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FP}}=\frac{\#\text{korrekte}}{\#\text{vorhergesagte}},\qquad R=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}}=\frac{\#\text{korrekte}}{\#\text{Referenz}},\qquad F_1=\frac{2PR}{P+R}. \]
+<p><span class="prov" data-kind="KURS">Folien 20–21</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §4.9</span></p>
+<p>True Negatives kommen nicht vor, und das ist Absicht: Bei NER wäre ein „true negative“ eine <em>nicht</em> vorhandene und <em>nicht</em> vorhergesagte Spanne. Davon gibt es in einem Satz mit \(T\) Wörtern \(\mathcal O(T^2)\) Kandidaten; jede Kennzahl mit TN im Zähler würde von dieser willkürlichen Zahl dominiert. Die Folie nennt „ignore true negatives“ als Eigenschaft; der Grund ist, dass sie auf Spannen-Ebene nicht sinnvoll definiert sind. <span class="prov" data-kind="ERLAEUTERUNG">eigene Erläuterung zu Folie 21</span></p>
+<p><strong>Satz 3 (Zählform).</strong> Ist \(\mathrm{TP}&gt;0\), so gilt \(F_1=\dfrac{2\,\mathrm{TP}}{2\,\mathrm{TP}+\mathrm{FP}+\mathrm{FN}}\).</p>
+<div class="proof"><p><em>Beweis.</em> Mit \(a=\mathrm{TP}+\mathrm{FP}\), \(c=\mathrm{TP}+\mathrm{FN}\) (beide \(&gt;0\)) ist
+\[\begin{aligned} 2PR &amp;= \frac{2\,\mathrm{TP}^2}{ac}, \qquad P+R=\frac{\mathrm{TP}}{a}+\frac{\mathrm{TP}}{c}=\frac{\mathrm{TP}\,(c+a)}{ac}=\frac{\mathrm{TP}\,(2\mathrm{TP}+\mathrm{FP}+\mathrm{FN})}{ac},\\ \frac{2PR}{P+R} &amp;= \frac{2\,\mathrm{TP}^2}{ac}\cdot\frac{ac}{\mathrm{TP}\,(2\mathrm{TP}+\mathrm{FP}+\mathrm{FN})}=\frac{2\,\mathrm{TP}}{2\mathrm{TP}+\mathrm{FP}+\mathrm{FN}}. \qquad\square\end{aligned}\]</p></div>
+<p>Die Zählform ist nicht nur bequemer: Sie bleibt auch dort definiert, wo die Quotientenform versagt (siehe Grenzfälle).</p>
+<p><strong>Satz 4 (Lage des harmonischen Mittels).</strong> Für \(P,R\in(0,1]\) gilt \(\min(P,R)\le F_1\le\max(P,R)\), \(F_1\le \tfrac{P+R}{2}\) und \(F_1\le 2\min(P,R)\).</p>
+<div class="proof"><p><em>Beweis.</em> O.&nbsp;B.&nbsp;d.&nbsp;A. \(P\le R\). (i) \(F_1\ge P \iff 2PR\ge P(P+R)\iff R\ge P\). (ii) \(F_1\le R\iff 2P\le P+R\iff P\le R\). (iii) \(\tfrac{P+R}{2}-\tfrac{2PR}{P+R}=\tfrac{(P-R)^2}{2(P+R)}\ge 0\). (iv) \(F_1\le 2P\iff R\le P+R\), wahr wegen \(P&gt;0\). \(\square\)</p></div>
+<p><strong>Interpretation.</strong> (iv) ist der Grund, \(F_1\) statt des arithmetischen Mittels zu berichten: Ein System, das jedes Wort als Entität markiert, erreicht \(R\approx 1\), aber \(F_1\le 2P\) bleibt klein, wenn \(P\) klein ist. Das arithmetische Mittel würde dasselbe System mit mindestens \(0{,}5\) belohnen. Die Differenz in (iii) wächst quadratisch mit dem Ungleichgewicht \(|P-R|\).</p>
+<div class="viz" data-viz="f1map"></div>
+<p><strong>Gewichtete Variante.</strong> \(F_\beta=\dfrac{(1+\beta^2)PR}{\beta^2P+R}\) gewichtet Recall \(\beta\)-mal so stark wie Precision; \(\beta=1\) ergibt \(F_1\). <span class="prov" data-kind="LEHRBUCH">SLP3 §4.9 (nach van Rijsbergen)</span></p>
+<h3>Grenzfälle mit Nenner 0</h3>
+<table class="edge"><tr><th>Situation</th><th>\(P\)</th><th>\(R\)</th><th>\(F_1\) (Zählform)</th></tr>
+<tr><td>System sagt nichts vorher, Gold hat 3 Entitäten (TP=FP=0, FN=3)</td><td>\(0/0\) undefiniert</td><td>\(0\)</td><td>\(0/3=0\)</td></tr>
+<tr><td>Gold leer, System sagt 2 Entitäten (TP=FN=0, FP=2)</td><td>\(0\)</td><td>\(0/0\) undefiniert</td><td>\(0/2=0\)</td></tr>
+<tr><td>TP=0, FP&gt;0, FN&gt;0</td><td>\(0\)</td><td>\(0\)</td><td>\(0\); die Formel \(2PR/(P+R)\) ergäbe \(0/0\)</td></tr>
+<tr><td>Gold leer und System leer</td><td>\(0/0\)</td><td>\(0/0\)</td><td>\(0/0\) – nur per Konvention</td></tr></table>
+<p>Für den letzten Fall gibt es keine mathematisch erzwungene Antwort. Bibliotheken legen sie per Parameter fest (in scikit-learn <code>zero_division</code>, Werte 0, 1 oder NaN); ein ehrlicher Bericht nennt die gewählte Konvention. Für ein ganzes Testkorpus tritt der Fall praktisch nie auf, für einzelne Sätze oder seltene Klassen dagegen regelmäßig – und dort entscheidet die Konvention über Macro-Mittelwerte (Abschnitt „Micro und Macro“). <span class="prov" data-kind="VERTIEFUNG">scikit-learn-Dokumentation, precision_recall_fscore_support</span></p>
+<div class="task-ref" data-task="B3"></div>
+</section>
+
+<section data-id="einheit" data-title="Was wird gezählt?">
+<h3>Phrasen-Ebene gegen Token-Ebene</h3>
+<p><strong>Phrasen-Ebene (exakter Spannenabgleich).</strong> Einheiten sind Tripel (Beginn, Ende, Typ). Eine vorhergesagte Spanne zählt nur bei exakt gleichen Grenzen <em>und</em> gleichem Typ als TP. Das ist die Konvention der CoNLL-2003-Auswertung. <span class="prov" data-kind="KURS">Folie 21 „Phrase-level counting“</span> <span class="prov" data-kind="FORSCHUNG">Tjong Kim Sang &amp; De Meulder 2003</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §9.5.4: „the entity rather than the word is the unit of response“</span></p>
+<p><strong>Token-Ebene.</strong> Einheiten sind Wörter mit ihrem Entitätstyp (B/I-Präfix ignoriert); Wörter, die in Gold und System O sind, werden nicht gezählt. <span class="prov" data-kind="KURS">Folie 22</span></p>
+<p>Das Vorlesungsbeispiel: Gold enthält <code>[First Bank of Chicago]ORG</code> und <code>[$200,000,000]MONEY</code>, also 2 Spannen und 5 Entitätstoken.</p>
+<table class="cmp"><tr><th>System</th><th>Phrasen: TP/FP/FN</th><th>\(P,\ R,\ F_1\)</th><th>Token: TP/FP/FN</th><th>\(P,\ R,\ F_1\)</th></tr>
+<tr><td>1: nur <code>[$200,000,000]</code></td><td>1/0/1</td><td>\(1,\ \tfrac12,\ \tfrac23\)</td><td>1/0/4</td><td>\(1,\ \tfrac15,\ \tfrac13\)</td></tr>
+<tr><td>2: <code>[Bank of Chicago]</code>, <code>[$200,000,000]</code></td><td>1/1/1</td><td>\(\tfrac12,\ \tfrac12,\ \tfrac12\)</td><td>4/0/1</td><td>\(1,\ \tfrac45,\ \tfrac89\)</td></tr></table>
+<p>Auf Phrasen-Ebene ist System 2 <em>schlechter</em> als System 1 (\(F_1=\tfrac12\) gegen \(\tfrac23\)), obwohl es drei der vier Wörter der Bank gefunden hat: Die falsche Grenze kostet einen FP <em>und</em> einen FN. Auf Token-Ebene kehrt sich die Rangfolge um (\(\tfrac89\) gegen \(\tfrac13\)). Die Folie fasst das zusammen: Phrasen-Ebene bestraft Teilüberlappungen, Token-Ebene belohnt sie, gewichtet aber lange Entitäten stärker. Die Folie trägt in den Tabellen für Phrasen auch „True-neg 3“ ein; nach dem vorigen Abschnitt geht dieser Wert in keine der drei Kennzahlen ein. <span class="prov" data-kind="KURS">Folien 20–21, Zahlen nachgerechnet</span></p>
+<div class="viz" data-viz="counter"></div>
+<p><strong>Doppelte Bestrafung.</strong> Ein Typfehler bei richtigen Grenzen (München als ORG statt LOC) zählt auf Phrasen-Ebene ebenfalls als FP und FN. Ein System, das unsichere Entitäten gar nicht ausgibt, erhält dafür nur einen FN – \(F_1\) kann also Weglassen gegenüber einem fast richtigen Versuch bevorzugen. Diese Kritik formulierte Manning (2006) in einem vielzitierten Blogbeitrag; die MUC-Bewertung, die die Folie als komplizierte Alternative nennt, vergibt deshalb Teilpunkte für Typ und Grenzen getrennt. <span class="prov" data-kind="VERTIEFUNG">Manning 2006 (Blogbeitrag, keine begutachtete Quelle)</span></p>
+<div class="task-ref" data-task="B4"></div>
+<div class="task-ref" data-task="B5"></div>
+</section>
+
+<section data-id="mittelung" data-title="Micro und Macro">
+<h3>Mehrere Entitätstypen zusammenfassen</h3>
+<p>Für Typen \(k=1,\dots,K\) mit Zählungen \(\mathrm{TP}_k,\mathrm{FP}_k,\mathrm{FN}_k\):</p>
+\[ F_1^{\text{micro}}=\frac{2\sum_k\mathrm{TP}_k}{2\sum_k\mathrm{TP}_k+\sum_k\mathrm{FP}_k+\sum_k\mathrm{FN}_k},\qquad F_1^{\text{macro}}=\frac1K\sum_{k=1}^K F_{1,k}. \]
+<p>Micro summiert zuerst die Zählungen und gewichtet damit jede <em>Entität</em> gleich; häufige Typen dominieren. Macro mittelt die Typ-Werte und gewichtet jeden <em>Typ</em> gleich; ein seltener, schlecht erkannter Typ zieht den Wert stark nach unten. <span class="prov" data-kind="LEHRBUCH">SLP3 §4.9.1 „Evaluating with more than two classes“</span></p>
+<p><strong>Beispiel.</strong> PER: TP 45, FP 5, FN 5; LOC: 30, 10, 10; ORG: 20, 15, 15; MISC: 1, 4, 9. Dann \(F_{1,\mathrm{PER}}=\tfrac{90}{100}=0{,}9\), \(F_{1,\mathrm{LOC}}=0{,}75\), \(F_{1,\mathrm{ORG}}=\tfrac{40}{70}\approx0{,}5714\), \(F_{1,\mathrm{MISC}}=\tfrac{2}{15}\approx0{,}1333\). Gepoolt: TP 96, FP 34, FN 39, also \(F_1^{\text{micro}}=\tfrac{192}{265}\approx0{,}7245\); dagegen \(F_1^{\text{macro}}=\tfrac{989}{1680}\approx0{,}5887\). Die Lücke von gut 0,13 stammt fast vollständig von MISC, das nur 10 der 135 Gold-Entitäten stellt.</p>
+<div class="viz" data-viz="micromacro"></div>
+<p><strong>Satz 5 (Micro-F1 und Accuracy).</strong> Erhält jedes Token genau ein Gold- und genau ein System-Label und werden <em>alle</em> Labels einschließlich O als Klassen gepoolt, dann ist \(F_1^{\text{micro}}\) gleich der Accuracy.</p>
+<div class="proof"><p><em>Beweis.</em> Ein falsch markiertes Token mit Gold \(a\) und System \(b\ne a\) ist genau ein FP (für \(b\)) und genau ein FN (für \(a\)). Also \(\sum_k\mathrm{FP}_k=\sum_k\mathrm{FN}_k=E\) (Fehlerzahl) und \(\sum_k\mathrm{TP}_k=N-E\) bei \(N\) Token. Damit \(F_1^{\text{micro}}=\frac{2(N-E)}{2(N-E)+2E}=\frac{N-E}{N}\). \(\square\)</p></div>
+<p>Deshalb schließt die NER-Auswertung O aus: Mit O wäre Micro-F1 die Token-Accuracy, und die ist bei überwiegend O-markierten Texten trivial hoch.</p>
+<div class="remark"><p><strong>Zwei „Macro-F1“.</strong> Neben dem Mittel der Typ-F1-Werte wird auch das harmonische Mittel aus gemitteltem \(P\) und gemitteltem \(R\) als Macro-F1 bezeichnet. Im Beispiel ergibt diese Variante \(\approx0{,}5926\) statt \(0{,}5887\). Die Unterschiede können größer sein; berichten Sie, welche Definition Sie verwenden. <span class="prov" data-kind="FORSCHUNG">Opitz &amp; Burst 2019 (Preprint)</span></p></div>
+<div class="task-ref" data-task="B6"></div>
+</section>
+
+<section data-id="fehler" data-title="Typische Denkfehler">
+<ul class="pitfalls">
+<li><strong>„F1 ist der Mittelwert von P und R.“</strong> Es ist das harmonische Mittel; \(\tfrac{P+R}{2}-F_1=\tfrac{(P-R)^2}{2(P+R)}\) (Satz 4).</li>
+<li><strong>„Ein Typfehler ist ein Fehler.“</strong> Auf Phrasen-Ebene sind es zwei Zählungen (FP und FN).</li>
+<li><strong>„Wenn nichts vorhergesagt wird, ist P = 0.“</strong> \(P=0/0\) ist undefiniert; \(F_1\) ist über die Zählform trotzdem 0, falls Gold nicht leer ist.</li>
+<li><strong>„Ein BiRNN kann Wort für Wort live taggen.“</strong> Der Rückwärtszustand braucht das Satzende (Grenze 1).</li>
+<li><strong>„Mit BiRNN sind die Labels konsistent.“</strong> Die Ausgaben bleiben bedingt unabhängig; Konsistenz bringt erst ein strukturiertes Ausgabemodell wie das CRF (Grenze 2).</li>
+<li><strong>„Micro-F1 und Macro-F1 messen dasselbe.“</strong> Micro gewichtet Entitäten, Macro Typen; bei ungleich verteilten Typen unterscheiden sie sich stark.</li></ul>
+</section>
+
+<section data-id="summary" data-title="Zusammenfassung">
+<p>Ein Tagger ist nur so gut wie der Kontext, den seine Repräsentation \(z_t\) sehen kann. Das vorwärts laufende RNN sieht beweisbar nur \(x_{1:t}\); das BiRNN verkettet einen Vorwärts- und einen Rückwärtszustand und sieht so den ganzen Satz – um den Preis, dass der Satz vollständig vorliegen muss, und ohne die Ausgaben aneinander zu koppeln. Ob das hilft, misst man mit Precision und Recall über einer klar festgelegten Einheit. Die Einheit entscheidet mit: Exakter Spannenabgleich bestraft Grenzfehler doppelt, Token-Zählung belohnt Teilüberlappungen. \(F_1\) als harmonisches Mittel verhindert, dass ein System eine der beiden Größen opfert, ist aber in Grenzfällen nur über die Zählform und eine erklärte Konvention definiert. Über mehrere Typen hinweg beantworten Micro (jede Entität zählt gleich) und Macro (jeder Typ zählt gleich) verschiedene Fragen.</p>
+</section>
