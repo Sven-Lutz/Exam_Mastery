@@ -26,6 +26,8 @@ sources/
 *.pptx
 *.docx
 *.png
+!fixtures/**/*.png
+!docs/**/*.png
 *.jpg
 *.jpeg
 *.zip
