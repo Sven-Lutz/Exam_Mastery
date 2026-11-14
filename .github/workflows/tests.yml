@@ -2,11 +2,15 @@ name: tests
 on: [push, pull_request]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: {python-version: "3.12"}
-      - run: pip install -e '.[qa]' pytest
-      - run: python -m playwright install --with-deps chromium
-      - run: python -m pytest -q
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - run: pip install -r requirements-math-tested.txt -r requirements-gemini-tested.txt
+      - run: npm install --prefix ~/.cache/exam-mastery-v05-node --save-exact mathjax-full@3.2.2
+      - run: python -m playwright install chromium
+      - run: python -m unittest discover -s tests
+      - run: bash -n release/install.sh && bash -n release/skill/exam-mastery/scripts/check_host.sh
