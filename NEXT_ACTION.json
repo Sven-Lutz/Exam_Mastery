@@ -12,7 +12,7 @@
     "nlp_reference_unit_v5": "HUMAN_REJECTED (owner review received 2026-11-15; no further v5 review needed)",
     "nlp_reference_unit_v6": "HUMAN_REVIEW_PENDING (Issue #9; docs/cross_domain/V6_REPORT.md); no self-release",
     "v6": "HUMAN_REJECTED (v6.1, Issue #10, mean 8/6 = 1.333/4)",
-    "v7": "v7.1 corrections per independent audit (Issue #10/PR #3): TECHNICAL_PASS locally; content/didactic/publishing review required; no self-release"
+    "v7": "v7.1 (cd438a9): GitHub CI green (runs 43732994556, 43732999492); CONTENT_CORRECTNESS/DIDACTIC/PUBLISHING review required; no self-release"
   },
   "product": {
     "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
