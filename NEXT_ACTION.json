@@ -10,7 +10,7 @@
     "nlp_reference_unit_v3": "HUMAN_REJECTED (Issue #7, mean 0.75/4 over 8 dimensions)",
     "nlp_reference_unit_v4": "HUMAN_REJECTED (Issue #8, 17 ratings, mean 16/17=0.94/4; lab 0/4 in all 5 dimensions)",
     "nlp_reference_unit_v5": "HUMAN_REJECTED (Issue #8/#9, 16/17 rated, mean 1.375/4, lab 1.8/4)",
-    "nlp_reference_unit_v6": "IN PROGRESS (Issue #9) -> HUMAN_REVIEW_PENDING; no self-release"
+    "nlp_reference_unit_v6": "HUMAN_REVIEW_PENDING (Issue #9; docs/cross_domain/V6_REPORT.md); no self-release"
   },
   "product": {
     "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
@@ -29,20 +29,17 @@
     "v4_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v4_snapshot/"
   },
   "verified": [
-    "verify: 217 recomputed values incl. every decimal in new text, worked solutions and cards (attn_full oracle)",
-    "tests/test_lab_math.py: 23 oracle/property/boundary tests (node vs Python vs seqlab)",
-    "tests/test_lab_ui.py: 15 rendered-interaction tests incl. drag, keyboard, solvability of all 12 reachable challenges, mobile 390px",
-    "full local suite: 779 passed, 6 skipped",
-    "Anki previews 576 renderings (Chromium/WebKit, light/dark/mobile) without overflow/raw TeX; PDFs inspected (Lehrbuch §6, Probeklausur_Loesungen)"
+    "full suite 797 passed, 6 skipped (+1 path-leak test)",
+    "tests/test_modules.py 18 passed",
+    "QC: analysis1 & ent all automatic dimensions PASS; NLP sources FAIL (lafferty, su without URL/DOI)"
   ],
   "not_verified": [
-    "didactic quality and learning effect of the lab (no user test, no delayed transfer test)",
-    "independent expert review of new proofs (numbers machine-checked, arguments not)",
-    "real Anki desktop/AnkiMobile clients",
-    "screen reader accessibility",
-    "§6-level depth (new theorems/proofs) for BiRNN, CRF, evaluation textbook sections"
+    "real ChatGPT sessions with tutor packs",
+    "didactic quality/learning effect",
+    "Anki redesign not done",
+    "new PDFs/Anki for Analysis/ENT not produced"
   ],
-  "next_action": "Implement Issue #9: math edge-case fixes, channel separation, portable ChatGPT tutor context, source discovery/verification prototype, cross-domain proof on Analysis 1 + Entrepreneurship.",
+  "next_action": "Owner re-rates (Issue #9 acceptance). Candidates: Anki content/design overhaul; add URLs for lafferty/su; extend module products (PDF/Anki) for Analysis/ENT if direction accepted. Do not merge PR #3.",
   "open_decisions_for_owner": [
     "Human re-rating of v5 (17 dimensions, Issue #8)",
     "Pilot budget for engine runs (none authorised)",
@@ -56,7 +53,8 @@
   "budget": {
     "paid_calls_authorised": 0,
     "engine_provider_calls": 0,
-    "claude_code_session_tokens": "not exposed to the session; not measured"
+    "claude_code_session_tokens": "not exposed to the session; not measured",
+    "tutor_api_calls_authorised": 0
   },
   "v4_ratings_issue8": {
     "scientific.textbook": "2/4",
@@ -101,5 +99,11 @@
     "lab.ux_design": "2/4",
     "system_integration": "1/4",
     "exam_core_vs_deeper_mastery": "NOT RATED"
+  },
+  "modules": {
+    "layer": "exam_mastery/modules (contract, sources, tutor, tutor_adapter, CLI python -m exam_mastery.modules build <dir> --out <out>)",
+    "analysis1_folgen": "modules/analysis1_folgen -> ~/Exam_Mastery_Output/modules/analysis1_folgen (labor.html, tutor/)",
+    "ent_funding": "modules/ent_funding -> ~/Exam_Mastery_Output/modules/ent_funding",
+    "nlp": "build-unit units/nlp_sequence_labeling (adapter); tutor/ also in reference unit output"
   }
 }

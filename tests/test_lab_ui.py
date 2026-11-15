@@ -156,7 +156,7 @@ class Lab(unittest.TestCase):
         imp.get_by_role('button', name='Starten').click(); pg.wait_for_timeout(800)
         imp.get_by_role('button', name='Ich halte das für unmöglich').click()
         imp.locator('.pred-opts button').nth(1).click()
-        self.assertIn('arg', imp.locator('.verdict.bad').inner_text())
+        self.assertIn('gleichauf', imp.locator('.verdict.bad').inner_text())
         imp.locator('.pred-opts button').nth(0).click()
         imp.locator('.reveal').wait_for()
         self.assertIn('Konvexkombination', imp.inner_text())

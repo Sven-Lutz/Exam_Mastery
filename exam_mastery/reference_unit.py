@@ -552,7 +552,7 @@ def _page(unit: dict, mode: str, part: str = '') -> str:
 <script id="unit-data" type="application/json">{payload}</script><script>{js}</script></body></html>"""
 
 
-LAB_JS = ('lab_math.js', 'lab_ui.js', 'lab_seq.js', 'lab_boot.js')
+LAB_JS = ('lab_math.js', 'lab_core.js', 'lab_attention.js', 'lab_seq.js', 'lab_boot.js')
 
 
 def _lab_page(unit: dict) -> str:
@@ -621,6 +621,9 @@ def build(unit_dir: Path, out: Path, pdf: bool = True, anki: bool = True) -> dic
     if pdf:
         for part, name in PARTS.items():
             _print_pdf(out / f'{part}.html', out / f'{name}.pdf')
+    from .modules.__main__ import from_unit                       # v6: portabler Tutor-Kontext (Issue #9)
+    from .modules import tutor as TU
+    report['tutor'] = TU.build(from_unit(unit_dir), out)
     report['outputs'] = sorted(p.name for p in out.iterdir())
     (out / 'verification.json').write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding='utf-8')
     return report

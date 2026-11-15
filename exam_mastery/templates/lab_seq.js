@@ -20,7 +20,7 @@ function crfInit() {
 }
 const crfEff = S => ({A: S.A.map((r, i) => r.map((x, j) => S.FA[i][j] ? NEGINF : x)), s: S.s.map((x, j) => S.Fs[j] ? NEGINF : x)});
 const tagsOf = y => y.map(j => CRF_LABELS[j]);
-const crfLab = {
+const crfLab = registerLab({
   id: 'crf', title: 'CRF & Viterbi', icon: 'δ',
   intro: 'Ein Tagger liefert für jedes Wort Label-Scores (Emissionen). Die CRF-Schicht addiert Übergangs-Scores zwischen benachbarten Labels und bewertet so <b>ganze Folgen</b>. Ändern Sie Emissionen und Übergänge, verbieten Sie Übergänge und vergleichen Sie: lokale Entscheidung, besten Pfad (Viterbi, max) und Wahrscheinlichkeiten (Vorwärts, Summe) – kontrolliert gegen alle 81 Pfade.',
   init: crfInit,
@@ -114,7 +114,7 @@ const crfLab = {
           best.map(p => h('tr', {}, h('td', {}, tagsOf(p.y).join(' '), M.bioValid(tagsOf(p.y)) ? '' : h('span', {class: 'badge bad', style: 'margin-left:6px'}, 'ungültig')), h('td', {}, f(p.score)), h('td', {}, f(p.p, 3))))));
     };
   },
-};
+});
 const sameTags = (a, b) => a.join() === b.join();
 crfLab.path = [
   {id: 'r1', title: 'Jedes Wort für sich', story: 'Alle Übergänge sind 0. Die lokale Entscheidung ergibt <code>I-PER I-PER O O</code> – eine Personen-Spanne, die mit <code>I</code> beginnt.',
@@ -175,7 +175,7 @@ function rnnInit() {
   return {words: ['Washington', 'signed', 'the', 'bill'], emb: clone(VOCAB), fw: {wx: [0.8, 0.3], wh: 0.5, b: 0}, bw: {wx: [0.2, 1.2], wh: 0.9, b: 0}, uf: 0.3, ub: 1.0, c: -0.3, bwOn: true, focus: 0};
 }
 const rnnP = d => ({Wx: [d.wx.slice()], Wh: [[d.wh]], b: [d.b]});
-const rnnLab = {
+const rnnLab = registerLab({
   id: 'birnn', title: 'BiRNN', icon: '⇄',
   intro: 'Ist „Washington“ eine Person oder ein Ort? Das entscheidet oft erst das <b>nächste</b> Wort. Tauschen Sie Wörter aus, ändern Sie Rückkopplungen und schalten Sie die Rückwärts-Richtung ab. Die Matrizen zeigen exakt, welches Wort welchen Zustand beeinflusst \\((\\lVert\\partial h_t/\\partial x_j\\rVert)\\).',
   init: rnnInit,
@@ -229,7 +229,7 @@ const rnnLab = {
         heat('Score: ‖∂zₜ/∂xⱼ‖', R.C, 'Mit beiden Richtungen hängt jedes zₜ vom ganzen Satz ab.'));
     };
   },
-};
+});
 rnnLab.path = [
   {id: 'b1', title: 'Vorwärts sieht nur die Vergangenheit', story: '„Washington signed …“ (Person) gegen „Washington state …“ (Ort). Schalten Sie zuerst die Rückwärts-Richtung ab.',
     setup: () => { const n = rnnInit(); n.bwOn = false; return n; },
@@ -275,7 +275,7 @@ const SP_CYCLE = ['O', 'B-PER', 'I-PER', 'B-LOC', 'I-LOC', 'B-ORG', 'I-ORG'];
 const SP_TYPES = ['PER', 'LOC', 'ORG'];
 const TYPEC = {PER: 'var(--t0)', LOC: 'var(--t2)', ORG: 'var(--t3)'};
 function spInit() { return {words: SP_WORDS.slice(), gold: SP_GOLD.slice(), pred: ['B-PER', 'I-PER', 'O', 'O', 'O', 'B-LOC', 'O', 'O', 'B-ORG', 'O'], edit: 'pred', level: 'span'}; }
-const spanLab = {
+const spanLab = registerLab({
   id: 'spans', title: 'Spannen & F1', icon: 'F',
   intro: 'Klicken Sie Wörter an, um Labels der <b>Vorhersage</b> (oder des Golds) zu ändern. Spannen werden wie von <code>conlleval</code> gelesen und nur bei <em>exakter</em> Übereinstimmung von Grenzen und Typ gezählt. Vergleichen Sie Spannen- mit Token-Zählung und Micro- mit Macro-Mittelung.',
   init: spInit,
@@ -327,7 +327,7 @@ const spanLab = {
         ...R.enc.map(e => h('div', {class: 'row', style: 'margin:2px 0'}, h('b', {style: 'width:60px'}, e.sc), h('code', {style: 'white-space:normal'}, e.e.join(' ')), h('span', {class: 'badge ' + (e.ok ? 'ok' : 'bad')}, e.ok ? 'umkehrbar' : 'Information verloren'))));
     };
   },
-};
+});
 spanLab.path = [
   {id: 's1', title: 'Fast richtig ist falsch', story: 'Gold: [Angela Merkel]PER. Das System erkennt nur [Angela]PER.',
     setup: () => { const n = spInit(); n.pred = SP_GOLD.slice(); return n; },

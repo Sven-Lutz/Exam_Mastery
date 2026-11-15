@@ -2,7 +2,7 @@
 // =====================================================================================
 // Start
 // =====================================================================================
-const LABS = [attention, typeof crfLab !== 'undefined' && crfLab, typeof rnnLab !== 'undefined' && rnnLab, typeof spanLab !== 'undefined' && spanLab].filter(Boolean);
+const LABS = REGISTERED_LABS;
 function boot() {
   const m = location.hash.match(/lab=([\w-]+)/);
   let cur = LABS.find(l => m && l.id === m[1]) || LABS[0];
@@ -11,7 +11,7 @@ function boot() {
   const wrap = h('div', {class: 'lab-wrap'});
   const rm = h('button', {'aria-pressed': String(document.body.classList.contains('reduced')), onclick: () => { document.body.classList.toggle('reduced'); const on = document.body.classList.contains('reduced'); rm.setAttribute('aria-pressed', String(on)); store.set('reduced', on); }}, 'Bewegung reduzieren');
   const share = h('button', {onclick: () => { try { navigator.clipboard.writeText(location.href).then(() => toast('Link mit exaktem Zustand kopiert')); } catch (e) { toast('Kopieren nicht möglich – Adresszeile verwenden'); } }}, 'Zustand teilen');
-  const top = h('header', {class: 'lab-top'}, h('span', {class: 'brand'}, 'Interaktives Labor'), h('span', {class: 'mute'}, UNIT.chapter || ''), nav,
+  const top = h('header', {class: 'lab-top'}, h('span', {class: 'brand'}, 'Interaktives Labor'), h('span', {class: 'mute'}, UNIT.chapter || UNIT.title || ''), nav,
     h('span', {class: 'right'}, rm, share, h('a', {class: 'btn', href: 'index.html'}, '← Lernplattform')));
   document.body.replaceChildren(top, wrap);
   function open(lab, keepHash) {

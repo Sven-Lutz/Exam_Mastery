@@ -1,0 +1,179 @@
+{
+ "module": "nlp-sequence-labeling",
+ "domain": "nlp",
+ "prefer": [
+  "ACL Anthology / Primärpaper",
+  "SLP3",
+  "Referenzimplementierung"
+ ],
+ "reject": [
+  "nicht datierte Blogposts als Beleg für Ergebnisse"
+ ],
+ "items": [
+  {
+   "kc": "spans",
+   "label": "Spannenkodierung (IO, BIO, BILOU)",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"Spannenkodierung (IO, BIO, BILOU)\" site:aclanthology.org",
+    "\"Spannenkodierung (IO, BIO, BILOU)\" arxiv",
+    "\"Spannenkodierung (IO, BIO, BILOU)\" Jurafsky Martin SLP3",
+    "\"Spannenkodierung (IO, BIO, BILOU)\" code implementation"
+   ],
+   "citation_chaining_from": [
+    "kurs",
+    "ratinov",
+    "lample"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "birnn",
+   "label": "Abhängigkeitsbereich und BiRNN",
+   "tier": "core",
+   "gap": true,
+   "queries": [
+    "\"Abhängigkeitsbereich und BiRNN\" site:aclanthology.org",
+    "\"Abhängigkeitsbereich und BiRNN\" arxiv",
+    "\"Abhängigkeitsbereich und BiRNN\" Jurafsky Martin SLP3",
+    "\"Abhängigkeitsbereich und BiRNN\" code implementation"
+   ],
+   "citation_chaining_from": [
+    "kurs"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "attention",
+   "label": "Self-Attention",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"Self-Attention\" site:aclanthology.org",
+    "\"Self-Attention\" arxiv",
+    "\"Self-Attention\" Jurafsky Martin SLP3",
+    "\"Self-Attention\" code implementation"
+   ],
+   "citation_chaining_from": [
+    "kurs",
+    "vaswani",
+    "jain",
+    "wiegreffe"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "position",
+   "label": "Positionsinformation",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"Positionsinformation\" site:aclanthology.org",
+    "\"Positionsinformation\" arxiv",
+    "\"Positionsinformation\" Jurafsky Martin SLP3",
+    "\"Positionsinformation\" code implementation"
+   ],
+   "citation_chaining_from": [
+    "kurs",
+    "vaswani",
+    "su"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "decoding",
+   "label": "Labelabhängigkeiten und Viterbi",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"Labelabhängigkeiten und Viterbi\" site:aclanthology.org",
+    "\"Labelabhängigkeiten und Viterbi\" arxiv",
+    "\"Labelabhängigkeiten und Viterbi\" Jurafsky Martin SLP3",
+    "\"Labelabhängigkeiten und Viterbi\" code implementation"
+   ],
+   "citation_chaining_from": [
+    "kurs",
+    "andor",
+    "ratinov",
+    "lample"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "prf",
+   "label": "Precision, Recall, F1",
+   "tier": "core",
+   "gap": true,
+   "queries": [
+    "\"Precision, Recall, F1\" site:aclanthology.org",
+    "\"Precision, Recall, F1\" arxiv",
+    "\"Precision, Recall, F1\" Jurafsky Martin SLP3",
+    "\"Precision, Recall, F1\" code implementation"
+   ],
+   "citation_chaining_from": [
+    "kurs"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "prf-edge",
+   "label": "Grenzfälle mit Nenner 0",
+   "tier": "deep",
+   "gap": false,
+   "queries": [
+    "\"Grenzfälle mit Nenner 0\" site:aclanthology.org",
+    "\"Grenzfälle mit Nenner 0\" arxiv",
+    "\"Grenzfälle mit Nenner 0\" Jurafsky Martin SLP3",
+    "\"Grenzfälle mit Nenner 0\" code implementation"
+   ],
+   "citation_chaining_from": [
+    "kurs"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "prf-level",
+   "label": "Phrasen- vs. Token-Zählung",
+   "tier": "core",
+   "gap": true,
+   "queries": [
+    "\"Phrasen- vs. Token-Zählung\" site:aclanthology.org",
+    "\"Phrasen- vs. Token-Zählung\" arxiv",
+    "\"Phrasen- vs. Token-Zählung\" Jurafsky Martin SLP3",
+    "\"Phrasen- vs. Token-Zählung\" code implementation"
+   ],
+   "citation_chaining_from": [
+    "kurs"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "micro-macro",
+   "label": "Micro- und Macro-Mittelung",
+   "tier": "deep",
+   "gap": false,
+   "queries": [
+    "\"Micro- und Macro-Mittelung\" site:aclanthology.org",
+    "\"Micro- und Macro-Mittelung\" arxiv",
+    "\"Micro- und Macro-Mittelung\" Jurafsky Martin SLP3",
+    "\"Micro- und Macro-Mittelung\" code implementation"
+   ],
+   "citation_chaining_from": [
+    "kurs"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  }
+ ],
+ "candidates_not_verified": [
+  "schuster",
+  "lafferty",
+  "huang",
+  "conll",
+  "opitz",
+  "manning",
+  "sklearn",
+  "3b1b-attention"
+ ],
+ "note": "Der Plan löst keine Netz- oder Provider-Aufrufe aus. Recherche erfolgt durch Agent/Mensch mit Zustimmung; Ergebnisse gehen ins Register."
+}

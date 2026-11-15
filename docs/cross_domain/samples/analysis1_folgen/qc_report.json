@@ -1,0 +1,85 @@
+{
+ "module": "analysis1-folgen",
+ "domain": "mathematics",
+ "method": "Beweisschritte gegen Lehrbuchsatz; Zahlen mit exakter Arithmetik (fractions) und Gleitkomma-Orakel",
+ "dimensions": {
+  "scope": {
+   "status": "PASS",
+   "evidence": "5/5 Kernkompetenzen mit offizieller Quelle"
+  },
+  "sources": {
+   "status": "PASS",
+   "evidence": "1 geprüfte Ergänzungsquellen; Regelverstöße 0; Lücken 0"
+  },
+  "claims": {
+   "status": "PASS",
+   "evidence": "3/3 Beispielprüfungen grün (Beweisschritte gegen Lehrbuchsatz; Zahlen mit exakter Arithmetik (fractions) und Gleitkomma-Orakel)"
+  },
+  "examples": {
+   "status": "PASS",
+   "evidence": "2 originelle Beispiele mit Grenzfall/Gegenbeispiel"
+  },
+  "tasks": {
+   "status": "PASS",
+   "evidence": "4 Aufgaben mit Schlüssel, ausführlicher Lösung, Rubrik"
+  },
+  "lab": {
+   "status": "PASS",
+   "evidence": "1 Labor(e); keine Karteikarten- oder Wiederholungsfunktion im Code"
+  },
+  "tutor": {
+   "status": "PASS",
+   "evidence": "5 Dateien; Lösungen im Kontext: keine; Lernstand: keiner (nicht erfunden); gemeinsame Anweisung 2224 Zeichen"
+  },
+  "channels": {
+   "status": "PASS",
+   "evidence": "Labor ohne Karteikarten; Anki als eigenes Paket; Tutor als eigener Kanal"
+  },
+  "human_review": {
+   "status": "PENDING",
+   "evidence": "HUMAN_REVIEW_PENDING"
+  }
+ },
+ "didactic_quality": "NOT_RATED (nur menschliche Bewertung)",
+ "checks": [
+  {
+   "example": "E1",
+   "ok": true,
+   "facts": {
+    "terms": [
+     "2",
+     "3/2",
+     "17/12",
+     "577/408",
+     "665857/470832"
+    ],
+    "errors": [
+     "5.858e-01",
+     "8.579e-02",
+     "2.453e-03",
+     "2.124e-06",
+     "1.595e-12",
+     "8.993e-25"
+    ],
+    "negative_start_limit": "-√2"
+   }
+  },
+  {
+   "example": "E2",
+   "ok": true,
+   "facts": {
+    "q": 0.8415,
+    "apriori_n_1e-3": 48,
+    "actual_n_1e-3": 16,
+    "x_plus_1_over_x_a200": 20.109
+   }
+  },
+  {
+   "example": "E3",
+   "ok": true,
+   "facts": {
+    "N": 698
+   }
+  }
+ ]
+}

@@ -690,7 +690,7 @@ function bibliography() {
 // ---------- views ----------
 const app = document.getElementById('app');
 function topbar(cur) {
-  const nav = [['home', 'Heute'], ['learn', 'Lernen'], ['review', `Wiederholen (${dueCards().length})`], ['exam', 'Prüfung'], ['progress', 'Fortschritt'], ['sources', 'Quellen']];
+  const nav = [['home', 'Heute'], ['learn', 'Lernen'], ['review', 'Anki'], ['tutor', 'Tutor'], ['exam', 'Prüfung'], ['progress', 'Fortschritt'], ['sources', 'Quellen']];
   return el('header', {class: 'top'}, el('span', {class: 'brand'}, 'Exam Mastery'), el('span', {class: 'mute'}, U.course),
     el('nav', {'aria-label': 'Hauptnavigation'}, nav.map(([k, l]) => el('button', {'aria-current': k === cur ? 'page' : false, onclick: () => go(k)}, l))));
 }
@@ -700,8 +700,6 @@ window.addEventListener('hashchange', render);
 const sections = () => [...el('div', {html: U.text_html}).querySelectorAll('section')];
 
 function nextStep() {
-  const due = dueCards().length;
-  if (due) return {t: `${due} Karte${due > 1 ? 'n' : ''} wiederholen`, d: 'Zuerst kurz abrufen – aktives Erinnern stärkt das Behalten mehr als erneutes Lesen.', a: () => go('review')};
   const unread = sections().find(s => !st.visited[s.dataset.id]);
   if (unread) return {t: `Weiter: ${unread.dataset.title}`, d: 'Text, Experiment und Aufgaben stehen zusammen.', a: () => go('learn', unread.dataset.id)};
   const open = U.tasks.find(t => !st.attempts.some(a => a.task === t.id && a.correct));
@@ -716,7 +714,8 @@ function home() {
       el('div', {class: 'card hero'}, el('h3', {}, 'Heute lernen'), el('p', {}, n.d), el('button', {class: 'primary', onclick: n.a}, n.t)),
       el('div', {class: 'card'}, el('h3', {}, 'Interaktives Labor'), el('p', {}, 'Self-Attention, CRF/Viterbi, BiRNN, Spannen & F1: frei experimentieren, Hypothesen prüfen, Challenges lösen.'), el('a', {class: 'btn', href: 'labor.html'}, 'Labor öffnen')),
       el('div', {class: 'card'}, el('h3', {}, 'Fortsetzen'), el('p', {}, st.last ? 'Zurück zur letzten Stelle.' : 'Mit dem Washington-Experiment beginnen.'), el('button', {onclick: () => go('learn', st.last || 'orientierung')}, 'Öffnen')),
-      el('div', {class: 'card'}, el('h3', {}, 'Wiederholen'), el('p', {}, `${dueCards().length} fällig · ${Object.keys(st.cards).length} von ${U.cards.length} Karten aktiv`), el('button', {onclick: () => go('review')}, 'Öffnen')),
+      el('div', {class: 'card'}, el('h3', {}, 'Wiederholen in Anki'), el('p', {}, `${U.cards.length} Karten als Anki-Paket; Abrufübungen laufen in Anki.`), el('button', {onclick: () => go('review')}, 'Anleitung')),
+      el('div', {class: 'card'}, el('h3', {}, 'Tutor (optional)'), el('p', {}, 'Sokratisches Gespräch mit ChatGPT auf Basis des Kontextpakets.'), el('button', {onclick: () => go('tutor')}, 'Einrichten')),
       el('div', {class: 'card'}, el('h3', {}, 'Schwächen'), el('p', {}, weak.length ? weak.map(k => KCS[k]).join(' · ') : 'Keine aus Prüfungen bekannt.'), weak.length ? el('button', {onclick: () => go('learn', Object.keys(SECTION_KC).find(s => SECTION_KC[s] === weak[0]))}, 'Gezielt üben') : null),
       el('div', {class: 'card'}, el('h3', {}, 'Prüfung'), el('p', {}, `Form ${nextForm()} · 10 neue Aufgaben, 2 je Kompetenz, ohne Hilfe.`), el('button', {onclick: () => go('exam')}, 'Starten')),
       el('div', {class: 'card'}, el('h3', {}, 'Kompetenzstand'), el('p', {}, Object.keys(KCS).map(k => `${KCS[k]}: ${LEVELS[kcLevel(k)][0]}`).join(' · ')), el('button', {onclick: () => go('progress')}, 'Details'))),
@@ -749,22 +748,30 @@ function learn(anchor) {
 }
 
 function review() {
-  const q = dueCards(), m = el('main', {}, el('h1', {}, 'Wiederholen'));
-  if (!q.length) m.append(el('p', {}, Object.keys(st.cards).length ? 'Nichts fällig. Nächste Karte: ' + new Date(Math.min(...Object.values(st.cards).map(c => c.due))).toLocaleString('de-DE') : 'Karten werden aktiv, sobald Sie den zugehörigen Abschnitt lesen oder eine Aufgabe lösen.'));
-  else {
-    const c = q[0], isCloze = c.type === 'cloze';
-    const front = isCloze ? c.cloze.replace(/\{\{c\d::(.*?)\}\}/g, '<span class="cloze">[…]</span>') : c.prompt;
-    const ans = isCloze ? c.cloze.replace(/\{\{c\d::(.*?)\}\}/g, '<span class="cloze-a">$1</span>') : c.answer;
-    const back = el('div', {hidden: true}, el('hr'), el('p', {class: 'canon', html: ans}), el('p', {html: '<b>Warum:</b> ' + c.why}),
-      c.example ? el('p', {html: '<b>Beispiel:</b> ' + c.example}) : null, c.mistake ? el('p', {html: '<b>Häufiger Fehler:</b> ' + c.mistake}) : null,
-      c.diagram ? el('img', {src: 'media/' + c.diagram, alt: 'Diagramm zur Karte', class: 'carddiag'}) : null, el('p', {class: 'mute small', html: 'Quelle: ' + c.source}), el('div', {class: 'ctl'},
-      el('button', {onclick: () => grade(false)}, 'Nicht gewusst'), el('button', {class: 'primary', onclick: () => grade(true)}, 'Gewusst')));
-    m.append(el('p', {class: 'mute'}, `${q.length} fällig. Erst selbst antworten, dann aufdecken.`), el('div', {class: 'flash'}, el('p', {class: 'pill'}, KCS[c.kc] || c.kc), el('p', {html: front}),
-      el('button', {onclick: e => { back.hidden = false; e.target.remove(); tex(back); }}, 'Antwort zeigen'), back));
-    function grade(ok) { const s = st.cards[c.key]; s.box = ok ? Math.min(BOX.length - 1, s.box + 1) : 0; s.due = now() + BOX[s.box] * DAY + (ok ? 0 : 10 * 60e3); save(); render(); }
-  }
-  m.append(el('p', {class: 'mute small'}, `Abstände ${BOX.join(' / ')} Tage (Leitner-Kästen). Das ist eine einfache, offene Regel – kein nachgewiesen optimaler Plan. Für Anki: anki_import.txt mit stabilen GUIDs.`));
-  tex(m); return [topbar('review'), noticeBar(), m];
+  // v6 (Issue #9): Kanaltrennung – Spaced Retrieval findet ausschließlich in Anki statt, nicht im Browser.
+  const m = el('main', {}, el('h1', {}, 'Wiederholen mit Anki'),
+    el('p', {}, 'Abrufübungen mit Abständen laufen in Anki – dort mit eigenem Planer, Statistik und auf allen Geräten. Dieses Modul liefert dafür ein fertiges Paket.'),
+    el('ol', {}, el('li', {html: `Datei <code>${U.id}.apkg</code> aus diesem Ordner in Anki importieren (Datei → Importieren). Bei Updates erneut importieren: Ihr Lernverlauf bleibt erhalten.`}),
+      el('li', {}, 'Täglich die fälligen Karten in Anki abrufen.'), el('li', {}, 'Experimentieren im Labor, Beweisen und Rechnen im Arbeitsbuch, Gespräche mit dem Tutor – jeder Kanal hat seine eigene Aufgabe.')),
+    el('p', {}, el('a', {class: 'btn', href: `${U.id}.apkg`, download: ''}, 'Anki-Paket herunterladen')),
+    el('p', {class: 'mute small'}, `${U.cards.length} Karten, stabile IDs (Updates überschreiben keine Wiederholungsdaten).`));
+  return [topbar('review'), noticeBar(), m];
+}
+function tutorView() {
+  const real = st.attempts.filter(a => !a.revealed);
+  const m = el('main', {}, el('h1', {}, 'Wissenschaftlicher Tutor (ChatGPT, optional)'),
+    el('p', {}, 'Für sokratische Gespräche, gemeinsame Herleitungen, Fehlerdiagnose und Transferprobleme. Der Tutor arbeitet mit einem Kontextpaket zu diesem Modul (Ordner tutor/). Es gibt keine automatische Verbindung: Was Sie im Gespräch lernen, fließt nicht von selbst hierher zurück.'),
+    el('ol', {}, el('li', {html: '<b>ChatGPT-Projekt:</b> Inhalt von <code>tutor/PROJECT_INSTRUCTIONS.md</code> als Projektanweisungen einfügen, <code>tutor/tutor_context.md</code> als Projektdatei hochladen.'}),
+      el('li', {html: '<b>Lernmodus (Study mode):</b> in einem normalen Chat außerhalb von Projekten aktivieren, beide Dateien anhängen und den Startsatz aus <code>tutor/README.md</code> verwenden.'}),
+      el('li', {html: 'Optional: Lernstand exportieren und als zusätzliche Datei mitgeben. Er enthält nur hier tatsächlich erfasste Versuche.'})),
+    el('p', {}, el('button', {class: 'primary', onclick: () => {
+      const data = {module: U.id, exported: new Date().toISOString(), note: 'Nur in diesem Browser erfasste Versuche. Keine Bewertung durch Dritte.',
+        attempts: st.attempts.map(a => ({task: a.task, kc: a.kc, correct: a.correct, first: a.first, hints: a.hints || 0, revealed: !!a.revealed, ts: a.ts})),
+        exams: st.exams.map(x => ({form: x.form, score: x.score, max: x.max, ts: x.ts})), predictions: (st.predictions || []).length};
+      const a = el('a', {href: URL.createObjectURL(new Blob([JSON.stringify(data, null, 1)], {type: 'application/json'})), download: `lernstand_${U.id}.json`}); document.body.append(a); a.click(); a.remove();
+    }}, 'Lernstand exportieren (JSON)')),
+    el('p', {class: 'mute small'}, `Erfasst: ${st.attempts.length} Aufgabenversuche (${real.length} ohne aufgedeckte Lösung), ${st.exams.length} Prüfungen.`));
+  return [topbar('tutor'), noticeBar(), m];
 }
 
 function exam() {
@@ -825,7 +832,7 @@ function sources() {
 
 function render() {
   const [v, arg] = (location.hash.slice(1) || 'home').split('/');
-  const view = {home, learn, review, exam, progress, sources}[v] || home;
+  const view = {home, learn, review, tutor: tutorView, exam, progress, sources}[v] || home;
   app.replaceChildren(...view(arg).filter(Boolean)); tex(app).then(() => linkify(app));
 }
 

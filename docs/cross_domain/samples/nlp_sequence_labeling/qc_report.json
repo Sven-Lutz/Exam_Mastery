@@ -1,0 +1,69 @@
+{
+ "module": "nlp-sequence-labeling",
+ "domain": "nlp",
+ "method": "Rechenorakel (Python) gegen JS-Kern; vollständige Aufzählung; Primärpaper",
+ "dimensions": {
+  "scope": {
+   "status": "PASS",
+   "evidence": "7/7 Kernkompetenzen mit offizieller Quelle"
+  },
+  "sources": {
+   "status": "FAIL",
+   "evidence": "8 geprüfte Ergänzungsquellen; Regelverstöße 2; Lücken 3: ['lafferty: url or doi required', 'su: url or doi required']"
+  },
+  "claims": {
+   "status": "PASS",
+   "evidence": "2/2 Beispielprüfungen grün (Rechenorakel (Python) gegen JS-Kern; vollständige Aufzählung; Primärpaper)"
+  },
+  "examples": {
+   "status": "PASS",
+   "evidence": "2 originelle Beispiele mit Grenzfall/Gegenbeispiel"
+  },
+  "tasks": {
+   "status": "PASS",
+   "evidence": "46 Aufgaben mit Schlüssel, ausführlicher Lösung, Rubrik"
+  },
+  "lab": {
+   "status": "PASS",
+   "evidence": "1 Labor(e); keine Karteikarten- oder Wiederholungsfunktion im Code"
+  },
+  "tutor": {
+   "status": "PASS",
+   "evidence": "5 Dateien; Lösungen im Kontext: keine; Lernstand: keiner (nicht erfunden); gemeinsame Anweisung 2224 Zeichen"
+  },
+  "channels": {
+   "status": "PASS",
+   "evidence": "Labor ohne Karteikarten; Anki als eigenes Paket; Tutor als eigener Kanal"
+  },
+  "human_review": {
+   "status": "PENDING",
+   "evidence": "HUMAN_REVIEW_PENDING"
+  }
+ },
+ "didactic_quality": "NOT_RATED (nur menschliche Bewertung)",
+ "checks": [
+  {
+   "example": "N1",
+   "ok": true,
+   "facts": {
+    "w": [
+     0.5904,
+     0.1037,
+     0.3059
+    ],
+    "o": [
+     1.1343,
+     0.3763
+    ]
+   }
+  },
+  {
+   "example": "N2",
+   "ok": true,
+   "facts": {
+    "unique_T0.01": 6.443360598484468e-42,
+    "tie_T0.01": 50.0
+   }
+  }
+ ]
+}

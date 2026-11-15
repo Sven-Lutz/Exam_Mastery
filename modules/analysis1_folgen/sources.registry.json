@@ -1,0 +1,18 @@
+[
+ {"id": "skript", "tier": "official", "type": "lecture", "status": "verified", "access_level": "private_course_material", "citation": "Vorlesungsskript Analysis 1, Kapitel 2 „Konvergenz von Folgen“ (private Kursunterlage des Nutzers, nicht veröffentlicht)",
+  "checked_on": "2026-11-12", "passages": [{"locator": "Def. 2.2, Satz 2.4, 2.7, 2.10, Thm. 2.14, Def. 2.17–2.19, Thm. 2.24, Def. 2.26, Thm. 2.27, Bem. 2.28, Satz 2.31", "content": "Gliederung und Nummerierung aus der Engine-Erfassung des Skripts; Inhalt hier nur mit eigenen Worten wiedergegeben."}],
+  "evidence": "official", "used_for": ["scope"], "limits": "Formeltranskription von vier Beweis-KCs ist laut Engine unsicher (HUMAN_DECISION_REQUIRED); Wortlaut wird nicht wiedergegeben.", "function": "legt den Prüfungsstoff und die Nummerierung fest"},
+ {"id": "lebl", "tier": "extension", "type": "textbook", "status": "verified", "access_level": "full_text",
+  "citation": "Lebl, J.: Basic Analysis I: Introduction to Real Analysis, Version 6.3, 15. Mai 2026. Lizenz CC BY-NC-SA 4.0 / CC BY-SA 4.0.", "url": "https://www.jirka.org/ra/", "date": "2026-05-15", "checked_on": "2026-11-15",
+  "passages": [
+   {"locator": "§2.2, Beispiel 2.2.8 (S. 66–67)", "content": "x₁ = 2, xₙ₊₁ = xₙ − (xₙ² − 2)/(2xₙ): Wohldefiniertheit und Positivität per Induktion, Monotonie über xₙ₊₁² − 2 = (xₙ² − 2)²/(4xₙ²) ≥ 0, Grenzwert √2; Hinweis: mit negativem x₁ ergibt sich −√2; als Newton-Verfahren bezeichnet."},
+   {"locator": "§2.1, Satz 2.1.10 (Monotone convergence theorem)", "content": "Eine monotone Folge ist genau dann beschränkt, wenn sie konvergiert."},
+   {"locator": "§2.3.3, Satz 2.3.8 (Bolzano–Weierstraß)", "content": "Beschränkte Folgen besitzen eine konvergente Teilfolge."},
+   {"locator": "§2.4, Beispiel 2.4.3", "content": "(−1)ⁿ ist keine Cauchy-Folge (Nachweis mit n gerade, k = n + 1)."},
+   {"locator": "§7.6.1, Def. 7.6.1 und Satz 7.6.2", "content": "Kontraktion = k-Lipschitz mit k < 1; jede Kontraktion eines nichtleeren vollständigen metrischen Raums hat genau einen Fixpunkt; „The words complete and contraction are necessary. See Exercise 7.6.6.“ (Aufgabe 7.6.6 b: 1-Lipschitz-Abbildung ohne Fixpunkt)."}],
+  "evidence": "secondary (Lehrbuch, Beweise selbst geprüft)", "used_for": ["claim", "example"],
+  "limits": "Englisch, metrische Räume allgemeiner als die Vorlesung; Nummerierung weicht vom Skript ab.",
+  "function": "offen zugängliche zweite Darstellung mit vollständigen Beweisen; Grundlage für E1 (erweitert um Fehleridentität und ℚ-Gegenbeispiel) und E2 (Gegenbeispiel x + 1/x zu Aufgabe 7.6.6 b)"},
+ {"id": "fowler-robson", "tier": "frontier", "type": "paper", "status": "unverified", "access_level": "metadata", "citation": "Fowler, D.; Robson, E. (1998): Square root approximations in Old Babylonian mathematics: YBC 7289 in context. Historia Mathematica 25(4).",
+  "doi": "10.1006/hmat.1998.2209", "limits": "nicht gelesen; Metadaten ungeprüft", "function": "Kandidat für historischen Kontext des Heron-Verfahrens – nicht verwendet"}
+]

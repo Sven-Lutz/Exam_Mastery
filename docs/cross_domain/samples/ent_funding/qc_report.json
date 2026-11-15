@@ -1,0 +1,87 @@
+{
+ "module": "ent-funding",
+ "domain": "business",
+ "method": "Kapitalisierungstabelle mit exakten Brüchen, Invarianten (Summe 100 %), datierte Praxisquellen, Annahmen explizit",
+ "dimensions": {
+  "scope": {
+   "status": "PASS",
+   "evidence": "4/4 Kernkompetenzen mit offizieller Quelle"
+  },
+  "sources": {
+   "status": "PASS",
+   "evidence": "3 geprüfte Ergänzungsquellen; Regelverstöße 0; Lücken 2"
+  },
+  "claims": {
+   "status": "PASS",
+   "evidence": "3/3 Beispielprüfungen grün (Kapitalisierungstabelle mit exakten Brüchen, Invarianten (Summe 100 %), datierte Praxisquellen, Annahmen explizit)"
+  },
+  "examples": {
+   "status": "PASS",
+   "evidence": "2 originelle Beispiele mit Grenzfall/Gegenbeispiel"
+  },
+  "tasks": {
+   "status": "PASS",
+   "evidence": "4 Aufgaben mit Schlüssel, ausführlicher Lösung, Rubrik"
+  },
+  "lab": {
+   "status": "PASS",
+   "evidence": "1 Labor(e); keine Karteikarten- oder Wiederholungsfunktion im Code"
+  },
+  "tutor": {
+   "status": "PASS",
+   "evidence": "5 Dateien; Lösungen im Kontext: keine; Lernstand: keiner (nicht erfunden); gemeinsame Anweisung 2224 Zeichen"
+  },
+  "channels": {
+   "status": "PASS",
+   "evidence": "Labor ohne Karteikarten; Anki als eigenes Paket; Tutor als eigener Kanal"
+  },
+  "human_review": {
+   "status": "PENDING",
+   "evidence": "HUMAN_REVIEW_PENDING"
+  }
+ },
+ "didactic_quality": "NOT_RATED (nur menschliche Bewertung)",
+ "checks": [
+  {
+   "example": "X1",
+   "ok": true,
+   "facts": {
+    "regime": "cap",
+    "x": "111111",
+    "x_cap": "111111",
+    "P": "158730",
+    "price": "6.3",
+    "nI": "317460",
+    "T": "1.5873e+06",
+    "price2": "15.12",
+    "n2": "396825",
+    "T2": "1.98413e+06",
+    "founder_share_seed": "0.63",
+    "founder_share_A": "0.504",
+    "founder_value_seed": "6.3e+06",
+    "founder_value_A": "1.512e+07",
+    "safe_share_seed": "0.07",
+    "down_round_founder_value_A": "3.78e+06",
+    "discount_case_regime": "discount"
+   }
+  },
+  {
+   "example": "X2",
+   "ok": true,
+   "facts": {
+    "single_exit_returns_fund": 666666666.6666666,
+    "solid_portfolio_multiple": 1.4,
+    "exit_for_3x_net": 2333333333.3333335
+   }
+  },
+  {
+   "example": "X3",
+   "ok": true,
+   "facts": {
+    "EN1_D": 1269841.2698412698,
+    "EN2_regime": "discount",
+    "EN3_gross_for_2x": 337500000.0
+   }
+  }
+ ]
+}
