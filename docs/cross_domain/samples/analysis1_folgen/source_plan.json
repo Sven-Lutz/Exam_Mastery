@@ -1,0 +1,121 @@
+{
+ "module": "analysis1-folgen",
+ "domain": "mathematics",
+ "prefer": [
+  "kanonische Lehrbücher (offen lizenziert bevorzugt)",
+  "Beweis selbst prüfen",
+  "historische Primärquelle nur für Historisches"
+ ],
+ "reject": [
+  "Foren ohne Beweis",
+  "KI-generierte Zusammenfassungen"
+ ],
+ "items": [
+  {
+   "kc": "konv",
+   "label": "ε-N-Konvergenz und ihre Verneinung",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"epsilon N definition limit of a sequence\" theorem proof open textbook",
+    "\"epsilon N definition limit of a sequence\" lecture notes pdf",
+    "\"epsilon N definition limit of a sequence\" counterexample",
+    "\"epsilon N definition limit of a sequence\" history"
+   ],
+   "citation_chaining_from": [
+    "skript",
+    "lebl"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "grenzw",
+   "label": "Grenzwertsätze und Sandwichkriterium",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"squeeze theorem sequences\" theorem proof open textbook",
+    "\"squeeze theorem sequences\" lecture notes pdf",
+    "\"squeeze theorem sequences\" counterexample",
+    "\"squeeze theorem sequences\" history"
+   ],
+   "citation_chaining_from": [
+    "skript",
+    "lebl"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "monoton",
+   "label": "Monotone Konvergenz und rekursive Folgen",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"monotone convergence theorem recursive sequence\" theorem proof open textbook",
+    "\"monotone convergence theorem recursive sequence\" lecture notes pdf",
+    "\"monotone convergence theorem recursive sequence\" counterexample",
+    "\"monotone convergence theorem recursive sequence\" history"
+   ],
+   "citation_chaining_from": [
+    "skript",
+    "lebl"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "hp",
+   "label": "Teilfolgen, Häufungspunkte, Bolzano–Weierstraß",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"Bolzano-Weierstrass theorem sequences\" theorem proof open textbook",
+    "\"Bolzano-Weierstrass theorem sequences\" lecture notes pdf",
+    "\"Bolzano-Weierstrass theorem sequences\" counterexample",
+    "\"Bolzano-Weierstrass theorem sequences\" history"
+   ],
+   "citation_chaining_from": [
+    "skript",
+    "lebl"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "cauchy",
+   "label": "Cauchy-Kriterium und Vollständigkeit",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"Cauchy sequence completeness rationals not complete\" theorem proof open textbook",
+    "\"Cauchy sequence completeness rationals not complete\" lecture notes pdf",
+    "\"Cauchy sequence completeness rationals not complete\" counterexample",
+    "\"Cauchy sequence completeness rationals not complete\" history"
+   ],
+   "citation_chaining_from": [
+    "skript",
+    "lebl"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "kontraktion",
+   "label": "Kontraktionsbedingung und Fixpunkt",
+   "tier": "deep",
+   "gap": false,
+   "queries": [
+    "\"contraction mapping principle Banach fixed point\" theorem proof open textbook",
+    "\"contraction mapping principle Banach fixed point\" lecture notes pdf",
+    "\"contraction mapping principle Banach fixed point\" counterexample",
+    "\"contraction mapping principle Banach fixed point\" history"
+   ],
+   "citation_chaining_from": [
+    "skript",
+    "lebl"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  }
+ ],
+ "candidates_not_verified": [
+  "fowler-robson"
+ ],
+ "note": "Der Plan löst keine Netz- oder Provider-Aufrufe aus. Recherche erfolgt durch Agent/Mensch mit Zustimmung; Ergebnisse gehen ins Register."
+}

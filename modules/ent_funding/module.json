@@ -1,0 +1,330 @@
+{
+ "id": "ent-funding",
+ "title": "Entrepreneurship – Funding a Venture",
+ "domain": "business",
+ "language": "de",
+ "status": "HUMAN_REVIEW_PENDING",
+ "scope": {
+  "summary": "Kapitel 6 der Vorlesung Entrepreneurship: Finanzierungsformen (Eigen-, Mezzanine-, Fremdkapital), Risiko und Insolvenz, Lebens- und Finanzierungszyklus, Business Angels, Venture Capital (Fondsstruktur, Potenzialanforderung), Finanzierungsprozess (Deal Origination, Screening, Closing, Tranchen, Exit), Scheitern von Start-ups, HTGF-Beispiel mit Wandeldarlehen, Pre-/Post-Money-Bewertung und Verwässerung über zwei Runden.",
+  "official": [
+   "Vorlesungsfolien Entrepreneurship, Kap. 6 „Funding a Venture“ (private Kursunterlage; Abschnittstitel als Lokatoren)"
+  ],
+  "note": "Zahlen der Folien zum Markt werden nicht übernommen; eigene Rechnungen sind als solche gekennzeichnet."
+ },
+ "exam": {
+  "summary": "Offizielle Angaben zu Dauer und Hilfsmitteln liegen nicht vor. Kapitelbezogen prüfbar: Begriffe und Unterschiede der Kapitalformen, Phasen- und Investorenlogik, Rechnungen zu Pre-/Post-Money, Anteilen und Verwässerung, Begründung der VC-Potenzialanforderung.",
+  "known": false
+ },
+ "notation": [
+  {
+   "symbol": "V_pre, V_post",
+   "meaning": "Bewertung vor bzw. nach der Investition I; V_post = V_pre + I"
+  },
+  {
+   "symbol": "I/(V_pre + I)",
+   "meaning": "Anteil des neuen Investors nach der Runde"
+  },
+  {
+   "symbol": "A, C, d",
+   "meaning": "SAFE-Betrag, Post-Money-Cap, Rabatt"
+  },
+  {
+   "symbol": "TVPI",
+   "meaning": "Netto-Rückfluss an Fondsinvestoren / Fondsgröße (hier vereinfacht)"
+  }
+ ],
+ "kcs": [
+  {
+   "id": "formen",
+   "label": "Kapitalformen und Risikoklassen",
+   "tier": "core",
+   "prerequisites": [
+    "ext:Bilanz Grundbegriffe"
+   ],
+   "objectives": [
+    "Eigen-, Mezzanine- und Fremdkapital nach Haftung, Rückzahlung, Mitsprache unterscheiden",
+    "Liquidationsrangfolge an einem Beispiel durchrechnen"
+   ],
+   "misconceptions": [
+    "Eigenkapital ist kostenlos, weil keine Zinsen anfallen"
+   ],
+   "products": {},
+   "sources": [
+    "kurs"
+   ],
+   "search_terms": [
+    "equity mezzanine debt startup financing"
+   ]
+  },
+  {
+   "id": "zyklus",
+   "label": "Lebens- und Finanzierungszyklus, passende Kapitalquelle",
+   "tier": "core",
+   "prerequisites": [
+    "formen"
+   ],
+   "objectives": [
+    "Begründen, warum Banken frühe Start-ups kaum finanzieren",
+    "Business Angel vs. VC nach Motiv und Kriterien abgrenzen"
+   ],
+   "misconceptions": [],
+   "products": {},
+   "sources": [
+    "kurs",
+    "htgf"
+   ],
+   "search_terms": [
+    "business angels investment criteria Germany"
+   ]
+  },
+  {
+   "id": "vc",
+   "label": "VC-Fondslogik und Potenzialanforderung",
+   "tier": "core",
+   "prerequisites": [
+    "zyklus"
+   ],
+   "objectives": [
+    "Mit Fondsgröße, Anteil und Gebühren berechnen, welcher Exit den Fonds zurückzahlt",
+    "Erklären, warum wenige Ausreißer die Rendite tragen"
+   ],
+   "misconceptions": [
+    "Ein VC optimiert die Überlebenswahrscheinlichkeit einzelner Beteiligungen"
+   ],
+   "products": {
+    "lab": [
+     {
+      "lab": "runden",
+      "item": "v4"
+     },
+     {
+      "lab": "runden",
+      "item": "w-fund"
+     }
+    ],
+    "tasks": [
+     "EN3",
+     "EN5"
+    ]
+   },
+   "sources": [
+    "kurs",
+    "knr-2014"
+   ],
+   "search_terms": [
+    "venture capital returns power law fund economics"
+   ]
+  },
+  {
+   "id": "prozess",
+   "label": "Finanzierungsprozess, Tranchen, Vertragsrechte",
+   "tier": "deep",
+   "prerequisites": [
+    "vc"
+   ],
+   "objectives": [
+    "Begründen, warum in Tranchen ausgezahlt wird",
+    "Trennung von Cash-Flow- und Kontrollrechten erläutern"
+   ],
+   "misconceptions": [],
+   "products": {},
+   "sources": [
+    "kurs",
+    "kaplan-stromberg"
+   ],
+   "search_terms": [
+    "staged financing venture capital contracts control rights"
+   ]
+  },
+  {
+   "id": "bewertung",
+   "label": "Pre-/Post-Money, Wandelinstrumente und Verwässerung",
+   "tier": "core",
+   "prerequisites": [
+    "formen"
+   ],
+   "objectives": [
+    "Kapitalisierungstabelle über SAFE/Wandeldarlehen, Seed und Serie A aufstellen",
+    "Cap und Rabatt vergleichen",
+    "Verwässerung von Wertverlust unterscheiden"
+   ],
+   "misconceptions": [
+    "Verwässerung bedeutet immer Geldverlust",
+    "Optionspool belastet den neuen Investor",
+    "höherer Cap kann dem Investor mehr geben"
+   ],
+   "products": {
+    "lab": [
+     {
+      "lab": "runden",
+      "item": "v1"
+     },
+     {
+      "lab": "runden",
+      "item": "v2"
+     },
+     {
+      "lab": "runden",
+      "item": "v3"
+     },
+     {
+      "lab": "runden",
+      "item": "w-imp"
+     }
+    ],
+    "tasks": [
+     "EN1",
+     "EN2",
+     "EN4"
+    ]
+   },
+   "sources": [
+    "kurs",
+    "yc-safe"
+   ],
+   "search_terms": [
+    "post-money SAFE valuation cap discount conversion"
+   ]
+  }
+ ],
+ "examples": [
+  {
+   "id": "X1",
+   "kc": "bewertung",
+   "original": true,
+   "counterexample": true,
+   "title": "Drei Runden mit Post-Money-SAFE: Anteil sinkt, Wert steigt",
+   "check": "checks.py::rounds",
+   "summary": "Gründer mit 1 Mio. Anteilen; SAFE 500 Tsd. € bei Post-Money-Cap 5 Mio. € (20 % Rabatt); Seed 2 Mio. € bei 8 Mio. € Pre-Money mit 10 % Pool-Ziel; Serie A 6 Mio. € bei 24 Mio. € Pre-Money. Ergebnis (exakt): SAFE vor Seed 10 %, nach Seed 7 %; Gründer 63 % → 50,4 %; Preis je Anteil 6,30 € → 15,12 €; Gründerwert 6,3 → 15,12 Mio. €. Gegenbeispiele: Down-Round (Pre-Money 6 Mio. €) senkt den Gründerwert auf 3,78 Mio. €; bei Seed-Pre-Money 5 Mio. € greift der Rabatt statt des Caps."
+  },
+  {
+   "id": "X2",
+   "kc": "vc",
+   "original": true,
+   "counterexample": true,
+   "title": "Fondslogik: Was ein Exit leisten muss",
+   "check": "checks.py::fund",
+   "summary": "100-Mio.-€-Fonds, 15 % Anteil bei Exit: Ein Exit zahlt den Fonds ab ≈ 667 Mio. € zurück. 25 solide Exits zu je 40 Mio. € ergeben nur 1,4× netto (nach 20 % Carry); für 3× netto braucht es 350 Mio. € brutto, also einen Exit von ≈ 2,33 Mrd. €. Eigene Rechnung, keine Marktdaten."
+  },
+  {
+   "id": "X3",
+   "kc": "bewertung",
+   "original": true,
+   "counterexample": false,
+   "title": "Zahlenprobe der Aufgaben EN1–EN3",
+   "check": "checks.py::tasks",
+   "summary": "Prüft alle Zahlen der Arbeitsaufgaben unabhängig."
+  },
+  {
+   "id": "X4",
+   "kc": "vc",
+   "original": true,
+   "counterexample": true,
+   "title": "Median 0×, Fonds 3,45×: ein Ausreißer trägt alles",
+   "check": "checks.py::portfolio_skew",
+   "summary": "20 Beteiligungen: Median 0×, brutto 3,45×, Ausreißer 87 % des Rückflusses; ohne ihn 0,47×. Verankert in Kerr, Nanda & Rhodes-Kropf (2014)."
+  }
+ ],
+ "tasks": [
+  {
+   "id": "EN1",
+   "kc": "bewertung",
+   "stage": "worked",
+   "prompt": "Stellen Sie die Kapitalisierungstabelle aus Beispiel X1 nach Seed auf: SAFE-Aktien, neue Pool-Aktien, Preis je Anteil, Anteile aller Gesellschafter.",
+   "hints": [
+    "SAFE: x/(S₀ + x) = A/C.",
+    "Pre-Money-Aktien D enthalten SAFE und neuen Pool; Preis = V/D.",
+    "Pool nach der Runde = 10 % aller Aktien."
+   ],
+   "key": "x = 111 111,1; D = 1 269 841,3; Preis 6,30 €; Pool 158 730,2; Seed-Investor 317 460,3 Aktien (20 %); Anteile: Gründer 63 %, SAFE 7 %, Pool 10 %, Seed 20 %.",
+   "worked": "S₀ = 1 000 000. SAFE: x = S₀·A/(C − A) = 1 000 000·0,5/4,5 = 111 111,1 (10 % vor der Runde). Seed: Investor erhält I/(V + I) = 2/10 = 20 %; Pool-Ziel 10 % nach der Runde; Altgesellschafter (Gründer + SAFE) teilen sich 70 % im Verhältnis 1 000 000 : 111 111 = 90 : 10, also Gründer 63 %, SAFE 7 %. Aktien vor dem Seed-Geld D = (S₀ + x)/(1 − 0,1·1,25) = 1 269 841,3; Preis = 8 Mio. €/D = 6,30 €; neue Pool-Aktien P = D − S₀ − x = 158 730,2; Seed-Aktien 2 Mio. €/6,30 € = 317 460,3. Probe: Summe 1 587 301,6 Aktien; Pool 10 %, Seed 20 %.",
+   "rubric": [
+    "SAFE-Umwandlung (2 P.)",
+    "Pool vor der Runde in Pre-Money (2 P.)",
+    "Preis und Investoraktien (2 P.)",
+    "Anteile mit Probe (1 P.)"
+   ]
+  },
+  {
+   "id": "EN2",
+   "kc": "bewertung",
+   "stage": "transfer",
+   "prompt": "Gleiche Daten wie X1, aber Seed-Pre-Money nur 5 Mio. €. Gilt für den SAFE der Cap oder der Rabatt? Begründen Sie mit beiden Umwandlungspreisen.",
+   "hints": [
+    "Cap-Preis = Cap / Kapitalisierung vor der Runde.",
+    "Rabattpreis = 0,8 × Rundenpreis; der Rundenpreis hängt von der Umwandlung ab."
+   ],
+   "key": "Rabatt: Er liefert mehr Aktien als der Cap (Rundenpreis sinkt so weit, dass 0,8 × Preis unter den Cap-Preis von 4,50 € fällt).",
+   "worked": "Cap-Preis = 5 Mio. €/(1 000 000 + 111 111,1) = 4,50 €. Unter Cap-Annahme: D = 1 111 111,1/(1 − 0,1·1,4) = 1 291 989,7, Rundenpreis 5 Mio. €/D ≈ 3,87 €, Rabattpreis 0,8·3,87 ≈ 3,10 € < 4,50 €. Also mehr Aktien über den Rabatt; dann löst man D = S₀/(1 − 0,14 − A/(0,8·V)) neu (der Rabatt-SAFE erhöht D selbst). Allgemein greift der Rabatt, wenn die Runde niedrig bewertet ist; der Cap schützt bei hoher Bewertung.",
+   "rubric": [
+    "Cap-Preis (1 P.)",
+    "Rundenpreis und Rabattpreis (2 P.)",
+    "richtige Entscheidung und Rückkopplung auf D (2 P.)"
+   ]
+  },
+  {
+   "id": "EN3",
+   "kc": "vc",
+   "stage": "independent",
+   "prompt": "Ein 150-Mio.-€-Fonds hält bei Exit typischerweise 12 % je Beteiligung. Ab welchem Exitwert zahlt eine einzelne Beteiligung den Fonds zurück? Welcher Bruttorückfluss ist für 2× netto bei 20 % Carry nötig?",
+   "hints": [
+    "Fondsgröße / Anteil.",
+    "netto = brutto − 0,2·(brutto − Fonds)."
+   ],
+   "key": "Rückzahlung ab 1,25 Mrd. €; für 2× netto 337,5 Mio. € brutto (ein Einzel-Exit von 2,8125 Mrd. €).",
+   "worked": "Rückzahlung: 150 Mio. €/0,12 = 1,25 Mrd. €. Netto N = B − 0,2(B − 150) = 0,8B + 30. Für N = 300 Mio. € (2×): 0,8B = 270 ⇒ B = 337,5 Mio. €. Ein einzelner Exit müsste dafür 337,5/0,12 = 2,8125 Mrd. € erreichen.",
+   "rubric": [
+    "Rückzahlungsschwelle (1 P.)",
+    "Carry-Gleichung (2 P.)",
+    "Ergebnis (1 P.)"
+   ]
+  },
+  {
+   "id": "EN4",
+   "kc": "bewertung",
+   "stage": "error",
+   "prompt": "Die Folie sagt: „Verwässerung bedeutet, dass die Gründer Geld verlieren.“ Formulieren Sie die Aussage so, dass sie stimmt, und belegen Sie mit X1.",
+   "hints": [
+    "Unterscheiden Sie Anteil und Wert.",
+    "Wert = Anteile × Preis je Anteil."
+   ],
+   "key": "Verwässerung senkt den Anteil; Geld (Papierwert) verlieren die Gründer nur, wenn der Preis je Anteil nicht ausreichend steigt (Down-Round oder Flat-Round mit Pool).",
+   "worked": "In X1 sinkt der Gründeranteil von 63 % auf 50,4 %, der Preis steigt von 6,30 € auf 15,12 €, der Wert von 6,3 auf 15,12 Mio. €. Bei Pre-Money 6 Mio. € in der Serie A fällt der Preis auf 3,78 € und der Wert auf 3,78 Mio. €. Korrekt: „Verwässerung verringert den Anteil; ob die Gründer Wert verlieren, hängt von der Bewertung der Runde ab.“ Die Folie ist für den Fall gemeint, dass zusätzliche Anteile ohne entsprechende Gegenleistung ausgegeben werden.",
+   "rubric": [
+    "Anteil vs. Wert (2 P.)",
+    "Zahlen aus X1 (1 P.)",
+    "präzise Neufassung (1 P.)"
+   ]
+  },
+  {
+   "id": "EN5",
+   "kc": "vc",
+   "stage": "case",
+   "prompt": "Ein Fonds investiert je 1 Mio. € in 20 Start-ups. Ergebnis: 14 Totalverluste, 4 Rückzahlungen zum Einstand (1×), eine Beteiligung mit 5× und eine mit 60×. Bestimmen Sie Median-Multiple und Brutto-Fondsmultiple sowie den Anteil des größten Ausreißers am Rückfluss. Welche Aussage von Kerr, Nanda und Rhodes-Kropf (2014) illustriert das?",
+   "hints": [
+    "Sortieren Sie die 20 Multiples; der Median ist der Mittelwert des 10. und 11. Werts.",
+    "Rückfluss = Σ Multiple × 1 Mio. €."
+   ],
+   "key": "Median 0×; Brutto 69 Mio. € auf 20 Mio. € = 3,45×; Ausreißer 60/69 ≈ 87 % des Rückflusses. Illustriert: niedriger Median, sehr hohe Varianz; Rendite aus der einen großen Erfolgsinvestition.",
+   "worked": "Sortiert: 14-mal 0, 4-mal 1, dann 5 und 60. Der 10. und 11. Wert sind 0 ⇒ Median 0×. Rückfluss 4·1 + 5 + 60 = 69 Mio. € ⇒ 69/20 = 3,45× brutto. Anteil des Ausreißers 60/69 ≈ 0,870. Ohne den 60×-Fall: 9/19 ≈ 0,47× – Verlust. Das ist genau die Struktur „low median value but very high variance“ und „returns on the one investment out of many“ (Kerr, Nanda & Rhodes-Kropf 2014, NBER WP S. 3). Grenze: Zahlen hier frei gewählt, nicht empirisch.",
+   "rubric": [
+    "Median korrekt (1 P.)",
+    "Fondsmultiple (1 P.)",
+    "Ausreißeranteil und kontrafaktische Rechnung (2 P.)",
+    "Quellenbezug mit Grenze (1 P.)"
+   ]
+  }
+ ],
+ "labs": [
+  {
+   "id": "runden",
+   "title": "Finanzierungsrunden & Fondslogik",
+   "purpose": "Kapitalisierungstabelle mit SAFE (Cap/Rabatt), Pool-Shuffle, Up-/Down-Round, Fonds-Multiple",
+   "js": [
+    "lab/venture_math.js",
+    "lab/venture_lab.js"
+   ]
+  }
+ ],
+ "tutor_test_protocol": "../../docs/cross_domain/tutor_tests/ENTREPRENEURSHIP_PROTOCOL.md"
+}

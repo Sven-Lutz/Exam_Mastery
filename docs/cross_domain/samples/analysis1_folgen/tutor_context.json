@@ -1,0 +1,374 @@
+{
+ "module": {
+  "id": "analysis1-folgen",
+  "title": "Analysis 1 – Konvergenz von Folgen",
+  "domain": "mathematics",
+  "language": "de"
+ },
+ "generated": "2026-11-15",
+ "scope": {
+  "summary": "Kapitel 2 der Vorlesung Analysis 1: Folgen, ε-N-Konvergenz und ihre Verneinung, Beschränktheit und Eindeutigkeit, Grenzwertsätze und Sandwich, monotone Konvergenz und Rekursionen, Teilfolgen, Häufungspunkte, lim sup/lim inf, Bolzano–Weierstraß, Cauchy-Kriterium und Vollständigkeit, Kontraktionsbedingung.",
+  "official": [
+   "Vorlesungsskript Analysis 1, Kap. 2 (private Kursunterlage; Definitions- und Satznummern 2.1–2.31 als Lokatoren)"
+  ],
+  "note": "Die Vorlesung legt den Prüfungsstoff fest. Ergänzungen (Lebl) vertiefen, ändern aber nicht den Umfang."
+ },
+ "exam": {
+  "summary": "Offizielle Angaben zu Dauer und Hilfsmitteln liegen nicht vor. Typische Anforderungen laut Kapitel: Definitionen exakt angeben, ε-N-Beweise führen, Grenzwerte mit Grenzwertsätzen berechnen, Konvergenz rekursiver Folgen über Monotonie oder Kontraktion zeigen, Gegenbeispiele angeben.",
+  "known": false
+ },
+ "notation": [
+  {
+   "symbol": "(a_n)_{n∈ℕ}",
+   "meaning": "Folge; ℕ beginnt bei 1"
+  },
+  {
+   "symbol": "a_n → a",
+   "meaning": "∀ε>0 ∃N∈ℕ ∀n≥N: |a_n − a| < ε"
+  },
+  {
+   "symbol": "lim sup, lim inf",
+   "meaning": "größter bzw. kleinster Häufungspunkt einer beschränkten reellen Folge"
+  },
+  {
+   "symbol": "q",
+   "meaning": "Kontraktionskonstante: |a_{n+2} − a_{n+1}| ≤ q|a_{n+1} − a_n| mit 0 ≤ q < 1"
+  }
+ ],
+ "kcs": [
+  {
+   "id": "konv",
+   "label": "ε-N-Konvergenz und ihre Verneinung",
+   "tier": "core",
+   "prerequisites": [
+    "ext:Quantorenlogik",
+    "ext:Betrag und Dreiecksungleichung"
+   ],
+   "objectives": [
+    "Definition 2.2 exakt angeben und an Beispielen N(ε) bestimmen",
+    "Divergenz durch Verneinung mit vertauschten Quantoren nachweisen"
+   ],
+   "misconceptions": [
+    "N darf nicht von n abhängen, aber von ε",
+    "endlicher numerischer Test ersetzt keinen Beweis",
+    "beschränkt ⇒ konvergent"
+   ],
+   "products": {
+    "lab": [
+     {
+      "lab": "folgen",
+      "item": "f1"
+     },
+     {
+      "lab": "folgen",
+      "item": "f3"
+     },
+     {
+      "lab": "folgen",
+      "item": "g-noN"
+     }
+    ],
+    "tasks": [
+     "AN1"
+    ]
+   },
+   "sources": [
+    "skript",
+    "lebl"
+   ]
+  },
+  {
+   "id": "grenzw",
+   "label": "Grenzwertsätze und Sandwichkriterium",
+   "tier": "core",
+   "prerequisites": [
+    "konv"
+   ],
+   "objectives": [
+    "Satz 2.7 und 2.10 anwenden; Voraussetzung a ≠ 0 beim Kehrwert prüfen"
+   ],
+   "misconceptions": [
+    "aus a_n < b_n folgt lim a_n < lim b_n"
+   ],
+   "products": {},
+   "sources": [
+    "skript",
+    "lebl"
+   ]
+  },
+  {
+   "id": "monoton",
+   "label": "Monotone Konvergenz und rekursive Folgen",
+   "tier": "core",
+   "prerequisites": [
+    "konv"
+   ],
+   "objectives": [
+    "Theorem 2.14 anwenden: Monotonie und Beschränktheit per Induktion zeigen, Grenzwert aus Fixpunktgleichung",
+    "Wahl der Lösung der Fixpunktgleichung begründen"
+   ],
+   "misconceptions": [
+    "Grenzwert aus Fixpunktgleichung ohne Existenznachweis",
+    "Fixpunktgleichung legt das Vorzeichen fest"
+   ],
+   "products": {
+    "lab": [
+     {
+      "lab": "folgen",
+      "item": "f4"
+     },
+     {
+      "lab": "folgen",
+      "item": "g-fast"
+     }
+    ],
+    "tasks": [
+     "AN2"
+    ]
+   },
+   "sources": [
+    "skript",
+    "lebl"
+   ]
+  },
+  {
+   "id": "hp",
+   "label": "Teilfolgen, Häufungspunkte, Bolzano–Weierstraß",
+   "tier": "core",
+   "prerequisites": [
+    "konv"
+   ],
+   "objectives": [
+    "Häufungspunkte als Teilfolgengrenzwerte bestimmen",
+    "Konvergenz über eindeutigen Häufungspunkt einer beschränkten Folge entscheiden"
+   ],
+   "misconceptions": [
+    "ein Häufungspunkt ⇒ konvergent (ohne Beschränktheit)"
+   ],
+   "products": {},
+   "sources": [
+    "skript",
+    "lebl"
+   ]
+  },
+  {
+   "id": "cauchy",
+   "label": "Cauchy-Kriterium und Vollständigkeit",
+   "tier": "core",
+   "prerequisites": [
+    "konv",
+    "hp"
+   ],
+   "objectives": [
+    "Cauchy-Folge definieren; Äquivalenz zur Konvergenz in ℝ nutzen",
+    "Gegenbeispiel: Nachbarglieder genügen nicht; ℚ ist nicht vollständig"
+   ],
+   "misconceptions": [
+    "|a_{n+1} − a_n| → 0 ⇒ Cauchy"
+   ],
+   "products": {
+    "tasks": [
+     "AN3"
+    ]
+   },
+   "sources": [
+    "skript",
+    "lebl"
+   ]
+  },
+  {
+   "id": "kontraktion",
+   "label": "Kontraktionsbedingung und Fixpunkt",
+   "tier": "deep",
+   "prerequisites": [
+    "cauchy",
+    "monoton"
+   ],
+   "objectives": [
+    "Satz 2.31 anwenden; a-priori-Schranke berechnen",
+    "Unterschied kontraktiv vs. Kontraktion an einem Gegenbeispiel erklären"
+   ],
+   "misconceptions": [
+    "|f(x) − f(y)| < |x − y| genügt"
+   ],
+   "products": {
+    "lab": [
+     {
+      "lab": "folgen",
+      "item": "f5"
+     },
+     {
+      "lab": "folgen",
+      "item": "g-contr"
+     }
+    ],
+    "tasks": [
+     "AN4"
+    ]
+   },
+   "sources": [
+    "skript",
+    "lebl"
+   ]
+  }
+ ],
+ "tasks": [
+  {
+   "id": "AN1",
+   "kc": "konv",
+   "stage": "independent",
+   "prompt": "Zeigen Sie (2n−1)/(n+3) → 2 mit der ε-N-Definition und bestimmen Sie für ε = 1/100 das kleinste N.",
+   "hints": [
+    "Berechnen Sie |aₙ − 2| als einen Bruch.",
+    "Lösen Sie 7/(n+3) < ε nach n auf.",
+    "Achten Sie auf die strenge Ungleichung am Rand."
+   ]
+  },
+  {
+   "id": "AN2",
+   "kc": "monoton",
+   "stage": "proof",
+   "prompt": "Sei a₁ = 2, aₙ₊₁ = (aₙ + 2/aₙ)/2. Zeigen Sie: aₙ ≥ √2 für alle n, die Folge fällt monoton, und lim aₙ = √2. Was ändert sich für a₁ = −1?",
+   "hints": [
+    "AM-GM: (x + 2/x)/2 ≥ √(x·2/x).",
+    "aₙ₊₁ − aₙ = (2 − aₙ²)/(2aₙ).",
+    "Grenzwert in der Rekursion einsetzen – erst nach Existenznachweis."
+   ]
+  },
+  {
+   "id": "AN3",
+   "kc": "cauchy",
+   "stage": "error",
+   "prompt": "Ein Kommilitone schreibt: „Wegen |aₙ₊₁ − aₙ| → 0 ist (aₙ) eine Cauchy-Folge und konvergiert.“ Widerlegen Sie das mit einem Gegenbeispiel und benennen Sie den Fehler.",
+   "hints": [
+    "Denken Sie an Folgen, die unbeschränkt, aber immer langsamer wachsen.",
+    "√n oder die harmonischen Partialsummen."
+   ]
+  },
+  {
+   "id": "AN4",
+   "kc": "kontraktion",
+   "stage": "transfer",
+   "prompt": "aₙ₊₁ = cos(aₙ), a₁ = 1. Zeigen Sie mit der Kontraktionsbedingung Konvergenz und bestimmen Sie mit der a-priori-Schranke ein n, ab dem |aₙ − a| ≤ 10⁻³ garantiert ist.",
+   "hints": [
+    "Zeigen Sie: cos bildet [cos 1, 1] in sich ab.",
+    "Mittelwertsatz: |cos x − cos y| ≤ max|sin|·|x − y|.",
+    "|aₙ − a| ≤ qⁿ⁻¹/(1−q)·|a₂ − a₁|."
+   ]
+  }
+ ],
+ "examples": [
+  {
+   "id": "E1",
+   "kc": "monoton",
+   "title": "Heron/Newton für √2 in exakten Brüchen",
+   "summary": "a₁ = 2, aₙ₊₁ = (aₙ + 2/aₙ)/2 liefert 3/2, 17/12, 577/408, 665857/470832 … Neu gegenüber der Quelle: exakte Fehleridentität eₙ₊₁ = eₙ²/(2aₙ) (Zahl korrekter Stellen verdoppelt sich), die Folge ist eine Cauchy-Folge rationaler Zahlen ohne Grenzwert in ℚ (Gegenbeispiel zur Vollständigkeit von ℚ) und ein negativer Start führt zu −√2 (Fixpunktgleichung allein wählt keine Wurzel)."
+  },
+  {
+   "id": "E2",
+   "kc": "kontraktion",
+   "title": "cos als Kontraktion – x + 1/x als Gegenbeispiel",
+   "summary": "cos bildet [cos 1, 1] in sich ab, q = sin 1 ≈ 0,8415; die a-priori-Schranke verlangt n = 48 für Fehler ≤ 10⁻³, tatsächlich genügen 16 Glieder (Schranke ist pessimistisch). f(x) = x + 1/x verkleinert Abstände echt, hat aber kein q < 1 und keinen Fixpunkt: aₙ² wächst um mehr als 2 je Schritt."
+  },
+  {
+   "id": "E3",
+   "kc": "konv",
+   "title": "Zahlenprobe AN1",
+   "summary": "Randfall N = 698."
+  }
+ ],
+ "sources": [
+  {
+   "id": "skript",
+   "tier": "official",
+   "type": "lecture",
+   "citation": "Vorlesungsskript Analysis 1, Kapitel 2 „Konvergenz von Folgen“ (private Kursunterlage des Nutzers, nicht veröffentlicht)",
+   "url": null,
+   "doi": null,
+   "date": null,
+   "access_level": "private_course_material",
+   "passages": [
+    {
+     "locator": "Def. 2.2, Satz 2.4, 2.7, 2.10, Thm. 2.14, Def. 2.17–2.19, Thm. 2.24, Def. 2.26, Thm. 2.27, Bem. 2.28, Satz 2.31",
+     "content": "Gliederung und Nummerierung aus der Engine-Erfassung des Skripts; Inhalt hier nur mit eigenen Worten wiedergegeben."
+    }
+   ],
+   "evidence": "official",
+   "limits": "Formeltranskription von vier Beweis-KCs ist laut Engine unsicher (HUMAN_DECISION_REQUIRED); Wortlaut wird nicht wiedergegeben.",
+   "function": "legt den Prüfungsstoff und die Nummerierung fest"
+  },
+  {
+   "id": "lebl",
+   "tier": "extension",
+   "type": "textbook",
+   "citation": "Lebl, J.: Basic Analysis I: Introduction to Real Analysis, Version 6.3, 15. Mai 2026. Lizenz CC BY-NC-SA 4.0 / CC BY-SA 4.0.",
+   "url": "https://www.jirka.org/ra/",
+   "doi": null,
+   "date": "2026-05-15",
+   "access_level": "full_text",
+   "passages": [
+    {
+     "locator": "§2.2, Beispiel 2.2.8 (S. 66–67)",
+     "content": "x₁ = 2, xₙ₊₁ = xₙ − (xₙ² − 2)/(2xₙ): Wohldefiniertheit und Positivität per Induktion, Monotonie über xₙ₊₁² − 2 = (xₙ² − 2)²/(4xₙ²) ≥ 0, Grenzwert √2; Hinweis: mit negativem x₁ ergibt sich −√2; als Newton-Verfahren bezeichnet.",
+     "kcs": [
+      "monoton"
+     ]
+    },
+    {
+     "locator": "§2.1, Satz 2.1.10 (Monotone convergence theorem)",
+     "content": "Eine monotone Folge ist genau dann beschränkt, wenn sie konvergiert.",
+     "kcs": [
+      "monoton"
+     ]
+    },
+    {
+     "locator": "§2.3.3, Satz 2.3.8 (Bolzano–Weierstraß)",
+     "content": "Beschränkte Folgen besitzen eine konvergente Teilfolge.",
+     "kcs": [
+      "hp"
+     ]
+    },
+    {
+     "locator": "§2.4, Beispiel 2.4.3",
+     "content": "(−1)ⁿ ist keine Cauchy-Folge (Nachweis mit n gerade, k = n + 1).",
+     "kcs": [
+      "cauchy"
+     ]
+    },
+    {
+     "locator": "§7.6.1, Def. 7.6.1 und Satz 7.6.2",
+     "content": "Kontraktion = k-Lipschitz mit k < 1; jede Kontraktion eines nichtleeren vollständigen metrischen Raums hat genau einen Fixpunkt; „The words complete and contraction are necessary. See Exercise 7.6.6.“ (Aufgabe 7.6.6 b: 1-Lipschitz-Abbildung ohne Fixpunkt).",
+     "kcs": [
+      "kontraktion"
+     ]
+    },
+    {
+     "locator": "§2.1, Definition 2.1.2",
+     "content": "Konvergenz: für jedes ε > 0 existiert M ∈ ℕ mit |xₙ − x| < ε für alle n ≥ M.",
+     "kcs": [
+      "konv"
+     ]
+    },
+    {
+     "locator": "§2.2, Lemma 2.2.1 (Squeeze lemma)",
+     "content": "Sandwich-Lemma für Folgen mit gemeinsamem Grenzwert der Schranken.",
+     "kcs": [
+      "grenzw"
+     ]
+    }
+   ],
+   "evidence": "secondary (Lehrbuch, Beweise selbst geprüft)",
+   "limits": "Englisch, metrische Räume allgemeiner als die Vorlesung; Nummerierung weicht vom Skript ab.",
+   "function": "offen zugängliche zweite Darstellung mit vollständigen Beweisen; Grundlage für E1 (erweitert um Fehleridentität und ℚ-Gegenbeispiel) und E2 (Gegenbeispiel x + 1/x zu Aufgabe 7.6.6 b)"
+  }
+ ],
+ "labs": [
+  {
+   "id": "folgen",
+   "title": "Folgen & Grenzwerte",
+   "purpose": "ε-Streifen mit Beweis/Test-Unterscheidung, Gegenbeispielsuche, Spinnwebdiagramme für Rekursionen und Kontraktionen"
+  }
+ ],
+ "learner_state": null,
+ "integration": "Keine automatische Synchronisierung. Lernstand nur über manuell exportierte Datei."
+}

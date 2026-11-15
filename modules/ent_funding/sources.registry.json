@@ -1,0 +1,177 @@
+[
+ {
+  "id": "kurs",
+  "tier": "official",
+  "type": "lecture",
+  "status": "verified",
+  "access_level": "private_course_material",
+  "citation": "Vorlesungsfolien Entrepreneurship, Kapitel 6 „Funding a Venture“ (private Kursunterlage des Nutzers, nicht veröffentlicht)",
+  "checked_on": "2026-11-13",
+  "passages": [
+   {
+    "locator": "Abschnitte Kapitalformen, Insolvenz, Lebenszyklus, Business Angels, Venture Capital, Finanzierungsprozess, HTGF-Beispiel mit Wandeldarlehen, Verwässerung über zwei Runden",
+    "content": "Gliederung aus der Engine-Erfassung; Inhalt nur mit eigenen Worten.",
+    "kcs": []
+   }
+  ],
+  "evidence": "official",
+  "used_for": [
+   "scope"
+  ],
+  "limits": "Marktzahlen der Folien wurden nicht unabhängig geprüft und werden nicht übernommen.",
+  "function": "legt Prüfungsstoff und Fragestellungen fest"
+ },
+ {
+  "id": "yc-safe",
+  "tier": "extension",
+  "type": "docs",
+  "status": "verified",
+  "access_level": "section",
+  "citation": "Y Combinator: Post-Money SAFE User Guide (inkl. Quick Start Guide), abgerufen über ycombinator.com/documents",
+  "url": "https://www.ycombinator.com/documents",
+  "date": "Leitfaden ohne Versionsangabe; YC standardisierte den Post-Money-SAFE 2018",
+  "checked_on": "2026-11-15",
+  "passages": [
+   {
+    "locator": "Quick Start Guide, S. 1, Nr. 1",
+    "content": "Verkaufter Anteil = Betrag / Post-Money-Cap; Beispiel 1 Mio. $ bei 15 % ⇒ Cap ≈ 6,7 Mio. $; 500 Tsd. $ ⇒ ≈ 7,5 %.",
+    "kcs": [
+     "bewertung"
+    ]
+   },
+   {
+    "locator": "Quick Start Guide, S. 2, Note #2",
+    "content": "SAFE-Anteil ist „post-safes“, nicht „post-Series A“; SAFEs werden in der Serie A verwässert wie alle anderen.",
+    "kcs": [
+     "bewertung"
+    ]
+   },
+   {
+    "locator": "User Guide, S. 3–4",
+    "content": "Cap ist „post“ aller SAFE-Gelder, NICHT „post“ der Eigenkapitalrunde; „post“ bestehender Optionen und Pools, NICHT eines in der Serie A neu geschaffenen oder aufgestockten Pools.",
+    "kcs": [
+     "bewertung"
+    ]
+   }
+  ],
+  "evidence": "primary (Originaldokument der Praxis)",
+  "used_for": [
+   "claim",
+   "example"
+  ],
+  "limits": "US-Instrument nach US-Recht; in Deutschland sind Wandeldarlehen bzw. andere Gestaltungen üblich. Die Rabatt-Umwandlung wird im Labor vereinfacht modelliert (Rabattpreis auf den Rundenpreis, günstigere Variante gilt).",
+  "function": "präzise Definition des Post-Money-Caps als Grundlage der Kapitalisierungstabelle im Labor und in X1"
+ },
+ {
+  "id": "htgf",
+  "tier": "extension",
+  "type": "practice",
+  "status": "verified",
+  "access_level": "section",
+  "citation": "High-Tech Gründerfonds: „Our investment criteria – Your chance“, htgf.de (englische Startseite, Stand der Seite 2026-11-09)",
+  "url": "https://www.htgf.de/en/",
+  "date": "2026-11-09",
+  "checked_on": "2026-11-15",
+  "passages": [
+   {
+    "locator": "Abschnitt „Our investment criteria“",
+    "content": "Erstinvestitionen in Pre-Seed/Seed typischerweise ab 800 000 €; in Wachstumsrunden bis zu 30 Mio. €; Unternehmen höchstens drei Jahre alt; Sitz oder Betriebsstätte in Deutschland.",
+    "kcs": [
+     "zyklus"
+    ]
+   }
+  ],
+  "evidence": "primary (Selbstauskunft des Investors)",
+  "used_for": [
+   "claim"
+  ],
+  "limits": "Selbstdarstellung; Instrument (Eigenkapital/Wandeldarlehen) und Gesamtvolumen je Unternehmen auf der Seite nicht angegeben; Konditionen ändern sich – Datum beachten. Die Zahlen des Folienbeispiels können ältere Konditionen zeigen.",
+  "function": "datierter Abgleich des Folienbeispiels mit den aktuellen Kriterien"
+ },
+ {
+  "id": "kaplan-stromberg",
+  "tier": "extension",
+  "type": "working_paper",
+  "status": "verified",
+  "access_level": "abstract",
+  "citation": "Kaplan, S. N.; Strömberg, P. (2003): Financial Contracting Theory Meets the Real World: An Empirical Analysis of Venture Capital Contracts. Review of Economic Studies 70(2), 281–315; NBER Working Paper 7660 (2000).",
+  "url": "https://www.nber.org/papers/w7660",
+  "doi": "10.1111/1467-937X.00245",
+  "date": "2003",
+  "checked_on": "2026-11-15",
+  "passages": [
+   {
+    "locator": "Abstract (RES und NBER)",
+    "content": "VC-Finanzierungen trennen Cash-Flow-, Board-, Stimm-, Liquidations- und andere Kontrollrechte; Wandelpapiere am häufigsten; Folgefinanzierungen oft an beobachtbare Kennzahlen geknüpft; bei schlechter Entwicklung übernehmen VCs die Kontrolle, bei sehr guter geben sie Kontroll- und Liquidationsrechte weitgehend ab.",
+    "kcs": [
+     "prozess"
+    ]
+   }
+  ],
+  "evidence": "primary (empirische Studie) – nur Abstract gelesen",
+  "used_for": [
+   "context"
+  ],
+  "limits": "Nur Abstract gelesen: Stichprobe, Methode und Effektgrößen nicht geprüft; keine Ergebnisse über das Abstract hinaus verwenden.",
+  "function": "Forschungsfrage für die Vertiefung „Warum Tranchen und getrennte Rechte?“"
+ },
+ {
+  "id": "gompers-1995",
+  "tier": "frontier",
+  "type": "paper",
+  "status": "unverified",
+  "access_level": "metadata",
+  "citation": "Gompers, P. A. (1995): Optimal Investment, Monitoring, and the Staging of Venture Capital. Journal of Finance 50(5).",
+  "doi": "10.1111/j.1540-6261.1995.tb05184.x",
+  "limits": "Verlagsseite verweigerte den Zugriff (HTTP 403); nichts gelesen",
+  "function": "Kandidat zur Stufenfinanzierung – nicht verwendet"
+ },
+ {
+  "id": "knr-2014",
+  "tier": "extension",
+  "type": "paper",
+  "status": "verified",
+  "access_level": "full_text",
+  "citation": "Kerr, W. R.; Nanda, R.; Rhodes-Kropf, M. (2014): Entrepreneurship as Experimentation. Journal of Economic Perspectives 28(3), 25–48; offen als NBER Working Paper 20358 (Juli 2014).",
+  "url": "https://www.nber.org/papers/w20358.pdf",
+  "date": "2014",
+  "checked_on": "2026-11-15",
+  "passages": [
+   {
+    "locator": "Abstract (PDF-S. 2)",
+    "content": "Erfolgswahrscheinlichkeiten sind niedrig, extrem schief verteilt und vor der Investition unbekannt.",
+    "kcs": [
+     "vc"
+    ]
+   },
+   {
+    "locator": "WP S. 3",
+    "content": "Renditeverteilung mit niedrigem Median, aber sehr hoher Varianz (mit Verweis auf Scherer & Harhoff 2000; Hall & Woodward 2010); VC-Investoren verdienen an der einen Investition unter vielen, die ein großer Erfolg wird; die große Mehrheit gibt weniger als den investierten Betrag zurück.",
+    "kcs": [
+     "vc"
+    ]
+   },
+   {
+    "locator": "WP S. 7",
+    "content": "Die Mehrheit der VC-finanzierten Unternehmen scheitert trotz erfahrener Investoren.",
+    "kcs": [
+     "vc"
+    ]
+   },
+   {
+    "locator": "WP S. 2",
+    "content": "Fallbeispiel Google: 12,5 Mio. $ (Sequoia, 1999) waren beim Verkauf 2005 über 4 Mrd. $ wert, das 320-Fache (nach Sahlman 2010).",
+    "kcs": [
+     "vc"
+    ]
+   }
+  ],
+  "evidence": "secondary (Übersichtsartikel in begutachteter Fachzeitschrift)",
+  "used_for": [
+   "claim",
+   "example"
+  ],
+  "limits": "Übersicht: Verteilungsaussagen beruhen auf zitierten Studien, nicht auf eigenen Daten; US-Kontext; Google-Fall ist eine Anekdote mit Survivorship-Risiko. Verifikation: research_log.jsonl (SHA-256 des PDF).",
+  "function": "empirische Verankerung der Fondslogik (X2, EN5, Labor-Station v4): niedriger Median, Rendite aus seltenen Ausreißern"
+ }
+]

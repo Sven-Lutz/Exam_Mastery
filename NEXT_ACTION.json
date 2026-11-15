@@ -1,26 +1,96 @@
 {
-  "updated": "2026-11-14",
+  "updated": "2026-11-15",
   "repo": "Sven-Lutz/Exam_Mastery",
-  "branch": "import/engine-snapshot",
-  "pr": 2,
-  "local_engine_checkout": "~/Documents/02_Projekte/01_GitHub_Projekte/Exam_Mastery_Studio/engine/Exam_Mastery_Engine_v0_5_1_p0_dev (feat/v0.18-learning-engine @ 913db7b, full history bundled in ~/Projects/Exam_Mastery_Backups)",
-  "release_status": {"nlp_neural_sequence_labeling_and_rc_v0.21.0-rc1_products": "HUMAN_REJECTED"},
-  "done": [
-    "A: inventory (clean tree, no active runs, no launchd job)",
-    "B: curated snapshot imported, SHA-256 verified, fresh venv 715 passed / 6 skipped",
-    "D (partial): 67,448 derived images/caches in unreferenced runs deleted, ~5.3 GiB freed (log: ~/Projects/Exam_Mastery_Backups/cleanup-2026-11-14-deleted.tsv)"
+  "main": "PR #2 squash-merged (engine snapshot, CI green on ubuntu-latest)",
+  "branch": "feat/nlp-reference-unit (PR #3: DRAFT, DO NOT MERGE; title updated 2026-11-15)",
+  "release_status": {
+    "engine_rc_v0.21.0-rc1_products_incl_nlp_baseline": "HUMAN_REJECTED",
+    "nlp_reference_unit_v1": "HUMAN_REJECTED (Issue #4)",
+    "nlp_reference_unit_v2": "NOT RELEASABLE (Issues #4-#6)",
+    "nlp_reference_unit_v3": "HUMAN_REJECTED (Issue #7, mean 0.75/4 over 8 dimensions)",
+    "nlp_reference_unit_v4": "HUMAN_REJECTED (Issue #8, 17 ratings, mean 16/17=0.94/4; lab 0/4 in all 5 dimensions)",
+    "nlp_reference_unit_v5": "HUMAN_REJECTED (owner review received 2026-11-15; no further v5 review needed)",
+    "nlp_reference_unit_v6": "HUMAN_REVIEW_PENDING (Issue #9; docs/cross_domain/V6_REPORT.md); no self-release",
+    "v6": "HUMAN_REJECTED (v6.1, Issue #10, mean 8/6 = 1.333/4)",
+    "v7": "v7.1 (cd438a9): GitHub CI green (runs 43732994556, 43732999492); CONTENT_CORRECTNESS/DIDACTIC/PUBLISHING review required; no self-release"
+  },
+  "product": {
+    "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
+    "build": "python -m exam_mastery.reference_unit build units/nlp_sequence_labeling --out ~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling",
+    "anki_preview": "python -m exam_mastery.reference_unit anki-preview units/nlp_sequence_labeling --out ~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling",
+    "open": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling/index.html",
+    "v2_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v2_snapshot/",
+    "reports": [
+      "docs/reference_unit/V5_REPORT.md",
+      "docs/reference_unit/review_v5/ (before/after evidence)",
+      "docs/reference_unit/V4_REPORT.md",
+      "docs/reference_unit/MATH_AUDIT.md",
+      "docs/reference_unit/CURRICULUM_MAP.md"
+    ],
+    "open_lab": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling/labor.html",
+    "v4_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v4_snapshot/",
+    "v7_report": "docs/reference_unit/V7_REFERENCE_SLICE.md (+ review_v7/before|after)",
+    "v6_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v6_snapshot/",
+    "v7_1_report": "docs/reference_unit/V7_1_CORRECTIONS.md (+ review_v7_1)"
+  },
+  "verified": [
+    "see final test run in commit message",
+    "QC: analysis1 all automatic dims PASS except proof_correctness NOT_VERIFIED; ENT literature_coverage FAIL (gap formen); NLP source_validity PASS after lafferty/su fix"
   ],
-  "next_action": "C: reference unit NLP 'Neural Sequence Labeling' (BiRNN, token/span F1 incl. zero-denominator, micro/macro). First locate the reported critical defect in the archived rejected run course-0e03a5f311fb/ch-20261113T185317Z-22ffdf83; fix root causes in author prompt/schema/visual/math path; regenerate only this chapter via the engine.",
+  "not_verified": [
+    "ChatGPT tutor sessions (protocols prepared, not run)",
+    "proof correctness (expert)",
+    "didactic quality",
+    "Anki/textbook/workbook/exams improvements (open product requirement)"
+  ],
+  "next_action": "RL engine production pilot (owner prompt 2026-11-15): sources at ~/Documents/01_Studium/RL (02 - Optimal Decision Making.pdf, Exercises/, Tutorium/); old engine run course-a8fba2d65467. Step 1 done: located sources + surveyed engine (exam_mastery/*, prompts/). Next: read engine pipeline (workflow.py, production.py, publish.py, chapter_publish.py), add generic engine components (workbook with integrated exams+solutions, design tokens in renderer, MDP lab kind with math core, independent MDP oracle gate, research stage), then real engine run with agent provider; no paid calls.",
   "open_decisions_for_owner": [
-    "Merge PR #2 (snapshot without history) or request history publication after author rewrite",
-    "Authorised budget for the next production run (agent provider: ledger 32/50 used)",
-    "Authorise the Sunday launchd job",
-    "Concrete location of the 'critical error' in the NLP rating, if known"
+    "Rate the v7 reference slice as products (textbook §6 pages 12-26, figures, lab simplex/attention, AT10, A19/B-19, Anki cards) per Issue #10 acceptance questions",
+    "Only after acceptance: transfer quality to other chapters/modules",
+    "Pilot budget (none authorised)",
+    "Weekly launchd (not activated)"
   ],
   "cleanup_candidates_not_touched": [
-    "Exam_Mastery_Studio/runs_v0_5_1_p0_dev (876M, old engine runs)",
-    "Exam_Mastery_Studio/output (223M), review_exports (85M), release_candidates (19M)",
-    "Referenced runs kept intact as baselines"
+    "Exam_Mastery_Studio/runs_v0_5_1_p0_dev (876M)",
+    "Exam_Mastery_Studio/output (223M)",
+    "review_exports (85M)"
   ],
-  "budget": {"paid_calls_authorised": 0}
+  "budget": {
+    "paid_calls_authorised": 0,
+    "engine_provider_calls": 0,
+    "claude_code_session_tokens": "not exposed to the session; not measured",
+    "tutor_api_calls_authorised": 0
+  },
+  "workflow": {
+    "gemini": "removed from workflow (Issue #8)",
+    "paid_provider_calls": "none authorised",
+    "weekly_launchd": "not activated",
+    "pr3": "draft, DO NOT MERGE"
+  },
+  "v5_ratings": {
+    "scientific.textbook": "2/4",
+    "scientific.mathematics_derivations": "1/4",
+    "scientific.books_research_cases": "1/4",
+    "scientific.pdf_layout": "2/4",
+    "scientific.workbook": "1/4",
+    "scientific.worked_solutions": "1/4",
+    "scientific.mock_exams": "1/4",
+    "anki.academic_content": "1/4",
+    "anki.html_css_media": "1/4",
+    "anki.long_term_usefulness": "1/4",
+    "lab.mathematical_visualization": "2/4",
+    "lab.free_experimentation": "2/4",
+    "lab.interaction_feedback": "2/4",
+    "lab.understanding_gain": "1/4",
+    "lab.ux_design": "2/4",
+    "system_integration": "1/4",
+    "exam_core_vs_deeper_mastery": "NOT RATED"
+  },
+  "modules": {
+    "layer": "exam_mastery/modules (contract, sources, tutor, tutor_adapter, CLI python -m exam_mastery.modules build <dir> --out <out>)",
+    "analysis1_folgen": "modules/analysis1_folgen -> ~/Exam_Mastery_Output/modules/analysis1_folgen (labor.html, tutor/)",
+    "ent_funding": "modules/ent_funding -> ~/Exam_Mastery_Output/modules/ent_funding",
+    "nlp": "build-unit units/nlp_sequence_labeling (adapter); tutor/ also in reference unit output"
+  },
+  "priorities": "Issue #10: core study products + publication-grade lab first; tutor deferred (keep exports working, no new tutor work)"
 }

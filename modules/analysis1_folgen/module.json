@@ -1,0 +1,347 @@
+{
+ "id": "analysis1-folgen",
+ "title": "Analysis 1 – Konvergenz von Folgen",
+ "domain": "mathematics",
+ "language": "de",
+ "status": "HUMAN_REVIEW_PENDING",
+ "scope": {
+  "summary": "Kapitel 2 der Vorlesung Analysis 1: Folgen, ε-N-Konvergenz und ihre Verneinung, Beschränktheit und Eindeutigkeit, Grenzwertsätze und Sandwich, monotone Konvergenz und Rekursionen, Teilfolgen, Häufungspunkte, lim sup/lim inf, Bolzano–Weierstraß, Cauchy-Kriterium und Vollständigkeit, Kontraktionsbedingung.",
+  "official": [
+   "Vorlesungsskript Analysis 1, Kap. 2 (private Kursunterlage; Definitions- und Satznummern 2.1–2.31 als Lokatoren)"
+  ],
+  "note": "Die Vorlesung legt den Prüfungsstoff fest. Ergänzungen (Lebl) vertiefen, ändern aber nicht den Umfang."
+ },
+ "exam": {
+  "summary": "Offizielle Angaben zu Dauer und Hilfsmitteln liegen nicht vor. Typische Anforderungen laut Kapitel: Definitionen exakt angeben, ε-N-Beweise führen, Grenzwerte mit Grenzwertsätzen berechnen, Konvergenz rekursiver Folgen über Monotonie oder Kontraktion zeigen, Gegenbeispiele angeben.",
+  "known": false
+ },
+ "notation": [
+  {
+   "symbol": "(a_n)_{n∈ℕ}",
+   "meaning": "Folge; ℕ beginnt bei 1"
+  },
+  {
+   "symbol": "a_n → a",
+   "meaning": "∀ε>0 ∃N∈ℕ ∀n≥N: |a_n − a| < ε"
+  },
+  {
+   "symbol": "lim sup, lim inf",
+   "meaning": "größter bzw. kleinster Häufungspunkt einer beschränkten reellen Folge"
+  },
+  {
+   "symbol": "q",
+   "meaning": "Kontraktionskonstante: |a_{n+2} − a_{n+1}| ≤ q|a_{n+1} − a_n| mit 0 ≤ q < 1"
+  }
+ ],
+ "kcs": [
+  {
+   "id": "konv",
+   "label": "ε-N-Konvergenz und ihre Verneinung",
+   "tier": "core",
+   "prerequisites": [
+    "ext:Quantorenlogik",
+    "ext:Betrag und Dreiecksungleichung"
+   ],
+   "objectives": [
+    "Definition 2.2 exakt angeben und an Beispielen N(ε) bestimmen",
+    "Divergenz durch Verneinung mit vertauschten Quantoren nachweisen"
+   ],
+   "misconceptions": [
+    "N darf nicht von n abhängen, aber von ε",
+    "endlicher numerischer Test ersetzt keinen Beweis",
+    "beschränkt ⇒ konvergent"
+   ],
+   "products": {
+    "lab": [
+     {
+      "lab": "folgen",
+      "item": "f1"
+     },
+     {
+      "lab": "folgen",
+      "item": "f3"
+     },
+     {
+      "lab": "folgen",
+      "item": "g-noN"
+     }
+    ],
+    "tasks": [
+     "AN1"
+    ]
+   },
+   "sources": [
+    "skript",
+    "lebl"
+   ],
+   "search_terms": [
+    "epsilon N definition limit of a sequence"
+   ]
+  },
+  {
+   "id": "grenzw",
+   "label": "Grenzwertsätze und Sandwichkriterium",
+   "tier": "core",
+   "prerequisites": [
+    "konv"
+   ],
+   "objectives": [
+    "Satz 2.7 und 2.10 anwenden; Voraussetzung a ≠ 0 beim Kehrwert prüfen"
+   ],
+   "misconceptions": [
+    "aus a_n < b_n folgt lim a_n < lim b_n"
+   ],
+   "products": {},
+   "sources": [
+    "skript",
+    "lebl"
+   ],
+   "search_terms": [
+    "squeeze theorem sequences"
+   ]
+  },
+  {
+   "id": "monoton",
+   "label": "Monotone Konvergenz und rekursive Folgen",
+   "tier": "core",
+   "prerequisites": [
+    "konv"
+   ],
+   "objectives": [
+    "Theorem 2.14 anwenden: Monotonie und Beschränktheit per Induktion zeigen, Grenzwert aus Fixpunktgleichung",
+    "Wahl der Lösung der Fixpunktgleichung begründen"
+   ],
+   "misconceptions": [
+    "Grenzwert aus Fixpunktgleichung ohne Existenznachweis",
+    "Fixpunktgleichung legt das Vorzeichen fest"
+   ],
+   "products": {
+    "lab": [
+     {
+      "lab": "folgen",
+      "item": "f4"
+     },
+     {
+      "lab": "folgen",
+      "item": "g-fast"
+     }
+    ],
+    "tasks": [
+     "AN2"
+    ]
+   },
+   "sources": [
+    "skript",
+    "lebl"
+   ],
+   "search_terms": [
+    "monotone convergence theorem recursive sequence"
+   ]
+  },
+  {
+   "id": "hp",
+   "label": "Teilfolgen, Häufungspunkte, Bolzano–Weierstraß",
+   "tier": "core",
+   "prerequisites": [
+    "konv"
+   ],
+   "objectives": [
+    "Häufungspunkte als Teilfolgengrenzwerte bestimmen",
+    "Konvergenz über eindeutigen Häufungspunkt einer beschränkten Folge entscheiden"
+   ],
+   "misconceptions": [
+    "ein Häufungspunkt ⇒ konvergent (ohne Beschränktheit)"
+   ],
+   "products": {},
+   "sources": [
+    "skript",
+    "lebl"
+   ],
+   "search_terms": [
+    "Bolzano-Weierstrass theorem sequences"
+   ]
+  },
+  {
+   "id": "cauchy",
+   "label": "Cauchy-Kriterium und Vollständigkeit",
+   "tier": "core",
+   "prerequisites": [
+    "konv",
+    "hp"
+   ],
+   "objectives": [
+    "Cauchy-Folge definieren; Äquivalenz zur Konvergenz in ℝ nutzen",
+    "Gegenbeispiel: Nachbarglieder genügen nicht; ℚ ist nicht vollständig"
+   ],
+   "misconceptions": [
+    "|a_{n+1} − a_n| → 0 ⇒ Cauchy"
+   ],
+   "products": {
+    "tasks": [
+     "AN3"
+    ]
+   },
+   "sources": [
+    "skript",
+    "lebl"
+   ],
+   "search_terms": [
+    "Cauchy sequence completeness rationals not complete"
+   ]
+  },
+  {
+   "id": "kontraktion",
+   "label": "Kontraktionsbedingung und Fixpunkt",
+   "tier": "deep",
+   "prerequisites": [
+    "cauchy",
+    "monoton"
+   ],
+   "objectives": [
+    "Satz 2.31 anwenden; a-priori-Schranke berechnen",
+    "Unterschied kontraktiv vs. Kontraktion an einem Gegenbeispiel erklären"
+   ],
+   "misconceptions": [
+    "|f(x) − f(y)| < |x − y| genügt"
+   ],
+   "products": {
+    "lab": [
+     {
+      "lab": "folgen",
+      "item": "f5"
+     },
+     {
+      "lab": "folgen",
+      "item": "g-contr"
+     }
+    ],
+    "tasks": [
+     "AN4"
+    ]
+   },
+   "sources": [
+    "skript",
+    "lebl"
+   ],
+   "search_terms": [
+    "contraction mapping principle Banach fixed point"
+   ]
+  }
+ ],
+ "examples": [
+  {
+   "id": "E1",
+   "kc": "monoton",
+   "original": true,
+   "counterexample": true,
+   "title": "Heron/Newton für √2 in exakten Brüchen",
+   "check": "checks.py::heron",
+   "summary": "a₁ = 2, aₙ₊₁ = (aₙ + 2/aₙ)/2 liefert 3/2, 17/12, 577/408, 665857/470832 … Neu gegenüber der Quelle: exakte Fehleridentität eₙ₊₁ = eₙ²/(2aₙ) (Zahl korrekter Stellen verdoppelt sich), die Folge ist eine Cauchy-Folge rationaler Zahlen ohne Grenzwert in ℚ (Gegenbeispiel zur Vollständigkeit von ℚ) und ein negativer Start führt zu −√2 (Fixpunktgleichung allein wählt keine Wurzel)."
+  },
+  {
+   "id": "E2",
+   "kc": "kontraktion",
+   "original": true,
+   "counterexample": true,
+   "title": "cos als Kontraktion – x + 1/x als Gegenbeispiel",
+   "check": "checks.py::contraction",
+   "summary": "cos bildet [cos 1, 1] in sich ab, q = sin 1 ≈ 0,8415; die a-priori-Schranke verlangt n = 48 für Fehler ≤ 10⁻³, tatsächlich genügen 16 Glieder (Schranke ist pessimistisch). f(x) = x + 1/x verkleinert Abstände echt, hat aber kein q < 1 und keinen Fixpunkt: aₙ² wächst um mehr als 2 je Schritt."
+  },
+  {
+   "id": "E3",
+   "kc": "konv",
+   "original": true,
+   "counterexample": false,
+   "title": "Zahlenprobe AN1",
+   "check": "checks.py::task_minN",
+   "summary": "Randfall N = 698."
+  }
+ ],
+ "tasks": [
+  {
+   "id": "AN1",
+   "kc": "konv",
+   "stage": "independent",
+   "prompt": "Zeigen Sie (2n−1)/(n+3) → 2 mit der ε-N-Definition und bestimmen Sie für ε = 1/100 das kleinste N.",
+   "hints": [
+    "Berechnen Sie |aₙ − 2| als einen Bruch.",
+    "Lösen Sie 7/(n+3) < ε nach n auf.",
+    "Achten Sie auf die strenge Ungleichung am Rand."
+   ],
+   "key": "|aₙ − 2| = 7/(n+3); N(ε) = ⌊7/ε − 3⌋ + 1; für ε = 1/100: N = 698.",
+   "worked": "aₙ − 2 = (2n − 1 − 2n − 6)/(n+3) = −7/(n+3), also |aₙ − 2| = 7/(n+3). Sei ε > 0. Für n > 7/ε − 3 gilt 7/(n+3) < ε. Wähle N als kleinste natürliche Zahl > 7/ε − 3. Da 7/(n+3) in n fällt, gilt die Ungleichung für alle n ≥ N. Für ε = 1/100: n > 697, also N = 698; für n = 697 ist 7/700 = 1/100 nicht kleiner als ε.",
+   "rubric": [
+    "Abstand exakt umgeformt (2 P.)",
+    "N in Abhängigkeit von ε und Monotonie-Argument für alle n ≥ N (2 P.)",
+    "Randfall n = 697 (1 P.)"
+   ]
+  },
+  {
+   "id": "AN2",
+   "kc": "monoton",
+   "stage": "proof",
+   "prompt": "Sei a₁ = 2, aₙ₊₁ = (aₙ + 2/aₙ)/2. Zeigen Sie: aₙ ≥ √2 für alle n, die Folge fällt monoton, und lim aₙ = √2. Was ändert sich für a₁ = −1?",
+   "hints": [
+    "AM-GM: (x + 2/x)/2 ≥ √(x·2/x).",
+    "aₙ₊₁ − aₙ = (2 − aₙ²)/(2aₙ).",
+    "Grenzwert in der Rekursion einsetzen – erst nach Existenznachweis."
+   ],
+   "key": "AM-GM ⇒ aₙ₊₁ ≥ √2; aₙ₊₁ − aₙ = (2 − aₙ²)/(2aₙ) ≤ 0; monoton und beschränkt ⇒ konvergent; Grenzwert a = (a + 2/a)/2 ⇒ a² = 2, a ≥ √2 > 0 ⇒ a = √2. Für a₁ = −1: −√2.",
+   "worked": "Induktiv aₙ > 0 (Summe positiver Zahlen). Für x > 0 gilt (x + 2/x)/2 − √2 = (x − √2)²/(2x) ≥ 0, also aₙ₊₁ ≥ √2. Damit aₙ² ≥ 2 für n ≥ 1 (a₁ = 2), und aₙ₊₁ − aₙ = (2 − aₙ²)/(2aₙ) ≤ 0. Monoton fallend und durch √2 nach unten beschränkt ⇒ konvergent (Theorem 2.14), Grenzwert a ≥ √2. Grenzübergang in 2aₙ₊₁aₙ = aₙ² + 2 liefert 2a² = a² + 2, a² = 2, also a = √2. Fehler: aₙ₊₁ − √2 = (aₙ − √2)²/(2aₙ) – quadratische Konvergenz. Für a₁ = −1 ist die Folge negativ (Symmetrie f(−x) = −f(x)); dasselbe Argument liefert −√2. Die Fixpunktgleichung allein hat zwei Lösungen; erst die Vorzeichen-Invarianz wählt die richtige.",
+   "rubric": [
+    "Positivität und untere Schranke (2 P.)",
+    "Monotonie (1 P.)",
+    "Satz 2.14 korrekt angewendet (1 P.)",
+    "Wahl der Wurzel begründet (1 P.)",
+    "negativer Start (1 P.)"
+   ]
+  },
+  {
+   "id": "AN3",
+   "kc": "cauchy",
+   "stage": "error",
+   "prompt": "Ein Kommilitone schreibt: „Wegen |aₙ₊₁ − aₙ| → 0 ist (aₙ) eine Cauchy-Folge und konvergiert.“ Widerlegen Sie das mit einem Gegenbeispiel und benennen Sie den Fehler.",
+   "hints": [
+    "Denken Sie an Folgen, die unbeschränkt, aber immer langsamer wachsen.",
+    "√n oder die harmonischen Partialsummen."
+   ],
+   "key": "aₙ = √n: |aₙ₊₁ − aₙ| = 1/(√(n+1) + √n) → 0, aber unbeschränkt, also divergent. Cauchy verlangt |aₘ − aₙ| < ε für ALLE m, n ≥ N.",
+   "worked": "Für aₙ = √n gilt √(n+1) − √n = 1/(√(n+1) + √n) ≤ 1/(2√n) → 0. Aber aₙ ist unbeschränkt, also nicht konvergent (Satz 2.4) und damit nicht Cauchy (in ℝ äquivalent). Fehler: Die Cauchy-Bedingung kontrolliert beliebig weite Abstände aₘ − aₙ, nicht nur Nachbarn; die Summe vieler kleiner Schritte kann beliebig groß werden (vgl. Bemerkung 2.28 der Vorlesung).",
+   "rubric": [
+    "korrektes Gegenbeispiel mit Rechnung (2 P.)",
+    "Fehler präzise benannt (1 P.)"
+   ]
+  },
+  {
+   "id": "AN4",
+   "kc": "kontraktion",
+   "stage": "transfer",
+   "prompt": "aₙ₊₁ = cos(aₙ), a₁ = 1. Zeigen Sie mit der Kontraktionsbedingung Konvergenz und bestimmen Sie mit der a-priori-Schranke ein n, ab dem |aₙ − a| ≤ 10⁻³ garantiert ist.",
+   "hints": [
+    "Zeigen Sie: cos bildet [cos 1, 1] in sich ab.",
+    "Mittelwertsatz: |cos x − cos y| ≤ max|sin|·|x − y|.",
+    "|aₙ − a| ≤ qⁿ⁻¹/(1−q)·|a₂ − a₁|."
+   ],
+   "key": "q = sin 1 ≈ 0,8415 auf [cos 1, 1]; |a₂ − a₁| = 1 − cos 1 ≈ 0,4597; kleinstes n mit qⁿ⁻¹/(1−q)·0,4597 ≤ 10⁻³ ist n = 48 (tatsächlich reichen 16).",
+   "worked": "cos fällt auf [0, 1]; mit c = cos 1 ≈ 0,5403 gilt cos([c, 1]) = [cos 1, cos c] ≈ [0,5403; 0,8576] ⊂ [c, 1]. Also bleiben alle aₙ in [c, 1]. Nach dem Mittelwertsatz |cos x − cos y| ≤ (max_{[c,1]} |sin|)|x − y| = sin(1)|x − y|, q = sin 1 < 1. Damit |aₙ₊₂ − aₙ₊₁| ≤ q|aₙ₊₁ − aₙ| (Satz 2.31) ⇒ Cauchy ⇒ konvergent, und der Grenzwert erfüllt a = cos a. A-priori: |aₙ − a| ≤ Σ_{k≥n} |aₖ₊₁ − aₖ| ≤ qⁿ⁻¹/(1−q)·|a₂ − a₁|. Mit 1 − q ≈ 0,1585: qⁿ⁻¹ ≤ 3,45·10⁻⁴ ⇒ n − 1 ≥ 47, n = 48. Numerisch genügen 16 Glieder: Die Schranke nutzt das ungünstigste q auf dem ganzen Intervall.",
+   "rubric": [
+    "invariantes Intervall (2 P.)",
+    "q über Mittelwertsatz (2 P.)",
+    "a-priori-Schranke und n (2 P.)",
+    "Deutung pessimistische Schranke (1 P.)"
+   ]
+  }
+ ],
+ "labs": [
+  {
+   "id": "folgen",
+   "title": "Folgen & Grenzwerte",
+   "purpose": "ε-Streifen mit Beweis/Test-Unterscheidung, Gegenbeispielsuche, Spinnwebdiagramme für Rekursionen und Kontraktionen",
+   "js": [
+    "lab/analysis_math.js",
+    "lab/analysis_lab.js"
+   ]
+  }
+ ],
+ "tutor_test_protocol": "../../docs/cross_domain/tutor_tests/ANALYSIS1_PROTOCOL.md"
+}

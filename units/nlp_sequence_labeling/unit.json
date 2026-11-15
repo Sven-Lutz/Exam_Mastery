@@ -1,0 +1,4199 @@
+{
+ "id": "nlp-sequence-labeling",
+ "version": "7.0.0",
+ "course": "Natural Language Processing",
+ "chapter": "09 Neural Sequence Labeling",
+ "title": "Neuronale Sequenzmarkierung",
+ "subtitle": "NER und Spannen · RNN, BiRNN, Self-Attention, Positionen · CRF und Viterbi · Precision, Recall, F1 · Fallstudie",
+ "status": "Status v7: Referenzsequenz Self-Attention in Prüfung (keine Selbstfreigabe). v1, v3, v4, v5, v6.1: HUMAN_REJECTED.",
+ "text": "text.html",
+ "kcs": {
+  "spans": "Spannenkodierung (IO, BIO, BILOU)",
+  "birnn": "Abhängigkeitsbereich und BiRNN",
+  "attention": "Self-Attention",
+  "position": "Positionsinformation",
+  "decoding": "Labelabhängigkeiten und Viterbi",
+  "prf": "Precision, Recall, F1",
+  "prf-edge": "Grenzfälle mit Nenner 0",
+  "prf-level": "Phrasen- vs. Token-Zählung",
+  "micro-macro": "Micro- und Macro-Mittelung"
+ },
+ "kc_map": {
+  "spans": {
+   "sections": [
+    "spannen",
+    "ner"
+   ],
+   "lecture": "PDF-S. 4–18",
+   "textbook": "SLP3 §9.5.2 S. 239; §18.3 S. 405",
+   "research": [
+    "ratinov",
+    "lample",
+    "conll"
+   ],
+   "scenes": [
+    "spans"
+   ]
+  },
+  "birnn": {
+   "sections": [
+    "tagger",
+    "rnn",
+    "birnn"
+   ],
+   "lecture": "PDF-S. 24–29, 77–80",
+   "textbook": "SLP3 §14.4–14.4.2 S. 312–314",
+   "research": [
+    "schuster"
+   ],
+   "scenes": [
+    "birnn"
+   ]
+  },
+  "attention": {
+   "sections": [
+    "attention",
+    "architektur"
+   ],
+   "lecture": "PDF-S. 31–58, 72–76",
+   "textbook": "SLP3 §7.1–7.3 S. 179–188",
+   "research": [
+    "vaswani",
+    "jain",
+    "wiegreffe"
+   ],
+   "scenes": [
+    "attention"
+   ]
+  },
+  "position": {
+   "sections": [
+    "position"
+   ],
+   "lecture": "PDF-S. 60–70",
+   "textbook": "SLP3 §7.4 S. 191–193",
+   "research": [
+    "vaswani",
+    "su"
+   ],
+   "scenes": [
+    "attention"
+   ]
+  },
+  "decoding": {
+   "sections": [
+    "struktur",
+    "fallstudie"
+   ],
+   "lecture": "PDF-S. 82–85",
+   "textbook": "SLP3 §18.4.5–18.5 S. 411–419; §9.5.3 S. 239–241",
+   "research": [
+    "lafferty",
+    "andor",
+    "ratinov",
+    "huang",
+    "lample"
+   ],
+   "scenes": [
+    "viterbi"
+   ]
+  },
+  "prf": {
+   "sections": [
+    "prf"
+   ],
+   "lecture": "PDF-S. 20–21",
+   "textbook": "SLP3 §4.9 S. 112–114",
+   "research": [],
+   "scenes": [
+    "f1"
+   ]
+  },
+  "prf-edge": {
+   "sections": [
+    "prf"
+   ],
+   "lecture": "– (Vertiefung)",
+   "textbook": "SLP3 §4.9; scikit-learn zero_division",
+   "research": [
+    "sklearn"
+   ],
+   "scenes": [
+    "f1"
+   ]
+  },
+  "prf-level": {
+   "sections": [
+    "einheit"
+   ],
+   "lecture": "PDF-S. 21–22",
+   "textbook": "SLP3 §9.5.4 S. 241",
+   "research": [
+    "conll",
+    "manning"
+   ],
+   "scenes": [
+    "counter"
+   ]
+  },
+  "micro-macro": {
+   "sections": [
+    "mittelung"
+   ],
+   "lecture": "– (Vertiefung)",
+   "textbook": "SLP3 §4.9.1 S. 114–115",
+   "research": [
+    "opitz"
+   ],
+   "scenes": [
+    "micromacro"
+   ]
+  }
+ },
+ "toy": {
+  "emb": {
+   "Washington": [
+    1,
+    0
+   ],
+   "signed": [
+    0,
+    1
+   ],
+   "state": [
+    0,
+    -1
+   ]
+  },
+  "a_fw": 0.5,
+  "a_bw": 0.8
+ },
+ "tasks": [
+  {
+   "id": "S1",
+   "stage": "independent",
+   "kc": "spans",
+   "title": "BIO lesen und Labels zählen",
+   "prompt": "(a) Wie viele Labels braucht BILOU für \\(K=5\\) Entitätstypen? (b) Welche Spannen liest <code>conlleval</code> aus der Folge <code>O I-LOC I-LOC B-LOC</code> über den Wörtern \\(w_1\\dots w_4\\)?",
+   "givens": {
+    "K": 5,
+    "scheme": "BILOU"
+   },
+   "answers": [
+    {
+     "label": "(a) Anzahl Labels",
+     "type": "num",
+     "check": "labels:BILOU:5",
+     "diagnoses": [
+      {
+       "value": "11",
+       "msg": "Das ist BIO (\\(2K+1\\)). BILOU hat vier Labels je Typ: \\(4K+1\\)."
+      }
+     ]
+    },
+    {
+     "label": "(b) Spannen",
+     "type": "choice",
+     "options": [
+      "\\([w_2\\,w_3]\\)LOC und \\([w_4]\\)LOC",
+      "nur \\([w_4]\\)LOC – ein I am Anfang ist ungültig und wird verworfen",
+      "\\([w_2\\,w_3\\,w_4]\\)LOC"
+     ],
+     "correct": 0,
+     "diagnoses": [
+      {
+       "value": "1",
+       "msg": "<code>conlleval</code> verwirft nichts: Ein <code>I-X</code>, das keine Spanne fortsetzt, eröffnet eine neue."
+      },
+      {
+       "value": "2",
+       "msg": "<code>B-LOC</code> beginnt immer eine neue Spanne."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "BILOU: B, I, L, U je Typ, dazu O.",
+    "Lesen Sie Wort für Wort: Wo beginnt eine Spanne?"
+   ],
+   "solution": "(a) \\(4\\cdot5+1=21\\). (b) \\(w_1\\) ist O. \\(w_2\\) ist <code>I-LOC</code> ohne Vorgänger desselben Typs und eröffnet daher eine Spanne, die \\(w_3\\) fortsetzt. \\(w_4\\) ist <code>B-LOC</code> und beginnt eine neue: \\([w_2\\,w_3]\\)LOC und \\([w_4]\\)LOC.",
+   "rubric": [
+    "4K+1 (1 P.)",
+    "I ohne Vorgänger eröffnet Spanne (1 P.)",
+    "B beginnt neue Spanne (1 P.)"
+   ]
+  },
+  {
+   "id": "G1",
+   "stage": "guided",
+   "kc": "birnn",
+   "title": "Selbst weiterrechnen: Position 2",
+   "prompt": "Berechnen Sie im Experiment für „Washington <b>state</b>“ den Vorwärtszustand \\(h^{\\rightarrow}_2=\\tanh(0{,}5\\,h^{\\rightarrow}_1+e_2)\\) mit \\(h^{\\rightarrow}_1=(0{,}7616;\\,0)\\) und \\(e_2=(0,-1)\\). Vier Nachkommastellen.",
+   "answers": [
+    {
+     "label": "erste Komponente",
+     "type": "num",
+     "check": "toy:fw:state:2:0",
+     "diagnoses": [
+      {
+       "value": "0.7616",
+       "msg": "Das ist \\(h^{\\rightarrow}_1\\). Der alte Zustand wird mit 0,5 multipliziert: \\(\\tanh(0{,}5\\cdot0{,}7616+0)\\)."
+      }
+     ]
+    },
+    {
+     "label": "zweite Komponente",
+     "type": "num",
+     "check": "toy:fw:state:2:1",
+     "diagnoses": [
+      {
+       "value": "0.7616",
+       "msg": "Vorzeichen: \\(e(\\text{state})=(0,-1)\\), und \\(\\tanh(-1)=-\\tanh(1)\\)."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Komponentenweise: \\(0{,}5\\cdot(0{,}7616;\\,0)+(0;\\,-1)=(0{,}3808;\\,-1)\\).",
+    "Dann \\(\\tanh(0{,}3808)\\) und \\(\\tanh(-1)\\)."
+   ],
+   "solution": "\\(0{,}5\\,h^{\\rightarrow}_1+e_2=(0{,}3808;\\,-1)\\), also \\(h^{\\rightarrow}_2=(\\tanh 0{,}3808;\\ \\tanh(-1))=(0{,}3634;\\,-0{,}7616)\\). Mit „signed“: \\((0{,}3634;\\,+0{,}7616)\\). Ab Position 2 unterscheiden sich die Sätze – dort hat der Vorwärtszustand das unterschiedliche Wort gelesen.",
+   "rubric": [
+    "Dämpfung 0,5 auf den alten Zustand",
+    "Komponentenweise tanh",
+    "Deutung: Unterschied erst ab Position 2"
+   ]
+  },
+  {
+   "id": "W1",
+   "stage": "worked",
+   "kc": "birnn",
+   "title": "Durchgerechnet: Parameter eines CoNLL-Taggers",
+   "prompt": "BiRNN-Tagger für CoNLL-2003 (vier Typen PER, ORG, LOC, MISC; Vorlesung PDF-S. 11) in BIO-Kodierung, Einbettung \\(d=100\\), Zustand \\(d_h=128\\) je Richtung. Wie viele Parameter hat er ohne Einbettungsmatrix?",
+   "givens": {
+    "d": 100,
+    "dh": 128,
+    "K": 4
+   },
+   "steps": [
+    {
+     "s": "\\(|\\mathcal L|=2K+1=2\\cdot4+1=9\\)",
+     "why": "Je Typ ein B- und ein I-Label, dazu O."
+    },
+    {
+     "s": "Eine Richtung: \\(128^2+128\\cdot100+128=16\\,384+12\\,800+128=29\\,312\\)",
+     "why": "\\(W\\in\\mathbb R^{d_h\\times d_h}\\), \\(U\\in\\mathbb R^{d_h\\times d}\\), \\(b\\in\\mathbb R^{d_h}\\)."
+    },
+    {
+     "s": "Zwei Richtungen: \\(2\\cdot29\\,312=58\\,624\\)",
+     "why": "Vorwärts- und Rückwärts-RNN haben eigene Parameter."
+    },
+    {
+     "s": "Ausgabe: \\(9\\cdot256+9=2\\,313\\)",
+     "why": "\\(W_o\\) hat \\(2d_h=256\\) Spalten, weil es den verketteten Zustand liest."
+    },
+    {
+     "s": "Summe: \\(58\\,624+2\\,313=60\\,937\\)",
+     "why": "Probe: \\(2(d_h^2+d_hd+d_h)+|\\mathcal L|(2d_h+1)\\)."
+    }
+   ],
+   "answers": [
+    {
+     "label": "Selbsterklärung: Warum hat \\(W_o\\) hier 256 und nicht 128 Spalten?",
+     "type": "choice",
+     "options": [
+      "Weil \\(W_o\\) den verketteten Zustand \\([h^{\\rightarrow};h^{\\leftarrow}]\\in\\mathbb R^{2d_h}\\) liest",
+      "Weil BIO doppelt so viele Labels hat wie IO",
+      "Weil der Bias mitgezählt wird"
+     ],
+     "correct": 0
+    }
+   ],
+   "result_check": "params:100:128:9",
+   "solution": "\\(|\\mathcal L|=2\\cdot4+1=9\\). Je Richtung \\(128^2+128\\cdot100+128=29\\,312\\), beide Richtungen \\(58\\,624\\). Ausgabe \\(W_o\\in\\mathbb R^{9\\times256}\\) plus Bias: \\(9\\cdot256+9=2\\,313\\). Summe \\(60\\,937\\). Selbsterklärung: \\(W_o\\) hat 256 Spalten, weil der Klassifikator \\(h^{\\mathrm{bi}}_t\\in\\mathbb R^{2d_h}\\) liest.",
+   "rubric": [
+    "Labelzahl 2K+1",
+    "zwei Richtungen ohne geteilte Parameter",
+    "W_o mit 2d_h Spalten",
+    "Summe"
+   ]
+  },
+  {
+   "id": "B1",
+   "stage": "independent",
+   "kc": "birnn",
+   "title": "Parameter eines kleineren Taggers",
+   "prompt": "BiRNN-Tagger mit drei Entitätstypen in BIO, Einbettung \\(d=50\\), Zustand \\(d_h=64\\) je Richtung. Wie viele Parameter ohne Einbettungsmatrix?",
+   "givens": {
+    "d": 50,
+    "dh": 64,
+    "K": 3
+   },
+   "answers": [
+    {
+     "label": "Parameter",
+     "type": "num",
+     "check": "params:50:64:7",
+     "diagnoses": [
+      {
+       "value": "15175",
+       "msg": "\\(W_o\\) liest \\([h^{\\rightarrow};h^{\\leftarrow}]\\) und hat \\(2d_h\\) Spalten, nicht \\(d_h\\)."
+      },
+      {
+       "value": "8263",
+       "msg": "Es gibt zwei RNNs mit getrennten Parametern; Sie haben eine Richtung gezählt."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Erst \\(|\\mathcal L|\\) für drei Typen.",
+    "Je Richtung \\(d_h^2+d_hd+d_h\\); Ausgabe \\(|\\mathcal L|(2d_h+1)\\)."
+   ],
+   "solution": "\\(|\\mathcal L|=2\\cdot3+1=7\\). Je Richtung \\(64^2+64\\cdot50+64=4\\,096+3\\,200+64=7\\,360\\); beide \\(14\\,720\\). Ausgabe \\(7\\cdot128+7=903\\). Summe \\(15\\,623\\).",
+   "rubric": [
+    "Labelzahl (1 P.)",
+    "zwei Richtungen (1 P.)",
+    "W_o mit 2d_h Spalten (1 P.)",
+    "Summe (1 P.)"
+   ]
+  },
+  {
+   "id": "B2",
+   "stage": "faded",
+   "kc": "birnn",
+   "title": "Rückwärts rechnen mit einem fehlenden Schritt",
+   "prompt": "Rückwärts-RNN des Experiments, \\(h^{\\leftarrow}_t=\\tanh(0{,}8\\,h^{\\leftarrow}_{t+1}+e_t)\\), \\(h^{\\leftarrow}_3=0\\), Satz „Washington state“. Bestimmen Sie die zweite Komponente von \\(h^{\\leftarrow}_1\\).",
+   "steps": [
+    {
+     "s": "\\(h^{\\leftarrow}_2=\\tanh(0{,}8\\cdot0+(0,-1))=(0;\\,-0{,}7616)\\)",
+     "why": "Die Rückwärtsrichtung beginnt beim letzten Wort, mit Startzustand 0."
+    },
+    {
+     "s": "\\(0{,}8\\,h^{\\leftarrow}_2+e_1=(0;\\,-0{,}6093)+(1;\\,0)=(1;\\,-0{,}6093)\\)",
+     "why": "Alten Zustand dämpfen, Einbettung von „Washington“ addieren."
+    },
+    {
+     "s": "\\(h^{\\leftarrow}_1=(\\tanh 1;\\ \\ ?\\ )\\)",
+     "why": "Ihr Schritt.",
+     "blank": true
+    }
+   ],
+   "answers": [
+    {
+     "label": "zweite Komponente von \\(h^{\\leftarrow}_1\\)",
+     "type": "num",
+     "check": "toy:bw:state:1:1",
+     "diagnoses": [
+      {
+       "value": "0.5436",
+       "msg": "Vorzeichen prüfen: Das Argument ist \\(-0{,}6093\\)."
+      },
+      {
+       "value": "-0.6093",
+       "msg": "Das ist das Argument; es fehlt \\(\\tanh\\)."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "\\(\\tanh(-0{,}6093)\\); \\(\\tanh\\) ist ungerade."
+   ],
+   "solution": "\\(\\tanh(-0{,}6093)\\approx-0{,}5436\\), also \\(h^{\\leftarrow}_1=(0{,}7616;\\,-0{,}5436)\\). Das Minuszeichen stammt von „state“ an Position 2 und erreicht Position 1 nur über die Rückwärtsrekursion.",
+   "rubric": [
+    "Rekursion von rechts",
+    "Wert ±0,0005",
+    "Herkunft des Vorzeichens"
+   ]
+  },
+  {
+   "id": "AT1",
+   "stage": "faded",
+   "kc": "attention",
+   "title": "Self-Attention von Hand",
+   "prompt": "Drei Token mit \\(x_1=(1,0)\\), \\(x_2=(0,1)\\), \\(x_3=(1,1)\\); \\(W_Q=W_K=W_V=I\\), \\(d_k=2\\). Berechnen Sie das Gewicht \\(\\alpha_{33}\\), mit dem Token 3 auf sich selbst achtet, und die erste Komponente von \\(o_3\\).",
+   "data": {
+    "X": [
+     [
+      1,
+      0
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      1,
+      1
+     ]
+    ],
+    "i": 3
+   },
+   "steps": [
+    {
+     "s": "\\(q_3=(1,1)\\); \\(q_3^\\top k_j=1,\\ 1,\\ 2\\) für \\(j=1,2,3\\)",
+     "why": "Mit \\(W=I\\) sind Anfrage, Schlüssel und Wert die Eingaben selbst."
+    },
+    {
+     "s": "\\(e_{3j}=q_3^\\top k_j/\\sqrt2=0{,}7071;\\ 0{,}7071;\\ 1{,}4142\\)",
+     "why": "Skalierung mit \\(\\sqrt{d_k}=\\sqrt2\\)."
+    },
+    {
+     "s": "\\(\\alpha_{33}=\\dfrac{e^{1{,}4142}}{2e^{0{,}7071}+e^{1{,}4142}}=\\ ?\\)",
+     "why": "Ihr Schritt: Softmax über die drei Energien.",
+     "blank": true
+    }
+   ],
+   "answers": [
+    {
+     "label": "\\(\\alpha_{33}\\)",
+     "type": "num",
+     "check": "attn:AT1:w:2",
+     "diagnoses": [
+      {
+       "value": "0.5761",
+       "msg": "Sie haben ohne \\(\\sqrt{d_k}\\) skaliert (Energien 1, 1, 2)."
+      },
+      {
+       "value": "0.5",
+       "msg": "Das ist \\(2/(1+1+2)\\) – die Softmax normiert \\(e^{e_{ij}}\\), nicht die Energien selbst."
+      }
+     ]
+    },
+    {
+     "label": "erste Komponente von \\(o_3\\)",
+     "type": "num",
+     "check": "attn:AT1:o:0"
+    }
+   ],
+   "hints": [
+    "\\(e^{0{,}7071}\\approx2{,}0281\\), \\(e^{1{,}4142}\\approx4{,}1133\\).",
+    "\\(o_3=\\alpha_{31}v_1+\\alpha_{32}v_2+\\alpha_{33}v_3\\) mit \\(v_j=x_j\\)."
+   ],
+   "solution": "\\(\\alpha_{3\\cdot}=(2{,}0281;\\,2{,}0281;\\,4{,}1133)/8{,}1695=(0{,}2483;\\,0{,}2483;\\,0{,}5035)\\). \\(o_3=0{,}2483\\,(1,0)+0{,}2483\\,(0,1)+0{,}5035\\,(1,1)=(0{,}7517;\\,0{,}7517)\\). Token 3 achtet am stärksten auf sich selbst, weil \\(q_3\\) mit \\(k_3\\) das größte Skalarprodukt hat.",
+   "rubric": [
+    "Energien mit Skalierung",
+    "Softmax korrekt normiert",
+    "gewichtete Summe"
+   ]
+  },
+  {
+   "id": "PO1",
+   "stage": "independent",
+   "kc": "position",
+   "title": "Reihenfolge und relative Position",
+   "prompt": "(a) Ein Self-Attention-Modell ohne Positionskodierung verarbeitet „Marry kills John“ und „John kills Marry“. Was gilt für den Ausgabevektor von „John“? (b) RoPE mit \\(\\theta=0{,}5\\), \\(q=k=(1,0)\\): Berechnen Sie die Ähnlichkeit \\(\\big(R(m\\theta)q\\big)^\\top R(n\\theta)k\\) für \\(m=2\\), \\(n=5\\).",
+   "givens": {
+    "theta": 0.5,
+    "m": 2,
+    "n": 5
+   },
+   "answers": [
+    {
+     "label": "(a)",
+     "type": "choice",
+     "options": [
+      "In beiden Sätzen identisch",
+      "Verschieden, weil „John“ an anderer Stelle steht",
+      "Nur der Vektor von „kills“ ist identisch"
+     ],
+     "correct": 0,
+     "diagnoses": [
+      {
+       "value": "1",
+       "msg": "Ohne Positionskodierung ist Self-Attention permutations-äquivariant (Satz 4): Die Stelle eines Tokens geht nicht ein."
+      },
+      {
+       "value": "2",
+       "msg": "Satz 4 gilt für jedes Token, nicht nur für das mittlere."
+      }
+     ]
+    },
+    {
+     "label": "(b) Ähnlichkeit",
+     "type": "num",
+     "check": "rope:0.5:2:5",
+     "diagnoses": [
+      {
+       "value": "-0.8011",
+       "msg": "Das ist \\(\\cos(5\\cdot0{,}5)\\): Es zählt der Abstand \\(n-m\\), nicht die absolute Position \\(n\\)."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Satz 4.",
+    "\\(q^\\top R((n-m)\\theta)k=\\cos((n-m)\\theta)\\) für \\(q=k=(1,0)\\)."
+   ],
+   "solution": "(a) Identisch: \\(\\operatorname{Att}(PX)=P\\operatorname{Att}(X)\\), der Vektor wandert nur mit dem Token. (b) \\(q^\\top R((5-2)\\cdot0{,}5)k=\\cos(1{,}5)\\approx0{,}0707\\). Gleicher Wert für \\(m=4,n=7\\): nur der Abstand zählt.",
+   "rubric": [
+    "Satz 4 angewandt",
+    "Drehungen zusammengefasst",
+    "Wert"
+   ]
+  },
+  {
+   "id": "C1",
+   "stage": "independent",
+   "kc": "decoding",
+   "title": "Gierig gegen Viterbi",
+   "prompt": "Emissionswerte \\(s_t(\\ell)\\) für „in New York“ mit Labels O, B-LOC, I-LOC: in (2; 0; 0,5), New (0,3; 1,0; 1,2), York (0; 0,2; 1,5). Übergänge: verboten sind Start→I-LOC und O→I-LOC, alle anderen 0. (a) Welche Folge wählt die gierige Dekodierung? (b) Welchen Score hat die beste gültige Folge?",
+   "data": {
+    "labels": [
+     "O",
+     "B-LOC",
+     "I-LOC"
+    ],
+    "emissions": [
+     [
+      2,
+      0,
+      0.5
+     ],
+     [
+      0.3,
+      1.0,
+      1.2
+     ],
+     [
+      0,
+      0.2,
+      1.5
+     ]
+    ]
+   },
+   "answers": [
+    {
+     "label": "(a) gierig",
+     "type": "choice",
+     "options": [
+      "O I-LOC I-LOC",
+      "O B-LOC I-LOC",
+      "O B-LOC B-LOC"
+     ],
+     "correct": 0
+    },
+    {
+     "label": "(b) bester Score",
+     "type": "num",
+     "check": "viterbi:C1",
+     "diagnoses": [
+      {
+       "value": "4.7",
+       "msg": "Das ist der Score der gierigen, aber ungültigen Folge."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "(a) Je Wort das Maximum.",
+    "(b) Prüfen Sie O B-LOC I-LOC gegen O B-LOC B-LOC."
+   ],
+   "solution": "(a) Je Wort das Maximum: O (2), I-LOC (1,2), I-LOC (1,5) – Score 4,7, aber O→I-LOC ist verboten. (b) Gültige Kandidaten: O B-LOC I-LOC mit \\(2+1{,}0+1{,}5=4{,}5\\); O B-LOC B-LOC mit 3,2; O O I-LOC verboten; O O O mit 2,3. Viterbi wählt O B-LOC I-LOC, Score 4,5.",
+   "rubric": [
+    "gierige Folge",
+    "Übergangsregel angewandt",
+    "bester Score"
+   ]
+  },
+  {
+   "id": "B3",
+   "stage": "hint",
+   "kc": "prf-edge",
+   "title": "Ein System, das nichts ausgibt",
+   "prompt": "Ein Satz enthält 3 Gold-Entitäten; das System gibt keine aus. Bestimmen Sie \\(F_1\\) mit der Zählform und entscheiden Sie, ob \\(P\\) definiert ist.",
+   "answers": [
+    {
+     "label": "\\(F_1\\)",
+     "type": "num",
+     "check": "f1:0:0:3"
+    },
+    {
+     "label": "Ist \\(P\\) definiert?",
+     "type": "choice",
+     "options": [
+      "ja, \\(P=0\\)",
+      "ja, \\(P=1\\)",
+      "nein, \\(P=0/0\\)"
+     ],
+     "correct": 2,
+     "diagnoses": [
+      {
+       "value": "0",
+       "msg": "Es gibt keine Ausgabe, über die man einen Anteil bilden könnte: \\(\\mathrm{TP}+\\mathrm{FP}=0\\). 0 wäre eine Konvention."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "TP, FP, FN aufschreiben.",
+    "Fall (iii) der Tabelle."
+   ],
+   "solution": "TP = FP = 0, FN = 3. \\(P=0/0\\) nicht definiert, \\(R=0/3=0\\), Zählform \\(F_1=0/(0+0+3)=0\\). \\(2PR/(P+R)\\) ist hier nicht anwendbar.",
+   "rubric": [
+    "Zählungen",
+    "P undefiniert begründet",
+    "F1 = 0 über Zählform"
+   ]
+  },
+  {
+   "id": "B4",
+   "stage": "independent",
+   "kc": "prf-level",
+   "title": "Phrasen- und Token-Ebene",
+   "prompt": "Gold: <code>[Angela Merkel]PER besuchte gestern die [Siemens AG]ORG in [München]LOC .</code><br>System: <code>[Angela Merkel]PER besuchte gestern die [Siemens]ORG AG in [München]ORG .</code><br>Berechnen Sie \\(F_1\\) auf Phrasen- und auf Token-Ebene.",
+   "data": {
+    "tokens": [
+     "Angela",
+     "Merkel",
+     "besuchte",
+     "gestern",
+     "die",
+     "Siemens",
+     "AG",
+     "in",
+     "München",
+     "."
+    ],
+    "gold": [
+     "B-PER",
+     "I-PER",
+     "O",
+     "O",
+     "O",
+     "B-ORG",
+     "I-ORG",
+     "O",
+     "B-LOC",
+     "O"
+    ],
+    "pred": [
+     "B-PER",
+     "I-PER",
+     "O",
+     "O",
+     "O",
+     "B-ORG",
+     "O",
+     "O",
+     "B-ORG",
+     "O"
+    ]
+   },
+   "answers": [
+    {
+     "label": "\\(F_1\\) Phrasen",
+     "type": "num",
+     "check": "span_f1:B4",
+     "diagnoses": [
+      {
+       "value": "2/5",
+       "msg": "Der Typfehler bei München zählt auf Phrasen-Ebene als FP <em>und</em> FN."
+      },
+      {
+       "value": "1/2",
+       "msg": "Auch der Grenzfehler bei „Siemens AG“ zählt doppelt: FP für [Siemens], FN für [Siemens AG]."
+      }
+     ]
+    },
+    {
+     "label": "\\(F_1\\) Token",
+     "type": "num",
+     "check": "token_f1:B4",
+     "diagnoses": [
+      {
+       "value": "3/4",
+       "msg": "Das ist die Precision. Recall: 3 von 5 Gold-Token."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Spannen als (Anfang, Ende, Typ) auflisten.",
+    "Token: 5 Gold-Entitätstoken, 4 System-Entitätstoken."
+   ],
+   "solution": "Phrasen: Gold {[Angela Merkel]PER, [Siemens AG]ORG, [München]LOC}, System {[Angela Merkel]PER, [Siemens]ORG, [München]ORG}: TP = 1, FP = 2, FN = 2, \\(F_1=2/6=1/3\\). Token: TP = 3 (Angela, Merkel, Siemens), FP = 1 (München als ORG), FN = 2 (AG; München als LOC): \\(F_1=6/9=2/3\\).",
+   "rubric": [
+    "Spannenmengen (1 P.)",
+    "Doppelzählung (2 P.)",
+    "Token-Zählung (1 P.)",
+    "beide Werte (1 P.)"
+   ]
+  },
+  {
+   "id": "B5",
+   "stage": "error",
+   "kc": "prf-level",
+   "title": "Fehleranalyse: eine Zähltabelle",
+   "prompt": "Eine Kommilitonin wertet B4 auf Phrasen-Ebene so aus:<br>TP: <code>[Angela Merkel]PER</code> · FP: <code>[Siemens]ORG</code> · FN: <code>[Siemens AG]ORG</code>, <code>[München]LOC</code><br>und erhält \\(P=\\tfrac12\\), \\(R=\\tfrac13\\). Welche Aussage beschreibt ihren Fehler genau?",
+   "answers": [
+    {
+     "label": "Fehler",
+     "type": "choice",
+     "options": [
+      "Die System-Spanne [München]ORG fehlt in ihrer FP-Liste.",
+      "Die Gold-Spanne [Siemens AG]ORG fehlt in ihrer FN-Liste.",
+      "Sie hat [Siemens]ORG als FP gezählt, obwohl es ein Teiltreffer ist.",
+      "Sie hat True Negatives mitgezählt."
+     ],
+     "correct": 0,
+     "diagnoses": [
+      {
+       "value": "1",
+       "msg": "[Siemens AG]ORG steht in ihrer FN-Liste."
+      },
+      {
+       "value": "2",
+       "msg": "Auf Phrasen-Ebene gibt es keine Teiltreffer; [Siemens]ORG ist korrekt ein FP."
+      },
+      {
+       "value": "3",
+       "msg": "TN kommen in P und R nicht vor."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Gehen Sie die drei System-Spannen durch: In welcher Liste steht jede?"
+   ],
+   "solution": "Jede System-Spanne muss genau einmal als TP oder FP erscheinen. Das System gibt drei Spannen aus; in ihren Listen stehen zwei ([Angela Merkel] als TP, [Siemens] als FP). [München]ORG fehlt als FP. Richtig: FP = 2, \\(P=\\tfrac13\\). Die FN-Liste ist korrekt.",
+   "rubric": [
+    "Prüfprinzip: jede System-Spanne genau einmal",
+    "fehlende FP-Zählung benannt",
+    "korrigiertes P"
+   ]
+  },
+  {
+   "id": "B6",
+   "stage": "transfer",
+   "kc": "micro-macro",
+   "title": "Eine seltene Klasse fällt aus",
+   "prompt": "PER: TP 80, FP 10, FN 20; LOC: TP 50, FP 25, FN 5; MISC: TP 0, FP 3, FN 7. (a) Micro-\\(F_1\\), (b) Macro-\\(F_1\\), (c) das exakte Gewicht \\(w_{\\mathrm{MISC}}\\) von MISC in Micro-\\(F_1\\) als gewichtetem Mittel der Typ-\\(F_1\\)-Werte.",
+   "data": {
+    "counts": "80,10,20;50,25,5;0,3,7",
+    "k": 2
+   },
+   "answers": [
+    {
+     "label": "(a) Micro-\\(F_1\\)",
+     "type": "num",
+     "check": "micro:80,10,20;50,25,5;0,3,7"
+    },
+    {
+     "label": "(b) Macro-\\(F_1\\)",
+     "type": "num",
+     "check": "macro:80,10,20;50,25,5;0,3,7",
+     "diagnoses": [
+      {
+       "value": "0.8057",
+       "msg": "Das ist das Mittel über PER und LOC. MISC hat \\(F_1=0\\) und zählt mit."
+      }
+     ]
+    },
+    {
+     "label": "(c) \\(w_{\\mathrm{MISC}}\\)",
+     "type": "num",
+     "check": "microweight:80,10,20;50,25,5;0,3,7:2",
+     "diagnoses": [
+      {
+       "value": "7/162",
+       "msg": "Das ist der Gold-Anteil (Support) von MISC. Micro gewichtet mit \\(D_k=2\\mathrm{TP}_k+\\mathrm{FP}_k+\\mathrm{FN}_k\\)."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Micro: Zählungen addieren, dann Zählform.",
+    "\\(D_k=2\\mathrm{TP}_k+\\mathrm{FP}_k+\\mathrm{FN}_k\\); \\(w_k=D_k/\\sum_l D_l\\)."
+   ],
+   "solution": "\\(D=(190,\\ 130,\\ 10)\\), \\(\\sum D=330\\). Typ-\\(F_1\\): PER \\(160/190\\approx0{,}8421\\), LOC \\(100/130\\approx0{,}7692\\), MISC \\(0/10=0\\). (a) Micro \\(=(160+100+0)/330=26/33\\approx0{,}7879\\). (b) Macro \\(\\approx0{,}5371\\). (c) \\(w_{\\mathrm{MISC}}=10/330=1/33\\approx0{,}0303\\) – nicht der Gold-Anteil \\(7/162\\approx0{,}0432\\). Macro zeigt den Ausfall, weil MISC dort ein Drittel Gewicht hat.",
+   "rubric": [
+    "Micro (1 P.)",
+    "Macro (1 P.)",
+    "Gewicht über D_k statt Support (2 P.)"
+   ]
+  },
+  {
+   "id": "F1",
+   "stage": "transfer",
+   "kc": "decoding",
+   "title": "Fallstudie: was Viterbi repariert",
+   "prompt": "Nutzen Sie die Fallstudie in Abschnitt 13 (gierige gegen Viterbi-Dekodierung). (a) Phrasen-\\(F_1\\) nach Viterbi. (b) Wie viele Grenzfehler bleiben nach Viterbi? (c) Warum repariert Viterbi den Fehler bei „Berlin .“ nicht?",
+   "answers": [
+    {
+     "label": "(a) Phrasen-\\(F_1\\) (Viterbi)",
+     "type": "num",
+     "check": "case:viterbi:span_f1",
+     "diagnoses": [
+      {
+       "value": "8/17",
+       "msg": "Das ist der Wert der gierigen Dekodierung."
+      }
+     ]
+    },
+    {
+     "label": "(b) Grenzfehler",
+     "type": "num",
+     "check": "case:viterbi:boundary"
+    },
+    {
+     "label": "(c)",
+     "type": "choice",
+     "options": [
+      "<code>B-LOC I-LOC</code> ist eine gültige Folge; die Übergangsregel verbietet sie nicht",
+      "Viterbi berücksichtigt das letzte Wort eines Satzes nicht",
+      "Der Satzpunkt ist kein Token"
+     ],
+     "correct": 0
+    }
+   ],
+   "hints": [
+    "Lesen Sie die Tabelle der Fallstudie für „Viterbi“."
+   ],
+   "solution": "(a) Nach Viterbi: TP = 5, FP = 3, FN = 3, \\(F_1=10/16=5/8\\) (gierig: TP = 4, FP = 5, FN = 4, \\(8/17\\)). (b) 2 Grenzfehler: [Barack]PER statt [Barack Obama]PER und [Berlin .]LOC statt [Berlin]LOC. (c) Harte Übergangsregeln schließen nur ungültige Folgen aus; <code>B-LOC I-LOC</code> ist gültig. Nur bessere Emissionen (oder gelernte Übergangswerte, die „. “ als Fortsetzung bestrafen) ändern das.",
+   "rubric": [
+    "F1 nach Viterbi",
+    "Grenzfehler gezählt",
+    "Begründung gültig/ungültig"
+   ]
+  },
+  {
+   "id": "B7",
+   "stage": "transfer",
+   "kc": "prf",
+   "title": "Beweisaufgabe",
+   "prompt": "Zeigen Sie für \\(P,R\\in(0,1]\\): \\(F_1\\le 2\\min(P,R)\\). Was folgt für ein System, das jedes Wort als Entität markiert?",
+   "answers": [
+    {
+     "label": "Selbstbewertung nach Lösung",
+     "type": "self"
+    }
+   ],
+   "hints": [
+    "O. B. d. A. \\(P\\le R\\); mit \\(P+R&gt;0\\) multiplizieren."
+   ],
+   "solution": "Sei \\(P\\le R\\) (Symmetrie). \\(\\tfrac{2PR}{P+R}\\le 2P\\iff 2PR\\le 2P(P+R)\\iff 0\\le 2P^2\\) – wahr. Markiert ein System alles, ist \\(R\\) nahe 1, \\(P\\) gleich dem Anteil der Entitätstoken; \\(F_1\\) bleibt unter dem Doppelten davon.",
+   "rubric": [
+    "WLOG begründet",
+    "Äquivalenzumformung mit positivem Faktor",
+    "Interpretation"
+   ]
+  },
+  {
+   "id": "S0",
+   "stage": "recall",
+   "kc": "spans",
+   "title": "Selbsterklärung: wozu L- und U-?",
+   "prompt": "BIO kann jede Spannenmenge eindeutig darstellen (Satz A). Welche zusätzliche Information liefert BILOU dem Klassifikator?",
+   "answers": [
+    {
+     "label": "Antwort",
+     "type": "choice",
+     "options": [
+      "Das Spannenende und Einwort-Spannen sind direkt als eigenes Label markiert",
+      "BILOU kann Spannen darstellen, die BIO nicht darstellen kann",
+      "BILOU braucht weniger Labels als BIO"
+     ],
+     "correct": 0,
+     "diagnoses": [
+      {
+       "value": "1",
+       "msg": "Beide Schemata sind auf gültigen Folgen eindeutig; BILOU drückt keine zusätzlichen Spannenmengen aus."
+      },
+      {
+       "value": "2",
+       "msg": "BILOU hat \\(4K+1\\), BIO \\(2K+1\\) Labels."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Vergleichen Sie, was der Klassifikator an der letzten Position einer Spanne vorhersagen muss."
+   ],
+   "solution": "BILOU markiert das letzte Wort einer Mehrwortspanne (L-) und Einwortspannen (U-) explizit. Darstellbar sind dieselben Spannenmengen wie mit BIO; der Unterschied liegt im Lernsignal: Der Klassifikator muss Spannenenden direkt vorhersagen, statt sie implizit aus dem folgenden Label zu erschließen.",
+   "rubric": [
+    "richtige Option (1 P.)",
+    "Begründung: gleiche Ausdruckskraft, anderes Lernsignal (1 P.)"
+   ]
+  },
+  {
+   "id": "S2",
+   "stage": "independent",
+   "kc": "spans",
+   "title": "Kodieren: BIO",
+   "prompt": "Satz: <code>Tickets nach New York und Boston</code> mit den Gold-Spannen [New York]CITY und [Boston]CITY. Geben Sie die BIO-Folge an (Labels durch Leerzeichen getrennt).",
+   "answers": [
+    {
+     "label": "BIO-Folge",
+     "type": "seq",
+     "check": "bio:6:2-4-CITY,5-6-CITY:BIO"
+    }
+   ],
+   "hints": [
+    "Jede Spanne beginnt mit B-, setzt sich mit I- fort."
+   ],
+   "solution": "<code>O O B-CITY I-CITY O B-CITY</code>. „Boston“ bekommt B-CITY, weil es eine neue Spanne beginnt; I-CITY wäre gültig nur direkt nach einem CITY-Label.",
+   "rubric": [
+    "Spannenanfänge mit B- (1 P.)",
+    "Fortsetzung mit I- (1 P.)",
+    "Rest O (1 P.)"
+   ]
+  },
+  {
+   "id": "S3",
+   "stage": "independent",
+   "kc": "spans",
+   "title": "Kodieren: BILOU",
+   "prompt": "Gleicher Satz wie S2. Geben Sie die BILOU-Folge an.",
+   "answers": [
+    {
+     "label": "BILOU-Folge",
+     "type": "seq",
+     "check": "bio:6:2-4-CITY,5-6-CITY:BILOU"
+    }
+   ],
+   "hints": [
+    "Zweiwortspanne: B- dann L-. Einwortspanne: U-."
+   ],
+   "solution": "<code>O O B-CITY L-CITY O U-CITY</code>. „New York“ ist eine Zweiwortspanne (B-, L-), „Boston“ eine Einwortspanne (U-).",
+   "rubric": [
+    "B/L für Mehrwortspanne (1 P.)",
+    "U für Einwortspanne (1 P.)"
+   ]
+  },
+  {
+   "id": "S4",
+   "stage": "error",
+   "kc": "spans",
+   "title": "Code lesen: ein abweichender Decoder",
+   "prompt": "Ein Team dekodiert BIO so:<pre><code>def spans(tags):\\n    out, start = [], None\\n    for i, t in enumerate(tags + [\"O\"]):\\n        if start is not None and not t.startswith(\"I-\"):\\n            out.append((start, i)); start = None\\n        if t.startswith(\"B-\"):\\n            start = i\\n    return out</code></pre>Was liefert der Code für <code>O I-LOC I-LOC</code>, und wie unterscheidet sich das von <code>conlleval</code>?",
+   "answers": [
+    {
+     "label": "Antwort",
+     "type": "choice",
+     "options": [
+      "[] – der Code verwirft Spannen ohne B-, conlleval liest [w₂ w₃]LOC",
+      "[(1, 3)] – wie conlleval",
+      "einen Fehler (Exception)"
+     ],
+     "correct": 0,
+     "diagnoses": [
+      {
+       "value": "1",
+       "msg": "start wird nur bei B- gesetzt; ein I- ohne vorheriges B- öffnet hier keine Spanne."
+      },
+      {
+       "value": "2",
+       "msg": "Der Code läuft fehlerfrei durch; er ignoriert die I-Labels nur."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Verfolgen Sie die Variable start über die drei Labels."
+   ],
+   "solution": "<code>start</code> wird nur bei <code>B-</code> gesetzt. Bei <code>O I-LOC I-LOC</code> bleibt <code>start=None</code>, die Ausgabe ist <code>[]</code>. <code>conlleval</code> liest dagegen ein <code>I-LOC</code> ohne Vorgänger als neue Spanne: [w₂ w₃]LOC. Dieselben Vorhersagen ergeben mit beiden Decodern verschiedene Recall-Werte – eine typische, schwer zu entdeckende Quelle nicht vergleichbarer Ergebnisse. Der Typ wird von diesem Code übrigens gar nicht ausgegeben.",
+   "rubric": [
+    "Ausgabe [] (1 P.)",
+    "Unterschied zu conlleval (1 P.)",
+    "Folge für Vergleichbarkeit (1 P.)"
+   ]
+  },
+  {
+   "id": "W1F",
+   "stage": "faded",
+   "kc": "birnn",
+   "title": "Parameterzahl mit ausgeblendetem Schritt",
+   "prompt": "BiRNN-Tagger mit zwei Entitätstypen in BIO, \\(d=200\\), \\(d_h=100\\) je Richtung. Ergänzen Sie den fehlenden Schritt und die Summe.",
+   "givens": {
+    "d": 200,
+    "dh": 100,
+    "K": 2
+   },
+   "steps": [
+    {
+     "s": "\\(|\\mathcal L|=2\\cdot2+1=5\\)",
+     "why": "BIO mit zwei Typen."
+    },
+    {
+     "s": "Eine Richtung: \\(100^2+100\\cdot200+100=30\\,100\\); beide: \\(60\\,200\\)",
+     "why": "\\(W,U,b\\) je Richtung, keine geteilten Parameter."
+    },
+    {
+     "s": "Ausgabe: \\(\\ ?\\ \\)",
+     "why": "Ihr Schritt: \\(W_o\\) liest \\(h^{\\mathrm{bi}}\\).",
+     "blank": true
+    }
+   ],
+   "answers": [
+    {
+     "label": "Parameter gesamt",
+     "type": "num",
+     "check": "params:200:100:5",
+     "diagnoses": [
+      {
+       "value": "60705",
+       "msg": "\\(W_o\\) hat \\(2d_h=200\\) Spalten: Ausgabe \\(5\\cdot200+5\\)."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "\\(|\\mathcal L|(2d_h+1)\\)."
+   ],
+   "solution": "Ausgabe \\(5\\cdot(2\\cdot100+1)=1\\,005\\). Summe \\(60\\,200+1\\,005=61\\,205\\).",
+   "rubric": [
+    "Ausgabeschicht mit 2d_h Spalten (1 P.)",
+    "Summe (1 P.)"
+   ]
+  },
+  {
+   "id": "R1",
+   "stage": "proof",
+   "kc": "birnn",
+   "title": "Beweis: Abhängigkeitsbereich des Rückwärts-RNN",
+   "prompt": "Beweisen Sie ohne Rückgriff auf Satz 1 per Induktion über \\(s=T,T-1,\\dots,1\\): \\(h^{\\leftarrow}_s\\) ist eine Funktion von \\(x_s,\\dots,x_T\\).",
+   "answers": [
+    {
+     "label": "Selbstbewertung nach Lösung",
+     "type": "self"
+    }
+   ],
+   "hints": [
+    "Anfang bei \\(s=T\\) mit \\(h^{\\leftarrow}_{T+1}=0\\)."
+   ],
+   "solution": "Anfang \\(s=T\\): \\(h^{\\leftarrow}_T=\\tanh(W\\prime\\cdot0+U\\prime e_T+b\\prime)\\) hängt nur von \\(x_T\\) ab. Schritt \\(s+1\\to s\\): Nach Annahme ist \\(h^{\\leftarrow}_{s+1}=G_{s+1}(x_{s+1},\\dots,x_T)\\). Einsetzen: \\(h^{\\leftarrow}_s=\\tanh\\big(W\\prime G_{s+1}(x_{s+1},\\dots,x_T)+U\\prime e_s+b\\prime\\big)=:G_s(x_s,\\dots,x_T)\\); kein \\(x_r\\) mit \\(r&lt;s\\) kommt vor. \\(\\square\\)",
+   "rubric": [
+    "Induktionsanfang mit Startzustand (1 P.)",
+    "Induktionsschritt sauber eingesetzt (2 P.)",
+    "Schlussfolgerung über fehlende linke Wörter (1 P.)"
+   ]
+  },
+  {
+   "id": "T1",
+   "stage": "transfer",
+   "kc": "birnn",
+   "title": "Transfer: Live-Tagging mit Vorausschau",
+   "prompt": "Ein Diktiersystem darf das Label von Wort \\(t\\) erst ausgeben, wenn zwei weitere Wörter gesprochen sind (Vorausschau \\(k=2\\)). Es nutzt ein Vorwärts-RNN, das zum Zeitpunkt der Ausgabe \\(h^{\\rightarrow}_{t+2}\\) liest. Von welchen Eingaben kann das Label für \\(t=4\\) in einem Satz mit \\(T=10\\) Wörtern abhängen?",
+   "answers": [
+    {
+     "label": "Indizes",
+     "type": "set",
+     "check": "deplook:10:4:2",
+     "diagnoses": []
+    }
+   ],
+   "hints": [
+    "Satz 1 auf Position \\(t+k\\) anwenden."
+   ],
+   "solution": "Das System liest \\(h^{\\rightarrow}_{6}\\); nach Satz 1 hängt es von \\(x_1,\\dots,x_6\\) ab, also Indizes 1, 2, 3, 4, 5, 6. Gegenüber einem reinen Vorwärts-Tagger gewinnt es zwei Wörter rechten Kontext, um den Preis von zwei Wörtern Latenz – der Kompromiss aus Abschnitt 5(a).",
+   "rubric": [
+    "Satz 1 auf t+k angewandt (1 P.)",
+    "Menge korrekt (1 P.)",
+    "Latenz-Kontext-Abwägung benannt (1 P.)"
+   ]
+  },
+  {
+   "id": "AT0",
+   "stage": "worked",
+   "kc": "attention",
+   "title": "Durchgerechnet: Attention mit zwei Schlüsseln",
+   "prompt": "Anfrage \\(q=(1,0)\\), Schlüssel \\(k_1=(1,0)\\), \\(k_2=(0,1)\\), Werte \\(v_1=(2,0)\\), \\(v_2=(0,4)\\), \\(d_k=2\\). Berechnen Sie die Ausgabe.",
+   "steps": [
+    {
+     "s": "Energien: \\(q^\\top k_1/\\sqrt2=1/\\sqrt2\\approx0{,}7071\\), \\(q^\\top k_2/\\sqrt2=0\\)",
+     "why": "Skalarprodukt, durch \\(\\sqrt{d_k}\\) geteilt."
+    },
+    {
+     "s": "Softmax: \\(e^{0{,}7071}\\approx2{,}0281\\), \\(e^0=1\\); \\(\\alpha_1=2{,}0281/3{,}0281\\approx0{,}6698\\), \\(\\alpha_2\\approx0{,}3302\\)",
+     "why": "Exponentieren und auf Summe 1 normieren."
+    },
+    {
+     "s": "Ausgabe: \\(o=0{,}6698\\,(2,0)+0{,}3302\\,(0,4)=(1{,}3395;\\ 1{,}3210)\\)",
+     "why": "Gewichtete Summe der Werte."
+    }
+   ],
+   "answers": [
+    {
+     "label": "Selbsterklärung: Warum ist \\(\\alpha_1&gt;\\alpha_2\\), obwohl \\(v_2\\) die größere Norm hat?",
+     "type": "choice",
+     "options": [
+      "Die Gewichte hängen von Anfrage und Schlüsseln ab, nicht von den Werten",
+      "Weil \\(v_1\\) zuerst kommt",
+      "Weil durch \\(\\sqrt{d_k}\\) geteilt wird"
+     ],
+     "correct": 0
+    }
+   ],
+   "solution": "Energien \\(0{,}7071\\) und \\(0\\); Gewichte \\(0{,}6698\\) und \\(0{,}3302\\); Ausgabe \\((1{,}3395;\\ 1{,}3210)\\). Die Werte bestimmen, <em>was</em> gemischt wird, die Schlüssel, <em>wie stark</em>: \\(q\\) ist parallel zu \\(k_1\\), daher \\(\\alpha_1&gt;\\alpha_2\\), unabhängig von der Norm der Werte.",
+   "rubric": [
+    "Energien",
+    "Softmax",
+    "gewichtete Summe",
+    "Rolle von Schlüssel vs. Wert"
+   ]
+  },
+  {
+   "id": "AT2",
+   "stage": "independent",
+   "kc": "attention",
+   "title": "Attention selbstständig",
+   "prompt": "Anfrage \\(q=(2,1)\\), Schlüssel und Werte \\(k_1=v_1=(1,0)\\), \\(k_2=v_2=(0,2)\\), \\(d_k=2\\). Bestimmen Sie \\(\\alpha_1\\) und die erste Komponente der Ausgabe \\(o\\).",
+   "answers": [
+    {
+     "label": "\\(\\alpha_1\\)",
+     "type": "num",
+     "check": "attnq:2,1|1,0;0,2:0",
+     "diagnoses": [
+      {
+       "value": "0.7311",
+       "msg": "Sie haben \\(q^\\top k_2\\) mit \\(k_2=(0,1)\\) gerechnet. Der Schlüssel ist \\((0,2)\\): \\(q^\\top k_2=2\\)."
+      }
+     ]
+    },
+    {
+     "label": "\\(o\\), erste Komponente",
+     "type": "num",
+     "check": "attno:2,1|1,0;0,2:0"
+    }
+   ],
+   "hints": [
+    "\\(q^\\top k_1=2\\), \\(q^\\top k_2=2\\)."
+   ],
+   "solution": "\\(q^\\top k_1=2\\cdot1+1\\cdot0=2\\), \\(q^\\top k_2=2\\cdot0+1\\cdot2=2\\); nach Skalierung beide \\(1{,}4142\\). Gleiche Energien ergeben gleiche Gewichte: \\(\\alpha_1=\\alpha_2=0{,}5\\). \\(o=0{,}5\\,(1,0)+0{,}5\\,(0,2)=(0{,}5;\\ 1)\\), erste Komponente \\(0{,}5\\). Gleich lange Projektionen bedeuten gleiche Aufmerksamkeit – auch wenn \\(q\\) nicht genau in eine der beiden Richtungen zeigt.",
+   "rubric": [
+    "Skalarprodukte",
+    "Gewichte",
+    "Ausgabe",
+    "Deutung"
+   ]
+  },
+  {
+   "id": "AT3",
+   "stage": "proof",
+   "kc": "attention",
+   "title": "Beweis: Varianz des Skalarprodukts",
+   "prompt": "Zeigen Sie: Sind \\(q_1,\\dots,q_d,k_1,\\dots,k_d\\) unabhängig mit Erwartungswert 0 und Varianz 1, so hat \\(q^\\top k\\) die Varianz \\(d\\). Welche Annahme benutzen Sie an welcher Stelle?",
+   "answers": [
+    {
+     "label": "Selbstbewertung nach Lösung",
+     "type": "self"
+    }
+   ],
+   "hints": [
+    "\\(\\operatorname{Var}(XY)\\) für unabhängige \\(X,Y\\) mit \\(\\mathbb E X=\\mathbb E Y=0\\)."
+   ],
+   "solution": "Für jedes \\(i\\): \\(\\mathbb E[q_ik_i]=\\mathbb E[q_i]\\mathbb E[k_i]=0\\) (Unabhängigkeit). \\(\\operatorname{Var}(q_ik_i)=\\mathbb E[q_i^2k_i^2]-0=\\mathbb E[q_i^2]\\mathbb E[k_i^2]=1\\) (Unabhängigkeit, \\(\\mathbb E[q_i^2]=\\operatorname{Var}q_i=1\\) wegen Mittelwert 0). Die Summanden sind paarweise unkorreliert (verschiedene unabhängige Variablen), also addieren sich die Varianzen: \\(\\operatorname{Var}(q^\\top k)=d\\). \\(\\square\\)",
+   "rubric": [
+    "Erwartungswert 0 (1 P.)",
+    "Varianz je Summand mit benannter Annahme (2 P.)",
+    "Additivität mit Begründung (1 P.)"
+   ]
+  },
+  {
+   "id": "AT4",
+   "stage": "transfer",
+   "kc": "attention",
+   "title": "Transfer: Parameter mit Ausgabematrix",
+   "prompt": "Ein Transformer-Attention-Block mit \\(n=d=128\\) und \\(h=4\\) Köpfen hat Projektionen \\(W_Q,W_K,W_V\\) (je Kopf \\(128\\times32\\)) und eine Ausgabematrix \\(W_O\\in\\mathbb R^{128\\times128}\\). Wie viele Gewichte (ohne Bias) hat er?",
+   "answers": [
+    {
+     "label": "Gewichte",
+     "type": "num",
+     "check": "int:65536",
+     "diagnoses": [
+      {
+       "value": "49152",
+       "msg": "Sie haben \\(W_O\\) vergessen: \\(3\\cdot128^2+128^2\\)."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Je Projektionsart \\(4\\cdot128\\cdot32=128^2\\)."
+   ],
+   "solution": "Je Projektionsart \\(4\\cdot128\\cdot32=16\\,384=128^2\\), drei Arten: \\(49\\,152\\). Dazu \\(W_O\\): \\(16\\,384\\). Summe \\(65\\,536\\). Die Aufteilung in Köpfe ändert die Zahl nicht; erst \\(W_O\\) kommt hinzu (Abschnitt 6).",
+   "rubric": [
+    "Köpfe ändern Anzahl nicht (1 P.)",
+    "W_O gezählt (1 P.)",
+    "Summe (1 P.)"
+   ]
+  },
+  {
+   "id": "PO2",
+   "stage": "independent",
+   "kc": "position",
+   "title": "Sinus-Kodierung ausrechnen",
+   "prompt": "Mit \\(d_{\\text{model}}=4\\): Berechnen Sie \\(\\mathrm{POS}(5,0)\\) und \\(\\mathrm{POS}(5,1)\\) (Bogenmaß, vier Nachkommastellen).",
+   "answers": [
+    {
+     "label": "\\(\\mathrm{POS}(5,0)\\)",
+     "type": "num",
+     "check": "sinpos:5:0:4"
+    },
+    {
+     "label": "\\(\\mathrm{POS}(5,1)\\)",
+     "type": "num",
+     "check": "sinpos:5:1:4"
+    }
+   ],
+   "hints": [
+    "\\(d=0\\): \\(\\sin(5/10000^0)\\); \\(d=1\\): \\(\\cos(5/10000^{0})\\)."
+   ],
+   "solution": "\\(\\mathrm{POS}(5,0)=\\sin(5)\\approx-0{,}9589\\), \\(\\mathrm{POS}(5,1)=\\cos(5)\\approx0{,}2837\\). Beide Komponenten gehören zur schnellsten Frequenz \\(\\omega=1\\); das Paar liegt auf dem Einheitskreis: \\(0{,}9589^2+0{,}2837^2\\approx1\\).",
+   "rubric": [
+    "Exponent 0 bei d=0 und d=1 (1 P.)",
+    "Werte (1 P.)",
+    "Einheitskreis-Deutung (1 P.)"
+   ]
+  },
+  {
+   "id": "PO3",
+   "stage": "proof",
+   "kc": "position",
+   "title": "Beweis: RoPE hängt nur vom Abstand ab",
+   "prompt": "Zeigen Sie für 2D-Vektoren \\(q,k\\) und Drehmatrizen \\(R(\\varphi)\\): \\(\\big(R(m\\theta)q\\big)^\\top R(n\\theta)k=q^\\top R((n-m)\\theta)k\\). Welche zwei Eigenschaften von Drehungen benutzen Sie?",
+   "answers": [
+    {
+     "label": "Selbstbewertung nach Lösung",
+     "type": "self"
+    }
+   ],
+   "hints": [
+    "\\((AB)^\\top=B^\\top A^\\top\\)."
+   ],
+   "solution": "\\(\\big(R(m\\theta)q\\big)^\\top R(n\\theta)k=q^\\top R(m\\theta)^\\top R(n\\theta)k\\). Drehmatrizen sind orthogonal mit \\(R(\\varphi)^\\top=R(-\\varphi)\\), und Drehungen addieren sich: \\(R(a)R(b)=R(a+b)\\). Also \\(q^\\top R(-m\\theta)R(n\\theta)k=q^\\top R((n-m)\\theta)k\\). \\(\\square\\) Folge: Verschiebt man beide Positionen um denselben Betrag, bleibt die Ähnlichkeit gleich.",
+   "rubric": [
+    "Transposition (1 P.)",
+    "Orthogonalität (1 P.)",
+    "Gruppeneigenschaft (1 P.)",
+    "Folgerung (1 P.)"
+   ]
+  },
+  {
+   "id": "PO4",
+   "stage": "transfer",
+   "kc": "position",
+   "title": "Transfer: längere Eingaben als im Training",
+   "prompt": "Ein Tagger mit <em>gelernten</em> absoluten Positionsvektoren für Positionen 1–512 soll Dokumente mit 600 Wörtern markieren. Was ist das unmittelbare Problem?",
+   "answers": [
+    {
+     "label": "Antwort",
+     "type": "choice",
+     "options": [
+      "Für Positionen 513–600 existiert kein gelernter Vektor",
+      "Die Softmax wird instabil",
+      "Self-Attention wird zu einem RNN"
+     ],
+     "correct": 0
+    }
+   ],
+   "hints": [
+    "Folie PDF-S. 67: Nachteile gelernter Positionsvektoren."
+   ],
+   "solution": "Gelernte Positionsvektoren sind eine Tabelle mit fester Länge: Für Positionen über 512 gibt es keinen Eintrag (Vorlesung: „limited length“). Sinus-Kodierungen sind für jede Position definiert, RoPE kodiert relative Abstände; ob ein Modell auf längere Folgen tatsächlich verallgemeinert, ist damit noch nicht garantiert.",
+   "rubric": [
+    "fehlender Tabelleneintrag (1 P.)",
+    "Alternative benannt mit Einschränkung (1 P.)"
+   ]
+  },
+  {
+   "id": "C0",
+   "stage": "worked",
+   "kc": "decoding",
+   "title": "Durchgerechnet: Viterbi-Tabelle",
+   "prompt": "Emissionen wie in Abb. 9.1 („in New York“, Labels O, B-LOC, I-LOC; erlaubte Übergänge 0, verbotene \\(-\\infty\\)). Füllen Sie die Viterbi-Tabelle \\(\\delta_t(\\ell)\\) und lesen Sie den besten Pfad ab.",
+   "steps": [
+    {
+     "s": "\\(t=1\\): \\(\\delta_1=(2;\\ 0;\\ -\\infty)\\)",
+     "why": "Start→I-LOC verboten."
+    },
+    {
+     "s": "\\(t=2\\): \\(\\delta_2(\\text{O})=2+0{,}3=2{,}3\\); \\(\\delta_2(\\text{B})=2+1{,}0=3{,}0\\); \\(\\delta_2(\\text{I})=\\delta_1(\\text{B})+1{,}2=1{,}2\\)",
+     "why": "I-LOC nur aus B-LOC (aus O verboten); O und B-LOC aus dem besten Vorgänger O."
+    },
+    {
+     "s": "\\(t=3\\): \\(\\delta_3(\\text{O})=3{,}0+0=3{,}0\\); \\(\\delta_3(\\text{B})=3{,}0+0{,}2=3{,}2\\); \\(\\delta_3(\\text{I})=\\max(3{,}0;1{,}2)+1{,}5=4{,}5\\)",
+     "why": "Bester Vorgänger ist jeweils B-LOC."
+    },
+    {
+     "s": "Rückverfolgung: I-LOC ← B-LOC ← O",
+     "why": "Rückzeiger vom Maximum 4,5."
+    }
+   ],
+   "answers": [
+    {
+     "label": "Selbsterklärung: Warum ist \\(\\delta_2(\\text{I-LOC})=1{,}2\\) und nicht \\(2+1{,}2=3{,}2\\)?",
+     "type": "choice",
+     "options": [
+      "O → I-LOC ist verboten; nur B-LOC → I-LOC ist erlaubt",
+      "Weil 1,2 die Emission ist",
+      "Weil Viterbi nur den letzten Schritt betrachtet"
+     ],
+     "correct": 0
+    }
+   ],
+   "solution": "\\(\\delta_1=(2;0;-\\infty)\\), \\(\\delta_2=(2{,}3;\\ 3{,}0;\\ 1{,}2)\\), \\(\\delta_3=(3{,}0;\\ 3{,}2;\\ 4{,}5)\\). Bester Pfad O B-LOC I-LOC mit Score 4,5. \\(\\delta_2(\\text{I-LOC})\\) kann nur aus B-LOC kommen: \\(0+1{,}2=1{,}2\\).",
+   "rubric": [
+    "Startbedingung",
+    "Übergangsregel in Zeile 2",
+    "Maximum je Zelle",
+    "Rückverfolgung"
+   ]
+  },
+  {
+   "id": "C2",
+   "stage": "independent",
+   "kc": "decoding",
+   "title": "Score und Wahrscheinlichkeit",
+   "prompt": "Gleiche Emissionen wie C1/Abb. 9.1. Berechnen Sie die Zustandssumme \\(Z\\) über alle gültigen Folgen und die Wahrscheinlichkeit \\(p(y^\\ast\\mid x)\\) des besten Pfades (vier Nachkommastellen).",
+   "data": {
+    "labels": [
+     "O",
+     "B-LOC",
+     "I-LOC"
+    ],
+    "emissions": [
+     [
+      2,
+      0,
+      0.5
+     ],
+     [
+      0.3,
+      1.0,
+      1.2
+     ],
+     [
+      0,
+      0.2,
+      1.5
+     ]
+    ]
+   },
+   "answers": [
+    {
+     "label": "\\(Z\\)",
+     "type": "num",
+     "check": "crfz:C2",
+     "tol": 0.01
+    },
+    {
+     "label": "\\(p(y^\\ast\\mid x)\\)",
+     "type": "num",
+     "check": "crfprob:C2",
+     "diagnoses": [
+      {
+       "value": "1",
+       "msg": "Der Score ist nicht normiert; die Wahrscheinlichkeit vergleicht mit allen gültigen Pfaden."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Forward-Algorithmus: \\(\\alpha_1=(e^2;\\ e^0;\\ 0)\\).",
+    "\\(\\alpha_3=(37{,}448;\\ 45{,}7391;\\ 117{,}0794)\\)."
+   ],
+   "solution": "Forward: \\(\\alpha_1=(7{,}3891;\\ 1;\\ 0)\\), \\(\\alpha_2=(11{,}324;\\ 22{,}8038;\\ 3{,}3201)\\), \\(\\alpha_3=(37{,}448;\\ 45{,}7391;\\ 117{,}0794)\\); \\(Z=\\sum\\alpha_3\\approx200{,}2664\\) (13 gültige Pfade). \\(p=e^{4{,}5}/200{,}2664\\approx0{,}4495\\). Der beste Pfad ist also der wahrscheinlichste, aber das Modell ist sich alles andere als sicher.",
+   "rubric": [
+    "Forward-Rekursion (2 P.)",
+    "Z (1 P.)",
+    "p (1 P.)",
+    "Deutung Score vs. Wahrscheinlichkeit (1 P.)"
+   ]
+  },
+  {
+   "id": "C3",
+   "stage": "error",
+   "kc": "decoding",
+   "title": "Fehleranalyse: „Der Score ist die Log-Wahrscheinlichkeit“",
+   "prompt": "Jemand schreibt: „Das CRF normiert global, also ist \\(S(x,y^\\ast)=4{,}5\\) direkt \\(\\log p(y^\\ast\\mid x)\\).“ Berechnen Sie das korrekte \\(\\log p(y^\\ast\\mid x)\\) für C1/C2.",
+   "data": {
+    "labels": [
+     "O",
+     "B-LOC",
+     "I-LOC"
+    ],
+    "emissions": [
+     [
+      2,
+      0,
+      0.5
+     ],
+     [
+      0.3,
+      1.0,
+      1.2
+     ],
+     [
+      0,
+      0.2,
+      1.5
+     ]
+    ],
+    "tag": "C3"
+   },
+   "answers": [
+    {
+     "label": "\\(\\log p(y^\\ast\\mid x)\\)",
+     "type": "num",
+     "check": "crflogp:C3",
+     "diagnoses": [
+      {
+       "value": "4.5",
+       "msg": "Das ist der Score. \\(\\log p=S-\\log Z\\)."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "\\(\\log p=S-\\log Z\\)."
+   ],
+   "solution": "\\(\\log p=S-\\log Z=4{,}5-\\log 200{,}2664\\approx4{,}5-5{,}2996=-0{,}7996\\). Der Fehler: „global normiert“ bezieht sich auf die Wahrscheinlichkeit (9.2); der Score (9.1) ist eine unnormierte Summe. Ein Score kann beliebig groß sein, ein Log-Wahrscheinlichkeitswert ist immer \\(\\le0\\).",
+   "rubric": [
+    "Formel log p = S − log Z (2 P.)",
+    "Wert (1 P.)",
+    "Fehler benannt (1 P.)"
+   ]
+  },
+  {
+   "id": "C4",
+   "stage": "transfer",
+   "kc": "decoding",
+   "title": "Transfer: medizinische Entitäten",
+   "prompt": "Ein Tagger für Arztbriefe hat die Typen DRUG und DOSE in BIO. Ein BiRNN gibt für „Ibuprofen 400 mg“ gierig <code>B-DRUG I-DOSE I-DOSE</code> aus. Was liefert Viterbi mit harten BIO-Regeln mindestens?",
+   "answers": [
+    {
+     "label": "Antwort",
+     "type": "choice",
+     "options": [
+      "Eine gültige Folge; ob „400 mg“ als DOSE erkannt wird, hängt von den Emissionen ab",
+      "Garantiert B-DRUG B-DOSE I-DOSE",
+      "Garantiert B-DRUG I-DRUG I-DRUG"
+     ],
+     "correct": 0
+    }
+   ],
+   "hints": [
+    "Welche Übergänge sind in der gierigen Folge verboten?"
+   ],
+   "solution": "<code>B-DRUG → I-DOSE</code> ist verboten. Viterbi wählt die beste <em>gültige</em> Folge; welche das ist (z. B. <code>B-DRUG B-DOSE I-DOSE</code> oder <code>B-DRUG I-DRUG I-DRUG</code>), entscheiden die Emissionswerte. Garantiert ist nur die Gültigkeit – wie in der Fallstudie.",
+   "rubric": [
+    "verbotener Übergang erkannt (1 P.)",
+    "nur Gültigkeit garantiert (1 P.)"
+   ]
+  },
+  {
+   "id": "P0",
+   "stage": "worked",
+   "kc": "prf",
+   "title": "Durchgerechnet: F1 aus Aufwand pro Treffer",
+   "prompt": "Ein System hat 6 Treffer, 2 falsche Alarme, 4 verpasste Entitäten. Leiten Sie \\(F_1\\) über den mittleren Aufwand her.",
+   "steps": [
+    {
+     "s": "\\(1/P=(6+2)/6=4/3\\)",
+     "why": "Ausgaben pro Treffer."
+    },
+    {
+     "s": "\\(1/R=(6+4)/6=5/3\\)",
+     "why": "Gold pro Treffer."
+    },
+    {
+     "s": "Mittel: \\((4/3+5/3)/2=3/2\\)",
+     "why": "Durchschnittlicher Aufwand."
+    },
+    {
+     "s": "\\(F_1=2/3\\approx0{,}6667\\)… Kontrolle: \\(2\\cdot6/(12+2+4)=12/18=2/3\\)",
+     "why": "Kehrwert; Zählform zur Probe."
+    }
+   ],
+   "answers": [
+    {
+     "label": "Selbsterklärung: Warum taucht TN nirgends auf?",
+     "type": "choice",
+     "options": [
+      "Weder Ausgaben noch Gold zählen nicht-vorhandene, nicht-vorhergesagte Spannen",
+      "TN ist hier zufällig 0",
+      "Weil TN in R steckt"
+     ],
+     "correct": 0
+    }
+   ],
+   "solution": "\\(1/P=4/3\\), \\(1/R=5/3\\), Mittel \\(3/2\\), \\(F_1=2/3\\); Probe mit der Zählform \\(12/18=2/3\\). TN tritt nicht auf, weil beide Aufwände nur Ausgaben und Gold-Entitäten zählen.",
+   "rubric": [
+    "beide Aufwände",
+    "Mittel und Kehrwert",
+    "Probe"
+   ]
+  },
+  {
+   "id": "P1",
+   "stage": "independent",
+   "kc": "prf",
+   "title": "F1 berechnen",
+   "prompt": "TP = 7, FP = 3, FN = 7. Berechnen Sie \\(P\\), \\(R\\) und \\(F_1\\) (Bruch oder vier Nachkommastellen).",
+   "answers": [
+    {
+     "label": "\\(F_1\\)",
+     "type": "num",
+     "check": "f1:7:3:7",
+     "diagnoses": [
+      {
+       "value": "0.6",
+       "msg": "Das ist das arithmetische Mittel von \\(P=0{,}7\\) und \\(R=0{,}5\\)."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Zählform."
+   ],
+   "solution": "\\(P=7/10=0{,}7\\), \\(R=7/14=0{,}5\\), \\(F_1=14/(14+3+7)=14/24=7/12\\approx0{,}5833\\) – unter dem arithmetischen Mittel \\(0{,}6\\).",
+   "rubric": [
+    "P und R",
+    "F1",
+    "Vergleich mit Mittel"
+   ]
+  },
+  {
+   "id": "P2",
+   "stage": "independent",
+   "kc": "prf",
+   "title": "\\(F_\\beta\\) für recall-kritische Anwendungen",
+   "prompt": "Ein Anonymisierungssystem muss möglichst alle Personennamen finden. \\(P=0{,}8\\), \\(R=0{,}5\\). Berechnen Sie \\(F_2\\).",
+   "answers": [
+    {
+     "label": "\\(F_2\\)",
+     "type": "num",
+     "check": "fbeta:4/5:1/2:2",
+     "diagnoses": [
+      {
+       "value": "0.6154",
+       "msg": "Das ist \\(F_1\\). Für \\(F_2\\): \\(\\beta^2=4\\)."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "\\(F_\\beta=(1+\\beta^2)PR/(\\beta^2P+R)\\)."
+   ],
+   "solution": "\\(F_2=\\frac{5\\cdot0{,}8\\cdot0{,}5}{4\\cdot0{,}8+0{,}5}=\\frac{2}{3{,}7}\\approx0{,}5405\\). Kleiner als \\(F_1\\approx0{,}6154\\), weil das schwache \\(R\\) stärker zählt – passend zur Anforderung „alle Namen finden“.",
+   "rubric": [
+    "Formel mit β²=4",
+    "Wert",
+    "Deutung"
+   ]
+  },
+  {
+   "id": "P3",
+   "stage": "proof",
+   "kc": "prf",
+   "title": "Beweis: F1 liegt über dem Minimum",
+   "prompt": "Zeigen Sie für \\(P,R\\in(0,1]\\): \\(F_1\\ge\\min(P,R)\\). Wo nutzen Sie \\(P,R&gt;0\\)?",
+   "answers": [
+    {
+     "label": "Selbstbewertung nach Lösung",
+     "type": "self"
+    }
+   ],
+   "hints": [
+    "O. B. d. A. \\(P\\le R\\); mit \\(P+R\\) multiplizieren."
+   ],
+   "solution": "Sei \\(P\\le R\\). \\(\\frac{2PR}{P+R}\\ge P\\iff 2PR\\ge P(P+R)\\) (Multiplikation mit \\(P+R&gt;0\\)) \\(\\iff PR\\ge P^2\\iff R\\ge P\\) (Division durch \\(P&gt;0\\)) – wahr. \\(\\square\\)",
+   "rubric": [
+    "WLOG (1 P.)",
+    "beide Umformungen mit Vorzeichenbegründung (2 P.)"
+   ]
+  },
+  {
+   "id": "E1",
+   "stage": "transfer",
+   "kc": "prf-edge",
+   "title": "Konventionen ändern Mittelwerte",
+   "prompt": "Drei Testsätze: Satz 1 hat \\(F_1=1\\), Satz 2 \\(F_1=\\tfrac12\\), Satz 3 hat weder Gold noch Ausgaben. Berechnen Sie den Mittelwert über Sätze (a) mit <code>zero_division=0</code> und (b) mit <code>np.nan</code> (Satz fällt heraus).",
+   "answers": [
+    {
+     "label": "(a)",
+     "type": "num",
+     "check": "mean:1,1/2,0"
+    },
+    {
+     "label": "(b)",
+     "type": "num",
+     "check": "mean:1,1/2"
+    }
+   ],
+   "hints": [
+    "Fall (v): Satz 3 ist \\(0/0\\)."
+   ],
+   "solution": "(a) \\((1+0{,}5+0)/3=1/2\\). (b) \\((1+0{,}5)/2=3/4\\). Dieselben Vorhersagen ergeben je nach Konvention 0,5 oder 0,75. Deshalb gehört die Konvention in jeden Bericht; die Zählform über das ganze Korpus vermeidet das Problem.",
+   "rubric": [
+    "(a)",
+    "(b)",
+    "Folgerung"
+   ]
+  },
+  {
+   "id": "L1",
+   "stage": "independent",
+   "kc": "prf-level",
+   "title": "Teilüberlappung zählen",
+   "prompt": "Gold: <code>Die [Deutsche Bank]ORG sitzt in [Frankfurt am Main]LOC .</code><br>System: <code>Die [Deutsche Bank]ORG sitzt in [Frankfurt]LOC am Main .</code><br>Phrasen- und Token-\\(F_1\\)?",
+   "data": {
+    "tokens": [
+     "Die",
+     "Deutsche",
+     "Bank",
+     "sitzt",
+     "in",
+     "Frankfurt",
+     "am",
+     "Main",
+     "."
+    ],
+    "gold": [
+     "O",
+     "B-ORG",
+     "I-ORG",
+     "O",
+     "O",
+     "B-LOC",
+     "I-LOC",
+     "I-LOC",
+     "O"
+    ],
+    "pred": [
+     "O",
+     "B-ORG",
+     "I-ORG",
+     "O",
+     "O",
+     "B-LOC",
+     "O",
+     "O",
+     "O"
+    ]
+   },
+   "answers": [
+    {
+     "label": "Phrasen-\\(F_1\\)",
+     "type": "num",
+     "check": "span_f1:L1"
+    },
+    {
+     "label": "Token-\\(F_1\\)",
+     "type": "num",
+     "check": "token_f1:L1"
+    }
+   ],
+   "hints": [
+    "Phrasen: Frankfurt ≠ Frankfurt am Main."
+   ],
+   "solution": "Phrasen: TP = 1 (Deutsche Bank), FP = 1 ([Frankfurt]LOC), FN = 1 ([Frankfurt am Main]LOC): \\(2/4=1/2\\). Token: TP = 3 (Deutsche, Bank, Frankfurt), FP = 0, FN = 2 (am, Main): \\(6/8=3/4\\).",
+   "rubric": [
+    "Phrasen",
+    "Token",
+    "Grenzfehler doppelt gezählt"
+   ]
+  },
+  {
+   "id": "M0",
+   "stage": "worked",
+   "kc": "micro-macro",
+   "title": "Durchgerechnet: Micro als gewichtetes Mittel",
+   "prompt": "PER: TP 45, FP 5, FN 5 · LOC: 30, 10, 10 · ORG: 20, 15, 15 · MISC: 1, 4, 9. Zeigen Sie, dass Micro-\\(F_1\\) das mit \\(D_k\\) gewichtete Mittel der Typ-\\(F_1\\) ist.",
+   "steps": [
+    {
+     "s": "\\(D=(100;\\ 80;\\ 70;\\ 15)\\), \\(\\sum D=265\\)",
+     "why": "\\(D_k=2\\mathrm{TP}_k+\\mathrm{FP}_k+\\mathrm{FN}_k\\)."
+    },
+    {
+     "s": "\\(F_{1,k}=(0{,}9;\\ 0{,}75;\\ 0{,}5714;\\ 0{,}1333)\\)",
+     "why": "Zählform je Typ."
+    },
+    {
+     "s": "\\(\\sum_k \\tfrac{D_k}{265}F_{1,k}=\\tfrac{90+60+40+2}{265}=\\tfrac{192}{265}\\approx0{,}7245\\)",
+     "why": "\\(D_kF_{1,k}=2\\mathrm{TP}_k\\)."
+    }
+   ],
+   "answers": [
+    {
+     "label": "Selbsterklärung: Warum hat MISC in Micro so wenig Gewicht?",
+     "type": "choice",
+     "options": [
+      "Weil \\(D_{\\mathrm{MISC}}=15\\) klein ist gegenüber \\(\\sum D=265\\)",
+      "Weil MISC schlecht erkannt wird",
+      "Weil Micro O mitzählt"
+     ],
+     "correct": 0
+    }
+   ],
+   "solution": "\\(D=(100;80;70;15)\\), Gewichte \\(D_k/265\\); \\(D_kF_{1,k}=2\\mathrm{TP}_k\\) ergibt \\(192/265\\approx0{,}7245\\) – identisch mit der gepoolten Zählform. MISC hat Gewicht \\(15/265\\approx0{,}0566\\).",
+   "rubric": [
+    "D_k",
+    "Typ-F1",
+    "Identität"
+   ]
+  },
+  {
+   "id": "M1",
+   "stage": "independent",
+   "kc": "micro-macro",
+   "title": "Support-gewichtetes Macro",
+   "prompt": "Zählungen wie in B6 (PER 80/10/20, LOC 50/25/5, MISC 0/3/7). Berechnen Sie das support-gewichtete Macro-\\(F_1\\) (Gewicht \\(\\mathrm{TP}_k+\\mathrm{FN}_k\\)).",
+   "answers": [
+    {
+     "label": "support-gewichtet",
+     "type": "num",
+     "check": "weighted:80,10,20;50,25,5;0,3,7",
+     "diagnoses": [
+      {
+       "value": "26/33",
+       "msg": "Das ist Micro (Gewichte \\(D_k\\)), nicht Support."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Support: 100, 55, 7."
+   ],
+   "solution": "Support \\(100,\\ 55,\\ 7\\) (Summe 162). \\((100\\cdot0{,}8421+55\\cdot0{,}7692+7\\cdot0)/162\\approx0{,}7810\\). Drei verschiedene Mittel derselben Zählungen: Micro \\(0{,}7879\\), support-gewichtet \\(0{,}7810\\), Macro \\(0{,}5371\\).",
+   "rubric": [
+    "Support je Typ",
+    "Wert",
+    "Vergleich der drei Mittel"
+   ]
+  },
+  {
+   "id": "M2",
+   "stage": "transfer",
+   "kc": "micro-macro",
+   "title": "Transfer: Kennzahl wählen",
+   "prompt": "Ein Krankenhaus will überwachen, ob ein NER-System <em>seltene</em> Medikamentennamen zuverlässig erkennt. Häufige Typen (Datum, Person) machen 90 % der Entitäten aus. Welche Kennzahl berichten Sie zuerst?",
+   "answers": [
+    {
+     "label": "Antwort",
+     "type": "choice",
+     "options": [
+      "Macro-F1 (und F1 je Typ)",
+      "Micro-F1",
+      "Token-Accuracy einschließlich O"
+     ],
+     "correct": 0
+    }
+   ],
+   "hints": [
+    "Wer dominiert Micro?"
+   ],
+   "solution": "Macro-\\(F_1\\) gibt jedem Typ gleiches Gewicht, ein Ausfall der seltenen Klasse wird sichtbar; zusätzlich \\(F_1\\) je Typ. Micro wird von den 90 % häufigen Entitäten dominiert; Accuracy mit O ist durch die vielen O-Token fast immer hoch (Satz 7).",
+   "rubric": [
+    "Macro mit Begründung",
+    "warum nicht Micro/Accuracy"
+   ]
+  },
+  {
+   "id": "AT5",
+   "stage": "worked",
+   "kc": "attention",
+   "title": "Durchgerechnet: „Bank“ am Fluss",
+   "prompt": "Query \\(q=(0{,}9;\\,-0{,}6)\\), Keys \\(k_{\\text{Fluss}}=(1{,}6;\\,0{,}4)\\), \\(k_{\\text{Geld}}=(-0{,}4;\\,1{,}5)\\), \\(k_{\\text{der}}=(0{,}1;\\,-0{,}3)\\), Values \\(v_{\\text{Fluss}}=(1{,}8;\\,0{,}2)\\), \\(v_{\\text{Geld}}=(0{,}1;\\,1{,}9)\\), \\(v_{\\text{der}}=(0{,}2;\\,0{,}2)\\), \\(d_k=2\\), \\(T=1\\). Berechnen Sie Gewichte und Ausgabe.",
+   "data": {
+    "attn": {
+     "q": [
+      0.9,
+      -0.6
+     ],
+     "K": [
+      [
+       1.6,
+       0.4
+      ],
+      [
+       -0.4,
+       1.5
+      ],
+      [
+       0.1,
+       -0.3
+      ]
+     ],
+     "V": [
+      [
+       1.8,
+       0.2
+      ],
+      [
+       0.1,
+       1.9
+      ],
+      [
+       0.2,
+       0.2
+      ]
+     ],
+     "T": 1,
+     "scale": true,
+     "lambdas": [
+      2,
+      3
+     ]
+    }
+   },
+   "steps": [
+    {
+     "s": "Skalarprodukte \\(1{,}2;\\ -1{,}26;\\ 0{,}27\\)",
+     "why": "Komponentenweise: \\(0{,}9\\cdot1{,}6+(-0{,}6)\\cdot0{,}4=1{,}2\\) usw."
+    },
+    {
+     "s": "Scores \\(s=(0{,}8485;\\ -0{,}891;\\ 0{,}1909)\\)",
+     "why": "Division durch \\(\\sqrt{d_k}=\\sqrt2\\)."
+    },
+    {
+     "s": "\\(e^{s}=(2{,}3362;\\ 0{,}4103;\\ 1{,}2104)\\), Summe \\(3{,}9568\\)",
+     "why": "Exponentieren; die Summe ist der Normierer."
+    },
+    {
+     "s": "\\(w=(0{,}5904;\\ 0{,}1037;\\ 0{,}3059)\\)",
+     "why": "Jeden Exponentialwert durch die Summe teilen; Probe: Summe 1."
+    },
+    {
+     "s": "\\(o=(1{,}1343;\\ 0{,}3763)\\)",
+     "why": "\\(o=\\sum_jw_jv_j\\), komponentenweise."
+    }
+   ],
+   "answers": [
+    {
+     "label": "Selbsterklärung: Warum bekommt „der“ mehr Gewicht als „Geld“, obwohl \\(k_{\\text{Geld}}\\) viel länger ist?",
+     "type": "choice",
+     "options": [
+      "Es zählt die Projektion auf \\(q\\): \\(k_{\\text{Geld}}\\) zeigt von \\(q\\) weg (negatives Skalarprodukt), \\(k_{\\text{der}}\\) leicht in Richtung \\(q\\).",
+      "Kurze Keys werden von der Softmax bevorzugt.",
+      "Weil \\(v_{\\text{der}}\\) klein ist."
+     ],
+     "correct": 0
+    }
+   ],
+   "lab": {
+    "lab": "attention",
+    "item": "a1",
+    "label": "Labor, Station 1 (gleicher Startzustand)"
+   },
+   "solution": "\\(w=(0{,}5904;\\ 0{,}1037;\\ 0{,}3059)\\), \\(o=(1{,}1343;\\ 0{,}3763)\\).",
+   "worked": "Skalarprodukte \\(1{,}2\\), \\(-1{,}26\\), \\(0{,}27\\); nach Division durch \\(\\sqrt2\\): \\(0{,}8485\\), \\(-0{,}891\\), \\(0{,}1909\\). Exponentialwerte \\(2{,}3362\\), \\(0{,}4103\\), \\(1{,}2104\\), Summe \\(3{,}9568\\). Gewichte \\(0{,}5904\\), \\(0{,}1037\\), \\(0{,}3059\\). Ausgabe \\(o=(1{,}1343;\\ 0{,}3763)\\) – nahe der Ufer-Achse. <b>Geometrie:</b> \\(q^\\top k_j=\\lVert q\\rVert\\pi_j\\); \\(k_{\\text{Geld}}\\) hat trotz großer Länge eine negative Projektion. <b>Kontrolle:</b> \\(o\\) liegt im Dreieck der Values (Satz 6.2).",
+   "rubric": [
+    "Skalarprodukte (1 P.)",
+    "Skalierung (1 P.)",
+    "Softmax mit Probe (1 P.)",
+    "gewichtete Summe (1 P.)",
+    "Deutung über Projektion (1 P.)"
+   ]
+  },
+  {
+   "id": "AT6",
+   "stage": "proof",
+   "kc": "attention",
+   "title": "Beweis: Verschiebung und Länge",
+   "prompt": "Beweisen Sie Satz 6.1: (a) Eine gemeinsame Verschiebung aller Keys um \\(u\\) ändert die Gewichte nicht. (b) \\(\\lambda q\\) bei Temperatur \\(T\\) wirkt wie \\(q\\) bei \\(T/\\lambda\\). Welcher Rechenschritt trägt (a)?",
+   "answers": [
+    {
+     "label": "Tragender Schritt in (a)",
+     "type": "choice",
+     "options": [
+      "\\(e^{(s_j+c)/T}=e^{c/T}e^{s_j/T}\\) – der Faktor \\(e^{c/T}\\) kürzt sich zwischen Zähler und Nenner",
+      "Die Softmax ist monoton",
+      "\\(q^\\top u=0\\) für jede Verschiebung"
+     ],
+     "correct": 0,
+     "diagnoses": [
+      {
+       "value": "2",
+       "msg": "Falsch: \\(q^\\top u\\) ist im Allgemeinen nicht 0 – die Scores ändern sich ja (im Labor sichtbar). Entscheidend ist, dass sich alle um <em>denselben</em> Betrag ändern."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Schreiben Sie den neuen Score als \\(s_j+c\\) mit \\(c=q^\\top u/\\sqrt{d_k}\\).",
+    "Für (b): Ziehen Sie \\(\\lambda\\) aus dem Skalarprodukt."
+   ],
+   "lab": {
+    "lab": "attention",
+    "item": "a3",
+    "label": "Labor, Station 3 und 2"
+   },
+   "solution": "(a) Score \\(s_j+c\\) mit gleichem \\(c=q^\\top u/\\sqrt{d_k}\\); \\(e^{c/T}\\) kürzt sich. (b) \\((\\lambda q)^\\top k_j/(\\sqrt{d_k}T)=s_j/(T/\\lambda)\\).",
+   "worked": "<b>(a)</b> Neue Keys \\(k_j+u\\). Score: \\(q^\\top(k_j+u)/\\sqrt{d_k}=s_j+c\\) mit \\(c=q^\\top u/\\sqrt{d_k}\\), <em>unabhängig von</em> \\(j\\). Softmax: \\(e^{(s_j+c)/T}/\\sum_le^{(s_l+c)/T}=e^{c/T}e^{s_j/T}/(e^{c/T}\\sum_le^{s_l/T})=w_j\\). <b>(b)</b> \\((\\lambda q)^\\top k_j/(\\sqrt{d_k}\\,T)=\\lambda s_j/T=s_j/(T/\\lambda)\\): exakt die Gewichte bei Temperatur \\(T/\\lambda\\). <b>Gegenbeispiel</b> (Grenze der Aussage): Verschiebt man nur \\(k_1\\), ändert sich nur \\(s_1\\), und \\(w_1\\) steigt oder fällt mit \\(q^\\top u\\). \\(\\square\\)",
+   "rubric": [
+    "c unabhängig von j erkannt (2 P.)",
+    "Kürzen korrekt (1 P.)",
+    "(b) mit Temperatur (1 P.)",
+    "Gegenbeispiel (1 P.)"
+   ]
+  },
+  {
+   "id": "AT7",
+   "stage": "transfer",
+   "kc": "attention",
+   "title": "Transfer: Was Attention nicht kann",
+   "prompt": "Values \\(v_1=(1,0)\\), \\(v_2=(0,1)\\), \\(v_3=(0,0)\\). Ein Kollege möchte mit einer einzigen Attention-Schicht (ohne \\(W_O\\), ohne Residualverbindung) die Ausgabe \\(o=(1,1)\\) erzeugen und sucht dafür Query und Temperatur. Was ist richtig?",
+   "answers": [
+    {
+     "label": "Aussage",
+     "type": "choice",
+     "options": [
+      "Unmöglich: \\(o\\) liegt im Dreieck \\(\\operatorname{conv}\\{v_1,v_2,v_3\\}\\), dort gilt \\(o_1+o_2\\le1\\).",
+      "Möglich mit \\(T\\to0\\) und \\(q\\) zwischen \\(k_1\\) und \\(k_2\\).",
+      "Möglich, wenn die Keys lang genug sind."
+     ],
+     "correct": 0,
+     "diagnoses": [
+      {
+       "value": "1",
+       "msg": "\\(T\\to0\\) konzentriert das Gewicht auf das Maximum (bei Gleichstand gleichmäßig auf die Maxima) – \\(o\\) wird dann \\(v_1\\), \\(v_2\\) oder \\((0{,}5;\\,0{,}5)\\), nie \\((1,1)\\)."
+      },
+      {
+       "value": "2",
+       "msg": "Keys ändern nur die Gewichte, nicht deren Eigenschaften \\(w_j\\ge0,\\ \\sum w_j=1\\)."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Welche Werte kann \\(w_1+w_2\\) höchstens annehmen?"
+   ],
+   "lab": {
+    "lab": "attention",
+    "item": "c-impossible",
+    "label": "Labor, Challenge „Unerreichbar?“"
+   },
+   "solution": "Unmöglich (Satz 6.2): \\(o_1+o_2=w_1+w_2\\le1\\).",
+   "worked": "Für jede Wahl von \\(q\\), Keys und \\(T\\) ist \\(o=w_1(1,0)+w_2(0,1)+w_3(0,0)=(w_1,w_2)\\) mit \\(w_j&gt;0\\) und \\(w_1+w_2+w_3=1\\). Also \\(o_1+o_2=1-w_3&lt;1\\). \\((1,1)\\) hat Koordinatensumme 2 – unerreichbar. Erreichbar wären nur Punkte im Inneren des Dreiecks (Satz 6.2), Randpunkte nur im Grenzwert. <b>Abhilfe in echten Modellen:</b> \\(W_O\\) (lineare Abbildung kann skalieren) und die Residualverbindung \\(x+\\operatorname{Att}(x)\\).",
+   "rubric": [
+    "Konvexkombination (2 P.)",
+    "konkrete Ungleichung (1 P.)",
+    "Abhilfe W_O/Residual (1 P.)"
+   ]
+  },
+  {
+   "id": "AT8",
+   "stage": "independent",
+   "kc": "attention",
+   "title": "Sättigung und Gradient",
+   "prompt": "\\(q=(1,1)\\), Keys \\(k_1=(2,0)\\), \\(k_2=(0,1)\\), \\(d_k=2\\), \\(T=1\\). Berechnen Sie \\(w_1\\) und die Ableitung \\(\\partial w_1/\\partial s_1=w_1(1-w_1)\\) (Lemma 6.4). Wie ändert sich diese Ableitung, wenn man die Skalierung weglässt – größer oder kleiner?",
+   "data": {
+    "attn": {
+     "q": [
+      1,
+      1
+     ],
+     "K": [
+      [
+       2,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "V": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "T": 1,
+     "scale": true
+    }
+   },
+   "answers": [
+    {
+     "label": "\\(w_1\\)",
+     "type": "num",
+     "check": "attnd:AT8:w:0",
+     "diagnoses": [
+      {
+       "value": "0.7311",
+       "msg": "Sie haben nicht durch \\(\\sqrt2\\) geteilt (Scores 2 und 1)."
+      }
+     ]
+    },
+    {
+     "label": "\\(\\partial w_1/\\partial s_1\\)",
+     "type": "num",
+     "check": "attnd:AT8:jac:0",
+     "diagnoses": [
+      {
+       "value": "0.25",
+       "msg": "Das wäre der Wert bei \\(w_1=0{,}5\\). Setzen Sie Ihr \\(w_1\\) ein."
+      }
+     ]
+    },
+    {
+     "label": "Ohne Skalierung wird die Ableitung …",
+     "type": "choice",
+     "options": [
+      "kleiner",
+      "größer",
+      "gleich"
+     ],
+     "correct": 0,
+     "diagnoses": [
+      {
+       "value": "1",
+       "msg": "Ohne Skalierung wächst der Score-Abstand, \\(w_1\\) rückt näher an 1, und \\(w_1(1-w_1)\\) fällt."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Scores \\(2/\\sqrt2\\) und \\(1/\\sqrt2\\); nur der Abstand zählt (Satz 6.1).",
+    "\\(w_1=1/(1+e^{-(s_1-s_2)})\\)."
+   ],
+   "lab": {
+    "lab": "attention",
+    "item": "a6",
+    "label": "Labor, Station 6 (Gradientenstärke ‖J‖)"
+   },
+   "solution": "\\(w_1\\approx0{,}6698\\), \\(\\partial w_1/\\partial s_1\\approx0{,}2212\\); ohne Skalierung kleiner.",
+   "worked": "Skalarprodukte \\(q^\\top k_1=2\\), \\(q^\\top k_2=1\\); Scores \\(1{,}4142\\) und \\(0{,}7071\\), Abstand \\(0{,}7071\\). \\(w_1=e^{1{,}4142}/(e^{1{,}4142}+e^{0{,}7071})=0{,}6698\\). Ableitung \\(w_1(1-w_1)=0{,}6698\\cdot0{,}3302=0{,}2212\\). Ohne Skalierung ist der Abstand \\(1\\): \\(w_1\\) wächst, \\(w_1(1-w_1)\\) sinkt. Allgemein ist \\(w(1-w)\\) bei \\(w=0{,}5\\) maximal (\\(0{,}25\\)) und geht gegen 0, wenn \\(w\\to1\\): Sättigung bremst das Lernen (Lemma 6.4).",
+   "rubric": [
+    "Scores mit Skalierung (1 P.)",
+    "w₁ (1 P.)",
+    "Ableitung (1 P.)",
+    "Richtung mit Begründung (1 P.)"
+   ]
+  },
+  {
+   "id": "AT9",
+   "stage": "error",
+   "kc": "attention",
+   "title": "Fehleranalyse: „Gleichverteilung nur bei q = 0“",
+   "prompt": "Eine Kommilitonin behauptet: „Die Gewichte sind genau dann gleichverteilt, wenn \\(q=0\\).“ Welches Gegenbeispiel widerlegt das?",
+   "answers": [
+    {
+     "label": "Gegenbeispiel",
+     "type": "choice",
+     "options": [
+      "\\(q=(2,0)\\), Keys \\((1,1)\\), \\((1,-1)\\), \\((1;\\,0{,}5)\\): alle Skalarprodukte 2, also gleichverteilt bei \\(q\\ne0\\).",
+      "\\(q=(0,0)\\) mit beliebigen Keys.",
+      "\\(q=(1,0)\\), Keys \\((1,0)\\), \\((0,1)\\)."
+     ],
+     "correct": 0,
+     "diagnoses": [
+      {
+       "value": "1",
+       "msg": "Das bestätigt die Richtung „q = 0 ⇒ gleichverteilt“, widerlegt aber das „genau dann“ nicht."
+      },
+      {
+       "value": "2",
+       "msg": "Skalarprodukte 1 und 0 – nicht gleichverteilt."
+      }
+     ]
+    }
+   ],
+   "hints": [
+    "Satz 6.3: Es kommt auf \\(q^\\top(k_i-k_j)\\) an."
+   ],
+   "lab": {
+    "lab": "attention",
+    "item": "c-uniform",
+    "label": "Labor, Challenge „Gleichgültig, aber nicht leer“"
+   },
+   "solution": "Gegenbeispiel (a); richtig ist Satz 6.3: \\(q\\perp(k_i-k_j)\\) für alle Paare.",
+   "worked": "Die Aussage verwechselt eine hinreichende mit einer notwendigen Bedingung. \\(q=0\\) reicht, ist aber nicht nötig: Bei \\(q=(2,0)\\) und Keys mit gleicher erster Komponente 1 sind alle Skalarprodukte \\(2\\) (die zweite Komponente wird mit 0 multipliziert), also alle Gewichte \\(1/3\\). Korrekt (Satz 6.3): gleichverteilt \\(\\Leftrightarrow\\) \\(q^\\top(k_i-k_j)=0\\) für alle \\(i,j\\). Geometrisch: alle Keys liegen in einer Hyperebene senkrecht zu \\(q\\).",
+   "rubric": [
+    "hinreichend vs. notwendig (1 P.)",
+    "Gegenbeispiel geprüft (1 P.)",
+    "korrekte Bedingung (1 P.)"
+   ]
+  },
+  {
+   "id": "AT10",
+   "stage": "transfer",
+   "kc": "attention",
+   "title": "Transfer: Attention rückwärts rechnen",
+   "prompt": "Drei Wörter A, B, C mit Values \\(v_A=(2,0)\\), \\(v_B=(0,2)\\), \\(v_C=(0,0)\\) und Keys \\(k_A=(1,0)\\), \\(k_B=(0,1)\\), \\(k_C=(0,0)\\); \\(d_k=2\\).\nEin Modell soll für das betrachtete Wort die Ausgabe \\(o=(1;\\,0{,}5)\\) erzeugen.<br>\n(a) Liegt \\(o\\) in der konvexen Hülle der Values? Bestimmen Sie die Gewichte \\(w=(w_A,w_B,w_C)\\).<br>\n(b) Bestimmen Sie Scores mit \\(s_C=0\\), die bei \\(T=1\\) genau diese Gewichte liefern. Geben Sie \\(s_A\\) an.<br>\n(c) Welche Query \\(q=(q_1,q_2)\\) erzeugt diese Scores? Geben Sie \\(q_1\\) an.<br>\n(d) Mit derselben Query, aber \\(T=0{,}5\\): Welche erste Komponente hat die Ausgabe jetzt?<br>\n(e) Welche Query liefert bei \\(T=0{,}5\\) wieder genau \\(o=(1;\\,0{,}5)\\)? Geben Sie \\(q_1\\) an.",
+   "answers": [
+    {
+     "label": "(b) \\(s_A\\)",
+     "type": "num",
+     "check": "ln:2",
+     "diagnoses": [
+      {
+       "value": "0.5",
+       "msg": "Das ist \\(w_A\\), nicht der Score. Scores sind Logarithmen von Gewichtsverhältnissen: \\(s_A-s_C=\\ln(w_A/w_C)\\)."
+      }
+     ]
+    },
+    {
+     "label": "(c) \\(q_1\\)",
+     "type": "num",
+     "check": "sqrt2ln:2:1",
+     "diagnoses": [
+      {
+       "value": "0.6931",
+       "msg": "Sie haben die Skalierung vergessen: \\(s_A=q^\\top k_A/\\sqrt2\\), also \\(q_1=\\sqrt2\\,s_A\\)."
+      }
+     ]
+    },
+    {
+     "label": "(d) \\(o_1\\) bei \\(T=0{,}5\\)",
+     "type": "num",
+     "check": "mean:4/3",
+     "diagnoses": [
+      {
+       "value": "1",
+       "msg": "Bei halber Temperatur verdoppeln sich alle Scores; die Gewichte ändern sich."
+      }
+     ]
+    },
+    {
+     "label": "(e) \\(q_1\\) bei \\(T=0{,}5\\)",
+     "type": "num",
+     "check": "sqrt2ln:2:1/2"
+    }
+   ],
+   "hints": [
+    "Schreiben Sie \\(o=w_Av_A+w_Bv_B+w_Cv_C\\) komponentenweise auf; \\(w_C=1-w_A-w_B\\).",
+    "Aus \\(w_j=e^{s_j}/Z\\) folgt \\(s_j-s_l=\\ln(w_j/w_l)\\) – der Nenner kürzt sich.",
+    "Mit \\(k_C=0\\) ist \\(s_C=0\\) automatisch; \\(s_A=q_1/\\sqrt2\\), \\(s_B=q_2/\\sqrt2\\).",
+    "Satz 6.1 (b): \\(\\lambda q\\) bei \\(T\\) wirkt wie \\(q\\) bei \\(T/\\lambda\\)."
+   ],
+   "lab": {
+    "lab": "attention",
+    "item": "c-target",
+    "label": "Labor, Challenge „Punktlandung“ (gleiche Idee, andere Zahlen)"
+   },
+   "solution": "(a) ja, \\(w=(0{,}5;\\,0{,}25;\\,0{,}25)\\); (b) \\(s_A=\\ln2\\approx0{,}6931\\), \\(s_B=0\\); (c) \\(q=(\\sqrt2\\ln2;\\,0)\\), \\(q_1\\approx0{,}9803\\); (d) \\(o_1=4/3\\approx1{,}3333\\); (e) \\(q_1=\\ln2/\\sqrt2\\approx0{,}4901\\).",
+   "worked": "<b>(a) Hülle und Gewichte.</b> Gesucht sind \\(w_A,w_B,w_C\\ge0\\) mit Summe 1 und \\(w_A(2,0)+w_B(0,2)+w_C(0,0)=(1;\\,0{,}5)\\). Komponentenweise: \\(2w_A=1\\), \\(2w_B=0{,}5\\), also \\(w_A=0{,}5\\), \\(w_B=0{,}25\\) und \\(w_C=1-0{,}5-0{,}25=0{,}25\\). Alle drei sind <em>echt positiv</em>; nach Satz 6.2 (b) ist \\(o\\) damit ein innerer Punkt und exakt erreichbar.<br>\n<b>(b) Scores.</b> Aus \\(w_j=e^{s_j}/Z\\) folgt \\(w_j/w_l=e^{s_j-s_l}\\) (der gemeinsame Nenner \\(Z\\) kürzt sich), also \\(s_j-s_l=\\ln(w_j/w_l)\\). Mit \\(s_C=0\\): \\(s_A=\\ln(0{,}5/0{,}25)=\\ln2\\approx0{,}6931\\) und \\(s_B=\\ln(0{,}25/0{,}25)=0\\). Probe: \\(e^{s}=(2;\\,1;\\,1)\\), Summe 4, Gewichte \\((0{,}5;\\,0{,}25;\\,0{,}25)\\). Die Scores sind nur bis auf eine gemeinsame Konstante bestimmt (Satz 6.1 a) – deshalb die Festlegung \\(s_C=0\\).<br>\n<b>(c) Query.</b> \\(s_j=q^\\top k_j/\\sqrt2\\). Mit \\(k_C=0\\) ist \\(s_C=0\\) für jedes \\(q\\) – passend zur Festlegung. \\(s_A=q_1/\\sqrt2=\\ln2\\) ⇒ \\(q_1=\\sqrt2\\ln2\\approx0{,}9803\\); \\(s_B=q_2/\\sqrt2=0\\) ⇒ \\(q_2=0\\).<br>\n<b>(d) Halbe Temperatur.</b> Alle \\(s_j/T\\) verdoppeln sich: \\((2\\ln2;\\,0;\\,0)\\), also Zähler \\(e^{2\\ln2}=4\\), 1, 1; Summe 6; Gewichte \\((2/3;\\,1/6;\\,1/6)\\). Ausgabe \\(o=\\tfrac23(2,0)+\\tfrac16(0,2)=(4/3;\\,1/3)\\), also \\(o_1=4/3\\approx1{,}3333\\). Die Ausgabe rückt zur Ecke \\(v_A\\): kleinere Temperatur schärft die Verteilung.<br>\n<b>(e) Ausgleich über die Länge.</b> Nach Satz 6.1 (b) wirkt \\(\\lambda q\\) bei \\(T\\) wie \\(q\\) bei \\(T/\\lambda\\). Wir wollen bei \\(T=0{,}5\\) dieselben Gewichte wie bei \\(T=1\\), also \\(\\lambda=0{,}5\\): \\(q=(\\ln2/\\sqrt2;\\,0)\\), \\(q_1\\approx0{,}4901\\).<br>\n<b>Kontrolle und Grenze.</b> Ein Ziel wie \\((2,0)\\) (Ecke) wäre nur im Grenzwert erreichbar; \\((2,2)\\) (außerhalb) nie. Und bei Keys, deren Projektionen nicht frei wählbar sind (z. B. zwei gleiche Keys), wären manche Gewichtsverhältnisse unerreichbar – dann scheitert Schritt (c), nicht (b).",
+   "rubric": [
+    "(a) Gewichte aus Komponentengleichungen, Positivität geprüft (2 P.)",
+    "(b) Logarithmus der Gewichtsverhältnisse mit Begründung (2 P.)",
+    "(c) Skalierung √2 berücksichtigt (1 P.)",
+    "(d) Gewichte und Ausgabe bei T = 0,5 (2 P.)",
+    "(e) Satz 6.1 b angewendet (1 P.)",
+    "Grenzbetrachtung (1 P.)"
+   ]
+  }
+ ],
+ "exam_forms": {
+  "A": [
+   {
+    "id": "A1",
+    "kc": "spans",
+    "prompt": "Wie viele Labels braucht BIO für \\(K=7\\) Typen?",
+    "answers": [
+     {
+      "label": "Anzahl",
+      "type": "num",
+      "check": "labels:BIO:7"
+     }
+    ],
+    "solution": "\\(2\\cdot7+1=15\\).",
+    "worked": "<b>Ansatz.</b> BIO braucht je Typ ein Label für den Spannenanfang (B-) und eines für die Fortsetzung (I-), dazu ein gemeinsames O.<br><b>Rechnung.</b> \\(|\\mathcal L|=2K+1=2\\cdot7+1=15\\).<br><b>Kontrolle.</b> Für \\(K=1\\): B-X, I-X, O – drei Labels, Formel liefert \\(3\\). <b>Typischer Fehler:</b> \\(2K=14\\) (O vergessen).",
+    "rubric": [
+     "Formel 2K+1 mit Begründung (1 P.)",
+     "Ergebnis 15 (1 P.)"
+    ]
+   },
+   {
+    "id": "A2",
+    "kc": "spans",
+    "prompt": "Ein Tagger gibt <code>B-PER I-LOC</code> über zwei Wörtern aus. Welche Spannen liest <code>conlleval</code>?",
+    "answers": [
+     {
+      "label": "Antwort",
+      "type": "choice",
+      "options": [
+       "\\([w_1]\\)PER und \\([w_2]\\)LOC",
+       "\\([w_1\\,w_2]\\)PER",
+       "keine – die Folge ist ungültig"
+      ],
+      "correct": 0
+     }
+    ],
+    "solution": "<code>I-LOC</code> setzt keine LOC-Spanne fort und eröffnet daher eine neue.",
+    "transfer": true,
+    "worked": "<b>Lesart von <code>conlleval</code>.</b> Eine Spanne beginnt bei B-X oder bei I-X, das keine Spanne desselben Typs fortsetzt.<br>\\(w_1\\): <code>B-PER</code> eröffnet \\([w_1]\\)PER. \\(w_2\\): <code>I-LOC</code> kann die PER-Spanne nicht fortsetzen (anderer Typ), also schließt \\([w_1]\\)PER und \\(w_2\\) eröffnet \\([w_2]\\)LOC.<br><b>Antwort (a).</b> Option (c) ist falsch, weil <code>conlleval</code> ungültige Folgen nicht verwirft, sondern nach dieser Regel liest; (b) ignoriert den Typwechsel.",
+    "rubric": [
+     "Typwechsel beendet Spanne (1 P.)",
+     "I-X ohne Vorgänger eröffnet neue Spanne (1 P.)"
+    ]
+   },
+   {
+    "id": "A3",
+    "kc": "birnn",
+    "prompt": "BiRNN-Tagger: \\(d=300\\), \\(d_h=200\\) je Richtung, vier Typen in BIO. Parameter ohne Einbettung?",
+    "answers": [
+     {
+      "label": "Parameter",
+      "type": "num",
+      "check": "params:300:200:9"
+     }
+    ],
+    "solution": "Je Richtung \\(40\\,000+60\\,000+200=100\\,200\\); beide \\(200\\,400\\); Ausgabe \\(9\\cdot401=3\\,609\\); Summe \\(204\\,009\\).",
+    "worked": "<b>Labels.</b> \\(|\\mathcal L|=2\\cdot4+1=9\\).<br><b>Eine Richtung.</b> \\(W\\in\\mathbb R^{200\\times200}\\): \\(40\\,000\\); \\(U\\in\\mathbb R^{200\\times300}\\): \\(60\\,000\\); \\(b\\): \\(200\\). Zusammen \\(100\\,200\\).<br><b>Beide Richtungen</b> (getrennte Parameter): \\(200\\,400\\).<br><b>Ausgabe.</b> \\(W_o\\in\\mathbb R^{9\\times400}\\) liest den verketteten Zustand \\([\\overrightarrow h_t;\\overleftarrow h_t]\\in\\mathbb R^{400}\\), dazu 9 Bias-Werte: \\(9\\cdot401=3\\,609\\).<br><b>Summe.</b> \\(200\\,400+3\\,609=204\\,009\\).",
+    "rubric": [
+     "Labelzahl 9 (1 P.)",
+     "je Richtung d_h²+d_h·d+d_h (1 P.)",
+     "zwei Richtungen (1 P.)",
+     "W_o mit 2d_h Spalten + Bias (1 P.)"
+    ]
+   },
+   {
+    "id": "A4",
+    "kc": "birnn",
+    "prompt": "Ein Sprachassistent muss das Label von Wort \\(t\\) ausgeben, bevor Wort \\(t+1\\) gesprochen ist. Welche Architektur erfüllt das ohne Änderung?",
+    "answers": [
+     {
+      "label": "Antwort",
+      "type": "choice",
+      "options": [
+       "BiRNN im Standardaufbau über den ganzen Satz",
+       "Vorwärts-RNN mit Softmax je Wort",
+       "BiRNN mit CRF im Standardaufbau"
+      ],
+      "correct": 1
+     }
+    ],
+    "solution": "Nur das Vorwärts-RNN: \\(h^{\\rightarrow}_t\\) braucht \\(x_1..x_t\\) (Satz 1). Die Standard-BiRNN-Varianten brauchen über \\(h^{\\leftarrow}\\) das Satzende (Satz 2).",
+    "transfer": true,
+    "worked": "<b>Bedingung.</b> Das Label von Wort \\(t\\) darf nur von \\(x_1,\\dots,x_t\\) abhängen.<br><b>Vorwärts-RNN.</b> \\(\\overrightarrow h_t=f(x_1,\\dots,x_t)\\) (Satz 1) – erfüllt.<br><b>BiRNN</b> (mit oder ohne CRF): \\(\\overleftarrow h_t\\) hängt von \\(x_t,\\dots,x_T\\) ab (Satz 2), also auch von Wort \\(t+1\\) – erst nach Satzende verfügbar. Ein CRF verschärft das: Viterbi legt Labels erst nach dem letzten Wort fest.<br><b>Antwort (b).</b>",
+    "rubric": [
+     "Abhängigkeitsbereich Vorwärts (1 P.)",
+     "BiRNN/CRF brauchen Satzende (1 P.)"
+    ]
+   },
+   {
+    "id": "A5",
+    "kc": "attention",
+    "prompt": "Unter den Annahmen von Satz 3 und \\(d_k=64\\): Welche Varianz hat \\(q^\\top k\\) (ohne Skalierung)?",
+    "answers": [
+     {
+      "label": "Varianz",
+      "type": "num",
+      "check": "int:64"
+     }
+    ],
+    "solution": "\\(d_k=64\\); nach Division durch \\(\\sqrt{64}=8\\) ist sie 1.",
+    "worked": "<b>Annahmen</b> (Satz 3): \\(q_i,k_i\\) unabhängig, Erwartungswert 0, Varianz 1.<br>\\(\\operatorname{Var}(q_ik_i)=\\mathbb E[q_i^2]\\,\\mathbb E[k_i^2]=1\\); die 64 Summanden sind unkorreliert, Varianzen addieren sich: \\(\\operatorname{Var}(q^\\top k)=64\\).<br><b>Einordnung.</b> Standardabweichung \\(8\\); nach Division durch \\(\\sqrt{64}=8\\) Varianz 1. Ohne Skalierung lägen typische Score-Abstände bei mehreren Einheiten – die Softmax sättigt (Labor: Ansicht „Skalierung“).",
+    "rubric": [
+     "Varianz je Summand 1 mit Annahme (1 P.)",
+     "Additivität → 64 (1 P.)"
+    ]
+   },
+   {
+    "id": "A6",
+    "kc": "attention",
+    "prompt": "Anfrage \\(q=(2,0)\\), Schlüssel \\(k_1=(1,0)\\), \\(k_2=(0,1)\\), \\(d_k=2\\). Welches Gewicht \\(\\alpha_1\\) erhält \\(k_1\\)?",
+    "answers": [
+     {
+      "label": "\\(\\alpha_1\\)",
+      "type": "num",
+      "check": "attnq:2,0|1,0;0,1:0"
+     }
+    ],
+    "solution": "Energien \\(2/\\sqrt2=1{,}4142\\) und 0; \\(\\alpha_1=e^{1{,}4142}/(e^{1{,}4142}+1)\\approx0{,}8044\\).",
+    "transfer": true,
+    "worked": "<b>Skalarprodukte.</b> \\(q^\\top k_1=2\\cdot1+0\\cdot0=2\\), \\(q^\\top k_2=2\\cdot0+0\\cdot1=0\\).<br><b>Skalierung.</b> \\(e_1=2/\\sqrt2=1{,}4142\\), \\(e_2=0\\).<br><b>Softmax.</b> \\(e^{1{,}4142}=4{,}1133\\), \\(e^0=1\\): \\(\\alpha_1=4{,}1133/(4{,}1133+1)=0{,}8044\\), \\(\\alpha_2=1-\\alpha_1\\).<br><b>Probe.</b> \\(\\alpha_1/\\alpha_2=e^{e_1-e_2}=4{,}1133\\). Ohne Skalierung wäre \\(\\alpha_1=e^2/(e^2+1)\\) größer – Skalierung macht die Verteilung flacher.",
+    "rubric": [
+     "Skalarprodukte (1 P.)",
+     "Division durch √2 (1 P.)",
+     "Softmax korrekt (2 P.)"
+    ]
+   },
+   {
+    "id": "A7",
+    "kc": "position",
+    "prompt": "Self-Attention ohne Positionskodierung: Vertauscht man zwei Token einer Eingabe, was passiert mit den Ausgabevektoren?",
+    "answers": [
+     {
+      "label": "Antwort",
+      "type": "choice",
+      "options": [
+       "Sie werden genauso vertauscht, sonst ändert sich nichts",
+       "Alle Ausgaben ändern sich",
+       "Die Ausgaben bleiben an ihren Positionen unverändert"
+      ],
+      "correct": 0
+     }
+    ],
+    "solution": "Satz 4: \\(\\operatorname{Att}(PX)=P\\operatorname{Att}(X)\\).",
+    "worked": "<b>Satz 4.</b> Sei \\(P\\) die Permutationsmatrix. Dann \\(Q'=PQ\\), \\(K'=PK\\), \\(V'=PV\\) und \\(Q'K'^\\top=P\\,QK^\\top P^\\top\\). Die zeilenweise Softmax vertauscht nur Zeilen und Spalten mit: \\(\\operatorname{softmax}(PSP^\\top)=P\\operatorname{softmax}(S)P^\\top\\). Also \\(\\operatorname{Att}(PX)=P\\operatorname{softmax}(S)P^\\top PV=P\\operatorname{Att}(X)\\) wegen \\(P^\\top P=I\\).<br><b>Deutung.</b> Jedes Token erhält exakt denselben Ausgabevektor, nur in anderer Zeile (Antwort a). Gegenbeispiel-Bedingung: Mit Positionsvektoren oder kausaler Maske gilt das nicht mehr (Labor, Ansicht „Ganzer Satz“).",
+    "rubric": [
+     "Äquivarianz statt Invarianz erkannt (1 P.)",
+     "Begründung über PSPᵀ (1 P.)"
+    ]
+   },
+   {
+    "id": "A8",
+    "kc": "position",
+    "prompt": "RoPE mit \\(\\theta=0{,}25\\), \\(q=k=(1,0)\\), Query an Position 1, Key an Position 5. Ähnlichkeit?",
+    "answers": [
+     {
+      "label": "Ähnlichkeit",
+      "type": "num",
+      "check": "rope:0.25:1:5"
+     }
+    ],
+    "solution": "\\(\\cos((5-1)\\cdot0{,}25)=\\cos 1\\approx0{,}5403\\).",
+    "transfer": true,
+    "worked": "<b>RoPE.</b> \\(\\big(R(m\\theta)q\\big)^\\top R(n\\theta)k=q^\\top R\\big((n-m)\\theta\\big)k\\), weil \\(R(a)^\\top R(b)=R(b-a)\\).<br>Mit \\(q=k=(1,0)\\): \\(q^\\top R(\\phi)k=\\cos\\phi\\). Hier \\(\\phi=(5-1)\\cdot0{,}25=1\\): Ähnlichkeit \\(\\cos 1=0{,}5403\\).<br><b>Kontrolle.</b> Gleiche Positionen ergäben \\(\\cos0=1\\); nur der Abstand 4 zählt.",
+    "rubric": [
+     "Abstandsformel (1 P.)",
+     "Winkel 1 und cos 1 (1 P.)"
+    ]
+   },
+   {
+    "id": "A9",
+    "kc": "decoding",
+    "prompt": "Emissionen für „nach New York“ (O, B-LOC, I-LOC): nach (1,5; 0,2; 0,1), New (0,4; 0,9; 1,1), York (0,1; 0,3; 1,4). Verboten: Start→I-LOC, O→I-LOC. Score der besten gültigen Folge?",
+    "answers": [
+     {
+      "label": "Score",
+      "type": "num",
+      "check": "viterbi:A9"
+     }
+    ],
+    "solution": "Gierig O I-LOC I-LOC ist ungültig. Beste gültige Folge O B-LOC I-LOC mit \\(1{,}5+0{,}9+1{,}4=3{,}8\\).",
+    "data": {
+     "labels": [
+      "O",
+      "B-LOC",
+      "I-LOC"
+     ],
+     "emissions": [
+      [
+       1.5,
+       0.2,
+       0.1
+      ],
+      [
+       0.4,
+       0.9,
+       1.1
+      ],
+      [
+       0.1,
+       0.3,
+       1.4
+      ]
+     ]
+    },
+    "worked": "<b>Gierig.</b> nach→O (1,5), New→I-LOC (1,1), York→I-LOC (1,4): Folge O I-LOC I-LOC ist ungültig (O→I-LOC verboten).<br><b>Gültige Kandidaten</b> (Summe der Emissionen, Übergänge sonst 0): O B-LOC I-LOC: \\(1{,}5+0{,}9+1{,}4=3{,}8\\); O B-LOC O: \\(1{,}5+0{,}9+0{,}1=2{,}5\\); O O O: \\(1{,}5+0{,}4+0{,}1=2{,}0\\); B-LOC I-LOC I-LOC: \\(0{,}2+1{,}1+1{,}4=2{,}7\\).<br><b>Viterbi.</b> Bester gültiger Pfad O B-LOC I-LOC mit Score \\(3{,}8\\). Er unterscheidet sich vom gierigen Ergebnis nur an „New“: Das Verbot erzwingt dort B statt I.",
+    "rubric": [
+     "Gierige Folge als ungültig erkannt (1 P.)",
+     "Kandidatenvergleich oder Viterbi-Rekursion (2 P.)",
+     "Score 3,8 (1 P.)"
+    ]
+   },
+   {
+    "id": "A10",
+    "kc": "decoding",
+    "prompt": "Was garantiert ein CRF mit harten BIO-Übergangsregeln?",
+    "answers": [
+     {
+      "label": "Antwort",
+      "type": "choice",
+      "options": [
+       "Keine ungültige BIO-Folge wird ausgegeben",
+       "Alle Spannengrenzen sind richtig",
+       "Gierige Dekodierung wäre immer schlechter"
+      ],
+      "correct": 0
+     }
+    ],
+    "solution": "Nur Gültigkeit. Grenzen und Typen hängen von den Emissionen ab; Ratinov &amp; Roth (2009) fanden gierige Dekodierung vergleichbar.",
+    "transfer": true,
+    "worked": "Ein CRF mit \\(-\\infty\\) für verbotene Übergänge gibt jedem ungültigen Pfad Wahrscheinlichkeit 0; Viterbi wählt daher immer einen gültigen Pfad (Antwort a). <b>Nicht garantiert:</b> richtige Grenzen oder Typen – die hängen von den Emissionen ab. <b>Beleg:</b> Ratinov &amp; Roth (2009) fanden gierige Dekodierung mit BILOU vergleichbar gut. Gegenbeispiel im Labor: verbotene Übergänge reparieren die Gültigkeit, nicht die Spannengrenze.",
+    "rubric": [
+     "nur Gültigkeit (1 P.)",
+     "Abgrenzung zu Grenz-/Typfehlern (1 P.)"
+    ]
+   },
+   {
+    "id": "A11",
+    "kc": "prf",
+    "prompt": "TP = 12, FP = 4, FN = 8. \\(F_1\\)?",
+    "answers": [
+     {
+      "label": "\\(F_1\\)",
+      "type": "num",
+      "check": "f1:12:4:8"
+     }
+    ],
+    "solution": "\\(24/(24+4+8)=2/3\\).",
+    "worked": "\\(F_1=\\dfrac{2\\,\\mathrm{TP}}{2\\,\\mathrm{TP}+\\mathrm{FP}+\\mathrm{FN}}=\\dfrac{24}{24+4+8}=\\dfrac{24}{36}=\\dfrac23\\).<br><b>Kontrolle über P und R.</b> \\(P=12/16\\), \\(R=12/20\\); \\(2PR/(P+R)\\) ergibt denselben Wert \\(2/3\\).",
+    "rubric": [
+     "Zählform (1 P.)",
+     "Ergebnis 2/3 (1 P.)"
+    ]
+   },
+   {
+    "id": "A12",
+    "kc": "prf",
+    "prompt": "Ein System markiert fast alles: \\(P=0{,}2\\), \\(R=1\\). Ein Kollege berichtet „im Mittel 0,6“. Welcher \\(F_1\\)-Wert ist korrekt?",
+    "answers": [
+     {
+      "label": "\\(F_1\\)",
+      "type": "num",
+      "check": "fpr:1/5:1"
+     }
+    ],
+    "solution": "\\(2\\cdot0{,}2\\cdot1/1{,}2=1/3\\); \\(F_1\\le2P=0{,}4\\).",
+    "transfer": true,
+    "worked": "Das arithmetische Mittel \\((0{,}2+1)/2=0{,}6\\) ist falsch: \\(F_1\\) ist das <em>harmonische</em> Mittel. \\(F_1=\\dfrac{2\\cdot0{,}2\\cdot1}{0{,}2+1}=\\dfrac{0{,}4}{1{,}2}=\\dfrac13\\approx0{,}3333\\).<br><b>Schranke.</b> \\(F_1\\le 2\\min(P,R)=0{,}4\\): Ein schlechter Wert lässt sich nicht durch einen guten ausgleichen.",
+    "rubric": [
+     "harmonisches Mittel (1 P.)",
+     "Ergebnis 1/3 (1 P.)"
+    ]
+   },
+   {
+    "id": "A13",
+    "kc": "prf-edge",
+    "prompt": "Gold enthält 3 Entitäten, das System gibt keine aus. \\(F_1\\) (Zählform)?",
+    "answers": [
+     {
+      "label": "\\(F_1\\)",
+      "type": "num",
+      "check": "f1:0:0:3"
+     }
+    ],
+    "solution": "\\(0/(0+0+3)=0\\); \\(P=0/0\\) ist nicht definiert.",
+    "worked": "TP = 0, FP = 0, FN = 3. \\(P=0/0\\) ist undefiniert (keine Ausgabe), \\(R=0/3=0\\). Zählform: \\(F_1=0/(0+0+3)=0\\) – definiert, weil der Nenner \\(2\\mathrm{TP}+\\mathrm{FP}+\\mathrm{FN}=3\\ne0\\).",
+    "rubric": [
+     "P undefiniert erkannt (1 P.)",
+     "F1 = 0 aus Zählform (1 P.)"
+    ]
+   },
+   {
+    "id": "A14",
+    "kc": "prf-edge",
+    "prompt": "Kein Gold, keine Ausgabe. Was gilt für \\(F_1\\)?",
+    "answers": [
+     {
+      "label": "Antwort",
+      "type": "choice",
+      "options": [
+       "\\(F_1=1\\), weil kein Fehler gemacht wurde",
+       "\\(F_1=0\\), weil TP = 0",
+       "\\(F_1=0/0\\); ein Wert entsteht nur durch eine genannte Konvention"
+      ],
+      "correct": 2
+     }
+    ],
+    "solution": "Fall (v): auch die Zählform ist \\(0/0\\).",
+    "worked": "TP = FP = FN = 0: Auch die Zählform ergibt \\(0/0\\). Weder 1 („kein Fehler“) noch 0 („kein Treffer“) folgt aus der Definition; Werkzeuge setzen per Konvention einen Wert (z. B. <code>zero_division</code> in scikit-learn). Antwort (c).",
+    "rubric": [
+     "0/0 erkannt (1 P.)",
+     "Konvention benannt (1 P.)"
+    ]
+   },
+   {
+    "id": "A15",
+    "kc": "prf-level",
+    "prompt": "Gold: <code>Der [FC Bayern München]ORG gewann in [Dortmund]LOC gegen [Borussia Dortmund]ORG .</code><br>System: <code>Der [FC Bayern]ORG [München]LOC gewann in [Dortmund]LOC gegen [Borussia Dortmund]PER .</code><br>Phrasen-\\(F_1\\)?",
+    "answers": [
+     {
+      "label": "Phrasen-\\(F_1\\)",
+      "type": "num",
+      "check": "span_f1:A15"
+     }
+    ],
+    "solution": "TP = 1, FP = 3, FN = 2: \\(2/7\\).",
+    "data": {
+     "tokens": [
+      "Der",
+      "FC",
+      "Bayern",
+      "München",
+      "gewann",
+      "in",
+      "Dortmund",
+      "gegen",
+      "Borussia",
+      "Dortmund",
+      "."
+     ],
+     "gold": [
+      "O",
+      "B-ORG",
+      "I-ORG",
+      "I-ORG",
+      "O",
+      "O",
+      "B-LOC",
+      "O",
+      "B-ORG",
+      "I-ORG",
+      "O"
+     ],
+     "pred": [
+      "O",
+      "B-ORG",
+      "I-ORG",
+      "B-LOC",
+      "O",
+      "O",
+      "B-LOC",
+      "O",
+      "B-PER",
+      "I-PER",
+      "O"
+     ]
+    },
+    "worked": "<b>Gold-Spannen</b> (3): [FC Bayern München]ORG, [Dortmund]LOC, [Borussia Dortmund]ORG.<br><b>System-Spannen</b> (4): [FC Bayern]ORG, [München]LOC, [Dortmund]LOC, [Borussia Dortmund]PER.<br><b>Exakter Vergleich.</b> Nur [Dortmund]LOC stimmt: TP = 1. FP = 4 − 1 = 3, FN = 3 − 1 = 2.<br>\\(F_1=\\dfrac{2}{2+3+2}=\\dfrac27\\). Der Grenzfehler bei „FC Bayern München“ kostet einen FN und zwei FP.",
+    "rubric": [
+     "Spannen beider Seiten (1 P.)",
+     "TP/FP/FN (2 P.)",
+     "F1 = 2/7 (1 P.)"
+    ]
+   },
+   {
+    "id": "A16",
+    "kc": "prf-level",
+    "prompt": "Gleicher Satz wie A15. Token-\\(F_1\\)?",
+    "answers": [
+     {
+      "label": "Token-\\(F_1\\)",
+      "type": "num",
+      "check": "token_f1:A15"
+     }
+    ],
+    "solution": "TP = 3, FP = 3, FN = 3: \\(6/12=1/2\\).",
+    "transfer": true,
+    "worked": "<b>Token mit Entitätstyp</b> (Gold): FC, Bayern, München (ORG), Dortmund (LOC), Borussia, Dortmund (ORG).<br>Vergleich je Token: FC ✓, Bayern ✓, München ORG→LOC (FP und FN), Dortmund LOC ✓, Borussia ORG→PER (FP+FN), Dortmund ORG→PER (FP+FN).<br>TP = 3, FP = 3, FN = 3: \\(F_1=6/12=1/2\\) – höher als Phrasen-\\(F_1=2/7\\), weil Teiltreffer zählen.",
+    "rubric": [
+     "tokenweiser Vergleich (2 P.)",
+     "F1 = 1/2 (1 P.)",
+     "Vergleich zu A15 (1 P.)"
+    ]
+   },
+   {
+    "id": "A17",
+    "kc": "micro-macro",
+    "prompt": "PER: TP 60, FP 15, FN 10; ORG: TP 40, FP 20, FN 30; LOC: TP 70, FP 5, FN 5. Micro-\\(F_1\\)?",
+    "answers": [
+     {
+      "label": "Micro-\\(F_1\\)",
+      "type": "num",
+      "check": "micro:60,15,10;40,20,30;70,5,5"
+     }
+    ],
+    "solution": "TP 170, FP 40, FN 45: \\(340/425=0{,}8\\).",
+    "worked": "<b>Micro:</b> Zählwerte summieren: TP = 60 + 40 + 70 = 170, FP = 15 + 20 + 5 = 40, FN = 10 + 30 + 5 = 45.<br>\\(F_1=\\dfrac{340}{340+40+45}=\\dfrac{340}{425}=0{,}8\\).",
+    "rubric": [
+     "Summieren der Zählwerte (1 P.)",
+     "Ergebnis 0,8 (1 P.)"
+    ]
+   },
+   {
+    "id": "A18",
+    "kc": "micro-macro",
+    "prompt": "Gleiche Zählungen wie A17. Macro-\\(F_1\\)?",
+    "answers": [
+     {
+      "label": "Macro-\\(F_1\\)",
+      "type": "num",
+      "check": "macro:60,15,10;40,20,30;70,5,5"
+     }
+    ],
+    "solution": "PER \\(120/145\\), ORG \\(80/130\\), LOC \\(140/150\\); Mittel \\(\\approx0{,}7921\\).",
+    "worked": "<b>Je Typ</b> (Zählform): PER \\(120/145=0{,}8276\\), ORG \\(80/130=0{,}6154\\), LOC \\(140/150=0{,}9333\\).<br><b>Macro</b> = ungewichtetes Mittel: \\((0{,}8276+0{,}6154+0{,}9333)/3=0{,}7921\\).<br><b>Vergleich.</b> Macro &lt; Micro (0,8), weil der schwache Typ ORG mit Gewicht \\(1/3\\) eingeht, in Micro aber nur mit \\(130/425\\).",
+    "rubric": [
+     "F1 je Typ (2 P.)",
+     "Mittelwert (1 P.)",
+     "Deutung (1 P.)"
+    ]
+   },
+   {
+    "id": "A19",
+    "kc": "attention",
+    "transfer": true,
+    "prompt": "Drei Wörter mit Keys \\(k_1=(1,0)\\), \\(k_2=(1,0)\\), \\(k_3=(0,1)\\), Values \\(v_1=(2,0)\\), \\(v_2=(0,2)\\), \\(v_3=(0,0)\\); \\(d_k=2\\), \\(T=1\\).<br>\n(a) Welche Aussage über die Gewichte gilt für <em>jede</em> Query \\(q\\)?<br>\n(b) Kann die Ausgabe \\(o=(1;\\,0{,}5)\\) erreicht werden? (Hinweis: Sie liegt im Inneren des Dreiecks der Values.)<br>\n(c) Für welchen Wert von \\(q_1-q_2\\) ist \\(o=(0{,}5;\\,0{,}5)\\)?",
+    "answers": [
+     {
+      "label": "(a)",
+      "type": "choice",
+      "options": [
+       "\\(w_1=w_2\\), weil \\(q^\\top k_1=q^\\top k_2\\)",
+       "\\(w_3=0\\)",
+       "\\(w_1+w_2=w_3\\)"
+      ],
+      "correct": 0
+     },
+     {
+      "label": "(b)",
+      "type": "choice",
+      "options": [
+       "Nein: Mit \\(w_1=w_2\\) liegt \\(o=(2w_1,2w_1)\\) immer auf der Diagonale.",
+       "Ja, nach Satz 6.2 (b), weil der Punkt im Inneren liegt.",
+       "Ja, aber nur für \\(T\\to0\\)."
+      ],
+      "correct": 0,
+      "diagnoses": [
+       {
+        "value": "1",
+        "msg": "Satz 6.2 (b) gilt für frei wählbare Scores. Hier sind die Scores an \\(s=Kq/\\sqrt2\\) gebunden, und gleiche Keys erzwingen gleiche Scores."
+       }
+      ]
+     },
+     {
+      "label": "(c) \\(q_1-q_2\\)",
+      "type": "num",
+      "check": "sqrt2ln:1/2:1"
+     }
+    ],
+    "solution": "(a) \\(w_1=w_2\\); (b) nein; (c) \\(q_1-q_2=-\\sqrt2\\ln2\\approx-0{,}9803\\).",
+    "worked": "<b>(a)</b> \\(s_j=q^\\top k_j/\\sqrt2\\). Wegen \\(k_1=k_2\\) ist \\(s_1=s_2\\) für jedes \\(q\\), und gleiche Scores geben gleiche Gewichte (gemeinsamer Nenner der Softmax): \\(w_1=w_2=:a\\), \\(w_3=1-2a\\).<br>\n<b>(b)</b> Dann ist \\(o=a(2,0)+a(0,2)+(1-2a)(0,0)=(2a,\\,2a)\\): Jede erreichbare Ausgabe liegt auf der Diagonale. \\((1;\\,0{,}5)\\) liegt nicht darauf – <em>unerreichbar</em>, obwohl der Punkt im Inneren der Hülle liegt (für frei wählbare Scores wäre er mit \\(w=(0{,}5;\\,0{,}25;\\,0{,}25)\\) erreichbar, Satz 6.2 b). Grund: Die Scores liegen im Bild von \\(K\\) (plus Vielfache von \\(\\mathbf 1\\)), und dieses Bild erzwingt \\(s_1=s_2\\).<br>\n<b>(c)</b> \\(o=(0{,}5;\\,0{,}5)\\) ⇒ \\(2a=0{,}5\\), \\(a=0{,}25\\), \\(w_3=0{,}5\\). Aus \\(w_1/w_3=e^{s_1-s_3}\\): \\(s_1-s_3=\\ln(0{,}25/0{,}5)=-\\ln2\\). Mit \\(s_1=q_1/\\sqrt2\\), \\(s_3=q_2/\\sqrt2\\): \\(q_1-q_2=-\\sqrt2\\ln2\\approx-0{,}9803\\). Nur die Differenz ist bestimmt (Satz 6.1 a).<br>\n<b>Erreichbare Menge insgesamt:</b> \\(a=e^{s_1}/(2e^{s_1}+e^{s_3})\\) nimmt jeden Wert in \\((0;\\,\\tfrac12)\\) an, also ist genau die offene Strecke von \\((0,0)\\) bis \\((1,1)\\) erreichbar.",
+    "rubric": [
+     "(a) gleiche Keys ⇒ gleiche Scores ⇒ gleiche Gewichte (2 P.)",
+     "(b) Diagonale als erreichbare Menge, Abgrenzung zu Satz 6.2 b (3 P.)",
+     "(c) Gewichte, Logarithmus, Skalierung (2 P.)",
+     "erreichbare Menge benannt (1 P.)"
+    ]
+   }
+  ],
+  "B": [
+   {
+    "id": "B-1",
+    "kc": "spans",
+    "prompt": "Wie viele Labels braucht BILOU für \\(K=3\\) Typen?",
+    "answers": [
+     {
+      "label": "Anzahl",
+      "type": "num",
+      "check": "labels:BILOU:3"
+     }
+    ],
+    "solution": "\\(4\\cdot3+1=13\\).",
+    "worked": "BILOU: je Typ B (Anfang), I (innen), L (letztes), U (Einzel-Token), dazu O: \\(4K+1=4\\cdot3+1=13\\). <b>Kontrolle</b> \\(K=1\\): B, I, L, U, O.",
+    "rubric": [
+     "4K+1 (1 P.)",
+     "13 (1 P.)"
+    ]
+   },
+   {
+    "id": "B-2",
+    "kc": "spans",
+    "prompt": "„Termine am Montag Dienstag“ mit zwei Spannen [Montag]DAY, [Dienstag]DAY. Welches Schema kann das <em>nicht</em> von einer Spanne [Montag Dienstag]DAY unterscheiden?",
+    "answers": [
+     {
+      "label": "Antwort",
+      "type": "choice",
+      "options": [
+       "IO",
+       "BIO",
+       "BILOU"
+      ],
+      "correct": 0
+     }
+    ],
+    "solution": "IO ergibt in beiden Fällen <code>DAY DAY</code> (Satz A).",
+    "transfer": true,
+    "worked": "IO: beide Lesarten ergeben <code>DAY DAY</code> – nicht unterscheidbar (Antwort a). BIO: <code>B-DAY B-DAY</code> vs. <code>B-DAY I-DAY</code>. BILOU: <code>U-DAY U-DAY</code> vs. <code>B-DAY L-DAY</code>. Satz A: BIO ist auf gültigen Folgen umkehrbar, IO nicht.",
+    "rubric": [
+     "IO (1 P.)",
+     "Begründung mit Kodierungen (1 P.)"
+    ]
+   },
+   {
+    "id": "B-3",
+    "kc": "birnn",
+    "prompt": "BiRNN-Tagger: \\(d=64\\), \\(d_h=32\\) je Richtung, zwei Typen in BIO. Parameter ohne Einbettung?",
+    "answers": [
+     {
+      "label": "Parameter",
+      "type": "num",
+      "check": "params:64:32:5"
+     }
+    ],
+    "solution": "\\(|\\mathcal L|=5\\). Je Richtung \\(1\\,024+2\\,048+32=3\\,104\\); beide \\(6\\,208\\); Ausgabe \\(5\\cdot65=325\\); Summe \\(6\\,533\\).",
+    "worked": "\\(|\\mathcal L|=2\\cdot2+1=5\\). Je Richtung \\(32^2+32\\cdot64+32=1\\,024+2\\,048+32=3\\,104\\); beide \\(6\\,208\\). Ausgabe \\(W_o\\in\\mathbb R^{5\\times64}\\) plus Bias: \\(5\\cdot65=325\\). Summe \\(6\\,533\\).",
+    "rubric": [
+     "Labelzahl (1 P.)",
+     "Richtungen (1 P.)",
+     "Ausgabe 2d_h+1 (1 P.)",
+     "Summe (1 P.)"
+    ]
+   },
+   {
+    "id": "B-4",
+    "kc": "birnn",
+    "prompt": "Zwei Sätze mit je 8 Wörtern unterscheiden sich nur im 5. Wort. An welchen Positionen \\(t\\) ist \\(h^{\\rightarrow}_t\\) garantiert gleich? (Indizes, kommagetrennt)",
+    "answers": [
+     {
+      "label": "Positionen",
+      "type": "set",
+      "check": "dep:8:4:forward"
+     }
+    ],
+    "solution": "\\(t=1,2,3,4\\) nach Satz 1.",
+    "transfer": true,
+    "worked": "\\(\\overrightarrow h_t\\) hängt nur von \\(x_1,\\dots,x_t\\) ab (Satz 1). Die Sätze stimmen in \\(x_1..x_4\\) überein, also gilt \\(\\overrightarrow h_t\\) gleich für \\(t=1,2,3,4\\). Ab \\(t=5\\) hat der Zustand das abweichende Wort gelesen; ob er sich tatsächlich unterscheidet, hängt von den Gewichten ab – garantiert ist nur 1–4.",
+    "rubric": [
+     "1,2,3,4 (1 P.)",
+     "Begründung „garantiert“ vs. „möglicherweise“ (1 P.)"
+    ]
+   },
+   {
+    "id": "B-5",
+    "kc": "attention",
+    "prompt": "Multi-Head mit Verkettung ohne Ausgabematrix: \\(n=d=512\\), \\(h=8\\) Köpfe. Wie viele Parameter haben alle Query-Projektionen zusammen?",
+    "answers": [
+     {
+      "label": "Parameter",
+      "type": "num",
+      "check": "int:262144"
+     }
+    ],
+    "solution": "\\(8\\) Köpfe je \\(512\\times64\\): \\(8\\cdot32\\,768=262\\,144=512^2\\) – so viele wie eine einzelne \\(512\\times512\\)-Projektion.",
+    "worked": "Je Kopf \\(W_Q^{(i)}\\in\\mathbb R^{512\\times64}\\) (\\(d/h=64\\)): \\(32\\,768\\) Einträge. Acht Köpfe: \\(8\\cdot32\\,768=262\\,144=512^2\\). Gleich viele wie eine einzelne \\(512\\times512\\)-Projektion: Die Aufteilung schneidet die Matrix nur in Spaltenblöcke.",
+    "rubric": [
+     "Kopfdimension d/h (1 P.)",
+     "Summe 262 144 (1 P.)"
+    ]
+   },
+   {
+    "id": "B-6",
+    "kc": "attention",
+    "prompt": "Warum teilt man die Skalarprodukte durch \\(\\sqrt{d_k}\\)?",
+    "answers": [
+     {
+      "label": "Antwort",
+      "type": "choice",
+      "options": [
+       "Unter Unabhängigkeitsannahmen hat \\(q^\\top k\\) Varianz \\(d_k\\); die Division bringt sie auf 1 und hält die Softmax aus der Sättigung",
+       "Damit die Gewichte sich zu 1 summieren",
+       "Weil die Werte \\(v_j\\) sonst zu groß werden"
+      ],
+      "correct": 0
+     }
+    ],
+    "solution": "Satz 3; die Normierung auf Summe 1 leistet die Softmax selbst.",
+    "transfer": true,
+    "worked": "Antwort (a). Unter den Annahmen von Satz 3 ist \\(\\operatorname{Var}(q^\\top k)=d_k\\); Division durch \\(\\sqrt{d_k}\\) bringt die Varianz auf 1. Ohne sie werden Score-Abstände groß, die Softmax nahezu one-hot und ihre Jacobi-Matrix \\(\\operatorname{diag}(w)-ww^\\top\\) fast 0 – kleine Gradienten. (b) ist falsch: Normierung auf Summe 1 leistet die Softmax immer. (c) ist falsch: Die Werte gehen nicht in die Gewichte ein.",
+    "rubric": [
+     "Varianzargument (1 P.)",
+     "Abgrenzung zu (b)/(c) (1 P.)"
+    ]
+   },
+   {
+    "id": "B-7",
+    "kc": "position",
+    "prompt": "Trigonometrische Kodierung mit \\(d_{\\text{model}}=4\\): Berechnen Sie \\(\\mathrm{POS}(3,2)\\).",
+    "answers": [
+     {
+      "label": "\\(\\mathrm{POS}(3,2)\\)",
+      "type": "num",
+      "check": "sinpos:3:2:4"
+     }
+    ],
+    "solution": "\\(d=2\\) gerade: \\(\\sin(3/10000^{2/4})=\\sin(0{,}03)\\approx0{,}0300\\).",
+    "worked": "Formel (Vaswani et al. 2017, §3.5): gerade Dimension \\(i=2k\\): \\(\\sin\\big(t/10000^{2k/d}\\big)\\). Hier \\(t=3\\), \\(i=2\\Rightarrow k=1\\), \\(d=4\\): \\(10000^{2/4}=100\\), also \\(\\sin(3/100)=\\sin(0{,}03)\\approx0{,}0300\\).",
+    "rubric": [
+     "richtiger Exponent 2k/d (1 P.)",
+     "Wert (1 P.)"
+    ]
+   },
+   {
+    "id": "B-8",
+    "kc": "position",
+    "prompt": "RoPE: Query an Position 3, Key an Position 3 + \\(\\Delta\\). Wovon hängt die Ähnlichkeit \\(\\big(R(3\\theta)q\\big)^\\top R((3+\\Delta)\\theta)k\\) ab?",
+    "answers": [
+     {
+      "label": "Antwort",
+      "type": "choice",
+      "options": [
+       "nur von \\(q\\), \\(k\\) und \\(\\Delta\\)",
+       "von der absoluten Position 3",
+       "von der Satzlänge"
+      ],
+      "correct": 0
+     }
+    ],
+    "solution": "\\(q^\\top R(\\Delta\\theta)k\\).",
+    "transfer": true,
+    "worked": "\\(R(a)^\\top R(b)=R(b-a)\\), daher \\(\\big(R(3\\theta)q\\big)^\\top R((3+\\Delta)\\theta)k=q^\\top R(\\Delta\\theta)k\\): nur \\(q\\), \\(k\\) und der Abstand \\(\\Delta\\) (Antwort a). Die absolute Position 3 kürzt sich heraus.",
+    "rubric": [
+     "Rotationsregel (1 P.)",
+     "Antwort (1 P.)"
+    ]
+   },
+   {
+    "id": "B-9",
+    "kc": "decoding",
+    "prompt": "Emissionen (O, B-LOC, I-LOC): Wort 1 (0,2; 1,0; 0,3), Wort 2 (0,5; 0,1; 0,9), Wort 3 (1,2; 0; 0,4). Verboten: Start→I-LOC, O→I-LOC. Score der besten gültigen Folge?",
+    "answers": [
+     {
+      "label": "Score",
+      "type": "num",
+      "check": "viterbi:B-9"
+     }
+    ],
+    "solution": "Gierig B-LOC I-LOC O ist gültig; Viterbi ändert nichts: \\(1{,}0+0{,}9+1{,}2=3{,}1\\).",
+    "data": {
+     "labels": [
+      "O",
+      "B-LOC",
+      "I-LOC"
+     ],
+     "emissions": [
+      [
+       0.2,
+       1.0,
+       0.3
+      ],
+      [
+       0.5,
+       0.1,
+       0.9
+      ],
+      [
+       1.2,
+       0,
+       0.4
+      ]
+     ]
+    },
+    "worked": "<b>Gierig.</b> Wort 1→B-LOC (1,0), Wort 2→I-LOC (0,9), Wort 3→O (1,2): B-LOC I-LOC O ist gültig. Da die Übergänge nur verbieten, aber nichts belohnen, ist die gierige Folge bereits optimal: Viterbi ändert nichts. Score \\(1{,}0+0{,}9+1{,}2=3{,}1\\). <b>Lehre:</b> Ein CRF mit harten Regeln greift nur bei ungültigen Folgen ein.",
+    "rubric": [
+     "Gültigkeit geprüft (1 P.)",
+     "Score 3,1 (1 P.)"
+    ]
+   },
+   {
+    "id": "B-10",
+    "kc": "decoding",
+    "prompt": "Ein Tagger wird mit Gold-Vorgängerlabels trainiert, im Test mit eigenen Vorhersagen betrieben. Wie heißt das Problem?",
+    "answers": [
+     {
+      "label": "Antwort",
+      "type": "choice",
+      "options": [
+       "Exposure Bias",
+       "Label Bias",
+       "Overfitting"
+      ],
+      "correct": 0
+     }
+    ],
+    "solution": "Exposure Bias. Label Bias entsteht durch lokale Normierung.",
+    "transfer": true,
+    "worked": "Exposure Bias (a): Im Training sieht das Modell Gold-Vorgänger, im Test eigene (möglicherweise falsche) Vorhersagen – Fehler pflanzen sich fort. Label Bias (b) ist ein anderes Problem lokal normierter Modelle (MEMM): Zustände mit wenigen Nachfolgern ignorieren die Beobachtung; CRFs normieren global.",
+    "rubric": [
+     "Begriff (1 P.)",
+     "Abgrenzung Label Bias (1 P.)"
+    ]
+   },
+   {
+    "id": "B-11",
+    "kc": "prf",
+    "prompt": "TP = 18, FP = 2, FN = 12. \\(F_1\\)?",
+    "answers": [
+     {
+      "label": "\\(F_1\\)",
+      "type": "num",
+      "check": "f1:18:2:12"
+     }
+    ],
+    "solution": "\\(36/50=0{,}72\\).",
+    "worked": "\\(F_1=\\dfrac{36}{36+2+12}=\\dfrac{36}{50}=0{,}72\\). Kontrolle: \\(P=18/20\\), \\(R=18/30\\).",
+    "rubric": [
+     "Zählform (1 P.)",
+     "0,72 (1 P.)"
+    ]
+   },
+   {
+    "id": "B-12",
+    "kc": "prf",
+    "prompt": "Ein vorsichtiges System: \\(P=0{,}9\\), \\(R=0{,}3\\). \\(F_1\\)?",
+    "answers": [
+     {
+      "label": "\\(F_1\\)",
+      "type": "num",
+      "check": "fpr:9/10:3/10"
+     }
+    ],
+    "solution": "\\(2\\cdot0{,}27/1{,}2=0{,}45\\).",
+    "transfer": true,
+    "worked": "\\(F_1=\\dfrac{2PR}{P+R}=\\dfrac{2\\cdot0{,}27}{1{,}2}=0{,}45\\) mit \\(PR=0{,}9\\cdot0{,}3=0{,}27\\) und \\(P+R=1{,}2\\). Liegt nahe am kleineren Wert: harmonisches Mittel.",
+    "rubric": [
+     "Produkt und Summe (1 P.)",
+     "0,45 (1 P.)"
+    ]
+   },
+   {
+    "id": "B-13",
+    "kc": "prf-edge",
+    "prompt": "Kein Gold; das System gibt 4 Entitäten aus. Was gilt?",
+    "answers": [
+     {
+      "label": "Antwort",
+      "type": "choice",
+      "options": [
+       "\\(P=0/0\\), \\(R=0\\), \\(F_1=0\\)",
+       "\\(P=0\\), \\(R=0/0\\), \\(F_1=0\\) (Zählform)",
+       "\\(P=0\\), \\(R=0\\), \\(F_1=0/0\\)"
+      ],
+      "correct": 1
+     }
+    ],
+    "solution": "Fall (iv).",
+    "worked": "TP = 0, FP = 4, FN = 0: \\(P=0/4=0\\); \\(R=0/0\\) undefiniert (kein Gold); Zählform \\(F_1=0/(0+4+0)=0\\). Antwort (b) – Fall (iv) der Tabelle im Lehrbuch.",
+    "rubric": [
+     "P und R (1 P.)",
+     "F1 = 0 aus Zählform (1 P.)"
+    ]
+   },
+   {
+    "id": "B-14",
+    "kc": "prf-edge",
+    "prompt": "TP = 0, FP = 2, FN = 5. Was liefert \\(2PR/(P+R)\\)?",
+    "answers": [
+     {
+      "label": "Antwort",
+      "type": "choice",
+      "options": [
+       "0",
+       "\\(0/0\\), also keinen Wert",
+       "\\(2/7\\)"
+      ],
+      "correct": 1
+     }
+    ],
+    "solution": "Fall (ii): \\(P=R=0\\); die Zählform liefert \\(0/7=0\\).",
+    "worked": "\\(P=0/2=0\\), \\(R=0/5=0\\). \\(2PR/(P+R)=0/0\\): kein Wert (Antwort b). Die Zählform liefert dagegen \\(0/(0+2+5)=0\\) – deshalb definiert man \\(F_1\\) über die Zählform.",
+    "rubric": [
+     "0/0 erkannt (1 P.)",
+     "Zählform als Ausweg (1 P.)"
+    ]
+   },
+   {
+    "id": "B-15",
+    "kc": "prf-level",
+    "prompt": "Gold: <code>[Barack Obama]PER traf [Angela Merkel]PER in [Berlin]LOC</code><br>System: <code>[Barack Obama]PER traf [Angela Merkel]LOC in [Berlin]LOC</code><br>Phrasen-\\(F_1\\)?",
+    "answers": [
+     {
+      "label": "Phrasen-\\(F_1\\)",
+      "type": "num",
+      "check": "span_f1:B-15"
+     }
+    ],
+    "solution": "TP = 2, FP = 1, FN = 1: \\(2/3\\).",
+    "data": {
+     "tokens": [
+      "Barack",
+      "Obama",
+      "traf",
+      "Angela",
+      "Merkel",
+      "in",
+      "Berlin"
+     ],
+     "gold": [
+      "B-PER",
+      "I-PER",
+      "O",
+      "B-PER",
+      "I-PER",
+      "O",
+      "B-LOC"
+     ],
+     "pred": [
+      "B-PER",
+      "I-PER",
+      "O",
+      "B-LOC",
+      "I-LOC",
+      "O",
+      "B-LOC"
+     ]
+    },
+    "worked": "Gold: [Barack Obama]PER, [Angela Merkel]PER, [Berlin]LOC. System: [Barack Obama]PER, [Angela Merkel]LOC, [Berlin]LOC. TP = 2, FP = 1 ([Angela Merkel]LOC), FN = 1 ([Angela Merkel]PER): \\(F_1=4/6=2/3\\).",
+    "rubric": [
+     "Zählung (1 P.)",
+     "2/3 (1 P.)"
+    ]
+   },
+   {
+    "id": "B-16",
+    "kc": "prf-level",
+    "prompt": "Gleicher Satz wie B-15. Token-\\(F_1\\)?",
+    "answers": [
+     {
+      "label": "Token-\\(F_1\\)",
+      "type": "num",
+      "check": "token_f1:B-15"
+     }
+    ],
+    "solution": "TP = 3, FP = 2, FN = 2: \\(3/5\\). Hier ist die Token-Ebene strenger, weil die falsch typisierte Entität zwei Wörter lang ist.",
+    "transfer": true,
+    "worked": "Token: Barack ✓, Obama ✓, Angela PER→LOC, Merkel PER→LOC, Berlin ✓. TP = 3, FP = 2, FN = 2: \\(F_1=6/10=3/5\\). Hier ist die Token-Ebene <em>strenger</em> als die Phrasen-Ebene (2/3), weil der Typfehler eine zweiwortige Spanne betrifft – die Rangfolge der Zählweisen ist nicht festgelegt.",
+    "rubric": [
+     "Token-Zählung (1 P.)",
+     "Deutung (1 P.)"
+    ]
+   },
+   {
+    "id": "B-17",
+    "kc": "micro-macro",
+    "prompt": "PER: TP 50, FP 10, FN 10; ORG: TP 10, FP 30, FN 10; LOC: TP 90, FP 10, FN 10. Micro-\\(F_1\\)?",
+    "answers": [
+     {
+      "label": "Micro-\\(F_1\\)",
+      "type": "num",
+      "check": "micro:50,10,10;10,30,10;90,10,10"
+     }
+    ],
+    "solution": "TP 150, FP 50, FN 30: \\(300/380=15/19\\approx0{,}7895\\).",
+    "worked": "TP = 150, FP = 50, FN = 30: \\(F_1=300/(300+50+30)=300/380=15/19\\approx0{,}7895\\).",
+    "rubric": [
+     "Summen (1 P.)",
+     "Ergebnis (1 P.)"
+    ]
+   },
+   {
+    "id": "B-18",
+    "kc": "micro-macro",
+    "prompt": "Gleiche Zählungen wie B-17. Wie groß ist das Gewicht von ORG in Micro-\\(F_1\\) als gewichtetem Mittel der Typ-\\(F_1\\)-Werte?",
+    "answers": [
+     {
+      "label": "\\(w_{\\mathrm{ORG}}\\)",
+      "type": "num",
+      "check": "microweight:50,10,10;10,30,10;90,10,10:1"
+     }
+    ],
+    "solution": "\\(D=(120;\\,60;\\,200)\\), \\(w_{\\mathrm{ORG}}=60/380\\approx0{,}1579\\) – größer als der Gold-Anteil \\(20/180\\approx0{,}1111\\), weil ORG viele Fehlalarme hat.",
+    "transfer": true,
+    "worked": "Micro-\\(F_1\\) ist ein gewichtetes Mittel der Typ-\\(F_1\\) mit Gewichten \\(D_k=2\\mathrm{TP}_k+\\mathrm{FP}_k+\\mathrm{FN}_k\\): PER \\(120\\), ORG \\(60\\), LOC \\(200\\), Summe \\(380\\). Beweisidee: \\(F_1^{(k)}D_k=2\\mathrm{TP}_k\\), also \\(\\sum_kF_1^{(k)}D_k/\\sum_kD_k=2\\mathrm{TP}/D\\). Gewicht ORG \\(=60/380\\approx0{,}1579\\), größer als sein Gold-Anteil \\(20/180\\approx0{,}1111\\), weil die 30 Fehlalarme in \\(D\\) zählen.",
+    "rubric": [
+     "Gewichtsformel (1 P.)",
+     "Wert (1 P.)"
+    ]
+   },
+   {
+    "id": "B-19",
+    "kc": "attention",
+    "transfer": true,
+    "data": {
+     "attn": {
+      "q": [
+       1,
+       0
+      ],
+      "K": [
+       [
+        1,
+        0
+       ],
+       [
+        0,
+        0
+       ]
+      ],
+      "V": [
+       [
+        2,
+        0
+       ],
+       [
+        0,
+        2
+       ]
+      ],
+      "T": 1,
+      "scale": true
+     }
+    },
+    "prompt": "Kausale Self-Attention (jedes Wort sieht nur sich und frühere Wörter), zwei Wörter in der Reihenfolge A, B. Keys \\(k_A=(1,0)\\), \\(k_B=(0,0)\\); Values \\(v_A=(2,0)\\), \\(v_B=(0,2)\\); Queries \\(q_A=(0,1)\\), \\(q_B=(1,0)\\); \\(d_k=2\\), \\(T=1\\).<br>\n(a) Welche Ausgabe hat A – und hängt sie von \\(q_A\\) ab?<br>\n(b) Welches Gewicht \\(w_{B\\to A}\\) gibt B dem Wort A?<br>\n(c) Jetzt wird die Reihenfolge vertauscht (B, A), alle Vektoren bleiben gleich. Was passiert mit der Ausgabe von B, und was zeigt das?",
+    "answers": [
+     {
+      "label": "(a)",
+      "type": "choice",
+      "options": [
+       "\\(o_A=v_A=(2,0)\\), unabhängig von \\(q_A\\)",
+       "\\(o_A=(1,1)\\)",
+       "\\(o_A\\) hängt von \\(q_A\\) ab"
+      ],
+      "correct": 0
+     },
+     {
+      "label": "(b) \\(w_{B\\to A}\\)",
+      "type": "num",
+      "check": "attnq:1,0|1,0;0,0:0"
+     },
+     {
+      "label": "(c)",
+      "type": "choice",
+      "options": [
+       "\\(o_B=v_B=(0,2)\\) statt vorher \\(\\approx(1{,}3395;\\,0{,}6605)\\): Mit Maske gilt Satz 4 nicht – die Reihenfolge ändert die Ausgabe desselben Wortes.",
+       "\\(o_B\\) bleibt gleich (Satz 4).",
+       "Nur die Zeilen der Ausgabe werden vertauscht."
+      ],
+      "correct": 0,
+      "diagnoses": [
+       {
+        "value": "1",
+        "msg": "Satz 4 setzt voraus, dass jede Zeile über alle Positionen normiert. Die kausale Maske hängt von der Position ab."
+       }
+      ]
+     }
+    ],
+    "solution": "(a) \\(o_A=(2,0)\\), unabhängig von \\(q_A\\); (b) \\(w_{B\\to A}\\approx0{,}6698\\); (c) \\(o_B\\) ändert sich zu \\((0,2)\\) – Gegenbeispiel zu Satz 4 unter Maske.",
+    "worked": "<b>(a)</b> A steht vorn und sieht nur sich selbst: Die Softmax über <em>einen</em> Score ist 1, also \\(o_A=v_A=(2,0)\\) für jede Query – \\(q_A\\) ist wirkungslos.<br>\n<b>(b)</b> B sieht A und sich: \\(s_A=q_B^\\top k_A/\\sqrt2=1/\\sqrt2\\approx0{,}7071\\), \\(s_B=q_B^\\top k_B/\\sqrt2=0\\). \\(w_{B\\to A}=e^{0{,}7071}/(e^{0{,}7071}+1)=2{,}0281/3{,}0281\\approx0{,}6698\\), also \\(o_B=0{,}6698\\,(2,0)+0{,}3302\\,(0,2)\\approx(1{,}3395;\\,0{,}6605)\\).<br>\n<b>(c)</b> Bei Reihenfolge (B, A) steht B vorn und sieht nur sich: \\(o_B=v_B=(0,2)\\). Dasselbe Wort mit denselben Vektoren erhält eine andere Ausgabe. Satz 4 (\\(\\operatorname{Att}(PX)=P\\operatorname{Att}(X)\\)) gilt also nicht mehr: Sein Beweis benutzt, dass \\(\\operatorname{softmax}(PSP^\\top)=P\\operatorname{softmax}(S)P^\\top\\) – mit Maske hängt die Menge der zugelassenen Spalten aber von der Position ab. Die Maske allein macht Reihenfolge sichtbar, ganz ohne Positionsvektoren.",
+    "rubric": [
+     "(a) eine sichtbare Position ⇒ Gewicht 1 (2 P.)",
+     "(b) Scores mit Skalierung, Softmax (2 P.)",
+     "(c) neue Ausgabe berechnet (1 P.)",
+     "(c) Begründung, welche Voraussetzung von Satz 4 verletzt ist (3 P.)"
+    ]
+   }
+  ]
+ },
+ "case": {
+  "labels": [
+   "O",
+   "B-PER",
+   "I-PER",
+   "B-ORG",
+   "I-ORG",
+   "B-LOC",
+   "I-LOC"
+  ],
+  "sentences": [
+   {
+    "tokens": [
+     "Angela",
+     "Merkel",
+     "besuchte",
+     "Siemens",
+     "in",
+     "München",
+     "."
+    ],
+    "gold": [
+     "B-PER",
+     "I-PER",
+     "O",
+     "B-ORG",
+     "O",
+     "B-LOC",
+     "O"
+    ],
+    "emissions": [
+     {
+      "B-PER": 2
+     },
+     {
+      "I-PER": 2
+     },
+     {
+      "O": 2
+     },
+     {
+      "B-LOC": 1.4,
+      "B-ORG": 1.2
+     },
+     {
+      "O": 2
+     },
+     {
+      "B-LOC": 2
+     },
+     {
+      "O": 2
+     }
+    ]
+   },
+   {
+    "tokens": [
+     "Die",
+     "Bayern",
+     "spielen",
+     "in",
+     "New",
+     "York",
+     "."
+    ],
+    "gold": [
+     "O",
+     "B-ORG",
+     "O",
+     "O",
+     "B-LOC",
+     "I-LOC",
+     "O"
+    ],
+    "emissions": [
+     {
+      "O": 2
+     },
+     {
+      "B-ORG": 2
+     },
+     {
+      "O": 2
+     },
+     {
+      "O": 2
+     },
+     {
+      "B-LOC": 2
+     },
+     {
+      "I-ORG": 1.2,
+      "I-LOC": 1.0
+     },
+     {
+      "O": 2
+     }
+    ]
+   },
+   {
+    "tokens": [
+     "Barack",
+     "Obama",
+     "traf",
+     "Angela",
+     "Merkel",
+     "in",
+     "Berlin",
+     "."
+    ],
+    "gold": [
+     "B-PER",
+     "I-PER",
+     "O",
+     "B-PER",
+     "I-PER",
+     "O",
+     "B-LOC",
+     "O"
+    ],
+    "emissions": [
+     {
+      "B-PER": 2
+     },
+     {
+      "O": 1.1,
+      "I-PER": 1.0
+     },
+     {
+      "O": 2
+     },
+     {
+      "B-PER": 2
+     },
+     {
+      "I-PER": 2
+     },
+     {
+      "O": 2
+     },
+     {
+      "B-LOC": 2
+     },
+     {
+      "I-LOC": 1.1,
+      "O": 1.0
+     }
+    ]
+   }
+  ]
+ },
+ "cards": [
+  {
+   "key": "spans/io-not-injective",
+   "kc": "spans",
+   "type": "concept",
+   "prompt": "Zwei <em>benachbarte</em> Spannen gleichen Typs, [Montag]DAY [Dienstag]DAY: Welche Information geht bei IO-Kodierung verloren?",
+   "answer": "Die Grenze zwischen den Spannen: IO ergibt <code>DAY DAY</code> – genau wie die eine Spanne [Montag Dienstag].",
+   "why": "IO hat nur ein Label je Typ; Spannenanfänge sind nicht markiert. BIO markiert sie mit B- und ist auf gültigen Folgen umkehrbar (Satz A).",
+   "source": "Lehrbuch §2, Satz A; Vorlesung PDF-S. 16",
+   "diagram": "bio_schemes.svg",
+   "prereq": "Spanne, Entitätstyp"
+  },
+  {
+   "key": "spans/label-count",
+   "kc": "spans",
+   "type": "cloze",
+   "prompt": "",
+   "answer": "",
+   "why": "IO: ein Label je Typ; BIO: B und I; BILOU: B, I, L, U – jeweils plus O.",
+   "source": "Vorlesung PDF-S. 15–18",
+   "cloze": "Mit \\(K\\) Entitätstypen hat IO {{c1::\\(K+1\\)}}, BIO {{c1::\\(2K+1\\)}} und BILOU {{c1::\\(4K+1\\)}} Labels.",
+   "prereq": "Kodierungsschemata IO, BIO, BILOU"
+  },
+  {
+   "key": "spans/conlleval-i",
+   "kc": "spans",
+   "type": "concept",
+   "prompt": "Wie liest das CoNLL-Skript <code>conlleval</code> ein <code>I-LOC</code>, das direkt auf <code>O</code> folgt?",
+   "answer": "Als Beginn einer neuen LOC-Spanne.",
+   "why": "Die Folge ist ungültig; das Skript repariert sie, statt das Label zu verwerfen. Andere Decoder verwerfen solche Labels – dann sind Ergebnisse nicht vergleichbar (Aufgabe S4).",
+   "source": "Lehrbuch §2",
+   "mistake": "„Ungültige Labels werden von allen Decodern ignoriert.“",
+   "prereq": "BIO-Kodierung",
+   "example": "<code>O I-LOC I-LOC B-LOC</code> → [w₂ w₃]LOC, [w₄]LOC"
+  },
+  {
+   "key": "spans/encode-mini",
+   "kc": "spans",
+   "type": "case",
+   "prompt": "BIO-Folge für <code>Tickets nach New York und Boston</code> mit [New York]CITY und [Boston]CITY?",
+   "answer": "<code>O O B-CITY I-CITY O B-CITY</code>",
+   "why": "Jede Spanne beginnt mit B-; „Boston“ beginnt eine neue Spanne und bekommt daher B-, nicht I-.",
+   "source": "Lehrbuch §2; Aufgabe S2",
+   "prereq": "BIO-Kodierung"
+  },
+  {
+   "key": "spans/bilou-evidence",
+   "kc": "spans",
+   "type": "research",
+   "prompt": "Welchen Schemavergleich berichten Ratinov &amp; Roth (2009) für ihr NER-System auf CoNLL-2003?",
+   "answer": "BILOU schnitt signifikant besser ab als BIO.",
+   "why": "BILOU markiert Spannenende und Einwortspannen explizit. Ein Befund zu diesem einen System mit handgebauten Merkmalen, kein allgemeiner Satz.",
+   "source": "Ratinov &amp; Roth 2009, S. 148, Tab. 2 S. 150",
+   "prereq": "BIO, BILOU"
+  },
+  {
+   "key": "birnn/abhaengigkeit-vorwaerts",
+   "kc": "birnn",
+   "type": "concept",
+   "prompt": "Vorwärts-RNN \\(h^{\\rightarrow}_t=f(h^{\\rightarrow}_{t-1},x_t)\\): Von welchen Eingaben kann \\(h^{\\rightarrow}_t\\) abhängen?",
+   "answer": "Nur von \\(x_1,\\dots,x_t\\).",
+   "why": "Induktion über die Rekursion: In der Formel für \\(h^{\\rightarrow}_t\\) kommt kein \\(x_s\\) mit \\(s&gt;t\\) vor (Satz 1). Gilt für jede Zelle \\(f\\), auch LSTM und GRU.",
+   "source": "SLP3 §14.4.2, Gl. 14.16, S. 313",
+   "mistake": "„Ein RNN hat globalen Kontext, also sieht jeder Zustand den ganzen Satz.“",
+   "diagram": "dependency_cones.svg",
+   "prereq": "RNN-Rekursion"
+  },
+  {
+   "key": "birnn/washington",
+   "kc": "birnn",
+   "type": "case",
+   "prompt": "„Washington signed“ gegen „Washington state“: Warum muss ein Tagger, der Wort 1 nur aus \\(h^{\\rightarrow}_1\\) klassifiziert, beiden „Washington“ dasselbe Label geben?",
+   "answer": "\\(h^{\\rightarrow}_1=\\tanh(Ue_1+b)\\) ist in beiden Sätzen derselbe Vektor; gleiche Eingabe, gleiche Ausgabe.",
+   "why": "Das unterscheidende Wort steht an Position 2. Im Lehrbuchbeispiel ist \\(h^{\\rightarrow}_1=(0{,}7616;\\,0)\\) in beiden Sätzen.",
+   "source": "Lehrbuch §4, Abb. 4.1",
+   "prereq": "Vorwärts-RNN; BiRNN",
+   "mistake": "„Das Vorwärts-RNN sieht das nächste Wort“ – erst ab Position 2."
+  },
+  {
+   "key": "birnn/definition",
+   "kc": "birnn",
+   "type": "concept",
+   "prompt": "Wie ist der Zustand \\(h^{\\mathrm{bi}}_t\\) eines BiRNN definiert, und welche Dimension hat er bei \\(d_h\\) je Richtung?",
+   "answer": "\\(h^{\\mathrm{bi}}_t=[h^{\\rightarrow}_t;\\,h^{\\leftarrow}_t]\\in\\mathbb R^{2d_h}\\), aus zwei RNNs mit getrennten Parametern.",
+   "why": "Die Verkettung vereinigt die Abhängigkeitsbereiche \\(\\{1,\\dots,t\\}\\) und \\(\\{t,\\dots,T\\}\\) zum ganzen Satz (Satz 2).",
+   "source": "Vorlesung PDF-S. 80; SLP3 §14.4.2, S. 313–314",
+   "prereq": "RNN-Rekursion"
+  },
+  {
+   "key": "birnn/latenz",
+   "kc": "birnn",
+   "type": "concept",
+   "prompt": "Ein BiRNN im <em>Standardaufbau</em> (Rückwärtsrichtung über den ganzen Satz): Wann kann es das Label von Wort \\(t\\) frühestens ausgeben?",
+   "answer": "Erst wenn der Satz vollständig vorliegt.",
+   "why": "\\(h^{\\leftarrow}_t\\) hängt vom letzten Wort ab. Varianten mit begrenzter Vorausschau \\(k\\) geben nach \\(k\\) weiteren Wörtern aus – mit höchstens \\(k\\) Wörtern rechtem Kontext.",
+   "source": "Lehrbuch §5(a); SLP3 §14.4.2, S. 313",
+   "example": "Vorausschau \\(k=2\\): Label für \\(t=4\\) sieht \\(x_1,\\dots,x_6\\).",
+   "prereq": "BiRNN-Definition"
+  },
+  {
+   "key": "birnn/softmax-unabhaengig",
+   "kc": "birnn",
+   "type": "concept",
+   "prompt": "Ein BiRNN-Tagger wählt jedes Label <em>einzeln</em> per Softmax und \\(\\arg\\max\\). Was verhindert dann die Ausgabe <code>O I-LOC</code>?",
+   "answer": "Nichts – erst ein strukturierter Decoder (z. B. CRF mit Übergangsregeln) schließt sie aus.",
+   "why": "Bei unabhängiger Dekodierung hängen die Labels nur über die gemeinsamen Eingaben zusammen, nicht über eine Bewertung ganzer Folgen.",
+   "source": "Vorlesung PDF-S. 83, 85",
+   "prereq": "Softmax je Position"
+  },
+  {
+   "key": "birnn/params",
+   "kc": "birnn",
+   "type": "math",
+   "prompt": "Parameterzahl eines BiRNN-Taggers (Elman-Zellen, ohne Einbettungsmatrix) mit Einbettung \\(d\\), Zustand \\(d_h\\) je Richtung, \\(|\\mathcal L|\\) Labels?",
+   "answer": "\\(2(d_h^2+d_hd+d_h)+|\\mathcal L|(2d_h+1)\\)",
+   "why": "Je Richtung \\(W,U,b\\); die Ausgabe \\(W_o\\) liest den verketteten Zustand mit \\(2d_h\\) Komponenten. LSTM-Zellen haben etwa viermal so viele rekurrente Parameter.",
+   "source": "Lehrbuch §5",
+   "example": "\\(d=100,\\ d_h=128,\\ |\\mathcal L|=9\\): \\(60\\,937\\).",
+   "prereq": "Matrixdimensionen eines RNN"
+  },
+  {
+   "key": "birnn/error-wo",
+   "kc": "birnn",
+   "type": "error",
+   "prompt": "Fehler finden: „Die Ausgabeschicht eines BiRNN-Taggers hat \\(|\\mathcal L|\\cdot d_h+|\\mathcal L|\\) Parameter.“",
+   "answer": "Falsch: \\(W_o\\) hat \\(2d_h\\) Spalten, also \\(|\\mathcal L|(2d_h+1)\\) Parameter.",
+   "why": "Der Klassifikator liest die Verkettung \\([h^{\\rightarrow}_t;h^{\\leftarrow}_t]\\), nicht nur eine Richtung.",
+   "source": "Lehrbuch §5; Aufgabe B1",
+   "prereq": "Verkettung [h→; h←]"
+  },
+  {
+   "key": "attention/formel",
+   "kc": "attention",
+   "type": "math",
+   "prompt": "Wie werden aus Scores \\(s_1,\\dots,s_N\\) bei Temperatur \\(T\\) die Attention-Gewichte \\(w_j\\) berechnet?",
+   "answer": "\\(w_j=\\dfrac{e^{s_j/T}}{\\sum_{l}e^{s_l/T}}\\) (Softmax); dann \\(o=\\sum_j w_jv_j\\).",
+   "why": "\\(e^x\\) macht jeden Score positiv und erhält die Reihenfolge; die Division normiert auf Summe 1. Gewichte hängen nur von Score-Differenzen ab.",
+   "source": "Lehrbuch 6.3, Definition 6.2, Abb. 6.2; SLP3 §7.1.1, S. 180",
+   "diagram": "att_pipeline.svg",
+   "prereq": "Exponentialfunktion; Skalarprodukt (6.2)",
+   "example": "Bank: \\(s=(0{,}8485;\\,-0{,}891;\\,0{,}1909)\\) → \\(w=(0{,}5904;\\,0{,}1037;\\,0{,}3059)\\).",
+   "mistake": "Values in die Gewichte einrechnen – sie werden nur gemischt."
+  },
+  {
+   "key": "attention/gelernt",
+   "kc": "attention",
+   "type": "concept",
+   "prompt": "Welche Größen einer Self-Attention-Schicht sind gelernte Parameter, welche nicht?",
+   "answer": "Gelernt: \\(W_Q,W_K,W_V\\) (beim Transformer auch \\(W_O\\)). Nicht gelernt: die Gewichte \\(\\alpha_{ij}\\).",
+   "why": "Die \\(\\alpha_{ij}\\) werden für jede Eingabe aus Anfrage und Schlüsseln neu berechnet – darum passen sie sich jedem Satz an.",
+   "source": "Vorlesung PDF-S. 46",
+   "mistake": "„Die Attention-Gewichte sind trainierte Parameter.“",
+   "prereq": "Self-Attention-Formel"
+  },
+  {
+   "key": "attention/skalierung",
+   "kc": "attention",
+   "type": "math",
+   "prompt": "Unter welchen Annahmen hat \\(q^\\top k\\) mit \\(q,k\\in\\mathbb R^{d_k}\\) die Varianz \\(d_k\\)?",
+   "answer": "Alle Komponenten unabhängig, Erwartungswert 0, Varianz 1.",
+   "why": "Dann hat jeder Summand \\(q_ik_i\\) Varianz 1, und die \\(d_k\\) Summanden sind unkorreliert. Geteilt durch \\(\\sqrt{d_k}\\) ist die Varianz 1. Vaswani et al. formulieren den Effekt vorsichtig als Vermutung („We suspect“).",
+   "source": "Lehrbuch 6.8, Satz 3 mit Beweis; Abb. 6.6; Vaswani et al. 2017, §3.2.1",
+   "prereq": "Varianz, Unabhängigkeit",
+   "mistake": "„Skalierung normiert die Gewichte auf Summe 1“ – das tut die Softmax."
+  },
+  {
+   "key": "attention/sharpening",
+   "kc": "attention",
+   "type": "case",
+   "prompt": "Energien \\((0{,}7071;\\ 0{,}7071;\\ 1{,}4142)\\) ergeben \\(\\alpha_3\\approx0{,}5035\\). Was passiert mit \\(\\alpha_3\\), wenn alle Energien viermal so groß sind?",
+   "answer": "Es wächst stark (gegen 1): Die Softmax wird spitzer und nähert sich einem argmax.",
+   "why": "Die Softmax hängt von Differenzen ab; viermal größere Differenzen werden exponentiell betont. Ihre Gradienten nach den übrigen Energien werden klein.",
+   "source": "Lehrbuch 6.3, Abb. 6.3 (Temperatur); Satz 6.1 b",
+   "prereq": "Softmax, Temperatur"
+  },
+  {
+   "key": "attention/convex",
+   "kc": "attention",
+   "type": "concept",
+   "prompt": "Wo liegt die Attention-Ausgabe \\(o=\\sum_j w_jv_j\\) relativ zu den Values \\(v_j\\)?",
+   "answer": "In der konvexen Hülle der \\(v_j\\); innere Punkte exakt, Randpunkte nur im Grenzwert, äußere nie.",
+   "why": "Softmax-Gewichte sind positiv und summieren zu 1: \\(o\\) ist eine Konvexkombination (Satz 6.2).",
+   "source": "Lehrbuch 6.5, Satz 6.2, Abb. 6.5",
+   "prereq": "Konvexkombination",
+   "diagram": "att_hull_bank.svg",
+   "mistake": "Mit kleiner Temperatur Punkte außerhalb erreichen wollen."
+  },
+  {
+   "key": "attention/burger",
+   "kc": "attention",
+   "type": "case",
+   "prompt": "Datenbank-Analogie der Vorlesung: Anfrage „burger“, Ähnlichkeiten 0,5 / 0 / 0,5 / 0 zu den Werten 12 / 5 / 10 / 6. Welches Ergebnis liefert die gewichtete Summe?",
+   "answer": "11",
+   "why": "Self-Attention gibt die gewichtete Summe der Werte aus: \\(0{,}5\\cdot12+0{,}5\\cdot10\\). Die Gewichte kommen aus der Ähnlichkeit von Anfrage und Schlüssel.",
+   "source": "Vorlesung PDF-S. 40",
+   "prereq": "gewichtete Summe"
+  },
+  {
+   "key": "attention/multihead",
+   "kc": "attention",
+   "type": "concept",
+   "prompt": "Warum ändert die Aufteilung in \\(h\\) Köpfe mit Verkettung die Zahl der Projektionsparameter nicht?",
+   "answer": "\\(h\\) Projektionen der Größe \\(n\\times(d/h)\\) haben zusammen \\(n\\cdot d\\) Einträge – so viele wie eine \\(n\\times d\\)-Projektion.",
+   "why": "Erst die Ausgabematrix \\(W_O\\in\\mathbb R^{d\\times d}\\) des Transformers fügt \\(d^2\\) Parameter hinzu.",
+   "source": "Vorlesung PDF-S. 58; SLP3 Gl. 7.35, S. 188",
+   "prereq": "Projektionsmatrizen"
+  },
+  {
+   "key": "position/permutation",
+   "kc": "position",
+   "type": "concept",
+   "prompt": "Self-Attention ohne Positionskodierung: Was gilt für \\(\\operatorname{Att}(PX)\\), wenn \\(P\\) die Token permutiert?",
+   "answer": "\\(\\operatorname{Att}(PX)=P\\operatorname{Att}(X)\\) – die Ausgaben werden nur mitpermutiert.",
+   "why": "„Marry kills John“ und „John kills Marry“ geben jedem Wort denselben Vektor; die Reihenfolge ist unsichtbar (Satz 4).",
+   "source": "Vorlesung PDF-S. 60–62; Lehrbuch Satz 4",
+   "prereq": "Self-Attention-Formel; Permutationsmatrix",
+   "mistake": "„Invarianz“ statt Äquivarianz: Die Ausgaben wandern mit."
+  },
+  {
+   "key": "position/sinus-linear",
+   "kc": "position",
+   "type": "math",
+   "prompt": "Sinus-Kodierung, ein Frequenzpaar \\(\\omega\\): Wie hängt die Kodierung von Position \\(i+\\Delta\\) von der von \\(i\\) ab?",
+   "answer": "Linear: Drehung um den Winkel \\(\\omega\\Delta\\), unabhängig von \\(i\\).",
+   "why": "Folgt aus den Additionstheoremen. Die Originalarbeit nennt genau diese Eigenschaft als Motivation.",
+   "source": "Vaswani et al. 2017, §3.5; Lehrbuch §7",
+   "prereq": "Additionstheoreme"
+  },
+  {
+   "key": "position/rope",
+   "kc": "position",
+   "type": "math",
+   "prompt": "RoPE dreht \\(q\\) um \\(m\\theta\\) und \\(k\\) um \\(n\\theta\\). Wovon hängt \\(\\big(R(m\\theta)q\\big)^\\top R(n\\theta)k\\) ab?",
+   "answer": "Nur von \\(q\\), \\(k\\) und dem Abstand \\(n-m\\): es ist \\(q^\\top R((n-m)\\theta)k\\).",
+   "why": "\\(R(\\varphi)^\\top=R(-\\varphi)\\) und \\(R(a)R(b)=R(a+b)\\).",
+   "source": "Vorlesung PDF-S. 69; Lehrbuch §7",
+   "prereq": "Rotationsmatrix"
+  },
+  {
+   "key": "position/learned-nachteil",
+   "kc": "position",
+   "type": "concept",
+   "prompt": "Welche zwei Nachteile nennt die Vorlesung für gelernte absolute Positionsvektoren?",
+   "answer": "Begrenzte Länge; große Positionen kommen im Training selten vor.",
+   "why": "Die Vektoren bilden eine Tabelle fester Länge: Für Positionen über der Trainingslänge existiert kein Eintrag.",
+   "source": "Vorlesung PDF-S. 67",
+   "prereq": "Positionskodierung"
+  },
+  {
+   "key": "decoding/crf-score",
+   "kc": "decoding",
+   "type": "math",
+   "prompt": "Wie lautet der <em>Score</em> \\(S(x,y)\\) einer Labelfolge im linear-chain-CRF – und ist er normiert?",
+   "answer": "\\(S(x,y)=\\sum_{t=1}^{T}\\big(s_t(y_t)+A_{y_{t-1},y_t}\\big)\\) mit \\(y_0=\\text{Start}\\); <b>nicht</b> normiert.",
+   "why": "Emissionswerte \\(s_t\\) aus dem BiRNN plus Übergangswerte \\(A\\). Der Score ist eine beliebige reelle Zahl; Viterbi maximiert ihn.",
+   "source": "Lehrbuch §9, Gl. (9.1); SLP3 §18.5",
+   "mistake": "„Der CRF-Score ist global normiert.“",
+   "diagram": "viterbi_lattice.svg",
+   "prereq": "Emission, Übergang"
+  },
+  {
+   "key": "decoding/crf-prob",
+   "kc": "decoding",
+   "type": "math",
+   "prompt": "Wie wird aus dem CRF-Score \\(S(x,y)\\) eine Wahrscheinlichkeit?",
+   "answer": "\\(p(y\\mid x)=\\exp S(x,y)\\,/\\,Z(x)\\) mit \\(Z(x)=\\sum_{y\\prime\\text{ gültig}}\\exp S(x,y\\prime)\\).",
+   "why": "Normiert wird global über alle (gültigen) Labelfolgen – das unterscheidet das CRF von lokal normierten Schrittmodellen.",
+   "source": "Lehrbuch §9, Gl. (9.2)",
+   "diagram": "crf_probabilities.svg",
+   "prereq": "CRF-Score; Softmax über Folgen"
+  },
+  {
+   "key": "decoding/forward-vs-viterbi",
+   "kc": "decoding",
+   "type": "concept",
+   "prompt": "Welche eine Operation unterscheidet den Forward-Algorithmus (für \\(Z\\)) vom Viterbi-Algorithmus?",
+   "answer": "Summe statt Maximum über die Vorgänger (bei gleicher Rekursion).",
+   "why": "Viterbi: \\(\\delta_t=s_t+\\max(\\delta_{t-1}+A)\\). Forward: \\(\\alpha_t=e^{s_t}\\sum\\alpha_{t-1}e^{A}\\). Beide kosten \\(O(T|\\mathcal L|^2)\\).",
+   "source": "Lehrbuch §9, Abb. 9.1",
+   "prereq": "Viterbi-Rekursion",
+   "example": "max ↔ log Σ exp: \\(\\delta\\) vs. \\(\\alpha\\)"
+  },
+  {
+   "key": "decoding/prob-mini",
+   "kc": "decoding",
+   "type": "case",
+   "prompt": "Bester Pfad mit Score \\(S=4{,}5\\), Zustandssumme \\(Z\\approx200{,}2664\\). Wie groß ist \\(p(y^\\ast\\mid x)\\)?",
+   "answer": "\\(e^{4{,}5}/200{,}2664\\approx0{,}4495\\).",
+   "why": "Höchster Score heißt nicht hohe Sicherheit: Mehrere gültige Konkurrenten liegen nur wenig dahinter. \\(\\log p=S-\\log Z\\approx-0{,}7996\\).",
+   "source": "Lehrbuch §9; Aufgaben C2, C3",
+   "prereq": "Partitionsfunktion Z"
+  },
+  {
+   "key": "decoding/garantie",
+   "kc": "decoding",
+   "type": "concept",
+   "prompt": "Was garantiert Viterbi mit harten BIO-Übergangsregeln – und was nicht?",
+   "answer": "Garantiert: keine ungültige Folge. Nicht garantiert: richtige Grenzen und Typen.",
+   "why": "Eine gültige, aber falsche Folge wie <code>B-LOC I-LOC</code> über „Berlin .“ bleibt erlaubt (Fallstudie).",
+   "source": "Lehrbuch §13",
+   "prereq": "BIO-Gültigkeit; Viterbi"
+  },
+  {
+   "key": "decoding/label-vs-exposure",
+   "kc": "decoding",
+   "type": "concept",
+   "prompt": "Label Bias und Exposure Bias: Was ist jeweils die Ursache?",
+   "answer": "Label Bias: lokale Normierung je Schritt. Exposure Bias: Training mit Gold-Vorgängern, Test mit eigenen Vorhersagen.",
+   "why": "Globale Normierung (CRF) adressiert Label Bias, nicht Exposure Bias.",
+   "source": "Lafferty et al. 2001; Andor et al. 2016, S. 2442; Vorlesung PDF-S. 84",
+   "prereq": "lokale vs. globale Normierung"
+  },
+  {
+   "key": "decoding/greedy-evidence",
+   "kc": "decoding",
+   "type": "research",
+   "prompt": "Was fanden Ratinov &amp; Roth (2009) zu gieriger Dekodierung gegenüber Viterbi in ihrem NER-System?",
+   "answer": "Vergleichbare Ergebnisse bei weit geringerem Rechenaufwand.",
+   "why": "Ein empirisches Gegengewicht zu „ein CRF ist immer nötig“ – gebunden an dieses System.",
+   "source": "Ratinov &amp; Roth 2009, S. 148",
+   "prereq": "gierige Dekodierung"
+  },
+  {
+   "key": "prf/zaehlform",
+   "kc": "prf",
+   "type": "math",
+   "prompt": "\\(F_1\\) in TP, FP, FN?",
+   "answer": "\\(\\dfrac{2\\mathrm{TP}}{2\\mathrm{TP}+\\mathrm{FP}+\\mathrm{FN}}\\)",
+   "why": "Kehrwert des Mittels von \\(1/P\\) (Ausgaben pro Treffer) und \\(1/R\\) (Gold pro Treffer) – das harmonische Mittel.",
+   "source": "SLP3 §4.9, Gl. 4.42–4.44, S. 114",
+   "diagram": "f1_contours.svg",
+   "prereq": "TP, FP, FN"
+  },
+  {
+   "key": "prf/schranke",
+   "kc": "prf",
+   "type": "math",
+   "prompt": "Welche obere Schranke hat \\(F_1\\) in Abhängigkeit von \\(\\min(P,R)\\)?",
+   "answer": "\\(F_1\\le2\\min(P,R)\\)",
+   "why": "Eine schwache Größe lässt sich durch eine starke nicht ausgleichen (Satz 6).",
+   "source": "Lehrbuch Satz 6",
+   "example": "\\(P=0{,}1,\\ R=1\\): \\(F_1\\approx0{,}182\\le0{,}2\\).",
+   "prereq": "harmonisches Mittel"
+  },
+  {
+   "key": "prf/keine-tn",
+   "kc": "prf",
+   "type": "concept",
+   "prompt": "Warum enthalten P, R und F1 bei NER keine True Negatives?",
+   "answer": "Ein TN wäre eine nicht vorhandene, nicht vorhergesagte Spanne – davon gibt es \\(T(T+1)/2\\) Kandidaten.",
+   "why": "Bei 30 Wörtern 465 mögliche Spannen; eine Kennzahl mit TN würde von dieser Zahl beherrscht.",
+   "source": "Lehrbuch §10",
+   "prereq": "Konfusionsmatrix"
+  },
+  {
+   "key": "prf/fbeta",
+   "kc": "prf",
+   "type": "math",
+   "prompt": "Wofür steht \\(\\beta\\) in \\(F_\\beta=\\frac{(1+\\beta^2)PR}{\\beta^2P+R}\\)?",
+   "answer": "\\(\\beta&gt;1\\) gewichtet Recall stärker, \\(\\beta&lt;1\\) Precision; \\(\\beta=1\\) ergibt \\(F_1\\).",
+   "why": "Beispiel Anonymisierung (alle Namen finden): \\(F_2\\) statt \\(F_1\\).",
+   "source": "SLP3 §4.9, S. 114; Aufgabe P2",
+   "prereq": "F1-Formel"
+  },
+  {
+   "key": "prf-edge/nichts-ausgegeben",
+   "kc": "prf-edge",
+   "type": "case",
+   "prompt": "Gold hat 3 Entitäten, das System gibt keine aus. P, R und F1?",
+   "answer": "\\(P=0/0\\) (nicht definiert), \\(R=0\\), \\(F_1=0\\) über die Zählform.",
+   "why": "Ohne Ausgaben gibt es keinen Anteil richtiger Ausgaben; die Zählform hat den Nenner 3.",
+   "source": "Lehrbuch §10, Fall (iii)",
+   "prereq": "Zählform von F1"
+  },
+  {
+   "key": "prf-edge/tp-null",
+   "kc": "prf-edge",
+   "type": "concept",
+   "prompt": "TP = 0, FP &gt; 0, FN &gt; 0: Was liefert \\(2PR/(P+R)\\), was die Zählform?",
+   "answer": "\\(2PR/(P+R)=0/0\\); die Zählform liefert 0.",
+   "why": "Hier ist \\(P=R=0\\). Deshalb rechnet man mit der Zählform (Satz 5).",
+   "source": "Lehrbuch Satz 5, Fall (ii)",
+   "prereq": "Zählform von F1"
+  },
+  {
+   "key": "prf-edge/beide-leer",
+   "kc": "prf-edge",
+   "type": "concept",
+   "prompt": "Weder Gold noch Ausgaben: Welcher \\(F_1\\)-Wert ist korrekt?",
+   "answer": "Keiner ist erzwungen: \\(0/0\\). Ein Wert entsteht nur durch eine genannte Konvention.",
+   "why": "scikit-learn: zero_division = 0, 1 oder NaN; Mittelwerte über Sätze hängen davon ab (Aufgabe E1).",
+   "source": "scikit-learn 1.9.1; Lehrbuch Fall (v)",
+   "prereq": "Zählform von F1"
+  },
+  {
+   "key": "prf-level/doppelt",
+   "kc": "prf-level",
+   "type": "concept",
+   "prompt": "Wie zählt ein Typfehler bei richtigen Grenzen auf Phrasen-Ebene?",
+   "answer": "Als ein FP und ein FN.",
+   "why": "Die System-Spanne passt zu keiner Gold-Spanne exakt, und die Gold-Spanne bleibt unerkannt. Weglassen kostet nur ein FN (Manning 2006).",
+   "source": "Vorlesung PDF-S. 21; Manning 2006",
+   "prereq": "exakter Spannenvergleich",
+   "example": "[Angela Merkel]PER vs. [Angela]PER: 1 FP + 1 FN"
+  },
+  {
+   "key": "prf-level/rangfolge",
+   "kc": "prf-level",
+   "type": "case",
+   "prompt": "Folienbeispiel „First Bank of Chicago“: System findet [Bank of Chicago] und den Betrag. Phrasen- und Token-\\(F_1\\)?",
+   "answer": "Phrasen \\(1/2\\), Token \\(8/9\\).",
+   "why": "Phrasen-Zählung bestraft den Grenzfehler doppelt, Token-Zählung belohnt die Teilüberlappung.",
+   "source": "Vorlesung PDF-S. 21–22",
+   "prereq": "Token- vs. Spannen-Zählung"
+  },
+  {
+   "key": "micro-macro/gewicht",
+   "kc": "micro-macro",
+   "type": "math",
+   "prompt": "Mit welchem Gewicht geht Typ \\(k\\) in Micro-\\(F_1\\) als Mittel der Typ-\\(F_1\\)-Werte ein?",
+   "answer": "\\(w_k=D_k/\\sum_lD_l\\) mit \\(D_k=2\\mathrm{TP}_k+\\mathrm{FP}_k+\\mathrm{FN}_k\\).",
+   "why": "Wegen \\(D_kF_{1,k}=2\\mathrm{TP}_k\\). Fehlalarme erhöhen das Gewicht eines Typs – es ist nicht der Gold-Anteil.",
+   "source": "Lehrbuch §12, Gl. (12.1)",
+   "prereq": "Micro-F1"
+  },
+  {
+   "key": "micro-macro/error-support",
+   "kc": "micro-macro",
+   "type": "error",
+   "prompt": "Fehler finden: „Micro-\\(F_1\\) gewichtet MISC mit 7 von 162 Gold-Entitäten“ (PER 80/10/20, LOC 50/25/5, MISC 0/3/7).",
+   "answer": "Falsch: Das Micro-Gewicht ist \\(D_{\\mathrm{MISC}}/\\sum D=10/330\\). 7/162 ist der Support-Anteil.",
+   "why": "Support-Gewichte gehören zum support-gewichteten Macro-F1, nicht zu Micro.",
+   "source": "Lehrbuch §12; Aufgabe B6",
+   "prereq": "Micro-F1 als gewichtetes Mittel"
+  },
+  {
+   "key": "micro-macro/unterschied",
+   "kc": "micro-macro",
+   "type": "concept",
+   "prompt": "Was gewichten Micro-F1, Macro-F1 und support-gewichtetes Macro-F1 jeweils?",
+   "answer": "Micro: nach \\(D_k\\) (jede Entscheidung). Macro: jeden Typ gleich. Support-gewichtet: nach Gold-Anteil.",
+   "why": "Dieselben Zählungen ergeben drei verschiedene Werte; der Bericht muss die Definition nennen.",
+   "source": "Lehrbuch §12; Aufgabe M1",
+   "prereq": "F1 je Typ"
+  },
+  {
+   "key": "micro-macro/accuracy",
+   "kc": "micro-macro",
+   "type": "concept",
+   "prompt": "Unter welcher Bedingung ist Micro-F1 gleich der Accuracy?",
+   "answer": "Jedes Token genau ein Gold- und ein System-Label, und alle Klassen einschließlich O werden gepoolt.",
+   "why": "Dann ist jeder Fehler genau ein FP und ein FN (Satz 7). Deshalb lässt die NER-Auswertung O weg.",
+   "source": "Lehrbuch Satz 7",
+   "prereq": "Micro-F1, Accuracy"
+  },
+  {
+   "key": "attention/shift-invariance",
+   "kc": "attention",
+   "type": "math",
+   "prompt": "Alle Keys werden um denselben Vektor \\(u\\) verschoben: \\(k_j\\mapsto k_j+u\\). Was passiert mit Scores und Gewichten?",
+   "answer": "Jeder Score ändert sich um dasselbe \\(c=q^\\top u/\\sqrt{d_k}\\); die Gewichte bleiben gleich.",
+   "why": "\\(e^{(s_j+c)/T}\\) enthält den Faktor \\(e^{c/T}\\), der sich in der Softmax kürzt (Satz 6.1a).",
+   "source": "Lehrbuch §6, Satz 6.1; Labor Station 3",
+   "example": "Bank-Beispiel: Scores ändern sich, \\(w=(0{,}5904;\\,0{,}1037;\\,0{,}3059)\\) bleibt.",
+   "mistake": "Nur einen Key verschieben – dann ändern sich die Gewichte sehr wohl.",
+   "diagram": "softmax_shift.svg",
+   "prereq": "Softmax; Skalarprodukt"
+  },
+  {
+   "key": "attention/length-temperature",
+   "kc": "attention",
+   "type": "concept",
+   "prompt": "Die Query wird auf das Dreifache verlängert, ihre Richtung bleibt. Welche andere Stellschraube hat exakt dieselbe Wirkung?",
+   "answer": "Die Temperatur auf \\(T/3\\) senken.",
+   "why": "\\((\\lambda q)^\\top k_j=\\lambda\\,q^\\top k_j\\): alle Scores werden mit \\(\\lambda\\) multipliziert – wie Division durch \\(T/\\lambda\\) (Satz 6.1b).",
+   "source": "Lehrbuch §6, Satz 6.1; Labor Station 2",
+   "example": "Bank: Entropie \\(1{,}3106\\to0{,}5762\\) Bit bei \\(\\lambda=3\\).",
+   "mistake": "„Nur die Richtung von q zählt“ – die Länge bestimmt die Schärfe.",
+   "prereq": "Temperatur der Softmax"
+  },
+  {
+   "key": "attention/uniform-condition",
+   "kc": "attention",
+   "type": "concept",
+   "prompt": "Unter welcher genauen Bedingung an \\(q\\) und die Keys sind alle Attention-Gewichte gleich?",
+   "answer": "\\(q^\\top(k_i-k_j)=0\\) für alle Paare \\(i,j\\): \\(q\\) steht senkrecht auf allen Key-Differenzen.",
+   "why": "Gleiche Gewichte ⇔ gleiche Scores, weil exp injektiv ist (Satz 6.3).",
+   "source": "Lehrbuch §6, Satz 6.3; Labor Station 4",
+   "example": "\\(q=(2,0)\\), Keys \\((1,1)\\), \\((1,-1)\\), \\((1;\\,0{,}5)\\): alle Gewichte \\(1/3\\).",
+   "mistake": "„Nur bei \\(q=0\\)“ – das ist hinreichend, nicht notwendig.",
+   "prereq": "Skalarprodukt, Orthogonalität"
+  },
+  {
+   "key": "attention/jacobian",
+   "kc": "attention",
+   "type": "math",
+   "prompt": "Wie lautet \\(\\partial w_i/\\partial s_j\\) für \\(w=\\operatorname{softmax}(s/T)\\), und was folgt bei fast one-hot \\(w\\)?",
+   "answer": "\\(\\tfrac1T(w_i[i=j]-w_iw_j)\\). Bei fester \\(T\\) und \\(w\\to e_m\\) gilt \\(J\\to0\\); bei \\(T\\to0\\) nur mit eindeutigem Maximum, bei Gleichstand divergiert \\(J\\).",
+   "why": "\\(\\lVert J\\rVert_F\\le4(1-w_m)/T\\) (Lemma 6.4). Gesättigte Softmax leitet kaum Gradient – Grund für \\(1/\\sqrt{d_k}\\).",
+   "source": "Lehrbuch §6, Lemma 6.4; Labor Station 6",
+   "example": "Zwei Scores: \\(\\partial w_1/\\partial s_1=w_1(1-w_1)\\), maximal \\(0{,}25\\) bei \\(w_1=0{,}5\\).",
+   "mistake": "„Kleines T ⇒ kleiner Gradient“ – falsch bei gleich großen Maxima.",
+   "prereq": "Softmax, Kettenregel; Satz 3"
+  },
+  {
+   "key": "attention/hull-impossible",
+   "kc": "attention",
+   "type": "case",
+   "prompt": "Values \\(v_1=(1,0)\\), \\(v_2=(0,1)\\), \\(v_3=(0,0)\\). Kann eine Attention-Schicht allein \\(o=(1,1)\\) ausgeben?",
+   "answer": "Nein: \\(o=(w_1,w_2)\\) mit \\(w_1+w_2&lt;1\\); \\((1,1)\\) liegt außerhalb der konvexen Hülle.",
+   "why": "Softmax-Gewichte sind positiv und summieren zu 1 – Konvexkombination (Satz 6.2). Abhilfe: W_O und Residualverbindung.",
+   "source": "Lehrbuch §6, Satz 6.2; Aufgabe AT7; Labor Challenge „Unerreichbar?“",
+   "mistake": "Mit T → 0 „erzwingen“: Das ergibt einen Value (eindeutiges Maximum) oder den Mittelwert gleichauf liegender Values – beides in der Hülle.",
+   "diagram": "attention_hull.svg",
+   "prereq": "Konvexkombination"
+  },
+  {
+   "key": "attention/softmax-why-exp",
+   "kc": "attention",
+   "type": "concept",
+   "prompt": "Warum normiert man Scores nicht einfach als \\(s_j/\\sum_l s_l\\), sondern über \\(e^{s_j}\\)?",
+   "answer": "Scores können negativ sein: Der einfache Quotient liefert negative oder riesige Gewichte. \\(e^{s_j}\\) ist positiv, ordnungserhaltend und macht nur Differenzen relevant.",
+   "why": "Die vier Forderungen: positiv, Summe 1, Ordnung erhalten, Verschiebung egal – \\(e^x\\) erfüllt alle (Lehrbuch 6.3).",
+   "example": "\\(s=(1;\\,-1;\\,0{,}5)\\): Quotient gibt \\((2;\\,-2;\\,1)\\).",
+   "mistake": "Gewichte = normierte Scores.",
+   "source": "Lehrbuch 6.3, Forderungen W1–W4",
+   "prereq": "Exponentialfunktion"
+  },
+  {
+   "key": "attention/simplex",
+   "kc": "attention",
+   "type": "case",
+   "prompt": "Drei Wörter. Welche Gewichtsvektoren \\((w_1,w_2,w_3)\\) kann die Softmax überhaupt ausgeben?",
+   "answer": "Genau die inneren Punkte des Simplex: alle \\(w_j&gt;0\\), Summe 1. Ecken wie \\((1,0,0)\\) nur im Grenzwert.",
+   "why": "\\(e^{s}&gt;0\\) – kein Gewicht wird 0. Für \\(T\\to\\infty\\): Mitte. Für \\(T\\to0\\): Ecke nur bei eindeutigem Maximum; bei Gleichstand der Mittelpunkt der Kante bzw. Fläche der Maxima; sind alle Scores gleich, bleibt w für jedes T in der Mitte.",
+   "source": "Lehrbuch 6.4, Abb. 6.4",
+   "diagram": "att_simplex.svg",
+   "prereq": "Softmax (6.3)",
+   "mistake": "„Bei kleiner Temperatur ist die Ausgabe exakt one-hot.“"
+  }
+ ],
+ "sources": [
+  {
+   "id": "kurs",
+   "kind": "KURS",
+   "ref": "Vorlesungsfolien Natural Language Processing, Kap. 09 „Neural Sequence Labeling“, WS 2025/26 (private Kursunterlagen, nicht veröffentlicht). Seitenangaben „PDF-S.“ = Seite im PDF; die Fußzeile der Folie zeigt diese Zahl minus 1."
+  },
+  {
+   "id": "slp3",
+   "kind": "LEHRBUCH",
+   "ref": "Jurafsky, D.; Martin, J. H.: Speech and Language Processing, 3. Aufl., Entwurf Aug. 2026 (lokale Kopie des Nutzers). Gelesen und verwendet (gedruckte Seiten): §4.9–4.9.1 S. 112–115; §7.1–7.4 S. 179–193; §9.5.1–9.5.4 S. 238–241; §14.4–14.4.2 S. 312–314; §18.3 S. 405; §18.4.5–18.5 S. 411–419.",
+   "url": "https://web.stanford.edu/~jurafsky/slp3/"
+  },
+  {
+   "id": "schuster",
+   "kind": "FORSCHUNG",
+   "ref": "Schuster, M.; Paliwal, K. K. (1997): Bidirectional recurrent neural networks. IEEE Transactions on Signal Processing 45(11), 2673–2681.",
+   "doi": "10.1109/78.650093"
+  },
+  {
+   "id": "lafferty",
+   "kind": "FORSCHUNG",
+   "ref": "Lafferty, J.; McCallum, A.; Pereira, F. (2001): Conditional Random Fields: Probabilistic Models for Segmenting and Labeling Sequence Data. Proc. ICML 2001 (Seitenangabe nicht geprüft). Fundstelle geprüft 2026-11-15: Penn ScholarlyCommons (Postprint, ICML 2001, S. 282–289), Abstract wörtlich abgeglichen.",
+   "url": "https://repository.upenn.edu/cis_papers/159"
+  },
+  {
+   "id": "andor",
+   "kind": "FORSCHUNG",
+   "ref": "Andor, D. et al. (2016): Globally Normalized Transition-Based Neural Networks. Proc. ACL 2016, 2442–2452. Verwendet: Abstract (S. 2442).",
+   "doi": "10.18653/v1/P16-1231"
+  },
+  {
+   "id": "huang",
+   "kind": "FORSCHUNG",
+   "ref": "Huang, Z.; Xu, W.; Yu, K. (2015): Bidirectional LSTM-CRF Models for Sequence Tagging. arXiv:1508.01991 (Preprint).",
+   "url": "https://arxiv.org/abs/1508.01991"
+  },
+  {
+   "id": "lample",
+   "kind": "FORSCHUNG",
+   "ref": "Lample, G. et al. (2016): Neural Architectures for Named Entity Recognition. Proc. NAACL-HLT 2016, 260–270. Verwendet: Abstract (S. 260), Tagging-Schema IOBES (S. 263).",
+   "doi": "10.18653/v1/N16-1030"
+  },
+  {
+   "id": "conll",
+   "kind": "FORSCHUNG",
+   "ref": "Tjong Kim Sang, E. F.; De Meulder, F. (2003): Introduction to the CoNLL-2003 Shared Task. Proc. CoNLL-2003, 142–147.",
+   "doi": "10.3115/1119176.1119195"
+  },
+  {
+   "id": "opitz",
+   "kind": "FORSCHUNG",
+   "ref": "Opitz, J.; Burst, S. (2019): Macro F1 and Macro F1. arXiv:1911.03347 (Preprint).",
+   "url": "https://arxiv.org/abs/1911.03347"
+  },
+  {
+   "id": "manning",
+   "kind": "VERTIEFUNG",
+   "ref": "Manning, C. (2006): Doing Named Entity Recognition? Don't optimize for F1. Gastbeitrag im Blog NLPers, 25.08.2006 (nicht begutachtet).",
+   "url": "https://nlpers.blogspot.com/2006/08/doing-named-entity-recognition-dont.html"
+  },
+  {
+   "id": "sklearn",
+   "kind": "VERTIEFUNG",
+   "ref": "scikit-learn 1.9.1, sklearn.metrics.precision_recall_fscore_support, Parameter zero_division (Abruf 14.11.2026).",
+   "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html"
+  },
+  {
+   "id": "ratinov",
+   "kind": "FORSCHUNG",
+   "ref": "Ratinov, L.; Roth, D. (2009): Design Challenges and Misconceptions in Named Entity Recognition. Proc. CoNLL-2009, 147–155. Verwendet: S. 148 (BILOU vs. BIO; gierige Dekodierung vergleichbar mit Viterbi), S. 150 (Tabelle 2, Schemavergleich).",
+   "url": "https://aclanthology.org/W09-1119/"
+  },
+  {
+   "id": "vaswani",
+   "kind": "FORSCHUNG",
+   "ref": "Vaswani, A. et al. (2017): Attention Is All You Need. arXiv:1706.03762 (NeurIPS 2017). Verwendet: §3.2.1 mit Fußnote 1 (Skalierung, Varianz d_k), §3.5 (Positionskodierung, lineare Verschiebung).",
+   "url": "https://arxiv.org/abs/1706.03762"
+  },
+  {
+   "id": "su",
+   "kind": "FORSCHUNG",
+   "ref": "Su, J. et al. (2024): RoFormer: Enhanced Transformer with Rotary Position Embedding. Neurocomputing 568 (in der Vorlesung PDF-S. 69 zitiert; Volltext nicht gelesen, nur die Rotationseigenschaft wird verwendet und hier selbst bewiesen) Fundstelle geprüft 2026-11-15: arXiv:2104.09864 v5 (8. Nov. 2023), Abstract wörtlich abgeglichen; die in der Vorlesung genannte Neurocomputing-Fassung wurde nicht geprüft.",
+   "url": "https://arxiv.org/abs/2104.09864"
+  },
+  {
+   "id": "blondel",
+   "kind": "FORSCHUNG",
+   "ref": "Blondel, M.; Martins, A. F. T.; Niculae, V. (2020): Learning with Fenchel-Young Losses. Journal of Machine Learning Research 21(35). Gelesen: §2 (regularisierte Vorhersagefunktionen, Gl. 6: Softmax als Maximierer mit Shannon-Entropie), Tab. 1. Preprint arXiv:1901.02324.",
+   "url": "https://arxiv.org/abs/1901.02324"
+  },
+  {
+   "id": "sparsemax",
+   "kind": "FORSCHUNG",
+   "ref": "Martins, A. F. T.; Astudillo, R. F. (2016): From Softmax to Sparsemax: A Sparse Model of Attention and Multi-Label Classification. Proc. ICML 2016. Gelesen: §2 (Definition als euklidische Projektion auf den Simplex, Proposition 1). Preprint arXiv:1602.02068.",
+   "url": "https://arxiv.org/abs/1602.02068"
+  },
+  {
+   "id": "jain",
+   "kind": "FORSCHUNG",
+   "ref": "Jain, S.; Wallace, B. C. (2019): Attention is not Explanation. Proc. NAACL-HLT 2019, 3543–3556. Gelesen: Zusammenfassung.",
+   "url": "https://aclanthology.org/N19-1357/"
+  },
+  {
+   "id": "wiegreffe",
+   "kind": "FORSCHUNG",
+   "ref": "Wiegreffe, S.; Pinter, Y. (2019): Attention is not not Explanation. Proc. EMNLP-IJCNLP 2019, 11–20. Gelesen: Zusammenfassung.",
+   "url": "https://aclanthology.org/D19-1002/"
+  },
+  {
+   "id": "3b1b-attention",
+   "kind": "VERTIEFUNG",
+   "ref": "3Blue1Brown (G. Sanderson): Attention in transformers, step-by-step. Deep Learning, Kapitel 6, Video, 7. April 2024. Rolle: visuelle Intuition; nicht im Detail ausgewertet.",
+   "url": "https://www.3blue1brown.com/lessons/attention"
+  }
+ ],
+ "lab": {
+  "attention": {
+   "lab": "attention",
+   "items": [
+    [
+     "a1",
+     "Station 1: Wonach sucht „Bank“?"
+    ],
+    [
+     "a2",
+     "Station 2: Länge ist Schärfe"
+    ],
+    [
+     "a3",
+     "Station 3: Nur Unterschiede zählen"
+    ],
+    [
+     "a4",
+     "Station 4: Gleichgültigkeit erzeugen"
+    ],
+    [
+     "a5",
+     "Station 5: Was die Ausgabe nie kann"
+    ],
+    [
+     "a6",
+     "Station 6: Warum durch die Wurzel der Key-Dimension teilen?"
+    ],
+    [
+     "c-impossible",
+     "Challenge: Unerreichbar?"
+    ]
+   ]
+  },
+  "position": {
+   "lab": "attention",
+   "items": [
+    [
+     "a7",
+     "Station 7: Self-Attention sieht keine Reihenfolge"
+    ],
+    [
+     "c-order",
+     "Challenge: Gegenbeispiel bauen"
+    ]
+   ]
+  },
+  "decoding": {
+   "lab": "crf",
+   "items": [
+    [
+     "r1",
+     "Station 1: Jedes Wort für sich"
+    ],
+    [
+     "r2",
+     "Station 2: Verbotene Übergänge"
+    ],
+    [
+     "r4",
+     "Station 4: Summe statt Maximum"
+    ],
+    [
+     "k-mm",
+     "Challenge: Die Randverteilungs-Falle"
+    ]
+   ]
+  },
+  "birnn": {
+   "lab": "birnn",
+   "items": [
+    [
+     "b1",
+     "Station 1: Vorwärts sieht nur die Vergangenheit"
+    ],
+    [
+     "b2",
+     "Station 2: Rückwärts bringt die Zukunft"
+    ],
+    [
+     "n-sat",
+     "Challenge: Gesättigt"
+    ]
+   ]
+  },
+  "spans": {
+   "lab": "spans",
+   "items": [
+    [
+     "s5",
+     "Station 5: IO verliert Grenzen"
+    ]
+   ]
+  },
+  "prf": {
+   "lab": "spans",
+   "items": [
+    [
+     "s1",
+     "Station 1: Fast richtig ist falsch"
+    ],
+    [
+     "f-prec",
+     "Challenge: Präzise, aber blind"
+    ]
+   ]
+  },
+  "prf-edge": {
+   "lab": "spans",
+   "items": [
+    [
+     "s3",
+     "Station 3: Wenn nichts da ist"
+    ]
+   ]
+  },
+  "prf-level": {
+   "lab": "spans",
+   "items": [
+    [
+     "s2",
+     "Station 2: Token-Zählung ist großzügiger"
+    ],
+    [
+     "f-half",
+     "Challenge: Halbe Treffer"
+    ]
+   ]
+  },
+  "micro-macro": {
+   "lab": "spans",
+   "items": [
+    [
+     "s4",
+     "Station 4: Micro gegen Macro"
+    ],
+    [
+     "f-macro",
+     "Challenge: Seltenes zählt"
+    ]
+   ]
+  }
+ },
+ "numeric_examples": [
+  {
+   "q": [
+    0.9,
+    -0.6
+   ],
+   "K": [
+    [
+     1.6,
+     0.4
+    ],
+    [
+     -0.4,
+     1.5
+    ],
+    [
+     0.1,
+     -0.3
+    ]
+   ],
+   "V": [
+    [
+     1.8,
+     0.2
+    ],
+    [
+     0.1,
+     1.9
+    ],
+    [
+     0.2,
+     0.2
+    ]
+   ],
+   "T": 1,
+   "scale": true,
+   "lambdas": [
+    2,
+    3
+   ]
+  }
+ ],
+ "mixture_examples": [
+  {
+   "V": [
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   "weights": [
+    [
+     0.5,
+     0.5,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1
+    ],
+    [
+     0.25,
+     0.25,
+     0.25,
+     0.25
+    ],
+    [
+     0.025,
+     0.025,
+     0.25,
+     0.7
+    ]
+   ]
+  }
+ ]
+}

@@ -1,0 +1,488 @@
+<section data-id="orientierung" data-title="Worum es geht">
+<p class="lead">Ein NER-System liest „<b>Washington</b> signed the bill“ und muss entscheiden: Person oder Ort? Das Wort selbst verrät es nicht; erst das <em>nächste</em> Wort entscheidet. Kapitel 09 der Vorlesung baut von dieser Aufgabe aus die Werkzeuge der neuronalen Sequenzmarkierung auf – und die Frage, wie man misst, ob sie funktionieren.</p>
+<div class="layers"><p><b>Drei Ebenen.</b> Jeder Abschnitt ist gekennzeichnet:</p><ul>
+<li><span class="layer" data-layer="core">Klausurkern</span> – Stoff der Vorlesungsfolien, ausgearbeitet bis zur Rechen- und Beweisfähigkeit.</li>
+<li><span class="layer" data-layer="deep">Vertiefung</span> – Lehrbuchwissen, das den Kern erklärt (Herleitungen, Grenzfälle, Gegenbeispiele).</li>
+<li><span class="layer" data-layer="research">Forschung &amp; Praxis</span> – belegte Befunde aus Primärarbeiten und die Fallstudie.</li></ul></div>
+<table class="sym"><tr><th>Abschnitt</th><th>Vorlesung (PDF-Seiten)</th><th>Lehrbuch (SLP3, gedruckte Seiten)</th></tr>
+<tr><td>1 NER als Aufgabe</td><td>4–11</td><td>§18.3, S. 405; §9.5.1, S. 238</td></tr>
+<tr><td>2 Spannen als Labels</td><td>13–18</td><td>§9.5.2, S. 239</td></tr>
+<tr><td>3 Neuronale Tagger, Fenster</td><td>24–29</td><td>§14.4, S. 312–314</td></tr>
+<tr><td>4–5 RNN und BiRNN</td><td>29, 77–80</td><td>§14.4.2, S. 313–314</td></tr>
+<tr><td>6 Self-Attention</td><td>31–58</td><td>§7.1–7.3, S. 179–188</td></tr>
+<tr><td>7 Positionsinformation</td><td>60–70</td><td>§7.4, S. 191–193</td></tr>
+<tr><td>8 Tiefe Architekturen</td><td>72–77</td><td>§7.2, S. 184–187</td></tr>
+<tr><td>9 Abhängigkeiten zwischen Labels</td><td>82–85</td><td>§18.4.5–18.5, S. 411–419</td></tr>
+<tr><td>10–12 Evaluation</td><td>20–22</td><td>§4.9–4.9.1, S. 112–115; §9.5.4, S. 241</td></tr>
+<tr><td>13 Fallstudie</td><td>–</td><td>Vertiefung mit Primärquellen</td></tr></table>
+<p class="mute small">„PDF-S.“ meint die Seite im Folien-PDF; die Fußzeile der Folie zeigt diese Zahl minus 1. SLP3: Jurafsky &amp; Martin, <i>Speech and Language Processing</i>, 3. Aufl., Entwurf Aug. 2026.</p>
+<p><b>Vorwissen:</b> Vektoren und Matrix-Vektor-Produkt; \(\tanh\) (ungerade, streng monoton, Werte in \((-1,1)\)); Softmax; Kreuzentropie.</p>
+</section>
+
+<section data-id="ner" data-title="1 · NER als Aufgabe">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p><b>Definition.</b> Eine <em>benannte Entität</em> (named entity) ist ein Objekt, auf das der Text mit einem Namen verweist – Person, Organisation, Ort, nach Annotationsrichtlinie auch Zahlen, Daten, Produkte. <em>Named Entity Recognition</em> (NER) heißt: alle solchen Erwähnungen im Text finden (Grenzen) und klassifizieren (Typ). <span class="prov" data-kind="KURS">PDF-S. 4–6</span></p>
+<p><b>Wozu.</b> Indizes und Hyperlinks, Informationsextraktion (Beziehungen zwischen Entitäten, Wissensbasen), Question Answering (Antworten sind oft Entitäten) und maschinelle Übersetzung: Namen werden meist nicht übersetzt, aber transliteriert; Zahlen mit Einheiten müssen erkannt und umgerechnet werden („7917.5 mi“ → „12 742 km“). <span class="prov" data-kind="KURS">PDF-S. 9</span></p>
+<p><b>Warum schwer.</b> Annotierte Daten sind teuer; Weltwissen ist nötig („Sheffield Wednesday F.C.“ ist ein Verein, „Wednesday“ allein ein Wochentag); entscheidender Kontext kann weit entfernt stehen; Modelle übertragen sich schlecht zwischen Domänen. <span class="prov" data-kind="KURS">PDF-S. 10</span> Derselbe Name hat mehrere Typen: SLP3 zeigt „Washington“ als Person, Ort, Organisation und Ereignis (Abb. 18.6). <span class="prov" data-kind="LEHRBUCH">SLP3 §18.3, S. 405</span></p>
+<p><b>Daten und Richtlinien.</b> CoNLL-2003 (Ausschnitt des Reuters-Korpus 1996) annotiert vier Typen: PER, ORG, LOC, MISC. Richtlinien legen Grenzfälle fest, die ein Modell nicht „verstehen“, sondern nur lernen kann: „North and South America“ sind <em>zwei</em> Orte; „U.S. Fish and Wildlife Service“ ist <em>eine</em> Organisation; bei „California’s“ gehört „’s“ nicht zum Ort, bei „McDonald’s“ gehört es zum Namen. <span class="prov" data-kind="KURS">PDF-S. 11</span> <span class="prov" data-kind="FORSCHUNG">Tjong Kim Sang &amp; De Meulder 2003</span></p>
+<div class="remark"><p><b>Folge für die Evaluation.</b> Was eine „richtige“ Entität ist, definiert die Richtlinie. Zwei Datensätze mit verschiedenen Richtlinien liefern nicht vergleichbare \(F_1\)-Werte – auch bei identischem System.</p></div>
+</section>
+
+<section data-id="spannen" data-title="2 · Spannen als Labels">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>NER sucht <em>Spannen</em>, ein Tagger gibt <em>ein Label pro Wort</em> aus. Eine Spannenkodierung übersetzt zwischen beiden. Mit \(K\) Entitätstypen: <span class="prov" data-kind="KURS">PDF-S. 15–18</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §9.5.2, S. 239</span></p>
+<table class="sym"><tr><th>Schema</th><th>Labels je Typ</th><th>Anzahl</th><th>„Show flights from Boston to New York City today“</th></tr>
+<tr><td>IO</td><td>I</td><td>\(K+1\)</td><td>O O O CITY O CITY CITY CITY O</td></tr>
+<tr><td>BIO</td><td>B, I</td><td>\(2K+1\)</td><td>O O O B-CITY O B-CITY I-CITY I-CITY O</td></tr>
+<tr><td>BILOU</td><td>B, I, L, U</td><td>\(4K+1\)</td><td>O O O U-CITY O B-CITY I-CITY L-CITY O</td></tr></table>
+<div class="thm"><b>Satz A (IO ist nicht umkehrbar, BIO schon).</b> Die Abbildung von Spannenmengen auf IO-Folgen ist nicht injektiv. Auf gültige BIO-Folgen (kein <code>I-X</code> am Anfang, nach <code>O</code> oder nach einem anderen Typ) ist sie injektiv.</div>
+<div class="proof"><p><em>Beweis.</em> Nicht injektiv: „flights on <u>Monday Tuesday</u>“ mit zwei Spannen [Monday]DAY, [Tuesday]DAY und mit einer Spanne [Monday Tuesday]DAY ergeben beide <code>DAY DAY</code>. Injektiv für BIO: Jede Spanne beginnt mit genau einem <code>B-</code>-Label und setzt sich mit <code>I-</code>-Labels desselben Typs fort; aus einer gültigen Folge liest man die Spannen eindeutig ab (Beginn bei jedem <code>B-</code>, Ende vor dem nächsten Label, das nicht <code>I-</code> desselben Typs ist). Verschiedene Spannenmengen unterscheiden sich in einem Anfang, Ende oder Typ und erzeugen dort verschiedene Labels. \(\square\)</p></div>
+<div class="scene" data-scene="spans"></div>
+<p><b>Ungültige BIO-Folgen.</b> Ein Tagger, der Labels einzeln wählt, kann <code>O I-LOC</code> ausgeben. Das CoNLL-Auswertungsskript <code>conlleval</code> liest ein solches <code>I-X</code> als Beginn einer neuen Spanne; diese Konvention gilt in diesem Kapitel durchgehend.</p>
+<div class="misconception"><h4>Achtung, Folie PDF-S. 17</h4><p>In der BIO-Spalte dieser Folie sind „Boston“ und „New York City“ mit <code>B-COMP</code>/<code>I-COMP</code> beschriftet; richtig ist <code>CITY</code>, wie die nächste Folie (PDF-S. 18) zeigt.</p></div>
+<p><span class="layer" data-layer="research">Forschung</span> Mehr Labels heißen feinere Grenzinformation, aber weniger Trainingsbeispiele je Label. Ratinov &amp; Roth (2009) berichten, dass BILOU in ihrem NER-System „signifikant“ besser abschneidet als BIO; Lample et al. (2016) verwenden deshalb das gleichwertige IOBES-Schema. Das ist ein Befund zu den dort untersuchten Systemen, kein allgemeiner Satz. <span class="prov" data-kind="FORSCHUNG">Ratinov &amp; Roth 2009, S. 148 und 150; Lample et al. 2016, S. 263</span></p>
+<div class="task-ref" data-task="S1"></div>
+<aside class="research"><h4>Forschungsfenster: Welche Spannenkodierung lernt besser?</h4><p><b>Frage.</b> Hängt die Qualität eines NER-Systems von der Wahl der Kodierung ab, obwohl BIO und BILOU dieselben Spannen ausdrücken?</p><p><b>Methode.</b> Ratinov &amp; Roth (2009) vergleichen innerhalb eines einzigen NER-Systems auf CoNLL-2003 die Schemata BIO und BILOU sowie gierige Dekodierung, Beam Search und Viterbi.</p><p><b>Befund.</b> BILOU „significantly outperforms“ BIO (Tab. 2, S. 150). Gierige Dekodierung schneidet „comparably“ zu Beam Search und Viterbi ab und ist in ihrem Modell zweiter Ordnung über 100-mal schneller als Viterbi (S. 148–149).</p><p><b>Grenzen.</b> Ein System mit handgebauten Merkmalen aus der Zeit vor neuronalen Taggern; der Befund ist an dieses System gebunden. Lample et al. (2016, S. 263) übernehmen das gleichwertige IOBES-Schema mit Verweis auf diese Arbeit, berichten aber keinen eigenen Schemavergleich in dem gelesenen Abschnitt.</p><p><b>Bedeutung.</b> Die Kodierung ist keine reine Formatfrage: Sie verändert, welche Unterscheidungen der Klassifikator lernen muss. Wenn ein Modell Grenzen schlecht trifft, ist eine feinere Kodierung eine prüfbare Hypothese.</p><p class="mute small">Belegstelle: <a class="cite" href="#ref-ratinov">Ratinov &amp; Roth 2009, S. 148–150</a>; <a class="cite" href="#ref-lample">Lample et al. 2016, S. 263</a></p></aside>
+
+</section>
+
+<section data-id="tagger" data-title="3 · Neuronale Tagger">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>Ein neuronaler Tagger hat vier Bausteine: 1-hot-Kodierung jedes Wortes, Einbettung \(e_t\in\mathbb R^d\), eine <b>Sequenzschicht</b>, die Kontext einmischt und Zustände \(z_t\) liefert, und einen Klassifikator je Position, \(p(y_t\mid x)=\operatorname{softmax}(W_o z_t+b_o)\). Trainiert wird mit der Kreuzentropie \(\mathcal J=-\sum_t\log p(y^\ast_t\mid x)\). <span class="prov" data-kind="KURS">PDF-S. 26–27</span></p>
+<p>Die ganze Architekturfrage lautet: <em>Welche Eingaben darf \(z_t\) sehen?</em></p>
+<p><b>Fenster (CNN/TDNN).</b> \(z_t\) sieht die \(n\) vorherigen und \(m\) folgenden Wörter, also \(m+n+1\) Eingaben, mit denselben Gewichten an jeder Position. Daraus folgen die drei Eigenschaften der Folie: verschiebungsinvariant (gleiche Wörter in gleicher Umgebung ergeben an jeder Stelle dieselbe Ausgabe), nur lokaler Kontext, Vorhersagen beeinflussen einander nicht. <span class="prov" data-kind="KURS">PDF-S. 28</span></p>
+<p><span class="layer" data-layer="deep">Vertiefung</span> <b>Stapeln vergrößert das Fenster nur linear.</b> \(L\) Faltungsschichten mit Fensterbreite \(w\) (Schrittweite 1) sehen \(L(w-1)+1\) Wörter: Jede Schicht verlängert den Bereich um \(w-1\) (Induktion über \(L\)). Mit \(w=3\) und \(L=4\) sind das 9 Wörter – endlich, egal wie lang der Satz ist.</p>
+<p><b>RNN.</b> Die Vorgeschichte steckt in einem Zustandsvektor; trainiert wird mit Backpropagation durch die Zeit. Was „globaler Kontext“ hier genau heißt, rechnen wir im nächsten Abschnitt aus. <span class="prov" data-kind="KURS">PDF-S. 29</span></p>
+</section>
+
+<section data-id="rnn" data-title="4 · Was ein RNN sehen kann">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<h3>Ein Experiment zuerst</h3>
+<p>Wir bauen das kleinste RNN, das man von Hand rechnen kann: Jedes Wort ist ein Vektor mit zwei Zahlen, der Zustand auch.</p>
+<table class="sym"><tr><th>Symbol</th><th>Bedeutung im Beispiel</th></tr>
+<tr><td>\(e_t\in\mathbb R^2\)</td><td>Einbettung: \(e(\text{Washington})=(1,0)\), \(e(\text{signed})=(0,1)\), \(e(\text{state})=(0,-1)\)</td></tr>
+<tr><td>\(h^{\rightarrow}_t\in\mathbb R^2\)</td><td>Vorwärtszustand nach Wort \(t\); Start \(h^{\rightarrow}_0=(0,0)\)</td></tr>
+<tr><td>\(W=0{,}5\,I\), \(U=I\), \(b=0\)</td><td>Rückkopplung, Eingabegewichte, Bias (zum Kopfrechnen gewählt)</td></tr></table>
+\[ h^{\rightarrow}_t=\tanh\!\big(W\,h^{\rightarrow}_{t-1}+U\,e_t+b\big)\qquad(\tanh\text{ komponentenweise}) \tag{4.1} \]
+<p>Lesen Sie die Gleichung als Rezept: <em>alten Zustand dämpfen, neues Wort dazugeben, in \((-1,1)\) drücken.</em> Die Szene rechnet beide Sätze Schritt für Schritt; vor dem Weiterklicken sagen Sie das Ergebnis voraus.</p>
+<div class="scene" data-scene="birnn"></div>
+<h3>Was das Experiment beweist</h3>
+<div class="thm"><b>Satz 1 (Was der Vorwärtszustand sieht).</b> Für jedes Vorwärts-RNN der obigen Form und jedes \(t\) gibt es eine Funktion \(F_t\) mit \(h^{\rightarrow}_t=F_t(x_1,\dots,x_t)\). Ändert man nur Wörter an Positionen \(s&gt;t\), bleibt \(h^{\rightarrow}_t\) exakt gleich.</div>
+<div class="proof"><p><em>Beweis (Induktion über \(t\)).</em></p>
+\[\begin{aligned}
+t=1:\quad h^{\rightarrow}_1&amp;=\tanh(W\cdot 0+Ue_1+b) &amp;&amp;\text{nur }x_1\\
+t-1\to t:\quad h^{\rightarrow}_{t-1}&amp;=F_{t-1}(x_1,\dots,x_{t-1}) &amp;&amp;\text{Annahme}\\
+h^{\rightarrow}_t&amp;=\tanh\big(W\,F_{t-1}(x_1,\dots,x_{t-1})+Ue_t+b\big)=:F_t(x_1,\dots,x_t) &amp;&amp;\square
+\end{aligned}\]</div>
+<p>Das Argument benutzt nur die Form der Rekursion, nicht \(\tanh\): Es gilt ebenso für LSTM- und GRU-Zellen. <span class="prov" data-kind="LEHRBUCH">SLP3 §14.4.2, S. 313, Gl. 14.16</span></p>
+<div class="misconception"><h4>Denkfehler: „Ein RNN hat globalen Kontext, also sieht es den ganzen Satz.“</h4><p>„Global context“ (PDF-S. 29) steht im Vergleich zum Fenster: Das RNN sieht die <em>gesamte Vorgeschichte</em>. Den ganzen Satz sieht nur der letzte Zustand \(h^{\rightarrow}_T\). Die abgelehnte Engine-Fassung vom 13.11.2026 enthielt genau diesen Fehler.</p></div>
+<div class="task-ref" data-task="G1"></div>
+</section>
+
+<section data-id="birnn" data-title="5 · Bidirektionale RNNs">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>Ein zweites RNN läuft von rechts nach links, der Klassifikator erhält beide Zustände (PDF-S. 79–80):</p>
+\[\begin{aligned}
+h^{\leftarrow}_{T+1}&amp;=0,\qquad h^{\leftarrow}_t=\tanh\!\big(W'h^{\leftarrow}_{t+1}+U'e_t+b'\big) &amp;&amp;\text{eigene Parameter}\\
+h^{\mathrm{bi}}_t&amp;=\big[h^{\rightarrow}_t;\,h^{\leftarrow}_t\big]\in\mathbb R^{2d_h} &amp;&amp;\text{Verkettung}
+\end{aligned}\]
+<p>Im Experiment (\(W'=0{,}8\,I\)) ist \(h^{\leftarrow}_1=(0{,}7616;\ +0{,}5436)\) nach „signed“ und \((0{,}7616;\ -0{,}5436)\) nach „state“. Ein Score \(s=v^\top h^{\mathrm{bi}}_1\) mit \(v=(0,0,0,1)\) trennt die Sätze; mit \(h^{\rightarrow}_1\) allein ist das für kein \(v\) möglich.</p>
+<div class="thm"><b>Satz 2.</b> \(h^{\leftarrow}_t\) ist eine Funktion von \(x_t,\dots,x_T\); \(h^{\mathrm{bi}}_t\) ist eine Funktion des ganzen Satzes \(x_1,\dots,x_T\).</div>
+<div class="proof"><p><em>Beweis.</em> Rückwärts gelesen, \((x_T,\dots,x_1)\), ist das Rückwärts-RNN ein Vorwärts-RNN; Satz 1 an Position \(T-t+1\) der umgekehrten Folge liefert \(x_T,\dots,x_t\). Die Verkettung hängt von \(\{1,\dots,t\}\cup\{t,\dots,T\}=\{1,\dots,T\}\) ab. \(\square\)</p>
+<p class="mute">„Funktion von“ heißt: darstellbar. Ob sich der Zustand bei Änderung von \(x_s\) tatsächlich ändert, hängt von den Parametern ab; mit \(W'=0\) erreicht keine Information von rechts Position \(t\).</p></div>
+<h3>Was das BiRNN nicht löst – mit genauen Bedingungen</h3>
+<div class="remark"><p><b>(a) Latenz.</b> Im <em>Standardaufbau</em> läuft das Rückwärts-RNN über den vollständigen Satz; \(h^{\leftarrow}_1\) hängt dann vom letzten Wort ab. Ein solches Modell kann das Label von Wort \(t\) erst ausgeben, wenn der Satz zu Ende ist. Wer nach Wort \(t\) sofort antworten muss, braucht ein Vorwärtsmodell oder eine Variante mit begrenzter Vorausschau – etwa eine Rückwärtsrichtung über Abschnitte von \(k\) Wörtern: Latenz höchstens \(k\) Wörter, rechter Kontext höchstens \(k\). <span class="prov" data-kind="LEHRBUCH">SLP3 §14.4.2, S. 313</span></p>
+<p><b>(b) Unabhängige Ausgaben.</b> <em>Wenn</em> der Tagger jedes Label einzeln per Softmax und \(\arg\max\) wählt, hängen die Labels nur über die gemeinsamen Eingaben zusammen; nichts verhindert <code>O I-LOC</code> (PDF-S. 83: „non consistent labels“). Ein strukturierter Decoder (CRF, Abschnitt 9) koppelt sie.</p></div>
+<h3>Wie groß ist ein BiRNN-Tagger?</h3>
+\[\begin{aligned}
+\text{eine Richtung:}\quad &amp; d_h^2+d_h\,d+d_h &amp;&amp;W,\ U,\ b\\
+\text{beide Richtungen:}\quad &amp; 2\,(d_h^2+d_h d+d_h) &amp;&amp;\text{getrennte Parameter}\\
+\text{Ausgabe:}\quad &amp; |\mathcal L|\cdot 2d_h+|\mathcal L| &amp;&amp;W_o\text{ liest }h^{\mathrm{bi}}
+\end{aligned}\]
+<p class="mute small">Gilt für Elman-Zellen ohne Einbettungsmatrix. LSTM-Zellen haben vier Torbausteine und damit etwa viermal so viele rekurrente Parameter.</p>
+<div class="task-ref" data-task="W1"></div>
+<div class="task-ref" data-task="B1"></div>
+<div class="task-ref" data-task="B2"></div>
+<aside class="research"><h4>Forschungsfenster: BiLSTM-CRF als Standard der neuronalen NER</h4><p><b>Frage.</b> Wie sah ein starkes neuronales NER-System vor den vortrainierten Transformern aus?</p><p><b>Methode.</b> Lample et al. (2016) stellen zwei Architekturen vor: ein bidirektionales LSTM mit CRF-Ausgabeschicht und ein übergangsbasiertes Modell, das Segmente wie ein Shift-Reduce-Parser bildet. Wörter werden aus zwei Quellen dargestellt: zeichenbasierte Repräsentationen aus den Trainingsdaten und unüberwacht gelernte Wortvektoren.</p><p><b>Befund.</b> Laut Abstract erreichen die Modelle den damaligen Stand der Technik in NER für vier Sprachen ohne sprachspezifisches Wissen oder Gazetteers (S. 260).</p><p><b>Grenzen.</b> Die Zahlen der Arbeit werden hier nicht wiedergegeben, weil nur Abstract und Methodenteil gelesen wurden. Seit 2018 übertreffen vortrainierte Transformer-Encoder diese Systeme meist (Vorlesung Kap. 10); das BiLSTM-CRF bleibt das klarste Modell, um Kontext und Labelabhängigkeiten getrennt zu verstehen.</p><p><b>Bedeutung.</b> Die beiden Bausteine dieses Kapitels – bidirektionaler Kontext (Abschnitt 5) und strukturierte Ausgabe (Abschnitt 9) – sind genau die beiden Komponenten dieser Architektur.</p><p class="mute small">Belegstelle: <a class="cite" href="#ref-lample">Lample et al. 2016, Abstract S. 260</a>; <a class="cite" href="#ref-huang">Huang, Xu &amp; Yu 2015 (Preprint)</a></p></aside>
+
+</section>
+
+<section data-id="attention" data-title="6 · Self-Attention">
+<div class="book7">
+<p><span class="layer" data-layer="core">Klausurkern</span> <span class="mute small">Abschnitte 6.1–6.7 · Vertiefung 6.8–6.10 · Forschung 6.11</span></p>
+
+<h3 id="att-problem">6.1 Das Problem: Ein Wort braucht seinen Kontext</h3>
+<p class="lede">Das Wort <span class="tok tq">Bank</span> bedeutet in „Wir sitzen auf der Bank am <span class="tok tk">Fluss</span>“ etwas anderes als in „Ich hebe <span class="tok tk">Geld</span> von der Bank ab“. Ein Tagger, der jedem Wort isoliert einen Vektor zuordnet, kann diese beiden Fälle nicht unterscheiden. Wir brauchen eine Rechenvorschrift, die den Vektor eines Wortes <em>abhängig von den anderen Wörtern des Satzes</em> verändert – und zwar so, dass die Vorschrift gelernt werden kann.</p>
+<p>Ein rekurrentes Netz (Abschnitt 4) löst das, indem es den Satz Wort für Wort liest. Das hat drei Nachteile, die die Vorlesung nennt: Alles Vorherige muss in einen Vektor fester Größe passen, Information aus weit entfernten Wörtern muss viele Rechenschritte überstehen, und Position \(t\) kann erst berechnet werden, wenn \(t-1\) fertig ist. <span class="prov" data-kind="KURS">PDF-S. 31–37</span></p>
+<p>Self-Attention verfolgt eine andere Idee, die man in einem Satz sagen kann: <b>Jedes Wort stellt eine Frage an alle Wörter, misst, wie gut jedes Wort zur Frage passt, und bildet daraus einen gewichteten Mittelwert ihrer Inhalte.</b> Dieser Abschnitt macht jedes Wort dieses Satzes mathematisch präzise: Was ist „Frage“, was „passt gut“, warum gerade dieser Mittelwert – und was folgt daraus, was <em>nicht</em>?</p>
+
+<div class="box int"><span class="lbl">Intuition · Datenbank-Analogie</span>
+<p>In einer Datenbank sucht eine Anfrage („burger“) unter Schlüsseln (Cheeseburger, Fries, Hamburger, Ice cream) und liefert die zugehörigen Werte (12, 5, 10, 6). Eine harte Datenbank liefert genau einen Treffer. Die Vorlesung zeigt die „weiche“ Variante: Bei Ähnlichkeiten 0,5; 0; 0,5; 0 ist die Antwort \(0{,}5\cdot12+0{,}5\cdot10=11\). <span class="prov" data-kind="KURS">PDF-S. 38–40</span> Self-Attention ist genau das – nur dass Anfrage, Schlüssel und Werte Vektoren sind, die das Netz selbst lernt, und dass die Ähnlichkeiten aus diesen Vektoren <em>berechnet</em> werden.</p></div>
+
+<h3 id="att-tools">6.2 Was wir dafür brauchen</h3>
+<p>Wir setzen nur Schulmathematik voraus und führen alles Weitere hier ein.</p>
+<div class="box def"><span class="lbl">Definition 6.1 · Skalarprodukt</span>
+<p>Für Vektoren \(a=(a_1,\dots,a_d)\) und \(b=(b_1,\dots,b_d)\) im \(\mathbb R^d\) ist \(a^\top b=\sum_{i=1}^d a_ib_i\). Die Länge ist \(\lVert a\rVert=\sqrt{a^\top a}\).</p></div>
+<p>Warum ist das ein Maß für „passt zusammen“? Weil es eine geometrische Bedeutung hat, die wir herleiten.</p>
+<div class="box thm"><span class="lbl">Satz 6.0 · Geometrie des Skalarprodukts</span>
+<p>Schließen \(a\ne0\) und \(b\ne0\) den Winkel \(\theta\in[0,\pi]\) ein, so gilt \(a^\top b=\lVert a\rVert\,\lVert b\rVert\cos\theta\). Gleichwertig: \(a^\top b=\lVert a\rVert\cdot\pi_a(b)\), wobei \(\pi_a(b)=\lVert b\rVert\cos\theta\) die <em>vorzeichenbehaftete</em> Länge des Schattens von \(b\) auf die Richtung von \(a\) ist.</p></div>
+<div class="box prf"><span class="lbl">Beweis</span>
+<ol class="drv">
+<li>\(\lVert a-b\rVert^2=(a-b)^\top(a-b)=\lVert a\rVert^2-2\,a^\top b+\lVert b\rVert^2\)<span class="why"><b>Warum:</b> Das Skalarprodukt ist in jedem Argument linear und symmetrisch (\(a^\top b=b^\top a\)); ausmultiplizieren wie bei \((x-y)^2\).</span></li>
+<li>\(\lVert a-b\rVert^2=\lVert a\rVert^2+\lVert b\rVert^2-2\lVert a\rVert\lVert b\rVert\cos\theta\)<span class="why"><b>Warum:</b> Kosinussatz im Dreieck mit den Seiten \(a\), \(b\), \(a-b\); der Winkel zwischen \(a\) und \(b\) liegt der Seite \(a-b\) gegenüber.</span></li>
+<li>\(a^\top b=\lVert a\rVert\lVert b\rVert\cos\theta\)<span class="why"><b>Warum:</b> Die rechten Seiten von (1) und (2) sind gleich; \(\lVert a\rVert^2+\lVert b\rVert^2\) kürzt sich, dann durch \(-2\) teilen. \(\square\)</span></li>
+</ol></div>
+<p>Damit lässt sich der Score sofort lesen: <b>groß</b>, wenn \(b\) weit in Richtung von \(a\) ragt; <b>null</b>, wenn \(b\) senkrecht steht; <b>negativ</b>, wenn \(b\) von \(a\) wegzeigt. Die Länge von \(a\) wirkt als gemeinsamer Verstärkungsfaktor – das wird in 6.3 wichtig.</p>
+<figure class="fig7"><div class="fig-ph" data-fig="projection"></div><figcaption><b>Abb. 6.1 – Scores als Projektionen.</b> Die Query \(\cq{q}\) des Wortes „Bank“ (blau) und die Keys \(\ck{k_j}\) dreier Kontextwörter (bernstein). Das gestrichelte Lot zeigt den Schatten \(\pi_q(k_j)\); der Score ist \(\lVert q\rVert\cdot\pi_q(k_j)\). Der Key von „Geld“ ist lang, zeigt aber von \(q\) weg – sein Score ist negativ.</figcaption></figure>
+
+<p><b>Exponentialfunktion.</b> Wir benötigen drei Eigenschaften von \(e^x\): (E1) \(e^x&gt;0\) für alle \(x\); (E2) streng wachsend; (E3) \(e^{x+y}=e^x e^y\). Alle drei sind Standard und werden in 6.3 an genau einer Stelle benutzt – wir markieren dort, wo.</p>
+
+<table class="sym"><tr><th>Symbol</th><th>Bedeutung</th><th>Form / Bereich</th></tr>
+<tr><td>\(N\)</td><td>Anzahl der Token im Satz</td><td>natürliche Zahl</td></tr>
+<tr><td>\(x_t\)</td><td>Eingabevektor (Einbettung) des Tokens an Position \(t\)</td><td>\(\mathbb R^{n}\)</td></tr>
+<tr><td>\(\cq{q}\)</td><td>Query: „wonach sucht das betrachtete Wort?“</td><td>\(\mathbb R^{d_k}\)</td></tr>
+<tr><td>\(\ck{k_j}\)</td><td>Key von Wort \(j\): „womit kann Wort \(j\) gefunden werden?“</td><td>\(\mathbb R^{d_k}\)</td></tr>
+<tr><td>\(\cv{v_j}\)</td><td>Value von Wort \(j\): „was liefert Wort \(j\), wenn es gewählt wird?“</td><td>\(\mathbb R^{d_v}\)</td></tr>
+<tr><td>\(s_j\)</td><td>Score (Energie): \(q^\top k_j/\sqrt{d_k}\)</td><td>\(\mathbb R\), auch negativ</td></tr>
+<tr><td>\(T\)</td><td>Temperatur der Softmax (Standard \(T=1\))</td><td>\(T&gt;0\)</td></tr>
+<tr><td>\(\cw{w_j}\)</td><td>Gewicht von Wort \(j\)</td><td>\(w_j&gt;0\), \(\sum_jw_j=1\)</td></tr>
+<tr><td>\(\co{o}\)</td><td>Ausgabe: neuer, kontextabhängiger Vektor des betrachteten Wortes</td><td>\(\mathbb R^{d_v}\)</td></tr>
+<tr><td>\(W_Q,W_K,W_V\)</td><td>gelernte Projektionsmatrizen</td><td>\(n\times d_k\), \(n\times d_k\), \(n\times d_v\)</td></tr></table>
+
+<h3 id="att-softmax">6.3 Vom Score zum Gewicht: die Softmax, hergeleitet</h3>
+<p>Angenommen, die Scores \(s_1,\dots,s_N\) sind berechnet. Wir wollen daraus Gewichte \(w_1,\dots,w_N\) machen, mit denen wir die Values mitteln. Bevor wir eine Formel hinschreiben, legen wir fest, was sie leisten muss:</p>
+<ol>
+<li><b>(W1) Positivität:</b> \(w_j&gt;0\). Ein Wort soll höchstens „wenig“ beitragen, nie „negativ“ – sonst wäre \(o\) kein Mittelwert.</li>
+<li><b>(W2) Normierung:</b> \(\sum_jw_j=1\). Dann ist \(o\) ein gewichteter <em>Durchschnitt</em> und behält die Größenordnung der Values.</li>
+<li><b>(W3) Ordnung:</b> Ist \(s_i&gt;s_j\), soll \(w_i&gt;w_j\) gelten.</li>
+<li><b>(W4) Nur Unterschiede zählen:</b> Addiert man zu allen Scores dieselbe Zahl, sollen die Gewichte gleich bleiben – „passt besser als die anderen“ ist eine relative Aussage.</li>
+</ol>
+<div class="box mis"><span class="lbl">Naheliegend, aber falsch</span>
+<p>„Teile jeden Score durch die Summe aller Scores.“ Das verletzt (W1) sofort: Im Bank-Beispiel unten ist ein Score negativ. Mit \(s=(1;\,{-1};\,0{,}5)\) entstünde das Gewicht \(-1/0{,}5=-2\) – und kleine Änderungen nahe einer Summe von 0 würden die Gewichte explodieren lassen.</p></div>
+<p>Die Lösung: erst jeden Score durch eine streng wachsende, positive Funktion schicken, dann normieren. Mit \(e^x\) erfüllt das alle vier Forderungen:</p>
+<div class="box def"><span class="lbl">Definition 6.2 · Softmax mit Temperatur</span>
+\[\cw{w_j}=\operatorname{softmax}(s/T)_j=\frac{e^{s_j/T}}{\sum_{l=1}^{N}e^{s_l/T}},\qquad j=1,\dots,N,\ T&gt;0.\]</div>
+<div class="box prf"><span class="lbl">Nachweis von (W1)–(W4)</span>
+<ol class="drv">
+<li>\(w_j&gt;0\)<span class="why"><b>Warum:</b> Zähler und Nenner sind Summen bzw. Werte von \(e^{\cdot}\), also positiv (E1).</span></li>
+<li>\[\sum_jw_j=\frac{\sum_je^{s_j/T}}{\sum_le^{s_l/T}}=1\]<span class="why"><b>Warum:</b> Alle \(w_j\) haben denselben Nenner; die Summe der Zähler ist genau dieser Nenner.</span></li>
+<li>\(s_i&gt;s_j\Rightarrow w_i&gt;w_j\)<span class="why"><b>Warum:</b> \(T&gt;0\) erhält die Ungleichung, \(e^x\) ist streng wachsend (E2), der Nenner ist für beide gleich.</span></li>
+<li>\[\dfrac{e^{(s_j+c)/T}}{\sum_le^{(s_l+c)/T}}=\dfrac{e^{c/T}\,e^{s_j/T}}{e^{c/T}\sum_le^{s_l/T}}=w_j\]<span class="why"><b>Warum:</b> (E3) zerlegt jeden Exponenten; der gemeinsame Faktor \(e^{c/T}\) steht in Zähler und Nenner und kürzt sich. \(\square\)</span></li>
+</ol></div>
+<div class="box mis"><span class="lbl">Wichtig: Die Forderungen legen die Softmax nicht fest</span>
+<p>Wir haben gezeigt, dass die Softmax (W1)–(W4) <em>erfüllt</em>. Daraus folgt nicht, dass sie die <em>einzige</em> solche Vorschrift ist. Gegenbeispiel: Mit dem Mittelwert \(\bar s=\tfrac1N\sum_ls_l\) und \(g(x)=1+\tanh x\) setze \(\tilde w_j=g(s_j-\bar s)\big/\sum_lg(s_l-\bar s)\). Dann gilt (W1), weil \(g&gt;0\); (W2) durch die Division; (W3), weil \(g\) streng wächst; (W4), weil \(s_j-\bar s\) sich bei \(s\mapsto s+c\mathbf 1\) nicht ändert. Für \(s=(1;\,0;\,-1)\) ist aber \(\tilde w_2=\tfrac{1}{3}\) (denn \(\tanh(-1)=-\tanh 1\), die Zähler sind \(1+\tanh1\), \(1\), \(1-\tanh1\) mit Summe 3), während die Softmax \(w_2=1/(e+1+e^{-1})\ne\tfrac13\) liefert. Die vier Forderungen beschreiben also eine ganze Klasse von Verfahren. Was die Exponentialfunktion auszeichnet, zeigt erst die folgende Charakterisierung.</p></div>
+<h4 id="att-variational">Warum gerade \(e^x\)? Die Softmax als eindeutige Lösung eines Optimierungsproblems</h4>
+<p><span class="layer" data-layer="deep">Vertiefung</span> Stellen Sie sich vor, das Wort darf seine Aufmerksamkeit frei auf die Kandidaten verteilen und wird dafür bezahlt: Jedes Gewicht \(w_j\) bringt \(w_js_j\) „Passung“. Ohne weitere Regel wäre die beste Wahl, alles auf den größten Score zu setzen – eine harte Auswahl, die bei kleinen Score-Änderungen sprunghaft umkippt. Eine zweite Größe bremst das: die <b>Entropie</b> \(H(w)=-\sum_jw_j\ln w_j\) (mit \(0\ln0:=0\)), die misst, wie breit die Verteilung ist; sie ist am größten bei Gleichverteilung (\(\ln N\)) und 0 bei einer Ecke. Die Temperatur \(T&gt;0\) ist der Wechselkurs zwischen beiden.</p>
+<div class="box thm"><span class="lbl">Satz 6.1* · Variationsprinzip der Softmax</span>
+<p>Für jedes \(s\in\mathbb R^N\) und \(T&gt;0\) hat das Problem \[\max_{w\in\Delta^{N-1}}\ F(w),\qquad F(w)=\sum_{j=1}^Nw_js_j+T\,H(w),\] genau eine Lösung, nämlich \(w^\ast=\operatorname{softmax}(s/T)\). Der Optimalwert ist \(F(w^\ast)=T\ln\sum_le^{s_l/T}\) („weiches Maximum“).</p></div>
+<div class="box prf"><span class="lbl">Beweis</span>
+<ol class="drv">
+<li>Es gibt ein Maximum.<span class="why"><b>Warum:</b> \(\Delta^{N-1}\) ist abgeschlossen und beschränkt; \(F\) ist stetig, weil \(x\ln x\to0\) für \(x\to0^+\) (Satz von Weierstraß).</span></li>
+<li>Es gibt höchstens eins.<span class="why"><b>Warum:</b> \(x\mapsto-x\ln x\) ist auf \([0,1]\) streng konkav (zweite Ableitung \(-1/x&lt;0\) im Inneren); eine Summe streng konkaver Funktionen der einzelnen Koordinaten plus eine lineare Funktion ist streng konkav, und eine streng konkave Funktion hat auf einer konvexen Menge höchstens ein Maximum.</span></li>
+<li>Das Maximum liegt im Inneren: alle \(w^\ast_j&gt;0\).<span class="why"><b>Warum:</b> Wäre \(w_m=0\) und \(w_i&gt;0\), verschiebe Masse \(\varepsilon\) von \(i\) nach \(m\). Die Änderung von \(F\) hat für \(\varepsilon\to0^+\) die Ableitung \(s_m-s_i+T\big(\lim_{\varepsilon\to0^+}(-\ln\varepsilon)+\ln w_i\big)=+\infty\): Eine kleine Verschiebung verbessert \(F\) immer. Also ist kein Randpunkt optimal – die Bedingung \(w_j\ge0\) ist im Optimum nicht aktiv.</span></li>
+<li>\[\dfrac{\partial}{\partial w_j}\Big[F(w)-\lambda\Big(\sum_lw_l-1\Big)\Big]=s_j-T(\ln w_j+1)-\lambda=0\]<span class="why"><b>Warum:</b> Im Inneren bleibt nur die Gleichheitsbedingung \(\sum_lw_l=1\); an einem Maximum unter einer Gleichheitsbedingung verschwindet der Gradient der Lagrange-Funktion (\(\lambda\) ist der Multiplikator). \(\partial(-w\ln w)/\partial w=-\ln w-1\).</span></li>
+<li>\[w_j=\exp\!\Big(\dfrac{s_j-\lambda-T}{T}\Big)=C\,e^{s_j/T}\quad\text{mit}\quad C=e^{-(\lambda+T)/T}&gt;0\]<span class="why"><b>Warum:</b> Gleichung (4) nach \(\ln w_j\) auflösen und exponenzieren. \(C\) ist für alle \(j\) gleich – hier entsteht die Exponentialform.</span></li>
+<li>\(C=1\big/\sum_le^{s_l/T}\), also \(w^\ast=\operatorname{softmax}(s/T)\)<span class="why"><b>Warum:</b> Einsetzen in \(\sum_jw_j=1\). Weil \(F\) konkav und die Nebenbedingung affin ist, ist der stationäre Punkt tatsächlich das (nach 2 eindeutige) Maximum.</span></li>
+<li>\(F(w^\ast)=\sum_jw^\ast_js_j-T\sum_jw^\ast_j\big(\tfrac{s_j}{T}-\ln Z\big)=T\ln Z\), \(Z=\sum_le^{s_l/T}\)<span class="why"><b>Warum:</b> \(\ln w^\ast_j=s_j/T-\ln Z\) einsetzen; die Score-Terme heben sich auf, \(\sum_jw^\ast_j=1\). \(\square\)</span></li>
+</ol></div>
+<p><b>Was die Temperatur jetzt bedeutet.</b> \(T\) ist der Preis, den man für Sicherheit zahlt. Für \(T\to0\) zählt nur noch \(\sum_jw_js_j\): Optimal ist jede Verteilung auf den größten Scores; die Softmax wählt im Grenzwert die <em>gleichmäßige</em> unter ihnen (darum kein one-hot bei Gleichstand). Für \(T\to\infty\) zählt nur die Entropie: Gleichverteilung. Im Bank-Beispiel aus 6.6 ist \(T\ln Z=\ln3{,}9568=1{,}3754\) – größer als der größte Score \(0{,}8485\) und kleiner als \(0{,}8485+\ln3\): Das weiche Maximum liegt immer zwischen \(\max_js_j\) und \(\max_js_j+T\ln N\).</p>
+<p><b>Ein anderer Regulierer, ein anderes Verfahren.</b> Ersetzt man \(T\,H(w)\) durch \(-\tfrac12\lVert w\rVert^2\), entsteht <b>Sparsemax</b>, die euklidische Projektion von \(s\) auf den Simplex; sie liefert oft exakte Nullen. Die Positivität (W1) ist also keine Naturnotwendigkeit, sondern Folge der Entropie-Regularisierung. <span class="prov" data-kind="FORSCHUNG">Blondel, Martins &amp; Niculae 2020, Gl. 6 und Tab. 1; Martins &amp; Astudillo 2016, Gl. 2–3</span></p>
+<p>Schritt (4) ist <b>Satz 6.1 (a)</b>: Verschiebungsinvarianz. Er hat eine nützliche Folge: Verschiebt man <em>alle</em> Keys um denselben Vektor \(u\), so ändert sich jeder Score um denselben Betrag \(q^\top u/\sqrt{d_k}\) – die Gewichte bleiben gleich. Und jede Implementierung zieht vor dem Exponenzieren \(\max_l s_l\) ab: dasselbe Ergebnis, aber ohne Zahlenüberlauf.</p>
+<div class="box thm"><span class="lbl">Satz 6.1 · Verschiebung und Länge</span>
+<p>(a) \(\operatorname{softmax}(s+c\mathbf 1)=\operatorname{softmax}(s)\) für jedes \(c\in\mathbb R\). (b) Die Query \(\lambda q\) mit \(\lambda&gt;0\) liefert bei Temperatur \(T\) dieselben Gewichte wie \(q\) bei Temperatur \(T/\lambda\).</p></div>
+<div class="box prf"><span class="lbl">Beweis von (b)</span>
+<ol class="drv"><li>\[\dfrac{(\lambda q)^\top k_j}{\sqrt{d_k}\,T}=\dfrac{\lambda\,s_j}{T}=\dfrac{s_j}{T/\lambda}\]<span class="why"><b>Warum:</b> Das Skalarprodukt ist linear in \(q\), also \((\lambda q)^\top k_j=\lambda\,q^\top k_j\). Die Gewichte hängen nur von \(s_j/T\) ab. \(\square\)</span></li></ol></div>
+<p><b>Was die Temperatur tut.</b> Kleines \(T\) vergrößert alle Abstände \((s_i-s_j)/T\): Die Verteilung wird spitzer. Großes \(T\) staucht sie: Die Gewichte nähern sich \(1/N\). Abb. 6.3 zeigt beides für die Scores des Beispiels unten. Wegen (b) kann ein Netz die Schärfe schon über die <em>Länge</em> seiner Queries steuern – ganz ohne \(T\).</p>
+<figure class="fig7"><div class="fig-ph" data-fig="pipeline"></div><figcaption><b>Abb. 6.2 – Die Rechenkette.</b> Links die Scores \(s_j\), Mitte \(e^{s_j}\) (alle positiv, Reihenfolge erhalten), rechts die normierten Gewichte \(\cw{w_j}\). Die Zahlen sind die des Bank-Beispiels aus 6.6.</figcaption></figure>
+<figure class="fig7"><div class="fig-ph" data-fig="temperature"></div><figcaption><b>Abb. 6.3 – Gewichte als Funktion der Temperatur.</b> Für \(T\to0\) wandert alles Gewicht zum größten Score (Fluss); für \(T\to\infty\) nähern sich alle drei Kurven \(1/3\). Die Reihenfolge der Kurven ändert sich nie (W3). Alle Kurven zeigen Gewichte und sind daher violett; die Linienart unterscheidet die Wörter.</figcaption></figure>
+<div class="box mis"><span class="lbl">Grenzfall · T → 0 mit Gleichstand</span>
+<p>„Für \(T\to0\) wird die Softmax one-hot“ stimmt nur bei <em>eindeutigem</em> Maximum. Haben \(k\ge2\) Scores denselben Maximalwert, verteilt sich das Gewicht im Grenzwert gleichmäßig auf diese \(k\) Wörter (je \(1/k\)), weil ihre Zähler gleich sind und alle anderen Zähler relativ gegen 0 gehen.</p></div>
+
+<h3 id="att-simplex">6.4 Gewichte sind Punkte in einem Dreieck</h3>
+<p>Alle Vektoren \(w\) mit \(w_j\ge0\) und \(\sum_jw_j=1\) bilden den <b>Wahrscheinlichkeitssimplex</b> \(\Delta^{N-1}\). Für \(N=3\) ist das ein Dreieck: Jede Ecke ist „alles Gewicht auf ein Wort“, der Mittelpunkt ist die Gleichverteilung. Die Softmax ist also eine Abbildung von beliebigen Score-Vektoren in dieses Dreieck. Sie erreicht jeden <em>inneren</em> Punkt, aber nie den Rand, weil alle Gewichte positiv sind (W1).</p>
+<figure class="fig7"><div class="fig-ph" data-fig="simplex"></div><figcaption><b>Abb. 6.4 – Der Simplex.</b> Die violette Bahn zeigt die Gewichte des Bank-Beispiels, während die Temperatur wächst. Kleine \(T\) liegen nahe der Ecke „Fluss“, große nahe der Mitte. Im Labor (Ansicht „Eine Query“) wandert dieser Punkt, wenn Sie \(q\) ziehen oder \(T\) verändern.</figcaption></figure>
+
+<h3 id="att-mix">6.5 Gewichte mischen Werte: die konvexe Kombination</h3>
+<div class="box def"><span class="lbl">Definition 6.3 · Ausgabe der Attention</span>
+\[\co{o}=\sum_{j=1}^{N}\cw{w_j}\,\cv{v_j}.\]
+<p>Ein solcher Ausdruck mit Gewichten im Simplex heißt <b>Konvexkombination</b> der \(v_j\); die Menge aller Konvexkombinationen ist die <b>konvexe Hülle</b> \(\operatorname{conv}\{v_1,\dots,v_N\}\) – anschaulich das „Gummiband“ um die Punkte.</p></div>
+<div class="box thm"><span class="lbl">Satz 6.2 · Was die Ausgabe kann – und was nicht</span>
+<p>(a) Für <em>beliebige</em> Scores liegt \(o\) in \(\operatorname{conv}\{v_1,\dots,v_N\}\). (b) Sind die Scores <em>frei wählbar</em>, wird jeder Punkt \(z\) exakt erreicht, der eine Darstellung \(z=\sum_j\mu_jv_j\) mit <em>allen</em> \(\mu_j&gt;0\), \(\sum_j\mu_j=1\) besitzt. (c) Besitzt \(z\) nur Darstellungen mit mindestens einem \(\mu_j=0\), so wird \(z\) nur im Grenzwert erreicht; Punkte außerhalb der Hülle nie.</p></div>
+<div class="box prf"><span class="lbl">Beweis</span>
+<ol class="drv">
+<li>(a) \(w\in\Delta^{N-1}\)<span class="why"><b>Warum:</b> (W1) und (W2). Damit ist \(o=\sum_jw_jv_j\) nach Definition eine Konvexkombination.</span></li>
+<li>(b) Setze \(s_j=T\ln\mu_j\).<span class="why"><b>Warum möglich:</b> \(\mu_j&gt;0\), also ist \(\ln\mu_j\) definiert.</span></li>
+<li>\[w_j=\dfrac{e^{\ln\mu_j}}{\sum_le^{\ln\mu_l}}=\mu_j\]<span class="why"><b>Warum:</b> \(e^{\ln x}=x\) und \(\sum_l\mu_l=1\). Also \(o=z\).</span></li>
+<li>(c) Jede Softmax-Ausgabe ist eine Darstellung mit lauter positiven Gewichten. Hat \(z\) keine solche Darstellung, kann \(o=z\) nie gelten; Gewichtsfolgen mit \(w_j\to0\) nähern \(z\) nur an. \(\square\)<span class="why"><b>Warum der Wortlaut „nur Darstellungen mit einem Nullgewicht“:</b> Sind die Values affin abhängig (z. B. vier Punkte in der Ebene), kann derselbe Punkt eine Darstellung mit einer Null <em>und</em> eine mit lauter positiven Gewichten haben – dann ist er erreichbar. Bei affin unabhängigen Values (Dreieck) ist die Darstellung eindeutig, und „mindestens ein \(\mu_j=0\)“ heißt genau: \(z\) liegt auf dem Rand.</span></li>
+</ol></div>
+<div class="box mis"><span class="lbl">Vorsicht · Frei wählbare Scores ≠ mit einer Query erreichbare Scores</span>
+<p>Satz 6.2 (b) setzt voraus, dass wir <em>jeden</em> Score-Vektor einstellen können. In einem Modell entstehen die Scores aber aus <em>einer</em> Query bei festen Keys: \(s=Kq/\sqrt{d_k}\), wobei \(K\in\mathbb R^{N\times d_k}\) die Keys als Zeilen enthält. Erreichbar sind also nur Score-Vektoren aus dem Bild von \(K\) – und wegen Satz 6.1 (a) zählt dieses Bild nur bis auf Addition von Vielfachen von \(\mathbf 1\). Ist \(\dim\big(\operatorname{Bild}K+\operatorname{span}\{\mathbf 1\}\big)&lt;N\), sind viele Gewichtsvektoren grundsätzlich unerreichbar. Extremfall: Zwei <b>gleiche Keys</b> \(k_1=k_2\) erzwingen \(s_1=s_2\) und damit \(w_1=w_2\) für jede Query – ein Punkt im Inneren der Hülle, der \(w_1\ne w_2\) verlangt, ist dann unerreichbar, obwohl Satz 6.2 (b) für freie Scores gilt. (Die Probeklausur prüft genau das.)</p></div>
+<figure class="fig7"><div class="fig-ph" data-fig="hull"></div><figcaption><b>Abb. 6.5 – Mischen statt auswählen.</b> Die Values \(\cv{v_j}\) spannen die getönte Hülle auf. Die violette Pfeilkette addiert \(w_1v_1\), \(w_2v_2\), \(w_3v_3\) und endet bei \(\co{o}\). Der rote Punkt \(Z\) liegt außerhalb – keine Wahl von Query, Keys oder Temperatur erreicht ihn.</figcaption></figure>
+<p><b>Warum das wichtig ist.</b> Self-Attention kann Information nur <em>mischen</em>, nicht verstärken oder umdrehen. Darum folgen im Transformer eine lineare Abbildung \(W_O\) und eine Residualverbindung \(x+\operatorname{Att}(x)\) (Abschnitt 8): Sie verlassen die Hülle. Wichtig auch für die Deutung: Viele verschiedene Gewichtsvektoren können dieselbe Ausgabe ergeben (etwa wenn zwei Values gleich sind) – große Gewichte allein „erklären“ eine Entscheidung nicht (6.11).</p>
+
+<h3 id="att-example">6.6 Durchgerechnet: „Bank“ am Fluss</h3>
+<p>Wir rechnen in zwei Dimensionen, damit jede Zahl sichtbar ist (\(d_k=d_v=2\), \(T=1\)). Die Achsen des Werteraums deuten wir als „Ufer-Bedeutung“ und „Finanz-Bedeutung“.</p>
+<table class="num7"><tr><th>Wort \(j\)</th><th>\(\ck{k_j}\)</th><th>\(\cv{v_j}\)</th></tr>
+<tr><td>Fluss</td><td>\((1{,}6;\ 0{,}4)\)</td><td>\((1{,}8;\ 0{,}2)\)</td></tr>
+<tr><td>Geld</td><td>\((-0{,}4;\ 1{,}5)\)</td><td>\((0{,}1;\ 1{,}9)\)</td></tr>
+<tr><td>der</td><td>\((0{,}1;\ {-0{,}3})\)</td><td>\((0{,}2;\ 0{,}2)\)</td></tr></table>
+<p>Die Query von „Bank“ sei \(\cq{q}=(0{,}9;\,{-0{,}6})\).</p>
+<ol class="drv">
+<li>\[\begin{aligned}q^\top k_{\text{Fluss}}&amp;=0{,}9\cdot1{,}6+(-0{,}6)\cdot0{,}4=1{,}2\\ q^\top k_{\text{Geld}}&amp;=0{,}9\cdot(-0{,}4)+(-0{,}6)\cdot1{,}5=-1{,}26\\ q^\top k_{\text{der}}&amp;=0{,}9\cdot0{,}1+(-0{,}6)\cdot(-0{,}3)=0{,}27\end{aligned}\]<span class="why"><b>Warum:</b> Definition 6.1, komponentenweise. Kontrolle mit Abb. 6.1: „Geld“ zeigt von \(q\) weg.</span></li>
+<li>\(s=(0{,}8485;\ {-0{,}891};\ 0{,}1909)\)<span class="why"><b>Warum:</b> Division durch \(\sqrt{d_k}=\sqrt2\) (Begründung in 6.8).</span></li>
+<li>\(e^{s}=(2{,}3362;\ 0{,}4103;\ 1{,}2104)\), Summe \(3{,}9568\)<span class="why"><b>Warum:</b> Zähler und Nenner der Softmax. Alle positiv, Reihenfolge wie bei \(s\).</span></li>
+<li>\(\cw{w}=(0{,}5904;\ 0{,}1037;\ 0{,}3059)\)<span class="why"><b>Warum:</b> Jeder Zähler durch \(3{,}9568\). Kontrolle: Summe 1.</span></li>
+<li>\(\co{o}=0{,}5904\,v_{\text{Fluss}}+0{,}1037\,v_{\text{Geld}}+0{,}3059\,v_{\text{der}}=(1{,}1343;\ 0{,}3763)\)<span class="why"><b>Warum:</b> Definition 6.3, komponentenweise. Kontrolle: \(o\) liegt im Dreieck der Values (Satz 6.2).</span></li>
+</ol>
+<p><b>Deutung.</b> Die Ausgabe liegt deutlich auf der Ufer-Achse: Das Wort „Bank“ ist in Richtung „Fluss“ verschoben worden. Bemerkenswert: „der“ erhält mehr Gewicht als „Geld“, obwohl \(k_{\text{Geld}}\) viel länger ist – entscheidend ist die Projektion auf \(q\), nicht die Länge. Die Entropie der Gewichte beträgt \(H=1{,}3106\) Bit von höchstens \(\log_23=1{,}585\) Bit: Die Aufmerksamkeit ist verteilt, nicht scharf. Verdoppelt man \(q\), werden die Gewichte \((0{,}7697;\,0{,}0237;\,0{,}2066)\) und die Entropie sinkt auf \(0{,}8888\) Bit (Satz 6.1 b).</p>
+<div class="lab-ref" data-kc="attention"></div>
+
+<h3 id="att-matrix">6.7 Für alle Wörter gleichzeitig: Matrixform und Dimensionen</h3>
+<p>Bisher hatte nur „Bank“ eine Query. In Self-Attention erhält jedes Token \(t\) aus seiner Einbettung \(x_t\) <em>alle drei</em> Rollen: \(q_t=x_tW_Q\), \(k_t=x_tW_K\), \(v_t=x_tW_V\) (Zeilenvektoren). Schreibt man die Einbettungen als Zeilen einer Matrix \(X\in\mathbb R^{N\times n}\), entstehen alle auf einmal:</p>
+\[Q=XW_Q\in\mathbb R^{N\times d_k},\quad K=XW_K\in\mathbb R^{N\times d_k},\quad V=XW_V\in\mathbb R^{N\times d_v},\qquad \operatorname{Att}(Q,K,V)=\operatorname{softmax}\!\Big(\frac{QK^\top}{\sqrt{d_k}}\Big)V.\]
+<ol class="drv">
+<li>\(QK^\top\in\mathbb R^{N\times N}\), Eintrag \((i,j)=q_i^\top k_j\)<span class="why"><b>Warum:</b> Zeile \(i\) von \(Q\) mal Spalte \(j\) von \(K^\top\) (= Zeile \(j\) von \(K\)). Dimensionsprobe: \((N\times d_k)(d_k\times N)\).</span></li>
+<li>Softmax <b>zeilenweise</b>: Zeile \(i\) enthält die Gewichte von Token \(i\) über alle \(j\)<span class="why"><b>Warum:</b> Jedes Token fragt einzeln; normiert wird über die Spalten \(j\) einer Zeile.</span></li>
+<li>\(A\,V\in\mathbb R^{N\times d_v}\), Zeile \(i\) \(=\sum_jA_{ij}v_j=o_i\)<span class="why"><b>Warum:</b> Zeile \(i\) von \(A\) mal \(V\) ist die gewichtete Summe der Zeilen von \(V\) – Definition 6.3 für Token \(i\).</span></li>
+</ol>
+<p><b>Dimensionsprobe an Zahlen.</b> \(N=3\) Token, Einbettung \(n=4\), \(d_k=d_v=2\): \(X\) ist \(3\times4\), \(W_Q\) ist \(4\times2\), also \(Q\) \(3\times2\); \(QK^\top\) ist \(3\times3\); \(AV\) ist \(3\times2\) – für jedes Token ein neuer Vektor der Länge 2. Gelernt werden nur \(W_Q,W_K,W_V\); die Gewichte \(A\) werden für jede Eingabe neu berechnet. <span class="prov" data-kind="KURS">PDF-S. 42–53</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §7.1.1, S. 180; §7.3, S. 188, Gl. 7.34</span></p>
+<p class="mute small">Notation: Die Folie schreibt Token als Spalten (\(X\in\mathbb R^{n\times N}\), \(q_i=W_Qx_i\)); hier gilt durchgehend die Zeilenkonvention von SLP3.</p>
+<div class="task-ref" data-task="AT5"></div>
+<div class="task-ref" data-task="AT1"></div>
+
+<p><span class="layer" data-layer="deep">Vertiefung</span></p>
+<h3 id="att-scale">6.8 Warum durch \(\sqrt{d_k}\) teilen?</h3>
+<p><b>Das Problem.</b> In echten Modellen ist \(d_k=64\) oder größer. Ein Skalarprodukt ist eine Summe von \(d_k\) Produkten – je mehr Summanden, desto weiter streuen die Scores. Weit gestreute Scores machen die Softmax fast one-hot, und dann (Lemma 6.4) kommt beim Lernen kaum noch ein Gradient an. Wie stark wachsen die Scores? Dafür brauchen wir zwei Begriffe aus der Wahrscheinlichkeitsrechnung: Erwartungswert \(\mathbb E\) und Varianz \(\operatorname{Var}(X)=\mathbb E[X^2]-(\mathbb E X)^2\).</p>
+<div class="box thm"><span class="lbl">Satz 3 · Varianz des Skalarprodukts</span>
+<p>Sind \(q_1,\dots,q_{d_k},k_1,\dots,k_{d_k}\) unabhängig mit Erwartungswert 0 und Varianz 1, so gilt \(\mathbb E[q^\top k]=0\) und \(\operatorname{Var}(q^\top k)=d_k\). Also hat \(q^\top k/\sqrt{d_k}\) die Varianz 1.</p></div>
+<div class="box prf"><span class="lbl">Beweis</span>
+<ol class="drv">
+<li>\(\mathbb E[q_ik_i]=\mathbb E[q_i]\,\mathbb E[k_i]=0\)<span class="why"><b>Warum:</b> Für unabhängige Zufallsgrößen ist der Erwartungswert des Produkts das Produkt der Erwartungswerte.</span></li>
+<li>\(\mathbb E[q^\top k]=\sum_i\mathbb E[q_ik_i]=0\)<span class="why"><b>Warum:</b> Linearität des Erwartungswerts – gilt immer, auch ohne Unabhängigkeit.</span></li>
+<li>\(\operatorname{Var}(q_ik_i)=\mathbb E[q_i^2k_i^2]-0=\mathbb E[q_i^2]\,\mathbb E[k_i^2]=1\cdot1\)<span class="why"><b>Warum:</b> Varianzformel mit (1); \(q_i^2\) und \(k_i^2\) sind unabhängig, weil \(q_i,k_i\) es sind; \(\mathbb E[q_i^2]=\operatorname{Var}(q_i)+(\mathbb Eq_i)^2=1\).</span></li>
+<li>\(\operatorname{Cov}(q_ik_i,q_jk_j)=\mathbb E[q_ik_iq_jk_j]-0=\mathbb E[q_i]\mathbb E[k_i]\mathbb E[q_j]\mathbb E[k_j]=0\) für \(i\ne j\)<span class="why"><b>Warum:</b> Vier verschiedene unabhängige Größen; jeder Faktor hat Erwartungswert 0.</span></li>
+<li>\(\operatorname{Var}\big(\sum_iq_ik_i\big)=\sum_i\operatorname{Var}(q_ik_i)=d_k\)<span class="why"><b>Warum:</b> Varianz einer Summe = Summe der Varianzen plus aller Kovarianzen; diese sind nach (4) null.</span></li>
+<li>\(\operatorname{Var}\big(q^\top k/\sqrt{d_k}\big)=d_k/d_k=1\)<span class="why"><b>Warum:</b> \(\operatorname{Var}(cX)=c^2\operatorname{Var}(X)\) mit \(c=1/\sqrt{d_k}\). \(\square\)</span></li>
+</ol></div>
+<figure class="fig7"><div class="fig-ph" data-fig="variance"></div><figcaption><b>Abb. 6.6 – Satz 3 im Experiment.</b> Punkte: gemessene Varianz von \(q^\top k\) bei zufälligen \(q,k\) mit unabhängigen Standardnormal-Komponenten (eigene Simulation, Seed 11). Sie folgen der Geraden \(\operatorname{Var}=d_k\). Quadrate: nach Teilen durch \(\sqrt{d_k}\) liegt die Varianz bei 1, unabhängig von \(d_k\).</figcaption></figure>
+<div class="box mis"><span class="lbl">Was Satz 3 nicht sagt</span>
+<p>Gelernte Projektionen erfüllen die Annahmen nicht genau (Komponenten sind korreliert, Varianzen ungleich 1). Satz 3 begründet die <em>Größenordnung</em> des Faktors, nicht seinen exakten Wert. Die Originalarbeit formuliert entsprechend vorsichtig („We suspect …“) und gibt genau diese Rechnung in einer Fußnote. <span class="prov" data-kind="FORSCHUNG">Vaswani et al. 2017, §3.2.1</span> Und: Die Skalierung ist <em>nicht</em> dafür da, die Gewichte auf Summe 1 zu bringen – das macht die Softmax immer.</p></div>
+<div class="box thm"><span class="lbl">Lemma 6.4 · Jacobi-Matrix der Softmax mit Temperatur</span>
+<p>\(\dfrac{\partial w_i}{\partial s_j}=\dfrac1T\big(w_i[i=j]-w_iw_j\big)\). Mit dem Index \(m\) eines größten Scores und dem Vorsprung \(\Delta=s_m-\max_{j\ne m}s_j\) gilt \(\lVert J\rVert_F\le4(1-w_m)/T\le4(N-1)e^{-\Delta/T}/T\). Folgen: (a) feste \(T\), \(\Delta\to\infty\): \(J\to0\); (b) \(T\to0\) mit eindeutigem Maximum: \(J\to0\); (c) \(T\to0\) mit \(k\ge2\) gleich großen Maxima: \(J\) divergiert.</p></div>
+<div class="box prf"><span class="lbl">Beweis</span>
+<ol class="drv">
+<li>\[\dfrac{\partial w_i}{\partial s_j}=\dfrac{\tfrac1Te^{s_i/T}[i=j]\,Z-e^{s_i/T}\,\tfrac1Te^{s_j/T}}{Z^2},\qquad Z=\sum_le^{s_l/T}\]<span class="why"><b>Warum:</b> Quotientenregel; \(\partial e^{s_i/T}/\partial s_j=\tfrac1Te^{s_i/T}\) nur für \(i=j\), sonst 0; \(\partial Z/\partial s_j=\tfrac1Te^{s_j/T}\).</span></li>
+<li>\(=\tfrac1T\big(w_i[i=j]-w_iw_j\big)\)<span class="why"><b>Warum:</b> Durch \(Z^2\) teilen und \(w_i=e^{s_i/T}/Z\) einsetzen.</span></li>
+<li>\(\lVert J\rVert_F\le\sum_{i,j}|J_{ij}|=\tfrac2T\sum_iw_i(1-w_i)\)<span class="why"><b>Warum:</b> Frobeniusnorm ≤ Summe der Beträge; Diagonale \(w_i(1-w_i)/T\), außerhalb \(w_iw_j/T\), und \(\sum_{j\ne i}w_j=1-w_i\).</span></li>
+<li>\(\sum_iw_i(1-w_i)\le(1-w_m)+\sum_{i\ne m}w_i=2(1-w_m)\)<span class="why"><b>Warum:</b> \(w_m\le1\) und \(1-w_i\le1\).</span></li>
+<li>\(1-w_m\le(N-1)e^{-\Delta/T}\)<span class="why"><b>Warum:</b> \(1-w_m=\sum_{j\ne m}e^{(s_j-s_m)/T}\big/\sum_le^{(s_l-s_m)/T}\); der Nenner ist ≥ 1 (Summand \(l=m\)), jeder Zählersummand ≤ \(e^{-\Delta/T}\).</span></li>
+<li>(c): Bei Gleichstand gilt \(w_i\to1/k\) für die \(k\) Maxima, also \(J_{ii}=w_i(1-w_i)/T\to\infty\). \(\square\)<span class="why"><b>Warum:</b> \(w_i(1-w_i)\) strebt gegen die positive Konstante \(\tfrac1k(1-\tfrac1k)\), \(1/T\) gegen unendlich.</span></li>
+</ol></div>
+<p>Im Bank-Beispiel ist \(\lVert J\rVert_F=0{,}4324\). Zusammen mit Satz 3 ergibt sich die präzise Fassung des Arguments der Originalarbeit: Ohne Skalierung streuen die Scores mit Standardabweichung \(\sqrt{d_k}\), der Vorsprung \(\Delta\) wird typischerweise groß, und nach (a) verschwindet der Gradient. Das Labor misst das reproduzierbar (Ansicht „Skalierung“).</p>
+
+<h3 id="att-uniform">6.9 Wann sind alle Gewichte gleich?</h3>
+<div class="box thm"><span class="lbl">Satz 6.3</span><p>\(w_1=\dots=w_N=1/N\) genau dann, wenn \(q^\top(k_i-k_j)=0\) für alle \(i,j\).</p></div>
+<div class="box prf"><span class="lbl">Beweis</span><p>Gleiche Gewichte \(\Leftrightarrow\) gleiche Zähler \(e^{s_i/T}\) (der Nenner ist gemeinsam) \(\Leftrightarrow\) \(s_i=s_j\) (\(e^x\) ist injektiv) \(\Leftrightarrow\) \(q^\top k_i=q^\top k_j\). \(\square\)</p></div>
+<p>\(q=0\) genügt, ist aber nicht nötig: Liegen alle Keys auf einer Geraden senkrecht zu \(q\), sind alle Projektionen gleich lang. In hohen Dimensionen ist das für viele \(q\ne0\) möglich, denn \(N-1\) Differenzvektoren spannen höchstens einen \((N-1)\)-dimensionalen Raum auf.</p>
+
+<h3 id="att-pitfalls">6.10 Typische Denkfehler</h3>
+<div class="box mis"><span class="lbl">Fünf Fehler, die in Prüfungen vorkommen</span>
+<ol>
+<li><b>„Values bestimmen die Gewichte.“</b> Nein: Gewichte hängen nur von \(q\), den Keys, \(d_k\) und \(T\) ab. Values bestimmen, <em>was</em> gemischt wird.</li>
+<li><b>„Ein langer Key bekommt viel Gewicht.“</b> Nur, wenn er in Richtung \(q\) zeigt (Satz 6.0). Im Beispiel: Geld.</li>
+<li><b>„T → 0 ergibt immer one-hot.“</b> Nicht bei Gleichstand (6.3).</li>
+<li><b>„Mit kleiner Temperatur erreicht o jeden Punkt.“</b> Nur Punkte der Hülle; Ecken nur im Grenzwert (Satz 6.2).</li>
+<li><b>„√d_k normiert die Gewichte.“</b> Normiert wird durch die Softmax; \(\sqrt{d_k}\) kontrolliert die Streuung (Satz 3).</li>
+</ol></div>
+
+<p><span class="layer" data-layer="research">Forschung</span></p>
+<h3 id="att-research">6.11 Sind Attention-Gewichte Erklärungen?</h3>
+<div class="box res"><span class="lbl">Forschungsfenster · zwei Originalarbeiten im Detail</span>
+<p><b>Frage.</b> Wenn ein Modell einem Wort viel Gewicht gibt – hat dieses Wort die Entscheidung <em>verursacht</em>?</p>
+<p><b>Jain &amp; Wallace (2019) – Aufbau.</b> Klassifikations-, Frage-Antwort- und NLI-Aufgaben (u. a. SST, IMDB, SNLI, bAbI) mit Encodern BiLSTM, CNN und Mittelwert, darüber additive Attention. Zwei Prüfungen: (1) Rangkorrelation (Kendall \(\tau\)) zwischen Attention-Gewichten und Wichtigkeitsmaßen aus Gradienten bzw. Weglassen einzelner Wörter („leave-one-out“); (2) <em>kontrafaktische</em> Gewichte: zufällig permutierte Gewichte und „adversariale“ Gewichte, die sich – gemessen mit der Jensen-Shannon-Divergenz – möglichst stark vom Original unterscheiden, während die Vorhersage nahezu gleich bleibt. <b>Befund</b> (für BiRNN-Encoder, so zusammengefasst in der Arbeit): Die Korrelation besteht „only weakly and inconsistently“, und es ist „very often possible“, solche alternativen Verteilungen zu konstruieren. <b>Selbst genannte Grenzen:</b> Gradienten- und Weglass-Maße seien keine „ground truth“; Sequenz-zu-Sequenz-Aufgaben wurden nicht untersucht. <span class="prov" data-kind="FORSCHUNG">Jain &amp; Wallace 2019, §1, §3–4, §6</span></p>
+<p><b>Wiegreffe &amp; Pinter (2019) – Einwand.</b> Die alternativen Verteilungen wurden pro Beispiel gesucht, ohne dass ein Modell sie konsistent erzeugen muss. Die Autorinnen schlagen vier Tests vor: einen Gleichverteilungs-Vergleich, die Streuung über Trainingsläufe mit verschiedenen Zufallssaaten, eine Diagnose mit eingefrorenen Gewichten in einem einfachen MLP und ein End-to-End-Training eines adversarialen Modells. <b>Befund:</b> Auch wenn sich verlässlich andere Verteilungen finden lassen, schneiden sie im Diagnosetest schlecht ab; das Ausmaß im Pro-Beispiel-Aufbau sei eine „considerable exaggeration“. Erklärungen könnten „plausible (but not necessarily faithful)“ sein. <span class="prov" data-kind="FORSCHUNG">Wiegreffe &amp; Pinter 2019, §1, §3–4</span></p>
+<p><b>Die mathematische Wurzel des Streits.</b> Die Abbildung \(w\mapsto o=\sum_jw_jv_j\) ist nicht injektiv, sobald die Values affin abhängig sind. Eigenes Beispiel: \(v_1=(2,0)\), \(v_2=(0,2)\), \(v_3=(0,0)\), \(v_4=(1,1)\). Dann ergeben \(w=(0{,}5;\,0{,}5;\,0;\,0)\) und \(w'=(0;\,0;\,0;\,1)\) beide \(o=(1,1)\); mit positiven Gewichten etwa \((0{,}25;\,0{,}25;\,0{,}25;\,0{,}25)\) und \((0{,}025;\,0{,}025;\,0{,}25;\,0{,}7)\), die beide \(o=(0{,}75;\,0{,}75)\) liefern, obwohl einmal „Wort 4“ dominiert und einmal nicht. Wer aus \(w\) die Ursache ablesen will, verwechselt die Gewichte mit der Ausgabe – genau die Lücke, die Jain &amp; Wallace empirisch ausnutzen. Umgekehrt zeigt Satz 6.2: Die Mehrdeutigkeit hängt an der Geometrie der Values; sie sagt noch nichts darüber, ob ein <em>trainiertes</em> Modell solche Alternativen auch selbst hervorbringt – das ist der Einwand von Wiegreffe &amp; Pinter.</p>
+<p><b>Grenzen dieser Darstellung.</b> Gelesen wurden die Volltexte (Methoden, Ergebnisse, Diskussion); Zahlen aus Abbildungen werden nicht wiedergegeben. Beide Arbeiten untersuchen Klassifikation mit RNN-Encodern, nicht Transformer-NER; die Übertragung auf dieses Kapitel ist eine Einordnung, kein Ergebnis der Arbeiten.</p>
+<p class="mute small">Belegstellen: <a class="cite" href="#ref-jain">Jain &amp; Wallace 2019</a>; <a class="cite" href="#ref-wiegreffe">Wiegreffe &amp; Pinter 2019</a>; <a class="cite" href="#ref-blondel">Blondel, Martins &amp; Niculae 2020</a>; <a class="cite" href="#ref-sparsemax">Martins &amp; Astudillo 2016</a>; zur Skalierung <a class="cite" href="#ref-vaswani">Vaswani et al. 2017, §3.2.1</a></p></div>
+<aside class="media"><h4>Zum Anschauen (optional)</h4><p><a href="https://www.youtube.com/watch?v=eMlx5fFNoYc">3Blue1Brown: „Attention in transformers, step-by-step“ (Deep Learning, Kapitel 6, 7. April 2024)</a>. Rolle: visuelle Intuition in hohen Dimensionen; andere Notation (Spaltenvektoren, kausale Maske). Nicht im Detail ausgewertet, daher ohne Zeitmarken.</p></aside>
+
+<h3 id="att-check">6.12 Selbstcheck und Transfer</h3>
+<div class="box chk"><span class="lbl">Selbstcheck (ohne Rechnung)</span>
+<ol><li>Sie addieren 5 zu allen Scores. Was passiert mit den Gewichten – und warum?</li><li>Ein Key steht senkrecht auf \(q\). Welchen Score hat er, welches Gewicht im Vergleich zu einem Key mit negativem Score?</li><li>Können Gewichte \((1;\,0;\,0)\) exakt herauskommen?</li></ol>
+<p class="mute small">Antworten: (1) nichts, Satz 6.1 a; (2) Score 0, größeres Gewicht als jeder negative Score (W3); (3) nein, nur im Grenzwert (W1).</p></div>
+<p>Die Transferaufgabe <b>AT10</b> im Arbeitsbuch dreht die Richtung um: Gegeben ist eine gewünschte Ausgabe; gesucht sind Gewichte, Scores und eine Query, die sie erzeugt. Die Probeklausur enthält eine neue Aufgabe dieser Art mit anderen Zahlen.</p>
+<div class="task-ref" data-task="AT10"></div>
+</div>
+</section>
+
+<section data-id="position" data-title="7 · Positionsinformation">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<div class="scene" data-scene="attention" data-print="off"></div>
+<p>Ein RNN-Zustand hängt von der Reihenfolge ab; Self-Attention ohne Zusatz nicht – die Vorlesung nennt das eine „Bag-of-words-Repräsentation“ („Marry kills John“ / „John kills Marry“, PDF-S. 60–62). Präzise:</p>
+<div class="thm"><b>Satz 4 (Permutations-Äquivarianz).</b> Für jede Permutationsmatrix \(P\) gilt \(\operatorname{Att}(PX)=P\,\operatorname{Att}(X)\): Vertauscht man die Token, vertauschen sich die Ausgaben genauso – jedes Token erhält denselben Ausgabevektor wie vorher.</div>
+<div class="proof">\[\begin{aligned}
+Q'&amp;=PXW_Q=PQ,\quad K'=PK,\quad V'=PV &amp;&amp;\text{zeilenweise Projektion}\\
+Q'K'^\top&amp;=PQK^\top P^\top &amp;&amp;(PK)^\top=K^\top P^\top\\
+\operatorname{softmax}(PSP^\top)&amp;=P\operatorname{softmax}(S)P^\top &amp;&amp;\text{Softmax je Zeile; Spalten nur umgeordnet}\\
+\operatorname{Att}(PX)&amp;=P\operatorname{softmax}(S)P^\top PV=P\,\operatorname{Att}(X) &amp;&amp;P^\top P=I\qquad\square
+\end{aligned}\]</div>
+<p>„John“ bekommt in beiden Sätzen denselben Vektor – das Modell kann Subjekt und Objekt nicht unterscheiden. Deshalb wird Position in die Eingabe kodiert (PDF-S. 63).</p>
+<p><b>Gelernte Positionsvektoren</b> werden zur Worteinbettung addiert oder angehängt; Nachteil: begrenzte Länge, große Positionen kommen im Training selten vor (PDF-S. 64–67). <b>Trigonometrische Kodierung</b> (PDF-S. 68):</p>
+\[ \mathrm{POS}(i,d)=\begin{cases}\sin\!\big(i/10000^{d/d_{\text{model}}}\big)&amp;d\text{ gerade}\\ \cos\!\big(i/10000^{(d-1)/d_{\text{model}}}\big)&amp;d\text{ ungerade}\end{cases} \]
+<p><span class="layer" data-layer="deep">Vertiefung</span> Jedes Paar \((d,d+1)\) mit geradem \(d\) hat eine Frequenz \(\omega=10000^{-d/d_{\text{model}}}\). Für einen festen Abstand \(\Delta\) gilt nach den Additionstheoremen</p>
+\[ \begin{pmatrix}\sin\omega(i+\Delta)\\ \cos\omega(i+\Delta)\end{pmatrix}=\begin{pmatrix}\cos\omega\Delta&amp;\sin\omega\Delta\\ -\sin\omega\Delta&amp;\cos\omega\Delta\end{pmatrix}\begin{pmatrix}\sin\omega i\\ \cos\omega i\end{pmatrix}, \]
+<p>also ist die Kodierung von \(i+\Delta\) eine lineare Funktion der Kodierung von \(i\), die nur von \(\Delta\) abhängt – die Eigenschaft, die die Originalarbeit als Motivation nennt (§3.5). <span class="prov" data-kind="FORSCHUNG">Vaswani et al. 2017, §3.5</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §7.4, S. 191–193</span></p>
+<div class="worked"><h4>Durchgerechnet: die Verschiebung als Drehung</h4>
+<p>Mit \(d_{\text{model}}=4\) hat das erste Paar \((d=0,1)\) die Frequenz \(\omega=10000^{0}=1\). Kodierungen von Position 1 und 2 (Bogenmaß):</p>
+\[\begin{aligned}
+\big(\mathrm{POS}(1,0),\mathrm{POS}(1,1)\big)&amp;=(\sin1,\ \cos1)=(0{,}8415;\ 0{,}5403)\\
+\big(\mathrm{POS}(2,0),\mathrm{POS}(2,1)\big)&amp;=(\sin2,\ \cos2)=(0{,}9093;\ -0{,}4161)
+\end{aligned}\]
+<p>Die Verschiebung um \(\Delta=1\) ist die Drehung mit \(\cos1=0{,}5403\), \(\sin1=0{,}8415\):</p>
+\[ \begin{pmatrix}0{,}5403&amp;0{,}8415\\-0{,}8415&amp;0{,}5403\end{pmatrix}\begin{pmatrix}0{,}8415\\0{,}5403\end{pmatrix}=\begin{pmatrix}0{,}5403\cdot0{,}8415+0{,}8415\cdot0{,}5403\\-0{,}8415\cdot0{,}8415+0{,}5403\cdot0{,}5403\end{pmatrix}=\begin{pmatrix}0{,}9093\\-0{,}4161\end{pmatrix}. \]
+<p><b>Deutung.</b> Dieselbe Matrix bildet jede Position \(i\) auf \(i+1\) ab – sie hängt nur von \(\Delta\), nicht von \(i\) ab. Geometrisch wandert das Paar auf dem Einheitskreis jeweils um den Winkel \(\omega\Delta\) weiter. Paare mit kleinerem \(\omega\) (höheres \(d\)) drehen langsamer: Sie unterscheiden weit entfernte Positionen, die schnellen Paare benachbarte. <b>Gegenbeispiel:</b> Gelernte Positionsvektoren haben keine solche Struktur; zwischen \(p_i\) und \(p_{i+1}\) besteht nur die Beziehung, die das Training zufällig erzeugt.</p></div>
+<p><b>RoPE</b> (PDF-S. 69–70) dreht Query und Key in jedem 2D-Paar um den Winkel \(m\theta\) bzw. \(n\theta\). Mit der Drehmatrix \(R(\varphi)\):</p>
+\[ \big(R(m\theta)q\big)^\top R(n\theta)k=q^\top R(-m\theta)R(n\theta)k=q^\top R\big((n-m)\theta\big)k, \]
+<p>weil \(R(\varphi)^\top=R(-\varphi)\) und \(R(a)R(b)=R(a+b)\). Die Ähnlichkeit hängt nur vom <em>Abstand</em> \(n-m\) ab, obwohl jede Position absolut kodiert wird. <span class="prov" data-kind="FORSCHUNG">Su et al. 2024 (RoFormer), zitiert auf PDF-S. 69</span></p>
+<div class="task-ref" data-task="PO1"></div>
+</section>
+
+<section data-id="architektur" data-title="8 · Tiefe Architekturen">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p><b>Stapeln.</b> Schicht \(l\) eines mehrschichtigen RNN rechnet \(h^l_t=f(h^l_{t-1},h^{l-1}_t,\theta^l)\) mit \(h^0_t=x_t\); die Parameter werden zwischen Schichten meist nicht geteilt, bei fester Parameterzahl wägt man Tiefe gegen Breite ab. CNNs mit Schrittweite größer 1 verkürzen zusätzlich die Sequenz (PDF-S. 72–73).</p>
+<p><b>Residualverbindung</b> \(h=F(x)+x\) (PDF-S. 75). <span class="layer" data-layer="deep">Vertiefung</span> Warum hilft sie dem Gradientenfluss (PDF-S. 74)?</p>
+\[\begin{aligned}
+\frac{\partial h}{\partial x}&amp;=I+\frac{\partial F}{\partial x} &amp;&amp;\text{Kettenregel}\\
+\frac{\partial h_L}{\partial x_0}&amp;=\prod_{l=L}^{1}\big(I+J_l\big) &amp;&amp;J_l=\partial F_l/\partial h_{l-1}
+\end{aligned}\]
+<p>Ausmultipliziert enthält das Produkt den Summanden \(I\): einen Pfad, auf dem der Gradient ungeschwächt zurückfließt. Skalar mit \(J_l=0{,}1\) und \(L=10\): ohne Residual \(0{,}1^{10}=10^{-10}\), mit Residual \(1{,}1^{10}\approx2{,}5937\). Im Transformer bildet sie den „Residual Stream“, in den jede Teilschicht addiert. <span class="prov" data-kind="LEHRBUCH">SLP3 §7.2, S. 184–187, Gl. 7.29 und 7.32</span></p>
+<p><b>Rezeptives Feld und Richtung</b> (PDF-S. 76–77):</p>
+<table class="sym"><tr><th>Sequenzschicht</th><th>\(z_t\) sieht</th><th>Richtung</th></tr>
+<tr><td>CNN/TDNN</td><td>lokales Fenster; gestapelt \(L(w-1)+1\) Wörter</td><td>keine</td></tr>
+<tr><td>RNN/SSM</td><td>\(x_1,\dots,x_t\) (Satz 1)</td><td>links → rechts</td></tr>
+<tr><td>BiRNN</td><td>ganzer Satz (Satz 2)</td><td>beide</td></tr>
+<tr><td>Self-Attention</td><td>ganzer Satz; Reihenfolge nur über Positionskodierung (Satz 4)</td><td>keine</td></tr></table>
+</section>
+
+<section data-id="struktur" data-title="9 · Abhängigkeiten zwischen Labels">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>Gegenüber HMM und CRF arbeiten neuronale Tagger mit kontinuierlichen Repräsentationen; zu vergleichen sind Markov- und Unabhängigkeitsannahmen (PDF-S. 82). Drei Arten, Labels auszugeben:</p>
+<ul><li><b>Nicht autoregressiv</b> (PDF-S. 83): jedes Label aus \(z_t\) allein. Probleme: wiederholte und inkonsistente Labels.</li>
+<li><b>Autoregressiv</b> (PDF-S. 84): das vorige Label geht in die nächste Vorhersage ein – im Training das korrekte, im Test das vorhergesagte (Beam Search). Problem laut Folie: Label Bias.</li>
+<li><b>RNN + CRF</b> (PDF-S. 85): ein CRF über den Ausgaben bewertet ganze Labelfolgen.</li></ul>
+<p><span class="layer" data-layer="deep">Vertiefung</span> Ein linear-chain-CRF bewertet eine Folge mit</p>
+\[ S(x,y)=\sum_{t=1}^T\Big(s_t(y_t)+A_{y_{t-1},y_t}\Big)\quad\text{(unnormierter Score, }y_0=\text{Start)} \tag{9.1} \]
+\[ p(y\mid x)=\frac{\exp S(x,y)}{Z(x)},\qquad Z(x)=\sum_{y'\text{ gültig}}\exp S(x,y') \tag{9.2} \]
+<p>\(s_t\) sind die Emissionswerte des BiRNN, \(A\) gelernte Übergangswerte; \(A_{y_0,y_1}\) ist der Übergang vom Startsymbol. <b>Achtung:</b> Der Score (9.1) ist eine beliebige reelle Zahl und <em>nicht</em> normiert. Normiert wird erst die Wahrscheinlichkeit (9.2), und zwar über <em>alle</em> gültigen Folgen (global). Die beste Folge findet der Viterbi-Algorithmus in \(O(T|\mathcal L|^2)\); die Zustandssumme \(Z(x)\) berechnet der Forward-Algorithmus mit derselben Rekursion, in der das Maximum durch eine Summe ersetzt ist. Im Beispiel der Abbildung 9.1 hat der beste Pfad den Score \(S=4{,}5\), es ist \(Z\approx200{,}2664\) und damit \(p=e^{4{,}5}/Z\approx0{,}4495\). Setzt man verbotene Übergänge wie <code>O → I-LOC</code> auf \(-\infty\), kann keine ungültige Folge mehr gewinnen. <span class="prov" data-kind="LEHRBUCH">SLP3 §18.4.5 und §18.5, S. 411–419</span> <span class="prov" data-kind="FORSCHUNG">Lafferty et al. 2001; Lample et al. 2016</span></p>
+<div class="scene" data-scene="viterbi"></div>
+<p><b>Label Bias – was die Folie meint.</b> Ein autoregressiver Tagger mit <em>lokal</em> auf 1 normierten Schrittverteilungen \(p(y_t\mid y_{&lt;t},x)\) muss in jedem Zustand die ganze Masse an Nachfolger weitergeben; späte Evidenz kann eine frühe Entscheidung nicht abwerten (Lafferty et al. 2001). Andor et al. (2016) schließen daraus, dass global normierte Modelle „strictly more expressive“ sein können als lokal normierte (Abstract, S. 2442). Davon verschieden ist <b>Exposure Bias</b>: Training mit Gold-Vorgängern, Test mit eigenen Vorhersagen.</p>
+<div class="remark"><p><span class="layer" data-layer="research">Forschung</span> <b>Braucht man das CRF immer?</b> Nicht zwingend. Ratinov &amp; Roth (2009) fanden für ihr NER-System, dass gierige Dekodierung „comparably to beamsearch or Viterbi“ abschneidet und dabei viel schneller ist (S. 148). Lample et al. (2016) kombinieren dagegen BiLSTM und CRF. Welche Variante besser ist, ist eine empirische Frage des Systems. Konstruktiv garantiert ein CRF mit harten Übergangsregeln nur, dass keine <em>ungültige</em> BIO-Folge ausgegeben wird – nicht, dass Grenzen und Typen stimmen (siehe Fallstudie).</p></div>
+<div class="task-ref" data-task="C1"></div>
+<aside class="research"><h4>Forschungsfenster: Lokale gegen globale Normierung</h4><p><b>Frage.</b> Warum ein CRF statt eines Modells, das jedes Label lokal normiert vorhersagt?</p><p><b>Befund.</b> Andor et al. (2016) zeigen für übergangsbasierte neuronale Modelle, dass global normierte Modelle wegen des Label-Bias-Problems „strictly more expressive“ sein können als lokal normierte (Abstract, S. 2442). Das CRF selbst geht auf Lafferty et al. (2001) zurück; deren Arbeit wurde für diese Einheit nicht im Volltext gelesen.</p><p><b>Grenzen.</b> „Ausdrucksstärker“ ist eine Aussage über darstellbare Verteilungen, nicht über die Genauigkeit eines bestimmten trainierten Systems. Ratinov &amp; Roth (2009) fanden in ihrem System gierige Dekodierung vergleichbar mit Viterbi (siehe Abschnitt 2).</p><p><b>Bedeutung.</b> Beide Befunde passen zusammen: Globale Normierung beseitigt eine strukturelle Schwäche; ob das in einem konkreten System messbar hilft, ist eine empirische Frage.</p><p class="mute small">Belegstelle: <a class="cite" href="#ref-andor">Andor et al. 2016, S. 2442</a>; <a class="cite" href="#ref-lafferty">Lafferty et al. 2001</a>; <a class="cite" href="#ref-ratinov">Ratinov &amp; Roth 2009</a></p></aside>
+
+</section>
+
+<section data-id="prf" data-title="10 · Precision, Recall, F1">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>Ein System gibt eine Menge \(S\) von Entitäten aus, Gold enthält \(G\). TP \(=|S\cap G|\) (gefunden und richtig), FP \(=|S\setminus G|\) (falscher Alarm), FN \(=|G\setminus S|\) (verpasst).</p>
+\[ P=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FP}},\qquad R=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}} \]
+<p><b>Precision</b> ist der Anteil richtiger unter den Ausgaben, <b>Recall</b> der Anteil gefundener unter den Gold-Entitäten. <span class="prov" data-kind="KURS">PDF-S. 20–21</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §4.9, S. 112–114</span></p>
+<p><b>Warum keine True Negatives?</b> Ein TN wäre eine Spanne, die weder vorhanden noch vorhergesagt ist. Ein Satz mit \(T\) Wörtern hat \(T(T+1)/2\) mögliche Spannen – bei 30 Wörtern 465. Eine Kennzahl mit TN würde von dieser Zahl erdrückt.</p>
+<h3>\(F_1\) herleiten</h3>
+<p>Wie viel „Aufwand“ kostet ein Treffer?</p>
+\[\begin{aligned}
+\frac1P&amp;=\frac{\mathrm{TP}+\mathrm{FP}}{\mathrm{TP}} &amp;&amp;\text{Ausgaben pro Treffer}\\
+\frac1R&amp;=\frac{\mathrm{TP}+\mathrm{FN}}{\mathrm{TP}} &amp;&amp;\text{Gold pro Treffer}\\
+F_1:=\Big[\frac12\Big(\frac1P+\frac1R\Big)\Big]^{-1}&amp;=\frac{2\,\mathrm{TP}}{2\,\mathrm{TP}+\mathrm{FP}+\mathrm{FN}} &amp;&amp;\text{Kehrwert des mittleren Aufwands}
+\end{aligned}\]
+<p>Das ist das harmonische Mittel; ausmultipliziert \(F_1=\frac{2PR}{P+R}\) (PDF-S. 20). Die <b>Zählform</b> rechts ist die Formel zum Rechnen. Allgemeiner \(F_\beta=\frac{(1+\beta^2)PR}{\beta^2P+R}\). <span class="prov" data-kind="LEHRBUCH">SLP3 §4.9, S. 114, Gl. 4.42–4.44</span></p>
+<p><b>Warum das harmonische Mittel?</b> Ein System, das fast alles markiert, hat etwa \(R=1\), \(P=0{,}1\): gewöhnliches Mittel \(0{,}55\), \(F_1\approx0{,}182\). Satz 6 zeigt: \(F_1\le2\min(P,R)\).</p>
+<div class="scene" data-scene="f1"></div>
+<h3>Wenn Nenner 0 werden</h3>
+<table class="edge"><tr><th>Fall</th><th>\(P\)</th><th>\(R\)</th><th>\(2PR/(P+R)\)</th><th>Zählform</th></tr>
+<tr><td>(i) TP &gt; 0</td><td>&gt; 0</td><td>&gt; 0</td><td>definiert</td><td>gleicher Wert (Satz 5)</td></tr>
+<tr><td>(ii) TP = 0, FP &gt; 0, FN &gt; 0</td><td>\(0\)</td><td>\(0\)</td><td>\(0/0\)</td><td>\(0\)</td></tr>
+<tr><td>(iii) keine Ausgabe, FN &gt; 0</td><td>\(0/0\)</td><td>\(0\)</td><td>nicht anwendbar</td><td>\(0\)</td></tr>
+<tr><td>(iv) Gold leer, FP &gt; 0</td><td>\(0\)</td><td>\(0/0\)</td><td>nicht anwendbar</td><td>\(0\)</td></tr>
+<tr><td>(v) beides leer</td><td>\(0/0\)</td><td>\(0/0\)</td><td>nicht anwendbar</td><td>\(0/0\), nur per Konvention</td></tr></table>
+<div class="thm"><b>Satz 5 (Zählform).</b> Für \(\mathrm{TP}&gt;0\) gilt \(\frac{2PR}{P+R}=\frac{2\mathrm{TP}}{2\mathrm{TP}+\mathrm{FP}+\mathrm{FN}}\). Für \(\mathrm{TP}=0\) ist \(\frac{2PR}{P+R}\) in keinem Fall definiert, die Zählform in allen Fällen außer (v), dort mit Wert 0.</div>
+<div class="proof"><p><em>Beweis.</em> Für \(\mathrm{TP}&gt;0\) seien \(a=\mathrm{TP}+\mathrm{FP}\), \(c=\mathrm{TP}+\mathrm{FN}\); dann \(a+c=2\mathrm{TP}+\mathrm{FP}+\mathrm{FN}\).</p>
+\[\begin{aligned}
+2PR&amp;=\frac{2\,\mathrm{TP}^2}{ac},\qquad P+R=\frac{\mathrm{TP}\,(a+c)}{ac} &amp;&amp;\text{Hauptnenner}\\
+\frac{2PR}{P+R}&amp;=\frac{2\,\mathrm{TP}^2}{ac}\cdot\frac{ac}{\mathrm{TP}\,(a+c)}=\frac{2\,\mathrm{TP}}{a+c} &amp;&amp;\text{kürzen (}\mathrm{TP}&gt;0)
+\end{aligned}\]
+<p>Für \(\mathrm{TP}=0\): in (ii) \(P=R=0\), also \(0/0\); in (iii)–(v) ist \(P\) oder \(R\) undefiniert. Die Zählform hat den Nenner \(\mathrm{FP}+\mathrm{FN}\), der nur in (v) verschwindet. \(\square\)</p></div>
+<p><b>Konvention.</b> scikit-learn 1.9.1 setzt bei \(0/0\) über <code>zero_division</code> 0 (Standard, mit Warnung), 1 oder <code>np.nan</code> (die Klasse fällt aus Mittelwerten heraus). Nennen Sie die Konvention, wenn Fall (v) auftreten kann. <span class="prov" data-kind="VERTIEFUNG">scikit-learn-Dokumentation</span></p>
+<div class="thm"><b>Satz 6 (Lage von \(F_1\)).</b> Für \(P,R\in(0,1]\): \(\min(P,R)\le F_1\le\max(P,R)\), \(F_1\le\tfrac{P+R}{2}\), \(F_1\le 2\min(P,R)\).</div>
+<div class="proof"><p><em>Beweis.</em> O. B. d. A. \(P\le R\) (\(F_1\) ist symmetrisch); multipliziert wird mit \(P+R&gt;0\):</p>
+\[\begin{aligned}
+F_1\ge P &amp;\iff 2PR\ge P^2+PR \iff R\ge P &amp;&amp;\text{wahr (}P&gt;0)\\
+F_1\le R &amp;\iff 2PR\le PR+R^2 \iff P\le R &amp;&amp;\text{wahr (}R&gt;0)\\
+\tfrac{P+R}{2}-F_1&amp;=\tfrac{(P-R)^2}{2(P+R)}\ge0 &amp;&amp;\text{binomische Formel}\\
+F_1\le 2P &amp;\iff 2PR\le 2P^2+2PR &amp;&amp;\text{wahr}\qquad\square
+\end{aligned}\]</div>
+<div class="task-ref" data-task="B3"></div>
+</section>
+
+<section data-id="einheit" data-title="11 · Was wird gezählt?">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<ul><li><b>Phrasen-Ebene:</b> Einheit = Spanne (Anfang, Ende, Typ); ein Treffer nur bei exakt gleichen Grenzen und gleichem Typ. Konvention der CoNLL-2003-Auswertung. <span class="prov" data-kind="LEHRBUCH">SLP3 §9.5.4, S. 241</span></li>
+<li><b>Token-Ebene:</b> Einheit = Wort mit Entitätstyp (B-/I- ignoriert); Wörter, die in Gold und System O sind, zählen nicht.</li></ul>
+<p>Folienbeispiel (PDF-S. 21–22): Gold <code>[First Bank of Chicago]ORG</code>, <code>[$200,000,000]MONEY</code>; ein System findet <code>[Bank of Chicago]ORG</code> und den Betrag.</p>
+\[\begin{aligned}
+\text{Phrasen:}\quad&amp;\mathrm{TP}=1,\ \mathrm{FP}=1,\ \mathrm{FN}=1 &amp;&amp;F_1=\tfrac{2}{2+1+1}=\tfrac12\\
+\text{Token:}\quad&amp;\mathrm{TP}=4,\ \mathrm{FP}=0,\ \mathrm{FN}=1 &amp;&amp;F_1=\tfrac{8}{8+0+1}=\tfrac89
+\end{aligned}\]
+<p>Ein falsch gesetzter Spannenanfang kostet auf Phrasen-Ebene zwei Zählungen (FP und FN), auf Token-Ebene eine. Die Folie: Phrasen-Zählung bestraft Teilüberlappung, Token-Zählung belohnt sie, gewichtet aber lange Entitäten stärker.</p>
+<div class="scene" data-scene="counter"></div>
+<p><span class="layer" data-layer="research">Kritik</span> Weil ein knapp verfehlter Versuch zwei Fehler kostet, das Weglassen nur einen, kann ein System sein \(F_1\) verbessern, indem es unsichere Entitäten gar nicht ausgibt (Manning 2006, Blogbeitrag). Die MUC-Bewertung, die die Folie erwähnt, vergibt deshalb Teilpunkte für Typ und Grenzen.</p>
+<div class="task-ref" data-task="B4"></div>
+<div class="task-ref" data-task="B5"></div>
+<aside class="research"><h4>Forschungsfenster: Optimiert man das Falsche, wenn man F1 optimiert?</h4><p><b>Frage.</b> Belohnt Phrasen-\(F_1\) das richtige Verhalten?</p><p><b>Befund.</b> Manning (2006) zählt Fehlerarten einzeln: Ein Typfehler, ein Grenzfehler und ein Typ-und-Grenzfehler kosten jeweils „a minimum of 2 demerits“, weil Precision und Recall getroffen werden; ein Weglassen kostet nur einen.</p><p><b>Grenzen.</b> Ein Blogbeitrag, kein begutachteter Artikel; das Argument ist aber elementar nachprüfbar (Abschnitt 11, Aufgabe B4).</p><p><b>Bedeutung.</b> Wer ein System nach \(F_1\) abstimmt, kann es unbeabsichtigt zu vorsichtigem Weglassen erziehen. Für Anwendungen, in denen eine fast richtige Entität nützlich ist, sind Token- oder MUC-ähnliche Maße zusätzlich zu berichten.</p><p class="mute small">Belegstelle: <a class="cite" href="#ref-manning">Manning 2006</a></p></aside>
+
+</section>
+
+<section data-id="mittelung" data-title="12 · Micro und Macro">
+<p><span class="layer" data-layer="core">Klausurkern</span></p>
+<p>Mit Zählungen je Typ \(k=1,\dots,K\):</p>
+\[ F_1^{\text{micro}}=\frac{2\sum_k\mathrm{TP}_k}{\sum_k\big(2\mathrm{TP}_k+\mathrm{FP}_k+\mathrm{FN}_k\big)},\qquad F_1^{\text{macro}}=\frac1K\sum_{k=1}^K F_{1,k} \tag{12.1} \]
+<p><span class="layer" data-layer="deep">Vertiefung</span> <b>Wie stark zählt ein Typ in Micro-\(F_1\)?</b> Setze \(D_k=2\mathrm{TP}_k+\mathrm{FP}_k+\mathrm{FN}_k\), den Nenner von \(F_{1,k}\). Für \(\sum_kD_k&gt;0\) und über alle Typen mit \(D_k&gt;0\):</p>
+\[ F_1^{\text{micro}}=\frac{\sum_k 2\mathrm{TP}_k}{\sum_l D_l}=\sum_k\frac{D_k}{\sum_lD_l}\cdot\frac{2\mathrm{TP}_k}{D_k}=\sum_k w_k\,F_{1,k},\qquad w_k=\frac{D_k}{\sum_l D_l}. \]
+<p>Micro-\(F_1\) ist ein gewichtetes Mittel der Typ-\(F_1\)-Werte – gewichtet mit \(D_k\), also mit Treffern <em>und</em> Fehlern des Typs, <b>nicht</b> mit seinem Gold-Anteil (Support) \(\mathrm{TP}_k+\mathrm{FN}_k\). Ein Typ mit vielen Fehlalarmen bekommt mehr Gewicht, als sein Gold-Anteil hergibt. Davon zu unterscheiden ist das <b>support-gewichtete Macro-\(F_1\)</b> (scikit-learn <code>average='weighted'</code>) mit Gewichten \(\mathrm{TP}_k+\mathrm{FN}_k\). Typen mit \(D_k=0\) (Gold leer, nichts vorhergesagt) tragen zu Micro nichts bei; bei Macro entscheidet die Konvention für \(0/0\).</p>
+<p><b>Durchgerechnet.</b> PER: TP 45, FP 5, FN 5 · LOC: 30, 10, 10 · ORG: 20, 15, 15 · MISC: 1, 4, 9.</p>
+\[\begin{aligned}
+D&amp;=(100,\ 80,\ 70,\ 15),\quad \textstyle\sum D=265 &amp;&amp;D_k=2\mathrm{TP}_k+\mathrm{FP}_k+\mathrm{FN}_k\\
+F_{1,k}&amp;=\big(0{,}9;\ 0{,}75;\ 0{,}5714;\ 0{,}1333\big) &amp;&amp;2\mathrm{TP}_k/D_k\\
+F_1^{\text{micro}}&amp;=\tfrac{90+60+40+2}{265}=\tfrac{192}{265}\approx0{,}7245 &amp;&amp;\text{Gewichte }D_k/265\\
+F_1^{\text{macro}}&amp;=\tfrac14(0{,}9+0{,}75+0{,}5714+0{,}1333)=\tfrac{989}{1680}\approx0{,}5887 &amp;&amp;\text{Gewicht je Typ }\tfrac14
+\end{aligned}\]
+<p>MISC hat in Micro das Gewicht \(15/265\approx0{,}0566\), in Macro \(0{,}25\). Ohne MISC wären Micro 0,76 und Macro 0,7405.</p>
+<div class="scene" data-scene="micromacro"></div>
+<div class="thm"><b>Satz 7 (wann Micro-\(F_1\) = Accuracy).</b> Hat jedes Token genau ein Gold- und ein System-Label und werden <em>alle</em> Labels einschließlich O als Klassen gepoolt, so ist \(F_1^{\text{micro}}\) der Anteil richtig markierter Token.</div>
+<div class="proof">\[\begin{aligned}
+&amp;\text{Fehler mit Gold }a\ne\text{System }b\ \Rightarrow\ \text{ein FP (für }b)\text{ und ein FN (für }a) &amp;&amp;\text{ein Label je Token}\\
+&amp;\textstyle\sum_k\mathrm{FP}_k=\sum_k\mathrm{FN}_k=E,\quad \sum_k\mathrm{TP}_k=N-E &amp;&amp;E\text{ Fehler, }N\text{ Token}\\
+&amp;F_1^{\text{micro}}=\frac{2(N-E)}{2(N-E)+2E}=\frac{N-E}{N} &amp;&amp;\square
+\end{aligned}\]</div>
+<p>Deshalb lässt die NER-Auswertung O weg. <b>Zwei „Macro-F1“:</b> Manche Arbeiten bilden \(F_1\) aus gemitteltem \(P\) und gemitteltem \(R\); im Beispiel \(\approx0{,}5926\) statt \(0{,}5887\). Nennen Sie die Definition. <span class="prov" data-kind="FORSCHUNG">Opitz &amp; Burst 2019 (Preprint)</span></p>
+<div class="task-ref" data-task="B6"></div>
+</section>
+
+<section data-id="fallstudie" data-title="13 · Fallstudie: ein NER-System von Ende zu Ende">
+<p><span class="layer" data-layer="research">Fallstudie</span> Alle Daten sind synthetisch, für diese Einheit erstellt. Die Emissionswerte stehen für die Ausgabe eines trainierten BiRNN; sie sind vorgegeben, nicht gelernt. Der Ablauf ist der eines echten Systems:</p>
+<ol class="big">
+<li><b>Daten und Tokenisierung.</b> Drei Sätze, wortweise tokenisiert; Gold nach den Richtlinien aus Abschnitt 1 in BIO annotiert.</li>
+<li><b>Modell.</b> Einbettung → BiRNN → Emissionswerte \(s_t(\ell)\) je Wort und Label (Abschnitt 5).</li>
+<li><b>Dekodierung, zweimal:</b> gierig (\(\arg\max\) je Wort) und Viterbi mit BIO-Übergangsregeln (Abschnitt 9).</li>
+<li><b>Auswertung</b> auf Phrasen- und Token-Ebene, Micro und Macro (Abschnitte 10–12).</li>
+<li><b>Fehleranalyse</b> nach Fehlerart: Typfehler (gleiche Grenzen, falscher Typ), Grenzfehler (gleicher Typ, überlappend), beides, verpasst, erfunden.</li></ol>
+<div class="casestudy" data-case="ner"></div>
+<p><b>Was die Fallstudie zeigt.</b> Viterbi repariert genau den Fehler, den eine BIO-Regel ausschließt: Gierig steht bei „New York“ <code>B-LOC I-ORG</code>, was <code>conlleval</code> als zwei falsche Spannen [New]LOC und [York]ORG liest; Viterbi verbietet <code>B-LOC → I-ORG</code> und wählt <code>I-LOC</code>. Phrasen-\(F_1\) steigt von \(8/17\approx0{,}4706\) auf \(5/8=0{,}625\). Nicht repariert werden der gültige Grenzfehler bei „Berlin .“, die verkürzte Spanne „Barack“ und der Typfehler bei „Siemens“. Dafür braucht es bessere Emissionen: mehr Kontext, Weltwissen, Daten aus der Zieldomäne.</p>
+<p><b>Feinheit der Auswertung.</b> Weil <code>conlleval</code> ein ungültiges <code>I-X</code> als neue Spanne liest, ändert die Reparatur das Ergebnis nur dann, wenn sie andere Spannen ergibt. Ein <code>O I-ORG</code>, das ohnehin als [ORG] gelesen wird, hätte dieselbe Bewertung wie <code>O B-ORG</code>.</p>
+<p><b>Was moderne Tagger ändern.</b> Heute ersetzt meist ein vortrainierter bidirektionaler Transformer-Encoder das BiRNN (Vorlesung Kap. 10). Zwei praktische Unterschiede: Self-Attention sieht den ganzen Satz in einer Schicht (Abschnitt 8), und die Eingabe besteht aus <em>Subwort</em>-Token. Das Training überträgt das Wort-Label auf alle Subwörter; dekodiert wird etwa mit dem Label des ersten Subworts. <span class="prov" data-kind="LEHRBUCH">SLP3 §9.5.3, S. 239–241</span> Die Evaluationslogik dieses Kapitels gilt unverändert.</p>
+<div class="task-ref" data-task="F1"></div>
+</section>
+
+<section data-id="summary" data-title="Zusammenfassung">
+<p>NER sucht Spannen; BIO macht daraus eindeutig ein Label pro Wort (Satz A). Welche Information ein Tagger an Position \(t\) nutzen kann, legt seine Sequenzschicht fest: Fenster sehen lokal, ein Vorwärts-RNN genau \(x_1,\dots,x_t\) (Satz 1), ein BiRNN den ganzen Satz um den Preis der Latenz (Satz 2), Self-Attention den ganzen Satz, aber ohne Reihenfolge (Satz 4) – daher Positionskodierungen, deren Sinus- und RoPE-Varianten relative Abstände linear bzw. exakt sichtbar machen. Die Skalierung mit \(\sqrt{d_k}\) hält die Energien bei Varianz 1 (Satz 3); Residualverbindungen geben dem Gradienten einen direkten Pfad. Ob Labels zueinander passen, sichert erst ein strukturierter Decoder, und auch der nur für ungültige Folgen. Gemessen wird mit \(F_1\), dem harmonischen Mittel von \(P\) und \(R\), in Zählform definiert, sobald es überhaupt eine Gold- oder System-Entität gibt (Satz 5); die Zähleinheit kann Rangfolgen umdrehen, und Micro-\(F_1\) ist ein mit \(2\mathrm{TP}_k+\mathrm{FP}_k+\mathrm{FN}_k\) gewichtetes Mittel – nicht mit dem Gold-Anteil.</p>
+</section>

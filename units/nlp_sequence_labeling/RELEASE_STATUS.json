@@ -1,0 +1,145 @@
+{
+ "unit": "nlp-sequence-labeling",
+ "history": [
+  {
+   "version": 1,
+   "commit": "e01232e",
+   "status": "HUMAN_REJECTED",
+   "date": "2026-11-14",
+   "ratings": {
+    "textbook": "1/4",
+    "mathematics": "0/4",
+    "visuals": "0/4",
+    "learning_process": "1/4",
+    "exam_readiness": "1/4"
+   },
+   "ref": "Issue #4"
+  },
+  {
+   "version": 2,
+   "status": "NOT RELEASABLE (open defects documented in Issues #4-#6)",
+   "date": "2026-11-14",
+   "ref": "docs/reference_unit/ISSUE4_CORRECTIONS.md"
+  },
+  {
+   "version": 3,
+   "status": "HUMAN_REJECTED",
+   "date": "2026-11-14",
+   "ref": "Issue #7",
+   "ratings": {
+    "textbook": "2/4",
+    "mathematics_derivations": "0/4",
+    "literature_research_cases": "1/4",
+    "visuals_animations": "1/4",
+    "design_pdf_formulas": "1/4",
+    "workbook": "0/4",
+    "anki_academic": "1/4",
+    "anki_design": "0/4"
+   },
+   "commit": "a1d1aa7"
+  },
+  {
+   "version": 4,
+   "status": "HUMAN_REJECTED",
+   "date": "2026-11-14",
+   "ref": "Issue #8",
+   "commit": "f27a3d3",
+   "ratings": {
+    "scientific.textbook": "2/4",
+    "scientific.mathematics_derivations": "1/4",
+    "scientific.books_research_cases": "1/4",
+    "scientific.pdf_layout": "1/4",
+    "scientific.workbook": "2/4",
+    "scientific.worked_solutions": "1/4",
+    "scientific.mock_exams": "1/4",
+    "anki.academic_content": "2/4",
+    "anki.html_css_media": "1/4",
+    "anki.long_term_usefulness": "2/4",
+    "lab.mathematical_visualization": "0/4",
+    "lab.playful_experimentation": "0/4",
+    "lab.interaction_feedback": "0/4",
+    "lab.understanding_gain": "0/4",
+    "lab.ux_design": "0/4",
+    "system_integration": "1/4",
+    "exam_core_vs_deeper_mastery": "1/4"
+   },
+   "mean": "16/17 = 0.94/4 (descriptive; not comparable with earlier scorecards)",
+   "critical_factual_errors_reported": "none",
+   "ci_note": "Green CI at f27a3d3 (run 43630074107: 659 passed, 6 skipped) is technical success, not academic approval."
+  },
+  {
+   "version": 5,
+   "status": "HUMAN_REJECTED",
+   "date": "2026-11-15",
+   "ref": "Issue #8 (v5 review comment) and Issue #9",
+   "note": "No self-release. Owner re-rates all 17 dimensions.",
+   "evidence": "docs/reference_unit/review_v5/",
+   "commit": "a3ae947",
+   "ratings": {
+    "scientific.textbook": "2/4",
+    "scientific.mathematics_derivations": "1/4",
+    "scientific.books_research_cases": "1/4",
+    "scientific.pdf_layout": "2/4",
+    "scientific.workbook": "1/4",
+    "scientific.worked_solutions": "1/4",
+    "scientific.mock_exams": "1/4",
+    "anki.academic_content": "1/4",
+    "anki.html_css_media": "1/4",
+    "anki.long_term_usefulness": "1/4",
+    "lab.mathematical_visualization": "2/4",
+    "lab.free_experimentation": "2/4",
+    "lab.interaction_feedback": "2/4",
+    "lab.understanding_gain": "1/4",
+    "lab.ux_design": "2/4",
+    "system_integration": "1/4",
+    "exam_core_vs_deeper_mastery": "NOT RATED"
+   },
+   "mean": "22/16 = 1.375/4 (16 of 17 rated); lab mean 9/5 = 1.8/4",
+   "critical_factual_errors_reported": "none by owner; independent code review noted two math edge-case errors (T->0 with tied maxima on hull card; Jacobian convergence needs temperature conditions) - corrected in v6"
+  },
+  {
+   "version": 6,
+   "status": "HUMAN_REJECTED",
+   "date": "2026-11-15",
+   "ref": "Issue #10",
+   "note": "No self-release.",
+   "commit": "67460ff",
+   "ratings": {
+    "analysis_lab_proof_safety": "2/4",
+    "certificate_math_correctness": "2/4",
+    "source_literature_quality": "1/4",
+    "autonomous_source_research": "1/4",
+    "original_examples_tasks": "1/4",
+    "analysis_ent_labs": "1/4",
+    "chatgpt_tutor": "NOT RATED",
+    "qc_honesty": "NOT RATED"
+   },
+   "mean": "8/6 = 1.333/4",
+   "critical_errors_reported": "none by owner; review found cos-interval false negative (fixed in v7)"
+  },
+  {
+   "version": 7,
+   "status": "HUMAN_REVIEW_PENDING",
+   "date": "2026-11-15",
+   "ref": "Issue #10 – reference vertical slice: Self-Attention softmax & convex combination",
+   "note": "No self-release."
+  }
+ ],
+ "rule": "Only a human rating changes a status. CI and agent checks never do.",
+ "status_taxonomy": {
+  "TECHNICAL_PASS": "CI/tests green – says nothing about academic quality",
+  "CONTENT_CORRECTNESS_REVIEW_REQUIRED": "mathematics/claims need expert check",
+  "DIDACTIC_REVIEW_REQUIRED": "learning design needs human review",
+  "PUBLISHING_REVIEW_REQUIRED": "editorial/visual review of rendered products by a human",
+  "HUMAN_REJECTED": "owner decision; only a new human rating changes it"
+ },
+ "current": {
+  "v7": [
+   "TECHNICAL_PASS (pending CI)",
+   "CONTENT_CORRECTNESS_REVIEW_REQUIRED",
+   "DIDACTIC_REVIEW_REQUIRED",
+   "PUBLISHING_REVIEW_REQUIRED"
+  ],
+  "v6.1": "HUMAN_REJECTED"
+ }
+}

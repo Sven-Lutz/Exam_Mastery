@@ -1,0 +1,410 @@
+{
+ "module": {
+  "id": "ent-funding",
+  "title": "Entrepreneurship – Funding a Venture",
+  "domain": "business",
+  "language": "de"
+ },
+ "generated": "2026-11-15",
+ "scope": {
+  "summary": "Kapitel 6 der Vorlesung Entrepreneurship: Finanzierungsformen (Eigen-, Mezzanine-, Fremdkapital), Risiko und Insolvenz, Lebens- und Finanzierungszyklus, Business Angels, Venture Capital (Fondsstruktur, Potenzialanforderung), Finanzierungsprozess (Deal Origination, Screening, Closing, Tranchen, Exit), Scheitern von Start-ups, HTGF-Beispiel mit Wandeldarlehen, Pre-/Post-Money-Bewertung und Verwässerung über zwei Runden.",
+  "official": [
+   "Vorlesungsfolien Entrepreneurship, Kap. 6 „Funding a Venture“ (private Kursunterlage; Abschnittstitel als Lokatoren)"
+  ],
+  "note": "Zahlen der Folien zum Markt werden nicht übernommen; eigene Rechnungen sind als solche gekennzeichnet."
+ },
+ "exam": {
+  "summary": "Offizielle Angaben zu Dauer und Hilfsmitteln liegen nicht vor. Kapitelbezogen prüfbar: Begriffe und Unterschiede der Kapitalformen, Phasen- und Investorenlogik, Rechnungen zu Pre-/Post-Money, Anteilen und Verwässerung, Begründung der VC-Potenzialanforderung.",
+  "known": false
+ },
+ "notation": [
+  {
+   "symbol": "V_pre, V_post",
+   "meaning": "Bewertung vor bzw. nach der Investition I; V_post = V_pre + I"
+  },
+  {
+   "symbol": "I/(V_pre + I)",
+   "meaning": "Anteil des neuen Investors nach der Runde"
+  },
+  {
+   "symbol": "A, C, d",
+   "meaning": "SAFE-Betrag, Post-Money-Cap, Rabatt"
+  },
+  {
+   "symbol": "TVPI",
+   "meaning": "Netto-Rückfluss an Fondsinvestoren / Fondsgröße (hier vereinfacht)"
+  }
+ ],
+ "kcs": [
+  {
+   "id": "formen",
+   "label": "Kapitalformen und Risikoklassen",
+   "tier": "core",
+   "prerequisites": [
+    "ext:Bilanz Grundbegriffe"
+   ],
+   "objectives": [
+    "Eigen-, Mezzanine- und Fremdkapital nach Haftung, Rückzahlung, Mitsprache unterscheiden",
+    "Liquidationsrangfolge an einem Beispiel durchrechnen"
+   ],
+   "misconceptions": [
+    "Eigenkapital ist kostenlos, weil keine Zinsen anfallen"
+   ],
+   "products": {},
+   "sources": [
+    "kurs"
+   ]
+  },
+  {
+   "id": "zyklus",
+   "label": "Lebens- und Finanzierungszyklus, passende Kapitalquelle",
+   "tier": "core",
+   "prerequisites": [
+    "formen"
+   ],
+   "objectives": [
+    "Begründen, warum Banken frühe Start-ups kaum finanzieren",
+    "Business Angel vs. VC nach Motiv und Kriterien abgrenzen"
+   ],
+   "misconceptions": [],
+   "products": {},
+   "sources": [
+    "kurs",
+    "htgf"
+   ]
+  },
+  {
+   "id": "vc",
+   "label": "VC-Fondslogik und Potenzialanforderung",
+   "tier": "core",
+   "prerequisites": [
+    "zyklus"
+   ],
+   "objectives": [
+    "Mit Fondsgröße, Anteil und Gebühren berechnen, welcher Exit den Fonds zurückzahlt",
+    "Erklären, warum wenige Ausreißer die Rendite tragen"
+   ],
+   "misconceptions": [
+    "Ein VC optimiert die Überlebenswahrscheinlichkeit einzelner Beteiligungen"
+   ],
+   "products": {
+    "lab": [
+     {
+      "lab": "runden",
+      "item": "v4"
+     },
+     {
+      "lab": "runden",
+      "item": "w-fund"
+     }
+    ],
+    "tasks": [
+     "EN3",
+     "EN5"
+    ]
+   },
+   "sources": [
+    "kurs",
+    "knr-2014"
+   ]
+  },
+  {
+   "id": "prozess",
+   "label": "Finanzierungsprozess, Tranchen, Vertragsrechte",
+   "tier": "deep",
+   "prerequisites": [
+    "vc"
+   ],
+   "objectives": [
+    "Begründen, warum in Tranchen ausgezahlt wird",
+    "Trennung von Cash-Flow- und Kontrollrechten erläutern"
+   ],
+   "misconceptions": [],
+   "products": {},
+   "sources": [
+    "kurs",
+    "kaplan-stromberg"
+   ]
+  },
+  {
+   "id": "bewertung",
+   "label": "Pre-/Post-Money, Wandelinstrumente und Verwässerung",
+   "tier": "core",
+   "prerequisites": [
+    "formen"
+   ],
+   "objectives": [
+    "Kapitalisierungstabelle über SAFE/Wandeldarlehen, Seed und Serie A aufstellen",
+    "Cap und Rabatt vergleichen",
+    "Verwässerung von Wertverlust unterscheiden"
+   ],
+   "misconceptions": [
+    "Verwässerung bedeutet immer Geldverlust",
+    "Optionspool belastet den neuen Investor",
+    "höherer Cap kann dem Investor mehr geben"
+   ],
+   "products": {
+    "lab": [
+     {
+      "lab": "runden",
+      "item": "v1"
+     },
+     {
+      "lab": "runden",
+      "item": "v2"
+     },
+     {
+      "lab": "runden",
+      "item": "v3"
+     },
+     {
+      "lab": "runden",
+      "item": "w-imp"
+     }
+    ],
+    "tasks": [
+     "EN1",
+     "EN2",
+     "EN4"
+    ]
+   },
+   "sources": [
+    "kurs",
+    "yc-safe"
+   ]
+  }
+ ],
+ "tasks": [
+  {
+   "id": "EN1",
+   "kc": "bewertung",
+   "stage": "worked",
+   "prompt": "Stellen Sie die Kapitalisierungstabelle aus Beispiel X1 nach Seed auf: SAFE-Aktien, neue Pool-Aktien, Preis je Anteil, Anteile aller Gesellschafter.",
+   "hints": [
+    "SAFE: x/(S₀ + x) = A/C.",
+    "Pre-Money-Aktien D enthalten SAFE und neuen Pool; Preis = V/D.",
+    "Pool nach der Runde = 10 % aller Aktien."
+   ]
+  },
+  {
+   "id": "EN2",
+   "kc": "bewertung",
+   "stage": "transfer",
+   "prompt": "Gleiche Daten wie X1, aber Seed-Pre-Money nur 5 Mio. €. Gilt für den SAFE der Cap oder der Rabatt? Begründen Sie mit beiden Umwandlungspreisen.",
+   "hints": [
+    "Cap-Preis = Cap / Kapitalisierung vor der Runde.",
+    "Rabattpreis = 0,8 × Rundenpreis; der Rundenpreis hängt von der Umwandlung ab."
+   ]
+  },
+  {
+   "id": "EN3",
+   "kc": "vc",
+   "stage": "independent",
+   "prompt": "Ein 150-Mio.-€-Fonds hält bei Exit typischerweise 12 % je Beteiligung. Ab welchem Exitwert zahlt eine einzelne Beteiligung den Fonds zurück? Welcher Bruttorückfluss ist für 2× netto bei 20 % Carry nötig?",
+   "hints": [
+    "Fondsgröße / Anteil.",
+    "netto = brutto − 0,2·(brutto − Fonds)."
+   ]
+  },
+  {
+   "id": "EN4",
+   "kc": "bewertung",
+   "stage": "error",
+   "prompt": "Die Folie sagt: „Verwässerung bedeutet, dass die Gründer Geld verlieren.“ Formulieren Sie die Aussage so, dass sie stimmt, und belegen Sie mit X1.",
+   "hints": [
+    "Unterscheiden Sie Anteil und Wert.",
+    "Wert = Anteile × Preis je Anteil."
+   ]
+  },
+  {
+   "id": "EN5",
+   "kc": "vc",
+   "stage": "case",
+   "prompt": "Ein Fonds investiert je 1 Mio. € in 20 Start-ups. Ergebnis: 14 Totalverluste, 4 Rückzahlungen zum Einstand (1×), eine Beteiligung mit 5× und eine mit 60×. Bestimmen Sie Median-Multiple und Brutto-Fondsmultiple sowie den Anteil des größten Ausreißers am Rückfluss. Welche Aussage von Kerr, Nanda und Rhodes-Kropf (2014) illustriert das?",
+   "hints": [
+    "Sortieren Sie die 20 Multiples; der Median ist der Mittelwert des 10. und 11. Werts.",
+    "Rückfluss = Σ Multiple × 1 Mio. €."
+   ]
+  }
+ ],
+ "examples": [
+  {
+   "id": "X1",
+   "kc": "bewertung",
+   "title": "Drei Runden mit Post-Money-SAFE: Anteil sinkt, Wert steigt",
+   "summary": "Gründer mit 1 Mio. Anteilen; SAFE 500 Tsd. € bei Post-Money-Cap 5 Mio. € (20 % Rabatt); Seed 2 Mio. € bei 8 Mio. € Pre-Money mit 10 % Pool-Ziel; Serie A 6 Mio. € bei 24 Mio. € Pre-Money. Ergebnis (exakt): SAFE vor Seed 10 %, nach Seed 7 %; Gründer 63 % → 50,4 %; Preis je Anteil 6,30 € → 15,12 €; Gründerwert 6,3 → 15,12 Mio. €. Gegenbeispiele: Down-Round (Pre-Money 6 Mio. €) senkt den Gründerwert auf 3,78 Mio. €; bei Seed-Pre-Money 5 Mio. € greift der Rabatt statt des Caps."
+  },
+  {
+   "id": "X2",
+   "kc": "vc",
+   "title": "Fondslogik: Was ein Exit leisten muss",
+   "summary": "100-Mio.-€-Fonds, 15 % Anteil bei Exit: Ein Exit zahlt den Fonds ab ≈ 667 Mio. € zurück. 25 solide Exits zu je 40 Mio. € ergeben nur 1,4× netto (nach 20 % Carry); für 3× netto braucht es 350 Mio. € brutto, also einen Exit von ≈ 2,33 Mrd. €. Eigene Rechnung, keine Marktdaten."
+  },
+  {
+   "id": "X3",
+   "kc": "bewertung",
+   "title": "Zahlenprobe der Aufgaben EN1–EN3",
+   "summary": "Prüft alle Zahlen der Arbeitsaufgaben unabhängig."
+  },
+  {
+   "id": "X4",
+   "kc": "vc",
+   "title": "Median 0×, Fonds 3,45×: ein Ausreißer trägt alles",
+   "summary": "20 Beteiligungen: Median 0×, brutto 3,45×, Ausreißer 87 % des Rückflusses; ohne ihn 0,47×. Verankert in Kerr, Nanda & Rhodes-Kropf (2014)."
+  }
+ ],
+ "sources": [
+  {
+   "id": "kurs",
+   "tier": "official",
+   "type": "lecture",
+   "citation": "Vorlesungsfolien Entrepreneurship, Kapitel 6 „Funding a Venture“ (private Kursunterlage des Nutzers, nicht veröffentlicht)",
+   "url": null,
+   "doi": null,
+   "date": null,
+   "access_level": "private_course_material",
+   "passages": [
+    {
+     "locator": "Abschnitte Kapitalformen, Insolvenz, Lebenszyklus, Business Angels, Venture Capital, Finanzierungsprozess, HTGF-Beispiel mit Wandeldarlehen, Verwässerung über zwei Runden",
+     "content": "Gliederung aus der Engine-Erfassung; Inhalt nur mit eigenen Worten.",
+     "kcs": []
+    }
+   ],
+   "evidence": "official",
+   "limits": "Marktzahlen der Folien wurden nicht unabhängig geprüft und werden nicht übernommen.",
+   "function": "legt Prüfungsstoff und Fragestellungen fest"
+  },
+  {
+   "id": "yc-safe",
+   "tier": "extension",
+   "type": "docs",
+   "citation": "Y Combinator: Post-Money SAFE User Guide (inkl. Quick Start Guide), abgerufen über ycombinator.com/documents",
+   "url": "https://www.ycombinator.com/documents",
+   "doi": null,
+   "date": "Leitfaden ohne Versionsangabe; YC standardisierte den Post-Money-SAFE 2018",
+   "access_level": "section",
+   "passages": [
+    {
+     "locator": "Quick Start Guide, S. 1, Nr. 1",
+     "content": "Verkaufter Anteil = Betrag / Post-Money-Cap; Beispiel 1 Mio. $ bei 15 % ⇒ Cap ≈ 6,7 Mio. $; 500 Tsd. $ ⇒ ≈ 7,5 %.",
+     "kcs": [
+      "bewertung"
+     ]
+    },
+    {
+     "locator": "Quick Start Guide, S. 2, Note #2",
+     "content": "SAFE-Anteil ist „post-safes“, nicht „post-Series A“; SAFEs werden in der Serie A verwässert wie alle anderen.",
+     "kcs": [
+      "bewertung"
+     ]
+    },
+    {
+     "locator": "User Guide, S. 3–4",
+     "content": "Cap ist „post“ aller SAFE-Gelder, NICHT „post“ der Eigenkapitalrunde; „post“ bestehender Optionen und Pools, NICHT eines in der Serie A neu geschaffenen oder aufgestockten Pools.",
+     "kcs": [
+      "bewertung"
+     ]
+    }
+   ],
+   "evidence": "primary (Originaldokument der Praxis)",
+   "limits": "US-Instrument nach US-Recht; in Deutschland sind Wandeldarlehen bzw. andere Gestaltungen üblich. Die Rabatt-Umwandlung wird im Labor vereinfacht modelliert (Rabattpreis auf den Rundenpreis, günstigere Variante gilt).",
+   "function": "präzise Definition des Post-Money-Caps als Grundlage der Kapitalisierungstabelle im Labor und in X1"
+  },
+  {
+   "id": "htgf",
+   "tier": "extension",
+   "type": "practice",
+   "citation": "High-Tech Gründerfonds: „Our investment criteria – Your chance“, htgf.de (englische Startseite, Stand der Seite 2026-11-09)",
+   "url": "https://www.htgf.de/en/",
+   "doi": null,
+   "date": "2026-11-09",
+   "access_level": "section",
+   "passages": [
+    {
+     "locator": "Abschnitt „Our investment criteria“",
+     "content": "Erstinvestitionen in Pre-Seed/Seed typischerweise ab 800 000 €; in Wachstumsrunden bis zu 30 Mio. €; Unternehmen höchstens drei Jahre alt; Sitz oder Betriebsstätte in Deutschland.",
+     "kcs": [
+      "zyklus"
+     ]
+    }
+   ],
+   "evidence": "primary (Selbstauskunft des Investors)",
+   "limits": "Selbstdarstellung; Instrument (Eigenkapital/Wandeldarlehen) und Gesamtvolumen je Unternehmen auf der Seite nicht angegeben; Konditionen ändern sich – Datum beachten. Die Zahlen des Folienbeispiels können ältere Konditionen zeigen.",
+   "function": "datierter Abgleich des Folienbeispiels mit den aktuellen Kriterien"
+  },
+  {
+   "id": "kaplan-stromberg",
+   "tier": "extension",
+   "type": "working_paper",
+   "citation": "Kaplan, S. N.; Strömberg, P. (2003): Financial Contracting Theory Meets the Real World: An Empirical Analysis of Venture Capital Contracts. Review of Economic Studies 70(2), 281–315; NBER Working Paper 7660 (2000).",
+   "url": "https://www.nber.org/papers/w7660",
+   "doi": "10.1111/1467-937X.00245",
+   "date": "2003",
+   "access_level": "abstract",
+   "passages": [
+    {
+     "locator": "Abstract (RES und NBER)",
+     "content": "VC-Finanzierungen trennen Cash-Flow-, Board-, Stimm-, Liquidations- und andere Kontrollrechte; Wandelpapiere am häufigsten; Folgefinanzierungen oft an beobachtbare Kennzahlen geknüpft; bei schlechter Entwicklung übernehmen VCs die Kontrolle, bei sehr guter geben sie Kontroll- und Liquidationsrechte weitgehend ab.",
+     "kcs": [
+      "prozess"
+     ]
+    }
+   ],
+   "evidence": "primary (empirische Studie) – nur Abstract gelesen",
+   "limits": "Nur Abstract gelesen: Stichprobe, Methode und Effektgrößen nicht geprüft; keine Ergebnisse über das Abstract hinaus verwenden.",
+   "function": "Forschungsfrage für die Vertiefung „Warum Tranchen und getrennte Rechte?“"
+  },
+  {
+   "id": "knr-2014",
+   "tier": "extension",
+   "type": "paper",
+   "citation": "Kerr, W. R.; Nanda, R.; Rhodes-Kropf, M. (2014): Entrepreneurship as Experimentation. Journal of Economic Perspectives 28(3), 25–48; offen als NBER Working Paper 20358 (Juli 2014).",
+   "url": "https://www.nber.org/papers/w20358.pdf",
+   "doi": null,
+   "date": "2014",
+   "access_level": "full_text",
+   "passages": [
+    {
+     "locator": "Abstract (PDF-S. 2)",
+     "content": "Erfolgswahrscheinlichkeiten sind niedrig, extrem schief verteilt und vor der Investition unbekannt.",
+     "kcs": [
+      "vc"
+     ]
+    },
+    {
+     "locator": "WP S. 3",
+     "content": "Renditeverteilung mit niedrigem Median, aber sehr hoher Varianz (mit Verweis auf Scherer & Harhoff 2000; Hall & Woodward 2010); VC-Investoren verdienen an der einen Investition unter vielen, die ein großer Erfolg wird; die große Mehrheit gibt weniger als den investierten Betrag zurück.",
+     "kcs": [
+      "vc"
+     ]
+    },
+    {
+     "locator": "WP S. 7",
+     "content": "Die Mehrheit der VC-finanzierten Unternehmen scheitert trotz erfahrener Investoren.",
+     "kcs": [
+      "vc"
+     ]
+    },
+    {
+     "locator": "WP S. 2",
+     "content": "Fallbeispiel Google: 12,5 Mio. $ (Sequoia, 1999) waren beim Verkauf 2005 über 4 Mrd. $ wert, das 320-Fache (nach Sahlman 2010).",
+     "kcs": [
+      "vc"
+     ]
+    }
+   ],
+   "evidence": "secondary (Übersichtsartikel in begutachteter Fachzeitschrift)",
+   "limits": "Übersicht: Verteilungsaussagen beruhen auf zitierten Studien, nicht auf eigenen Daten; US-Kontext; Google-Fall ist eine Anekdote mit Survivorship-Risiko. Verifikation: research_log.jsonl (SHA-256 des PDF).",
+   "function": "empirische Verankerung der Fondslogik (X2, EN5, Labor-Station v4): niedriger Median, Rendite aus seltenen Ausreißern"
+  }
+ ],
+ "labs": [
+  {
+   "id": "runden",
+   "title": "Finanzierungsrunden & Fondslogik",
+   "purpose": "Kapitalisierungstabelle mit SAFE (Cap/Rabatt), Pool-Shuffle, Up-/Down-Round, Fonds-Multiple"
+  }
+ ],
+ "learner_state": null,
+ "integration": "Keine automatische Synchronisierung. Lernstand nur über manuell exportierte Datei."
+}

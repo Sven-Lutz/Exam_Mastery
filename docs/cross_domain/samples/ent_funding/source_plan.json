@@ -1,0 +1,104 @@
+{
+ "module": "ent-funding",
+ "domain": "business",
+ "prefer": [
+  "empirische Primärstudien mit Stichprobe",
+  "datierte Originaldokumente der Praxis (Term Sheets, Musterverträge)",
+  "amtliche Statistik"
+ ],
+ "reject": [
+  "Marketingtexte als Beleg für Wirkungen",
+  "undatierte Zahlen",
+  "erfundene Unternehmenshistorien"
+ ],
+ "items": [
+  {
+   "kc": "formen",
+   "label": "Kapitalformen und Risikoklassen",
+   "tier": "core",
+   "gap": true,
+   "queries": [
+    "\"equity mezzanine debt startup financing\" empirical study journal of finance",
+    "\"equity mezzanine debt startup financing\" NBER working paper",
+    "\"equity mezzanine debt startup financing\" official term sheet",
+    "\"equity mezzanine debt startup financing\" case study"
+   ],
+   "citation_chaining_from": [
+    "kurs"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "zyklus",
+   "label": "Lebens- und Finanzierungszyklus, passende Kapitalquelle",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"business angels investment criteria Germany\" empirical study journal of finance",
+    "\"business angels investment criteria Germany\" NBER working paper",
+    "\"business angels investment criteria Germany\" official term sheet",
+    "\"business angels investment criteria Germany\" case study"
+   ],
+   "citation_chaining_from": [
+    "kurs",
+    "htgf"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "vc",
+   "label": "VC-Fondslogik und Potenzialanforderung",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"venture capital returns power law fund economics\" empirical study journal of finance",
+    "\"venture capital returns power law fund economics\" NBER working paper",
+    "\"venture capital returns power law fund economics\" official term sheet",
+    "\"venture capital returns power law fund economics\" case study"
+   ],
+   "citation_chaining_from": [
+    "kurs",
+    "knr-2014"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "prozess",
+   "label": "Finanzierungsprozess, Tranchen, Vertragsrechte",
+   "tier": "deep",
+   "gap": false,
+   "queries": [
+    "\"staged financing venture capital contracts control rights\" empirical study journal of finance",
+    "\"staged financing venture capital contracts control rights\" NBER working paper",
+    "\"staged financing venture capital contracts control rights\" official term sheet",
+    "\"staged financing venture capital contracts control rights\" case study"
+   ],
+   "citation_chaining_from": [
+    "kurs",
+    "kaplan-stromberg"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  },
+  {
+   "kc": "bewertung",
+   "label": "Pre-/Post-Money, Wandelinstrumente und Verwässerung",
+   "tier": "core",
+   "gap": false,
+   "queries": [
+    "\"post-money SAFE valuation cap discount conversion\" empirical study journal of finance",
+    "\"post-money SAFE valuation cap discount conversion\" NBER working paper",
+    "\"post-money SAFE valuation cap discount conversion\" official term sheet",
+    "\"post-money SAFE valuation cap discount conversion\" case study"
+   ],
+   "citation_chaining_from": [
+    "kurs",
+    "yc-safe"
+   ],
+   "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
+  }
+ ],
+ "candidates_not_verified": [
+  "gompers-1995"
+ ],
+ "note": "Der Plan löst keine Netz- oder Provider-Aufrufe aus. Recherche erfolgt durch Agent/Mensch mit Zustimmung; Ergebnisse gehen ins Register."
+}
