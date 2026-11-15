@@ -507,6 +507,9 @@ def verify(unit: dict) -> dict:
     for ref in re.findall(r'data-task="([A-Z0-9-]+)"', html):
         if ref not in ids:
             errors.append(f'text references unknown task {ref}')
+    for seg in re.findall(r'\\\[(.*?)\\\]', html, flags=re.S):           # v7.1: keine Inline-Formel in Display-Formel
+        if '\\(' in seg or '\\)' in seg:
+            errors.append(f'inline TeX delimiter inside display formula: {seg[:60]}')
     if html.count('\\(') != html.count('\\)') or html.count('\\[') != html.count('\\]'):
         errors.append('unbalanced TeX delimiters in text')
     report = {'ok': not errors, 'errors': errors, 'checked': checked,

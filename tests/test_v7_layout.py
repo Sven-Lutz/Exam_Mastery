@@ -65,7 +65,7 @@ class Rendered(unittest.TestCase):
         return pg
 
     def test_no_overflow_no_tiny_text_on_phone_and_desktop(self):
-        for w in (320, 360, 390, 1280, 1440):      # 320/360: Puffer gegen breitere Linux-Schriften in CI
+        for w in (300, 320, 360, 390, 1280, 1440):      # 300–360: Puffer gegen breitere Linux-Schriften in CI
             pg = self.open(w)
             sec = pg.locator('section, main').first
             res = pg.evaluate("""() => {
@@ -79,11 +79,16 @@ class Rendered(unittest.TestCase):
             self.assertEqual(res, {'over': 0, 'tiny': 0, 'hscroll': False, 'tallMath': 0}, w)
 
     def test_no_page_wider_than_viewport_on_small_phones(self):
-        for w in (320, 360):
+        for w in (300, 320, 360):
             ctx = self.b.new_context(viewport={'width': w, 'height': 800}); self.addCleanup(ctx.close); pg = ctx.new_page()
             for h in ('', '#learn/orientierung', '#learn/rnn', '#learn/att-problem', '#learn/prf', '#exam', '#review', '#tutor'):
                 pg.goto((self.out / 'index.html').as_uri() + h); pg.wait_for_function('document.body.dataset.ready === "1"', timeout=60000); pg.wait_for_timeout(300)
-                self.assertLessEqual(pg.evaluate('document.documentElement.scrollWidth'), w, (w, h))
+                sw = pg.evaluate('document.documentElement.scrollWidth')
+                if sw > w:   # Diagnose für CI-Logs: welche Elemente ragen heraus?
+                    culprits = pg.evaluate('''(vw) => [...document.querySelectorAll('body *')].filter(e => { const r = e.getBoundingClientRect(); if (r.right <= vw + .5 || !r.width) return false;
+                        let a = e.parentElement; while (a) { const o = getComputedStyle(a).overflowX; if (o !== 'visible') return false; a = a.parentElement; } return true; })
+                        .slice(0, 6).map(e => e.tagName + '.' + (e.className.baseVal ?? e.className) + ' r=' + Math.round(e.getBoundingClientRect().right) + ' ' + (e.textContent || '').trim().slice(0, 40))''', w)
+                    self.fail(f'{w}px {h}: scrollWidth {sw}; {culprits}')
 
     def test_figure_labels_do_not_collide(self):
         pg = self.open(1280)

@@ -101,3 +101,5 @@ figure.fig7 figcaption b{color:var(--ink)}
 .book7,.book7 *{min-width:0}.book7 .box{overflow-x:auto}
 @media print{.box>.lbl{display:block;break-after:avoid;page-break-after:avoid}.box>.lbl+*{break-before:avoid;page-break-before:avoid}.box{orphans:3;widows:3}.box.mis,.box.int,.box.res,.box.chk{break-inside:avoid}}
 @media print{.book7 p:has(> .layer){break-after:avoid;page-break-after:avoid}}
+.book7 ol.drv>li>mjx-container[display=true]{margin:.2em 0 .3em!important;text-align:left}
+.task header{flex-wrap:wrap;row-gap:2px}.task header b{min-width:0;overflow-wrap:anywhere}.task header>*{min-width:0}main,main *{min-width:0}
