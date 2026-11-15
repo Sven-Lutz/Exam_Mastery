@@ -3612,11 +3612,11 @@
    "kc": "attention",
    "type": "math",
    "prompt": "Wie lautet \\(\\partial w_i/\\partial s_j\\) für \\(w=\\operatorname{softmax}(s/T)\\), und was folgt bei fast one-hot \\(w\\)?",
-   "answer": "\\(\\tfrac1T(w_i[i=j]-w_iw_j)\\); bei \\(w\\to e_m\\) geht die ganze Jacobi-Matrix gegen 0.",
-   "why": "Quotientenregel; für \\(w=e_m\\) verschwinden alle Einträge – gesättigte Softmax leitet kaum Gradient (Lemma 6.4, Grund für \\(1/\\sqrt{d_k}\\)).",
+   "answer": "\\(\\tfrac1T(w_i[i=j]-w_iw_j)\\). Bei fester \\(T\\) und \\(w\\to e_m\\) gilt \\(J\\to0\\); bei \\(T\\to0\\) nur mit eindeutigem Maximum, bei Gleichstand divergiert \\(J\\).",
+   "why": "\\(\\lVert J\\rVert_F\\le4(1-w_m)/T\\) (Lemma 6.4). Gesättigte Softmax leitet kaum Gradient – Grund für \\(1/\\sqrt{d_k}\\).",
    "source": "Lehrbuch §6, Lemma 6.4; Labor Station 6",
    "example": "Zwei Scores: \\(\\partial w_1/\\partial s_1=w_1(1-w_1)\\), maximal \\(0{,}25\\) bei \\(w_1=0{,}5\\).",
-   "mistake": "Gradienten-Problem der Skalierung mit „Gewichte summieren nicht zu 1“ verwechseln.",
+   "mistake": "„Kleines T ⇒ kleiner Gradient“ – falsch bei gleich großen Maxima.",
    "prereq": "Softmax, Kettenregel; Satz 3"
   },
   {
@@ -3627,7 +3627,7 @@
    "answer": "Nein: \\(o=(w_1,w_2)\\) mit \\(w_1+w_2&lt;1\\); \\((1,1)\\) liegt außerhalb der konvexen Hülle.",
    "why": "Softmax-Gewichte sind positiv und summieren zu 1 – Konvexkombination (Satz 6.2). Abhilfe: W_O und Residualverbindung.",
    "source": "Lehrbuch §6, Satz 6.2; Aufgabe AT7; Labor Challenge „Unerreichbar?“",
-   "mistake": "Mit T → 0 „erzwingen“ – das liefert nur Ecken der Hülle.",
+   "mistake": "Mit T → 0 „erzwingen“: Das ergibt einen Value (eindeutiges Maximum) oder den Mittelwert gleichauf liegender Values – beides in der Hülle.",
    "diagram": "attention_hull.svg",
    "prereq": "Konvexkombination"
   }

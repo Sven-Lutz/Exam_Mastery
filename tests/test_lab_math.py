@@ -293,3 +293,20 @@ def test_span_and_token_counts_match_python_seqlab():
         assert (sc['tp'], sc['fp'], sc['fn']) == (a.tp, a.fp, a.fn)
         assert (tc['tp'], tc['fp'], tc['fn']) == (b.tp, b.fp, b.fn)
         assert (sl['tp'], sl['fp'], sl['fn']) == (c.tp, c.fp, c.fn)
+
+
+def test_jacobian_temperature_regimes():
+    """Lemma 6.4: fest T + großer Vorsprung -> 0; T->0 mit eindeutigem Maximum -> 0; T->0 bei Gleichstand -> divergent."""
+    def jnorm(s, T):
+        p = o_softmax(s, T)
+        return math.sqrt(sum(((p[i] if i == j else 0) - p[i] * p[j]) ** 2 for i in range(len(p)) for j in range(len(p)))) / T
+    uniq, tie = [1.0, 0.0, -0.5], [1.0, 1.0, -0.5]
+    a = [jnorm(uniq, T) for T in (1, .3, .1, .03, .01)]
+    b = [jnorm(tie, T) for T in (1, .3, .1, .03, .01)]
+    assert a[-1] < 1e-6 and all(x > y for x, y in zip(a[1:], a[2:]))
+    assert b[-1] > 30 and all(x < y for x, y in zip(b, b[1:]))
+    for s, T in ((uniq, .2), (tie, .2), ([3, 0, 0, 0], 1)):          # Schranke 4(1-w_m)/T
+        p = o_softmax(s, T)
+        assert jnorm(s, T) <= 4 * (1 - max(p)) / T + 1e-12
+    J = js([('softmaxJacobian', [o_softmax(tie, .05), .05])])[0]
+    assert abs(J[0][0] - jnorm([1.0, 1.0, -0.5], .05) / 1) < 1e9 and J[0][0] > 4    # JS-Kern liefert dieselbe Divergenz

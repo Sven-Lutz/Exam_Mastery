@@ -69,11 +69,40 @@
   },
   {
    "version": 5,
-   "status": "HUMAN_REVIEW_PENDING",
-   "date": "2026-11-14",
-   "ref": "Issue #8 implementation; docs/reference_unit/V5_REPORT.md",
+   "status": "HUMAN_REJECTED",
+   "date": "2026-11-15",
+   "ref": "Issue #8 (v5 review comment) and Issue #9",
    "note": "No self-release. Owner re-rates all 17 dimensions.",
-   "evidence": "docs/reference_unit/review_v5/"
+   "evidence": "docs/reference_unit/review_v5/",
+   "commit": "a3ae947",
+   "ratings": {
+    "scientific.textbook": "2/4",
+    "scientific.mathematics_derivations": "1/4",
+    "scientific.books_research_cases": "1/4",
+    "scientific.pdf_layout": "2/4",
+    "scientific.workbook": "1/4",
+    "scientific.worked_solutions": "1/4",
+    "scientific.mock_exams": "1/4",
+    "anki.academic_content": "1/4",
+    "anki.html_css_media": "1/4",
+    "anki.long_term_usefulness": "1/4",
+    "lab.mathematical_visualization": "2/4",
+    "lab.free_experimentation": "2/4",
+    "lab.interaction_feedback": "2/4",
+    "lab.understanding_gain": "1/4",
+    "lab.ux_design": "2/4",
+    "system_integration": "1/4",
+    "exam_core_vs_deeper_mastery": "NOT RATED"
+   },
+   "mean": "22/16 = 1.375/4 (16 of 17 rated); lab mean 9/5 = 1.8/4",
+   "critical_factual_errors_reported": "none by owner; independent code review noted two math edge-case errors (T->0 with tied maxima on hull card; Jacobian convergence needs temperature conditions) - corrected in v6"
+  },
+  {
+   "version": 6,
+   "status": "HUMAN_REVIEW_PENDING",
+   "date": "2026-11-15",
+   "ref": "Issue #9 implementation; docs/cross_domain/V6_REPORT.md",
+   "note": "No self-release."
   }
  ],
  "rule": "Only a human rating changes a status. CI and agent checks never do."
