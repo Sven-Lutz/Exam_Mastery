@@ -108,81 +108,195 @@ h^{\mathrm{bi}}_t&amp;=\big[h^{\rightarrow}_t;\,h^{\leftarrow}_t\big]\in\mathbb 
 </section>
 
 <section data-id="attention" data-title="6 · Self-Attention">
-<p><span class="layer" data-layer="core">Klausurkern</span></p>
-<p><b>Motivation.</b> Ein RNN muss die gesamte Vorgeschichte in einen Vektor fester Größe pressen; weit entfernte Information muss viele Rechenschritte überstehen (schwierig für Backpropagation); und \(h_t\) braucht \(h_{t-1}\), die Positionen lassen sich nicht parallel berechnen. Idee: an jeder Position eine <em>eigene</em> Zusammenfassung bilden, die je nach aktuellem Wort andere Teile der Sequenz gewichtet. <span class="prov" data-kind="KURS">PDF-S. 31–37</span></p>
-<p><b>Datenbank-Analogie (PDF-S. 38–40).</b> Anfrage „burger“, Schlüssel Cheeseburger, Fries, Hamburger, Ice cream mit Werten 12, 5, 10, 6. Bei Ähnlichkeiten 0,5; 0; 0,5; 0 ist die Antwort die gewichtete Summe \(0{,}5\cdot12+0{,}5\cdot10=11\). Self-Attention tut dasselbe mit gelernten Vektoren.</p>
-<p><b>Definition.</b> Eingaben als Zeilen \(X\in\mathbb R^{N\times n}\) (\(N\) Token). Mit gelernten \(W_Q,W_K\in\mathbb R^{n\times d_k}\), \(W_V\in\mathbb R^{n\times d_v}\):</p>
-\[\begin{aligned}
-Q&amp;=XW_Q,\ K=XW_K,\ V=XW_V &amp;&amp;\text{Anfrage, Schlüssel, Wert je Token}\\
-e_{ij}&amp;=\tfrac{q_i^\top k_j}{\sqrt{d_k}} &amp;&amp;\text{skaliertes Skalarprodukt}\\
-\alpha_{ij}&amp;=\tfrac{\exp e_{ij}}{\sum_{l}\exp e_{il}} &amp;&amp;\text{Softmax über }j\\
-o_i&amp;=\textstyle\sum_j\alpha_{ij}v_j &amp;&amp;\text{gewichtete Summe}
-\end{aligned}\]
-<p>Kompakt: \(\operatorname{Att}(Q,K,V)=\operatorname{softmax}\!\big(QK^\top/\sqrt{d_k}\big)V\). Gelernt werden nur \(W_Q,W_K,W_V\) (PDF-S. 46); die Gewichte \(\alpha_{ij}\) werden für jede Eingabe neu berechnet. Alternativen zur Ähnlichkeit: multiplikativ \(q^\top Wk\) oder ein Feed-Forward-Netz auf \([q;k]\) (PDF-S. 49–50). <span class="prov" data-kind="KURS">PDF-S. 42–53</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §7.1.1, S. 180; §7.3, S. 188, Gl. 7.34</span></p>
-<p class="mute small">Notation: Die Folie schreibt Token als Spalten (\(X\in\mathbb R^{n\times N}\)) und \(q_i=W_Qx_i\) mit \(W_Q\in\mathbb R^{n\times h}\); passend wäre dort \(W_Q\in\mathbb R^{h\times n}\). Hier gilt durchgehend die Zeilenkonvention.</p>
-<div class="scene" data-scene="attention"></div>
-<h3 id="attention-geometrie">Geometrie der Attention: ein Wort sucht seinen Kontext</h3>
-<p><span class="layer" data-layer="core">Klausurkern</span></p>
-<p><b>Problem.</b> Im Satz „Wir sitzen auf der <b>Bank</b> am <b>Fluss</b>“ muss der Vektor von „Bank“ zur Ufer-Bedeutung verschoben werden, im Satz „Ich hebe Geld von der Bank ab“ zur Finanz-Bedeutung. Dieselbe Rechenvorschrift muss beides leisten – nur aus dem Kontext. Wir verfolgen die Rechnung in zwei Dimensionen, in denen jede Zwischengröße sichtbar ist; im Labor ist genau dieser Zustand der Startpunkt.</p>
-<div class="lab-ref" data-kc="attention"></div>
-<p><b>Notation und Dimensionen.</b> Eine Query \(q\in\mathbb R^{d_k}\) (das suchende Wort), Keys \(k_1,\dots,k_N\in\mathbb R^{d_k}\), Values \(v_1,\dots,v_N\in\mathbb R^{d_v}\), Temperatur \(T&gt;0\) (Standard \(T=1\)). Scores, Gewichte und Ausgabe:</p>
-\[s_j=\frac{q^\top k_j}{\sqrt{d_k}},\qquad w_j=\frac{e^{s_j/T}}{\sum_{l=1}^Ne^{s_l/T}},\qquad o=\sum_{j=1}^Nw_jv_j\in\mathbb R^{d_v}.\]
-<p>Geometrisch ist \(q^\top k_j=\lVert q\rVert\,\lVert k_j\rVert\cos\theta_j=\lVert q\rVert\cdot\pi_j\) mit der vorzeichenbehafteten Projektionslänge \(\pi_j\) von \(k_j\) auf die Richtung von \(q\): <em>Wer weit in Richtung der Query ragt, bekommt Gewicht.</em></p>
-<p><b>Durchgerechnetes Beispiel.</b> \(q=(0{,}9;\,-0{,}6)\); Keys Fluss \((1{,}6;\,0{,}4)\), Geld \((-0{,}4;\,1{,}5)\), der \((0{,}1;\,-0{,}3)\); Values (Achsen: Ufer-, Finanz-Bedeutung) Fluss \((1{,}8;\,0{,}2)\), Geld \((0{,}1;\,1{,}9)\), der \((0{,}2;\,0{,}2)\); \(d_k=2\).</p>
-\[\begin{aligned}
-q^\top k&amp;=\big(0{,}9\cdot1{,}6+(-0{,}6)\cdot0{,}4;\ \ 0{,}9\cdot(-0{,}4)+(-0{,}6)\cdot1{,}5;\ \ 0{,}9\cdot0{,}1+(-0{,}6)(-0{,}3)\big)=(1{,}2;\ -1{,}26;\ 0{,}27) &amp;&amp;\text{(Fluss; Geld; der)}\\
-s&amp;=(0{,}8485;\ -0{,}891;\ 0{,}1909) &amp;&amp;\text{(Division durch }\sqrt2)\\
-e^{s}&amp;=(2{,}3362;\ 0{,}4103;\ 1{,}2104),\ \textstyle\sum=3{,}9568 &amp;&amp;\\
-w&amp;=(0{,}5904;\ 0{,}1037;\ 0{,}3059) &amp;&amp;\text{(Summe 1)}\\
-o&amp;=0{,}5904\,v_{\text{Fluss}}+0{,}1037\,v_{\text{Geld}}+0{,}3059\,v_{\text{der}}=(1{,}1343;\ 0{,}3763)
-\end{aligned}\]
-<p>Die Ausgabe liegt deutlich auf der Ufer-Achse. Entropie der Gewichte: \(H=1{,}3106\) Bit von höchstens \(\log_23=1{,}585\) Bit – die Aufmerksamkeit ist verteilt, nicht scharf.</p>
-<div class="thm"><b>Satz 6.1 (Verschiebung und Länge).</b> (a) Für jedes \(c\in\mathbb R\) gilt \(\operatorname{softmax}(s+c\mathbf 1)=\operatorname{softmax}(s)\). Insbesondere ändert die gemeinsame Verschiebung aller Keys um denselben Vektor \(u\) keine Gewichte. (b) Für \(\lambda&gt;0\) liefert die Query \(\lambda q\) bei Temperatur \(T\) dieselben Gewichte wie \(q\) bei Temperatur \(T/\lambda\).</div>
-<div class="proof">\[\begin{aligned}
-\frac{e^{(s_j+c)/T}}{\sum_le^{(s_l+c)/T}}&amp;=\frac{e^{c/T}\,e^{s_j/T}}{e^{c/T}\sum_le^{s_l/T}}=\frac{e^{s_j/T}}{\sum_le^{s_l/T}} &amp;&amp;\text{(a): Faktor kürzt sich}\\
-\frac{q^\top(k_j+u)}{\sqrt{d_k}}&amp;=s_j+\frac{q^\top u}{\sqrt{d_k}} &amp;&amp;\text{gleiches }c\text{ für alle }j\\
-\frac{(\lambda q)^\top k_j}{\sqrt{d_k}\,T}&amp;=\frac{s_j}{T/\lambda} &amp;&amp;\text{(b)}\quad\square
-\end{aligned}\]</div>
-<p><b>Rechenbeispiel zu (b).</b> Verdoppelt bzw. verdreifacht man \(q\) im Bank-Beispiel, werden die Gewichte \((0{,}7697;\,0{,}0237;\,0{,}2066)\) bzw. \((0{,}8738;\,0{,}0047;\,0{,}1215)\); die Entropie fällt von \(1{,}3106\) auf \(0{,}8888\) bzw. \(0{,}5762\) Bit. Ein Netz steuert die Schärfe seiner Auswahl also schon über die Länge der Query. <b>Gegenbeispiel zu (a):</b> Verschiebt man nur <em>einen</em> Key, ändert sich nur ein Score – die Gewichte ändern sich. <b>Praxis:</b> (a) ist der Grund, warum Implementierungen vor dem Exponenzieren \(\max_ls_l\) abziehen (keine Überläufe, identisches Ergebnis).</p>
-<div class="thm"><b>Satz 6.2 (Konvexe Hülle).</b> Die Ausgabe \(o\) liegt in der konvexen Hülle \(\operatorname{conv}\{v_1,\dots,v_N\}\). Jeder Punkt im <em>Inneren</em> der Hülle ist für geeignete Scores exakt erreichbar; Punkte außerhalb nie.</div>
-<div class="proof">Aus \(w_j=e^{s_j/T}/\sum_le^{s_l/T}&gt;0\) und \(\sum_jw_j=1\) ist \(o\) eine Konvexkombination – das ist die Definition der konvexen Hülle. Umgekehrt: Für einen inneren Punkt \(z=\sum_j\mu_jv_j\) mit allen \(\mu_j&gt;0\), \(\sum_j\mu_j=1\) wähle \(s_j=T\ln\mu_j\); dann ist \(w_j=\mu_j\). Randpunkte brauchen \(\mu_j=0\), also \(s_j\to-\infty\): nur im Grenzwert. \(\square\)</div>
-<p>Konsequenz: Self-Attention allein kann Information nur <em>mischen</em>, nicht verstärken oder umkehren. Darum folgen im Transformer eine lineare Abbildung \(W_O\) und eine Residualverbindung (Abschnitt 8). Ob ein Score-Vektor \(s\) mit diesen Werten auch durch eine Query \(q\) realisierbar ist, hängt zusätzlich von den Keys ab – im Labor (Challenge „Punktlandung“) sieht man, dass dafür Richtung <em>und</em> Länge von \(q\) gebraucht werden.</p>
-<div class="thm"><b>Satz 6.3 (Gleichverteilung).</b> \(w_1=\dots=w_N=1/N\) genau dann, wenn \(q^\top(k_i-k_j)=0\) für alle \(i,j\) – also wenn \(q\) auf allen Differenzen der Keys senkrecht steht.</div>
-<div class="proof">Gleiche Gewichte \(\Leftrightarrow\) \(e^{s_i/T}=e^{s_j/T}\) \(\Leftrightarrow\) \(s_i=s_j\) (exp ist injektiv) \(\Leftrightarrow\) \(q^\top k_i=q^\top k_j\) \(\Leftrightarrow\) \(q^\top(k_i-k_j)=0\). \(\square\)</div>
-<p><b>Grenzfälle.</b> \(q=0\) erfüllt Satz 6.3 trivial. Mit \(q\ne0\) geht es in \(\mathbb R^2\) nur, wenn alle Keys auf einer Geraden senkrecht zu \(q\) liegen; in \(\mathbb R^{d_k}\) mit \(d_k\ge N\) dagegen fast immer (die \(N-1\) Differenzen spannen höchstens einen \((N-1)\)-dimensionalen Raum auf). \(T\to0\): Gewicht gleichmäßig auf alle Maxima (bei Gleichstand nicht one-hot!). \(T\to\infty\): Gleichverteilung. Alle Positionen maskiert: Softmax undefiniert.</p>
-<p><span class="layer" data-layer="deep">Vertiefung</span> <b>Warum Sättigung das Lernen bremst.</b></p>
-<div class="thm"><b>Lemma 6.4 (Jacobi-Matrix der Softmax mit Temperatur).</b> Für \(w=\operatorname{softmax}(s/T)\) gilt \(\dfrac{\partial w_i}{\partial s_j}=\dfrac{1}{T}\big(w_i[i=j]-w_iw_j\big)\), also \(J=\frac1T\big(\operatorname{diag}(w)-ww^\top\big)\). Sei \(m\) ein Index mit maximalem Score und \(\Delta=s_m-\max_{j\ne m}s_j\) der Vorsprung. Dann gilt
-\[\lVert J\rVert_F\;\le\;\frac{4\,(1-w_m)}{T}\;\le\;\frac{4\,(N-1)\,e^{-\Delta/T}}{T}.\]
-(a) Bei <b>fester</b> Temperatur \(T&gt;0\) und \(\Delta\to\infty\) folgt \(J\to0\) (Sättigung). (b) Für \(T\to0\) bei <b>eindeutigem</b> Maximum (\(\Delta&gt;0\) fest) folgt ebenfalls \(J\to0\), weil \(e^{-\Delta/T}/T\to0\). (c) Für \(T\to0\) bei \(k\ge2\) <b>gleich großen</b> Maxima gilt \(w\to\) Gleichverteilung auf diesen \(k\) Indizes und \(J_{mm}\to\infty\): Die Jacobi-Matrix divergiert.</div>
-<div class="proof">\[\begin{aligned}
-\frac{\partial w_i}{\partial s_j}&amp;=\frac{\tfrac1T e^{s_i/T}[i=j]\,Z-e^{s_i/T}\,\tfrac1Te^{s_j/T}}{Z^2}=\tfrac1T\big(w_i[i=j]-w_iw_j\big) &amp;&amp;\text{Quotientenregel},\ Z=\textstyle\sum_le^{s_l/T}\\
-\lVert J\rVert_F\le\textstyle\sum_{i,j}|J_{ij}|&amp;=\tfrac1T\Big(\textstyle\sum_iw_i(1-w_i)+\sum_{i\ne j}w_iw_j\Big)=\tfrac2T\textstyle\sum_iw_i(1-w_i) &amp;&amp;\textstyle\sum_{j\ne i}w_j=1-w_i\\
-\textstyle\sum_iw_i(1-w_i)&amp;\le(1-w_m)+\textstyle\sum_{i\ne m}w_i=2(1-w_m) &amp;&amp;w_m\le1,\ 1-w_i\le1\\
-1-w_m=\frac{\sum_{j\ne m}e^{(s_j-s_m)/T}}{\sum_le^{(s_l-s_m)/T}}&amp;\le(N-1)\,e^{-\Delta/T} &amp;&amp;\text{Nenner}\ge1\\
-\text{(c)}:\ w_i\to\tfrac1k\ (i\text{ unter den Maxima}),\quad J_{ii}&amp;=\tfrac1Tw_i(1-w_i)\to\tfrac1T\cdot\tfrac1k\big(1-\tfrac1k\big)\to\infty &amp;&amp;\square
-\end{aligned}\]</div>
-<p><b>Lehre aus (c).</b> „Kleine Temperatur macht Gradienten klein“ ist <em>falsch</em> formuliert. Klein werden sie nur, wenn ein Score eindeutig vorn liegt. Bei Gleichstand wird die Softmax für \(T\to0\) zum unstetigen \(\arg\max\), und an dieser Stelle explodiert die Ableitung. Im Labor: Preset „Zwei gleich gute Schlüssel“ und \(T\) verkleinern; \(\lVert J\rVert\) steigt.</p>
-<p>Im Bank-Beispiel ist \(\lVert J\rVert_F=0{,}4324\) (bezogen auf \(s\)). Satz 3 sagt, dass ohne Skalierung die Scores mit Standardabweichung \(\sqrt{d_k}\) streuen; dann ist \(w\) fast immer nahezu one-hot, und nach Lemma 6.4 kommt kaum Gradient bei den Scores an. Das Labor misst das reproduzierbar (Ansicht „Skalierung“). Das ist die präzise Fassung des Arguments „die Softmax gerät in Bereiche mit sehr kleinen Gradienten“ der Originalarbeit.</p>
-<aside class="research"><h4>Forschungsfenster: Sind Attention-Gewichte Erklärungen?</h4><p><b>Frage.</b> Darf man aus großen Gewichten \(w_j\) schließen, dass Wort \(j\) die Entscheidung verursacht hat?</p><p><b>Methode und Befund.</b> Jain &amp; Wallace (2019) vergleichen Attention-Gewichte mit gradientenbasierten Wichtigkeitsmaßen und konstruieren stark abweichende („adversariale“) Gewichtsverteilungen, die dennoch dieselbe Vorhersage liefern; sie folgern, dass Standard-Attention keine verlässlichen Erklärungen liefert. Wiegreffe &amp; Pinter (2019) halten dagegen: Ob Attention erklärt, hängt von der Definition von „Erklärung“ ab; ihre Diagnosen zeigen, dass die gefundenen adversarialen Verteilungen in einem einfachen Test schlecht abschneiden – die frühere Arbeit widerlege die Nützlichkeit nicht.</p><p><b>Grenzen dieser Darstellung.</b> Gelesen wurden die Zusammenfassungen beider Arbeiten (ACL Anthology), nicht die Experimente im Detail; Zahlen werden daher nicht wiedergegeben. Beide Arbeiten untersuchen Klassifikationsmodelle mit RNN-Encodern, nicht Transformer-NER.</p><p><b>Bedeutung für dieses Kapitel.</b> Satz 6.1 und 6.2 zeigen mathematisch, warum Vorsicht geboten ist: Viele verschiedene Gewichtsvektoren ergeben dieselbe Ausgabe, sobald Values zusammenfallen oder kollinear sind, und die Gewichte sagen nichts über \(W_O\) und die Residualverbindung. Prüfungstauglich: „Attention-Gewichte zeigen, <em>wie gemischt</em> wird, nicht zwingend, <em>was entscheidet</em>.“</p><p class="mute small">Belegstellen: <a class="cite" href="#ref-jain">Jain &amp; Wallace 2019</a>; <a class="cite" href="#ref-wiegreffe">Wiegreffe &amp; Pinter 2019</a></p></aside>
-<aside class="media"><h4>Zum Anschauen (optional, Vertiefung)</h4><p><a href="https://www.youtube.com/watch?v=eMlx5fFNoYc">3Blue1Brown: „Attention in transformers, step-by-step“ (Deep Learning, Kapitel 6, 7. April 2024)</a>, Begleitseite <a href="https://www.3blue1brown.com/lessons/attention">3blue1brown.com/lessons/attention</a>. <b>Rolle:</b> visuelle Intuition für Query, Key und Value in hohen Dimensionen vor bzw. nach dem Labor. <b>Hinweis:</b> Das Video verwendet eine andere Notation (Spaltenvektoren, Beispiele aus der Textgenerierung mit kausaler Maske); für die Klausur gilt die Notation dieses Lehrbuchs. Inhalt hier nicht im Detail ausgewertet, daher keine Zeitmarken.</p></aside>
-<div class="task-ref" data-task="AT5"></div>
-<p><span class="layer" data-layer="deep">Vertiefung</span> <b>Warum durch \(\sqrt{d_k}\) teilen?</b></p>
-<div class="thm"><b>Satz 3.</b> Sind die Komponenten von \(q,k\in\mathbb R^{d_k}\) unabhängig mit Erwartungswert 0 und Varianz 1, dann hat \(q^\top k\) Erwartungswert 0 und Varianz \(d_k\); \(q^\top k/\sqrt{d_k}\) hat Varianz 1.</div>
-<div class="proof">\[\begin{aligned}
-\mathbb E[q_ik_i]&amp;=\mathbb E[q_i]\,\mathbb E[k_i]=0 &amp;&amp;\text{Unabhängigkeit}\\
-\operatorname{Var}(q_ik_i)&amp;=\mathbb E[q_i^2]\,\mathbb E[k_i^2]-0=1 &amp;&amp;\mathbb E[q_i^2]=\operatorname{Var}(q_i)\\
-\operatorname{Var}\big(\textstyle\sum_{i}q_ik_i\big)&amp;=\textstyle\sum_i\operatorname{Var}(q_ik_i)=d_k &amp;&amp;\text{Summanden unkorreliert}\\
-\operatorname{Var}\big(q^\top k/\sqrt{d_k}\big)&amp;=d_k/d_k=1 &amp;&amp;\square
-\end{aligned}\]</div>
-<p>Ohne Skalierung wachsen die Energien mit \(d_k\), die Softmax wird fast zum \(\arg\max\) und ihre Gradienten werden klein. Das ist die Begründung der Originalarbeit unter denselben Annahmen (§3.2.1, Fußnote 1). Gelernte Projektionen erfüllen diese Annahmen nicht genau; Satz 3 begründet die Größenordnung, keinen exakten Wert. <span class="prov" data-kind="FORSCHUNG">Vaswani et al. 2017, §3.2.1</span></p>
-<p><b>Mehrere Köpfe.</b> Ein \(d\)-dimensionaler Zustand wird als \(h\) Teilvektoren der Länge \(d/h\) gelesen; jeder Kopf rechnet eigene Attention, die Ergebnisse werden verkettet (PDF-S. 54–58). Die Parameterzahl bleibt gleich: \(h\) Projektionen der Größe \(n\times(d/h)\) haben zusammen \(n\cdot d\) Einträge wie eine Projektion \(n\times d\). Das gilt für die Verkettung ohne zusätzliche Ausgabematrix; der Transformer fügt danach \(W_O\in\mathbb R^{d\times d}\) hinzu (SLP3 Gl. 7.35, S. 188).</p>
-<div class="task-ref" data-task="AT1"></div>
-<aside class="research"><h4>Forschungsfenster: Was die Originalarbeit über die Skalierung sagt</h4><p><b>Frage.</b> Ist \(1/\sqrt{d_k}\) bewiesen notwendig?</p><p><b>Befund.</b> Vaswani et al. (2017, §3.2.1) formulieren vorsichtig: „We suspect that for large values of \(d_k\), the dot products grow large in magnitude“. Die Fußnote begründet das mit derselben Varianzrechnung wie Satz 3 unter der Annahme unabhängiger Komponenten mit Mittelwert 0 und Varianz 1.</p><p><b>Grenzen.</b> Das ist eine Plausibilitätsbegründung, kein Satz über trainierte Netze; gelernte Projektionen erfüllen die Annahmen nicht. Die Skalierung ist eine bewährte Konvention, deren Begründung eine Größenordnungsabschätzung ist.</p><p><b>Bedeutung.</b> Prüfungstauglich formuliert: „Ohne Skalierung wächst die Varianz der Energien unter Unabhängigkeitsannahmen linear mit \(d_k\); die Softmax sättigt und ihre Gradienten werden klein.“</p><p class="mute small">Belegstelle: <a class="cite" href="#ref-vaswani">Vaswani et al. 2017, §3.2.1 mit Fn. 1</a></p></aside>
+<div class="book7">
+<p><span class="layer" data-layer="core">Klausurkern</span> <span class="mute small">Abschnitte 6.1–6.7 · Vertiefung 6.8–6.10 · Forschung 6.11</span></p>
 
+<h3 id="att-problem">6.1 Das Problem: Ein Wort braucht seinen Kontext</h3>
+<p class="lede">Das Wort <span class="tok tq">Bank</span> bedeutet in „Wir sitzen auf der Bank am <span class="tok tk">Fluss</span>“ etwas anderes als in „Ich hebe <span class="tok tk">Geld</span> von der Bank ab“. Ein Tagger, der jedem Wort isoliert einen Vektor zuordnet, kann diese beiden Fälle nicht unterscheiden. Wir brauchen eine Rechenvorschrift, die den Vektor eines Wortes <em>abhängig von den anderen Wörtern des Satzes</em> verändert – und zwar so, dass die Vorschrift gelernt werden kann.</p>
+<p>Ein rekurrentes Netz (Abschnitt 4) löst das, indem es den Satz Wort für Wort liest. Das hat drei Nachteile, die die Vorlesung nennt: Alles Vorherige muss in einen Vektor fester Größe passen, Information aus weit entfernten Wörtern muss viele Rechenschritte überstehen, und Position \(t\) kann erst berechnet werden, wenn \(t-1\) fertig ist. <span class="prov" data-kind="KURS">PDF-S. 31–37</span></p>
+<p>Self-Attention verfolgt eine andere Idee, die man in einem Satz sagen kann: <b>Jedes Wort stellt eine Frage an alle Wörter, misst, wie gut jedes Wort zur Frage passt, und bildet daraus einen gewichteten Mittelwert ihrer Inhalte.</b> Dieser Abschnitt macht jedes Wort dieses Satzes mathematisch präzise: Was ist „Frage“, was „passt gut“, warum gerade dieser Mittelwert – und was folgt daraus, was <em>nicht</em>?</p>
+
+<div class="box int"><span class="lbl">Intuition · Datenbank-Analogie</span>
+<p>In einer Datenbank sucht eine Anfrage („burger“) unter Schlüsseln (Cheeseburger, Fries, Hamburger, Ice cream) und liefert die zugehörigen Werte (12, 5, 10, 6). Eine harte Datenbank liefert genau einen Treffer. Die Vorlesung zeigt die „weiche“ Variante: Bei Ähnlichkeiten 0,5; 0; 0,5; 0 ist die Antwort \(0{,}5\cdot12+0{,}5\cdot10=11\). <span class="prov" data-kind="KURS">PDF-S. 38–40</span> Self-Attention ist genau das – nur dass Anfrage, Schlüssel und Werte Vektoren sind, die das Netz selbst lernt, und dass die Ähnlichkeiten aus diesen Vektoren <em>berechnet</em> werden.</p></div>
+
+<h3 id="att-tools">6.2 Was wir dafür brauchen</h3>
+<p>Wir setzen nur Schulmathematik voraus und führen alles Weitere hier ein.</p>
+<div class="box def"><span class="lbl">Definition 6.1 · Skalarprodukt</span>
+<p>Für Vektoren \(a=(a_1,\dots,a_d)\) und \(b=(b_1,\dots,b_d)\) im \(\mathbb R^d\) ist \(a^\top b=\sum_{i=1}^d a_ib_i\). Die Länge ist \(\lVert a\rVert=\sqrt{a^\top a}\).</p></div>
+<p>Warum ist das ein Maß für „passt zusammen“? Weil es eine geometrische Bedeutung hat, die wir herleiten.</p>
+<div class="box thm"><span class="lbl">Satz 6.0 · Geometrie des Skalarprodukts</span>
+<p>Schließen \(a\ne0\) und \(b\ne0\) den Winkel \(\theta\in[0,\pi]\) ein, so gilt \(a^\top b=\lVert a\rVert\,\lVert b\rVert\cos\theta\). Gleichwertig: \(a^\top b=\lVert a\rVert\cdot\pi_a(b)\), wobei \(\pi_a(b)=\lVert b\rVert\cos\theta\) die <em>vorzeichenbehaftete</em> Länge des Schattens von \(b\) auf die Richtung von \(a\) ist.</p></div>
+<div class="box prf"><span class="lbl">Beweis</span>
+<ol class="drv">
+<li>\(\lVert a-b\rVert^2=(a-b)^\top(a-b)=\lVert a\rVert^2-2\,a^\top b+\lVert b\rVert^2\)<span class="why"><b>Warum:</b> Das Skalarprodukt ist in jedem Argument linear und symmetrisch (\(a^\top b=b^\top a\)); ausmultiplizieren wie bei \((x-y)^2\).</span></li>
+<li>\(\lVert a-b\rVert^2=\lVert a\rVert^2+\lVert b\rVert^2-2\lVert a\rVert\lVert b\rVert\cos\theta\)<span class="why"><b>Warum:</b> Kosinussatz im Dreieck mit den Seiten \(a\), \(b\), \(a-b\); der Winkel zwischen \(a\) und \(b\) liegt der Seite \(a-b\) gegenüber.</span></li>
+<li>\(a^\top b=\lVert a\rVert\lVert b\rVert\cos\theta\)<span class="why"><b>Warum:</b> Die rechten Seiten von (1) und (2) sind gleich; \(\lVert a\rVert^2+\lVert b\rVert^2\) kürzt sich, dann durch \(-2\) teilen. \(\square\)</span></li>
+</ol></div>
+<p>Damit lässt sich der Score sofort lesen: <b>groß</b>, wenn \(b\) weit in Richtung von \(a\) ragt; <b>null</b>, wenn \(b\) senkrecht steht; <b>negativ</b>, wenn \(b\) von \(a\) wegzeigt. Die Länge von \(a\) wirkt als gemeinsamer Verstärkungsfaktor – das wird in 6.3 wichtig.</p>
+<figure class="fig7"><div class="fig-ph" data-fig="projection"></div><figcaption><b>Abb. 6.1 – Scores als Projektionen.</b> Die Query \(\cq{q}\) des Wortes „Bank“ (blau) und die Keys \(\ck{k_j}\) dreier Kontextwörter (bernstein). Das gestrichelte Lot zeigt den Schatten \(\pi_q(k_j)\); der Score ist \(\lVert q\rVert\cdot\pi_q(k_j)\). Der Key von „Geld“ ist lang, zeigt aber von \(q\) weg – sein Score ist negativ.</figcaption></figure>
+
+<p><b>Exponentialfunktion.</b> Wir benötigen drei Eigenschaften von \(e^x\): (E1) \(e^x&gt;0\) für alle \(x\); (E2) streng wachsend; (E3) \(e^{x+y}=e^x e^y\). Alle drei sind Standard und werden in 6.3 an genau einer Stelle benutzt – wir markieren dort, wo.</p>
+
+<table class="sym"><tr><th>Symbol</th><th>Bedeutung</th><th>Form / Bereich</th></tr>
+<tr><td>\(N\)</td><td>Anzahl der Token im Satz</td><td>natürliche Zahl</td></tr>
+<tr><td>\(x_t\)</td><td>Eingabevektor (Einbettung) des Tokens an Position \(t\)</td><td>\(\mathbb R^{n}\)</td></tr>
+<tr><td>\(\cq{q}\)</td><td>Query: „wonach sucht das betrachtete Wort?“</td><td>\(\mathbb R^{d_k}\)</td></tr>
+<tr><td>\(\ck{k_j}\)</td><td>Key von Wort \(j\): „womit kann Wort \(j\) gefunden werden?“</td><td>\(\mathbb R^{d_k}\)</td></tr>
+<tr><td>\(\cv{v_j}\)</td><td>Value von Wort \(j\): „was liefert Wort \(j\), wenn es gewählt wird?“</td><td>\(\mathbb R^{d_v}\)</td></tr>
+<tr><td>\(s_j\)</td><td>Score (Energie): \(q^\top k_j/\sqrt{d_k}\)</td><td>\(\mathbb R\), auch negativ</td></tr>
+<tr><td>\(T\)</td><td>Temperatur der Softmax (Standard \(T=1\))</td><td>\(T&gt;0\)</td></tr>
+<tr><td>\(\cw{w_j}\)</td><td>Gewicht von Wort \(j\)</td><td>\(w_j&gt;0\), \(\sum_jw_j=1\)</td></tr>
+<tr><td>\(\co{o}\)</td><td>Ausgabe: neuer, kontextabhängiger Vektor des betrachteten Wortes</td><td>\(\mathbb R^{d_v}\)</td></tr>
+<tr><td>\(W_Q,W_K,W_V\)</td><td>gelernte Projektionsmatrizen</td><td>\(n\times d_k\), \(n\times d_k\), \(n\times d_v\)</td></tr></table>
+
+<h3 id="att-softmax">6.3 Vom Score zum Gewicht: die Softmax, hergeleitet</h3>
+<p>Angenommen, die Scores \(s_1,\dots,s_N\) sind berechnet. Wir wollen daraus Gewichte \(w_1,\dots,w_N\) machen, mit denen wir die Values mitteln. Bevor wir eine Formel hinschreiben, legen wir fest, was sie leisten muss:</p>
+<ol>
+<li><b>(W1) Positivität:</b> \(w_j&gt;0\). Ein Wort soll höchstens „wenig“ beitragen, nie „negativ“ – sonst wäre \(o\) kein Mittelwert.</li>
+<li><b>(W2) Normierung:</b> \(\sum_jw_j=1\). Dann ist \(o\) ein gewichteter <em>Durchschnitt</em> und behält die Größenordnung der Values.</li>
+<li><b>(W3) Ordnung:</b> Ist \(s_i&gt;s_j\), soll \(w_i&gt;w_j\) gelten.</li>
+<li><b>(W4) Nur Unterschiede zählen:</b> Addiert man zu allen Scores dieselbe Zahl, sollen die Gewichte gleich bleiben – „passt besser als die anderen“ ist eine relative Aussage.</li>
+</ol>
+<div class="box mis"><span class="lbl">Naheliegend, aber falsch</span>
+<p>„Teile jeden Score durch die Summe aller Scores.“ Das verletzt (W1) sofort: Im Bank-Beispiel unten ist ein Score negativ. Mit \(s=(1;\,{-1};\,0{,}5)\) entstünde das Gewicht \(-1/0{,}5=-2\) – und kleine Änderungen nahe einer Summe von 0 würden die Gewichte explodieren lassen.</p></div>
+<p>Die Lösung: erst jeden Score durch eine streng wachsende, positive Funktion schicken, dann normieren. Mit \(e^x\) erfüllt das alle vier Forderungen:</p>
+<div class="box def"><span class="lbl">Definition 6.2 · Softmax mit Temperatur</span>
+\[\cw{w_j}=\operatorname{softmax}(s/T)_j=\frac{e^{s_j/T}}{\sum_{l=1}^{N}e^{s_l/T}},\qquad j=1,\dots,N,\ T&gt;0.\]</div>
+<div class="box prf"><span class="lbl">Nachweis von (W1)–(W4)</span>
+<ol class="drv">
+<li>\(w_j&gt;0\)<span class="why"><b>Warum:</b> Zähler und Nenner sind Summen bzw. Werte von \(e^{\cdot}\), also positiv (E1).</span></li>
+<li>\(\sum_jw_j=\frac{\sum_je^{s_j/T}}{\sum_le^{s_l/T}}=1\)<span class="why"><b>Warum:</b> Alle \(w_j\) haben denselben Nenner; die Summe der Zähler ist genau dieser Nenner.</span></li>
+<li>\(s_i&gt;s_j\Rightarrow w_i&gt;w_j\)<span class="why"><b>Warum:</b> \(T&gt;0\) erhält die Ungleichung, \(e^x\) ist streng wachsend (E2), der Nenner ist für beide gleich.</span></li>
+<li>\(\dfrac{e^{(s_j+c)/T}}{\sum_le^{(s_l+c)/T}}=\dfrac{e^{c/T}\,e^{s_j/T}}{e^{c/T}\sum_le^{s_l/T}}=w_j\)<span class="why"><b>Warum:</b> (E3) zerlegt jeden Exponenten; der gemeinsame Faktor \(e^{c/T}\) steht in Zähler und Nenner und kürzt sich. \(\square\)</span></li>
+</ol></div>
+<p>Schritt (4) ist <b>Satz 6.1 (a)</b>: Verschiebungsinvarianz. Er hat eine nützliche Folge: Verschiebt man <em>alle</em> Keys um denselben Vektor \(u\), so ändert sich jeder Score um denselben Betrag \(q^\top u/\sqrt{d_k}\) – die Gewichte bleiben gleich. Und jede Implementierung zieht vor dem Exponenzieren \(\max_l s_l\) ab: dasselbe Ergebnis, aber ohne Zahlenüberlauf.</p>
+<div class="box thm"><span class="lbl">Satz 6.1 · Verschiebung und Länge</span>
+<p>(a) \(\operatorname{softmax}(s+c\mathbf 1)=\operatorname{softmax}(s)\) für jedes \(c\in\mathbb R\). (b) Die Query \(\lambda q\) mit \(\lambda&gt;0\) liefert bei Temperatur \(T\) dieselben Gewichte wie \(q\) bei Temperatur \(T/\lambda\).</p></div>
+<div class="box prf"><span class="lbl">Beweis von (b)</span>
+<ol class="drv"><li>\(\dfrac{(\lambda q)^\top k_j}{\sqrt{d_k}\,T}=\dfrac{\lambda\,s_j}{T}=\dfrac{s_j}{T/\lambda}\)<span class="why"><b>Warum:</b> Das Skalarprodukt ist linear in \(q\), also \((\lambda q)^\top k_j=\lambda\,q^\top k_j\). Die Gewichte hängen nur von \(s_j/T\) ab. \(\square\)</span></li></ol></div>
+<p><b>Was die Temperatur tut.</b> Kleines \(T\) vergrößert alle Abstände \((s_i-s_j)/T\): Die Verteilung wird spitzer. Großes \(T\) staucht sie: Die Gewichte nähern sich \(1/N\). Abb. 6.3 zeigt beides für die Scores des Beispiels unten. Wegen (b) kann ein Netz die Schärfe schon über die <em>Länge</em> seiner Queries steuern – ganz ohne \(T\).</p>
+<figure class="fig7"><div class="fig-ph" data-fig="pipeline"></div><figcaption><b>Abb. 6.2 – Die Rechenkette.</b> Links die Scores \(s_j\), Mitte \(e^{s_j}\) (alle positiv, Reihenfolge erhalten), rechts die normierten Gewichte \(\cw{w_j}\). Die Zahlen sind die des Bank-Beispiels aus 6.6.</figcaption></figure>
+<figure class="fig7"><div class="fig-ph" data-fig="temperature"></div><figcaption><b>Abb. 6.3 – Gewichte als Funktion der Temperatur.</b> Für \(T\to0\) wandert alles Gewicht zum größten Score (Fluss); für \(T\to\infty\) nähern sich alle drei Kurven \(1/3\). Die Reihenfolge der Kurven ändert sich nie (W3).</figcaption></figure>
+<div class="box mis"><span class="lbl">Grenzfall · T → 0 mit Gleichstand</span>
+<p>„Für \(T\to0\) wird die Softmax one-hot“ stimmt nur bei <em>eindeutigem</em> Maximum. Haben \(k\ge2\) Scores denselben Maximalwert, verteilt sich das Gewicht im Grenzwert gleichmäßig auf diese \(k\) Wörter (je \(1/k\)), weil ihre Zähler gleich sind und alle anderen Zähler relativ gegen 0 gehen.</p></div>
+
+<h3 id="att-simplex">6.4 Gewichte sind Punkte in einem Dreieck</h3>
+<p>Alle Vektoren \(w\) mit \(w_j\ge0\) und \(\sum_jw_j=1\) bilden den <b>Wahrscheinlichkeitssimplex</b> \(\Delta^{N-1}\). Für \(N=3\) ist das ein Dreieck: Jede Ecke ist „alles Gewicht auf ein Wort“, der Mittelpunkt ist die Gleichverteilung. Die Softmax ist also eine Abbildung von beliebigen Score-Vektoren in dieses Dreieck. Sie erreicht jeden <em>inneren</em> Punkt, aber nie den Rand, weil alle Gewichte positiv sind (W1).</p>
+<figure class="fig7"><div class="fig-ph" data-fig="simplex"></div><figcaption><b>Abb. 6.4 – Der Simplex.</b> Die violette Bahn zeigt die Gewichte des Bank-Beispiels, während die Temperatur wächst. Kleine \(T\) liegen nahe der Ecke „Fluss“, große nahe der Mitte. Im Labor (Ansicht „Eine Query“) wandert dieser Punkt, wenn Sie \(q\) ziehen oder \(T\) verändern.</figcaption></figure>
+
+<h3 id="att-mix">6.5 Gewichte mischen Werte: die konvexe Kombination</h3>
+<div class="box def"><span class="lbl">Definition 6.3 · Ausgabe der Attention</span>
+\[\co{o}=\sum_{j=1}^{N}\cw{w_j}\,\cv{v_j}.\]
+<p>Ein solcher Ausdruck mit Gewichten im Simplex heißt <b>Konvexkombination</b> der \(v_j\); die Menge aller Konvexkombinationen ist die <b>konvexe Hülle</b> \(\operatorname{conv}\{v_1,\dots,v_N\}\) – anschaulich das „Gummiband“ um die Punkte.</p></div>
+<div class="box thm"><span class="lbl">Satz 6.2 · Was die Ausgabe kann – und was nicht</span>
+<p>(a) \(o\) liegt immer in \(\operatorname{conv}\{v_1,\dots,v_N\}\). (b) Jeder Punkt \(z=\sum_j\mu_jv_j\) mit <em>allen</em> \(\mu_j&gt;0\), \(\sum_j\mu_j=1\) wird von geeigneten Scores exakt erreicht. (c) Punkte, die nur mit einem \(\mu_j=0\) darstellbar sind (Randpunkte), werden nur im Grenzwert erreicht; Punkte außerhalb der Hülle nie.</p></div>
+<div class="box prf"><span class="lbl">Beweis</span>
+<ol class="drv">
+<li>(a) \(w\in\Delta^{N-1}\)<span class="why"><b>Warum:</b> (W1) und (W2) aus 6.3. Damit ist \(o=\sum_jw_jv_j\) nach Definition eine Konvexkombination.</span></li>
+<li>(b) Setze \(s_j=T\ln\mu_j\).<span class="why"><b>Warum möglich:</b> \(\mu_j&gt;0\), also ist \(\ln\mu_j\) definiert.</span></li>
+<li>\(w_j=\dfrac{e^{\ln\mu_j}}{\sum_le^{\ln\mu_l}}=\dfrac{\mu_j}{\sum_l\mu_l}=\mu_j\)<span class="why"><b>Warum:</b> \(e^{\ln x}=x\) und \(\sum_l\mu_l=1\). Also \(o=z\).</span></li>
+<li>(c) Aus \(w_j&gt;0\) für alle \(j\) folgt: Ein Randpunkt mit \(\mu_j=0\) braucht \(w_j\to0\), also \(s_j-\max_ls_l\to-\infty\); ein Punkt außerhalb verletzt (a). \(\square\)<span class="why"><b>Warum:</b> \(w_j\le e^{(s_j-\max_l s_l)/T}\), weil der Nenner mindestens den Summanden des Maximums \(e^{\max_l s_l/T}\) enthält.</span></li>
+</ol></div>
+<figure class="fig7"><div class="fig-ph" data-fig="hull"></div><figcaption><b>Abb. 6.5 – Mischen statt auswählen.</b> Die Values \(\cv{v_j}\) spannen die getönte Hülle auf. Die violette Pfeilkette addiert \(w_1v_1\), \(w_2v_2\), \(w_3v_3\) und endet bei \(\co{o}\). Der rote Punkt \(Z\) liegt außerhalb – keine Wahl von Query, Keys oder Temperatur erreicht ihn.</figcaption></figure>
+<p><b>Warum das wichtig ist.</b> Self-Attention kann Information nur <em>mischen</em>, nicht verstärken oder umdrehen. Darum folgen im Transformer eine lineare Abbildung \(W_O\) und eine Residualverbindung \(x+\operatorname{Att}(x)\) (Abschnitt 8): Sie verlassen die Hülle. Wichtig auch für die Deutung: Viele verschiedene Gewichtsvektoren können dieselbe Ausgabe ergeben (etwa wenn zwei Values gleich sind) – große Gewichte allein „erklären“ eine Entscheidung nicht (6.11).</p>
+
+<h3 id="att-example">6.6 Durchgerechnet: „Bank“ am Fluss</h3>
+<p>Wir rechnen in zwei Dimensionen, damit jede Zahl sichtbar ist (\(d_k=d_v=2\), \(T=1\)). Die Achsen des Werteraums deuten wir als „Ufer-Bedeutung“ und „Finanz-Bedeutung“.</p>
+<table class="num7"><tr><th>Wort \(j\)</th><th>\(\ck{k_j}\)</th><th>\(\cv{v_j}\)</th></tr>
+<tr><td>Fluss</td><td>\((1{,}6;\ 0{,}4)\)</td><td>\((1{,}8;\ 0{,}2)\)</td></tr>
+<tr><td>Geld</td><td>\((-0{,}4;\ 1{,}5)\)</td><td>\((0{,}1;\ 1{,}9)\)</td></tr>
+<tr><td>der</td><td>\((0{,}1;\ {-0{,}3})\)</td><td>\((0{,}2;\ 0{,}2)\)</td></tr></table>
+<p>Die Query von „Bank“ sei \(\cq{q}=(0{,}9;\,{-0{,}6})\).</p>
+<ol class="drv">
+<li>\(\begin{aligned}q^\top k_{\text{Fluss}}&amp;=0{,}9\cdot1{,}6+(-0{,}6)\cdot0{,}4=1{,}2\\ q^\top k_{\text{Geld}}&amp;=0{,}9\cdot(-0{,}4)+(-0{,}6)\cdot1{,}5=-1{,}26\\ q^\top k_{\text{der}}&amp;=0{,}9\cdot0{,}1+(-0{,}6)\cdot(-0{,}3)=0{,}27\end{aligned}\)<span class="why"><b>Warum:</b> Definition 6.1, komponentenweise. Kontrolle mit Abb. 6.1: „Geld“ zeigt von \(q\) weg.</span></li>
+<li>\(s=(0{,}8485;\ {-0{,}891};\ 0{,}1909)\)<span class="why"><b>Warum:</b> Division durch \(\sqrt{d_k}=\sqrt2\) (Begründung in 6.8).</span></li>
+<li>\(e^{s}=(2{,}3362;\ 0{,}4103;\ 1{,}2104)\), Summe \(3{,}9568\)<span class="why"><b>Warum:</b> Zähler und Nenner der Softmax. Alle positiv, Reihenfolge wie bei \(s\).</span></li>
+<li>\(\cw{w}=(0{,}5904;\ 0{,}1037;\ 0{,}3059)\)<span class="why"><b>Warum:</b> Jeder Zähler durch \(3{,}9568\). Kontrolle: Summe 1.</span></li>
+<li>\(\co{o}=0{,}5904\,v_{\text{Fluss}}+0{,}1037\,v_{\text{Geld}}+0{,}3059\,v_{\text{der}}=(1{,}1343;\ 0{,}3763)\)<span class="why"><b>Warum:</b> Definition 6.3, komponentenweise. Kontrolle: \(o\) liegt im Dreieck der Values (Satz 6.2).</span></li>
+</ol>
+<p><b>Deutung.</b> Die Ausgabe liegt deutlich auf der Ufer-Achse: Das Wort „Bank“ ist in Richtung „Fluss“ verschoben worden. Bemerkenswert: „der“ erhält mehr Gewicht als „Geld“, obwohl \(k_{\text{Geld}}\) viel länger ist – entscheidend ist die Projektion auf \(q\), nicht die Länge. Die Entropie der Gewichte beträgt \(H=1{,}3106\) Bit von höchstens \(\log_23=1{,}585\) Bit: Die Aufmerksamkeit ist verteilt, nicht scharf. Verdoppelt man \(q\), werden die Gewichte \((0{,}7697;\,0{,}0237;\,0{,}2066)\) und die Entropie sinkt auf \(0{,}8888\) Bit (Satz 6.1 b).</p>
+<div class="lab-ref" data-kc="attention"></div>
+
+<h3 id="att-matrix">6.7 Für alle Wörter gleichzeitig: Matrixform und Dimensionen</h3>
+<p>Bisher hatte nur „Bank“ eine Query. In Self-Attention erhält jedes Token \(t\) aus seiner Einbettung \(x_t\) <em>alle drei</em> Rollen: \(q_t=x_tW_Q\), \(k_t=x_tW_K\), \(v_t=x_tW_V\) (Zeilenvektoren). Schreibt man die Einbettungen als Zeilen einer Matrix \(X\in\mathbb R^{N\times n}\), entstehen alle auf einmal:</p>
+\[Q=XW_Q\in\mathbb R^{N\times d_k},\quad K=XW_K\in\mathbb R^{N\times d_k},\quad V=XW_V\in\mathbb R^{N\times d_v},\qquad \operatorname{Att}(Q,K,V)=\operatorname{softmax}\!\Big(\frac{QK^\top}{\sqrt{d_k}}\Big)V.\]
+<ol class="drv">
+<li>\(QK^\top\in\mathbb R^{N\times N}\), Eintrag \((i,j)=q_i^\top k_j\)<span class="why"><b>Warum:</b> Zeile \(i\) von \(Q\) mal Spalte \(j\) von \(K^\top\) (= Zeile \(j\) von \(K\)). Dimensionsprobe: \((N\times d_k)(d_k\times N)\).</span></li>
+<li>Softmax <b>zeilenweise</b>: Zeile \(i\) enthält die Gewichte von Token \(i\) über alle \(j\)<span class="why"><b>Warum:</b> Jedes Token fragt einzeln; normiert wird über die Spalten \(j\) einer Zeile.</span></li>
+<li>\(A\,V\in\mathbb R^{N\times d_v}\), Zeile \(i\) \(=\sum_jA_{ij}v_j=o_i\)<span class="why"><b>Warum:</b> Zeile \(i\) von \(A\) mal \(V\) ist die gewichtete Summe der Zeilen von \(V\) – Definition 6.3 für Token \(i\).</span></li>
+</ol>
+<p><b>Dimensionsprobe an Zahlen.</b> \(N=3\) Token, Einbettung \(n=4\), \(d_k=d_v=2\): \(X\) ist \(3\times4\), \(W_Q\) ist \(4\times2\), also \(Q\) \(3\times2\); \(QK^\top\) ist \(3\times3\); \(AV\) ist \(3\times2\) – für jedes Token ein neuer Vektor der Länge 2. Gelernt werden nur \(W_Q,W_K,W_V\); die Gewichte \(A\) werden für jede Eingabe neu berechnet. <span class="prov" data-kind="KURS">PDF-S. 42–53</span> <span class="prov" data-kind="LEHRBUCH">SLP3 §7.1.1, S. 180; §7.3, S. 188, Gl. 7.34</span></p>
+<p class="mute small">Notation: Die Folie schreibt Token als Spalten (\(X\in\mathbb R^{n\times N}\), \(q_i=W_Qx_i\)); hier gilt durchgehend die Zeilenkonvention von SLP3.</p>
+<div class="task-ref" data-task="AT5"></div>
+<div class="task-ref" data-task="AT1"></div>
+
+<p><span class="layer" data-layer="deep">Vertiefung</span></p>
+<h3 id="att-scale">6.8 Warum durch \(\sqrt{d_k}\) teilen?</h3>
+<p><b>Das Problem.</b> In echten Modellen ist \(d_k=64\) oder größer. Ein Skalarprodukt ist eine Summe von \(d_k\) Produkten – je mehr Summanden, desto weiter streuen die Scores. Weit gestreute Scores machen die Softmax fast one-hot, und dann (Lemma 6.4) kommt beim Lernen kaum noch ein Gradient an. Wie stark wachsen die Scores? Dafür brauchen wir zwei Begriffe aus der Wahrscheinlichkeitsrechnung: Erwartungswert \(\mathbb E\) und Varianz \(\operatorname{Var}(X)=\mathbb E[X^2]-(\mathbb E X)^2\).</p>
+<div class="box thm"><span class="lbl">Satz 3 · Varianz des Skalarprodukts</span>
+<p>Sind \(q_1,\dots,q_{d_k},k_1,\dots,k_{d_k}\) unabhängig mit Erwartungswert 0 und Varianz 1, so gilt \(\mathbb E[q^\top k]=0\) und \(\operatorname{Var}(q^\top k)=d_k\). Also hat \(q^\top k/\sqrt{d_k}\) die Varianz 1.</p></div>
+<div class="box prf"><span class="lbl">Beweis</span>
+<ol class="drv">
+<li>\(\mathbb E[q_ik_i]=\mathbb E[q_i]\,\mathbb E[k_i]=0\)<span class="why"><b>Warum:</b> Für unabhängige Zufallsgrößen ist der Erwartungswert des Produkts das Produkt der Erwartungswerte.</span></li>
+<li>\(\mathbb E[q^\top k]=\sum_i\mathbb E[q_ik_i]=0\)<span class="why"><b>Warum:</b> Linearität des Erwartungswerts – gilt immer, auch ohne Unabhängigkeit.</span></li>
+<li>\(\operatorname{Var}(q_ik_i)=\mathbb E[q_i^2k_i^2]-0=\mathbb E[q_i^2]\,\mathbb E[k_i^2]=1\cdot1\)<span class="why"><b>Warum:</b> Varianzformel mit (1); \(q_i^2\) und \(k_i^2\) sind unabhängig, weil \(q_i,k_i\) es sind; \(\mathbb E[q_i^2]=\operatorname{Var}(q_i)+(\mathbb Eq_i)^2=1\).</span></li>
+<li>\(\operatorname{Cov}(q_ik_i,q_jk_j)=\mathbb E[q_ik_iq_jk_j]-0=\mathbb E[q_i]\mathbb E[k_i]\mathbb E[q_j]\mathbb E[k_j]=0\) für \(i\ne j\)<span class="why"><b>Warum:</b> Vier verschiedene unabhängige Größen; jeder Faktor hat Erwartungswert 0.</span></li>
+<li>\(\operatorname{Var}\big(\sum_iq_ik_i\big)=\sum_i\operatorname{Var}(q_ik_i)=d_k\)<span class="why"><b>Warum:</b> Varianz einer Summe = Summe der Varianzen plus aller Kovarianzen; diese sind nach (4) null.</span></li>
+<li>\(\operatorname{Var}\big(q^\top k/\sqrt{d_k}\big)=d_k/d_k=1\)<span class="why"><b>Warum:</b> \(\operatorname{Var}(cX)=c^2\operatorname{Var}(X)\) mit \(c=1/\sqrt{d_k}\). \(\square\)</span></li>
+</ol></div>
+<figure class="fig7"><div class="fig-ph" data-fig="variance"></div><figcaption><b>Abb. 6.6 – Satz 3 im Experiment.</b> Punkte: gemessene Varianz von \(q^\top k\) bei zufälligen \(q,k\) mit unabhängigen Standardnormal-Komponenten (eigene Simulation, Seed 11). Sie folgen der Geraden \(\operatorname{Var}=d_k\). Quadrate: nach Teilen durch \(\sqrt{d_k}\) liegt die Varianz bei 1, unabhängig von \(d_k\).</figcaption></figure>
+<div class="box mis"><span class="lbl">Was Satz 3 nicht sagt</span>
+<p>Gelernte Projektionen erfüllen die Annahmen nicht genau (Komponenten sind korreliert, Varianzen ungleich 1). Satz 3 begründet die <em>Größenordnung</em> des Faktors, nicht seinen exakten Wert. Die Originalarbeit formuliert entsprechend vorsichtig („We suspect …“) und gibt genau diese Rechnung in einer Fußnote. <span class="prov" data-kind="FORSCHUNG">Vaswani et al. 2017, §3.2.1</span> Und: Die Skalierung ist <em>nicht</em> dafür da, die Gewichte auf Summe 1 zu bringen – das macht die Softmax immer.</p></div>
+<div class="box thm"><span class="lbl">Lemma 6.4 · Jacobi-Matrix der Softmax mit Temperatur</span>
+<p>\(\dfrac{\partial w_i}{\partial s_j}=\dfrac1T\big(w_i[i=j]-w_iw_j\big)\). Mit dem Index \(m\) eines größten Scores und dem Vorsprung \(\Delta=s_m-\max_{j\ne m}s_j\) gilt \(\lVert J\rVert_F\le4(1-w_m)/T\le4(N-1)e^{-\Delta/T}/T\). Folgen: (a) feste \(T\), \(\Delta\to\infty\): \(J\to0\); (b) \(T\to0\) mit eindeutigem Maximum: \(J\to0\); (c) \(T\to0\) mit \(k\ge2\) gleich großen Maxima: \(J\) divergiert.</p></div>
+<div class="box prf"><span class="lbl">Beweis</span>
+<ol class="drv">
+<li>\(\dfrac{\partial w_i}{\partial s_j}=\dfrac{\tfrac1Te^{s_i/T}[i=j]\,Z-e^{s_i/T}\,\tfrac1Te^{s_j/T}}{Z^2}\), \(Z=\sum_le^{s_l/T}\)<span class="why"><b>Warum:</b> Quotientenregel; \(\partial e^{s_i/T}/\partial s_j=\tfrac1Te^{s_i/T}\) nur für \(i=j\), sonst 0; \(\partial Z/\partial s_j=\tfrac1Te^{s_j/T}\).</span></li>
+<li>\(=\tfrac1T\big(w_i[i=j]-w_iw_j\big)\)<span class="why"><b>Warum:</b> Durch \(Z^2\) teilen und \(w_i=e^{s_i/T}/Z\) einsetzen.</span></li>
+<li>\(\lVert J\rVert_F\le\sum_{i,j}|J_{ij}|=\tfrac2T\sum_iw_i(1-w_i)\)<span class="why"><b>Warum:</b> Frobeniusnorm ≤ Summe der Beträge; Diagonale \(w_i(1-w_i)/T\), außerhalb \(w_iw_j/T\), und \(\sum_{j\ne i}w_j=1-w_i\).</span></li>
+<li>\(\sum_iw_i(1-w_i)\le(1-w_m)+\sum_{i\ne m}w_i=2(1-w_m)\)<span class="why"><b>Warum:</b> \(w_m\le1\) und \(1-w_i\le1\).</span></li>
+<li>\(1-w_m\le(N-1)e^{-\Delta/T}\)<span class="why"><b>Warum:</b> \(1-w_m=\sum_{j\ne m}e^{(s_j-s_m)/T}\big/\sum_le^{(s_l-s_m)/T}\); der Nenner ist ≥ 1 (Summand \(l=m\)), jeder Zählersummand ≤ \(e^{-\Delta/T}\).</span></li>
+<li>(c): Bei Gleichstand gilt \(w_i\to1/k\) für die \(k\) Maxima, also \(J_{ii}=w_i(1-w_i)/T\to\infty\). \(\square\)<span class="why"><b>Warum:</b> \(w_i(1-w_i)\) strebt gegen die positive Konstante \(\tfrac1k(1-\tfrac1k)\), \(1/T\) gegen unendlich.</span></li>
+</ol></div>
+<p>Im Bank-Beispiel ist \(\lVert J\rVert_F=0{,}4324\). Zusammen mit Satz 3 ergibt sich die präzise Fassung des Arguments der Originalarbeit: Ohne Skalierung streuen die Scores mit Standardabweichung \(\sqrt{d_k}\), der Vorsprung \(\Delta\) wird typischerweise groß, und nach (a) verschwindet der Gradient. Das Labor misst das reproduzierbar (Ansicht „Skalierung“).</p>
+
+<h3 id="att-uniform">6.9 Wann sind alle Gewichte gleich?</h3>
+<div class="box thm"><span class="lbl">Satz 6.3</span><p>\(w_1=\dots=w_N=1/N\) genau dann, wenn \(q^\top(k_i-k_j)=0\) für alle \(i,j\).</p></div>
+<div class="box prf"><span class="lbl">Beweis</span><p>Gleiche Gewichte \(\Leftrightarrow\) gleiche Zähler \(e^{s_i/T}\) (der Nenner ist gemeinsam) \(\Leftrightarrow\) \(s_i=s_j\) (\(e^x\) ist injektiv) \(\Leftrightarrow\) \(q^\top k_i=q^\top k_j\). \(\square\)</p></div>
+<p>\(q=0\) genügt, ist aber nicht nötig: Liegen alle Keys auf einer Geraden senkrecht zu \(q\), sind alle Projektionen gleich lang. In hohen Dimensionen ist das für viele \(q\ne0\) möglich, denn \(N-1\) Differenzvektoren spannen höchstens einen \((N-1)\)-dimensionalen Raum auf.</p>
+
+<h3 id="att-pitfalls">6.10 Typische Denkfehler</h3>
+<div class="box mis"><span class="lbl">Fünf Fehler, die in Prüfungen vorkommen</span>
+<ol>
+<li><b>„Values bestimmen die Gewichte.“</b> Nein: Gewichte hängen nur von \(q\), den Keys, \(d_k\) und \(T\) ab. Values bestimmen, <em>was</em> gemischt wird.</li>
+<li><b>„Ein langer Key bekommt viel Gewicht.“</b> Nur, wenn er in Richtung \(q\) zeigt (Satz 6.0). Im Beispiel: Geld.</li>
+<li><b>„T → 0 ergibt immer one-hot.“</b> Nicht bei Gleichstand (6.3).</li>
+<li><b>„Mit kleiner Temperatur erreicht o jeden Punkt.“</b> Nur Punkte der Hülle; Ecken nur im Grenzwert (Satz 6.2).</li>
+<li><b>„√d_k normiert die Gewichte.“</b> Normiert wird durch die Softmax; \(\sqrt{d_k}\) kontrolliert die Streuung (Satz 3).</li>
+</ol></div>
+
+<p><span class="layer" data-layer="research">Forschung</span></p>
+<h3 id="att-research">6.11 Sind Attention-Gewichte Erklärungen?</h3>
+<div class="box res"><span class="lbl">Forschungsfenster</span>
+<p><b>Frage.</b> Darf man aus großen Gewichten \(w_j\) schließen, dass Wort \(j\) die Entscheidung verursacht hat?</p>
+<p><b>Befund.</b> Jain &amp; Wallace (2019) vergleichen Attention-Gewichte mit gradientenbasierten Wichtigkeitsmaßen und konstruieren stark abweichende Gewichtsverteilungen, die dieselbe Vorhersage liefern; sie folgern, Standard-Attention liefere keine verlässlichen Erklärungen. Wiegreffe &amp; Pinter (2019) halten dagegen: Es hängt von der Definition von „Erklärung“ ab; die gefundenen alternativen Verteilungen bestehen ihren Diagnosetest schlecht.</p>
+<p><b>Verbindung zur Mathematik.</b> Satz 6.2 erklärt, warum die Frage berechtigt ist: Die Abbildung \(w\mapsto o=\sum_jw_jv_j\) ist im Allgemeinen nicht injektiv – sobald Values kollinear oder gleich sind, ergeben viele \(w\) dieselbe Ausgabe. Und die Gewichte sagen nichts über \(W_O\) und die Residualverbindung, die danach kommen.</p>
+<p><b>Grenzen dieser Darstellung.</b> Gelesen wurden die Zusammenfassungen beider Arbeiten (ACL Anthology), nicht die Experimente; Zahlen werden nicht wiedergegeben. Beide untersuchen Klassifikation mit RNN-Encodern, nicht Transformer-NER.</p>
+<p class="mute small">Belegstellen: <a class="cite" href="#ref-jain">Jain &amp; Wallace 2019</a>; <a class="cite" href="#ref-wiegreffe">Wiegreffe &amp; Pinter 2019</a>; zur Skalierung <a class="cite" href="#ref-vaswani">Vaswani et al. 2017, §3.2.1</a></p></div>
+<aside class="media"><h4>Zum Anschauen (optional)</h4><p><a href="https://www.youtube.com/watch?v=eMlx5fFNoYc">3Blue1Brown: „Attention in transformers, step-by-step“ (Deep Learning, Kapitel 6, 7. April 2024)</a>. Rolle: visuelle Intuition in hohen Dimensionen; andere Notation (Spaltenvektoren, kausale Maske). Nicht im Detail ausgewertet, daher ohne Zeitmarken.</p></aside>
+
+<h3 id="att-check">6.12 Selbstcheck und Transfer</h3>
+<div class="box chk"><span class="lbl">Selbstcheck (ohne Rechnung)</span>
+<ol><li>Sie addieren 5 zu allen Scores. Was passiert mit den Gewichten – und warum?</li><li>Ein Key steht senkrecht auf \(q\). Welchen Score hat er, welches Gewicht im Vergleich zu einem Key mit negativem Score?</li><li>Können Gewichte \((1;\,0;\,0)\) exakt herauskommen?</li></ol>
+<p class="mute small">Antworten: (1) nichts, Satz 6.1 a; (2) Score 0, größeres Gewicht als jeder negative Score (W3); (3) nein, nur im Grenzwert (W1).</p></div>
+<p>Die Transferaufgabe <b>AT10</b> im Arbeitsbuch dreht die Richtung um: Gegeben ist eine gewünschte Ausgabe; gesucht sind Gewichte, Scores und eine Query, die sie erzeugt. Die Probeklausur enthält eine neue Aufgabe dieser Art mit anderen Zahlen.</p>
+<div class="task-ref" data-task="AT10"></div>
+</div>
 </section>
 
 <section data-id="position" data-title="7 · Positionsinformation">
 <p><span class="layer" data-layer="core">Klausurkern</span></p>
+<div class="scene" data-scene="attention"></div>
 <p>Ein RNN-Zustand hängt von der Reihenfolge ab; Self-Attention ohne Zusatz nicht – die Vorlesung nennt das eine „Bag-of-words-Repräsentation“ („Marry kills John“ / „John kills Marry“, PDF-S. 60–62). Präzise:</p>
 <div class="thm"><b>Satz 4 (Permutations-Äquivarianz).</b> Für jede Permutationsmatrix \(P\) gilt \(\operatorname{Att}(PX)=P\,\operatorname{Att}(X)\): Vertauscht man die Token, vertauschen sich die Ausgaben genauso – jedes Token erhält denselben Ausgabevektor wie vorher.</div>
 <div class="proof">\[\begin{aligned}

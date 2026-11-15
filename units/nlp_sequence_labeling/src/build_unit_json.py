@@ -10,6 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import v5_attention as V5  # noqa: E402
 import v5_exam_worked as V5W  # noqa: E402
+import v7_tasks as V7  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / 'unit.json'
 L3 = ['O', 'B-LOC', 'I-LOC']
@@ -468,8 +469,12 @@ KC_MAP = {
 
 # ---- v5 (Issue #8): Attention-Mikrosequenz, ausführliche Lösungen, Anki-Anreicherung, Labor-Verknüpfung ----
 T.extend(V5.TASKS)
+T.append(V7.AT10)
+A.append(V7.A19)
+B.append(V7.B19)
 for it in A + B:
-    it['worked'] = V5W.W[it['id']]; it['rubric'] = V5W.R[it['id']]
+    if it['id'] in V5W.W:
+        it['worked'] = V5W.W[it['id']]; it['rubric'] = V5W.R[it['id']]
 CARDS.extend(V5.CARDS)
 for c in CARDS:
     for k, v in V5.CARD_EXTRAS.get(c['key'], {}).items():
@@ -477,10 +482,10 @@ for c in CARDS:
 KC_MAP['attention']['research'] = KC_MAP['attention']['research'] + ['jain', 'wiegreffe']
 
 unit = {
-    'id': 'nlp-sequence-labeling', 'version': '5.0.0', 'course': 'Natural Language Processing', 'chapter': '09 Neural Sequence Labeling',
+    'id': 'nlp-sequence-labeling', 'version': '7.0.0', 'course': 'Natural Language Processing', 'chapter': '09 Neural Sequence Labeling',
     'title': 'Neuronale Sequenzmarkierung',
     'subtitle': 'NER und Spannen · RNN, BiRNN, Self-Attention, Positionen · CRF und Viterbi · Precision, Recall, F1 · Fallstudie',
-    'status': 'Status v5: HUMAN_REVIEW_PENDING (keine Selbstfreigabe). v1, v3, v4: HUMAN_REJECTED; v2: nicht freigabefähig.',
+    'status': 'Status v7: Referenzsequenz Self-Attention in Prüfung (keine Selbstfreigabe). v1, v3, v4, v5, v6.1: HUMAN_REJECTED.',
     'text': 'text.html', 'kcs': KCS, 'kc_map': KC_MAP,
     'toy': {'emb': {'Washington': [1, 0], 'signed': [0, 1], 'state': [0, -1]}, 'a_fw': 0.5, 'a_bw': 0.8},
     'tasks': T, 'exam_forms': {'A': A, 'B': B}, 'case': CASE, 'cards': CARDS,

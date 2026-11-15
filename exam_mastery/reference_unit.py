@@ -181,6 +181,11 @@ def compute(check: str, unit: dict):
     if kind == 'weighted':                  # support-weighted macro F1
         cs = list(_counts(arg).values()); sup = [c.tp + c.fn for c in cs]
         return sum(Fraction(s_) * (S.f1(c) or 0) for s_, c in zip(sup, cs)) / sum(sup)
+    if kind == 'ln':                        # ln:<x>  (v7: inverse Softmax)
+        return math.log(float(Fraction(arg)))
+    if kind == 'sqrt2ln':                   # sqrt2ln:<x>:<faktor>  = faktor·√2·ln x
+        x, fac = arg.split(':')
+        return float(Fraction(fac)) * math.sqrt(2) * math.log(float(Fraction(x)))
     if kind == 'attnd':                     # attnd:<taskid>:<what>:<idx>  (data.attn der Aufgabe)
         tid, what, idx = arg.split(':')
         return attn_full(data[tid]['attn'])[what][int(idx)]
@@ -223,6 +228,10 @@ def _ex():
 def load(unit_dir: Path) -> dict:
     unit = json.loads((unit_dir / 'unit.json').read_text(encoding='utf-8'))
     unit['text_html'] = (unit_dir / unit['text']).read_text(encoding='utf-8')
+    if 'fig-ph' in unit['text_html'] and unit.get('numeric_examples'):          # v7: Originalgrafiken, inline-SVG
+        from . import figures7
+        figs = figures7.render_all(unit['numeric_examples'][0])
+        unit['text_html'] = re.sub(r'<div class="fig-ph" data-fig="(\w+)"></div>', lambda m_: figs[m_.group(1)], unit['text_html'])
     unit['_dir'] = str(unit_dir)
     return unit
 
@@ -470,7 +479,7 @@ def verify(unit: dict) -> dict:
             if sc not in scenes:
                 errors.append(f'KC {k}: scene {sc} not embedded in text')
     known = _known_decimals(unit)
-    prose = unit['text_html'] + json.dumps([t.get('steps', []) for t in unit['tasks']], ensure_ascii=False) + \
+    prose = re.sub(r'(?s)<svg.*?</svg>', '', unit['text_html']) + json.dumps([t.get('steps', []) for t in unit['tasks']], ensure_ascii=False) + \
         json.dumps([t.get('solution', '') for t in items], ensure_ascii=False) + json.dumps([t.get('worked', '') for t in items], ensure_ascii=False) + \
         json.dumps(unit['cards'], ensure_ascii=False)
     prose = prose.replace('\\\\', '\\')
@@ -540,13 +549,13 @@ PARTS = {'lehrbuch': 'Lehrbuch', 'arbeitsbuch': 'Arbeitsbuch', 'loesungen': 'Mus
 def _page(unit: dict, mode: str, part: str = '') -> str:
     data = {k: v for k, v in unit.items() if not k.startswith('_')}   # never publish local paths
     payload = json.dumps(data, ensure_ascii=False).replace('</', '<\\/')
-    css = (TEMPLATES / 'unit_app.css').read_text(encoding='utf-8')
+    css = (TEMPLATES / 'unit_app.css').read_text(encoding='utf-8') + (TEMPLATES / 'design_tokens.css').read_text(encoding='utf-8')
     js = (TEMPLATES / 'unit_app.js').read_text(encoding='utf-8')
     title = unit['title'] + (f' – {PARTS[part]}' if part else '')
     return f"""<!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title><style>{css}</style>
-<script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]}},svg:{{fontCache:'global'}},startup:{{typeset:false}}}};</script>
+<script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']],macros:{{cq:['\\\\class{{mq}}{{#1}}',1],ck:['\\\\class{{mk}}{{#1}}',1],cv:['\\\\class{{mv}}{{#1}}',1],cw:['\\\\class{{mw}}{{#1}}',1],co:['\\\\class{{mo}}{{#1}}',1]}}}},svg:{{fontCache:'global'}},startup:{{typeset:false}}}};</script>
 <script src="assets/tex-svg-full.js" defer></script></head>
 <body data-mode="{mode}" data-part="{part}"><div id="app" aria-live="polite"></div>
 <script id="unit-data" type="application/json">{payload}</script><script>{js}</script></body></html>"""
@@ -559,12 +568,12 @@ def _lab_page(unit: dict) -> str:
     """Interaktives Labor: eigene Seite, vollständig offline (MathJax lokal, kein Netz)."""
     data = {k: v for k, v in unit.items() if k in ('id', 'title', 'chapter', 'course', 'lab', 'kc_map')}
     payload = json.dumps(data, ensure_ascii=False).replace('</', '<\\/')
-    css = (TEMPLATES / 'unit_app.css').read_text(encoding='utf-8') + (TEMPLATES / 'lab.css').read_text(encoding='utf-8')
+    css = (TEMPLATES / 'unit_app.css').read_text(encoding='utf-8') + (TEMPLATES / 'design_tokens.css').read_text(encoding='utf-8') + (TEMPLATES / 'lab.css').read_text(encoding='utf-8')
     js = '\n'.join((TEMPLATES / f).read_text(encoding='utf-8') for f in LAB_JS if (TEMPLATES / f).exists())
     return f"""<!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Interaktives Labor – {unit['title']}</title><style>{css}</style>
-<script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]}},svg:{{fontCache:'global'}}}};</script>
+<script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']],macros:{{cq:['\\\\class{{mq}}{{#1}}',1],ck:['\\\\class{{mk}}{{#1}}',1],cv:['\\\\class{{mv}}{{#1}}',1],cw:['\\\\class{{mw}}{{#1}}',1],co:['\\\\class{{mo}}{{#1}}',1]}}}},svg:{{fontCache:'global'}}}};</script>
 <script src="assets/tex-svg-full.js" defer></script></head>
 <body class="lab"><noscript>Das Labor benötigt JavaScript.</noscript>
 <script id="unit-data" type="application/json">{payload}</script><script>{js}</script></body></html>"""

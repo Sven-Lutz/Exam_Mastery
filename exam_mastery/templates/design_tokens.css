@@ -1,0 +1,97 @@
+/* Exam Mastery – gemeinsames Designsystem (Lehrbuch HTML/PDF, Lab, Anki).
+ * Farben tragen Bedeutung: jedes mathematische Objekt hat eine feste Farbe in Text, Formel, Grafik und Lab.
+ * Kontrast ≥ 4.5:1 auf dem jeweiligen Hintergrund (hell/dunkel geprüft); Bedeutung nie nur über Farbe – immer auch Beschriftung/Form.
+ */
+:root{
+  /* Semantik */
+  --c-q:#1d4ed8;      /* Query q            – Blau   */
+  --c-k:#b45309;      /* Keys k_j           – Bernstein */
+  --c-v:#0f766e;      /* Values v_j         – Petrol */
+  --c-w:#7c3aed;      /* Gewichte/Wahrscheinlichkeiten w_j – Violett */
+  --c-o:#be123c;      /* Ausgabe o          – Karmin */
+  --c-s:#334155;      /* Scores s_j         – Schiefer */
+  --c-proof:#15803d;  /* Beweis / gültig    */
+  --c-sim:#64748b;    /* Simulation / Indiz */
+  --c-err:#b91c1c;    /* Fehler / verletzt  */
+  --c-warn:#a16207;   /* Vorsicht / Grenzfall */
+  /* Flächen und Text */
+  --bg:#fbfaf7; --panel:#ffffff; --ink:#1b1f24; --mute:#525a66; --line:#e3dfd6; --soft:#f1f4fa;
+  --tint-def:#eef4ff; --tint-thm:#f3efff; --tint-proof:#f1f8f3; --tint-int:#fff8ec; --tint-ex:#eefaf8; --tint-mis:#fff1f1; --tint-res:#f8f4ee;
+  /* Typografie */
+  --serif:"Iowan Old Style","Charter","Palatino Linotype","Georgia",serif;
+  --sans:-apple-system,"Segoe UI","Helvetica Neue",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --fs-body:18px; --lh-body:1.62; --measure:70ch;
+  --fs-small:14.5px; --fs-label:12.5px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --c-q:#7ea6ff; --c-k:#f5a35a; --c-v:#4fd1c0; --c-w:#b79bff; --c-o:#ff7a98; --c-s:#cbd5e1;
+  --c-proof:#5bd38a; --c-sim:#a3adbb; --c-err:#ff8a8a; --c-warn:#f2c14e;
+  --bg:#14161a; --panel:#1c1f25; --ink:#e9e7e2; --mute:#a7adb7; --line:#343842; --soft:#232836;
+  --tint-def:#1d2740; --tint-thm:#262040; --tint-proof:#1a2b20; --tint-int:#2e2617; --tint-ex:#16302c; --tint-mis:#341c1e; --tint-res:#2a251e;
+}}
+:root[data-theme=dark]{
+  --c-q:#7ea6ff; --c-k:#f5a35a; --c-v:#4fd1c0; --c-w:#b79bff; --c-o:#ff7a98; --c-s:#cbd5e1;
+  --c-proof:#5bd38a; --c-sim:#a3adbb; --c-err:#ff8a8a; --c-warn:#f2c14e;
+  --bg:#14161a; --panel:#1c1f25; --ink:#e9e7e2; --mute:#a7adb7; --line:#343842; --soft:#232836;
+  --tint-def:#1d2740; --tint-thm:#262040; --tint-proof:#1a2b20; --tint-int:#2e2617; --tint-ex:#16302c; --tint-mis:#341c1e; --tint-res:#2a251e;
+}
+/* Semantische Klassen für MathJax (\class{mq}{…}) und Text */
+.mq,.mq *{color:var(--c-q);fill:var(--c-q)} .mk,.mk *{color:var(--c-k);fill:var(--c-k)} .mv,.mv *{color:var(--c-v);fill:var(--c-v)}
+.mw,.mw *{color:var(--c-w);fill:var(--c-w)} .mo,.mo *{color:var(--c-o);fill:var(--c-o)} .ms,.ms *{color:var(--c-s);fill:var(--c-s)}
+.mproof,.mproof *{color:var(--c-proof);fill:var(--c-proof)} .merr,.merr *{color:var(--c-err);fill:var(--c-err)}
+
+/* ---------- Lehrbuch-Satz (v7) ---------- */
+.book7{font:var(--fs-body)/var(--lh-body) var(--serif);color:var(--ink);hyphens:auto;-webkit-hyphens:auto}
+.book7 p,.book7 li{max-width:var(--measure)}
+.book7 h3{font:650 21px/1.3 var(--sans);margin:2.2em 0 .5em;letter-spacing:-.005em}
+.book7 h4{font:650 17px/1.35 var(--sans);margin:1.6em 0 .4em;color:var(--ink)}
+.book7 .lede{font-size:19.5px;line-height:1.6;color:var(--ink)}
+.book7 mjx-container{font-size:100%!important}
+.book7 mjx-container[display=true]{margin:.9em 0!important;overflow-x:auto;overflow-y:hidden;max-width:100%}
+.book7 .num{font-variant-numeric:tabular-nums lining-nums;font-family:var(--sans);font-size:.95em}
+/* Kastenarten: Bedeutung über Etikett + Linienstil + Tönung (auch in Graustufen unterscheidbar) */
+.box{position:relative;margin:1.3em 0;padding:.75em 1.1em .8em;border-radius:10px;border:1px solid var(--line);background:var(--panel);break-inside:avoid}
+.box>.lbl{display:inline-block;font:700 var(--fs-label)/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.45em}
+.box.def{background:var(--tint-def);border-left:5px solid var(--c-q)} .box.def>.lbl{color:var(--c-q)}
+.box.thm{background:var(--tint-thm);border-left:5px solid var(--c-w)} .box.thm>.lbl{color:var(--c-w)}
+.box.prf{background:var(--tint-proof);border-left:5px dotted var(--c-proof)} .box.prf>.lbl{color:var(--c-proof)}
+.box.int{background:var(--tint-int);border-left:5px double var(--c-warn)} .box.int>.lbl{color:var(--c-warn)}
+.box.ex{background:var(--tint-ex);border-left:5px solid var(--c-v)} .box.ex>.lbl{color:var(--c-v)}
+.box.mis{background:var(--tint-mis);border-left:5px dashed var(--c-err)} .box.mis>.lbl{color:var(--c-err)}
+.box.res{background:var(--tint-res);border-left:5px solid #8a6d3b} .box.res>.lbl{color:#8a6d3b}
+.box.chk{border-left:5px solid var(--c-s)} .box.chk>.lbl{color:var(--c-s)}
+/* Herleitungen: nummerierte Schritte, Formel links, Begründung darunter */
+ol.drv{counter-reset:d;list-style:none;padding:0;margin:.6em 0}
+ol.drv>li{counter-increment:d;position:relative;padding:.35em 0 .45em 2.6em;border-bottom:1px dashed var(--line);max-width:none}
+ol.drv>li::before{content:"(" counter(d) ")";position:absolute;left:0;top:.45em;font:600 14px var(--sans);color:var(--mute)}
+ol.drv .why{display:block;font:var(--fs-small)/1.5 var(--sans);color:var(--mute);margin-top:.15em}
+ol.drv .why b{color:var(--ink);font-weight:600}
+/* Symbolverzeichnis */
+table.sym{border-collapse:collapse;width:100%;font:15px/1.45 var(--sans);margin:.8em 0;display:table}
+table.sym th{font-weight:650;text-align:left;border-bottom:2px solid var(--line);padding:6px 8px}
+table.sym td{border-bottom:1px solid var(--line);padding:6px 8px;vertical-align:top}
+table.sym td:first-child{white-space:nowrap;width:1%}
+table.num7{width:auto!important;display:table!important;border-collapse:collapse;font:15px/1.4 var(--sans);font-variant-numeric:tabular-nums;margin:.8em 0;display:table}
+table.num7 th,table.num7 td{padding:5px 10px;border-bottom:1px solid var(--line);text-align:right}
+table.num7 th:first-child,table.num7 td:first-child{text-align:left}
+/* Abbildungen */
+figure.fig7{margin:1.6em 0;padding:0;break-inside:avoid}
+figure.fig7 svg{display:block;width:100%;height:auto;max-width:720px;margin:0 auto}
+figure.fig7 figcaption{font:var(--fs-small)/1.5 var(--sans);color:var(--mute);max-width:var(--measure);margin:.5em auto 0}
+figure.fig7 figcaption b{color:var(--ink)}
+.fig7 text{font-family:var(--sans);fill:var(--ink)} .fig7 .ax{stroke:var(--mute);stroke-width:1} .fig7 .grid{stroke:var(--line);stroke-width:1}
+.fig7 .t-mute{fill:var(--mute)} .fig7 .t-small{font-size:12.5px} .fig7 .t-lab{font-size:14px;font-weight:600}
+.fig7 .s-q{stroke:var(--c-q)} .fig7 .s-k{stroke:var(--c-k)} .fig7 .s-v{stroke:var(--c-v)} .fig7 .s-w{stroke:var(--c-w)} .fig7 .s-o{stroke:var(--c-o)} .fig7 .s-err{stroke:var(--c-err)}
+.fig7 .f-q{fill:var(--c-q)} .fig7 .f-k{fill:var(--c-k)} .fig7 .f-v{fill:var(--c-v)} .fig7 .f-w{fill:var(--c-w)} .fig7 .f-o{fill:var(--c-o)} .fig7 .f-s{fill:var(--c-s)} .fig7 .f-err{fill:var(--c-err)}
+.fig7 .f-hull{fill:var(--tint-def);stroke:var(--c-v);stroke-width:1.5}
+.tok{font-family:var(--sans);font-weight:600;padding:0 .25em;border-radius:4px;white-space:nowrap}
+.tq{color:var(--c-q)} .tk{color:var(--c-k)} .tv{color:var(--c-v)} .tw{color:var(--c-w)} .to{color:var(--c-o)}
+@media print{
+  .book7{font-size:10.6pt;line-height:1.5}.book7 p,.book7 li{max-width:none}
+  .book7 h3{font-size:14pt;break-after:avoid}.book7 h4{font-size:11.5pt;break-after:avoid}
+  .box,figure.fig7,ol.drv>li,table.sym,table.num7{break-inside:avoid}
+  .box{padding:.55em .9em}
+}
+@media (max-width:640px){:root{--fs-body:17px}.book7 h3{font-size:19px}ol.drv>li{padding-left:2.1em}table.sym td:first-child{white-space:normal}}
+.book7 ol.drv mjx-container[display=false]{white-space:normal}
