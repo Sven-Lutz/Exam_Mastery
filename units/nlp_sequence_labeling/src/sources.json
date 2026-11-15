@@ -81,5 +81,17 @@
   "kind": "FORSCHUNG",
   "ref": "Su, J. et al. (2024): RoFormer: Enhanced Transformer with Rotary Position Embedding. Neurocomputing 568 (in der Vorlesung PDF-S. 69 zitiert; Volltext nicht gelesen, nur die Rotationseigenschaft wird verwendet und hier selbst bewiesen) Fundstelle geprüft 2026-11-15: arXiv:2104.09864 v5 (8. Nov. 2023), Abstract wörtlich abgeglichen; die in der Vorlesung genannte Neurocomputing-Fassung wurde nicht geprüft.",
   "url": "https://arxiv.org/abs/2104.09864"
+ },
+ {
+  "id": "blondel",
+  "kind": "FORSCHUNG",
+  "ref": "Blondel, M.; Martins, A. F. T.; Niculae, V. (2020): Learning with Fenchel-Young Losses. Journal of Machine Learning Research 21(35). Gelesen: §2 (regularisierte Vorhersagefunktionen, Gl. 6: Softmax als Maximierer mit Shannon-Entropie), Tab. 1. Preprint arXiv:1901.02324.",
+  "url": "https://arxiv.org/abs/1901.02324"
+ },
+ {
+  "id": "sparsemax",
+  "kind": "FORSCHUNG",
+  "ref": "Martins, A. F. T.; Astudillo, R. F. (2016): From Softmax to Sparsemax: A Sparse Model of Attention and Multi-Label Classification. Proc. ICML 2016. Gelesen: §2 (Definition als euklidische Projektion auf den Simplex, Proposition 1). Preprint arXiv:1602.02068.",
+  "url": "https://arxiv.org/abs/1602.02068"
  }
 ]

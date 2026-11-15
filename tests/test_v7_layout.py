@@ -65,7 +65,7 @@ class Rendered(unittest.TestCase):
         return pg
 
     def test_no_overflow_no_tiny_text_on_phone_and_desktop(self):
-        for w in (390, 1280, 1440):
+        for w in (320, 360, 390, 1280, 1440):      # 320/360: Puffer gegen breitere Linux-Schriften in CI
             pg = self.open(w)
             sec = pg.locator('section, main').first
             res = pg.evaluate("""() => {
@@ -77,6 +77,13 @@ class Rendered(unittest.TestCase):
               return {over, tiny, hscroll, tallMath};
             }""")
             self.assertEqual(res, {'over': 0, 'tiny': 0, 'hscroll': False, 'tallMath': 0}, w)
+
+    def test_no_page_wider_than_viewport_on_small_phones(self):
+        for w in (320, 360):
+            ctx = self.b.new_context(viewport={'width': w, 'height': 800}); self.addCleanup(ctx.close); pg = ctx.new_page()
+            for h in ('', '#learn/orientierung', '#learn/rnn', '#learn/att-problem', '#learn/prf', '#exam', '#review', '#tutor'):
+                pg.goto((self.out / 'index.html').as_uri() + h); pg.wait_for_function('document.body.dataset.ready === "1"', timeout=60000); pg.wait_for_timeout(300)
+                self.assertLessEqual(pg.evaluate('document.documentElement.scrollWidth'), w, (w, h))
 
     def test_figure_labels_do_not_collide(self):
         pg = self.open(1280)
@@ -114,3 +121,56 @@ class Rendered(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class V71Mathematics(unittest.TestCase):
+    """Unabhängige Prüfung der v7.1-Aussagen (Python, nicht der Lehrtext)."""
+
+    def test_w1_w4_do_not_characterise_softmax(self):
+        def g_weights(s):
+            m = sum(s) / len(s); z = [1 + math.tanh(x - m) for x in s]; return [x / sum(z) for x in z]
+        s = [1.0, 0.0, -1.0]
+        g = g_weights(s); sm = [math.exp(x) / sum(math.exp(y) for y in s) for x in s]
+        self.assertAlmostEqual(g[1], 1 / 3, places=12)
+        self.assertNotAlmostEqual(sm[1], 1 / 3, places=3)
+        self.assertTrue(all(x > 0 for x in g) and abs(sum(g) - 1) < 1e-12 and g[0] > g[1] > g[2])
+        self.assertEqual([round(x, 12) for x in g_weights([x + 7 for x in s])], [round(x, 12) for x in g])
+
+    def test_variational_principle(self):
+        import random
+        rng = random.Random(3)
+        for _ in range(50):
+            n = rng.choice([2, 3, 5]); s = [rng.uniform(-3, 3) for _ in range(n)]; T = rng.choice([0.3, 1, 2.5])
+            Z = sum(math.exp(x / T) for x in s); ws = [math.exp(x / T) / Z for x in s]
+            F = lambda w: sum(a * b for a, b in zip(w, s)) - T * sum(x * math.log(x) for x in w if x > 0)
+            self.assertAlmostEqual(F(ws), T * math.log(Z), places=10)            # Optimalwert = weiches Maximum
+            for _ in range(200):
+                r = [rng.random() ** 3 for _ in range(n)]; r = [x / sum(r) for x in r]
+                self.assertLessEqual(F(r), F(ws) + 1e-12)
+            m = max(s); self.assertTrue(m - 1e-12 <= T * math.log(Z) <= m + T * math.log(n) + 1e-12)
+
+    def test_exam_a19_tied_keys_reachable_set_is_diagonal(self):
+        V = [(2, 0), (0, 2), (0, 0)]
+        for q1, q2 in ((0.3, -1.2), (2.0, 0.5), (-1.0, -1.0)):
+            s = [q1 / math.sqrt(2), q1 / math.sqrt(2), q2 / math.sqrt(2)]
+            e = [math.exp(x) for x in s]; w = [x / sum(e) for x in e]
+            o = [sum(wj * v[i] for wj, v in zip(w, V)) for i in range(2)]
+            self.assertAlmostEqual(o[0], o[1], places=12)
+        d = -math.sqrt(2) * math.log(2)                       # Teil (c)
+        s = [d / math.sqrt(2), d / math.sqrt(2), 0.0]; e = [math.exp(x) for x in s]; w = [x / sum(e) for x in e]
+        self.assertAlmostEqual(2 * w[0], 0.5, places=12)
+
+    def test_exam_b19_causal_mask_breaks_permutation_equivariance(self):
+        sA, sB = 1 / math.sqrt(2), 0.0
+        wA = math.exp(sA) / (math.exp(sA) + math.exp(sB))
+        oB = (2 * wA, 2 * (1 - wA))
+        self.assertEqual(round(wA, 4), 0.6698)
+        self.assertEqual((round(oB[0], 4), round(oB[1], 4)), (1.3395, 0.6605))
+        self.assertNotEqual(oB, (0, 2))                       # vertauscht: B sieht nur sich -> (0, 2)
+
+    def test_noninjectivity_example(self):
+        V = [(2, 0), (0, 2), (0, 0), (1, 1)]
+        mix = lambda w: tuple(round(sum(a * v[i] for a, v in zip(w, V)), 12) for i in range(2))
+        self.assertEqual(mix([0.5, 0.5, 0, 0]), mix([0, 0, 0, 1]))
+        self.assertEqual(mix([0.25] * 4), mix([0.025, 0.025, 0.25, 0.7]))
+        self.assertEqual(mix([0.25] * 4), (0.75, 0.75))

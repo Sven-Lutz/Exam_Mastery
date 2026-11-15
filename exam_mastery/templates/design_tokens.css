@@ -96,3 +96,8 @@ figure.fig7 figcaption b{color:var(--ink)}
 @media (max-width:640px){:root{--fs-body:17px}.book7 h3{font-size:19px}ol.drv>li{padding-left:2.1em}table.sym td:first-child{white-space:normal}}
 .book7 ol.drv mjx-container[display=false]{white-space:normal}
 @media print{.box.prf,.box.mis{break-inside:auto}.box.prf>.lbl,.box>.lbl{break-after:avoid}ol.drv>li{break-inside:avoid}figure.fig7 figcaption{break-before:avoid}.book7 h3+p,.book7 h3+.box{break-before:avoid}}
+/* CI-Befund v7: Tabellen dürfen auf schmalen Bildschirmen nie die Seite verbreitern */
+@media (max-width:640px){table.sym,table.num7{display:block!important;max-width:100%;overflow-x:auto;width:auto!important}table.sym td,table.sym th{white-space:normal}}
+.book7,.book7 *{min-width:0}.book7 .box{overflow-x:auto}
+@media print{.box>.lbl{display:block;break-after:avoid;page-break-after:avoid}.box>.lbl+*{break-before:avoid;page-break-before:avoid}.box{orphans:3;widows:3}.box.mis,.box.int,.box.res,.box.chk{break-inside:avoid}}
+@media print{.book7 p:has(> .layer){break-after:avoid;page-break-after:avoid}}

@@ -369,7 +369,7 @@ function sceneAttention() {
     {dur: 1200, v: {c: c0, proj: 1, soft: 1, chain: 1, swap: 0}, cap: 'Zurück zu \\(c=1/\\sqrt2\\). Nun vertauschen wir die Reihenfolge von \\(x_1\\) und \\(x_2\\) im Satz.', predict: {q: 'Ändert sich \\(o_3\\)?', options: ['nein', 'ja'], correct: 0, explain: 'Die Gewichte hängen nur von den Vektoren ab, nicht von ihrer Position in der Folge.'}},
     {key: true, dur: 1500, v: {c: c0, proj: 1, soft: 1, chain: 1, swap: 1}, cap: '<b>Verifikation.</b> Die Balken tauschen die Plätze, der Pfeil \\(o_3\\) bleibt, wo er war. Self-Attention ohne Positionskodierung sieht keine Reihenfolge (Satz 4) – deshalb braucht man Abschnitt 7.', eq: '\\(\\operatorname{Att}(PX)=P\\operatorname{Att}(X)\\)'}
   ];
-  return {id: 'attention', fig: 'Abb. 6.1', title: 'Self-Attention als Geometrie: Projektion, Softmax, gewichtete Summe', question: 'Wie entsteht aus drei Vektoren eine neue Darstellung von Token 3 – und warum braucht man \\(1/\\sqrt{d_k}\\) und Positionen?', steps, draw};
+  return {id: 'attention', fig: 'Abb. 7.1', title: 'Wiederholung in Schritten: Projektion, Softmax, gewichtete Summe – und was Positionen ändern', question: 'Wie entsteht aus drei Vektoren eine neue Darstellung von Token 3 – und warum braucht man \\(1/\\sqrt{d_k}\\) und Positionen?', steps, draw};
 }
 
 // ---- storyboard 3: CRF — Viterbi (max) vs forward (sum), score vs probability ----
@@ -603,7 +603,7 @@ function caseStudy(root) {
   draw();
 }
 const SCENES = {birnn: sceneBirnn, f1: sceneF1, counter: sceneCounter, micromacro: sceneMicroMacro, attention: sceneAttention, viterbi: sceneViterbi, spans: sceneSpans};
-function mountScenes(scope, print) { scope.querySelectorAll('.scene[data-scene]').forEach(n => Scene(n, SCENES[n.dataset.scene](), print)); scope.querySelectorAll('.casestudy').forEach(n => { n.replaceChildren(); caseStudy(n); }); }
+function mountScenes(scope, print) { scope.querySelectorAll('.scene[data-scene]').forEach(n => { if (print && n.dataset.print === 'off') { n.remove(); return; } Scene(n, SCENES[n.dataset.scene](), print); }); scope.querySelectorAll('.casestudy').forEach(n => { n.replaceChildren(); caseStudy(n); }); }
 
 // ---------- tasks ----------
 function renderTask(task, ctx = {}) {
@@ -676,7 +676,7 @@ function labRefs(scope, print) {
 }
 
 // ---------- citations: every provenance marker links into the bibliography ----------
-const SOURCE_MATCH = [['SLP3', 'slp3'], ['Ratinov', 'ratinov'], ['Lample', 'lample'], ['Vaswani', 'vaswani'], ['Andor', 'andor'], ['Lafferty', 'lafferty'], ['Huang', 'huang'],
+const SOURCE_MATCH = [['Blondel', 'blondel'], ['Martins &amp; Astudillo', 'sparsemax'], ['Martins & Astudillo', 'sparsemax'], ['Jain', 'jain'], ['Wiegreffe', 'wiegreffe'], ['SLP3', 'slp3'], ['Ratinov', 'ratinov'], ['Lample', 'lample'], ['Vaswani', 'vaswani'], ['Andor', 'andor'], ['Lafferty', 'lafferty'], ['Huang', 'huang'],
   ['Opitz', 'opitz'], ['Manning', 'manning'], ['scikit', 'sklearn'], ['Tjong', 'conll'], ['CoNLL', 'conll'], ['Su et al', 'su'], ['Schuster', 'schuster'], ['Folie', 'kurs'], ['PDF-S', 'kurs'], ['Vorlesung', 'kurs']];
 function linkCitations(scope) {
   scope.querySelectorAll('.prov').forEach(n => { if (n.querySelector('a')) return; const m = SOURCE_MATCH.find(([k]) => n.textContent.includes(k)); if (!m) return;

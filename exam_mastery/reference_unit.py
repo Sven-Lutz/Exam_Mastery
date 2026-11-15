@@ -80,7 +80,7 @@ def attn_full(spec: dict) -> dict:
     o = [sum(w[j] * V[j][i] for j in range(len(V))) for i in range(len(V[0]))]
     H = -sum(x * math.log2(x) for x in w if x > 0)
     J = math.sqrt(sum(((w[i] if i == j else 0) - w[i] * w[j]) ** 2 for i in range(len(w)) for j in range(len(w))))
-    out = {'raw': raw, 'e': e, 'exp': ex, 'Z': [Z], 'w': w, 'o': o, 'H': [H, math.log2(len(w))], 'J': [J],
+    out = {'raw': raw, 'e': e, 'exp': ex, 'Z': [Z], 'lse': [T * math.log(Z)], 'w': w, 'o': o, 'H': [H, math.log2(len(w))], 'J': [J],
            'jac': [w[i] * (1 - w[i]) for i in range(len(w))], 'contrib': [w[j] * v for j in range(len(V)) for v in V[j]]}
     for lam in spec.get('lambdas', []):
         el = [lam * x for x in e]; exl = [math.exp(x) for x in el]; wl = [x / sum(exl) for x in exl]
@@ -316,6 +316,12 @@ def _known_decimals(unit):
         for a in it['answers']:
             if a.get('check', '').startswith('fbeta:'):
                 p_, r_, b_ = (Fraction(x) for x in a['check'][6:].split(':')); add(b_ ** 2 * p_ + r_); add((1 + b_ ** 2) * p_ * r_); add(S.f_beta(p_, r_, 1))
+    for mx in unit.get('mixture_examples', []):                      # v7.1: Mischungen w -> o = Σ w_j v_j (Nichtinjektivität)
+        for w in mx['weights']:
+            for x in w:
+                add(x)
+            for i in range(len(mx['V'][0])):
+                add(sum(wj * v[i] for wj, v in zip(w, mx['V'])))
     specs = list(unit.get('numeric_examples', [])) + [it['data']['attn'] for it in items if (it.get('data') or {}).get('attn')] + \
         [c['attn'] for c in unit['cards'] if c.get('attn')]
     for spec in specs:                                                # v5 Attention-Beispiele: alle Zwischengrößen

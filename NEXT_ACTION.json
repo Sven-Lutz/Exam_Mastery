@@ -12,7 +12,7 @@
     "nlp_reference_unit_v5": "HUMAN_REJECTED (owner review received 2026-11-15; no further v5 review needed)",
     "nlp_reference_unit_v6": "HUMAN_REVIEW_PENDING (Issue #9; docs/cross_domain/V6_REPORT.md); no self-release",
     "v6": "HUMAN_REJECTED (v6.1, Issue #10, mean 8/6 = 1.333/4)",
-    "v7": "Reference vertical slice delivered (attention softmax + convex combination): TECHNICAL_PASS locally; CONTENT_CORRECTNESS_REVIEW_REQUIRED, DIDACTIC_REVIEW_REQUIRED, PUBLISHING_REVIEW_REQUIRED; no self-release"
+    "v7": "v7.1 corrections per independent audit (Issue #10/PR #3): TECHNICAL_PASS locally; content/didactic/publishing review required; no self-release"
   },
   "product": {
     "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
@@ -30,7 +30,8 @@
     "open_lab": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling/labor.html",
     "v4_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v4_snapshot/",
     "v7_report": "docs/reference_unit/V7_REFERENCE_SLICE.md (+ review_v7/before|after)",
-    "v6_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v6_snapshot/"
+    "v6_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v6_snapshot/",
+    "v7_1_report": "docs/reference_unit/V7_1_CORRECTIONS.md (+ review_v7_1)"
   },
   "verified": [
     "see final test run in commit message",

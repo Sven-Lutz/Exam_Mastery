@@ -81,3 +81,4 @@ details.numbers{margin-top:10px;border:1px solid var(--line);border-radius:10px;
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .step.target,.chal.target{outline:3px solid var(--accent);outline-offset:2px}
 @media (max-width:560px){.lab-top{position:static}.lab-top>.mute{display:none}.lab-top .right .btn,.lab-top .right button{padding:5px 9px;font-size:13px}.lab-top nav button{padding:5px 9px;font-size:13px}}
+@media (max-width:640px){.formula-live{white-space:normal;overflow-wrap:anywhere;font-size:15px}}

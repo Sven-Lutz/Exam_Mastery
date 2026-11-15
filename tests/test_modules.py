@@ -82,9 +82,14 @@ class ResearchTrail(unittest.TestCase):
         for d in list(MODS.values()) + [ROOT / 'units/nlp_sequence_labeling']:
             ev = R.read_log(d)
             self.assertTrue(ev, d)
+            last = {}
             for e in ev:
                 if e['step'] == 'verify':
-                    self.assertTrue(e['result']['all_found'], (d, e['source']))
+                    last[e['source']] = e                                  # Protokoll ist append-only: maßgeblich ist die letzte Prüfung
+            for e in last.values():
+                self.assertTrue(e['result']['all_found'], (d, e['source']))
+            for e in ev:
+                if e['step'] == 'verify':
                     self.assertEqual(len(e['result']['sha256']), 64)
                     for p in e['result']['phrases']:
                         self.assertLessEqual(len(p['context'] or ''), 240)       # nur kurze Zitate im Repo

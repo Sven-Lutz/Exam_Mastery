@@ -123,7 +123,7 @@ def fig_temperature(bank):
     for T in (0.1, 0.3, 1, 3, 10):
         b += f'<line x1="{X(T)}" y1="{y0}" x2="{X(T)}" y2="{y0 + h}" class="grid"/><text x="{X(T)}" y="{y0 + h + 18}" text-anchor="middle" class="t-small t-mute">{de(T, 1) if T < 1 else int(T)}</text>'
     b += f'<line x1="{x0}" y1="{Y(1 / 3)}" x2="{x0 + w}" y2="{Y(1 / 3)}" class="s-w" stroke-dasharray="3 4" stroke-width="1"/><text x="{x0 + 8}" y="{Y(1 / 3) - 6}" class="t-small f-w">1/3 (Grenzwert für T → ∞)</text>'
-    styles = [('s-v', '', 'Fluss'), ('s-k', '6 4', 'Geld'), ('s-o', '2 3', 'der')]
+    styles = [('s-w', '', 'w(Fluss)'), ('s-w', '8 5', 'w(Geld)'), ('s-w', '2 4', 'w(der)')]   # alle Kurven sind Gewichte -> Violett; Unterscheidung über Linienart + Beschriftung
     for j, (cls, dash, nm) in enumerate(styles):
         pts = ' '.join(f'{X(T):.1f},{Y(p):.1f}' for T, p in zip(Ts, curves[j]))
         b += f'<polyline points="{pts}" fill="none" class="{cls}" stroke-width="2.6"' + (f' stroke-dasharray="{dash}"' if dash else '') + '/>'
@@ -152,9 +152,9 @@ def fig_simplex(bank):
     b += '<polyline points="' + ' '.join(f'{x:.1f},{y:.1f}' for x, y in path) + '" fill="none" class="s-w" stroke-width="2.6"/>'
     for T, lab in ((0.25, 'T = 0,25'), (1, 'T = 1 (Beispiel)'), (4, 'T = 4')):
         w_ = attn_full(dict(bank, T=T))['w']; x, y = pt(w_)
-        b += f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{6.5 if T == 1 else 5}" class="f-o"/><text x="{x + 12:.1f}" y="{y + 5:.1f}" class="t-small">{lab}</text>'
+        b += f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{6.5 if T == 1 else 5}" class="f-w"/><text x="{x - 14:.1f}" y="{y + 5:.1f}" text-anchor="end" class="t-small">{lab}</text>'
     g = pt([1 / 3] * 3)
-    b += f'<circle cx="{g[0]:.1f}" cy="{g[1]:.1f}" r="5" fill="none" class="s-w" stroke-width="1.8"/><text x="{g[0] - 10:.1f}" y="{g[1] + 22:.1f}" text-anchor="end" class="t-small t-mute">Mitte: Gleichverteilung (T → ∞)</text>'
+    b += f'<circle cx="{g[0]:.1f}" cy="{g[1]:.1f}" r="5" fill="none" class="s-w" stroke-width="1.8"/><text x="{g[0]:.1f}" y="{g[1] + 26:.1f}" text-anchor="middle" class="t-small t-mute">Mitte: Gleichverteilung (T → ∞)</text>'
     b += f'<text x="20" y="{H - 14}" class="t-small t-mute">Violette Bahn: Softmax-Gewichte des Bank-Beispiels für T von 0,06 bis 16 (logarithmisch abgetastet).</text>'
     return _svg(W, H, b, 'Wahrscheinlichkeitssimplex mit der Bahn der Gewichte bei variabler Temperatur')
 

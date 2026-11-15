@@ -494,6 +494,7 @@ unit = {
     'tasks': T, 'exam_forms': {'A': A, 'B': B}, 'case': CASE, 'cards': CARDS,
     'sources': json.loads((OUT.parent / 'src' / 'sources.json').read_text(encoding='utf-8')) + V5.SOURCES,
     'lab': V5.LAB, 'numeric_examples': [V5.BANK],
+    'mixture_examples': [{'V': [[2, 0], [0, 2], [0, 0], [1, 1]], 'weights': [[0.5, 0.5, 0, 0], [0, 0, 0, 1], [0.25, 0.25, 0.25, 0.25], [0.025, 0.025, 0.25, 0.7]]}],
 }
 OUT.write_text(json.dumps(unit, ensure_ascii=False, indent=1), encoding='utf-8')
 print('wrote', OUT, len(T), 'tasks', len(A) + len(B), 'exam items', len(CARDS), 'cards')
