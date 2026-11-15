@@ -17,7 +17,7 @@ const anaLab = registerLab({
     const q = orb.length > 2 ? A.lipschitz(S.map, Math.min(lo, hi), Math.max(lo, hi)) : NaN;
     const lim = m.fix.length ? m.fix.reduce((b, x) => Math.abs(x - orb[orb.length - 1]) < Math.abs(b - orb[orb.length - 1]) ? x : b) : null;
     const cert = S.ia === null || S.ib === null ? null : A.certificate(S.map, S.ia, S.ib);
-    const startIn = cert && S.a1 >= S.ia && S.a1 <= S.ib;
+    const startIn = !!(cert && cert.a !== undefined && S.a1 >= cert.a && S.a1 <= cert.b);
     // Diagramm-Horizont: wichtige Ereignisse (N, kleinstes N, Gegenbeispiel) müssen sichtbar sein
     const keyN = Math.max(S.N, mn.N || 0, chk.ok ? 0 : chk.n);
     const nmax = Math.min(20000, Math.max(120, Math.ceil(keyN * 1.15)));
@@ -102,28 +102,28 @@ function webView(root, api) {
   a1.addEventListener('input', () => api.set({a1: +a1.value}));
   const nn = h('input', {type: 'range', min: 2, max: 60, step: 1, 'aria-label': 'Anzahl Glieder'}), nL = h('b', {});
   nn.addEventListener('input', () => api.set({n: +nn.value}));
-  const ia = h('input', {class: 'num', type: 'text', inputmode: 'decimal', 'aria-label': 'Intervall linker Rand a'}), ib = h('input', {class: 'num', type: 'text', inputmode: 'decimal', 'aria-label': 'Intervall rechter Rand b'});
-  ia.addEventListener('change', () => api.set({ia: parse(ia.value)})); ib.addEventListener('change', () => api.set({ib: parse(ib.value)}));
+  const ia = h('input', {class: 'num', type: 'text', inputmode: 'decimal', 'aria-label': 'Intervall linker Rand a (Zahl oder Ausdruck wie cos(1))', style: 'width:120px'}), ib = h('input', {class: 'num', type: 'text', inputmode: 'decimal', 'aria-label': 'Intervall rechter Rand b', style: 'width:120px'});
+  ia.addEventListener('change', () => api.set({ia: ia.value.trim() || null})); ib.addEventListener('change', () => api.set({ib: ib.value.trim() || null}));
   root.append(h('div', {class: 'row'}, sel, h('label', {class: 'ctl'}, 'a₁ = ', a1L, a1), h('label', {class: 'ctl'}, 'Glieder ', nL, nn)),
     h('div', {class: 'row'}, h('b', {}, 'Beweisversuch: Intervall [a, b] = ['), ia, ',', ib, h('b', {}, ']')));
   const plane = h('div', {class: 'plane'}), tbl = h('div', {class: 'calc-wrap'}), meters = h('div', {class: 'meters'}), tiers = h('div', {class: 'planes', style: 'grid-template-columns:repeat(auto-fit,minmax(220px,1fr))'});
   root.append(plane, tiers, meters, tbl);
   return function update(S, R) {
     a1.value = S.a1; a1L.textContent = f(S.a1); nn.value = S.n; nL.textContent = S.n; sel.value = S.map;
-    if (document.activeElement !== ia) ia.value = S.ia === null ? '' : String(S.ia); if (document.activeElement !== ib) ib.value = S.ib === null ? '' : String(S.ib);
+    if (document.activeElement !== ia) ia.value = S.ia ?? ''; if (document.activeElement !== ib) ib.value = S.ib ?? '';
     const tier = (title, cls, body) => h('div', {class: 'plane', style: 'padding:8px 12px'}, h('h3', {style: 'padding:0'}, title), h('div', {class: 'verdict ' + cls}, ...body));
     tiers.replaceChildren(
       tier('1 · Simulation', R.err !== null && R.err < 1e-6 ? 'ok' : '', [h('p', {}, R.err === null ? 'Kein Fixpunkt der Abbildung: Die Folge kann nicht gegen einen Fixpunkt konvergieren.' : `Nach ${S.n} Gliedern Abstand ${R.err.toExponential(2)} zum Fixpunkt.`), h('p', {class: 'note'}, 'Zeigt nur, was bei diesem Startwert in endlich vielen Schritten passiert.')]),
       tier('2 · Indiz', '', [h('p', {}, `max |f′| auf den Punkten des Orbits ≈ ${f(R.q, 3)}`), h('p', {class: 'note'}, 'Abtastung endlich vieler Punkte – keine Schranke für alle x, kein Beweis.')]),
-      tier('3 · Beweis (Fixpunktsatz)', R.cert ? (R.cert.ok && R.startIn ? 'ok' : 'bad') : '', R.cert ? [h('ul', {}, R.cert.steps.map(st => h('li', {}, (st.ok ? '✓ ' : '✗ ') + st.text, st.lemma ? h('div', {class: 'note'}, 'Begründung: ' + st.lemma) : null))),
+      tier('3 · Beweis (Fixpunktsatz)', R.cert ? (R.cert.ok && R.startIn ? 'ok' : R.cert.status === 'inconclusive' ? '' : 'bad') : '', R.cert ? [h('ul', {}, R.cert.steps.map(st => h('li', {}, (st.ok ? '✓ ' : st.unknown ? '? ' : '✗ ') + st.text, st.lemma ? h('div', {class: 'note'}, 'Begründung: ' + st.lemma) : null))),
         h('p', {}, R.startIn ? '✓ Startwert a₁ liegt in [a, b].' : '✗ Startwert a₁ liegt nicht in [a, b] – der Satz sagt dann nichts über diese Folge.'),
-        h('p', {html: R.cert.ok && R.startIn ? '<b>Bewiesen:</b> eindeutiger Fixpunkt in [a, b], Konvergenz für jeden Start in [a, b], |aₙ − a| ≤ qⁿ⁻¹/(1 − q)·|a₂ − a₁|.' : '<b>Kein Beweis</b> mit diesem Intervall.'}),
-        h('p', {class: 'note'}, 'Zahlen mit Sicherheitsabstand 10⁻¹²; ein Rand, der genau getroffen wird, ist numerisch nicht zertifizierbar – Intervall etwas größer wählen.')] : [h('p', {}, 'Geben Sie ein Intervall [a, b] ein. Bewiesen ist erst, wenn f([a, b]) ⊆ [a, b] und sup |f′| < 1 auf [a, b] analytisch gezeigt sind.')]));
+        h('p', {html: R.cert.ok && R.startIn ? '<b>Bewiesen:</b> eindeutiger Fixpunkt in [a, b], Konvergenz für jeden Start in [a, b], |aₙ − a| ≤ qⁿ⁻¹/(1 − q)·|a₂ − a₁|.' : R.cert.status === 'inconclusive' ? '<b>Nicht entscheidbar:</b> Eine Bedingung liegt innerhalb der Rechengenauigkeit auf dem Rand. Geben Sie den Endpunkt exakt als Ausdruck an (z. B. <code>cos(1)</code> statt einer Dezimalzahl) – dann wird Gleichheit rigoros erkannt.' : '<b>Widerlegt:</b> Mit diesem Intervall gilt mindestens eine Voraussetzung nicht.'}),
+        h('p', {class: 'note'}, 'Vergleiche: exakt (rationale Arithmetik oder identischer Ausdruck) oder numerisch mit Sicherheitsabstand 10⁻¹²; dazwischen „nicht entscheidbar“ statt einer falschen Ablehnung.')] : [h('p', {}, 'Geben Sie ein Intervall [a, b] ein. Bewiesen ist erst, wenn f([a, b]) ⊆ [a, b] und sup |f′| < 1 auf [a, b] analytisch gezeigt sind.')]));
     const m = A.MAPS[S.map], o = R.orb, xs = o.concat(m.dom), lo = Math.min(...xs.filter(Number.isFinite)) - .2, hi = Math.max(...xs.filter(Number.isFinite)) + .2;
     const W = 420, X = x => 30 + (x - lo) / (hi - lo) * (W - 40), Y = y => W - 20 - (y - lo) / (hi - lo) * (W - 40);
     const svg = s('svg', {viewBox: `0 0 ${W} ${W}`, role: 'img', 'aria-label': 'Spinnwebdiagramm'});
     svg.append(s('line', {x1: X(lo), y1: Y(lo), x2: X(hi), y2: Y(hi), stroke: 'var(--mute)', 'stroke-dasharray': '3 3'}));
-    if (R.cert && S.ib > S.ia) svg.append(s('rect', {x: X(S.ia), y: Y(S.ib), width: X(S.ib) - X(S.ia), height: Y(S.ia) - Y(S.ib), fill: R.cert.ok ? 'color-mix(in srgb,var(--ok) 14%,transparent)' : 'color-mix(in srgb,var(--bad) 10%,transparent)', stroke: R.cert.ok ? 'var(--ok)' : 'var(--bad)'}));
+    if (R.cert && R.cert.b > R.cert.a) svg.append(s('rect', {x: X(R.cert.a), y: Y(R.cert.b), width: X(R.cert.b) - X(R.cert.a), height: Y(R.cert.a) - Y(R.cert.b), fill: R.cert.ok ? 'color-mix(in srgb,var(--ok) 14%,transparent)' : 'color-mix(in srgb,var(--bad) 10%,transparent)', stroke: R.cert.ok ? 'var(--ok)' : 'var(--bad)'}));
     const pts = []; for (let i = 0; i <= 300; i++) { const x = lo + (hi - lo) * i / 300, y = m.f(x); if (Number.isFinite(y) && y > lo - 5 && y < hi + 5) pts.push(`${X(x)},${Y(Math.max(lo - .5, Math.min(hi + .5, y)))}`); }
     svg.append(s('polyline', {points: pts.join(' '), fill: 'none', stroke: 'var(--accent)', 'stroke-width': 2}));
     let path = `M${X(o[0])},${Y(lo)}`; for (let i = 0; i < o.length - 1; i++) path += ` L${X(o[i])},${Y(o[i + 1])} L${X(o[i + 1])},${Y(o[i + 1])}`;
@@ -173,7 +173,7 @@ anaLab.challenges = [
     setup: S => { S.view = 'web'; S.map = 'cos'; S.a1 = 1; S.n = 30; S.ia = null; S.ib = null; return S; },
     check: (S, R) => { const ok = S.view === 'web' && S.map === 'cos' && S.a1 === 1 && R.cert && R.cert.ok && R.startIn;
       return {done: !!ok, progress: !R.cert ? 0 : (R.cert.steps.filter(x => x.ok).length + (R.startIn ? 1 : 0)) / (R.cert.steps.length + 1), msg: !R.cert ? 'Noch kein Intervall angegeben.' : R.cert.steps.filter(x => !x.ok).map(x => x.text).join(' ') || (R.startIn ? '' : 'a₁ liegt nicht im Intervall.')}; },
-    hints: ['cos ist auf [0, π/2] fallend: Das Bild von [a, b] ist [cos b, cos a].', 'Wählen Sie b = 1 (dann enthält das Intervall a₁ = 1) und a so, dass cos 1 ≥ a und cos a ≤ 1.', 'Mit [0,5; 1] gilt cos([0,5; 1]) ≈ [0,5403; 0,8776] und q = sin 1 ≈ 0,8415.'],
+    hints: ['cos ist auf [0, π/2] fallend: Das Bild von [a, b] ist [cos b, cos a].', 'Wählen Sie b = 1 (dann enthält das Intervall a₁ = 1) und a so, dass cos 1 ≥ a und cos a ≤ 1.', 'Das klassische Intervall ist [cos(1), 1] – geben Sie den linken Rand exakt als cos(1) ein. Auch [0,5; 1] funktioniert: cos([0,5; 1]) ≈ [0,5403; 0,8776], q = sin 1 ≈ 0,8415.'],
     success: 'Bewiesen: [a, b] ist abgeschlossen (vollständig), f([a, b]) ⊆ [a, b] folgt aus der Monotonie von cos, und sup |f′| = sin b < 1 folgt aus der Monotonie von sin – nicht aus Abtastung. Erst damit liefert der Fixpunktsatz (Lebl, Satz 7.6.2) Existenz, Eindeutigkeit und die a-priori-Schranke. Die Simulation zeigt nur, dass es bei diesem Start „so aussieht“.', links: {book: 'kontraktion'}},
   {id: 'g-xinv', title: 'Warum kein Intervall funktioniert', level: 'Transfer', goal: 'Finden Sie für f(x) = x + 1/x ein Intervall [a, b] mit Zertifikat – oder begründen Sie, warum es keines gibt.', setup: S => { S.view = 'web'; S.map = 'xinv'; S.a1 = 1; S.ia = 1; S.ib = 20; return S; },
     check: () => ({done: false, progress: 0, msg: ''}),

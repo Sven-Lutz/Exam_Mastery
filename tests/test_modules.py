@@ -132,6 +132,30 @@ class ContractionCertificate(unittest.TestCase):
         r = node(js, [('certificate', ['cos', 0.5, 1]), ('certificate', ['xinv', 1, 20]), ('certificate', ['cos', -1, 1])])
         self.assertTrue(r[0]['ok']); self.assertFalse(r[1]['ok']); self.assertFalse(r[2]['ok'])
 
+    @unittest.skipUnless(HAVE_NODE, 'node fehlt')
+    def test_boundary_equality_no_false_negative_and_adversarial_cases(self):
+        """Issue #10: [cos 1, 1] ist mathematisch gültig (nicht-strikte Inklusion). Exakte Endpunkte => bewiesen; Dezimalnäherung am Rand
+        => 'inconclusive' (keine falsche Ablehnung, kein falscher Beweis); echte Verletzungen => widerlegt. Orakel: sympy exakt."""
+        import sympy as sp
+        js = ROOT / 'modules/analysis1_folgen/lab/analysis_math.js'
+        cases = [('cos', 'cos(1)', '1', 'proven'), ('cos', '0.5403023058681398', '1', 'inconclusive'), ('cos', '0.5404', '1', 'refuted'),
+                 ('cos', '0,54', '1', 'proven'), ('cos', '0.5', '1', 'proven'), ('heron', 'sqrt(2)', '2', 'proven'), ('sqrt', '3', '4', 'proven'),
+                 ('lect', '0', '1', 'proven'), ('xinv', '1', '20', 'refuted'), ('cos', '-1', '1', 'refuted'), ('cos', '1', '0.5', 'refuted'), ('cos', '0', 'pi/2', 'inconclusive')]
+        res = node(js, [('certificate', [k, a, b]) for k, a, b, _ in cases])
+        x = sp.Symbol('x')
+        F = {'cos': sp.cos(x), 'heron': (x + 2 / x) / 2, 'sqrt': sp.sqrt(3 + 2 * x), 'lect': 1 / (3 + x), 'xinv': x + 1 / x}
+        for (k, a, b, want), r in zip(cases, res):
+            self.assertEqual(r['status'], want, (k, a, b, r['steps']))
+            if want == 'proven':                                           # exaktes Orakel: Bild in [a,b], sup|f'| < 1
+                A, B = sp.nsimplify(a.replace(',', '.'), [sp.pi]) if 'cos' not in a else sp.cos(1), sp.nsimplify(b.replace(',', '.'))
+                f = F[k]; d = sp.diff(f, x)
+                ends = [f.subs(x, A), f.subs(x, B)] + ([f.subs(x, sp.sqrt(2))] if k == 'heron' else [])
+                self.assertTrue(all(sp.N(e - A, 50) >= -sp.Rational(1, 10**40) and sp.N(B - e, 50) >= -sp.Rational(1, 10**40) for e in ends), (k, a, b))
+                self.assertTrue(max(abs(sp.N(d.subs(x, A + (B - A) * sp.Rational(i, 200)), 30)) for i in range(201)) < 1)
+        msg = ' '.join(s['text'] for s in res[1]['steps'])
+        self.assertIn('nicht entscheidbar', msg)
+        self.assertIn('exakt', ' '.join(s['text'] for s in res[0]['steps']))
+
 
 class SourceRules(unittest.TestCase):
     base = {'id': 'x', 'tier': 'extension', 'type': 'paper', 'status': 'verified', 'access_level': 'section', 'citation': 'c', 'url': 'https://example.org',
@@ -324,10 +348,10 @@ class RenderedLabs(unittest.TestCase):
         pg = self.open('analysis1_folgen', 'folgen', st); pg.get_by_role('tab', name='Challenges').click()
         self.assertEqual(pg.locator('.chal.solved[data-id="g-contr"]').count(), 0)          # konvergiert numerisch, aber kein Beweis
         self.assertIn('kein Beweis', pg.locator('.lab-stage').inner_text())
-        st.update(ia=0.6, ib=0.9)                                                              # a₁ = 1 nicht im Intervall
+        st.update(ia='0.6', ib='0.9')                                                              # a₁ = 1 nicht im Intervall
         pg = self.open('analysis1_folgen', 'folgen', st); pg.get_by_role('tab', name='Challenges').click()
         self.assertEqual(pg.locator('.chal.solved[data-id="g-contr"]').count(), 0)
-        st.update(ia=0.5, ib=1)
+        st.update(ia='0.5', ib='1')
         pg = self.open('analysis1_folgen', 'folgen', st); pg.get_by_role('tab', name='Challenges').click()
         self.assertEqual(pg.locator('.chal.solved[data-id="g-contr"]').count(), 1)
         self.assertIn('Bewiesen', pg.locator('.lab-stage').inner_text())
@@ -359,3 +383,14 @@ class RenderedLabs(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class FetchHardening(unittest.TestCase):
+    def test_rejects_unsafe_urls_without_network(self):
+        from exam_mastery.modules import research as R
+        for u in ('file:///etc/passwd', 'ftp://example.org/x', 'http://127.0.0.1/', 'http://localhost/', 'http://10.0.0.5/', 'https://user:pw@example.org/', 'http://[::1]/'):
+            with self.assertRaises(R.SourceFetchError, msg=u):
+                R._check_url(u)
+        with self.assertRaises(RuntimeError):
+            R.fetch('https://example.invalid/never-cached', online=False)
+        self.assertIn('NICHT geprüft', R.LABEL)

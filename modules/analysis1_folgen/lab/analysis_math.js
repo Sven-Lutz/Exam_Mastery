@@ -39,38 +39,94 @@
   function aprioriN(q, d1, tol) { if (!(q < 1)) return null; let n = 1; while (Math.pow(q, n - 1) / (1 - q) * d1 > tol) n++; return n; }
   function stepsTo(key, a1, tol, limit) { const o = orbit(key, a1, 200); const i = o.findIndex(v => Math.abs(v - limit) <= tol); return i < 0 ? null : i + 1; }
 
-  /** Beweis-Zertifikat für den Fixpunktsatz auf einem abgeschlossenen Intervall [a, b] ⊂ ℝ (vollständig).
-   *  Nur analytisch begründete Formeln (Monotonie von f und |f'| auf dem Intervall), keine Abtastung.
-   *  Liefert die einzelnen Beweisschritte; jede Bedingung muss mit Sicherheitsabstand erfüllt sein. */
+  // ---------- exakte Endpunkte: kleiner Ausdrucksparser (Zahlen, pi, sqrt, cos, sin, + − * / Klammern) ----------
+  // Rationale Ausdrücke (inkl. sqrt von Quadraten) werden exakt als Brüche (BigInt) ausgewertet, alles andere als Gleitkomma
+  // plus kanonische Form. Damit lassen sich Randgleichheiten wie f(b) = cos 1 = a rigoros erkennen.
+  const gcd = (a, b) => { a = a < 0n ? -a : a; b = b < 0n ? -b : b; while (b) [a, b] = [b, a % b]; return a; };
+  const Q = (n, d = 1n) => { if (d === 0n) throw new Error('Division durch 0'); if (d < 0n) { n = -n; d = -d; } const g = gcd(n, d) || 1n; return {n: n / g, d: d / g}; };
+  const qadd = (x, y) => Q(x.n * y.d + y.n * x.d, x.d * y.d), qmul = (x, y) => Q(x.n * y.n, x.d * y.d), qdiv = (x, y) => Q(x.n * y.d, x.d * y.n);
+  const qcmp = (x, y) => { const v = x.n * y.d - y.n * x.d; return v > 0n ? 1 : v < 0n ? -1 : 0; };
+  function isqrt(n) { if (n < 0n) return null; if (n < 2n) return n; let x = BigInt(Math.floor(Math.sqrt(Number(n)))); while (x * x > n) x--; while ((x + 1n) * (x + 1n) <= n) x++; return x * x === n ? x : null; }
+  function qsqrt(x) { const a = isqrt(x.n), b = isqrt(x.d); return a !== null && b !== null ? Q(a, b) : null; }
+  function decToQ(s) { const m = s.match(/^(\d+)(?:\.(\d+))?$/); if (!m) return null; const frac = m[2] || ''; return Q(BigInt(m[1] + frac), 10n ** BigInt(frac.length)); }
+  function parseExpr(src) {
+    if (typeof src === 'number') src = String(src);
+    const s = String(src).replace(/,/g, '.').replace(/−/g, '-').replace(/π/g, 'pi').replace(/\s+/g, '').toLowerCase();
+    let i = 0;
+    const peek = () => s[i], eat = c => { if (s[i] === c) { i++; return true; } return false; };
+    function num() { const m = s.slice(i).match(/^\d+(\.\d+)?/); if (!m) return null; i += m[0].length; return {v: parseFloat(m[0]), q: decToQ(m[0]), c: String(parseFloat(m[0]))}; }
+    function atom() {
+      if (eat('(')) { const x = add(); if (!eat(')')) throw new Error('Klammer fehlt'); return {...x, c: '(' + x.c + ')'}; }
+      if (eat('-')) { const x = atom(); return {v: -x.v, q: x.q ? Q(-x.q.n, x.q.d) : null, c: '-' + x.c}; }
+      for (const fn of ['sqrt', 'cos', 'sin']) if (s.startsWith(fn + '(', i)) { i += fn.length + 1; const x = add(); if (!eat(')')) throw new Error('Klammer fehlt');
+        const v = Math[fn](x.v), q = fn === 'sqrt' && x.q ? qsqrt(x.q) : (fn !== 'sqrt' && x.q && x.q.n === 0n ? Q(fn === 'cos' ? 1n : 0n) : null);
+        return {v, q, c: `${fn}(${x.c})`}; }
+      if (s.startsWith('pi', i)) { i += 2; return {v: Math.PI, q: null, c: 'pi'}; }
+      const n = num(); if (n) return n; throw new Error('Ausdruck nicht lesbar');
+    }
+    function mul() { let x = atom(); for (;;) { if (eat('*')) { const y = atom(); x = {v: x.v * y.v, q: x.q && y.q ? qmul(x.q, y.q) : null, c: x.c + '*' + y.c}; } else if (eat('/')) { const y = atom(); x = {v: x.v / y.v, q: x.q && y.q ? qdiv(x.q, y.q) : null, c: x.c + '/' + y.c}; } else return x; } }
+    function add() { let x = mul(); for (;;) { if (eat('+')) { const y = mul(); x = {v: x.v + y.v, q: x.q && y.q ? qadd(x.q, y.q) : null, c: x.c + '+' + y.c}; } else if (peek() === '-') { i++; const y = mul(); x = {v: x.v - y.v, q: x.q && y.q ? qadd(x.q, Q(-y.q.n, y.q.d)) : null, c: x.c + '-' + y.c}; } else return x; } }
+    const r = add(); if (i !== s.length) throw new Error('Ausdruck nicht lesbar');
+    return r;
+  }
   const TOL = 1e-12;
+  /** Vergleich x ≥ y (bzw. ≤) rigoros, wo möglich: 'yes' | 'no' | 'unknown' und Art des Nachweises. */
+  function geq(x, y) {
+    if (x.q && y.q) return {r: qcmp(x.q, y.q) >= 0 ? 'yes' : 'no', how: 'exakt (rationale Arithmetik)'};
+    if (x.c === y.c) return {r: 'yes', how: 'exakt (identischer Ausdruck)'};
+    if (x.v >= y.v + TOL) return {r: 'yes', how: 'numerisch mit Sicherheitsabstand'};
+    if (x.v <= y.v - TOL) return {r: 'no', how: 'numerisch mit Sicherheitsabstand'};
+    return {r: 'unknown', how: 'numerisch nicht entscheidbar (Differenz unter 10⁻¹²)'};
+  }
+  const E = (v, c, q = null) => ({v, c, q});
+  /** Beweis-Zertifikat für den Fixpunktsatz auf [a, b] ⊂ ℝ (abgeschlossen ⇒ vollständig).
+   *  Bildintervall und sup|f′| folgen aus Monotonie-Lemmata; Endpunkte als Ausdrücke, damit Randgleichheit exakt erkannt wird.
+   *  status: 'proven' | 'refuted' | 'inconclusive'. */
   const CERT = {
-    cos: (a, b) => { if (!(a >= 0 && b <= Math.PI / 2)) return {ok: false, why: 'Zertifikat nur für [a, b] ⊂ [0, π/2] (dort cos fallend, |cos′| = sin steigend).'};
-      return {img: [Math.cos(b), Math.cos(a)], q: Math.sin(b), lemma: 'cos ist auf [0, π/2] fallend ⇒ cos([a,b]) = [cos b, cos a]; |cos′(x)| = sin x ist dort steigend ⇒ sup |f′| = sin b.'}; },
-    lect: (a, b) => { if (!(a > -3)) return {ok: false, why: 'Zertifikat nur für a > −3.'};
-      return {img: [1 / (3 + b), 1 / (3 + a)], q: 1 / ((3 + a) ** 2), lemma: 'f(x) = 1/(3+x) ist für x > −3 fallend ⇒ f([a,b]) = [f(b), f(a)]; |f′(x)| = 1/(3+x)² fallend ⇒ sup |f′| = 1/(3+a)².'}; },
-    sqrt: (a, b) => { if (!(a > -1.5)) return {ok: false, why: 'Zertifikat nur für a > −1,5.'};
-      return {img: [Math.sqrt(3 + 2 * a), Math.sqrt(3 + 2 * b)], q: 1 / Math.sqrt(3 + 2 * a), lemma: 'f(x) = √(3+2x) steigend ⇒ f([a,b]) = [f(a), f(b)]; f′(x) = 1/√(3+2x) > 0 fallend ⇒ sup |f′| = f′(a).'}; },
-    heron: (a, b) => { if (!(a > 0)) return {ok: false, why: 'Zertifikat nur für a > 0.'};
-      const f = MAPS.heron.f, df = MAPS.heron.df, r = Math.SQRT2;
-      return {img: [a <= r && r <= b ? r : Math.min(f(a), f(b)), Math.max(f(a), f(b))], q: Math.max(Math.abs(df(a)), Math.abs(df(b))),
-        lemma: 'f′(x) = (1 − 2/x²)/2 ist für x > 0 steigend ⇒ sup |f′| wird an einem Randpunkt angenommen; f fällt auf (0, √2], steigt auf [√2, ∞) ⇒ Minimum f(√2) = √2, Maximum an einem Rand.'}; },
-    xinv: (a, b) => { if (!(a > 0)) return {ok: false, why: 'Zertifikat nur für a > 0.'};
-      const f = MAPS.xinv.f, df = MAPS.xinv.df;
-      return {img: [a <= 1 && 1 <= b ? 2 : Math.min(f(a), f(b)), Math.max(f(a), f(b))], q: Math.max(Math.abs(df(a)), Math.abs(df(b))),
+    cos: (a, b) => (a.v >= 0 && b.v <= Math.PI / 2) ? {img: [E(Math.cos(b.v), `cos(${b.c})`), E(Math.cos(a.v), `cos(${a.c})`, a.q && a.q.n === 0n ? Q(1n) : null)], q: E(Math.sin(b.v), `sin(${b.c})`),
+      lemma: 'cos ist auf [0, π/2] fallend ⇒ cos([a,b]) = [cos b, cos a]; |cos′(x)| = sin x ist dort steigend ⇒ sup |f′| = sin b.'} : {why: 'Zertifikat nur für [a, b] ⊂ [0, π/2] (dort cos fallend, |cos′| = sin steigend).'},
+    lect: (a, b) => a.v > -3 ? {img: [E(1 / (3 + b.v), `1/(3+${b.c})`, b.q ? qdiv(Q(1n), qadd(Q(3n), b.q)) : null), E(1 / (3 + a.v), `1/(3+${a.c})`, a.q ? qdiv(Q(1n), qadd(Q(3n), a.q)) : null)],
+      q: E(1 / ((3 + a.v) ** 2), `1/(3+${a.c})^2`, a.q ? qdiv(Q(1n), qmul(qadd(Q(3n), a.q), qadd(Q(3n), a.q))) : null),
+      lemma: 'f(x) = 1/(3+x) ist für x > −3 fallend ⇒ f([a,b]) = [f(b), f(a)]; |f′(x)| = 1/(3+x)² fallend ⇒ sup |f′| = 1/(3+a)².'} : {why: 'Zertifikat nur für a > −3.'},
+    sqrt: (a, b) => a.v > -1.5 ? (() => { const ia = a.q ? qadd(Q(3n), qmul(Q(2n), a.q)) : null, ib = b.q ? qadd(Q(3n), qmul(Q(2n), b.q)) : null;
+      return {img: [E(Math.sqrt(3 + 2 * a.v), `sqrt(3+2*${a.c})`, ia ? qsqrt(ia) : null), E(Math.sqrt(3 + 2 * b.v), `sqrt(3+2*${b.c})`, ib ? qsqrt(ib) : null)],
+        q: E(1 / Math.sqrt(3 + 2 * a.v), `1/sqrt(3+2*${a.c})`, ia && qsqrt(ia) ? qdiv(Q(1n), qsqrt(ia)) : null),
+        lemma: 'f(x) = √(3+2x) steigend ⇒ f([a,b]) = [f(a), f(b)]; f′(x) = 1/√(3+2x) > 0 fallend ⇒ sup |f′| = f′(a).'}; })() : {why: 'Zertifikat nur für a > −1,5.'},
+    heron: (a, b) => { if (!(a.v > 0)) return {why: 'Zertifikat nur für a > 0.'};
+      const fq = x => x.q ? qdiv(qadd(x.q, qdiv(Q(2n), x.q)), Q(2n)) : null, dq = x => x.q ? qdiv(qadd(Q(1n), Q(-1n * 2n * x.q.d * x.q.d, x.q.n * x.q.n)), Q(2n)) : null;
+      const fa = E((a.v + 2 / a.v) / 2, `h(${a.c})`, fq(a)), fb = E((b.v + 2 / b.v) / 2, `h(${b.c})`, fq(b));
+      const sq2 = E(Math.SQRT2, 'sqrt(2)'), inside = geq(sq2, a).r === 'yes' && geq(b, sq2).r === 'yes';
+      const lo = inside ? sq2 : (fa.v <= fb.v ? fa : fb), hi = fa.v >= fb.v ? fa : fb;
+      const da = E(Math.abs((1 - 2 / (a.v * a.v)) / 2), `|h'(${a.c})|`, dq(a) ? (qcmp(dq(a), Q(0n)) < 0 ? Q(-dq(a).n, dq(a).d) : dq(a)) : null);
+      const db = E(Math.abs((1 - 2 / (b.v * b.v)) / 2), `|h'(${b.c})|`, dq(b) ? (qcmp(dq(b), Q(0n)) < 0 ? Q(-dq(b).n, dq(b).d) : dq(b)) : null);
+      return {img: [lo, hi], q: da.v >= db.v ? da : db, lemma: 'f′(x) = (1 − 2/x²)/2 ist für x > 0 steigend ⇒ sup |f′| an einem Rand; f fällt auf (0, √2], steigt auf [√2, ∞) ⇒ Minimum f(√2) = √2, Maximum an einem Rand.'}; },
+    xinv: (a, b) => { if (!(a.v > 0)) return {why: 'Zertifikat nur für a > 0.'};
+      const fq = x => x.q ? qadd(x.q, qdiv(Q(1n), x.q)) : null;
+      const fa = E(a.v + 1 / a.v, `g(${a.c})`, fq(a)), fb = E(b.v + 1 / b.v, `g(${b.c})`, fq(b)), one = E(1, '1', Q(1n));
+      const inside = geq(one, a).r === 'yes' && geq(b, one).r === 'yes';
+      const dq = x => x.q ? qadd(Q(1n), Q(-x.q.d * x.q.d, x.q.n * x.q.n)) : null, abs = z => z && qcmp(z, Q(0n)) < 0 ? Q(-z.n, z.d) : z;
+      const da = E(Math.abs(1 - 1 / (a.v * a.v)), `|g'(${a.c})|`, abs(dq(a))), db = E(Math.abs(1 - 1 / (b.v * b.v)), `|g'(${b.c})|`, abs(dq(b)));
+      return {img: [inside ? E(2, '2', Q(2n)) : (fa.v <= fb.v ? fa : fb), fa.v >= fb.v ? fa : fb], q: da.v >= db.v ? da : db,
         lemma: 'f′(x) = 1 − 1/x² steigend ⇒ sup |f′| an einem Rand; f fällt auf (0, 1], steigt auf [1, ∞) ⇒ Minimum f(1) = 2.'}; },
   };
-  function certificate(key, a, b) {
+  function certificate(key, aIn, bIn) {
     const steps = [];
-    if (!(Number.isFinite(a) && Number.isFinite(b) && a < b)) return {ok: false, steps: [{ok: false, text: 'Ein abgeschlossenes, beschränktes Intervall [a, b] mit a < b angeben.'}]};
-    steps.push({ok: true, text: `[${a}, ${b}] ist abgeschlossen in ℝ, also vollständig.`});
+    let a, b;
+    try { a = parseExpr(aIn); b = parseExpr(bIn); } catch (err) { return {ok: false, status: 'refuted', steps: [{ok: false, text: 'Endpunkte nicht lesbar: ' + err.message + ' (erlaubt: Zahlen, pi, sqrt(), cos(), sin(), + − * /)'}]}; }
+    const lt = geq(a, b);
+    if (!(Number.isFinite(a.v) && Number.isFinite(b.v)) || lt.r !== 'no') return {ok: false, status: 'refuted', steps: [{ok: false, text: 'Ein abgeschlossenes, beschränktes Intervall [a, b] mit a < b angeben.'}]};
+    steps.push({ok: true, text: `[${a.c}, ${b.c}] ist abgeschlossen in ℝ, also vollständig.`});
     const c = CERT[key](a, b);
-    if (c.ok === false) return {ok: false, steps: steps.concat({ok: false, text: c.why})};
-    const inv = c.img[0] >= a + TOL && c.img[1] <= b - TOL;
-    steps.push({ok: inv, text: `Invarianz: f([a,b]) = [${c.img[0].toFixed(6)}, ${c.img[1].toFixed(6)}] ${inv ? '⊆' : '⊄'} [${a}, ${b}].`, lemma: c.lemma});
-    const qok = c.q < 1 - TOL;
-    steps.push({ok: qok, text: `Kontraktionskonstante: q = sup_{[a,b]} |f′| = ${c.q.toFixed(6)} ${qok ? '< 1' : '≥ 1'}; nach dem Mittelwertsatz |f(x) − f(y)| ≤ q|x − y| auf [a, b].`});
-    return {ok: inv && qok, steps, q: c.q, img: c.img, lemma: c.lemma};
+    if (c.why) return {ok: false, status: 'refuted', steps: steps.concat({ok: false, text: c.why})};
+    const lo = geq(c.img[0], a), hi = geq(b, c.img[1]);
+    const inv = lo.r === 'yes' && hi.r === 'yes' ? 'yes' : (lo.r === 'no' || hi.r === 'no') ? 'no' : 'unknown';
+    steps.push({ok: inv === 'yes', unknown: inv === 'unknown', text: `Invarianz: f([a,b]) = [${c.img[0].c} ≈ ${c.img[0].v.toFixed(6)}, ${c.img[1].c} ≈ ${c.img[1].v.toFixed(6)}] ${inv === 'yes' ? '⊆' : inv === 'no' ? '⊄' : '⊆ ?'} [${a.c}, ${b.c}] – linker Rand: ${lo.how}, rechter Rand: ${hi.how}.`, lemma: c.lemma});
+    const one = E(1, '1', Q(1n)), qq = geq(one, c.q), qstrict = qq.r === 'yes' && !(c.q.q ? qcmp(c.q.q, Q(1n)) === 0 : c.q.c === '1');
+    const qres = qstrict ? 'yes' : qq.r === 'no' || (c.q.q && qcmp(c.q.q, Q(1n)) >= 0) ? 'no' : 'unknown';
+    steps.push({ok: qres === 'yes', unknown: qres === 'unknown', text: `Kontraktionskonstante: q = sup_{[a,b]} |f′| = ${c.q.c} ≈ ${c.q.v.toFixed(6)} ${qres === 'yes' ? '< 1' : qres === 'no' ? '≥ 1' : '< 1 ?'} (${qq.how}); nach dem Mittelwertsatz |f(x) − f(y)| ≤ q|x − y| auf [a, b].`});
+    const status = inv === 'yes' && qres === 'yes' ? 'proven' : inv === 'no' || qres === 'no' ? 'refuted' : 'inconclusive';
+    return {ok: status === 'proven', status, steps, q: c.q.v, img: [c.img[0].v, c.img[1].v], lemma: c.lemma, a: a.v, b: b.v};
   }
-  const API = {SEQ, MAPS, checkN, minN, orbit, lipschitz, aprioriN, stepsTo, certificate};
+  const API = {SEQ, MAPS, checkN, minN, orbit, lipschitz, aprioriN, stepsTo, certificate, parseExpr};
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else root.AnaMath = API;
 })(typeof window !== 'undefined' ? window : globalThis);
