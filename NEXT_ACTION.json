@@ -12,7 +12,7 @@
     "nlp_reference_unit_v5": "HUMAN_REJECTED (owner review received 2026-11-15; no further v5 review needed)",
     "nlp_reference_unit_v6": "HUMAN_REVIEW_PENDING (Issue #9; docs/cross_domain/V6_REPORT.md); no self-release",
     "v6": "HUMAN_REJECTED (v6.1, Issue #10, mean 8/6 = 1.333/4)",
-    "v7": "IN PROGRESS: reference vertical slice (attention softmax + convex combination); then HUMAN_REVIEW_PENDING"
+    "v7": "Reference vertical slice delivered (attention softmax + convex combination): TECHNICAL_PASS locally; CONTENT_CORRECTNESS_REVIEW_REQUIRED, DIDACTIC_REVIEW_REQUIRED, PUBLISHING_REVIEW_REQUIRED; no self-release"
   },
   "product": {
     "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
@@ -28,7 +28,9 @@
       "docs/reference_unit/CURRICULUM_MAP.md"
     ],
     "open_lab": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling/labor.html",
-    "v4_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v4_snapshot/"
+    "v4_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v4_snapshot/",
+    "v7_report": "docs/reference_unit/V7_REFERENCE_SLICE.md (+ review_v7/before|after)",
+    "v6_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v6_snapshot/"
   },
   "verified": [
     "see final test run in commit message",
@@ -40,12 +42,12 @@
     "didactic quality",
     "Anki/textbook/workbook/exams improvements (open product requirement)"
   ],
-  "next_action": "Build v7 reference slice per Issue #10; owner rates products (not architecture).",
+  "next_action": "Owner reviews v7 slice products. Do not extend to other chapters before acceptance. Do not merge PR #3; no paid calls; no Gemini; tutor work deferred.",
   "open_decisions_for_owner": [
-    "Rate v6 with docs/cross_domain/HUMAN_ACCEPTANCE_v6.md (8 questions)",
-    "Run tutor test protocols (ANALYSIS1_PROTOCOL.md, ENTREPRENEURSHIP_PROTOCOL.md) in ChatGPT and file results",
-    "Pilot budget for engine runs (none authorised)",
-    "Weekly launchd job (not activated)"
+    "Rate the v7 reference slice as products (textbook §6 pages 12-26, figures, lab simplex/attention, AT10, A19/B-19, Anki cards) per Issue #10 acceptance questions",
+    "Only after acceptance: transfer quality to other chapters/modules",
+    "Pilot budget (none authorised)",
+    "Weekly launchd (not activated)"
   ],
   "cleanup_candidates_not_touched": [
     "Exam_Mastery_Studio/runs_v0_5_1_p0_dev (876M)",

@@ -476,9 +476,12 @@ for it in A + B:
     if it['id'] in V5W.W:
         it['worked'] = V5W.W[it['id']]; it['rubric'] = V5W.R[it['id']]
 CARDS.extend(V5.CARDS)
+CARDS.extend(V7.NEW_CARDS)
 for c in CARDS:
     for k, v in V5.CARD_EXTRAS.get(c['key'], {}).items():
         c[k] = v
+for c in CARDS:                       # v7 zuletzt: Referenzsequenz hat Vorrang
+    c.update(V7.CARD_UPDATES.get(c['key'], {}))
 KC_MAP['attention']['research'] = KC_MAP['attention']['research'] + ['jain', 'wiegreffe']
 
 unit = {

@@ -232,3 +232,26 @@ def render_all(bank):
     v, _ = fig_variance()
     return {'projection': fig_projection(bank, R), 'pipeline': fig_pipeline(R), 'temperature': fig_temperature(bank),
             'simplex': fig_simplex(bank), 'hull': fig_hull(bank, R), 'variance': v}
+
+
+LIGHT = {'q': '#1d4ed8', 'k': '#b45309', 'v': '#0f766e', 'w': '#7c3aed', 'o': '#be123c', 's': '#334155', 'err': '#b91c1c'}
+
+
+def static_svg(svg: str, bg: str = '#ffffff', card: bool = True, crop: str | None = None, fonts=('17px', '19px')) -> str:
+    """Für Anki/Dateien: semantische Klassen in feste Farben übersetzen (Kartenansicht kennt die Buch-CSS nicht).
+    card=True: Titel/Fußzeilen entfernen (die Karte hat eigenen Text) und Schrift für das Handy vergrößern."""
+    import re
+    if card:
+        h = float(re.search(r'viewBox="0 0 [\d.]+ ([\d.]+)"', svg).group(1))
+        def keep(m):
+            y = float(m.group(1))
+            return '' if (y < 50 or y > h - 48) else m.group(0)
+        svg = re.sub(r'<text x="[\d.]+" y="([\d.]+)" class="t-(?:lab|small t-mute|small)">[^<]*(?:<tspan[^>]*>[^<]*</tspan>[^<]*)*</text>', keep, svg)
+    fs = fonts if card else ('12.5px', '14px')
+    if crop:
+        svg = re.sub(r'viewBox="[^"]+"', f'viewBox="{crop}"', svg, count=1)
+    css = '<style>text{font-family:Helvetica,Arial,sans-serif;fill:#1b1f24}.t-mute{fill:#525a66}.t-small{font-size:' + fs[0] + '}.t-lab{font-size:' + fs[1] + ';font-weight:600}.grid{stroke:#e3dfd6}.ax{stroke:#525a66}' + \
+          ''.join(f'.s-{k}{{stroke:{c}}}.f-{k}{{fill:{c}}}' for k, c in LIGHT.items()) + '.f-hull{fill:#eef4ff;stroke:#0f766e;stroke-width:1.5}</style>'
+    svg = svg.replace('<svg ', '<svg ', 1)
+    svg = re.sub(r'(<svg[^>]*>)', lambda m: m.group(1) + css + f'<rect width="100%" height="100%" fill="{bg}"/>', svg, count=1)
+    return svg

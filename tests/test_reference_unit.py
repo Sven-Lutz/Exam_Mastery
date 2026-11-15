@@ -168,7 +168,7 @@ class AnkiPackage(unittest.TestCase):
         opt = ImportAnkiPackageOptions(update_notes=cond, update_notetypes=cond, with_scheduling=False)   # Anki's default dialog choices
         col.import_anki_package(ImportAnkiPackageRequest(package_path=str(tmp / 'v1.apkg'), options=opt))
         self.assertEqual(col.note_count(), len(u['cards']))
-        self.assertEqual(len(list(Path(col.media.dir()).glob('em_*.svg'))), len(list((tmp / 'm').glob('*.svg'))))
+        self.assertEqual(len(list(Path(col.media.dir()).glob('em_*.svg'))), len({c['diagram'] for c in u['cards'] if c.get('diagram')}))   # nur referenzierte Grafiken
         col.decks.select(col.decks.id(A.deck_name(u)))
         reviewed = []
         for _ in range(5):

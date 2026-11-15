@@ -17,7 +17,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
-TEMPLATE_VERSION = '2.0.0'
+TEMPLATE_VERSION = '2.1.0'
 FIELDS = ['StableID', 'Course', 'Chapter', 'KC', 'Prerequisites', 'Prompt', 'CanonicalAnswer', 'Why',
           'MicroExample', 'Misconception', 'Source', 'DiagramMedia', 'Version']   # schema frozen since v1: new fields would break updates
 KIND_LABEL = {'concept': 'Begriff', 'math': 'Formel', 'cloze': 'Lückentext', 'case': 'Mini-Fall', 'error': 'Fehler finden', 'research': 'Forschung'}
@@ -308,6 +308,12 @@ def diagrams(out: Path, unit: dict):
             body += f'<rect x="{x0 + 40}" y="{y}" width="{max(2, (val + 1) * 18):.1f}" height="18" rx="3" fill="{col}" opacity=".55"/><text x="{x0}" y="{y + 14}" font-size="12" fill="#333">{str(round(val, 2)).replace(".", ",").replace("-", "−")}</text>'
         body += f'<rect x="250" y="{y}" width="{wv * 100:.1f}" height="18" rx="3" fill="{col}"/><text x="{256 + wv * 100:.1f}" y="{y + 14}" font-size="12" fill="#333">{str(round(wv, 3)).replace(".", ",")}</text>'
     (out / 'softmax_shift.svg').write_text(_svg(380, 175, body), encoding='utf-8')
+    if unit.get('numeric_examples'):                      # v7: Kartengrafiken aus denselben Originalabbildungen wie das Lehrbuch
+        from . import figures7 as F7
+        figs = F7.render_all(unit['numeric_examples'][0])
+        for name, key, crop, fonts in (('att_pipeline.svg', 'pipeline', '10 10 680 310', ('19px', '21px')), ('att_simplex.svg', 'simplex', '20 60 670 360', ('22px', '22px')),
+                                       ('att_hull_bank.svg', 'hull', '20 70 700 340', ('21px', '22px'))):
+            (out / name).write_text(F7.static_svg(figs[key], crop=crop, fonts=fonts), encoding='utf-8')
     return sorted(p.name for p in out.glob('*.svg'))
 
 

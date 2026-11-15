@@ -45,3 +45,31 @@ B19 = dict(id='B-19', kc='attention', transfer=True,
            solution=r'\(w=(2/3;\,1/6;\,1/6)\), \(s_1=\ln4\approx1{,}3863\), \(s_2=0\).',
            worked=r'\(3w_1=2\), \(3w_2=0{,}5\) ⇒ \(w_1=2/3\), \(w_2=1/6\), \(w_3=1-2/3-1/6=1/6\). Alle positiv ⇒ erreichbar. \(s_1=\ln\frac{2/3}{1/6}=\ln4\approx1{,}3863\), \(s_2=\ln1=0\). Probe: \(e^{s}=(4;\,1;\,1)\), Summe 6, Gewichte \((2/3;\,1/6;\,1/6)\).',
            rubric=['Gewichte (1 P.)', 'Score über Logarithmus (1 P.)'])
+
+# ---- Anki: Referenzsequenz (atomar, kein Beweis auf Karten; Grafik nur, wo sie beim Abruf hilft) ----
+CARD_UPDATES = {
+ 'attention/formel': dict(
+     prompt=r'Wie werden aus Scores \(s_1,\dots,s_N\) bei Temperatur \(T\) die Attention-Gewichte \(w_j\) berechnet?',
+     answer=r'\(w_j=\dfrac{e^{s_j/T}}{\sum_{l}e^{s_l/T}}\) (Softmax); dann \(o=\sum_j w_jv_j\).',
+     why=r'\(e^x\) macht jeden Score positiv und erhält die Reihenfolge; die Division normiert auf Summe 1. Gewichte hängen nur von Score-Differenzen ab.',
+     example=r'Bank: \(s=(0{,}8485;\,-0{,}891;\,0{,}1909)\) → \(w=(0{,}5904;\,0{,}1037;\,0{,}3059)\).',
+     source='Lehrbuch 6.3, Definition 6.2, Abb. 6.2; SLP3 §7.1.1, S. 180', diagram='att_pipeline.svg', prereq='Exponentialfunktion; Skalarprodukt (6.2)'),
+ 'attention/sharpening': dict(source='Lehrbuch 6.3, Abb. 6.3 (Temperatur); Satz 6.1 b'),
+ 'attention/skalierung': dict(source='Lehrbuch 6.8, Satz 3 mit Beweis; Abb. 6.6; Vaswani et al. 2017, §3.2.1'),
+ 'attention/convex': dict(prompt=r'Wo liegt die Attention-Ausgabe \(o=\sum_j w_jv_j\) relativ zu den Values \(v_j\)?', answer=r'In der konvexen Hülle der \(v_j\); innere Punkte exakt, Randpunkte nur im Grenzwert, äußere nie.',
+     why=r'Softmax-Gewichte sind positiv und summieren zu 1: \(o\) ist eine Konvexkombination (Satz 6.2).',
+     diagram='att_hull_bank.svg', source='Lehrbuch 6.5, Satz 6.2, Abb. 6.5'),
+}
+NEW_CARDS = [
+ dict(key='attention/softmax-why-exp', kc='attention', type='concept',
+      prompt=r'Warum normiert man Scores nicht einfach als \(s_j/\sum_l s_l\), sondern über \(e^{s_j}\)?',
+      answer=r'Scores können negativ sein: Der einfache Quotient liefert negative oder riesige Gewichte. \(e^{s_j}\) ist positiv, ordnungserhaltend und macht nur Differenzen relevant.',
+      why=r'Die vier Forderungen: positiv, Summe 1, Ordnung erhalten, Verschiebung egal – \(e^x\) erfüllt alle (Lehrbuch 6.3).',
+      example=r'\(s=(1;\,-1;\,0{,}5)\): Quotient gibt \((2;\,-2;\,1)\).', mistake='Gewichte = normierte Scores.',
+      source='Lehrbuch 6.3, Forderungen W1–W4', prereq='Exponentialfunktion'),
+ dict(key='attention/simplex', kc='attention', type='case',
+      prompt=r'Drei Wörter. Welche Gewichtsvektoren \((w_1,w_2,w_3)\) kann die Softmax überhaupt ausgeben?',
+      answer=r'Genau die inneren Punkte des Simplex: alle \(w_j&gt;0\), Summe 1. Ecken wie \((1,0,0)\) nur im Grenzwert.',
+      why=r'\(e^{s}&gt;0\) für jedes \(s\) – kein Gewicht wird 0. Temperatur bewegt den Punkt zwischen Ecke (\(T\to0\)) und Mitte (\(T\to\infty\)).',
+      source='Lehrbuch 6.4, Abb. 6.4', diagram='att_simplex.svg', prereq='Softmax (6.3)', mistake=r'„Bei kleiner Temperatur ist die Ausgabe exakt one-hot.“'),
+]

@@ -3355,13 +3355,13 @@
    "key": "attention/formel",
    "kc": "attention",
    "type": "math",
-   "prompt": "Skalierte Dot-Product-Attention für \\(Q,K,V\\) mit Schlüsseldimension \\(d_k\\)?",
-   "answer": "\\(\\operatorname{softmax}\\!\\big(QK^\\top/\\sqrt{d_k}\\big)\\,V\\), Softmax zeilenweise.",
-   "why": "Ähnlichkeit je Anfrage-Schlüssel-Paar, normiert zu Gewichten mit Summe 1, dann gewichtete Summe der Werte.",
-   "source": "Vorlesung PDF-S. 53; SLP3 §7.3, Gl. 7.34, S. 188",
-   "diagram": "attention_geometry.svg",
-   "prereq": "Skalarprodukt, Softmax",
-   "example": "Bank-Beispiel: \\(w=(0{,}5904;\\,0{,}1037;\\,0{,}3059)\\), \\(o=(1{,}1343;\\,0{,}3763)\\)",
+   "prompt": "Wie werden aus Scores \\(s_1,\\dots,s_N\\) bei Temperatur \\(T\\) die Attention-Gewichte \\(w_j\\) berechnet?",
+   "answer": "\\(w_j=\\dfrac{e^{s_j/T}}{\\sum_{l}e^{s_l/T}}\\) (Softmax); dann \\(o=\\sum_j w_jv_j\\).",
+   "why": "\\(e^x\\) macht jeden Score positiv und erhält die Reihenfolge; die Division normiert auf Summe 1. Gewichte hängen nur von Score-Differenzen ab.",
+   "source": "Lehrbuch 6.3, Definition 6.2, Abb. 6.2; SLP3 §7.1.1, S. 180",
+   "diagram": "att_pipeline.svg",
+   "prereq": "Exponentialfunktion; Skalarprodukt (6.2)",
+   "example": "Bank: \\(s=(0{,}8485;\\,-0{,}891;\\,0{,}1909)\\) → \\(w=(0{,}5904;\\,0{,}1037;\\,0{,}3059)\\).",
    "mistake": "Values in die Gewichte einrechnen – sie werden nur gemischt."
   },
   {
@@ -3382,7 +3382,7 @@
    "prompt": "Unter welchen Annahmen hat \\(q^\\top k\\) mit \\(q,k\\in\\mathbb R^{d_k}\\) die Varianz \\(d_k\\)?",
    "answer": "Alle Komponenten unabhängig, Erwartungswert 0, Varianz 1.",
    "why": "Dann hat jeder Summand \\(q_ik_i\\) Varianz 1, und die \\(d_k\\) Summanden sind unkorreliert. Geteilt durch \\(\\sqrt{d_k}\\) ist die Varianz 1. Vaswani et al. formulieren den Effekt vorsichtig als Vermutung („We suspect“).",
-   "source": "Vaswani et al. 2017, §3.2.1 mit Fn. 1; Lehrbuch Satz 3",
+   "source": "Lehrbuch 6.8, Satz 3 mit Beweis; Abb. 6.6; Vaswani et al. 2017, §3.2.1",
    "prereq": "Varianz, Unabhängigkeit",
    "mistake": "„Skalierung normiert die Gewichte auf Summe 1“ – das tut die Softmax."
   },
@@ -3393,19 +3393,19 @@
    "prompt": "Energien \\((0{,}7071;\\ 0{,}7071;\\ 1{,}4142)\\) ergeben \\(\\alpha_3\\approx0{,}5035\\). Was passiert mit \\(\\alpha_3\\), wenn alle Energien viermal so groß sind?",
    "answer": "Es wächst stark (gegen 1): Die Softmax wird spitzer und nähert sich einem argmax.",
    "why": "Die Softmax hängt von Differenzen ab; viermal größere Differenzen werden exponentiell betont. Ihre Gradienten nach den übrigen Energien werden klein.",
-   "source": "Lehrbuch §6, Abb. 6.1",
+   "source": "Lehrbuch 6.3, Abb. 6.3 (Temperatur); Satz 6.1 b",
    "prereq": "Softmax, Temperatur"
   },
   {
    "key": "attention/convex",
    "kc": "attention",
    "type": "concept",
-   "prompt": "Wo liegt der Ausgabevektor \\(o_i=\\sum_j\\alpha_{ij}v_j\\) relativ zu den Werten \\(v_j\\)?",
-   "answer": "In der konvexen Hülle der \\(v_j\\): Gewichte \\(\\ge0\\) mit Summe 1.",
-   "why": "Self-Attention mischt Werte; sie kann keinen Wert außerhalb ihrer Hülle erzeugen. Neue Richtungen entstehen erst durch Projektionen und Feed-Forward-Schichten.",
-   "source": "Lehrbuch §6, Abb. 6.1",
+   "prompt": "Wo liegt die Attention-Ausgabe \\(o=\\sum_j w_jv_j\\) relativ zu den Values \\(v_j\\)?",
+   "answer": "In der konvexen Hülle der \\(v_j\\); innere Punkte exakt, Randpunkte nur im Grenzwert, äußere nie.",
+   "why": "Softmax-Gewichte sind positiv und summieren zu 1: \\(o\\) ist eine Konvexkombination (Satz 6.2).",
+   "source": "Lehrbuch 6.5, Satz 6.2, Abb. 6.5",
    "prereq": "Konvexkombination",
-   "diagram": "attention_hull.svg",
+   "diagram": "att_hull_bank.svg",
    "mistake": "Mit kleiner Temperatur Punkte außerhalb erreichen wollen."
   },
   {
@@ -3736,6 +3736,30 @@
    "mistake": "Mit T → 0 „erzwingen“: Das ergibt einen Value (eindeutiges Maximum) oder den Mittelwert gleichauf liegender Values – beides in der Hülle.",
    "diagram": "attention_hull.svg",
    "prereq": "Konvexkombination"
+  },
+  {
+   "key": "attention/softmax-why-exp",
+   "kc": "attention",
+   "type": "concept",
+   "prompt": "Warum normiert man Scores nicht einfach als \\(s_j/\\sum_l s_l\\), sondern über \\(e^{s_j}\\)?",
+   "answer": "Scores können negativ sein: Der einfache Quotient liefert negative oder riesige Gewichte. \\(e^{s_j}\\) ist positiv, ordnungserhaltend und macht nur Differenzen relevant.",
+   "why": "Die vier Forderungen: positiv, Summe 1, Ordnung erhalten, Verschiebung egal – \\(e^x\\) erfüllt alle (Lehrbuch 6.3).",
+   "example": "\\(s=(1;\\,-1;\\,0{,}5)\\): Quotient gibt \\((2;\\,-2;\\,1)\\).",
+   "mistake": "Gewichte = normierte Scores.",
+   "source": "Lehrbuch 6.3, Forderungen W1–W4",
+   "prereq": "Exponentialfunktion"
+  },
+  {
+   "key": "attention/simplex",
+   "kc": "attention",
+   "type": "case",
+   "prompt": "Drei Wörter. Welche Gewichtsvektoren \\((w_1,w_2,w_3)\\) kann die Softmax überhaupt ausgeben?",
+   "answer": "Genau die inneren Punkte des Simplex: alle \\(w_j&gt;0\\), Summe 1. Ecken wie \\((1,0,0)\\) nur im Grenzwert.",
+   "why": "\\(e^{s}&gt;0\\) für jedes \\(s\\) – kein Gewicht wird 0. Temperatur bewegt den Punkt zwischen Ecke (\\(T\\to0\\)) und Mitte (\\(T\\to\\infty\\)).",
+   "source": "Lehrbuch 6.4, Abb. 6.4",
+   "diagram": "att_simplex.svg",
+   "prereq": "Softmax (6.3)",
+   "mistake": "„Bei kleiner Temperatur ist die Ausgabe exakt one-hot.“"
   }
  ],
  "sources": [
@@ -3867,7 +3891,7 @@
     ],
     [
      "a6",
-     "Station 6: Warum durch √d_k teilen?"
+     "Station 6: Warum durch die Wurzel der Key-Dimension teilen?"
     ],
     [
      "c-impossible",

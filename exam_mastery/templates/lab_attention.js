@@ -101,7 +101,8 @@ function attOne(root, api) {
   const meters = h('div', {class: 'meters'});
   const tbl = h('table', {class: 'calc'}); const tw = h('div', {class: 'calc-wrap'}, tbl);
   const nums = h('details', {class: 'numbers'}, h('summary', {}, 'Alle Vektoren als Zahlen eingeben'), h('div', {class: 'numgrid'}));
-  const stageEl = h('div', {}, h('div', {class: 'planes'}, L.root, Rt.root), fl, meters, tw, nums,
+  const simplex = h('div', {class: 'plane', style: 'padding:6px 10px'});
+  const stageEl = h('div', {}, h('div', {class: 'planes'}, L.root, Rt.root), simplex, fl, meters, tw, nums,
     h('p', {class: 'note'}, 'Tastatur: Tab wählt einen Pfeil, Pfeiltasten verschieben ihn (Umschalt = größere Schritte). Der lila Griff ◆ im Schwerpunkt der Keys verschiebt alle Keys gemeinsam. Der Link in der Adresszeile speichert den exakten Zustand.'));
   root.append(stageEl);
   const setHL = j => { if (j == null) stageEl.removeAttribute('data-hl'); else stageEl.setAttribute('data-hl', j); stageEl.querySelectorAll('.dimmable').forEach(n => n.classList.toggle('hl', n.dataset.j === String(j) || n.dataset.j === 'all')); };
@@ -139,10 +140,25 @@ function attOne(root, api) {
     let acc = [0, 0];  // Kette w_j v_j Spitze an Fuß
     o.contrib.forEach((cv, j) => { const nx = M.add(acc, cv); d.append(s('g', {class: 'dimmable', 'data-j': j}, Rt.arrow(acc, nx, TOKC[j], 3))); acc = nx; });
     if (S.target) d.append(s('g', {}, s('circle', {cx: Rt.X(S.target[0]), cy: Rt.Y(S.target[1]), r: 8, fill: 'none', stroke: 'var(--bad)', 'stroke-width': 2}), s('text', {x: Rt.X(S.target[0]) + 10, y: Rt.Y(S.target[1]) + 4, class: 'lbl', fill: 'var(--bad)'}, 'Ziel Z')));
-    d.append(s('circle', {cx: Rt.X(o.out[0]), cy: Rt.Y(o.out[1]), r: 6.5, fill: 'var(--q)'}), s('text', {x: Rt.X(o.out[0]) + 9, y: Rt.Y(o.out[1]) - 8, class: 'lbl', fill: 'var(--q)'}, 'o'));
+    d.append(s('circle', {cx: Rt.X(o.out[0]), cy: Rt.Y(o.out[1]), r: 7, fill: 'var(--c-o)'}), s('text', {x: Rt.X(o.out[0]) + 9, y: Rt.Y(o.out[1]) - 8, class: 'lbl', fill: 'var(--c-o)'}, 'o'));
     const vids = [];
     S.V.forEach((v, j) => { vids.push('v' + j); Rt.handle('v' + j, {get: () => S.V[j], set: nv => api.set(st => { st.V[j] = nv; return st; }), color: TOKC[j], label: 'v' + sub[j + 1], aria: `Value von ${S.names[j]}`}); });
     Rt.only(vids);
+    // --- Simplex (Lehrbuch Abb. 6.4): derselbe Gewichtsvektor als Punkt im Dreieck, Bahn über die Temperatur ---
+    if (n !== 3) simplex.replaceChildren(h('h3', {style: 'padding:0'}, 'Simplex der Gewichte'), h('p', {class: 'note'}, 'Die Simplex-Ansicht zeigt genau drei Token. Entfernen oder ergänzen Sie Token, um sie zu sehen.'));
+    else {
+      const W = 520, H = 250, A = [260, 22], B = [40, 228], C = [480, 228];
+      const P = w => [w[0] * A[0] + w[1] * B[0] + w[2] * C[0], w[0] * A[1] + w[1] * B[1] + w[2] * C[1]];
+      const sv = s('svg', {viewBox: `0 0 ${W} ${H}`, style: 'max-width:440px;margin:0 auto', role: 'img', 'aria-label': `Gewichte als Punkt im Simplex: ${o.w.map(x => f(x, 3)).join('; ')}`});
+      sv.append(s('polygon', {points: [A, B, C].map(p => p.join(',')).join(' '), fill: 'none', stroke: 'var(--c-w)', 'stroke-width': 1.5}));
+      const path = []; for (let i = 0; i <= 80; i++) { const T = Math.pow(10, -1.3 + 2.6 * i / 80); path.push(P(M.softmax(o.scaled, T)).map(v => v.toFixed(1)).join(',')); }
+      sv.append(s('polyline', {points: path.join(' '), fill: 'none', stroke: 'var(--c-w)', 'stroke-width': 2, opacity: .55, 'stroke-dasharray': '4 3'}));
+      [[A, S.names[0], 'middle', -8], [B, S.names[1], 'start', 18], [C, S.names[2], 'end', 18]].forEach(([p, nm, anc, dy]) => sv.append(s('text', {x: p[0], y: p[1] + dy, 'text-anchor': anc, 'font-size': 16, fill: 'var(--ink)'}, 'nur ' + nm)));
+      const g = P([1 / 3, 1 / 3, 1 / 3]); sv.append(s('circle', {cx: g[0], cy: g[1], r: 4, fill: 'none', stroke: 'var(--c-w)'}));
+      const cur = P(o.w); sv.append(s('circle', {cx: cur[0], cy: cur[1], r: 7, fill: 'var(--c-w)'}), s('text', {x: cur[0] + 10, y: cur[1] + 5, 'font-size': 16, 'font-weight': 600, fill: 'var(--c-w)'}, `w (T = ${f(S.T)})`));
+      simplex.replaceChildren(h('h3', {style: 'padding:0'}, 'Simplex der Gewichte – derselbe Vektor w als Punkt im Dreieck (Lehrbuch Abb. 6.4)'), sv,
+        h('p', {class: 'note'}, 'Gestrichelt: wohin w wandert, wenn nur die Temperatur sich ändert (von der Ecke des größten Scores zur Mitte). Ein Punkt auf dem Rand ist nie erreichbar – alle Gewichte sind positiv.'));
+    }
     // --- Formel synchron ---
     const sc = S.scaled ? '\u221A2' : '1';
     fl.replaceChildren(h('span', {}, 'o = '), ...o.w.flatMap((w, j) => [j ? ' + ' : '', h('span', {class: `t tok-${j} dimmable`, 'data-j': j, style: `color:${TOKC[j]}`}, `${f(w, 3)}·v${sub[j + 1]}`)]), ` = (${f(o.out[0])}; ${f(o.out[1])})`,

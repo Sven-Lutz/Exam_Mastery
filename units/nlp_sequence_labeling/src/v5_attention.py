@@ -8,7 +8,7 @@ AT8 = {'q': [1, 1], 'K': [[2, 0], [0, 1]], 'V': [[1, 0], [0, 1]], 'T': 1, 'scale
 
 LAB = {  # KC -> Experimente im Labor (Stationen/Challenges); Labor verlinkt zurück ins Lehrbuch
     'attention': {'lab': 'attention', 'items': [['a1', 'Station 1: Wonach sucht „Bank“?'], ['a2', 'Station 2: Länge ist Schärfe'], ['a3', 'Station 3: Nur Unterschiede zählen'],
-                  ['a4', 'Station 4: Gleichgültigkeit erzeugen'], ['a5', 'Station 5: Was die Ausgabe nie kann'], ['a6', 'Station 6: Warum durch √d_k teilen?'], ['c-impossible', 'Challenge: Unerreichbar?']]},
+                  ['a4', 'Station 4: Gleichgültigkeit erzeugen'], ['a5', 'Station 5: Was die Ausgabe nie kann'], ['a6', 'Station 6: Warum durch die Wurzel der Key-Dimension teilen?'], ['c-impossible', 'Challenge: Unerreichbar?']]},
     'position': {'lab': 'attention', 'items': [['a7', 'Station 7: Self-Attention sieht keine Reihenfolge'], ['c-order', 'Challenge: Gegenbeispiel bauen']]},
     'decoding': {'lab': 'crf', 'items': [['r1', 'Station 1: Jedes Wort für sich'], ['r2', 'Station 2: Verbotene Übergänge'], ['r4', 'Station 4: Summe statt Maximum'], ['k-mm', 'Challenge: Die Randverteilungs-Falle']]},
     'birnn': {'lab': 'birnn', 'items': [['b1', 'Station 1: Vorwärts sieht nur die Vergangenheit'], ['b2', 'Station 2: Rückwärts bringt die Zukunft'], ['n-sat', 'Challenge: Gesättigt']]},

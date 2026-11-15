@@ -95,3 +95,4 @@ figure.fig7 figcaption b{color:var(--ink)}
 }
 @media (max-width:640px){:root{--fs-body:17px}.book7 h3{font-size:19px}ol.drv>li{padding-left:2.1em}table.sym td:first-child{white-space:normal}}
 .book7 ol.drv mjx-container[display=false]{white-space:normal}
+@media print{.box.prf,.box.mis{break-inside:auto}.box.prf>.lbl,.box>.lbl{break-after:avoid}ol.drv>li{break-inside:avoid}figure.fig7 figcaption{break-before:avoid}.book7 h3+p,.book7 h3+.box{break-before:avoid}}

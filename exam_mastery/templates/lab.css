@@ -1,7 +1,7 @@
 /* Interaktives Labor – baut auf den Tokens von unit_app.css auf */
-:root{--t0:#2756c4;--t1:#c2410c;--t2:#15803d;--t3:#9333ea;--t4:#0e7490;--q:#111827;--grid:#ece8df;--hull:rgba(39,86,196,.08)}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--t0:#7aa2ff;--t1:#ff9b5e;--t2:#4ade80;--t3:#c084fc;--t4:#22d3ee;--q:#f3f4f6;--grid:#2a2e36;--hull:rgba(122,162,255,.10)}}
-:root[data-theme=dark]{--t0:#7aa2ff;--t1:#ff9b5e;--t2:#4ade80;--t3:#c084fc;--t4:#22d3ee;--q:#f3f4f6;--grid:#2a2e36;--hull:rgba(122,162,255,.10)}
+:root{--t0:#2756c4;--t1:#c2410c;--t2:#15803d;--t3:#9333ea;--t4:#0e7490;--q:var(--c-q);--grid:#ece8df;--hull:rgba(39,86,196,.08)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--t0:#7aa2ff;--t1:#ff9b5e;--t2:#4ade80;--t3:#c084fc;--t4:#22d3ee;--q:var(--c-q);--grid:#2a2e36;--hull:rgba(122,162,255,.10)}}
+:root[data-theme=dark]{--t0:#7aa2ff;--t1:#ff9b5e;--t2:#4ade80;--t3:#c084fc;--t4:#22d3ee;--q:var(--c-q);--grid:#2a2e36;--hull:rgba(122,162,255,.10)}
 body.lab{font:15px/1.5 var(--sans)}
 .lab-top{position:sticky;top:0;z-index:6;background:var(--panel);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:8px 16px}
 .lab-top .brand{font-weight:700}.lab-top nav{display:flex;gap:4px;flex-wrap:wrap}.lab-top .right{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}

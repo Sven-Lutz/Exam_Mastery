@@ -136,7 +136,10 @@ class ContractionCertificate(unittest.TestCase):
     def test_boundary_equality_no_false_negative_and_adversarial_cases(self):
         """Issue #10: [cos 1, 1] ist mathematisch gültig (nicht-strikte Inklusion). Exakte Endpunkte => bewiesen; Dezimalnäherung am Rand
         => 'inconclusive' (keine falsche Ablehnung, kein falscher Beweis); echte Verletzungen => widerlegt. Orakel: sympy exakt."""
-        import sympy as sp
+        try:
+            import sympy as sp
+        except ImportError:
+            self.skipTest('sympy fehlt')
         js = ROOT / 'modules/analysis1_folgen/lab/analysis_math.js'
         cases = [('cos', 'cos(1)', '1', 'proven'), ('cos', '0.5403023058681398', '1', 'inconclusive'), ('cos', '0.5404', '1', 'refuted'),
                  ('cos', '0,54', '1', 'proven'), ('cos', '0.5', '1', 'proven'), ('heron', 'sqrt(2)', '2', 'proven'), ('sqrt', '3', '4', 'proven'),
