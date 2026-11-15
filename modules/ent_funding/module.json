@@ -103,11 +103,13 @@
      }
     ],
     "tasks": [
-     "EN3"
+     "EN3",
+     "EN5"
     ]
    },
    "sources": [
-    "kurs"
+    "kurs",
+    "knr-2014"
    ],
    "search_terms": [
     "venture capital returns power law fund economics"
@@ -212,6 +214,15 @@
    "title": "Zahlenprobe der Aufgaben EN1–EN3",
    "check": "checks.py::tasks",
    "summary": "Prüft alle Zahlen der Arbeitsaufgaben unabhängig."
+  },
+  {
+   "id": "X4",
+   "kc": "vc",
+   "original": true,
+   "counterexample": true,
+   "title": "Median 0×, Fonds 3,45×: ein Ausreißer trägt alles",
+   "check": "checks.py::portfolio_skew",
+   "summary": "20 Beteiligungen: Median 0×, brutto 3,45×, Ausreißer 87 % des Rückflusses; ohne ihn 0,47×. Verankert in Kerr, Nanda & Rhodes-Kropf (2014)."
   }
  ],
  "tasks": [
@@ -284,6 +295,24 @@
     "Zahlen aus X1 (1 P.)",
     "präzise Neufassung (1 P.)"
    ]
+  },
+  {
+   "id": "EN5",
+   "kc": "vc",
+   "stage": "case",
+   "prompt": "Ein Fonds investiert je 1 Mio. € in 20 Start-ups. Ergebnis: 14 Totalverluste, 4 Rückzahlungen zum Einstand (1×), eine Beteiligung mit 5× und eine mit 60×. Bestimmen Sie Median-Multiple und Brutto-Fondsmultiple sowie den Anteil des größten Ausreißers am Rückfluss. Welche Aussage von Kerr, Nanda und Rhodes-Kropf (2014) illustriert das?",
+   "hints": [
+    "Sortieren Sie die 20 Multiples; der Median ist der Mittelwert des 10. und 11. Werts.",
+    "Rückfluss = Σ Multiple × 1 Mio. €."
+   ],
+   "key": "Median 0×; Brutto 69 Mio. € auf 20 Mio. € = 3,45×; Ausreißer 60/69 ≈ 87 % des Rückflusses. Illustriert: niedriger Median, sehr hohe Varianz; Rendite aus der einen großen Erfolgsinvestition.",
+   "worked": "Sortiert: 14-mal 0, 4-mal 1, dann 5 und 60. Der 10. und 11. Wert sind 0 ⇒ Median 0×. Rückfluss 4·1 + 5 + 60 = 69 Mio. € ⇒ 69/20 = 3,45× brutto. Anteil des Ausreißers 60/69 ≈ 0,870. Ohne den 60×-Fall: 9/19 ≈ 0,47× – Verlust. Das ist genau die Struktur „low median value but very high variance“ und „returns on the one investment out of many“ (Kerr, Nanda & Rhodes-Kropf 2014, NBER WP S. 3). Grenze: Zahlen hier frei gewählt, nicht empirisch.",
+   "rubric": [
+    "Median korrekt (1 P.)",
+    "Fondsmultiple (1 P.)",
+    "Ausreißeranteil und kontrafaktische Rechnung (2 P.)",
+    "Quellenbezug mit Grenze (1 P.)"
+   ]
   }
  ],
  "labs": [
@@ -296,5 +325,6 @@
     "lab/venture_lab.js"
    ]
   }
- ]
+ ],
+ "tutor_test_protocol": "../../docs/cross_domain/tutor_tests/ENTREPRENEURSHIP_PROTOCOL.md"
 }

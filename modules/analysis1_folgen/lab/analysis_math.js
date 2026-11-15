@@ -38,6 +38,39 @@
   /** A-priori-Schranke aus dem Fixpunktsatz: |aₙ − a| ≤ qⁿ⁻¹/(1−q)·|a₂ − a₁|; kleinstes n für Toleranz tol. */
   function aprioriN(q, d1, tol) { if (!(q < 1)) return null; let n = 1; while (Math.pow(q, n - 1) / (1 - q) * d1 > tol) n++; return n; }
   function stepsTo(key, a1, tol, limit) { const o = orbit(key, a1, 200); const i = o.findIndex(v => Math.abs(v - limit) <= tol); return i < 0 ? null : i + 1; }
-  const API = {SEQ, MAPS, checkN, minN, orbit, lipschitz, aprioriN, stepsTo};
+
+  /** Beweis-Zertifikat für den Fixpunktsatz auf einem abgeschlossenen Intervall [a, b] ⊂ ℝ (vollständig).
+   *  Nur analytisch begründete Formeln (Monotonie von f und |f'| auf dem Intervall), keine Abtastung.
+   *  Liefert die einzelnen Beweisschritte; jede Bedingung muss mit Sicherheitsabstand erfüllt sein. */
+  const TOL = 1e-12;
+  const CERT = {
+    cos: (a, b) => { if (!(a >= 0 && b <= Math.PI / 2)) return {ok: false, why: 'Zertifikat nur für [a, b] ⊂ [0, π/2] (dort cos fallend, |cos′| = sin steigend).'};
+      return {img: [Math.cos(b), Math.cos(a)], q: Math.sin(b), lemma: 'cos ist auf [0, π/2] fallend ⇒ cos([a,b]) = [cos b, cos a]; |cos′(x)| = sin x ist dort steigend ⇒ sup |f′| = sin b.'}; },
+    lect: (a, b) => { if (!(a > -3)) return {ok: false, why: 'Zertifikat nur für a > −3.'};
+      return {img: [1 / (3 + b), 1 / (3 + a)], q: 1 / ((3 + a) ** 2), lemma: 'f(x) = 1/(3+x) ist für x > −3 fallend ⇒ f([a,b]) = [f(b), f(a)]; |f′(x)| = 1/(3+x)² fallend ⇒ sup |f′| = 1/(3+a)².'}; },
+    sqrt: (a, b) => { if (!(a > -1.5)) return {ok: false, why: 'Zertifikat nur für a > −1,5.'};
+      return {img: [Math.sqrt(3 + 2 * a), Math.sqrt(3 + 2 * b)], q: 1 / Math.sqrt(3 + 2 * a), lemma: 'f(x) = √(3+2x) steigend ⇒ f([a,b]) = [f(a), f(b)]; f′(x) = 1/√(3+2x) > 0 fallend ⇒ sup |f′| = f′(a).'}; },
+    heron: (a, b) => { if (!(a > 0)) return {ok: false, why: 'Zertifikat nur für a > 0.'};
+      const f = MAPS.heron.f, df = MAPS.heron.df, r = Math.SQRT2;
+      return {img: [a <= r && r <= b ? r : Math.min(f(a), f(b)), Math.max(f(a), f(b))], q: Math.max(Math.abs(df(a)), Math.abs(df(b))),
+        lemma: 'f′(x) = (1 − 2/x²)/2 ist für x > 0 steigend ⇒ sup |f′| wird an einem Randpunkt angenommen; f fällt auf (0, √2], steigt auf [√2, ∞) ⇒ Minimum f(√2) = √2, Maximum an einem Rand.'}; },
+    xinv: (a, b) => { if (!(a > 0)) return {ok: false, why: 'Zertifikat nur für a > 0.'};
+      const f = MAPS.xinv.f, df = MAPS.xinv.df;
+      return {img: [a <= 1 && 1 <= b ? 2 : Math.min(f(a), f(b)), Math.max(f(a), f(b))], q: Math.max(Math.abs(df(a)), Math.abs(df(b))),
+        lemma: 'f′(x) = 1 − 1/x² steigend ⇒ sup |f′| an einem Rand; f fällt auf (0, 1], steigt auf [1, ∞) ⇒ Minimum f(1) = 2.'}; },
+  };
+  function certificate(key, a, b) {
+    const steps = [];
+    if (!(Number.isFinite(a) && Number.isFinite(b) && a < b)) return {ok: false, steps: [{ok: false, text: 'Ein abgeschlossenes, beschränktes Intervall [a, b] mit a < b angeben.'}]};
+    steps.push({ok: true, text: `[${a}, ${b}] ist abgeschlossen in ℝ, also vollständig.`});
+    const c = CERT[key](a, b);
+    if (c.ok === false) return {ok: false, steps: steps.concat({ok: false, text: c.why})};
+    const inv = c.img[0] >= a + TOL && c.img[1] <= b - TOL;
+    steps.push({ok: inv, text: `Invarianz: f([a,b]) = [${c.img[0].toFixed(6)}, ${c.img[1].toFixed(6)}] ${inv ? '⊆' : '⊄'} [${a}, ${b}].`, lemma: c.lemma});
+    const qok = c.q < 1 - TOL;
+    steps.push({ok: qok, text: `Kontraktionskonstante: q = sup_{[a,b]} |f′| = ${c.q.toFixed(6)} ${qok ? '< 1' : '≥ 1'}; nach dem Mittelwertsatz |f(x) − f(y)| ≤ q|x − y| auf [a, b].`});
+    return {ok: inv && qok, steps, q: c.q, img: c.img, lemma: c.lemma};
+  }
+  const API = {SEQ, MAPS, checkN, minN, orbit, lipschitz, aprioriN, stepsTo, certificate};
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else root.AnaMath = API;
 })(typeof window !== 'undefined' ? window : globalThis);

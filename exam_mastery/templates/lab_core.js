@@ -33,12 +33,13 @@ const store = {get(k, d) { try { const v = localStorage.getItem('emlab:' + k); r
   set(k, v) { try { localStorage.setItem('emlab:' + k, JSON.stringify(v)); } catch (e) { /* ohne Speicher weiter */ } }};
 /** Verweise ins Lehrbuch / Aufgaben / Karten (Produktverknüpfung) */
 function links(ref) {
-  if (!ref) return null;
+  if (!ref) return document.createDocumentFragment();
   const parts = [];
   if (ref.book) { const sec = ((UNIT.kc_map || {})[ref.book] || {sections: [ref.book]}).sections[0], lbl = 'Lehrbuch ' + (ref.bookLabel || (UNIT.kc_labels || {})[ref.book] || ref.book);
     parts.push(UNIT.book_href === null ? h('span', {}, lbl) : h('a', {href: (UNIT.book_href || 'index.html#learn/{sec}').replace('{sec}', sec)}, lbl)); }
   (ref.tasks || []).forEach(t => parts.push(h('a', {href: `index.html#learn/task-${t}`}, 'Aufgabe ' + t)));
   (ref.cards || []).forEach(c => parts.push(h('span', {}, 'Karte „' + c + '“')));
+  if (!parts.length) return document.createDocumentFragment();   // nie „null“ in den DOM schreiben
   return h('div', {class: 'links'}, 'Weiter: ', ...parts.flatMap((p, i) => i ? [' · ', p] : [p]));
 }
 
@@ -203,7 +204,7 @@ function Shell(lab) {
       const drawHints = () => hints.replaceChildren(...c.hints.slice(0, nh()).map((t, k) => h('div', {class: 'hint', html: `<b>Hinweis ${k + 1}:</b> ${t}`})));
       const win = () => { out.replaceChildren(h('div', {class: 'reveal', html: c.success}), links(c.links)); typeset(out); };
       box.append(h('h4', {}, h('span', {}, c.title), h('span', {class: 'badge' + (progress.chal[c.id] ? ' ok' : '')}, progress.chal[c.id] ? 'gelöst' : c.level || '')),
-        h('p', {html: c.goal}), c.constraint ? h('p', {class: 'note', html: 'Bedingung: ' + c.constraint}) : null,
+        h('p', {html: c.goal}), c.constraint ? h('p', {class: 'note', html: 'Bedingung: ' + c.constraint}) : document.createDocumentFragment(),
         h('div', {class: 'row'}, h('button', {onclick: () => { api.set(c.setup(clone(S)), {animate: true}); }}, 'Starten'),
           h('button', {onclick: () => { if (nh() < c.hints.length) { progress.hints[c.id] = nh() + 1; save(); drawHints(); typeset(hints); } }}, 'Hinweis'),
           c.impossible ? h('button', {onclick: () => impossible(c, out, box)}, 'Ich halte das für unmöglich') : null),

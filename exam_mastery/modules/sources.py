@@ -66,9 +66,14 @@ def is_verified(s: dict) -> bool:
 
 
 def gaps(m: dict) -> list[dict]:
-    """Kernkompetenzen ohne geprüfte Ergänzungsquelle."""
-    ok = {s['id'] for s in m['_sources'] if is_verified(s) and s['tier'] != 'official'}
-    return [{'kc': k['id'], 'label': k['label']} for k in m['kcs'] if k['tier'] == 'core' and not set(k.get('sources', [])) & ok]
+    """Kernkompetenzen ohne geprüfte Ergänzungsquelle, deren gelesene Passage genau diese Kompetenz trägt (passage.kcs).
+    Eine bloße Nennung der Quelle an der Kompetenz zählt nicht."""
+    covered = set()
+    for s in m['_sources']:
+        if is_verified(s) and s['tier'] != 'official':
+            for p in s.get('passages', []):
+                covered.update(p.get('kcs', []))
+    return [{'kc': k['id'], 'label': k['label']} for k in m['kcs'] if k['tier'] == 'core' and k['id'] not in covered]
 
 
 def plan(m: dict) -> dict:

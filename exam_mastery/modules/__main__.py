@@ -34,7 +34,8 @@ def build_lab(m: dict, out: Path, core_files=('lab_core.js',), extra_js: list[Pa
 <body class="lab"><noscript>Das Labor benötigt JavaScript.</noscript><script id="unit-data" type="application/json">{json.dumps(payload, ensure_ascii=False).replace('</', '<\\/')}</script>
 <script>{code}</script></body></html>"""
     (out / 'labor.html').write_text(html, encoding='utf-8')
-    status = ('FAIL', f'Karteikarten-/Wiederholungsbegriffe im Labor-Code: {hits}') if hits else ('PASS', f'{len(m.get("labs", []))} Labor(e); keine Karteikarten- oder Wiederholungsfunktion im Code')
+    n_ch = len(re.findall(r"\{id: '[\w-]+', title: .*?check: ", code, flags=re.S))
+    status = ('FAIL', f'Karteikarten-/Wiederholungsbegriffe im Labor-Code: {hits}') if hits else ('PASS', f'{len(m.get("labs", []))} Labor(e); keine Karteikarten- oder Wiederholungsfunktion im Code; fachliche Gültigkeit der Challenge-Ziele: siehe Abnahmepaket (menschlich)')
     return status
 
 
@@ -61,7 +62,7 @@ def from_unit(unit_dir: Path) -> dict:
                      'type': 'lecture' if private else ('textbook' if s['kind'] == 'LEHRBUCH' else 'video' if s['id'].startswith('3b1b') else 'paper'),
                      'status': 'verified' if (read or private) else 'unverified', 'access_level': 'private_course_material' if private else ('abstract' if abstract else 'section'),
                      'citation': s['ref'], 'url': None if private else s.get('url'), 'doi': s.get('doi'), 'checked_on': '2026-11-14',
-                     'passages': [{'locator': 'siehe Zitat', 'content': s['ref']}] if (read or private) else [],
+                     'passages': [{'locator': 'siehe Zitat', 'content': s['ref'], 'kcs': [k for k, km in u['kc_map'].items() if s['id'] in km['research'] or (s['id'] == 'slp3')]}] if (read or private) else [],
                      'used_for': (['scope'] if private else ['context'] if abstract else ['claim']) if (read or private) else [],
                      'limits': 'Belegstellen im Lehrbuch angegeben; Nachprüfung der Lesepassagen: docs/reference_unit/MATH_AUDIT.md', 'function': 'Beleg im Lehrbuch der NLP-Einheit',
                      'creator': '3Blue1Brown' if s['id'].startswith('3b1b') else None, 'date': '2024-04-07' if s['id'].startswith('3b1b') else None})
@@ -89,6 +90,8 @@ def build(m: dict, out: Path, state: Path | None, lab: bool = True) -> dict:
     lab_status = build_lab(m, out) if lab and any(l.get('js') for l in m.get('labs', [])) else None
     tr = TU.build(m, out, state)
     tutor_status = ('PASS' if not tr['answer_leak'] else 'FAIL', f'{len(tr["files"])} Dateien; Lösungen im Kontext: {tr["answer_leak"] or "keine"}; Lernstand: {"real erhoben" if tr["learner_state"] else "keiner (nicht erfunden)"}; gemeinsame Anweisung {tr["chars_instructions"]} Zeichen')
+    from . import research as RS
+    (out / 'research_trace.md').write_text(RS.trace(Path(m['_dir']), m), encoding='utf-8')
     plan = SRC.plan(m)
     (out / 'source_plan.json').write_text(json.dumps(plan, ensure_ascii=False, indent=1), encoding='utf-8')
     q = C.qc(m, {'lab': lab_status, 'tutor': tutor_status, 'channels': ('PASS', 'Labor ohne Karteikarten; Anki als eigenes Paket; Tutor als eigener Kanal') if (lab_status or ('PASS',))[0] == 'PASS' else ('FAIL', 'siehe lab')})

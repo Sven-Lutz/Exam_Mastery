@@ -29,3 +29,10 @@ Nur hochladen, wenn der Tutor Antworten prüfen soll. Der Tutor gibt Lösungen e
 **Ausführliche Lösung.** In X1 sinkt der Gründeranteil von 63 % auf 50,4 %, der Preis steigt von 6,30 € auf 15,12 €, der Wert von 6,3 auf 15,12 Mio. €. Bei Pre-Money 6 Mio. € in der Serie A fällt der Preis auf 3,78 € und der Wert auf 3,78 Mio. €. Korrekt: „Verwässerung verringert den Anteil; ob die Gründer Wert verlieren, hängt von der Bewertung der Runde ab.“ Die Folie ist für den Fall gemeint, dass zusätzliche Anteile ohne entsprechende Gegenleistung ausgegeben werden.
 
 **Bewertung.** Anteil vs. Wert (2 P.) · Zahlen aus X1 (1 P.) · präzise Neufassung (1 P.)
+
+## EN5
+**Kurzschlüssel.** Median 0×; Brutto 69 Mio. € auf 20 Mio. € = 3,45×; Ausreißer 60/69 ≈ 87 % des Rückflusses. Illustriert: niedriger Median, sehr hohe Varianz; Rendite aus der einen großen Erfolgsinvestition.
+
+**Ausführliche Lösung.** Sortiert: 14-mal 0, 4-mal 1, dann 5 und 60. Der 10. und 11. Wert sind 0 ⇒ Median 0×. Rückfluss 4·1 + 5 + 60 = 69 Mio. € ⇒ 69/20 = 3,45× brutto. Anteil des Ausreißers 60/69 ≈ 0,870. Ohne den 60×-Fall: 9/19 ≈ 0,47× – Verlust. Das ist genau die Struktur „low median value but very high variance“ und „returns on the one investment out of many“ (Kerr, Nanda & Rhodes-Kropf 2014, NBER WP S. 3). Grenze: Zahlen hier frei gewählt, nicht empirisch.
+
+**Bewertung.** Median korrekt (1 P.) · Fondsmultiple (1 P.) · Ausreißeranteil und kontrafaktische Rechnung (2 P.) · Quellenbezug mit Grenze (1 P.)

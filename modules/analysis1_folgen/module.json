@@ -342,5 +342,6 @@
     "lab/analysis_lab.js"
    ]
   }
- ]
+ ],
+ "tutor_test_protocol": "../../docs/cross_domain/tutor_tests/ANALYSIS1_PROTOCOL.md"
 }

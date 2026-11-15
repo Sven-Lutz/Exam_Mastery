@@ -10,15 +10,18 @@ TIERS = {'core', 'deep', 'frontier'}
 STAGES = {'worked', 'faded', 'guided', 'independent', 'proof', 'error', 'transfer', 'case', 'issue-spotting', 'model'}
 
 # Gleiche Dimensionen für jedes Fach; Methode je Domäne
-QC_DIMENSIONS = [
-    ('scope', 'Offizieller Rahmen: jede Kernkompetenz verweist auf eine offizielle Kursquelle (Lokator).'),
-    ('sources', 'Eigenständig recherchierte, geprüfte Ergänzungsquellen mit gelesener Passage, Evidenzgrad, Grenzen, didaktischer Funktion.'),
-    ('claims', 'Zahlen und Behauptungen der eigenen Beispiele unabhängig geprüft (fachspezifische Methode).'),
-    ('examples', 'Mindestens zwei originelle, geprüfte Anwendungen mit Gegenbeispiel bzw. Grenzfall.'),
-    ('tasks', 'Aufgaben mit Kurzschlüssel, ausführlicher Lösung und Bewertungsschema; keine Selbstbewertung.'),
-    ('lab', 'Labor ist ein Experiment mit kausaler Rückmeldung, ohne Karteikarten-/Wiederholungsfunktion.'),
+QC_DIMENSIONS = [  # gleiche Dimensionen für jedes Fach; strikt getrennt (Issue #9, v6-Prüfung)
+    ('scope', 'Offizieller Rahmen: jede Kernkompetenz verweist auf eine offizielle Kursquelle.'),
+    ('source_validity', 'Registrierte Quellen erfüllen die Regeln (gelesene Passage, Zugriffsniveau, Grenzen, Funktion). Sagt nichts über Abdeckung.'),
+    ('literature_coverage', 'Jede Kernkompetenz hat mindestens eine geprüfte Ergänzungsquelle. FAIL, solange eine Lücke offen ist.'),
+    ('computation', 'Die registrierten Rechenaussagen der Beispiele/Aufgaben sind unabhängig nachgerechnet. Nur diese Teilmenge – nicht der Fließtext.'),
+    ('proof_correctness', 'Beweise und Argumente: nur durch fachkundige Prüfung. Nie automatisch PASS.'),
+    ('examples', 'Mindestens zwei originelle, geprüfte Anwendungen mit Gegenbeispiel bzw. Grenzfall (Existenz, nicht Güte).'),
+    ('tasks', 'Aufgaben mit Kurzschlüssel, ausführlicher Lösung und Bewertungsschema; keine Selbstbewertung (Struktur, nicht Güte).'),
+    ('lab', 'Labor ohne Karteikarten-/Wiederholungsfunktion; Challenge-Ziele mit Prüffunktion oder Unmöglichkeitsbegründung.'),
     ('tutor', 'Portabler Tutor-Kontext vollständig; keine Lösungen im Kontext; Lernstand nur, wenn real erhoben.'),
     ('channels', 'Kanäle getrennt: Labor ≠ Anki ≠ Lehrbuch ≠ Tutor.'),
+    ('didactic_quality', 'Didaktische Güte und Lernwirkung: nur menschliche Bewertung.'),
     ('human_review', 'Freigabe nur durch menschliche Bewertung.'),
 ]
 METHODS = {
@@ -109,12 +112,15 @@ def qc(m: dict, extra: dict | None = None) -> dict:
     serr = S.validate(m['_sources'])
     ext = [s for s in m['_sources'] if s['tier'] != 'official' and S.is_verified(s)]
     gaps = S.gaps(m)
-    res['sources'] = ('PASS' if not serr and ext else 'FAIL', f'{len(ext)} geprüfte Ergänzungsquellen; Regelverstöße {len(serr)}; Lücken {len(gaps)}' + (f': {serr[:3]}' if serr else ''))
+    res['source_validity'] = ('PASS' if not serr else 'FAIL', f'{len(m["_sources"])} Registereinträge, davon {len(ext)} geprüfte Ergänzungen; Regelverstöße: {serr or "keine"}')
+    res['literature_coverage'] = ('PASS' if not gaps else 'FAIL', f'{len(core) - len(gaps)}/{len(core)} Kernkompetenzen mit geprüfter Ergänzungsquelle' + (f'; offene Lücken: {[g["kc"] for g in gaps]}' if gaps else ''))
     checks = run_checks(m)
     bad = [c for c in checks if not c['ok']]
-    res['claims'] = ('PASS' if checks and not bad else 'FAIL', f'{len(checks) - len(bad)}/{len(checks)} Beispielprüfungen grün ({METHODS[m["domain"]]})')
+    n_facts = sum(len(c.get('facts') or {}) for c in checks if c['ok'])
+    res['computation'] = ('PASS' if checks and not bad else 'FAIL', f'{len(checks) - len(bad)}/{len(checks)} Prüffunktionen grün, {n_facts} protokollierte Rechenwerte ({METHODS[m["domain"]]}). Geltungsbereich: nur diese registrierten Aussagen; Fließtext, Lab-Begründungen und Beweise sind damit NICHT geprüft.')
+    res['proof_correctness'] = ('NOT_VERIFIED', 'Keine maschinelle Beweisprüfung. Fachkundige Gegenlesung erforderlich.')
     ex = [e for e in m.get('examples', []) if e.get('original') and e.get('counterexample')]
-    res['examples'] = ('PASS' if len(ex) >= 2 else 'FAIL', f'{len(ex)} originelle Beispiele mit Grenzfall/Gegenbeispiel')
+    res['examples'] = ('PASS' if len(ex) >= 2 else 'FAIL', f'{len(ex)} originelle Beispiele mit Grenzfall/Gegenbeispiel (Existenz geprüft, Güte nicht)')
     tasks = m.get('tasks', [])
     res['tasks'] = ('PASS' if tasks and not [e for e in validate(m) if e.startswith('task')] else 'FAIL', f'{len(tasks)} Aufgaben mit Schlüssel, ausführlicher Lösung, Rubrik')
     lab = extra.get('lab')
@@ -122,6 +128,7 @@ def qc(m: dict, extra: dict | None = None) -> dict:
     tut = extra.get('tutor')
     res['tutor'] = tut or ('NOT_BUILT', 'kein Tutor-Kontext erzeugt')
     res['channels'] = extra.get('channels', ('NOT_CHECKED', ''))
+    res['didactic_quality'] = ('NOT_RATED', 'nur menschliche Bewertung')
     res['human_review'] = ('PENDING', m.get('status', 'HUMAN_REVIEW_PENDING'))
     return {'module': m['id'], 'domain': m['domain'], 'method': METHODS[m['domain']], 'dimensions': {k: {'status': v[0], 'evidence': v[1]} for k, v in res.items()},
-            'didactic_quality': 'NOT_RATED (nur menschliche Bewertung)', 'checks': checks}
+            'dimension_definitions': dict(QC_DIMENSIONS), 'checks': checks}

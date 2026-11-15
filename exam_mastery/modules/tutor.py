@@ -101,5 +101,7 @@ def build(m: dict, out: Path, state_path: Path | None = None) -> dict:
          '', 'Dateigrenzen und Verfügbarkeit hängen vom Tarif ab; vor Nutzung in der OpenAI-Hilfe prüfen. Es gibt keine automatische Rückmeldung an Exam Mastery: Ergebnisse bitte selbst in der Lernplattform üben bzw. als Notiz übernehmen.', '', '## Startsätze']
     R += [f'- **{n}:** „{s.format(kc=kc0, task=t0, src=s0)}“' for n, s in INTENTS]
     (out / 'README.md').write_text('\n'.join(R) + '\n', encoding='utf-8')
+    if m.get('tutor_test_protocol'):
+        shutil.copy2(Path(m['_dir']) / m['tutor_test_protocol'], out / 'TESTPROTOKOLL.md')
     leak = [t['id'] for t in m.get('tasks', []) if t['key'] and t['key'] in (out / 'tutor_context.md').read_text(encoding='utf-8')]
     return {'files': sorted(p.name for p in out.iterdir()), 'answer_leak': leak, 'learner_state': bool(st), 'chars_instructions': len(SHARED.read_text(encoding='utf-8'))}

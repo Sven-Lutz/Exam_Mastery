@@ -89,6 +89,8 @@ Quellen: skript, lebl
   - §2.3.3, Satz 2.3.8 (Bolzano–Weierstraß): Beschränkte Folgen besitzen eine konvergente Teilfolge.
   - §2.4, Beispiel 2.4.3: (−1)ⁿ ist keine Cauchy-Folge (Nachweis mit n gerade, k = n + 1).
   - §7.6.1, Def. 7.6.1 und Satz 7.6.2: Kontraktion = k-Lipschitz mit k < 1; jede Kontraktion eines nichtleeren vollständigen metrischen Raums hat genau einen Fixpunkt; „The words complete and contraction are necessary. See Exercise 7.6.6.“ (Aufgabe 7.6.6 b: 1-Lipschitz-Abbildung ohne Fixpunkt).
+  - §2.1, Definition 2.1.2: Konvergenz: für jedes ε > 0 existiert M ∈ ℕ mit |xₙ − x| < ε für alle n ≥ M.
+  - §2.2, Lemma 2.2.1 (Squeeze lemma): Sandwich-Lemma für Folgen mit gemeinsamem Grenzwert der Schranken.
   - Grenzen: Englisch, metrische Räume allgemeiner als die Vorlesung; Nummerierung weicht vom Skript ab.
   - Funktion: offen zugängliche zweite Darstellung mit vollständigen Beweisen; Grundlage für E1 (erweitert um Fehleridentität und ℚ-Gegenbeispiel) und E2 (Gegenbeispiel x + 1/x zu Aufgabe 7.6.6 b)
 

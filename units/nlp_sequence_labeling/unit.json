@@ -3653,7 +3653,8 @@
   {
    "id": "lafferty",
    "kind": "FORSCHUNG",
-   "ref": "Lafferty, J.; McCallum, A.; Pereira, F. (2001): Conditional Random Fields: Probabilistic Models for Segmenting and Labeling Sequence Data. Proc. ICML 2001 (Seitenangabe nicht geprüft)."
+   "ref": "Lafferty, J.; McCallum, A.; Pereira, F. (2001): Conditional Random Fields: Probabilistic Models for Segmenting and Labeling Sequence Data. Proc. ICML 2001 (Seitenangabe nicht geprüft). Fundstelle geprüft 2026-11-15: Penn ScholarlyCommons (Postprint, ICML 2001, S. 282–289), Abstract wörtlich abgeglichen.",
+   "url": "https://repository.upenn.edu/cis_papers/159"
   },
   {
    "id": "andor",
@@ -3712,7 +3713,8 @@
   {
    "id": "su",
    "kind": "FORSCHUNG",
-   "ref": "Su, J. et al. (2024): RoFormer: Enhanced Transformer with Rotary Position Embedding. Neurocomputing 568 (in der Vorlesung PDF-S. 69 zitiert; Volltext nicht gelesen, nur die Rotationseigenschaft wird verwendet und hier selbst bewiesen)."
+   "ref": "Su, J. et al. (2024): RoFormer: Enhanced Transformer with Rotary Position Embedding. Neurocomputing 568 (in der Vorlesung PDF-S. 69 zitiert; Volltext nicht gelesen, nur die Rotationseigenschaft wird verwendet und hier selbst bewiesen) Fundstelle geprüft 2026-11-15: arXiv:2104.09864 v5 (8. Nov. 2023), Abstract wörtlich abgeglichen; die in der Vorlesung genannte Neurocomputing-Fassung wurde nicht geprüft.",
+   "url": "https://arxiv.org/abs/2104.09864"
   },
   {
    "id": "jain",

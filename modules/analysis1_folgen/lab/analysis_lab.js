@@ -2,7 +2,7 @@
 'use strict';
 const A = window.AnaMath;
 const SEQKEYS = Object.keys(A.SEQ), MAPKEYS = Object.keys(A.MAPS);
-function anaInit() { return {view: 'eps', seq: 'rational', a: 2, logEps: Math.log10(0.1), N: 10, map: 'heron', a1: 2, n: 12}; }
+function anaInit() { return {view: 'eps', seq: 'rational', a: 2, logEps: Math.log10(0.1), N: 10, plot: 'values', map: 'heron', a1: 2, n: 12, ia: null, ib: null}; }
 const EPS = S => Math.round(Math.pow(10, S.logEps) * 1e6) / 1e6;
 const anaLab = registerLab({
   id: 'folgen', title: 'Folgen & Grenzwerte',
@@ -11,13 +11,21 @@ const anaLab = registerLab({
   structural: (a, b) => a.view !== b.view,
   compute(S) {
     const eps = EPS(S), seq = A.SEQ[S.seq];
-    const pts = Array.from({length: 120}, (_, i) => [i + 1, seq.a(i + 1)]);
     const chk = A.checkN(S.seq, S.a, eps, S.N), mn = A.minN(S.seq, S.a, eps);
     const m = A.MAPS[S.map], orb = A.orbit(S.map, S.a1, S.n);
     const lo = Math.min(...orb.slice(1)), hi = Math.max(...orb.slice(1));
     const q = orb.length > 2 ? A.lipschitz(S.map, Math.min(lo, hi), Math.max(lo, hi)) : NaN;
     const lim = m.fix.length ? m.fix.reduce((b, x) => Math.abs(x - orb[orb.length - 1]) < Math.abs(b - orb[orb.length - 1]) ? x : b) : null;
-    return {eps, pts, chk, mn, orb, q, lim, err: lim === null ? null : Math.abs(orb[orb.length - 1] - lim)};
+    const cert = S.ia === null || S.ib === null ? null : A.certificate(S.map, S.ia, S.ib);
+    const startIn = cert && S.a1 >= S.ia && S.a1 <= S.ib;
+    // Diagramm-Horizont: wichtige Ereignisse (N, kleinstes N, Gegenbeispiel) müssen sichtbar sein
+    const keyN = Math.max(S.N, mn.N || 0, chk.ok ? 0 : chk.n);
+    const nmax = Math.min(20000, Math.max(120, Math.ceil(keyN * 1.15)));
+    const step = Math.max(1, Math.floor(nmax / 400)), ns = new Set();
+    for (let n = 1; n <= nmax; n += (n < 60 ? 1 : step)) ns.add(n);
+    [S.N, mn.N, chk.ok ? null : chk.n, S.N - 1].forEach(n => n && n >= 1 && n <= nmax && ns.add(n));
+    const P = [...ns].sort((x, y) => x - y).map(n => [n, seq.a(n)]);
+    return {eps, pts: P, nmax, chk, mn, orb, q, lim, err: lim === null ? null : Math.abs(orb[orb.length - 1] - lim), cert, startIn};
   },
   quantities(S, R) { return S.view === 'eps' ? [{id: 'mn', label: 'kleinstes N(ε)', value: R.mn.N ?? NaN}, {id: 'eps', label: 'ε', value: R.eps}] :
     [{id: 'err', label: `Fehler nach ${S.n} Schritten`, value: R.err ?? NaN}, {id: 'q', label: 'Lipschitz-Schätzung q auf dem Orbit', value: R.q}, {id: 'last', label: 'letztes Glied', value: R.orb[R.orb.length - 1]}]; },
@@ -48,27 +56,37 @@ function epsView(root, api) {
   sel.addEventListener('change', () => api.set(st => { st.seq = sel.value; st.a = A.SEQ[sel.value].lim ?? 0; return st; }));
   const eps = h('input', {type: 'range', min: -3, max: 0, step: 0.01, 'aria-label': 'ε (logarithmisch)'}), epsL = h('b', {});
   eps.addEventListener('input', () => api.set({logEps: +eps.value}));
+  const plotSegHolder = h('span', {});
   const Ni = h('input', {class: 'num', type: 'text', inputmode: 'numeric', 'aria-label': 'Vorschlag N'});
   Ni.addEventListener('change', () => { const v = parseInt(Ni.value, 10); if (v >= 1) api.set({N: v}); });
   const ai = h('input', {class: 'num', type: 'text', inputmode: 'decimal', 'aria-label': 'Kandidat a'});
   ai.addEventListener('change', () => { const v = parse(ai.value); if (v !== null) api.set({a: v}); });
   root.append(h('div', {class: 'row'}, sel, h('label', {class: 'ctl'}, 'ε = ', epsL, eps), h('label', {class: 'ctl'}, 'Kandidat a = ', ai), h('label', {class: 'ctl'}, 'mein N = ', Ni),
-    h('button', {onclick: () => api.set(st => { st.N = Math.max(1, st.N - 1); return st; })}, 'N − 1'), h('button', {onclick: () => api.set(st => { st.N += 1; return st; })}, 'N + 1')));
+    h('button', {onclick: () => api.set(st => { st.N = Math.max(1, st.N - 1); return st; })}, 'N − 1'), h('button', {onclick: () => api.set(st => { st.N += 1; return st; })}, 'N + 1')),
+    h('div', {class: 'row'}, plotSegHolder));
   const svgWrap = h('div', {class: 'plane'}), verdict = h('div', {}), fl = h('div', {class: 'formula-live'}), meters = h('div', {class: 'meters'});
   root.append(svgWrap, verdict, fl, meters);
   return function update(S, R) {
     eps.value = S.logEps; epsL.textContent = f(R.eps, 4); Ni.value = S.N; ai.value = f(S.a, 3); sel.value = S.seq;
-    const W = 760, H = 300, nmax = 120, ys = R.pts.map(p => p[1]), lo = Math.min(...ys, S.a - R.eps) - 0.2, hi = Math.max(...ys, S.a + R.eps) + 0.2;
+    plotSegHolder.replaceChildren(seg([['values', 'Werte aₙ'], ['dist', 'Abstand |aₙ − a| (log)']], S.plot || 'values', v => api.set({plot: v}), 'Darstellung'));
+    const W = 760, H = 300, nmax = R.nmax, dist = S.plot === 'dist' && S.a !== null;
+    const val = y => dist ? Math.log10(Math.max(1e-12, Math.abs(y - S.a))) : y;
+    const ys = R.pts.map(p => val(p[1])), lo = Math.min(...ys, dist ? Math.log10(R.eps) - 0.5 : S.a - R.eps) - (dist ? 0 : 0.2), hi = Math.max(...ys, dist ? Math.log10(R.eps) + 0.5 : S.a + R.eps) + (dist ? 0 : 0.2);
     const X = n => 40 + (n - 1) / (nmax - 1) * (W - 60), Y = y => H - 24 - (y - lo) / (hi - lo) * (H - 44);
-    const svg = s('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `Folge, ε-Streifen um a = ${f(S.a)} und N = ${S.N}`});
-    svg.append(s('rect', {x: X(Math.min(S.N, nmax)), y: Y(S.a + R.eps), width: Math.max(0, X(nmax) - X(Math.min(S.N, nmax))), height: Math.max(1, Y(S.a - R.eps) - Y(S.a + R.eps)), fill: 'color-mix(in srgb,var(--ok) 18%,transparent)'}),
-      s('line', {x1: 40, x2: W - 20, y1: Y(S.a), y2: Y(S.a), stroke: 'var(--ok)', 'stroke-dasharray': '4 3'}),
-      s('line', {x1: X(Math.min(S.N, nmax)), x2: X(Math.min(S.N, nmax)), y1: 10, y2: H - 20, stroke: 'var(--accent)', 'stroke-width': 2}),
-      s('text', {x: X(Math.min(S.N, nmax)) + 4, y: 20, fill: 'var(--accent)', 'font-size': 12, 'font-weight': 700}, `N = ${S.N}`));
+    const svg = s('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `Folge bis n = ${nmax}, ε = ${f(R.eps, 4)}, N = ${S.N}`});
+    if (dist) svg.append(s('rect', {x: X(S.N), y: Y(Math.log10(R.eps)), width: Math.max(0, X(nmax) - X(S.N)), height: Math.max(0, Y(lo) - Y(Math.log10(R.eps))), fill: 'color-mix(in srgb,var(--ok) 15%,transparent)'}),
+      s('line', {x1: 40, x2: W - 20, y1: Y(Math.log10(R.eps)), y2: Y(Math.log10(R.eps)), stroke: 'var(--ok)', 'stroke-dasharray': '4 3'}), s('text', {x: W - 22, y: Y(Math.log10(R.eps)) - 5, 'text-anchor': 'end', 'font-size': 11, fill: 'var(--ok)'}, 'ε'));
+    else svg.append(s('rect', {x: X(S.N), y: Y(S.a + R.eps), width: Math.max(0, X(nmax) - X(S.N)), height: Math.max(1.5, Y(S.a - R.eps) - Y(S.a + R.eps)), fill: 'color-mix(in srgb,var(--ok) 25%,transparent)'}),
+      s('line', {x1: 40, x2: W - 20, y1: Y(S.a), y2: Y(S.a), stroke: 'var(--ok)', 'stroke-dasharray': '4 3'}));
+    const vline = (n, col, txt, dy, dash) => n && n <= nmax ? svg.append(s('line', {x1: X(n), x2: X(n), y1: 10, y2: H - 20, stroke: col, 'stroke-width': 2, 'stroke-dasharray': dash || null}), s('text', {x: X(n) + (X(n) > W - 160 ? -4 : 4), y: dy, fill: col, 'font-size': 12, 'font-weight': 700, 'text-anchor': X(n) > W - 160 ? 'end' : 'start'}, txt)) : null;
+    vline(R.mn.N, 'var(--ok)', `kleinstes N = ${R.mn.N}`, 34, '5 3');
+    vline(S.N, 'var(--accent)', `Ihr N = ${S.N}`, 18);
     R.pts.forEach(([n, y]) => { const inside = Math.abs(y - S.a) < R.eps, bad = !R.chk.ok && n === R.chk.n;
-      svg.append(s('circle', {cx: X(n), cy: Y(y), r: bad ? 6 : 2.6, fill: n < S.N ? 'var(--mute)' : inside ? 'var(--ok)' : 'var(--bad)', stroke: bad ? 'var(--bad)' : null, 'stroke-width': bad ? 2 : null})); });
-    [lo, S.a, hi].forEach(v => svg.append(s('text', {x: 4, y: Y(v) + 4, 'font-size': 11, fill: 'var(--mute)'}, f(v, 2))));
-    svgWrap.replaceChildren(h('h3', {}, 'Glieder aₙ, n = 1 … 120 · grüner Streifen: (a − ε, a + ε) ab N'), svg);
+      svg.append(s('circle', {cx: X(n), cy: Y(val(y)), r: bad ? 6 : 2.4, fill: n < S.N ? 'var(--mute)' : inside ? 'var(--ok)' : 'var(--bad)', stroke: bad ? 'var(--bad)' : null, 'stroke-width': bad ? 2 : null})); });
+    if (!R.chk.ok) { const right = X(R.chk.n) > W - 200; svg.append(s('text', {x: X(R.chk.n) + (right ? -8 : 8), y: Y(val(R.chk.value)) + 18, 'text-anchor': right ? 'end' : 'start', 'font-size': 12, fill: 'var(--bad)', 'font-weight': 700}, `Gegenbeispiel n = ${R.chk.n}`)); }
+    [lo, hi].forEach(v => svg.append(s('text', {x: 4, y: Y(v) + 4, 'font-size': 11, fill: 'var(--mute)'}, dist ? '10^' + f(v, 1) : f(v, 2))));
+    [1, Math.round(nmax / 2), nmax].forEach(n => svg.append(s('text', {x: X(n), y: H - 6, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--mute)'}, 'n = ' + n)));
+    svgWrap.replaceChildren(h('h3', {}, S.plot === 'dist' ? `Abstand |aₙ − a| (logarithmisch), n = 1 … ${R.nmax} · grün: unter ε ab N` : `Glieder aₙ, n = 1 … ${R.nmax} · grüner Streifen: (a − ε, a + ε) ab N`), svg);
     verdict.replaceChildren(R.chk.ok ? h('p', {class: 'verdict ok', html: R.chk.proven ? `Für alle n ≥ ${S.N} gilt |aₙ − a| &lt; ε – <b>bewiesen</b> mit ${A.SEQ[S.seq].why}.` : `Bis n = ${S.N + R.chk.horizon} kein Gegenbeispiel gefunden. Das ist <b>kein Beweis</b> – dafür braucht es eine Abschätzung für alle n.`}) :
       h('p', {class: 'verdict bad', html: `Gegenbeispiel: n = ${R.chk.n} ≥ N mit |aₙ − a| = ${f(Math.abs(R.chk.value - S.a), 4)} ≥ ε. Dieses N reicht nicht.`}));
     const sq = A.SEQ[S.seq];
@@ -84,15 +102,28 @@ function webView(root, api) {
   a1.addEventListener('input', () => api.set({a1: +a1.value}));
   const nn = h('input', {type: 'range', min: 2, max: 60, step: 1, 'aria-label': 'Anzahl Glieder'}), nL = h('b', {});
   nn.addEventListener('input', () => api.set({n: +nn.value}));
-  root.append(h('div', {class: 'row'}, sel, h('label', {class: 'ctl'}, 'a₁ = ', a1L, a1), h('label', {class: 'ctl'}, 'Glieder ', nL, nn)));
-  const plane = h('div', {class: 'plane'}), tbl = h('div', {class: 'calc-wrap'}), meters = h('div', {class: 'meters'});
-  root.append(plane, meters, tbl);
+  const ia = h('input', {class: 'num', type: 'text', inputmode: 'decimal', 'aria-label': 'Intervall linker Rand a'}), ib = h('input', {class: 'num', type: 'text', inputmode: 'decimal', 'aria-label': 'Intervall rechter Rand b'});
+  ia.addEventListener('change', () => api.set({ia: parse(ia.value)})); ib.addEventListener('change', () => api.set({ib: parse(ib.value)}));
+  root.append(h('div', {class: 'row'}, sel, h('label', {class: 'ctl'}, 'a₁ = ', a1L, a1), h('label', {class: 'ctl'}, 'Glieder ', nL, nn)),
+    h('div', {class: 'row'}, h('b', {}, 'Beweisversuch: Intervall [a, b] = ['), ia, ',', ib, h('b', {}, ']')));
+  const plane = h('div', {class: 'plane'}), tbl = h('div', {class: 'calc-wrap'}), meters = h('div', {class: 'meters'}), tiers = h('div', {class: 'planes', style: 'grid-template-columns:repeat(auto-fit,minmax(220px,1fr))'});
+  root.append(plane, tiers, meters, tbl);
   return function update(S, R) {
     a1.value = S.a1; a1L.textContent = f(S.a1); nn.value = S.n; nL.textContent = S.n; sel.value = S.map;
+    if (document.activeElement !== ia) ia.value = S.ia === null ? '' : String(S.ia); if (document.activeElement !== ib) ib.value = S.ib === null ? '' : String(S.ib);
+    const tier = (title, cls, body) => h('div', {class: 'plane', style: 'padding:8px 12px'}, h('h3', {style: 'padding:0'}, title), h('div', {class: 'verdict ' + cls}, ...body));
+    tiers.replaceChildren(
+      tier('1 · Simulation', R.err !== null && R.err < 1e-6 ? 'ok' : '', [h('p', {}, R.err === null ? 'Kein Fixpunkt der Abbildung: Die Folge kann nicht gegen einen Fixpunkt konvergieren.' : `Nach ${S.n} Gliedern Abstand ${R.err.toExponential(2)} zum Fixpunkt.`), h('p', {class: 'note'}, 'Zeigt nur, was bei diesem Startwert in endlich vielen Schritten passiert.')]),
+      tier('2 · Indiz', '', [h('p', {}, `max |f′| auf den Punkten des Orbits ≈ ${f(R.q, 3)}`), h('p', {class: 'note'}, 'Abtastung endlich vieler Punkte – keine Schranke für alle x, kein Beweis.')]),
+      tier('3 · Beweis (Fixpunktsatz)', R.cert ? (R.cert.ok && R.startIn ? 'ok' : 'bad') : '', R.cert ? [h('ul', {}, R.cert.steps.map(st => h('li', {}, (st.ok ? '✓ ' : '✗ ') + st.text, st.lemma ? h('div', {class: 'note'}, 'Begründung: ' + st.lemma) : null))),
+        h('p', {}, R.startIn ? '✓ Startwert a₁ liegt in [a, b].' : '✗ Startwert a₁ liegt nicht in [a, b] – der Satz sagt dann nichts über diese Folge.'),
+        h('p', {html: R.cert.ok && R.startIn ? '<b>Bewiesen:</b> eindeutiger Fixpunkt in [a, b], Konvergenz für jeden Start in [a, b], |aₙ − a| ≤ qⁿ⁻¹/(1 − q)·|a₂ − a₁|.' : '<b>Kein Beweis</b> mit diesem Intervall.'}),
+        h('p', {class: 'note'}, 'Zahlen mit Sicherheitsabstand 10⁻¹²; ein Rand, der genau getroffen wird, ist numerisch nicht zertifizierbar – Intervall etwas größer wählen.')] : [h('p', {}, 'Geben Sie ein Intervall [a, b] ein. Bewiesen ist erst, wenn f([a, b]) ⊆ [a, b] und sup |f′| < 1 auf [a, b] analytisch gezeigt sind.')]));
     const m = A.MAPS[S.map], o = R.orb, xs = o.concat(m.dom), lo = Math.min(...xs.filter(Number.isFinite)) - .2, hi = Math.max(...xs.filter(Number.isFinite)) + .2;
     const W = 420, X = x => 30 + (x - lo) / (hi - lo) * (W - 40), Y = y => W - 20 - (y - lo) / (hi - lo) * (W - 40);
     const svg = s('svg', {viewBox: `0 0 ${W} ${W}`, role: 'img', 'aria-label': 'Spinnwebdiagramm'});
     svg.append(s('line', {x1: X(lo), y1: Y(lo), x2: X(hi), y2: Y(hi), stroke: 'var(--mute)', 'stroke-dasharray': '3 3'}));
+    if (R.cert && S.ib > S.ia) svg.append(s('rect', {x: X(S.ia), y: Y(S.ib), width: X(S.ib) - X(S.ia), height: Y(S.ia) - Y(S.ib), fill: R.cert.ok ? 'color-mix(in srgb,var(--ok) 14%,transparent)' : 'color-mix(in srgb,var(--bad) 10%,transparent)', stroke: R.cert.ok ? 'var(--ok)' : 'var(--bad)'}));
     const pts = []; for (let i = 0; i <= 300; i++) { const x = lo + (hi - lo) * i / 300, y = m.f(x); if (Number.isFinite(y) && y > lo - 5 && y < hi + 5) pts.push(`${X(x)},${Y(Math.max(lo - .5, Math.min(hi + .5, y)))}`); }
     svg.append(s('polyline', {points: pts.join(' '), fill: 'none', stroke: 'var(--accent)', 'stroke-width': 2}));
     let path = `M${X(o[0])},${Y(lo)}`; for (let i = 0; i < o.length - 1; i++) path += ` L${X(o[i])},${Y(o[i + 1])} L${X(o[i + 1])},${Y(o[i + 1])}`;
@@ -101,7 +132,7 @@ function webView(root, api) {
     svg.append(s('text', {x: X(hi) - 4, y: Y(hi) + 14, 'text-anchor': 'end', 'font-size': 11, fill: 'var(--mute)'}, 'y = x'));
     plane.replaceChildren(h('h3', {}, 'Spinnweb: senkrecht zu f, waagrecht zur Diagonale'), svg);
     meters.replaceChildren(meter('letztes Glied', f(o[o.length - 1], 6), null), meter('Abstand zum Fixpunkt', R.err === null ? 'kein Fixpunkt' : f(R.err, 8), null),
-      meter('q = max |f′| auf dem Orbit', f(R.q, 3), Math.min(1, R.q), 'q < 1 auf einem abgeschlossenen, invarianten Intervall ⇒ Kontraktion'));
+      meter('Indiz: max |f′| auf dem Orbit', f(R.q, 3), Math.min(1, R.q), 'Abtastung – kein Beweis'));
     tbl.replaceChildren(h('table', {class: 'calc'}, h('tr', {}, h('th', {}, 'n'), h('th', {}, 'aₙ'), h('th', {}, 'aₙ₊₁ − aₙ'), h('th', {}, R.lim === null ? '' : '|aₙ − a|')),
       o.slice(0, 12).map((v, i) => h('tr', {}, h('td', {}, i + 1), h('td', {}, f(v, 10)), h('td', {}, i + 1 < o.length ? f(o[i + 1] - v, 10) : ''), h('td', {}, R.lim === null ? '' : f(Math.abs(v - R.lim), 10))))));
   };
@@ -116,7 +147,7 @@ anaLab.path = [
     reveal: 'Ein endlicher Test kann nur widerlegen. Der Beweis braucht eine Schranke für alle n: |sin(n)/n| ≤ 1/n < ε für n > 1/ε. Damit ist N = ⌊1/ε⌋ + 1 sicher – oft größer als das kleinste N, aber garantiert.', links: {book: 'konv'}},
   {id: 'f3', title: 'Divergenz formal', story: 'aₙ = (−1)ⁿ springt zwischen −1 und 1.', setup: S => { S.view = 'eps'; S.seq = 'sign'; S.a = 0; S.logEps = Math.log10(0.5); S.N = 10; return S; },
     predict: {q: 'Gibt es für ε = 0,5 einen Kandidaten a und ein N, sodass alle Glieder ab N im Streifen liegen?', options: ['Nein, für kein a.', 'Ja, für a = 0.', 'Ja, für a = 1 und großes N.'], correct: 0},
-    task: 'Versuchen Sie verschiedene a. Ziel: Sie haben mindestens drei Kandidaten a getestet (Hypothese-Tab optional).', goal: (S, R) => S.view === 'eps' && S.seq === 'sign' && !R.chk.ok && Math.abs(S.a) > 0.4,
+    task: 'Setzen Sie den Kandidaten a = 1 (einer der beiden Werte, also der „beste“ Versuch) und beobachten Sie das Gegenbeispiel.', goal: (S, R) => S.view === 'eps' && S.seq === 'sign' && Math.abs(S.a - 1) < 1e-9 && R.eps <= 0.5 + 1e-9 && !R.chk.ok,
     reveal: 'Verneinung: ∃ε>0 ∀N ∃n≥N: |aₙ − a| ≥ ε. Mit ε = 1/2: Für jedes a liegt mindestens eines der Glieder ±1 mindestens 1 von a entfernt… genauer: |1 − a| + |−1 − a| ≥ 2, also ist eines ≥ 1 > ε. Beide Werte kommen unendlich oft vor.', links: {book: 'konv'}},
   {id: 'f4', title: 'Monoton und beschränkt', story: 'Heron/Newton: aₙ₊₁ = (aₙ + 2/aₙ)/2 mit a₁ = 2 (Lebl, Beispiel 2.2.8).', setup: S => { S.view = 'web'; S.map = 'heron'; S.a1 = 2; S.n = 8; return S; },
     predict: {q: 'Welcher Grenzwert ergibt sich für den Startwert a₁ = −1?', options: ['−√2', '√2', 'keiner – die Folge divergiert'], correct: 0},
@@ -138,7 +169,15 @@ anaLab.challenges = [
   {id: 'g-fast', title: 'Quadratisch schnell', level: 'mittel', goal: 'Erreichen Sie mit der Heron-Abbildung einen Abstand < 10⁻¹⁰ zu √2 mit höchstens 6 Gliedern.', setup: S => { S.view = 'web'; S.map = 'heron'; S.a1 = 5; S.n = 4; return S; },
     check: (S, R) => ({done: S.view === 'web' && S.map === 'heron' && S.n <= 6 && R.err !== null && R.err < 1e-10, progress: R.err ? Math.min(1, -Math.log10(R.err + 1e-17) / 10) : 0, msg: R.err === null ? '' : `Abstand ${R.err.toExponential(2)}`}),
     hints: ['Der Fehler erfüllt eₙ₊₁ = eₙ²/(2aₙ).', 'Ein Startwert nahe √2 hilft – z. B. 1,5.'], success: 'Quadratische Konvergenz: Die Zahl korrekter Stellen verdoppelt sich ungefähr je Schritt (eₙ₊₁ = eₙ²/(2aₙ)). Vergleichen Sie mit cos: dort schrumpft der Fehler nur um den Faktor ≈ |sin a| ≈ 0,67 je Schritt.', links: {book: 'monoton'}},
-  {id: 'g-contr', title: 'Kontraktion nachweisen', level: 'mittel', goal: 'Finden Sie für f(x) = cos x einen Startwert, sodass die Lipschitz-Schätzung auf dem Orbit unter 0,75 liegt und die Folge auf 10⁻⁶ genau konvergiert ist.', setup: S => { S.view = 'web'; S.map = 'cos'; S.a1 = 1; S.n = 40; return S; },
-    check: (S, R) => ({done: S.view === 'web' && S.map === 'cos' && R.q < .75 && R.err !== null && R.err < 1e-6, progress: R.q < .75 ? .5 + (R.err < 1e-6 ? .5 : 0) : .2, msg: `q ≈ ${f(R.q, 3)}`}),
-    hints: ['q hängt vom Bereich ab, den der Orbit durchläuft: |cos′| = |sin x|.', 'Startwerte nahe dem Fixpunkt 0,739 halten |sin x| klein; mehr Glieder senken den Fehler.'], success: 'Auf einem Intervall [c, d] ⊂ [0, 1] mit cos([c, d]) ⊂ [c, d] ist q = max |sin x| < 1 – Kontraktion auf einem vollständigen Raum ⇒ eindeutiger Fixpunkt (Lebl Satz 7.6.2). q hängt vom Intervall ab: Je enger um den Fixpunkt, desto besser die Schranke.', links: {book: 'kontraktion'}},
+  {id: 'g-contr', title: 'Kontraktion beweisen', level: 'Transfer', goal: 'Beweisen Sie für f(x) = cos x und a₁ = 1 die Konvergenz mit dem Fixpunktsatz: Geben Sie ein abgeschlossenes Intervall [a, b] an, das f in sich abbildet, auf dem sup |f′| < 1 gilt und das a₁ enthält.', constraint: 'Simulation und Abtastung zählen nicht; nur das Zertifikat (Stufe 3).',
+    setup: S => { S.view = 'web'; S.map = 'cos'; S.a1 = 1; S.n = 30; S.ia = null; S.ib = null; return S; },
+    check: (S, R) => { const ok = S.view === 'web' && S.map === 'cos' && S.a1 === 1 && R.cert && R.cert.ok && R.startIn;
+      return {done: !!ok, progress: !R.cert ? 0 : (R.cert.steps.filter(x => x.ok).length + (R.startIn ? 1 : 0)) / (R.cert.steps.length + 1), msg: !R.cert ? 'Noch kein Intervall angegeben.' : R.cert.steps.filter(x => !x.ok).map(x => x.text).join(' ') || (R.startIn ? '' : 'a₁ liegt nicht im Intervall.')}; },
+    hints: ['cos ist auf [0, π/2] fallend: Das Bild von [a, b] ist [cos b, cos a].', 'Wählen Sie b = 1 (dann enthält das Intervall a₁ = 1) und a so, dass cos 1 ≥ a und cos a ≤ 1.', 'Mit [0,5; 1] gilt cos([0,5; 1]) ≈ [0,5403; 0,8776] und q = sin 1 ≈ 0,8415.'],
+    success: 'Bewiesen: [a, b] ist abgeschlossen (vollständig), f([a, b]) ⊆ [a, b] folgt aus der Monotonie von cos, und sup |f′| = sin b < 1 folgt aus der Monotonie von sin – nicht aus Abtastung. Erst damit liefert der Fixpunktsatz (Lebl, Satz 7.6.2) Existenz, Eindeutigkeit und die a-priori-Schranke. Die Simulation zeigt nur, dass es bei diesem Start „so aussieht“.', links: {book: 'kontraktion'}},
+  {id: 'g-xinv', title: 'Warum kein Intervall funktioniert', level: 'Transfer', goal: 'Finden Sie für f(x) = x + 1/x ein Intervall [a, b] mit Zertifikat – oder begründen Sie, warum es keines gibt.', setup: S => { S.view = 'web'; S.map = 'xinv'; S.a1 = 1; S.ia = 1; S.ib = 20; return S; },
+    check: () => ({done: false, progress: 0, msg: ''}),
+    impossible: {q: 'Warum scheitert jedes Intervall [a, b] mit a > 0?', options: ['Es gilt f(b) = b + 1/b > b: Das Bild ragt immer über den rechten Rand hinaus, also ist kein [a, b] invariant (und f hat keinen Fixpunkt).', 'Weil sup |f′| immer ≥ 1 ist.', 'Weil das Intervall nicht vollständig ist.'], correct: 0,
+      applies: S => S.map === 'xinv', notApplicable: 'Bedingung: Abbildung x + 1/x.', why: {1: 'Falsch: Auf [1, b] ist sup |f′| = 1 − 1/b² < 1. Die Schranke allein reicht nicht – es fehlt die Invarianz.', 2: 'Abgeschlossene Intervalle in ℝ sind vollständig.'}},
+    hints: ['Vergleichen Sie f(b) mit b.'], success: 'Auf jedem [1, b] ist f sogar eine Kontraktion im Sinne der Lipschitz-Schranke (q = 1 − 1/b² < 1), aber f bildet [1, b] nicht in sich ab. Der Fixpunktsatz braucht beide Voraussetzungen – das Gegenbeispiel trennt sie sauber.', links: {book: 'kontraktion'}},
 ];

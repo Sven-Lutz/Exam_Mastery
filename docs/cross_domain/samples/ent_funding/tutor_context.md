@@ -37,8 +37,8 @@ Voraussetzungen: zyklus
 - Ziel: Mit Fondsgröße, Anteil und Gebühren berechnen, welcher Exit den Fonds zurückzahlt
 - Ziel: Erklären, warum wenige Ausreißer die Rendite tragen
 - Typische Fehlvorstellung: Ein VC optimiert die Überlebenswahrscheinlichkeit einzelner Beteiligungen
-Lernprodukte: {"lab": [{"lab": "runden", "item": "v4"}, {"lab": "runden", "item": "w-fund"}], "tasks": ["EN3"]}
-Quellen: kurs
+Lernprodukte: {"lab": [{"lab": "runden", "item": "v4"}, {"lab": "runden", "item": "w-fund"}], "tasks": ["EN3", "EN5"]}
+Quellen: kurs, knr-2014
 
 ### prozess · Finanzierungsprozess, Tranchen, Vertragsrechte (Vertiefung)
 Voraussetzungen: vc
@@ -63,11 +63,13 @@ Quellen: kurs, yc-safe
 - **EN2** (bewertung, transfer): Gleiche Daten wie X1, aber Seed-Pre-Money nur 5 Mio. €. Gilt für den SAFE der Cap oder der Rabatt? Begründen Sie mit beiden Umwandlungspreisen.
 - **EN3** (vc, independent): Ein 150-Mio.-€-Fonds hält bei Exit typischerweise 12 % je Beteiligung. Ab welchem Exitwert zahlt eine einzelne Beteiligung den Fonds zurück? Welcher Bruttorückfluss ist für 2× netto bei 20 % Carry nötig?
 - **EN4** (bewertung, error): Die Folie sagt: „Verwässerung bedeutet, dass die Gründer Geld verlieren.“ Formulieren Sie die Aussage so, dass sie stimmt, und belegen Sie mit X1.
+- **EN5** (vc, case): Ein Fonds investiert je 1 Mio. € in 20 Start-ups. Ergebnis: 14 Totalverluste, 4 Rückzahlungen zum Einstand (1×), eine Beteiligung mit 5× und eine mit 60×. Bestimmen Sie Median-Multiple und Brutto-Fondsmultiple sowie den Anteil des größten Ausreißers am Rückfluss. Welche Aussage von Kerr, Nanda und Rhodes-Kropf (2014) illustriert das?
 
 ## Eigene, geprüfte Beispiele
 - **X1** (bewertung): Drei Runden mit Post-Money-SAFE: Anteil sinkt, Wert steigt – Gründer mit 1 Mio. Anteilen; SAFE 500 Tsd. € bei Post-Money-Cap 5 Mio. € (20 % Rabatt); Seed 2 Mio. € bei 8 Mio. € Pre-Money mit 10 % Pool-Ziel; Serie A 6 Mio. € bei 24 Mio. € Pre-Money. Ergebnis (exakt): SAFE vor Seed 10 %, nach Seed 7 %; Gründer 63 % → 50,4 %; Preis je Anteil 6,30 € → 15,12 €; Gründerwert 6,3 → 15,12 Mio. €. Gegenbeispiele: Down-Round (Pre-Money 6 Mio. €) senkt den Gründerwert auf 3,78 Mio. €; bei Seed-Pre-Money 5 Mio. € greift der Rabatt statt des Caps.
 - **X2** (vc): Fondslogik: Was ein Exit leisten muss – 100-Mio.-€-Fonds, 15 % Anteil bei Exit: Ein Exit zahlt den Fonds ab ≈ 667 Mio. € zurück. 25 solide Exits zu je 40 Mio. € ergeben nur 1,4× netto (nach 20 % Carry); für 3× netto braucht es 350 Mio. € brutto, also einen Exit von ≈ 2,33 Mrd. €. Eigene Rechnung, keine Marktdaten.
 - **X3** (bewertung): Zahlenprobe der Aufgaben EN1–EN3 – Prüft alle Zahlen der Arbeitsaufgaben unabhängig.
+- **X4** (vc): Median 0×, Fonds 3,45×: ein Ausreißer trägt alles – 20 Beteiligungen: Median 0×, brutto 3,45×, Ausreißer 87 % des Rückflusses; ohne ihn 0,47×. Verankert in Kerr, Nanda & Rhodes-Kropf (2014).
 
 ## Geprüfte Quellen (nur diese zitieren)
 - **kurs** [official, lecture, Zugriff: private_course_material] Vorlesungsfolien Entrepreneurship, Kapitel 6 „Funding a Venture“ (private Kursunterlage des Nutzers, nicht veröffentlicht) 
@@ -88,6 +90,13 @@ Quellen: kurs, yc-safe
   - Abstract (RES und NBER): VC-Finanzierungen trennen Cash-Flow-, Board-, Stimm-, Liquidations- und andere Kontrollrechte; Wandelpapiere am häufigsten; Folgefinanzierungen oft an beobachtbare Kennzahlen geknüpft; bei schlechter Entwicklung übernehmen VCs die Kontrolle, bei sehr guter geben sie Kontroll- und Liquidationsrechte weitgehend ab.
   - Grenzen: Nur Abstract gelesen: Stichprobe, Methode und Effektgrößen nicht geprüft; keine Ergebnisse über das Abstract hinaus verwenden.
   - Funktion: Forschungsfrage für die Vertiefung „Warum Tranchen und getrennte Rechte?“
+- **knr-2014** [extension, paper, Zugriff: full_text] Kerr, W. R.; Nanda, R.; Rhodes-Kropf, M. (2014): Entrepreneurship as Experimentation. Journal of Economic Perspectives 28(3), 25–48; offen als NBER Working Paper 20358 (Juli 2014). https://www.nber.org/papers/w20358.pdf
+  - Abstract (PDF-S. 2): Erfolgswahrscheinlichkeiten sind niedrig, extrem schief verteilt und vor der Investition unbekannt.
+  - WP S. 3: Renditeverteilung mit niedrigem Median, aber sehr hoher Varianz (mit Verweis auf Scherer & Harhoff 2000; Hall & Woodward 2010); VC-Investoren verdienen an der einen Investition unter vielen, die ein großer Erfolg wird; die große Mehrheit gibt weniger als den investierten Betrag zurück.
+  - WP S. 7: Die Mehrheit der VC-finanzierten Unternehmen scheitert trotz erfahrener Investoren.
+  - WP S. 2: Fallbeispiel Google: 12,5 Mio. $ (Sequoia, 1999) waren beim Verkauf 2005 über 4 Mrd. $ wert, das 320-Fache (nach Sahlman 2010).
+  - Grenzen: Übersicht: Verteilungsaussagen beruhen auf zitierten Studien, nicht auf eigenen Daten; US-Kontext; Google-Fall ist eine Anekdote mit Survivorship-Risiko. Verifikation: research_log.jsonl (SHA-256 des PDF).
+  - Funktion: empirische Verankerung der Fondslogik (X2, EN5, Labor-Station v4): niedriger Median, Rendite aus seltenen Ausreißern
 
 ## Labore
 - runden: Finanzierungsrunden & Fondslogik – Kapitalisierungstabelle mit SAFE (Cap/Rabatt), Pool-Shuffle, Up-/Down-Round, Fonds-Multiple

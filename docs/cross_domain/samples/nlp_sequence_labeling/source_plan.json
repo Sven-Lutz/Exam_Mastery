@@ -32,7 +32,7 @@
    "kc": "birnn",
    "label": "Abhängigkeitsbereich und BiRNN",
    "tier": "core",
-   "gap": true,
+   "gap": false,
    "queries": [
     "\"Abhängigkeitsbereich und BiRNN\" site:aclanthology.org",
     "\"Abhängigkeitsbereich und BiRNN\" arxiv",
@@ -94,6 +94,7 @@
    ],
    "citation_chaining_from": [
     "kurs",
+    "lafferty",
     "andor",
     "ratinov",
     "lample"
@@ -104,7 +105,7 @@
    "kc": "prf",
    "label": "Precision, Recall, F1",
    "tier": "core",
-   "gap": true,
+   "gap": false,
    "queries": [
     "\"Precision, Recall, F1\" site:aclanthology.org",
     "\"Precision, Recall, F1\" arxiv",
@@ -136,7 +137,7 @@
    "kc": "prf-level",
    "label": "Phrasen- vs. Token-Zählung",
    "tier": "core",
-   "gap": true,
+   "gap": false,
    "queries": [
     "\"Phrasen- vs. Token-Zählung\" site:aclanthology.org",
     "\"Phrasen- vs. Token-Zählung\" arxiv",
@@ -167,7 +168,6 @@
  ],
  "candidates_not_verified": [
   "schuster",
-  "lafferty",
   "huang",
   "conll",
   "opitz",

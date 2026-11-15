@@ -49,7 +49,7 @@
    "kc": "vc",
    "label": "VC-Fondslogik und Potenzialanforderung",
    "tier": "core",
-   "gap": true,
+   "gap": false,
    "queries": [
     "\"venture capital returns power law fund economics\" empirical study journal of finance",
     "\"venture capital returns power law fund economics\" NBER working paper",
@@ -57,7 +57,8 @@
     "\"venture capital returns power law fund economics\" case study"
    ],
    "citation_chaining_from": [
-    "kurs"
+    "kurs",
+    "knr-2014"
    ],
    "acceptance": "gelesene Passage mit Lokator; Evidenzgrad; Grenzen; didaktische Funktion; Datum/Version"
   },

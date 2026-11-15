@@ -7,17 +7,25 @@
    "status": "PASS",
    "evidence": "7/7 Kernkompetenzen mit offizieller Quelle"
   },
-  "sources": {
-   "status": "FAIL",
-   "evidence": "8 geprüfte Ergänzungsquellen; Regelverstöße 2; Lücken 3: ['lafferty: url or doi required', 'su: url or doi required']"
-  },
-  "claims": {
+  "source_validity": {
    "status": "PASS",
-   "evidence": "2/2 Beispielprüfungen grün (Rechenorakel (Python) gegen JS-Kern; vollständige Aufzählung; Primärpaper)"
+   "evidence": "17 Registereinträge, davon 9 geprüfte Ergänzungen; Regelverstöße: keine"
+  },
+  "literature_coverage": {
+   "status": "PASS",
+   "evidence": "7/7 Kernkompetenzen mit geprüfter Ergänzungsquelle"
+  },
+  "computation": {
+   "status": "PASS",
+   "evidence": "2/2 Prüffunktionen grün, 4 protokollierte Rechenwerte (Rechenorakel (Python) gegen JS-Kern; vollständige Aufzählung; Primärpaper). Geltungsbereich: nur diese registrierten Aussagen; Fließtext, Lab-Begründungen und Beweise sind damit NICHT geprüft."
+  },
+  "proof_correctness": {
+   "status": "NOT_VERIFIED",
+   "evidence": "Keine maschinelle Beweisprüfung. Fachkundige Gegenlesung erforderlich."
   },
   "examples": {
    "status": "PASS",
-   "evidence": "2 originelle Beispiele mit Grenzfall/Gegenbeispiel"
+   "evidence": "2 originelle Beispiele mit Grenzfall/Gegenbeispiel (Existenz geprüft, Güte nicht)"
   },
   "tasks": {
    "status": "PASS",
@@ -25,7 +33,7 @@
   },
   "lab": {
    "status": "PASS",
-   "evidence": "1 Labor(e); keine Karteikarten- oder Wiederholungsfunktion im Code"
+   "evidence": "1 Labor(e); keine Karteikarten- oder Wiederholungsfunktion im Code; fachliche Gültigkeit der Challenge-Ziele: siehe Abnahmepaket (menschlich)"
   },
   "tutor": {
    "status": "PASS",
@@ -35,12 +43,29 @@
    "status": "PASS",
    "evidence": "Labor ohne Karteikarten; Anki als eigenes Paket; Tutor als eigener Kanal"
   },
+  "didactic_quality": {
+   "status": "NOT_RATED",
+   "evidence": "nur menschliche Bewertung"
+  },
   "human_review": {
    "status": "PENDING",
    "evidence": "HUMAN_REVIEW_PENDING"
   }
  },
- "didactic_quality": "NOT_RATED (nur menschliche Bewertung)",
+ "dimension_definitions": {
+  "scope": "Offizieller Rahmen: jede Kernkompetenz verweist auf eine offizielle Kursquelle.",
+  "source_validity": "Registrierte Quellen erfüllen die Regeln (gelesene Passage, Zugriffsniveau, Grenzen, Funktion). Sagt nichts über Abdeckung.",
+  "literature_coverage": "Jede Kernkompetenz hat mindestens eine geprüfte Ergänzungsquelle. FAIL, solange eine Lücke offen ist.",
+  "computation": "Die registrierten Rechenaussagen der Beispiele/Aufgaben sind unabhängig nachgerechnet. Nur diese Teilmenge – nicht der Fließtext.",
+  "proof_correctness": "Beweise und Argumente: nur durch fachkundige Prüfung. Nie automatisch PASS.",
+  "examples": "Mindestens zwei originelle, geprüfte Anwendungen mit Gegenbeispiel bzw. Grenzfall (Existenz, nicht Güte).",
+  "tasks": "Aufgaben mit Kurzschlüssel, ausführlicher Lösung und Bewertungsschema; keine Selbstbewertung (Struktur, nicht Güte).",
+  "lab": "Labor ohne Karteikarten-/Wiederholungsfunktion; Challenge-Ziele mit Prüffunktion oder Unmöglichkeitsbegründung.",
+  "tutor": "Portabler Tutor-Kontext vollständig; keine Lösungen im Kontext; Lernstand nur, wenn real erhoben.",
+  "channels": "Kanäle getrennt: Labor ≠ Anki ≠ Lehrbuch ≠ Tutor.",
+  "didactic_quality": "Didaktische Güte und Lernwirkung: nur menschliche Bewertung.",
+  "human_review": "Freigabe nur durch menschliche Bewertung."
+ },
  "checks": [
   {
    "example": "N1",

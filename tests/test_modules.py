@@ -1,5 +1,6 @@
 """Fachübergreifende Modulschicht (Issue #9): Vertrag, Quellenregeln, Tutor-Export, API-Sperre, Rechenkerne, gerenderte Labore."""
 import base64
+import math
 import json
 import random
 import shutil
@@ -33,10 +34,14 @@ class Contract(unittest.TestCase):
             with tempfile.TemporaryDirectory() as t:
                 q = build(m, Path(t), None)
             dims = {k: v['status'] for k, v in q['dimensions'].items()}
-            for k in ('scope', 'sources', 'claims', 'examples', 'tasks', 'lab', 'tutor', 'channels'):
+            for k in ('scope', 'source_validity', 'computation', 'examples', 'tasks', 'lab', 'tutor', 'channels'):
                 self.assertEqual(dims[k], 'PASS', (name, k, q['dimensions'][k]))
             self.assertEqual(dims['human_review'], 'PENDING')
-            self.assertIn('NOT_RATED', q['didactic_quality'])
+            self.assertEqual(dims['didactic_quality'], 'NOT_RATED')
+            self.assertEqual(dims['proof_correctness'], 'NOT_VERIFIED')          # nie automatisch PASS
+            self.assertIn('NICHT geprüft', q['dimensions']['computation']['evidence'])
+            gaps = S.gaps(m)
+            self.assertEqual(dims['literature_coverage'], 'FAIL' if gaps else 'PASS', name)
 
     def test_domains_differ_but_schema_is_identical(self):
         ms = [C.load(d) for d in MODS.values()]
@@ -56,6 +61,76 @@ class Contract(unittest.TestCase):
         m = from_unit(ROOT / 'units/nlp_sequence_labeling')
         self.assertEqual(C.validate(m), [])
         self.assertTrue(all(c['ok'] for c in C.run_checks(m)))
+
+
+class Coverage(unittest.TestCase):
+    def test_coverage_requires_passage_for_the_kc_not_just_a_listed_source(self):
+        m = C.load(MODS['analysis1_folgen'])
+        for s in m['_sources']:
+            for p in s.get('passages', []):
+                p['kcs'] = [k for k in p.get('kcs', []) if k != 'grenzw']
+        self.assertIn('grenzw', [g['kc'] for g in S.gaps(m)])
+        self.assertEqual(C.qc(m)['dimensions']['literature_coverage']['status'], 'FAIL')
+
+    def test_ent_formen_gap_is_reported_not_hidden(self):
+        self.assertEqual([g['kc'] for g in S.gaps(C.load(MODS['ent_funding']))], ['formen'])
+
+
+class ResearchTrail(unittest.TestCase):
+    def test_every_logged_verification_is_complete_and_linked(self):
+        from exam_mastery.modules import research as R
+        for d in list(MODS.values()) + [ROOT / 'units/nlp_sequence_labeling']:
+            ev = R.read_log(d)
+            self.assertTrue(ev, d)
+            for e in ev:
+                if e['step'] == 'verify':
+                    self.assertTrue(e['result']['all_found'], (d, e['source']))
+                    self.assertEqual(len(e['result']['sha256']), 64)
+                    for p in e['result']['phrases']:
+                        self.assertLessEqual(len(p['context'] or ''), 240)       # nur kurze Zitate im Repo
+            steps = [e['step'] for e in ev]
+            self.assertLess(steps.index('need'), steps.index('verify'))
+        ent = C.load(MODS['ent_funding']); ids = {s['id'] for s in ent['_sources'] if s['status'] == 'verified'}
+        for e in R.read_log(MODS['ent_funding']):
+            if e['step'] in ('verify', 'decide', 'integrate'):
+                self.assertIn(e['source'], ids)
+        self.assertIn('Kerr', R.trace(MODS['ent_funding'], ent) + json.dumps(ent['_sources']))
+
+    def test_nlp_registry_has_verified_urls_for_lafferty_and_su(self):
+        u = json.loads((ROOT / 'units/nlp_sequence_labeling/unit.json').read_text(encoding='utf-8'))
+        src = {s['id']: s for s in u['sources']}
+        self.assertEqual(src['lafferty']['url'], 'https://repository.upenn.edu/cis_papers/159')
+        self.assertEqual(src['su']['url'], 'https://arxiv.org/abs/2104.09864')
+        self.assertIn('nicht geprüft', src['su']['ref'])
+
+
+class ContractionCertificate(unittest.TestCase):
+    """Zertifikat darf nie „bewiesen“ melden, wenn eine dichte Abtastung (unabhängig, Python) eine Bedingung verletzt."""
+    MAPS = {'cos': (math.cos, lambda x: -math.sin(x)), 'lect': (lambda x: 1 / (3 + x), lambda x: -1 / (3 + x) ** 2),
+            'sqrt': (lambda x: math.sqrt(3 + 2 * x), lambda x: 1 / math.sqrt(3 + 2 * x)), 'heron': (lambda x: (x + 2 / x) / 2, lambda x: (1 - 2 / x ** 2) / 2),
+            'xinv': (lambda x: x + 1 / x, lambda x: 1 - 1 / x ** 2)}
+
+    @unittest.skipUnless(HAVE_NODE, 'node fehlt')
+    def test_certificate_sound_against_dense_sampling(self):
+        js = ROOT / 'modules/analysis1_folgen/lab/analysis_math.js'
+        rng = random.Random(4); cases = []
+        for _ in range(300):
+            k = rng.choice(list(self.MAPS)); a = round(rng.uniform(-0.5, 4), 2); b = round(a + rng.uniform(0.05, 3), 2)
+            cases.append((k, a, b))
+        res = node(js, [('certificate', list(c)) for c in cases])
+        proven = 0
+        for (k, a, b), r in zip(cases, res):
+            if not r['ok']:
+                continue
+            proven += 1
+            fn, d = self.MAPS[k]
+            xs = [a + (b - a) * i / 2000 for i in range(2001)]
+            self.assertTrue(all(a <= fn(x) <= b for x in xs), (k, a, b))
+            self.assertLess(max(abs(d(x)) for x in xs), 1, (k, a, b))
+            self.assertLessEqual(max(abs(d(x)) for x in xs), r['q'] + 1e-9, (k, a, b))
+        self.assertGreater(proven, 10)
+        r = node(js, [('certificate', ['cos', 0.5, 1]), ('certificate', ['xinv', 1, 20]), ('certificate', ['cos', -1, 1])])
+        self.assertTrue(r[0]['ok']); self.assertFalse(r[1]['ok']); self.assertFalse(r[2]['ok'])
 
 
 class SourceRules(unittest.TestCase):
@@ -243,6 +318,35 @@ class RenderedLabs(unittest.TestCase):
         self.assertEqual(pg.locator('.chal.solved[data-id="w-major"]').count(), 1)
         st = self.state(self.open('ent_funding', 'runden')); st.update(pre=5e6)
         self.assertIn('den Rabatt', self.open('ent_funding', 'runden', st).locator('.formula-live').inner_text())
+
+    def test_contraction_challenge_requires_certificate_not_simulation(self):
+        st = self.state(self.open('analysis1_folgen', 'folgen')); st.update(view='web', map='cos', a1=1, n=60, ia=None, ib=None)
+        pg = self.open('analysis1_folgen', 'folgen', st); pg.get_by_role('tab', name='Challenges').click()
+        self.assertEqual(pg.locator('.chal.solved[data-id="g-contr"]').count(), 0)          # konvergiert numerisch, aber kein Beweis
+        self.assertIn('kein Beweis', pg.locator('.lab-stage').inner_text())
+        st.update(ia=0.6, ib=0.9)                                                              # a₁ = 1 nicht im Intervall
+        pg = self.open('analysis1_folgen', 'folgen', st); pg.get_by_role('tab', name='Challenges').click()
+        self.assertEqual(pg.locator('.chal.solved[data-id="g-contr"]').count(), 0)
+        st.update(ia=0.5, ib=1)
+        pg = self.open('analysis1_folgen', 'folgen', st); pg.get_by_role('tab', name='Challenges').click()
+        self.assertEqual(pg.locator('.chal.solved[data-id="g-contr"]').count(), 1)
+        self.assertIn('Bewiesen', pg.locator('.lab-stage').inner_text())
+
+    def test_key_event_N698_visible_in_plot(self):
+        st = self.state(self.open('analysis1_folgen', 'folgen')); st.update(logEps=-2, N=697, plot='dist')
+        svg = self.open('analysis1_folgen', 'folgen', st).locator('.plane svg').first.inner_html()
+        self.assertIn('kleinstes N = 698', svg); self.assertIn('Gegenbeispiel n = 697', svg); self.assertIn('Ihr N = 697', svg)
+
+    def test_no_null_or_undefined_text_anywhere(self):
+        for name, lab in (('analysis1_folgen', 'folgen'), ('ent_funding', 'runden')):
+            pg = self.open(name, lab)
+            for tab in ('Entdecken', 'Challenges', 'Hypothese'):
+                pg.get_by_role('tab', name=tab).click()
+                if tab == 'Challenges':
+                    for b in pg.get_by_role('button', name='Hinweis').all():
+                        b.click()
+                txt = pg.inner_text('body')
+                self.assertNotRegex(txt, r'\bnull\b|\bundefined\b|NaN', (name, tab))
 
     def test_labs_have_no_flashcard_ui_and_fit_mobile(self):
         for name, lab in (('analysis1_folgen', 'folgen'), ('ent_funding', 'runden')):

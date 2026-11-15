@@ -309,23 +309,52 @@
    "passages": [
     {
      "locator": "§2.2, Beispiel 2.2.8 (S. 66–67)",
-     "content": "x₁ = 2, xₙ₊₁ = xₙ − (xₙ² − 2)/(2xₙ): Wohldefiniertheit und Positivität per Induktion, Monotonie über xₙ₊₁² − 2 = (xₙ² − 2)²/(4xₙ²) ≥ 0, Grenzwert √2; Hinweis: mit negativem x₁ ergibt sich −√2; als Newton-Verfahren bezeichnet."
+     "content": "x₁ = 2, xₙ₊₁ = xₙ − (xₙ² − 2)/(2xₙ): Wohldefiniertheit und Positivität per Induktion, Monotonie über xₙ₊₁² − 2 = (xₙ² − 2)²/(4xₙ²) ≥ 0, Grenzwert √2; Hinweis: mit negativem x₁ ergibt sich −√2; als Newton-Verfahren bezeichnet.",
+     "kcs": [
+      "monoton"
+     ]
     },
     {
      "locator": "§2.1, Satz 2.1.10 (Monotone convergence theorem)",
-     "content": "Eine monotone Folge ist genau dann beschränkt, wenn sie konvergiert."
+     "content": "Eine monotone Folge ist genau dann beschränkt, wenn sie konvergiert.",
+     "kcs": [
+      "monoton"
+     ]
     },
     {
      "locator": "§2.3.3, Satz 2.3.8 (Bolzano–Weierstraß)",
-     "content": "Beschränkte Folgen besitzen eine konvergente Teilfolge."
+     "content": "Beschränkte Folgen besitzen eine konvergente Teilfolge.",
+     "kcs": [
+      "hp"
+     ]
     },
     {
      "locator": "§2.4, Beispiel 2.4.3",
-     "content": "(−1)ⁿ ist keine Cauchy-Folge (Nachweis mit n gerade, k = n + 1)."
+     "content": "(−1)ⁿ ist keine Cauchy-Folge (Nachweis mit n gerade, k = n + 1).",
+     "kcs": [
+      "cauchy"
+     ]
     },
     {
      "locator": "§7.6.1, Def. 7.6.1 und Satz 7.6.2",
-     "content": "Kontraktion = k-Lipschitz mit k < 1; jede Kontraktion eines nichtleeren vollständigen metrischen Raums hat genau einen Fixpunkt; „The words complete and contraction are necessary. See Exercise 7.6.6.“ (Aufgabe 7.6.6 b: 1-Lipschitz-Abbildung ohne Fixpunkt)."
+     "content": "Kontraktion = k-Lipschitz mit k < 1; jede Kontraktion eines nichtleeren vollständigen metrischen Raums hat genau einen Fixpunkt; „The words complete and contraction are necessary. See Exercise 7.6.6.“ (Aufgabe 7.6.6 b: 1-Lipschitz-Abbildung ohne Fixpunkt).",
+     "kcs": [
+      "kontraktion"
+     ]
+    },
+    {
+     "locator": "§2.1, Definition 2.1.2",
+     "content": "Konvergenz: für jedes ε > 0 existiert M ∈ ℕ mit |xₙ − x| < ε für alle n ≥ M.",
+     "kcs": [
+      "konv"
+     ]
+    },
+    {
+     "locator": "§2.2, Lemma 2.2.1 (Squeeze lemma)",
+     "content": "Sandwich-Lemma für Folgen mit gemeinsamem Grenzwert der Schranken.",
+     "kcs": [
+      "grenzw"
+     ]
     }
    ],
    "evidence": "secondary (Lehrbuch, Beweise selbst geprüft)",
@@ -337,11 +366,7 @@
   {
    "id": "folgen",
    "title": "Folgen & Grenzwerte",
-   "purpose": "ε-Streifen mit Beweis/Test-Unterscheidung, Gegenbeispielsuche, Spinnwebdiagramme für Rekursionen und Kontraktionen",
-   "js": [
-    "lab/analysis_math.js",
-    "lab/analysis_lab.js"
-   ]
+   "purpose": "ε-Streifen mit Beweis/Test-Unterscheidung, Gegenbeispielsuche, Spinnwebdiagramme für Rekursionen und Kontraktionen"
   }
  ],
  "learner_state": null,

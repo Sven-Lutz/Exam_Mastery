@@ -145,6 +145,10 @@ Quellen: kurs, opitz
   - siehe Zitat: Jurafsky, D.; Martin, J. H.: Speech and Language Processing, 3. Aufl., Entwurf Aug. 2026 (lokale Kopie des Nutzers). Gelesen und verwendet (gedruckte Seiten): §4.9–4.9.1 S. 112–115; §7.1–7.4 S. 179–193; §9.5.1–9.5.4 S. 238–241; §14.4–14.4.2 S. 312–314; §18.3 S. 405; §18.4.5–18.5 S. 411–419.
   - Grenzen: Belegstellen im Lehrbuch angegeben; Nachprüfung der Lesepassagen: docs/reference_unit/MATH_AUDIT.md
   - Funktion: Beleg im Lehrbuch der NLP-Einheit
+- **lafferty** [extension, paper, Zugriff: abstract] Lafferty, J.; McCallum, A.; Pereira, F. (2001): Conditional Random Fields: Probabilistic Models for Segmenting and Labeling Sequence Data. Proc. ICML 2001 (Seitenangabe nicht geprüft). Fundstelle geprüft 2026-11-16: Penn ScholarlyCommons (Postprint, ICML 2001, S. 282–289), Abstract wörtlich abgeglichen. https://repository.upenn.edu/cis_papers/159
+  - siehe Zitat: Lafferty, J.; McCallum, A.; Pereira, F. (2001): Conditional Random Fields: Probabilistic Models for Segmenting and Labeling Sequence Data. Proc. ICML 2001 (Seitenangabe nicht geprüft). Fundstelle geprüft 2026-11-16: Penn ScholarlyCommons (Postprint, ICML 2001, S. 282–289), Abstract wörtlich abgeglichen.
+  - Grenzen: Belegstellen im Lehrbuch angegeben; Nachprüfung der Lesepassagen: docs/reference_unit/MATH_AUDIT.md
+  - Funktion: Beleg im Lehrbuch der NLP-Einheit
 - **andor** [extension, paper, Zugriff: abstract] Andor, D. et al. (2016): Globally Normalized Transition-Based Neural Networks. Proc. ACL 2016, 2442–2452. Verwendet: Abstract (S. 2442). 
   - siehe Zitat: Andor, D. et al. (2016): Globally Normalized Transition-Based Neural Networks. Proc. ACL 2016, 2442–2452. Verwendet: Abstract (S. 2442).
   - Grenzen: Belegstellen im Lehrbuch angegeben; Nachprüfung der Lesepassagen: docs/reference_unit/MATH_AUDIT.md
@@ -161,8 +165,8 @@ Quellen: kurs, opitz
   - siehe Zitat: Vaswani, A. et al. (2017): Attention Is All You Need. arXiv:1706.03762 (NeurIPS 2017). Verwendet: §3.2.1 mit Fußnote 1 (Skalierung, Varianz d_k), §3.5 (Positionskodierung, lineare Verschiebung).
   - Grenzen: Belegstellen im Lehrbuch angegeben; Nachprüfung der Lesepassagen: docs/reference_unit/MATH_AUDIT.md
   - Funktion: Beleg im Lehrbuch der NLP-Einheit
-- **su** [extension, paper, Zugriff: section] Su, J. et al. (2024): RoFormer: Enhanced Transformer with Rotary Position Embedding. Neurocomputing 568 (in der Vorlesung PDF-S. 69 zitiert; Volltext nicht gelesen, nur die Rotationseigenschaft wird verwendet und hier selbst bewiesen). 
-  - siehe Zitat: Su, J. et al. (2024): RoFormer: Enhanced Transformer with Rotary Position Embedding. Neurocomputing 568 (in der Vorlesung PDF-S. 69 zitiert; Volltext nicht gelesen, nur die Rotationseigenschaft wird verwendet und hier selbst bewiesen).
+- **su** [extension, paper, Zugriff: abstract] Su, J. et al. (2024): RoFormer: Enhanced Transformer with Rotary Position Embedding. Neurocomputing 568 (in der Vorlesung PDF-S. 69 zitiert; Volltext nicht gelesen, nur die Rotationseigenschaft wird verwendet und hier selbst bewiesen) Fundstelle geprüft 2026-11-16: arXiv:2104.09864 v5 (8. Nov. 2023), Abstract wörtlich abgeglichen; die in der Vorlesung genannte Neurocomputing-Fassung wurde nicht geprüft. https://arxiv.org/abs/2104.09864
+  - siehe Zitat: Su, J. et al. (2024): RoFormer: Enhanced Transformer with Rotary Position Embedding. Neurocomputing 568 (in der Vorlesung PDF-S. 69 zitiert; Volltext nicht gelesen, nur die Rotationseigenschaft wird verwendet und hier selbst bewiesen) Fundstelle geprüft 2026-11-16: arXiv:2104.09864 v5 (8. Nov. 2023), Abstract wörtlich abgeglichen; die in der Vorlesung genannte Neurocomputing-Fassung wurde nicht geprüft.
   - Grenzen: Belegstellen im Lehrbuch angegeben; Nachprüfung der Lesepassagen: docs/reference_unit/MATH_AUDIT.md
   - Funktion: Beleg im Lehrbuch der NLP-Einheit
 - **jain** [extension, paper, Zugriff: abstract] Jain, S.; Wallace, B. C. (2019): Attention is not Explanation. Proc. NAACL-HLT 2019, 3543–3556. Gelesen: Zusammenfassung. https://aclanthology.org/N19-1357/

@@ -7,40 +7,65 @@
    "status": "PASS",
    "evidence": "4/4 Kernkompetenzen mit offizieller Quelle"
   },
-  "sources": {
+  "source_validity": {
    "status": "PASS",
-   "evidence": "3 geprüfte Ergänzungsquellen; Regelverstöße 0; Lücken 2"
+   "evidence": "6 Registereinträge, davon 4 geprüfte Ergänzungen; Regelverstöße: keine"
   },
-  "claims": {
+  "literature_coverage": {
+   "status": "FAIL",
+   "evidence": "3/4 Kernkompetenzen mit geprüfter Ergänzungsquelle; offene Lücken: ['formen']"
+  },
+  "computation": {
    "status": "PASS",
-   "evidence": "3/3 Beispielprüfungen grün (Kapitalisierungstabelle mit exakten Brüchen, Invarianten (Summe 100 %), datierte Praxisquellen, Annahmen explizit)"
+   "evidence": "4/4 Prüffunktionen grün, 27 protokollierte Rechenwerte (Kapitalisierungstabelle mit exakten Brüchen, Invarianten (Summe 100 %), datierte Praxisquellen, Annahmen explizit). Geltungsbereich: nur diese registrierten Aussagen; Fließtext, Lab-Begründungen und Beweise sind damit NICHT geprüft."
+  },
+  "proof_correctness": {
+   "status": "NOT_VERIFIED",
+   "evidence": "Keine maschinelle Beweisprüfung. Fachkundige Gegenlesung erforderlich."
   },
   "examples": {
    "status": "PASS",
-   "evidence": "2 originelle Beispiele mit Grenzfall/Gegenbeispiel"
+   "evidence": "3 originelle Beispiele mit Grenzfall/Gegenbeispiel (Existenz geprüft, Güte nicht)"
   },
   "tasks": {
    "status": "PASS",
-   "evidence": "4 Aufgaben mit Schlüssel, ausführlicher Lösung, Rubrik"
+   "evidence": "5 Aufgaben mit Schlüssel, ausführlicher Lösung, Rubrik"
   },
   "lab": {
    "status": "PASS",
-   "evidence": "1 Labor(e); keine Karteikarten- oder Wiederholungsfunktion im Code"
+   "evidence": "1 Labor(e); keine Karteikarten- oder Wiederholungsfunktion im Code; fachliche Gültigkeit der Challenge-Ziele: siehe Abnahmepaket (menschlich)"
   },
   "tutor": {
    "status": "PASS",
-   "evidence": "5 Dateien; Lösungen im Kontext: keine; Lernstand: keiner (nicht erfunden); gemeinsame Anweisung 2224 Zeichen"
+   "evidence": "6 Dateien; Lösungen im Kontext: keine; Lernstand: keiner (nicht erfunden); gemeinsame Anweisung 2224 Zeichen"
   },
   "channels": {
    "status": "PASS",
    "evidence": "Labor ohne Karteikarten; Anki als eigenes Paket; Tutor als eigener Kanal"
+  },
+  "didactic_quality": {
+   "status": "NOT_RATED",
+   "evidence": "nur menschliche Bewertung"
   },
   "human_review": {
    "status": "PENDING",
    "evidence": "HUMAN_REVIEW_PENDING"
   }
  },
- "didactic_quality": "NOT_RATED (nur menschliche Bewertung)",
+ "dimension_definitions": {
+  "scope": "Offizieller Rahmen: jede Kernkompetenz verweist auf eine offizielle Kursquelle.",
+  "source_validity": "Registrierte Quellen erfüllen die Regeln (gelesene Passage, Zugriffsniveau, Grenzen, Funktion). Sagt nichts über Abdeckung.",
+  "literature_coverage": "Jede Kernkompetenz hat mindestens eine geprüfte Ergänzungsquelle. FAIL, solange eine Lücke offen ist.",
+  "computation": "Die registrierten Rechenaussagen der Beispiele/Aufgaben sind unabhängig nachgerechnet. Nur diese Teilmenge – nicht der Fließtext.",
+  "proof_correctness": "Beweise und Argumente: nur durch fachkundige Prüfung. Nie automatisch PASS.",
+  "examples": "Mindestens zwei originelle, geprüfte Anwendungen mit Gegenbeispiel bzw. Grenzfall (Existenz, nicht Güte).",
+  "tasks": "Aufgaben mit Kurzschlüssel, ausführlicher Lösung und Bewertungsschema; keine Selbstbewertung (Struktur, nicht Güte).",
+  "lab": "Labor ohne Karteikarten-/Wiederholungsfunktion; Challenge-Ziele mit Prüffunktion oder Unmöglichkeitsbegründung.",
+  "tutor": "Portabler Tutor-Kontext vollständig; keine Lösungen im Kontext; Lernstand nur, wenn real erhoben.",
+  "channels": "Kanäle getrennt: Labor ≠ Anki ≠ Lehrbuch ≠ Tutor.",
+  "didactic_quality": "Didaktische Güte und Lernwirkung: nur menschliche Bewertung.",
+  "human_review": "Freigabe nur durch menschliche Bewertung."
+ },
  "checks": [
   {
    "example": "X1",
@@ -81,6 +106,16 @@
     "EN1_D": 1269841.2698412698,
     "EN2_regime": "discount",
     "EN3_gross_for_2x": 337500000.0
+   }
+  },
+  {
+   "example": "X4",
+   "ok": true,
+   "facts": {
+    "median": 0,
+    "gross_multiple": 3.45,
+    "outlier_share": 0.87,
+    "without_outlier": 0.47368421052631576
    }
   }
  ]

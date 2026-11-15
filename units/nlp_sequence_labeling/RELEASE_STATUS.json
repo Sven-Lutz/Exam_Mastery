@@ -101,7 +101,7 @@
    "version": 6,
    "status": "HUMAN_REVIEW_PENDING",
    "date": "2026-11-15",
-   "ref": "Issue #9 implementation; docs/cross_domain/V6_REPORT.md",
+   "ref": "Issue #9; docs/cross_domain/V6_REPORT.md; v6.1 corrections docs/cross_domain/HUMAN_ACCEPTANCE_v6.md",
    "note": "No self-release."
   }
  ],

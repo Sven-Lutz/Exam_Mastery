@@ -71,3 +71,14 @@ def tasks():
     B = (2 * size - c * size) / (1 - c)
     assert B == Fr(675_000_000, 2) and B / own == Fr(2_812_500_000)
     return {'EN1_D': float(r['T'] - r['nI']), 'EN2_regime': low['regime'], 'EN3_gross_for_2x': float(B)}
+
+
+def portfolio_skew():
+    """EN5: Median vs. Mittel (Kerr, Nanda & Rhodes-Kropf 2014: niedriger Median, hohe Varianz)."""
+    import statistics
+    mult = [0] * 14 + [1] * 4 + [5, 60]
+    assert statistics.median(mult) == 0
+    assert Fr(sum(mult), 20) == Fr(69, 20)
+    assert round(60 / 69, 3) == 0.870
+    assert Fr(sum(mult) - 60, 19) == Fr(9, 19)
+    return {'median': 0, 'gross_multiple': 3.45, 'outlier_share': 0.870, 'without_outlier': 9 / 19}

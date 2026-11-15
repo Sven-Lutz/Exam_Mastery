@@ -99,11 +99,13 @@
      }
     ],
     "tasks": [
-     "EN3"
+     "EN3",
+     "EN5"
     ]
    },
    "sources": [
-    "kurs"
+    "kurs",
+    "knr-2014"
    ]
   },
   {
@@ -213,6 +215,16 @@
     "Unterscheiden Sie Anteil und Wert.",
     "Wert = Anteile × Preis je Anteil."
    ]
+  },
+  {
+   "id": "EN5",
+   "kc": "vc",
+   "stage": "case",
+   "prompt": "Ein Fonds investiert je 1 Mio. € in 20 Start-ups. Ergebnis: 14 Totalverluste, 4 Rückzahlungen zum Einstand (1×), eine Beteiligung mit 5× und eine mit 60×. Bestimmen Sie Median-Multiple und Brutto-Fondsmultiple sowie den Anteil des größten Ausreißers am Rückfluss. Welche Aussage von Kerr, Nanda und Rhodes-Kropf (2014) illustriert das?",
+   "hints": [
+    "Sortieren Sie die 20 Multiples; der Median ist der Mittelwert des 10. und 11. Werts.",
+    "Rückfluss = Σ Multiple × 1 Mio. €."
+   ]
   }
  ],
  "examples": [
@@ -233,6 +245,12 @@
    "kc": "bewertung",
    "title": "Zahlenprobe der Aufgaben EN1–EN3",
    "summary": "Prüft alle Zahlen der Arbeitsaufgaben unabhängig."
+  },
+  {
+   "id": "X4",
+   "kc": "vc",
+   "title": "Median 0×, Fonds 3,45×: ein Ausreißer trägt alles",
+   "summary": "20 Beteiligungen: Median 0×, brutto 3,45×, Ausreißer 87 % des Rückflusses; ohne ihn 0,47×. Verankert in Kerr, Nanda & Rhodes-Kropf (2014)."
   }
  ],
  "sources": [
@@ -248,7 +266,8 @@
    "passages": [
     {
      "locator": "Abschnitte Kapitalformen, Insolvenz, Lebenszyklus, Business Angels, Venture Capital, Finanzierungsprozess, HTGF-Beispiel mit Wandeldarlehen, Verwässerung über zwei Runden",
-     "content": "Gliederung aus der Engine-Erfassung; Inhalt nur mit eigenen Worten."
+     "content": "Gliederung aus der Engine-Erfassung; Inhalt nur mit eigenen Worten.",
+     "kcs": []
     }
    ],
    "evidence": "official",
@@ -267,15 +286,24 @@
    "passages": [
     {
      "locator": "Quick Start Guide, S. 1, Nr. 1",
-     "content": "Verkaufter Anteil = Betrag / Post-Money-Cap; Beispiel 1 Mio. $ bei 15 % ⇒ Cap ≈ 6,7 Mio. $; 500 Tsd. $ ⇒ ≈ 7,5 %."
+     "content": "Verkaufter Anteil = Betrag / Post-Money-Cap; Beispiel 1 Mio. $ bei 15 % ⇒ Cap ≈ 6,7 Mio. $; 500 Tsd. $ ⇒ ≈ 7,5 %.",
+     "kcs": [
+      "bewertung"
+     ]
     },
     {
      "locator": "Quick Start Guide, S. 2, Note #2",
-     "content": "SAFE-Anteil ist „post-safes“, nicht „post-Series A“; SAFEs werden in der Serie A verwässert wie alle anderen."
+     "content": "SAFE-Anteil ist „post-safes“, nicht „post-Series A“; SAFEs werden in der Serie A verwässert wie alle anderen.",
+     "kcs": [
+      "bewertung"
+     ]
     },
     {
      "locator": "User Guide, S. 3–4",
-     "content": "Cap ist „post“ aller SAFE-Gelder, NICHT „post“ der Eigenkapitalrunde; „post“ bestehender Optionen und Pools, NICHT eines in der Serie A neu geschaffenen oder aufgestockten Pools."
+     "content": "Cap ist „post“ aller SAFE-Gelder, NICHT „post“ der Eigenkapitalrunde; „post“ bestehender Optionen und Pools, NICHT eines in der Serie A neu geschaffenen oder aufgestockten Pools.",
+     "kcs": [
+      "bewertung"
+     ]
     }
    ],
    "evidence": "primary (Originaldokument der Praxis)",
@@ -294,7 +322,10 @@
    "passages": [
     {
      "locator": "Abschnitt „Our investment criteria“",
-     "content": "Erstinvestitionen in Pre-Seed/Seed typischerweise ab 800 000 €; in Wachstumsrunden bis zu 30 Mio. €; Unternehmen höchstens drei Jahre alt; Sitz oder Betriebsstätte in Deutschland."
+     "content": "Erstinvestitionen in Pre-Seed/Seed typischerweise ab 800 000 €; in Wachstumsrunden bis zu 30 Mio. €; Unternehmen höchstens drei Jahre alt; Sitz oder Betriebsstätte in Deutschland.",
+     "kcs": [
+      "zyklus"
+     ]
     }
    ],
    "evidence": "primary (Selbstauskunft des Investors)",
@@ -313,23 +344,65 @@
    "passages": [
     {
      "locator": "Abstract (RES und NBER)",
-     "content": "VC-Finanzierungen trennen Cash-Flow-, Board-, Stimm-, Liquidations- und andere Kontrollrechte; Wandelpapiere am häufigsten; Folgefinanzierungen oft an beobachtbare Kennzahlen geknüpft; bei schlechter Entwicklung übernehmen VCs die Kontrolle, bei sehr guter geben sie Kontroll- und Liquidationsrechte weitgehend ab."
+     "content": "VC-Finanzierungen trennen Cash-Flow-, Board-, Stimm-, Liquidations- und andere Kontrollrechte; Wandelpapiere am häufigsten; Folgefinanzierungen oft an beobachtbare Kennzahlen geknüpft; bei schlechter Entwicklung übernehmen VCs die Kontrolle, bei sehr guter geben sie Kontroll- und Liquidationsrechte weitgehend ab.",
+     "kcs": [
+      "prozess"
+     ]
     }
    ],
    "evidence": "primary (empirische Studie) – nur Abstract gelesen",
    "limits": "Nur Abstract gelesen: Stichprobe, Methode und Effektgrößen nicht geprüft; keine Ergebnisse über das Abstract hinaus verwenden.",
    "function": "Forschungsfrage für die Vertiefung „Warum Tranchen und getrennte Rechte?“"
+  },
+  {
+   "id": "knr-2014",
+   "tier": "extension",
+   "type": "paper",
+   "citation": "Kerr, W. R.; Nanda, R.; Rhodes-Kropf, M. (2014): Entrepreneurship as Experimentation. Journal of Economic Perspectives 28(3), 25–48; offen als NBER Working Paper 20358 (Juli 2014).",
+   "url": "https://www.nber.org/papers/w20358.pdf",
+   "doi": null,
+   "date": "2014",
+   "access_level": "full_text",
+   "passages": [
+    {
+     "locator": "Abstract (PDF-S. 2)",
+     "content": "Erfolgswahrscheinlichkeiten sind niedrig, extrem schief verteilt und vor der Investition unbekannt.",
+     "kcs": [
+      "vc"
+     ]
+    },
+    {
+     "locator": "WP S. 3",
+     "content": "Renditeverteilung mit niedrigem Median, aber sehr hoher Varianz (mit Verweis auf Scherer & Harhoff 2000; Hall & Woodward 2010); VC-Investoren verdienen an der einen Investition unter vielen, die ein großer Erfolg wird; die große Mehrheit gibt weniger als den investierten Betrag zurück.",
+     "kcs": [
+      "vc"
+     ]
+    },
+    {
+     "locator": "WP S. 7",
+     "content": "Die Mehrheit der VC-finanzierten Unternehmen scheitert trotz erfahrener Investoren.",
+     "kcs": [
+      "vc"
+     ]
+    },
+    {
+     "locator": "WP S. 2",
+     "content": "Fallbeispiel Google: 12,5 Mio. $ (Sequoia, 1999) waren beim Verkauf 2005 über 4 Mrd. $ wert, das 320-Fache (nach Sahlman 2010).",
+     "kcs": [
+      "vc"
+     ]
+    }
+   ],
+   "evidence": "secondary (Übersichtsartikel in begutachteter Fachzeitschrift)",
+   "limits": "Übersicht: Verteilungsaussagen beruhen auf zitierten Studien, nicht auf eigenen Daten; US-Kontext; Google-Fall ist eine Anekdote mit Survivorship-Risiko. Verifikation: research_log.jsonl (SHA-256 des PDF).",
+   "function": "empirische Verankerung der Fondslogik (X2, EN5, Labor-Station v4): niedriger Median, Rendite aus seltenen Ausreißern"
   }
  ],
  "labs": [
   {
    "id": "runden",
    "title": "Finanzierungsrunden & Fondslogik",
-   "purpose": "Kapitalisierungstabelle mit SAFE (Cap/Rabatt), Pool-Shuffle, Up-/Down-Round, Fonds-Multiple",
-   "js": [
-    "lab/venture_math.js",
-    "lab/venture_lab.js"
-   ]
+   "purpose": "Kapitalisierungstabelle mit SAFE (Cap/Rabatt), Pool-Shuffle, Up-/Down-Round, Fonds-Multiple"
   }
  ],
  "learner_state": null,

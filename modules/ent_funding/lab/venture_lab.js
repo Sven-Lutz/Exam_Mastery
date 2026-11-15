@@ -99,7 +99,7 @@ ventLab.path = [
   {id: 'v4', title: 'Warum nur riesige Märkte', story: 'Fondslogik: 100 Mio. €, 25 Beteiligungen, 15 % Anteil bei Exit.', setup: S => { S.view = 'fund'; return S; },
     predict: {q: 'Wie groß muss ein einzelner Exit sein, um allein den Fonds zurückzuzahlen?', options: ['ca. 667 Mio. €', '100 Mio. €', '4 Mio. €'], correct: 0},
     task: 'Setzen Sie die Zahl der Gewinner auf 0 und die übrigen Exits auf 40 Mio. €: Wie hoch ist das Multiple?', goal: (S, R) => S.view === 'fund' && S.f.k === 0 && S.f.er >= 40e6,
-    reveal: 'Fondsgröße / Anteil = 100 Mio. € / 0,15 ≈ 667 Mio. €. 25 solide Exits zu 40 Mio. € bringen nur 150 Mio. € brutto (1,4× netto nach Carry). Wenige Ausreißer tragen die Rendite – deshalb prüfen VCs zuerst das Potenzial, nicht die Überlebenswahrscheinlichkeit.', links: {}},
+    reveal: 'Fondsgröße / Anteil = 100 Mio. € / 0,15 ≈ 667 Mio. €. 25 solide Exits zu 40 Mio. € bringen nur 150 Mio. € brutto (1,4× netto nach Carry). Wenige Ausreißer tragen die Rendite – deshalb prüfen VCs zuerst das Potenzial, nicht die Überlebenswahrscheinlichkeit. Empirischer Bezug: Renditen von Neugründungen haben „a low median value but very high variance“; VC-Investoren verdienen an „the one investment out of many“ (Kerr, Nanda & Rhodes-Kropf 2014, NBER WP 20358, S. 3). Die Zahlen hier sind eigene Rechnung.', links: {}},
 ];
 ventLab.challenges = [
   {id: 'w-major', title: 'Mehrheit halten', level: 'mittel', goal: 'Gründer halten nach der Serie A mindestens 50 %. Verändern Sie nur Cap, Pool und Pre-Money-Bewertungen.', setup: () => ventInit(),
