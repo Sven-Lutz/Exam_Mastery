@@ -99,11 +99,47 @@
   },
   {
    "version": 6,
+   "status": "HUMAN_REJECTED",
+   "date": "2026-11-15",
+   "ref": "Issue #10",
+   "note": "No self-release.",
+   "commit": "67460ff",
+   "ratings": {
+    "analysis_lab_proof_safety": "2/4",
+    "certificate_math_correctness": "2/4",
+    "source_literature_quality": "1/4",
+    "autonomous_source_research": "1/4",
+    "original_examples_tasks": "1/4",
+    "analysis_ent_labs": "1/4",
+    "chatgpt_tutor": "NOT RATED",
+    "qc_honesty": "NOT RATED"
+   },
+   "mean": "8/6 = 1.333/4",
+   "critical_errors_reported": "none by owner; review found cos-interval false negative (fixed in v7)"
+  },
+  {
+   "version": 7,
    "status": "HUMAN_REVIEW_PENDING",
    "date": "2026-11-15",
-   "ref": "Issue #9; docs/cross_domain/V6_REPORT.md; v6.1 corrections docs/cross_domain/HUMAN_ACCEPTANCE_v6.md",
+   "ref": "Issue #10 – reference vertical slice: Self-Attention softmax & convex combination",
    "note": "No self-release."
   }
  ],
- "rule": "Only a human rating changes a status. CI and agent checks never do."
+ "rule": "Only a human rating changes a status. CI and agent checks never do.",
+ "status_taxonomy": {
+  "TECHNICAL_PASS": "CI/tests green – says nothing about academic quality",
+  "CONTENT_CORRECTNESS_REVIEW_REQUIRED": "mathematics/claims need expert check",
+  "DIDACTIC_REVIEW_REQUIRED": "learning design needs human review",
+  "PUBLISHING_REVIEW_REQUIRED": "editorial/visual review of rendered products by a human",
+  "HUMAN_REJECTED": "owner decision; only a new human rating changes it"
+ },
+ "current": {
+  "v7": [
+   "TECHNICAL_PASS (pending CI)",
+   "CONTENT_CORRECTNESS_REVIEW_REQUIRED",
+   "DIDACTIC_REVIEW_REQUIRED",
+   "PUBLISHING_REVIEW_REQUIRED"
+  ],
+  "v6.1": "HUMAN_REJECTED"
+ }
 }

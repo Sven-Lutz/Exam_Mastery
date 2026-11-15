@@ -11,7 +11,8 @@
     "nlp_reference_unit_v4": "HUMAN_REJECTED (Issue #8, 17 ratings, mean 16/17=0.94/4; lab 0/4 in all 5 dimensions)",
     "nlp_reference_unit_v5": "HUMAN_REJECTED (owner review received 2026-11-15; no further v5 review needed)",
     "nlp_reference_unit_v6": "HUMAN_REVIEW_PENDING (Issue #9; docs/cross_domain/V6_REPORT.md); no self-release",
-    "v6": "HUMAN_REVIEW_PENDING (v6.1 corrections per Issue #9 review); acceptance package docs/cross_domain/HUMAN_ACCEPTANCE_v6.md"
+    "v6": "HUMAN_REJECTED (v6.1, Issue #10, mean 8/6 = 1.333/4)",
+    "v7": "IN PROGRESS: reference vertical slice (attention softmax + convex combination); then HUMAN_REVIEW_PENDING"
   },
   "product": {
     "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
@@ -39,7 +40,7 @@
     "didactic quality",
     "Anki/textbook/workbook/exams improvements (open product requirement)"
   ],
-  "next_action": "Owner: rate v6 via acceptance package; run tutor protocols. Agent next (only after owner decision): close ENT 'formen' gap via research pipeline; revise f-macro challenge; product quality of textbook/workbook/solutions/exams/Anki. Do not merge PR #3; no paid calls; no Gemini.",
+  "next_action": "Build v7 reference slice per Issue #10; owner rates products (not architecture).",
   "open_decisions_for_owner": [
     "Rate v6 with docs/cross_domain/HUMAN_ACCEPTANCE_v6.md (8 questions)",
     "Run tutor test protocols (ANALYSIS1_PROTOCOL.md, ENTREPRENEURSHIP_PROTOCOL.md) in ChatGPT and file results",
@@ -87,5 +88,6 @@
     "analysis1_folgen": "modules/analysis1_folgen -> ~/Exam_Mastery_Output/modules/analysis1_folgen (labor.html, tutor/)",
     "ent_funding": "modules/ent_funding -> ~/Exam_Mastery_Output/modules/ent_funding",
     "nlp": "build-unit units/nlp_sequence_labeling (adapter); tutor/ also in reference unit output"
-  }
+  },
+  "priorities": "Issue #10: core study products + publication-grade lab first; tutor deferred (keep exports working, no new tutor work)"
 }
