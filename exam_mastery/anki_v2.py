@@ -101,6 +101,8 @@ def _html(s):
     """Card text: same light markup as the books (bold, italics, lists, line breaks); math stays as \\( \\)."""
     from .typeset import md
     out = md(s)
+    # B33: a punctuation mark right after inline math must not wrap onto its own line ("… R_max" / "?")
+    out = re.sub(r'(\\\(.{1,60}?\\\))([?.!,:;])', r'<span style="white-space:nowrap">\1\2</span>', out)
     return out[3:-4] if out.startswith('<p>') and out.count('<p>') == 1 and out.endswith('</p>') else out
 
 

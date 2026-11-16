@@ -241,3 +241,11 @@ class B33Figures(unittest.TestCase):
         html = MS.page([MS.validate(json.loads(json.dumps(TOY)))], 'Studio', 'Kurs')
         self.assertIn("['compare', 'VI vs. PI']", html)
         self.assertIn('place(', html)                        # label collision avoidance in the graph
+
+
+class AnkiPunctuation(unittest.TestCase):
+    def test_short_math_keeps_its_punctuation_long_math_may_wrap(self):
+        from exam_mastery.anki_v2 import _html
+        self.assertIn('white-space:nowrap', _html('Bei \\(|r| \\le R_{\\max}\\)?'))
+        long = '\\(' + ' + '.join(f'x_{i}' for i in range(30)) + '\\).'
+        self.assertNotIn('white-space:nowrap', _html(long))
