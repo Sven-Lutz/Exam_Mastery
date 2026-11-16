@@ -212,7 +212,7 @@ mjx-container[display="true"]{display:block;max-width:100%}mjx-container[display
 .cmp .row{display:contents}
 .ftx{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:1.1em;align-items:start;break-inside:avoid-page}
 .ftx.left{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr)}.ftx.left .ftx-fig{order:-1}
-.ftx.stack{display:block}.ftx.stack .ftx-fig{margin-top:.6em}.ftx.stack .ftx-txt{break-after:avoid}
+.ftx.stack{display:block}.ftx.stack .ftx-fig{margin-top:.6em}.ftx.stack figure{margin-right:calc(-1 * (var(--side) + var(--gap)))}.ftx.stack .ftx-txt{break-after:avoid}
 .ftx figure{margin:0}.ftx .ftx-txt>:first-child{margin-top:0}
 .box{background:var(--soft);padding:.6em .95em .35em;border-left:5px solid var(--line)}
 .box.law{border-left-color:var(--gold);background:var(--gold-l)}.box.law .lab{color:var(--gold)}
@@ -294,7 +294,7 @@ tr.neg td.num{color:var(--coral)}
 @media print{a{color:inherit;text-decoration:none}main{max-width:none}}
 @media screen{body{background:#eef1f4}main{max-width:64rem;margin:0 auto;padding:2.5em 1.5em 5em;padding-right:calc(var(--side) + var(--gap) + 1.5em);background:#fff}
  .cover{height:auto;min-height:70vh}h2{break-before:auto;margin-top:2.4em}}
-@media screen and (max-width:760px){main{padding-right:1.2em}figure,.opener{margin-right:0}.side,.src{float:none;width:auto;margin:.2em 0 .6em}.opener .road{grid-template-columns:1fr 1fr}
+@media screen and (max-width:760px){main{padding-right:1.2em}figure,.opener,.ftx.stack figure{margin-right:0}.side,.src{float:none;width:auto;margin:.2em 0 .6em}.opener .road{grid-template-columns:1fr 1fr}
  .opener .goals ol{columns:1}.ftx,.cmp,.res-w .grid,.mis{grid-template-columns:1fr}.cmp>div+div{border-left:none;border-top:1px solid var(--line)}
  .ex ol.steps>li .why,.prf ol.steps>li .why{flex-basis:100%;padding-left:2.7em}}
 html.grey{filter:grayscale(1)}
