@@ -400,7 +400,9 @@ class B74Delivery(unittest.TestCase):
                 self.assertIn(f'1 / {doc.page_count - 1}', doc[1].get_text(), f)    # own numbering after the cover
             d = deliver_chapter(ch, Path(td) / 'LERNMATERIAL' / 'x', label='ML')
             names = {p.name for p in d.iterdir()}
-            self.assertTrue({'LIES_MICH.md', 'quality_dossier.json', '1_Lehrbuch.pdf', 'kapitel.html', 'assets'} <= names, names)
+            # B33: learners get the typeset textbook HTML (same book model as the PDF); the internal AST overview is not delivered
+            self.assertTrue({'LIES_MICH.md', 'quality_dossier.json', '1_Lehrbuch.pdf', '1_Lehrbuch.html', 'assets'} <= names, names)
+            self.assertNotIn('kapitel.html', names)
             self.assertIn('NICHT unabhängig validiert', (d / 'LIES_MICH.md').read_text())
 
 

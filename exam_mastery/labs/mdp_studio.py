@@ -154,6 +154,13 @@ function heat(v, lo, hi) { if (v >= 0) { const t = Math.min(1, v / (hi || 1)) * 
 function drawGraph(V, pol, focus) {
   const m = model(sc), W = sc.w || 560, H = sc.h || 320, P = sc.pos || {}, svg = [];
   const xy = s => P[s] || [80 + 400 * (m.S.indexOf(s) / Math.max(1, m.S.length - 1)), 160];
+  // B33: label placement with collision avoidance (first free candidate position wins; states are obstacles too)
+  const boxes = m.S.map(s => { const [x, y] = xy(s); return [x - 34, y - 34, x + 34, y + 34]; });
+  const hit = (b) => boxes.some(o => b[0] < o[2] && b[2] > o[0] && b[1] < o[3] && b[3] > o[1]);
+  const place = (x, y, txt, size) => { const w = txt.length * size * .58 + 4, h = size + 3;
+    for (const [dx, dy] of [[0, 0], [0, -14], [0, 14], [18, 0], [-18, 0], [0, -26], [0, 26], [26, -14], [-26, 14]]) {
+      const b = [x + dx - w / 2, y + dy - h + 2, x + dx + w / 2, y + dy + 2]; if (!hit(b)) { boxes.push(b); return [x + dx, y + dy]; } }
+    boxes.push([x - w / 2, y - h + 2, x + w / 2, y + 2]); return [x, y]; };
   svg.push(`<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#0F6E73"/></marker>
     <marker id="ac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#C8483A"/></marker></defs>`);
   for (const s of m.S) for (const [ai, a] of m.A[s].entries()) {
@@ -161,15 +168,17 @@ function drawGraph(V, pol, focus) {
     const ang = (-90 + (ai - (m.A[s].length - 1) / 2) * 52) * Math.PI / 180, AP = (sc.apos || {})[s + '|' + a];
     const ax = AP ? AP[0] : x + Math.cos(ang) * 58, ay = AP ? AP[1] : y + Math.sin(ang) * 58;
     svg.push(`<line x1="${x}" y1="${y}" x2="${ax}" y2="${ay}" stroke="${on ? '#C8483A' : '#1B2A41'}" stroke-width="${on ? 3 : 1.4}"/>`);
-    const ly = AP && AP[1] > y ? ay + 20 : ay - 11;
-    svg.push(`<circle cx="${ax}" cy="${ay}" r="6.5" fill="${on ? '#C8483A' : '#1B2A41'}"/><text x="${ax}" y="${ly}" font-size="12.5" text-anchor="middle" font-weight="700" fill="${on ? '#C8483A' : '#1B2A41'}" paint-order="stroke" stroke="#fff" stroke-width="3">${a} · r=${fmt(t.r, 1)}</text>`);
+    const atxt = `${a} · r=${fmt(t.r, 1)}`, [lx, ly] = place(ax, AP && AP[1] > y ? ay + 20 : ay - 11, atxt, 12.5);
+    svg.push(`<circle cx="${ax}" cy="${ay}" r="6.5" fill="${on ? '#C8483A' : '#1B2A41'}"/><text x="${lx}" y="${ly}" font-size="12.5" text-anchor="middle" font-weight="700" fill="${on ? '#C8483A' : '#1B2A41'}" paint-order="stroke" stroke="#fff" stroke-width="3">${a} · r=${fmt(t.r, 1)}</text>`);
     for (const [n, p] of Object.entries(t.next)) { const [nx, ny] = xy(n); const dx = nx - ax, dy = ny - ay, L = Math.hypot(dx, dy) || 1;
       if (n === s) { const dx0 = x - ax, dy0 = y - ay, L0 = Math.hypot(dx0, dy0) || 1, ex = x - dx0 / L0 * 34, ey = y - dy0 / L0 * 34, mx = (ax + ex) / 2 + dy0 / L0 * 26, my = (ay + ey) / 2 - dx0 / L0 * 26;
         svg.push(`<path d="M${ax},${ay} Q${mx},${my} ${ex},${ey}" fill="none" stroke="${on ? '#C8483A' : '#0F6E73'}" stroke-dasharray="${on ? '' : '4 3'}" stroke-width="${on ? 2 : 1.3}" marker-end="url(#${on ? 'ac' : 'ar'})"/>`);
-        svg.push(`<text x="${mx}" y="${my}" font-size="11.5" font-weight="700" text-anchor="middle" fill="${on ? '#C8483A' : '#0F6E73'}">p=${fmt(p, 2)}</text>`); continue; }
+        const [qx, qy] = place(mx, my, `p=${fmt(p, 2)}`, 11.5);
+        svg.push(`<text x="${qx}" y="${qy}" font-size="11.5" font-weight="700" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" fill="${on ? '#C8483A' : '#0F6E73'}">p=${fmt(p, 2)}</text>`); continue; }
       const ex = nx - dx / L * 34, ey = ny - dy / L * 34, mx = (ax + ex) / 2 - dy / L * 18, my = (ay + ey) / 2 + dx / L * 18;
       svg.push(`<path d="M${ax},${ay} Q${mx},${my} ${ex},${ey}" fill="none" stroke="${on ? '#C8483A' : '#0F6E73'}" stroke-dasharray="${on ? '' : '4 3'}" stroke-width="${on ? 2 : 1.3}" marker-end="url(#${on ? 'ac' : 'ar'})"/>`);
-      svg.push(`<text x="${mx}" y="${my}" font-size="11.5" font-weight="700" fill="${on ? '#C8483A' : '#0F6E73'}" text-anchor="middle">p=${fmt(p, 2)}</text>`); } }
+      const [qx, qy] = place(mx, my, `p=${fmt(p, 2)}`, 11.5);
+      svg.push(`<text x="${qx}" y="${qy}" font-size="11.5" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" fill="${on ? '#C8483A' : '#0F6E73'}" text-anchor="middle">p=${fmt(p, 2)}</text>`); } }
   for (const s of m.S) { const [x, y] = xy(s), term = !m.A[s].length;
     svg.push(`<circle cx="${x}" cy="${y}" r="32" fill="${focus === s ? '#FBF2DE' : '#E2F0F0'}" stroke="${focus === s ? '#8C6416' : '#0F6E73'}" stroke-width="${focus === s ? 3.5 : 2}" ${term ? 'stroke-dasharray="4 3"' : ''}/>`);
     svg.push(`<text x="${x}" y="${y - 3}" font-size="13.5" font-weight="800" text-anchor="middle" fill="#1B2A41">${label(s)}</text>`);
@@ -207,7 +216,7 @@ function backupText(m, V, s, a) { const t = m.T[s + '|' + a]; let parts = [], su
   return `Q(${label(s)}, ${a}) = r + γ·Σ p·V(s')\n          = ${fmt(t.r, 2)} + ${fmt(m.g, 2)}·(${parts.join(' + ')})\n          = ${fmt(sum, 4)}`; }
 
 /* ---------- views ---------- */
-const MODES = [['start', 'Start'], ['model', 'Modell'], ['policy', 'Policy-Explorer'], ['vi', 'Wertiteration'], ['pi', 'Policy Iteration'], ['gamma', 'Diskont γ'], ['tasks', 'Aufgaben']];
+const MODES = [['start', 'Start'], ['model', 'Modell'], ['policy', 'Policy-Explorer'], ['vi', 'Wertiteration'], ['pi', 'Policy Iteration'], ['compare', 'VI vs. PI'], ['gamma', 'Diskont γ'], ['tasks', 'Aufgaben']];
 function reset(keepModel) {
   if (!keepModel) st = {mode: st && st.mode, gamma: +sc.gamma, transitions: JSON.parse(JSON.stringify(sc.transitions || []))};
   const m = model(sc); st.policy = Object.fromEntries(m.S.filter(s => m.A[s].length).map(s => [s, (sc.policy && sc.policy[s]) || m.A[s][0]]));
@@ -217,7 +226,7 @@ function reset(keepModel) {
 function setScenario(i) { sc = D.scenarios[i]; reset(false);
   document.querySelectorAll('nav.sc button').forEach((b, j) => b.setAttribute('aria-pressed', i === j)); render(); }
 function setMode(id) { st.mode = id; document.querySelectorAll('nav.md button').forEach(b => b.setAttribute('aria-selected', b.dataset.m === id)); render(); }
-function render() { const m = model(sc), v = $('view'); v.innerHTML = ({start, model: modelView, policy, vi, pi, gamma, tasks})[st.mode || 'start'](m); bind(m); if (window.MathJax && MathJax.typeset) MathJax.typeset(); }
+function render() { const m = model(sc), v = $('view'); v.innerHTML = ({start, model: modelView, policy, vi, pi, compare, gamma, tasks})[st.mode || 'start'](m); bind(m); if (window.MathJax && MathJax.typeset) MathJax.typeset(); }
 function start(m) {
   return `<div class="grid2"><div><div class="card"><h2>${sc.title}</h2><p class="lead">${sc.intro || ''}</p>
   <h3>So arbeiten Sie mit dem Studio</h3><ol><li><b>Modell</b>: Zustände, Aktionen, Belohnungen und Übergänge ansehen (und begrenzt verändern).</li>
@@ -270,6 +279,24 @@ function pi(m) {
   ${sc.kind === 'grid' ? '' : `<label class="f">Start: ${m.S.filter(s => m.A[s].length > 1).map(s => `<select data-p0="${s}">${m.A[s].map(a => `<option ${P.pol[s] === a ? 'selected' : ''}>${a}</option>`).join('')}</select>`).join(' ')}</label>`}</div>
   ${P.V ? qtable(m, V, P.pol, P.prev) : ''}<h3>Protokoll</h3><ol id="plog">${P.log.map(x => `<li>${x}</li>`).join('')}</ol></div>
   <div class="card">${draw(P.V || null, P.pol, st.focus)}</div></div>`; }
+function compare(m) {
+  // B33: both algorithms on the same model, measured by their distance to V* (exact, from the oracle-equivalent solver)
+  const o = optimal(m), S = m.S.filter(s => m.A[s].length), nA = S.reduce((x, s) => x + m.A[s].length, 0);
+  let V = zeros(m); const vi = []; let k = 0, kPol = null;
+  while (k < 400) { V = sweep(m, V); k++; const e = norm(V, o.V); vi.push(e); const g = greedy(m, V);
+    if (kPol === null && S.every(s => q(m, o.V, s, g[s]) >= q(m, o.V, s, o.pol[s]) - 1e-9)) kPol = k; if (e < 1e-6) break; }
+  let pol = {...st.policy}; const pe = [], rows = [];
+  for (let it = 1; it <= 50; it++) { const Vp = evaluate(m, pol), e = norm(Vp, o.V); pe.push(Math.max(e, 1e-12)); const np = greedy(m, Vp, pol), ch = S.filter(s => np[s] !== pol[s]);
+    rows.push(`<tr><td>${it}</td><td class="num">${e < 1e-12 ? '0' : e.toExponential(2)}</td><td>${ch.length ? ch.map(s => `${label(s)}: ${pol[s]} → ${np[s]}`).join(', ') : 'keine → Stopp'}</td></tr>`);
+    if (!ch.length) break; pol = np; }
+  return `<div class="grid2"><div class="card"><h2>Wertiteration und Policy Iteration im Vergleich</h2>
+  <p>Beide starten bei diesem Modell (γ = ${fmt(m.g, 2)}); gemessen wird jeweils der Abstand \\(\\|V - V^*\\|_\\infty\\) zur exakten Lösung. Startpolicy der PI: Ihre Wahl im Policy-Explorer.</p>
+  <div class="kpi"><div><b id="cmp-vi">${k}</b><span>VI-Sweeps bis Fehler &lt; 10⁻⁶ (je ${nA} Backups)</span></div><div><b id="cmp-vipol">${kPol ?? '—'}</b><span>kleinstes k, ab dem die gierige Policy zu V<sub>k</sub> optimal ist (gewählt im Sweep k+1)</span></div>
+  <div><b id="cmp-pi">${pe.length}</b><span>PI-Bewertungen (je ein lineares Gleichungssystem mit ${S.length} Unbekannten)</span></div></div>
+  ${plot([{n: 'VI: Fehler je Sweep', v: vi, c: '#0F6E73'}, {n: 'PI: Fehler je Bewertung', v: pe, c: '#C8483A', dash: 1}], 'Fehler zu V* (log)')}
+  <p class="msg info">Lesen Sie die Achse als „Iteration“: Ein VI-Schritt ist ein billiger Sweep, ein PI-Schritt eine vollständige Bewertung. PI braucht wenige teure Schritte und erreicht V* exakt; VI viele billige und nähert sich geometrisch (Faktor γ). Die gierige VI-Policy ist oft lange vor den Werten optimal.</p></div>
+  <div class="card"><h3>Protokoll der Policy Iteration</h3><table><thead><tr><th>Bewertung</th><th class="num">‖V^π − V*‖∞</th><th>Policy-Änderungen</th></tr></thead><tbody>${rows.join('')}</tbody></table>
+  <h3>Frage zum Nachdenken</h3><p>Ändern Sie γ im Modell auf 0.99: Welche Zahl wächst stark, welche kaum? (VI-Sweeps wachsen etwa wie 1/(1−γ); die Zahl der PI-Bewertungen bleibt klein.)</p></div></div>`; }
 function gamma(m) {
   if (sc.kind === 'grid') return `<div class="card"><h2>Diskont im Gitter</h2><label class="f">γ = <input type="range" min="0" max="0.99" step="0.01" value="${st.gamma}" id="g"><output>${fmt(st.gamma, 2)}</output></label>${draw(optimal(m).V, optimal(m).pol)}<p class="msg info">Kleines γ: Nur nahe Belohnungen zählen, entfernte Zellen haben kaum Wert. Großes γ: Werte breiten sich weit aus.</p></div>`;
   const th = sc.threshold, G = [], pols = [];

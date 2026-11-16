@@ -202,6 +202,44 @@ def apply(book, ed):
                     raise ContractError(f'EDITION_DUPLICATE_CARD: {c["key"]}')
                 cards[c['key']] = c
             b['cards'] = list(cards.values())
+        elif kind == 'patch':
+            # B33: exact text correction inside one block / workbook item / figure spec. Fail-closed: the old text must
+            # occur exactly once in the target (so a correction can never silently miss or hit twice), reason required.
+            if not op.get('reason'):
+                raise ContractError(f'EDITION_REASON_MISSING: {where}')
+            if op.get('block_id'):
+                lst, i = locate(op['block_id']); obj = lst[i]
+            elif op.get('item_id'):
+                hits = [(st['items'], j) for st in b['stages'] for j, it in enumerate(st['items']) if it['id'] == op['item_id']]
+                if b.get('exam'):
+                    hits += [(b['exam']['items'], j) for j, it in enumerate(b['exam']['items']) if it['id'] == op['item_id']]
+                if not hits:
+                    raise ContractError(f'EDITION_UNKNOWN_ITEM: {where} {op["item_id"]}')
+                lst, i = hits[0]; obj = lst[i]
+            elif op.get('figure_id'):
+                if op['figure_id'] not in b['figures']:
+                    raise ContractError(f'EDITION_UNKNOWN_FIGURE: {where} {op["figure_id"]}')
+                obj = b['figures'][op['figure_id']]
+            else:
+                raise ContractError(f'EDITION_PATCH_TARGET: {where}')
+            targets = hits if op.get('item_id') else [(None, None)]
+            for lst_, i_ in targets:                 # an item may also sit in the exam copy: patch every occurrence
+                cur = obj if lst_ is None else lst_[i_]
+                j = json.dumps(cur, ensure_ascii=False)
+                for old_, new_ in op['replace']:
+                    o_, n_ = json.dumps(old_, ensure_ascii=False)[1:-1], json.dumps(new_, ensure_ascii=False)[1:-1]
+                    if j.count(o_) != 1:
+                        raise ContractError(f'EDITION_PATCH_NOT_UNIQUE: {where} {o_[:60]!r} occurs {j.count(o_)}x')
+                    j = j.replace(o_, n_)
+                if op.get('figure_id'):
+                    b['figures'][op['figure_id']] = json.loads(j)
+                elif lst_ is None:
+                    lst[i] = json.loads(j)
+                else:
+                    lst_[i_] = json.loads(j)
+            log.append({'op': kind, 'target': op.get('block_id') or op.get('item_id') or op.get('figure_id'), 'reason': op['reason'],
+                        'review_finding': op.get('finding')})
+            continue
         elif kind == 'meta':
             for k in ('objectives', 'opener_lead', 'glossary', 'references', 'production_notes', 'workbook_intro', 'workbook_intro_solutions'):
                 if k in op:

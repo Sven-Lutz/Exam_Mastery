@@ -689,6 +689,18 @@ def publish_visual_sources(ctx, manifest, assets_root, out_pdf, chapter_sources=
 
 # ------------------------------------------------------------------ entry point
 
+def _page_kind(pg):
+    import pymupdf
+    col = lambda c: c is not None and len(c) == 3 and (max(c) - min(c)) > 0.08
+    A = pg.rect.width * pg.rect.height
+    img = max([pymupdf.Rect(i['bbox']).width * pymupdf.Rect(i['bbox']).height / A for i in pg.get_image_info()] or [0])
+    dr = pg.get_drawings()
+    strokes = sum(1 for x in dr if col(x.get('color')))
+    fill = sum(x['rect'].width * x['rect'].height for x in dr if col(x.get('fill')) and x['rect'].height > 6) / A
+    cap = bool(re.search(r'(Abbildung|Figure|Abb\.)\s+\d+\.\d+', pg.get_text()))
+    return 'F' if cap or img >= 0.08 or strokes >= 15 else 'B' if fill >= 0.06 else 't'
+
+
 def _layout_lint(art, name):
     """B33: what the typesetter's layout lint found and repaired (inline formulas reflowed) or could not repair."""
     f = Path(art) / f'..{name}.main.layout_lint.json'
@@ -704,7 +716,66 @@ def _layout_lint(art, name):
                              if len(doc[i].get_text().strip()) < 350 and not doc[i].get_images() and len(doc[i].get_drawings()) < 40]
         if d['sparse_pages'] and d['status'] == 'PASS':
             d['status'] = 'WARN'
+        # B33 page audit (calibrated on the RL pilot: V1 textbook 22/29 text-only pages, V2/V3 none in the core):
+        # 'F' figure page (figure caption, large image or >= 15 coloured strokes), 'B' component page (coloured boxes
+        # cover >= 6 % of the page), 't' text only. Formula glyphs are black vector paths and never count.
+        # A monotone stretch = >= 3 consecutive text-only pages inside the core (between the first and last visual
+        # page), so table of contents, opener and back matter (answers, glossary, sources) are not penalised.
+        kinds = [_page_kind(doc[i]) for i in range(1, doc.page_count)]
+        vis = [i for i, k in enumerate(kinds) if k != 't']
+        runs, cur = [], []
+        for i, k in enumerate(kinds):
+            inside = bool(vis) and vis[0] < i < vis[-1]
+            if k == 't' and inside:
+                cur.append(i + 2)
+            else:
+                if len(cur) >= 3:
+                    runs.append(cur)
+                cur = []
+        d['page_audit'] = {'pages': len(kinds), 'profile': ''.join(kinds), 'text_only_pages': kinds.count('t'), 'figure_pages': kinds.count('F'),
+                           'component_pages': kinds.count('B'), 'monotone_runs': runs,
+                           'max_chars_page': max((len(doc[i].get_text()) for i in range(1, doc.page_count)), default=0)}
+        if runs and d['status'] == 'PASS' and name.startswith('1_'):
+            d['status'] = 'WARN'
     return d
+
+
+QUALITY_METRICS = ('numeric_fail', 'didactic_fail', 'semantic_fail', 'anki_render_fail', 'open_blockers', 'layout_fail',
+                   'monotone_runs', 'items_without_solution')
+
+
+def _metrics(report, book):
+    docs = report.get('documents') or {}
+    anki = (report.get('products') or {}).get('anki') or {}
+    return {'numeric_fail': (report.get('numeric_checks') or {}).get('counts', {}).get('FAIL', 0),
+            'didactic_fail': (report.get('didactic_rules') or {}).get('counts', {}).get('FAIL', 0),
+            'semantic_fail': (report.get('semantic_checks') or {}).get('counts', {}).get('FAIL', 0),
+            'anki_render_fail': len((anki.get('render_gate') or {}).get('fail') or {}),
+            'open_blockers': len((report.get('issue_lifecycle') or {}).get('open_blockers') or []),
+            'layout_fail': sum(1 for v in docs.values() if (v.get('layout_lint') or {}).get('status') == 'FAIL'),
+            'monotone_runs': sum(len(((v.get('layout_lint') or {}).get('page_audit') or {}).get('monotone_runs') or []) for v in docs.values()),
+            'items_without_solution': sum(1 for st in book.get('stages') or [] for i in st['items'] if not (i.get('solution') or {}).get('answer')),
+            'figures_used': len({b.get('id') or b.get('figure') for s in book.get('sections') or [] for b in s['blocks'] if b.get('type') in ('figure', 'figtext')}),
+            'cards': anki.get('cards', 0), 'items': sum(len(st['items']) for st in book.get('stages') or [])}
+
+
+def regression_guard(chapter_dir, report, book):
+    """B33 ratchet: compares the quality metrics with the last accepted baseline of this chapter (stored next to the
+    edition). Any defect metric that got worse is a regression (FAIL); a drop of figures/items/cards by more than 20 %
+    is reported for review. Without regressions the baseline is advanced; with regressions it is kept."""
+    ch = Path(chapter_dir)
+    bp = ch.parent.parent.parent / 'editions' / f'{ch.name}.quality_baseline.json'
+    cur = _metrics(report, book)
+    if not bp.exists():
+        bp.parent.mkdir(parents=True, exist_ok=True)
+        write_json(bp, {'schema': 'em-quality-baseline-v1', 'metrics': cur})
+        return {'status': 'BASELINE_CREATED', 'metrics': cur}
+    base = json.loads(bp.read_text(encoding='utf-8'))['metrics']
+    worse = {k: [base.get(k, 0), cur[k]] for k in QUALITY_METRICS if cur[k] > base.get(k, 0)}
+    shrink = {k: [base[k], cur[k]] for k in ('figures_used', 'items', 'cards') if base.get(k) and cur[k] < 0.8 * base[k]}
+    if not worse:
+        write_json(bp, {'schema': 'em-quality-baseline-v1', 'metrics': cur})
+    return {'status': 'FAIL' if worse else 'REVIEW' if shrink else 'PASS', 'regressions': worse, 'shrinkage': shrink, 'metrics': cur, 'baseline': base}
 
 
 def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_root=None, edition=None):
@@ -731,7 +802,7 @@ def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_r
     from datetime import date
     try:
         from importlib.metadata import version as _v
-        eng = 'v' + _v('exam-mastery')
+        eng = 'v' + _v('exam-mastery-engine')
     except Exception:
         eng = ''
     book = book_from_ast(ast, manifest, plan, course=course_title(manifest, chapter_dir), engine=eng, date=date.today().strftime('%d.%m.%Y'))
@@ -819,7 +890,18 @@ def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_r
               'academic_status': m['academic_status'] or 'NOT_TESTED', 'source_verification': 'NONE_HUMAN'}
     if edition_report:
         write_json(pub / 'edition_report.json', edition_report)
-        write_json(pub / 'book.json', book)
+    write_json(pub / 'book.json', book)             # B33: always kept; dossier and issue lifecycle judge the published book
+    # B33: issue lifecycle (explicit, rechecked state per open issue) and exam-item mapping audit
+    from . import issue_lifecycle as _il, exam_mapping as _xm
+    try:
+        life = _il.evaluate(chapter_dir, book, elements=_il.element_pages(manifest), gate_codes=_il.final_gate_codes(chapter_dir, plan))
+        life['exam_mapping_audit'] = _xm.audit(json.loads((chapter_dir / 'content_ast.json').read_text(encoding='utf-8')).get('open_issues') or [],
+                                               plan or {}, manifest or {}, chapter_dir.name) if plan and plan.get('chapters') else []
+        write_json(pub / 'issue_lifecycle.json', life)
+        report['issue_lifecycle'] = {k: life[k] for k in ('total', 'counts', 'gate', 'open_blockers')}
+    except (ValueError, KeyError, StopIteration) as e:
+        report['issue_lifecycle'] = {'gate': 'NOT_EVALUATED', 'error': f'{type(e).__name__}: {e}'}
+    report['regression_guard'] = regression_guard(chapter_dir, report, book)
     write_json(pub / 'publish_report.json', report)
     return report
 

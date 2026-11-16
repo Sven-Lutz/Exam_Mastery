@@ -10,6 +10,8 @@ nothing is invented here. Kinds registered into figures_svg.RENDER:
   flow         vertical algorithm / decision flow with loop-back arrow
   loop         two-actor interaction loop (agent-environment, controller-plant, producer-consumer)
   stems        stem plot of one or more weight sequences (discount weights, probabilities, kernels)
+  timeline     one or more step sequences (states/events with per-step values, end markers, open ends): episodes vs.
+               continuing tasks, cash-flow streams, process stages
 
 Colour carries meaning only together with text: every value is printed, every arrow is labelled or listed in the
 legend, and line styles differ between series.
@@ -124,7 +126,8 @@ def state_graph(spec):
         stroke = T['coral'] if n.get('highlight') else (T['petrol'] if k == 'state' else MUTED)
         dash = ' stroke-dasharray="4 3"' if k == 'terminal' else ''
         body.append(f'<circle cx="{n["x"]}" cy="{n["y"]}" r="30" fill="{fill}" stroke="{stroke}" stroke-width="{3 if n.get("highlight") else 2}"{dash}/>')
-        body.append(_t(n['x'], n['y'] + (0 if n.get('sub') else 5), n['label'], 14, weight=700, fill=T['navy']))
+        fs = max(10.5, min(14.0, 52 / (0.6 * max(1, len(str(n['label']))))))       # long labels shrink to fit the node, never below 10.5
+        body.append(_t(n['x'], n['y'] + (0 if n.get('sub') else 5), n['label'], round(fs, 1), weight=700, fill=T['navy']))
         if n.get('sub'):
             body.append(_t(n['x'], n['y'] + 15, n['sub'], 10.5, fill=MUTED))
     body.extend(_legend(spec.get('legend'), 14, H - 10, W))
@@ -439,8 +442,46 @@ def convergence(spec):
     return _svg(W, H, ''.join(body), spec.get('title', 'Konvergenz'))
 
 
+def timeline(spec):
+    """{'rows': [{'label','color','steps': [{'label','value','weight','kind': step|end|more}],'note'}],'title','w','value_label','weight_label'}
+    Each row is a sequence of steps left to right. 'end' draws a double-ringed terminal node, 'more' an open ellipsis
+    with an arrow (sequence continues without end). Values (e.g. rewards) are printed above, weights below."""
+    rows = spec['rows']; W = spec.get('w', 660); L = 150; step_w = (W - L - 30) / max(len(r['steps']) for r in rows)
+    rh = 112; H = 26 + rh * len(rows) + 10
+    body = []
+    for ri, r in enumerate(rows):
+        y = 26 + ri * rh + 52; c = COLORS.get(r.get('color', 'petrol'), T['petrol'])
+        body.append(_lines(12, y - 26, _wrap(r['label'], 20), 12.5, 15, anchor='start', weight=700, fill=c))
+        if r.get('note'):
+            body.append(_lines(12, y + 6, _wrap(r['note'], 24), 10.5, 13, anchor='start', fill=MUTED))
+        xs = [L + step_w * (i + .5) for i in range(len(r['steps']))]
+        for i, (x, st) in enumerate(zip(xs, r['steps'])):
+            if i:
+                body.append(f'<line x1="{xs[i - 1] + 17:.1f}" y1="{y}" x2="{x - 19:.1f}" y2="{y}" stroke="{c}" stroke-width="1.6" marker-end="url(#ah-ink)"/>')
+            k = st.get('kind', 'step')
+            if k == 'more':
+                body.append(_t(x, y + 5, '…', 20, weight=700, fill=c))
+                body.append(f'<line x1="{x + 12:.1f}" y1="{y}" x2="{x + step_w * .45:.1f}" y2="{y}" stroke="{c}" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#ah-ink)"/>')
+            else:
+                body.append(f'<circle cx="{x:.1f}" cy="{y}" r="16" fill="{T["paper"]}" stroke="{c}" stroke-width="2"/>')
+                if k == 'end':
+                    body.append(f'<circle cx="{x:.1f}" cy="{y}" r="12" fill="{T.get(r.get("color", "petrol") + "_l", T["wash"])}" stroke="{c}" stroke-width="1.4"/>')
+                if k == 'end':                    # terminal: label under the double ring (it does not fit inside)
+                    body.append(_t(x, y + 33, st.get('label', ''), 10.5, weight=600, fill=c))
+                else:
+                    body.append(_t(x, y + 4.5, st.get('label', ''), 11.5, weight=600))
+            if st.get('value') is not None:
+                body.append(_t(x, y - 24, st['value'], 11.5, fill=INK, weight=600))
+            if st.get('weight') is not None:
+                body.append(_t(x, y + 33, st['weight'], 10.5, fill=MUTED))
+    leg = [x for x in (spec.get('value_label') and f"oben: {spec['value_label']}", spec.get('weight_label') and f"unten: {spec['weight_label']}") if x]
+    if leg:
+        body.append(_t(W - 10, H - 6, ' · '.join(leg), 10.5, anchor='end', fill=MUTED))
+    return _svg(W, H, ''.join(body), spec.get('title', 'Zeitleiste'))
+
+
 KINDS = {'convergence': convergence, 'state_graph': state_graph, 'backup_tree': backup_tree, 'grid_world': grid_world, 'panels': panels,
-         'regime_line': regime_line, 'flow': flow, 'loop': loop, 'stems': stems}
+         'regime_line': regime_line, 'flow': flow, 'loop': loop, 'stems': stems, 'timeline': timeline}
 
 
 def register(render_table):

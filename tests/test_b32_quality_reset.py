@@ -146,3 +146,98 @@ class TokenDrift(unittest.TestCase):
         for name in ('navy', 'petrol', 'blue', 'gold', 'coral', 'green', 'violet'):
             self.assertIn(T.TOKENS[name].upper(), src, name)
         self.assertNotIn('#A8781E', src)                    # the old, too light gold (3.9:1 on white) must not come back
+
+
+# ---------------------------------------------------------------- B33
+def _book(text='Living reward erklärt', fig='f-a', kc='kc-1', items=('i1',)):
+    return {'sections': [{'title': 'S', 'blocks': [{'type': 'text', 'md': text}, {'type': 'figure', 'id': fig},
+                                                   {'type': 'example', 'title': 'Bsp', 'kc_ids': [kc]}]}],
+            'stages': [{'title': 'St', 'items': [{'id': i, 'prompt': 'p', 'solution': {'answer': 'a'}} for i in items]}],
+            'exam': {}, 'cards': [], 'figures': {}}
+
+
+class IssueLifecycle(unittest.TestCase):
+    def run_ast(self, issues, decisions, book):
+        from exam_mastery import issue_lifecycle as IL
+        with tempfile.TemporaryDirectory() as td:
+            ch = Path(td) / 'run' / 'chapters' / 'ch-x'; ch.mkdir(parents=True)
+            (ch / 'content_ast.json').write_text(json.dumps({'open_issues': issues}))
+            return IL.evaluate(ch, book, decisions=dict({'schema': IL.SCHEMA, 'decisions': {}, 'rules': []}, **decisions),
+                               elements={'e1': ('src-a', 4), 'e2': ('src-b', 9)}, gate_codes=set())
+
+    def test_states_rechecks_duplicates_and_gate(self):
+        iss = [{'issue_id': 'a', 'code': 'ESSENTIAL_VISUAL_UNRESOLVED', 'severity': 'blocker', 'element_ids': ['e1'], 'detail': 'd'},
+               {'issue_id': 'b', 'code': 'ESSENTIAL_VISUAL_UNRESOLVED', 'severity': 'blocker', 'element_ids': ['e1'], 'detail': 'd'},
+               {'issue_id': 'c', 'code': 'VISUAL_REVIEW_PENDING', 'element_ids': ['e2'], 'detail': 'x'},
+               {'issue_id': 'd', 'code': 'NOTE', 'object_id': 'o', 'detail': 'y'}]
+        dec = {'rules': [{'codes': ['ESSENTIAL_VISUAL_UNRESOLVED'], 'pages': [['src-a', 4]], 'state': 'RESOLVED', 'recheck': {'kind': 'figure_in_book', 'figures': ['f-a']}},
+                         {'codes': ['VISUAL_REVIEW_PENDING'], 'source_not': 'src-a', 'state': 'REASSIGNED', 'reason': 'other lecture'}],
+               'decisions': {'d': {'state': 'ACCEPTED_RISK', 'reason': 'documented'}}}
+        r = self.run_ast(iss, dec, _book())
+        st = {x['issue_id']: x['state'] for x in r['issues']}
+        self.assertEqual(st, {'a': 'RESOLVED', 'b': 'DUPLICATE', 'c': 'REASSIGNED', 'd': 'ACCEPTED_RISK'})
+        self.assertEqual(r['gate'], 'PASS')
+        # regression: the figure disappears from the book -> the blocker re-opens and the gate blocks
+        r = self.run_ast(iss, dec, _book(fig='f-other'))
+        self.assertEqual({x['issue_id']: x['state'] for x in r['issues']}['a'], 'OPEN')
+        self.assertEqual(r['gate'], 'BLOCKED')
+
+    def test_reason_required_and_kc_example_recheck(self):
+        iss = [{'issue_id': 'a', 'code': 'X', 'object_id': 'o1', 'detail': ''}, {'issue_id': 'b', 'code': 'Y', 'object_id': 'o2', 'detail': ''}]
+        dec = {'decisions': {'a': {'state': 'NOT_APPLICABLE'}, 'b': {'state': 'RESOLVED', 'recheck': {'kind': 'kc_worked_example', 'kc': 'kc-9'}}}}
+        r = self.run_ast(iss, dec, _book())
+        self.assertEqual([x['state'] for x in r['issues']], ['OPEN', 'OPEN'])
+        self.assertIn('without a reason', r['issues'][0]['recheck_failed'])
+
+
+class ExamMapping(unittest.TestCase):
+    def test_classes(self):
+        from exam_mastery.exam_mapping import classify
+        vocab = {'discount', 'corridor', 'bellman', 'iteration', 'optimal'}
+        self.assertEqual(classify('Does it Work?', 's1', '', {'s0'}, {}, vocab)[0], 'NOT_AN_ASSESSMENT')
+        self.assertEqual(classify('Q: What does DQN become for C to infinity?', 's2', '', {'s0'}, {'s2': 'ch-dqn'}, vocab)[0], 'OTHER_CHAPTER_SOURCE')
+        c, ev = classify('Solve for the discount such that left and right are equally good in the corridor (optimal)?', 'tut', 'Example Exam Questions Q2',
+                         {'s0'}, {}, vocab)
+        self.assertEqual(c, 'CANDIDATE_FOR_CHAPTER'); self.assertTrue(ev['example_exam'])
+        self.assertEqual(classify('a) What is the benefit of the minimum in SAC?', 'tut', 'Example Exam Questions Q4', {'s0'}, {}, vocab)[0], 'PRACTICE_OTHER_TOPIC')
+
+
+class PageAuditAndGuard(unittest.TestCase):
+    def test_monotone_text_stretch_is_found_only_in_the_core(self):
+        import pymupdf
+        from exam_mastery.chapter_publish import _layout_lint
+        with tempfile.TemporaryDirectory() as td:
+            doc = pymupdf.open()
+            kinds = 'cFtttFtt'                      # cover, figure page, 3 text pages, figure page, back matter
+            for k in kinds:
+                pg = doc.new_page()
+                pg.insert_text((72, 72), 'Text ' * 200 if k != 'F' else 'Abbildung 3.1 Ein Diagramm')
+            doc.save(Path(td) / '1_Lehrbuch.pdf')
+            (Path(td) / '..1_Lehrbuch.main.layout_lint.json').write_text(json.dumps({'inline_math_reflowed': [], 'overflow': [], 'broken_images': []}))
+            r = _layout_lint(td, '1_Lehrbuch')
+            self.assertEqual(r['page_audit']['monotone_runs'], [[3, 4, 5]])
+            self.assertEqual(r['status'], 'WARN')
+
+    def test_regression_guard_ratchet(self):
+        from exam_mastery.chapter_publish import regression_guard
+        rep = lambda fails: {'numeric_checks': {'counts': {'FAIL': fails}}, 'documents': {}, 'products': {'anki': {'cards': 10}}}
+        with tempfile.TemporaryDirectory() as td:
+            ch = Path(td) / 'course' / 'run' / 'chapters' / 'ch-x'; ch.mkdir(parents=True)
+            self.assertEqual(regression_guard(ch, rep(0), _book())['status'], 'BASELINE_CREATED')
+            self.assertEqual(regression_guard(ch, rep(0), _book())['status'], 'PASS')
+            r = regression_guard(ch, rep(2), _book())
+            self.assertEqual(r['status'], 'FAIL'); self.assertEqual(r['regressions'], {'numeric_fail': [0, 2]})
+            self.assertEqual(regression_guard(ch, rep(2), _book())['status'], 'FAIL')     # baseline was not lowered
+
+
+class B33Figures(unittest.TestCase):
+    def test_timeline_marks_end_and_open_continuation(self):
+        svg = K.timeline({'title': 'Episoden', 'rows': [{'label': 'episodisch', 'steps': [{'label': 's0', 'value': '0'}, {'label': 'Ende', 'kind': 'end'}]},
+                                                        {'label': 'fortlaufend', 'steps': [{'label': 's0', 'value': '+1', 'weight': '1'}, {'kind': 'more'}]}]})
+        ET.fromstring(svg)
+        self.assertIn('Ende', svg); self.assertIn('…', svg); self.assertIn('stroke-dasharray', svg)
+
+    def test_studio_has_comparison_mode(self):
+        html = MS.page([MS.validate(json.loads(json.dumps(TOY)))], 'Studio', 'Kurs')
+        self.assertIn("['compare', 'VI vs. PI']", html)
+        self.assertIn('place(', html)                        # label collision avoidance in the graph

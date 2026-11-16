@@ -281,6 +281,7 @@ tr.neg td.num{color:var(--coral)}
 .part{break-before:page}.part>.ph{background:var(--navy);color:#fff;font-family:var(--sans);padding:6mm 7mm;margin-bottom:6mm}
 .part>.ph .k{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;opacity:.8}.part>.ph h2{color:#fff;border:none;margin:.2em 0 0;break-before:auto}
 .rub td:last-child,.rub th:last-child{text-align:right;width:5em;white-space:nowrap;hyphens:none}
+.evid{font-family:var(--sans);font-size:.78rem;color:var(--gold);border-left:3px solid var(--gold);padding:.1em .6em;margin:.2em 0 .5em}
 .hint{font-family:var(--sans);font-size:.85rem;color:var(--muted)}
 .alt{border-left:3px solid var(--blue);padding-left:.8em;margin:.6em 0}
 .examhead{border:2px solid var(--navy);padding:.7em 1em;font-family:var(--sans);margin-bottom:1.2em}
@@ -536,7 +537,10 @@ def _item_html(d, it, solution=False, space=True, exam=False):
     meta = ([] if exam or it.get('stage_label') in ('exam', 'recall', 'guided', 'standard', 'transfer') else [it.get('stage_label', '')]) + ([f'≈ {it["minutes"]:g} Min.'] if it.get('minutes') else []) + ([f'{it["points"]:g} P.'] if it.get('points') else [])
     op = OPS.get(it.get('operation') or '', '')
     h = (f'<div class="item" id="{E(it["id"])}"><div class="head"><span class="id">{"Aufgabe " + E(it["no"])}{(" · " + inline(it["title"])) if it.get("title") else ""}</span>'
-         f'<span class="meta">{f"<span class=op>{E(op)}</span>" if op else ""}{E(" · ".join(x for x in meta if x))}</span></div>{md(it["prompt"])}')
+         f'<span class="meta">{f"<span class=op>{E(op)}</span>" if op else ""}{E(" · ".join(x for x in meta if x))}</span></div>'
+         # B33: provenance of the task itself (official exam evidence vs. author-created practice) is printed, not only stored
+         + (f'<p class="evid"><b>Offizielle Beispielfrage</b> · {inline(it.get("source_note") or "")}</p>' if it.get('evidence') == 'OFFICIAL_EXAM_EVIDENCE' else '')
+         + md(it["prompt"]))
     if it.get('figure'):
         h += d.figure({'id': it['figure']})
     if it.get('table'):

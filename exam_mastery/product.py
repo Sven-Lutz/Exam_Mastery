@@ -192,7 +192,10 @@ def deliver_chapter(chapter_dir, target, dossier=None, label=None):
     if not (art / '1_Lehrbuch.pdf').exists():
         return None
     target.mkdir(parents=True, exist_ok=True)
-    for f in sorted(art.glob('[0-9]_*.pdf')) + [art / 'kapitel.html', art / 'kompetenzmatrix.csv']:
+    # B33: the learner HTML is the typeset textbook (same book model as the PDF, incl. edition); kapitel.html is an
+    # internal AST overview without edition and is no longer delivered to learners
+    html = art / '1_Lehrbuch.html' if (art / '1_Lehrbuch.html').exists() else art / 'kapitel.html'
+    for f in sorted(art.glob('[0-9]_*.pdf')) + sorted(art.glob('[0-9]_*.html')) + ([] if html.name.startswith('1_') else [html]) + [art / 'kompetenzmatrix.csv']:
         if f.exists():
             shutil.copy2(f, target / f.name)
     for sub in ('assets', 'math', 'Lernumgebung', 'anki'):
@@ -208,7 +211,7 @@ def deliver_chapter(chapter_dir, target, dossier=None, label=None):
              '| Prüfdimension | Ergebnis |', '|---|---|'] + [f'| {k} | {v["status"]} |' for k, v in d.items()] + ['',
              'PASS = maschinelle Prüfung bestanden; NOT_TESTED = nicht prüfbar ohne unabhängige Fachprüfung; FAIL = Lücke, siehe unten.', '',
              '## Dateien'] + [f'- `{f.name}` ({_pages(f)} Seiten)' + (f': {DOC_NOTE[f.name]}' if f.name in DOC_NOTE else '') for f in sorted(target.glob('[0-9]_*.pdf'))] + [
-             '- `kapitel.html`: Lehrbuch als Webseite (mit Formeln)'] + (['- `Lernumgebung/index.html`: interaktive Labs, offline im Browser'] if (target / 'Lernumgebung' / 'index.html').exists() else []) + [
+             ('- `1_Lehrbuch.html`: Lehrbuch als Webseite (identischer Inhalt wie das PDF)' if (target / '1_Lehrbuch.html').exists() else '- `kapitel.html`: Lehrbuch als Webseite (mit Formeln)')] + (['- `Lernumgebung/index.html`: interaktive Labs, offline im Browser'] if (target / 'Lernumgebung' / 'index.html').exists() else []) + [
              f'- `{f.name}`: Anki-Deck' for f in sorted(target.glob('*.apkg'))] + ['',
              '## Offene Punkte',
              f"- Gelehrt und geübt: {cov.get('produced', 0) - len(cov.get('content_gaps') or [])} von {cov.get('produced', 0)} produzierten Kompetenzen; "
