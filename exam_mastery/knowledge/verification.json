@@ -684,6 +684,87 @@
    "url": "https://www.epo.org/en/legal/guidelines-epc/2026/g_vii_5.html",
    "accessed": "2026-11-13",
    "abstract_stored": false
+  },
+  "ye2011": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED",
+   "checked_on": "2026-11-16",
+   "method": "abstract_read (Crossref)"
+  },
+  "putermanshin1978": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED",
+   "checked_on": "2026-11-16",
+   "method": "abstract_read (Crossref)"
+  },
+  "mnih2015": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED",
+   "checked_on": "2026-11-16",
+   "method": "abstract_read (PubMed 25719670)"
+  },
+  "tamar2016": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED",
+   "checked_on": "2026-11-16",
+   "method": "abstract_read (arXiv)"
+  },
+  "silver2018": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED",
+   "checked_on": "2026-11-16",
+   "method": "editor_summary_read (Crossref)"
+  },
+  "littman1995": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED",
+   "checked_on": "2026-11-16",
+   "method": "abstract_read (arXiv)"
+  },
+  "puterman1994": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "METADATA_ONLY",
+   "checked_on": "2026-11-16",
+   "method": "metadata (Crossref)"
+  },
+  "bellman1957mdp": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "METADATA_ONLY",
+   "checked_on": "2026-11-16",
+   "method": "metadata (Crossref)"
+  },
+  "singhyee1994": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "CONTENT_NOT_ACCESSIBLE",
+   "checked_on": "2026-11-16",
+   "method": "metadata (Crossref); full text not accessible"
   }
  },
  "claim_snippets": {
@@ -996,6 +1077,68 @@
    {
     "source": "black1998",
     "snippet": "yield substantial learning gains",
+    "found_in_abstract": true
+   }
+  ],
+  "rl.ye2011": [
+   {
+    "source": "ye2011",
+    "snippet": "policy-iteration method",
+    "found_in_abstract": true
+   },
+   {
+    "source": "ye2011",
+    "snippet": "strongly polynomial-time algorithms for solving the markov decision problem (mdp) with a fixed discount rate",
+    "found_in_abstract": true
+   }
+  ],
+  "rl.putermanshin1978": [
+   {
+    "source": "putermanshin1978",
+    "snippet": "these correspond to performing policy evaluation by successive approximations",
+    "found_in_abstract": true
+   },
+   {
+    "source": "putermanshin1978",
+    "snippet": "converge at least as quickly as successive approximations",
+    "found_in_abstract": true
+   }
+  ],
+  "rl.mnih2015": [
+   {
+    "source": "mnih2015",
+    "snippet": "receiving only the pixels and the game score as inputs",
+    "found_in_abstract": true
+   },
+   {
+    "source": "mnih2015",
+    "snippet": "across a set of 49 games",
+    "found_in_abstract": true
+   }
+  ],
+  "rl.tamar2016": [
+   {
+    "source": "tamar2016",
+    "snippet": "differentiable approximation of the value-iteration algorithm",
+    "found_in_abstract": true
+   },
+   {
+    "source": "tamar2016",
+    "snippet": "trained end-to-end using standard backpropagation",
+    "found_in_abstract": true
+   }
+  ],
+  "rl.silver2018": [
+   {
+    "source": "silver2018",
+    "snippet": "alphazero, which taught itself to play go, chess, and shogi",
+    "found_in_abstract": true
+   }
+  ],
+  "rl.littman1995": [
+   {
+    "source": "littman1995",
+    "snippet": "although mdps can be solved efficiently in theory, more study is needed to reveal practical algorithms for solving large problems quickly",
     "found_in_abstract": true
    }
   ]

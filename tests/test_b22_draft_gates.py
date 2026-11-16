@@ -65,7 +65,9 @@ def test_equation_checker_ignores_fragments_but_keeps_real_errors():
     from exam_mastery.numeric_checks import equations
     ok = lambda t: [(e, s, good) for e, s, _, good in equations(t)]
     # fragments of correct computations are not recomputed on their own (were false FAILs before B22)
-    assert ok('\\(V_2(H) = 2 + 0.5(0.7 \\cdot 2 + 0.3 \\cdot 0) = 2.7\\)') == []
+    # B33: an implicit-product Bellman backup is checked as ONE computation (not dropped, not cut into fragments)
+    assert ok('\\(V_2(H) = 2 + 0.5(0.7 \\cdot 2 + 0.3 \\cdot 0) = 2.7\\)') == [('2 + 0.5*(0.7 * 2 + 0.3 * 0)', '2.7', True)]
+    assert ok('\\(V_2(H) = 2 + 0.5(0.7 \\cdot 2 + 0.3 \\cdot 0) = 2.9\\)') == [('2 + 0.5*(0.7 * 2 + 0.3 * 0)', '2.9', False)]
     assert ok('\\(V(H)(1 - 0.63 - 0.243) = 2\\)') == []
     assert ok('Probe: \\(0.5^3 \\cdot 8 = 1 = 0.5 \\cdot 2\\)') == []
     # in a chain only complete links are checked

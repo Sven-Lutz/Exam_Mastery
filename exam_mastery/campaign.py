@@ -17,8 +17,8 @@ import os
 from pathlib import Path
 
 E = lambda s: html.escape(str(s), quote=True)
-PRODUCTS = [('1_Lehrbuch.pdf', 'Lehrbuch'), ('2_Arbeitsbuch.pdf', 'Arbeitsbuch'), ('3_Musterloesungen.pdf', 'Musterlösungen'),
-            ('4_Probeklausur.pdf', 'Probeklausur'), ('5_Probeklausur_Loesungen.pdf', 'Probeklausur – Lösungen'),
+PRODUCTS = [('1_Lehrbuch.pdf', 'Lehrbuch'), ('2_Arbeitsbuch.pdf', 'Arbeitsbuch'), ('3_Probeklausur_einzeln.pdf', 'Probeklausur (Einzelheft)'),
+
             ('Anki_Karten.apkg', 'Anki-Deck'), ('Lernumgebung/index.html', 'Lernumgebung'),
             ('6_Quellenabbildungen.pdf', 'Quellenabbildungen')]
 DIM = {'rendering': 'Rendering', 'formulas_and_figures': 'Formeln & Abbildungen', 'anki': 'Anki', 'coverage': 'Kompetenzabdeckung',

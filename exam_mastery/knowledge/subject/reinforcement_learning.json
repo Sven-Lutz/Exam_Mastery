@@ -1,10 +1,131 @@
-{"schema": "em-subject-sources-v1", "subject": "reinforcement_learning", "version": "1.0.0", "date": "2026-11-16",
- "keywords": ["markov decision", "mdp", "bellman", "value iteration", "policy iteration", "reinforcement learning", "wertiteration", "policy evaluation"],
+{
+ "schema": "em-subject-sources-v1",
+ "subject": "reinforcement_learning",
+ "version": "1.1.0",
+ "date": "2026-11-16",
+ "keywords": [
+  "markov decision",
+  "mdp",
+  "bellman",
+  "value iteration",
+  "policy iteration",
+  "reinforcement learning",
+  "wertiteration",
+  "policy evaluation"
+ ],
  "note": "'access' = what was actually checked in session 2026-11-16. Standard mathematical results (Bellman equations, contraction) are textbook knowledge; no verbatim copying.",
  "sources": [
-  {"id": "silver2015", "kind": "lecture_notes", "cite": "Silver, D. (2015). Reinforcement Learning, Lecture 2: Markov Decision Processes; Lecture 3: Planning by Dynamic Programming. COMPM050/COMPGI13. https://davidstarsilver.wordpress.com/teaching/ (CC-BY-NC 4.0).", "year": 2015, "access": "course_page_verified", "use": "Weiterführende Lektüre; Gliederung (MDP -> DP-Planung). Keine Folien kopieren."},
-  {"id": "cs188_mdp", "kind": "open_course_notes", "cite": "Sharma, N. (2024). MDPs (Kap. 4: Markov Decision Processes, Solving MDPs, Value Iteration, Policy Iteration). CS 188 Introduction to Artificial Intelligence, UC Berkeley. https://inst.eecs.berkeley.edu/~cs188/textbook/mdp/", "year": 2024, "access": "toc_verified", "use": "Weiterführende Lektüre zu Value/Policy Iteration."},
-  {"id": "suttonbarto2018", "kind": "textbook", "cite": "Sutton, R. S., & Barto, A. G. (2018). Reinforcement Learning: An Introduction (2nd ed.). MIT Press.", "year": 2018, "access": "metadata", "use": "Nur als Standardliteratur nennen; keine Seiten-/Abschnittszitate (Online-Fassung in dieser Sitzung nicht abrufbar: TLS-Fehler)."},
-  {"id": "bellman1957", "kind": "monograph", "cite": "Bellman, R. (1957). Dynamic Programming. Princeton University Press.", "year": 1957, "access": "metadata", "use": "Historischer Ursprung des Optimalitätsprinzips; nur Nennung."},
-  {"id": "howard1960", "kind": "monograph", "cite": "Howard, R. A. (1960). Dynamic Programming and Markov Processes. MIT Press.", "year": 1960, "access": "metadata", "use": "Historischer Ursprung der Policy Iteration; nur Nennung."}
- ]}
+  {
+   "id": "silver2015",
+   "kind": "lecture_notes",
+   "cite": "Silver, D. (2015). Reinforcement Learning, Lecture 2: Markov Decision Processes; Lecture 3: Planning by Dynamic Programming. COMPM050/COMPGI13. https://davidstarsilver.wordpress.com/teaching/ (CC-BY-NC 4.0).",
+   "year": 2015,
+   "access": "course_page_verified",
+   "use": "Weiterführende Lektüre; Gliederung (MDP -> DP-Planung). Keine Folien kopieren."
+  },
+  {
+   "id": "cs188_mdp",
+   "kind": "open_course_notes",
+   "cite": "Sharma, N. (2024). MDPs (Kap. 4: Markov Decision Processes, Solving MDPs, Value Iteration, Policy Iteration). CS 188 Introduction to Artificial Intelligence, UC Berkeley. https://inst.eecs.berkeley.edu/~cs188/textbook/mdp/",
+   "year": 2024,
+   "access": "toc_verified",
+   "use": "Weiterführende Lektüre zu Value/Policy Iteration."
+  },
+  {
+   "id": "suttonbarto2018",
+   "kind": "textbook",
+   "cite": "Sutton, R. S., & Barto, A. G. (2018). Reinforcement Learning: An Introduction (2nd ed.). MIT Press.",
+   "year": 2018,
+   "access": "metadata",
+   "use": "Nur als Standardliteratur nennen; keine Seiten-/Abschnittszitate (Online-Fassung in dieser Sitzung nicht abrufbar: TLS-Fehler)."
+  },
+  {
+   "id": "bellman1957",
+   "kind": "monograph",
+   "cite": "Bellman, R. (1957). Dynamic Programming. Princeton University Press.",
+   "year": 1957,
+   "access": "metadata",
+   "use": "Historischer Ursprung des Optimalitätsprinzips; nur Nennung."
+  },
+  {
+   "id": "howard1960",
+   "kind": "monograph",
+   "cite": "Howard, R. A. (1960). Dynamic Programming and Markov Processes. MIT Press.",
+   "year": 1960,
+   "access": "metadata",
+   "use": "Historischer Ursprung der Policy Iteration; nur Nennung."
+  },
+  {
+   "id": "ye2011",
+   "kind": "journal_article",
+   "cite": "Ye, Y. (2011). The simplex and policy-iteration methods are strongly polynomial for the Markov decision problem with a fixed discount rate. Mathematics of Operations Research, 36(4), 593–603. https://doi.org/10.1287/moor.1110.0516",
+   "year": 2011,
+   "access": "abstract_read (Crossref)",
+   "use": "Komplexität exakter DP: Policy Iteration ist bei festem Diskont stark polynomiell."
+  },
+  {
+   "id": "putermanshin1978",
+   "kind": "journal_article",
+   "cite": "Puterman, M. L., & Shin, M. C. (1978). Modified policy iteration algorithms for discounted Markov decision problems. Management Science, 24(11), 1127–1137. https://doi.org/10.1287/mnsc.24.11.1127",
+   "year": 1978,
+   "access": "abstract_read (Crossref)",
+   "use": "Modifizierte Policy Iteration (teilweise Bewertung), Konvergenz und Einsatzbereich."
+  },
+  {
+   "id": "mnih2015",
+   "kind": "journal_article",
+   "cite": "Mnih, V., Kavukcuoglu, K., Silver, D., et al. (2015). Human-level control through deep reinforcement learning. Nature, 518(7540), 529–533. https://doi.org/10.1038/nature14236",
+   "year": 2015,
+   "access": "abstract_read (PubMed 25719670)",
+   "use": "Approximation: Q-Funktion als tiefes Netz, gelernt aus Pixeln; Brücke von exakter DP zu Deep RL."
+  },
+  {
+   "id": "tamar2016",
+   "kind": "conference_paper",
+   "cite": "Tamar, A., Wu, Y., Thomas, G., Levine, S., & Abbeel, P. (2016). Value Iteration Networks. Advances in Neural Information Processing Systems 29, 2154–2162. arXiv:1602.02867",
+   "year": 2016,
+   "access": "abstract_read (arXiv)",
+   "use": "Wertiteration als differenzierbares Faltungsnetz (Planungsmodul)."
+  },
+  {
+   "id": "silver2018",
+   "kind": "journal_article",
+   "cite": "Silver, D., Hubert, T., Schrittwieser, J., et al. (2018). A general reinforcement learning algorithm that masters chess, shogi, and Go through self-play. Science, 362(6419), 1140–1144. https://doi.org/10.1126/science.aar6404",
+   "year": 2018,
+   "access": "editor_summary_read (Crossref)",
+   "use": "Ein Algorithmus lernt drei Spiele durch Selbstspiel; Einordnung als GPI ist eigene Interpretation."
+  },
+  {
+   "id": "littman1995",
+   "kind": "conference_paper",
+   "cite": "Littman, M. L., Dean, T. L., & Kaelbling, L. P. (1995). On the complexity of solving Markov decision problems. Proceedings of UAI 1995, 394–402. arXiv:1302.4971",
+   "year": 1995,
+   "access": "abstract_read (arXiv)",
+   "use": "Theoretisch effizient lösbar, praktisch für große Probleme offen."
+  },
+  {
+   "id": "puterman1994",
+   "kind": "textbook",
+   "cite": "Puterman, M. L. (1994). Markov Decision Processes: Discrete Stochastic Dynamic Programming. Wiley. https://doi.org/10.1002/9780470316887",
+   "year": 1994,
+   "access": "metadata (Crossref)",
+   "use": "Standardreferenz endlicher MDPs; nur Nennung, Inhalt nicht im Detail geprüft."
+  },
+  {
+   "id": "bellman1957mdp",
+   "kind": "journal_article",
+   "cite": "Bellman, R. (1957). A Markovian decision process. Journal of Mathematics and Mechanics, 6(5), 679–684. https://doi.org/10.1512/iumj.1957.6.56038",
+   "year": 1957,
+   "access": "metadata (Crossref)",
+   "use": "Historischer Ursprung des Begriffs; nur Nennung."
+  },
+  {
+   "id": "singhyee1994",
+   "kind": "journal_article",
+   "cite": "Singh, S. P., & Yee, R. C. (1994). An upper bound on the loss from approximate optimal-value functions. Machine Learning, 16, 227–233. https://doi.org/10.1007/BF00993308",
+   "year": 1994,
+   "access": "metadata (Crossref); full text not accessible",
+   "use": "Nicht inhaltlich zitieren (Text nicht eingesehen)."
+  }
+ ]
+}

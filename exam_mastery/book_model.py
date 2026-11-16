@@ -14,8 +14,8 @@ import re
 
 from .anki_v2 import card_lint, slug
 
-PROV = {'COURSE_SOURCE': 'course', 'VERIFIED_SUPPLEMENT': 'supplement', 'AUTHOR_INFERENCE': 'interpretation',
-        'DIDACTIC_EXAMPLE': 'didactic', 'UNCONFIRMED': 'unconfirmed'}
+PROV = {'COURSE_SOURCE': 'course', 'SOURCE_PARAPHRASE': 'course', 'EXAM_ADAPTED': 'course', 'VERIFIED_SUPPLEMENT': 'supplement',
+        'AUTHOR_INFERENCE': 'interpretation', 'AUTHOR_CREATED': 'didactic', 'DIDACTIC_EXAMPLE': 'didactic', 'UNCONFIRMED': 'unconfirmed'}
 STAGES = [('recall', 1, 'Grundverständnis'), ('guided', 2, 'Geführte Anwendung'), ('standard', 3, 'Selbstständige Anwendung'),
           ('transfer', 4, 'Transfer'), ('exam', 5, 'Klausurtraining')]
 EXAMPLE_KINDS = {'WORKED_EXAMPLE', 'CALCULATION', 'DERIVATION', 'PROOF', 'SUBSUMPTION', 'ALGORITHM'}

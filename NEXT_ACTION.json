@@ -12,7 +12,9 @@
     "nlp_reference_unit_v5": "HUMAN_REJECTED (owner review received 2026-11-15; no further v5 review needed)",
     "nlp_reference_unit_v6": "HUMAN_REVIEW_PENDING (Issue #9; docs/cross_domain/V6_REPORT.md); no self-release",
     "v6": "HUMAN_REJECTED (v6.1, Issue #10, mean 8/6 = 1.333/4)",
-    "v7": "v7.1 (cd438a9): GitHub CI green (runs 43732994556, 43732999492); CONTENT_CORRECTNESS/DIDACTIC/PUBLISHING review required; no self-release"
+    "v7": "v7.1 (cd438a9): GitHub CI green (runs 43732994556, 43732999492); CONTENT_CORRECTNESS/DIDACTIC/PUBLISHING review required; no self-release",
+    "rl_kap03_v1": "HUMAN_REJECTED (owner 1/5, 2026-11-16)",
+    "rl_kap03_v2": "TECHNICAL_PASS · PRODUCT_REVIEW_READY · HUMAN_REVIEW_PENDING (no self-release)"
   },
   "product": {
     "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
@@ -43,7 +45,7 @@
     "didactic quality",
     "Anki/textbook/workbook/exams improvements (open product requirement)"
   ],
-  "next_action": "SEE rl_pilot_2026_11_16: RL chapter published, awaiting owner review (HUMAN_REVIEW_PENDING).",
+  "next_action": "SEE rl_v2_2026_11_16: RL V2 review build packaged; awaiting owner review (HUMAN_REVIEW_PENDING). V1 = HUMAN_REJECTED (1/5).",
   "rl_pilot_2026_11_16": {
     "branch": "feat/rl-engine-pilot (from 6ebdf40; PR #3 untouched)",
     "engine_commit": "7b85869 B31 (on top of 98fb96e B30); installed from committed tree",
@@ -121,5 +123,17 @@
     "ent_funding": "modules/ent_funding -> ~/Exam_Mastery_Output/modules/ent_funding",
     "nlp": "build-unit units/nlp_sequence_labeling (adapter); tutor/ also in reference unit output"
   },
-  "priorities": "Issue #10: core study products + publication-grade lab first; tutor deferred (keep exports working, no new tutor work)"
+  "priorities": "Issue #10: core study products + publication-grade lab first; tutor deferred (keep exports working, no new tutor work)",
+  "rl_v2_2026_11_16": {
+    "branch": "feat/rl-engine-pilot",
+    "engine_work": "B32/B33: design tokens + editorial typeset components, figure_kit (9 generic SVG kinds), layout lint (inline-math reflow, overflow, sparse pages), wide figures, MDP Studio lab, subject lab routing, Anki render gate + card rules, Bellman numeric parser fix, dossier from published book with competency_evidence fields, workbook single product (solutions last)",
+    "run_dir": "~/Exam_Mastery_Output/course-a8fba2d65467/ch-20261116T120000Z-v2edition (copy of V1 run de894dce + edition; V1 run untouched)",
+    "edition": "~/Exam_Mastery_Output/course-a8fba2d65467/editions/ch-271642018f0467.json (built by editions/v2_build/make_edition.py; content authored by the agent, not by engine role calls)",
+    "reproduce": "cd ~/Exam_Mastery_Output/course-a8fba2d65467 && PYTHONPATH=<repo> python editions/v2_build/make_edition.py ch-20261116T085650Z-de894dce && python editions/v2_build/publish_v2.py ch-20261116T085650Z-de894dce ch-20261116T120000Z-v2edition",
+    "package": "~/Exam_Mastery_Output/rl_releases/RL_Kap03_OptimalDecisionMaking_v2_2026-11-16(.zip) with LIES_MICH.md, SHA256SUMS, docs/ACCEPTANCE_MATRIX.md",
+    "model_calls_used": "8/30 (unchanged; V2 used 0 paid provider calls)",
+    "open_findings": "see package docs/ACCEPTANCE_MATRIX.md (P1-1 no independent expert review; P2-1..P2-6; P3-1..P3-3)",
+    "engine_install": "installed venv still at committed tree 98fb96e; V2 was built with PYTHONPATH=<repo working tree>. Reinstall from the new commit before the next product run.",
+    "next_human_step": "Owner rates V2 per product (Lehrbuch, Arbeitsbuch, Anki, MDP-Studio) 1-5 per ACCEPTANCE_MATRIX section Owner-Review"
+  }
 }

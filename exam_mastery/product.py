@@ -168,9 +168,19 @@ def run_product(root, cfg=None, output_base=None, provider=None, only_chapter=No
 
 # ------------------------------------------------------------------ delivery folder (B7.4)
 
-DOC_NOTE = {'1_Lehrbuch.pdf': 'Lehrbuch', '2_Arbeitsbuch.pdf': 'Arbeitsbuch: Teile 1–5, integrierte Probeklausur, vollständige Lösungen am Ende', '3_Musterloesungen.pdf': 'Aufgaben mit Lösungen und Bewertung',
-            '4_Probeklausur.pdf': 'Probeklausur', '5_Probeklausur_Loesungen.pdf': 'Lösungen der Probeklausur',
+DOC_NOTE = {'1_Lehrbuch.pdf': 'Lehrbuch', '2_Arbeitsbuch.pdf': 'Arbeitsbuch: Übungsstufen, integrierte Probeklausur, vollständige Lösungen am Ende',
+            '3_Probeklausur_einzeln.pdf': 'Probeklausur als Einzelheft (identisch mit dem Klausurteil des Arbeitsbuchs, ohne Lösungen)',
             '6_Quellenabbildungen.pdf': 'Folien mit Abbildungen, mit Quelle, Seite und Auswertungsstatus'}
+
+
+def _pages(pdf):
+    """Measured page count of a delivered PDF (B32: the README states what the file really contains)."""
+    try:
+        import pymupdf
+        with pymupdf.open(pdf) as d:
+            return d.page_count
+    except Exception:
+        return '?'
 
 
 def deliver_chapter(chapter_dir, target, dossier=None, label=None):
@@ -197,7 +207,7 @@ def deliver_chapter(chapter_dir, target, dossier=None, label=None):
              '**Status: Vorschau (Preview). Modellgenerierter Entwurf, technisch geprüft, fachlich NICHT unabhängig validiert.**', '',
              '| Prüfdimension | Ergebnis |', '|---|---|'] + [f'| {k} | {v["status"]} |' for k, v in d.items()] + ['',
              'PASS = maschinelle Prüfung bestanden; NOT_TESTED = nicht prüfbar ohne unabhängige Fachprüfung; FAIL = Lücke, siehe unten.', '',
-             '## Dateien'] + [f'- `{f.name}`' + (f': {DOC_NOTE[f.name]}' if f.name in DOC_NOTE else '') for f in sorted(target.glob('[0-9]_*.pdf'))] + [
+             '## Dateien'] + [f'- `{f.name}` ({_pages(f)} Seiten)' + (f': {DOC_NOTE[f.name]}' if f.name in DOC_NOTE else '') for f in sorted(target.glob('[0-9]_*.pdf'))] + [
              '- `kapitel.html`: Lehrbuch als Webseite (mit Formeln)'] + (['- `Lernumgebung/index.html`: interaktive Labs, offline im Browser'] if (target / 'Lernumgebung' / 'index.html').exists() else []) + [
              f'- `{f.name}`: Anki-Deck' for f in sorted(target.glob('*.apkg'))] + ['',
              '## Offene Punkte',
@@ -245,7 +255,7 @@ def _evidenced(cov):
 
 # ------------------------------------------------------------------ quality dossier
 
-DIMENSIONS = ['coverage', 'subject_correctness', 'math_numeric', 'didactic_completeness', 'items_and_solutions',
+DIMENSIONS = ['coverage', 'competency_evidence', 'subject_correctness', 'math_numeric', 'didactic_completeness', 'items_and_solutions',
               'formulas_and_figures', 'anki', 'rendering']
 TECHNICAL = ['math_numeric', 'items_and_solutions', 'formulas_and_figures', 'anki', 'rendering']
 
@@ -419,6 +429,39 @@ def chapter_dossier(ch):
                                  'detail': f"rule set {sc.get('version')}: {sc.get('counts')}; failures: {[f['rule'] + ' ' + str(f['object']) for f in sc.get('fail', [])][:8]}; "
                                            f"review: {[f['rule'] + ' ' + str(f['object']) for f in sc.get('review', [])][:8]}" if sc else 'not checked'}
     nc = (pub or {}).get('numeric_checks') or {}
+    # B33: the dossier judges the PUBLISHED learner products (book model after errata + edition), not the raw AST, so it
+    # can never contradict the publish report (V1 showed 30 items / arithmetic NOT_TESTED while 34 items were typeset).
+    d['competency_evidence'] = {'status': 'NOT_TESTED', 'detail': 'no published book model (chapter not published)'}
+    bk_p = ch / 'publish' / 'book.json'
+    if bk_p.exists():
+        bk = json.loads(bk_p.read_text())
+        items = [i for st_ in bk.get('stages') or [] for i in st_['items']]
+        with_sol = [i for i in items if (i.get('solution') or {}).get('answer')]
+        d['items_and_solutions'] = {'status': 'FAIL' if not items or len(with_sol) != len(items) else d['items_and_solutions']['status'],
+                                    'detail': f"published workbook: {len(items)} items, {len(with_sol)} with a worked solution and answer; "
+                                              f"mock exam {len((bk.get('exam') or {}).get('items') or [])} items / {(bk.get('exam') or {}).get('total_points')} points; "
+                                              f"AST gates G1: {d['items_and_solutions']['status']}"}
+        cnt = nc.get('counts') or {}
+        oracle = json.loads((ch / 'mdp_oracle_report.json').read_text()) if (ch / 'mdp_oracle_report.json').exists() else None
+        d['math_numeric'] = {'status': 'FAIL' if cnt.get('FAIL') else d['math_numeric']['status'],
+                             'arithmetic_published_text': f"{cnt.get('PASS', 0)} PASS / {cnt.get('FAIL', 0)} FAIL recomputed equations and table totals",
+                             'edition_reference_checks': (pub or {}).get('edition', {}).get('numeric_checks') if isinstance((pub or {}).get('edition'), dict) else None,
+                             'oracle': (oracle or {}).get('summary') or ((oracle or {}).get('counts') if oracle else 'NOT_RUN'),
+                             'detail': f"arithmetic of the published text: {cnt.get('PASS', 0)} PASS, {cnt.get('FAIL', 0)} FAIL (scope: written computations 'a op b = c' and table totals only); "
+                                       f"set-up/proof: NOT machine-verifiable -> status stays {d['math_numeric']['status']} unless a human reviews derivations"}
+        # B33: competency evidence in separate fields instead of one '44/44' success line
+        kcs = list(a.get('kc_ids') or [])
+        taught_b = {k for s_ in bk['sections'] for b_ in s_['blocks'] for k in b_.get('kc_ids') or []}
+        prac_b = {k for i in items for k in (i.get('kc_keys') or i.get('kc_ids') or [])}
+        official = {r['kc_id'] for r in cov if r.get('status') == 'EVIDENCED_PENDING_SEMANTIC_REVIEW'}
+        op_fail = {f.get('object') for f in ((pub or {}).get('didactic_rules') or {}).get('fail', []) if f.get('rule') == 'A1'}
+        d['competency_evidence'] = {'status': 'INFO', 'produced': len(kcs),
+                                    'taught': sum(k in taught_b for k in kcs), 'practised': sum(k in prac_b for k in kcs),
+                                    'operation_met': 'NOT_TESTED' if not (pub or {}).get('didactic_rules') else sum(k not in op_fail for k in kcs),
+                                    'official_exam_evidence': sum(k in official for k in kcs),
+                                    'source_verified_by_human': 0, 'human_review': len(human),
+                                    'detail': 'taught/practised from the published book; operation_met = didactic rule A1 (machine heuristic); '
+                                              'official_exam_evidence = an official course question exists; nothing here is a human verification'}
     if nc.get('counts', {}).get('FAIL'):
         d['math_numeric'] = {'status': 'FAIL', 'detail': f"recomputed equations or table totals wrong: {[f['object'] for f in nc['fail']][:6]}"}
     anki = (pub or {}).get('products', {}).get('anki') or {}

@@ -121,16 +121,19 @@ class Typeset(unittest.TestCase):
         import pymupdf
         with tempfile.TemporaryDirectory() as td:
             res = typeset.publish_book(mini_book(), td)
-            self.assertEqual(set(res), {'1_Lehrbuch', '2_Arbeitsbuch', '3_Musterloesungen', '4_Probeklausur', '5_Probeklausur_Loesungen'})
+            self.assertEqual(set(res) - {'3_Probeklausur_einzeln'}, {'1_Lehrbuch', '2_Arbeitsbuch'})
             d = pymupdf.open(res['1_Lehrbuch']['pdf'])
             self.assertTrue(d.get_toc())
             last = d[d.page_count - 1].get_text()
             self.assertIn(f'{d.page_count - 1} / {d.page_count - 1}', last)    # cover not counted, numbering starts at 1
-            ex = pymupdf.open(res['4_Probeklausur']['pdf']).get_text('text') if hasattr(pymupdf.open(res['4_Probeklausur']['pdf']), 'get_text') else \
-                ''.join(p.get_text() for p in pymupdf.open(res['4_Probeklausur']['pdf']))
-            self.assertNotIn('Bewertung', ex)                                 # no solutions in the question paper
-            sol = ''.join(p.get_text() for p in pymupdf.open(res['5_Probeklausur_Loesungen']['pdf']))
-            self.assertIn('Bewertung', sol)
+            wb = ''.join(p.get_text() for p in pymupdf.open(res['2_Arbeitsbuch']['pdf']))
+            i_sol = wb.rfind('Lösungen')
+            self.assertGreater(i_sol, 0)
+            self.assertNotIn('Bewertung', wb[:wb.find('Lösungen', wb.find('Inhalt') + 200)])   # no rubric before the solutions part
+            self.assertIn('Bewertung', wb[i_sol:])                                           # solutions with rubric at the END
+            if '3_Probeklausur_einzeln' in res:
+                ex = ''.join(p.get_text() for p in pymupdf.open(res['3_Probeklausur_einzeln']['pdf']))
+                self.assertNotIn('Bewertung', ex)                                            # stand-alone booklet: questions only
 
 
 class AnkiV2(unittest.TestCase):

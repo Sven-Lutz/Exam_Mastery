@@ -31,7 +31,27 @@ EQ = re.compile(r'((?:\(?\s*(?:' + NUM + r')\s*\)?\s*[-+*/]\s*)+\(?\s*(?:' + NUM
 # B22: a match is only a complete computation if nothing that belongs to the expression stands right before it
 # (implicit product 0.5(..., symbol V(H)(..., exponent 0.5^3 * 8, an operator of a longer chain). Before B22 such
 # fragments were recomputed on their own and reported as FAIL although the written computation was right.
-_GLUED = re.compile(r'(?:[\w.)\]}^]|[*/+\-]\s*)$')
+_GLUED = re.compile(r'(?:[\w.)\]}^]|[*/+\-]\s*)$|[\d)]\s+$')
+# B33: a glued match is not skipped blindly: the arithmetic prefix in front of it (e.g. "2 + 0.9 (" of a Bellman
+# backup "2 + 0.9 (0.7 * 0 + 0.3 * 0) = 2") is taken into the expression, implicit products become explicit, and the
+# whole written computation is checked. Only if no balanced arithmetic expression results is the match dropped.
+_PREFIX = re.compile(r'[\d.\s+\-*/()]*$')
+
+
+def _extend(t, start, expr):
+    pre = _PREFIX.search(t[:start]).group(0)
+    while pre and pre[0] in ')*/+ ':
+        pre = pre[1:]
+    if pre[:1] == '-' and len(pre) > 1 and pre[1] == ' ':
+        pre = pre[1:].lstrip()
+    if not pre or re.search(r'[\w.)\]}^]$', t[:start - len(pre)].rstrip()[-1:] or ''):
+        return None
+    full = pre + expr
+    if full.count('(') != full.count(')'):
+        return None
+    full = re.sub(r'(\d)\s*\(', r'\1*(', full)
+    full = re.sub(r'\)\s*\(', ')*(', full)
+    return full
 
 
 def equations(text):
@@ -45,9 +65,11 @@ def equations(text):
             break
         pos = m.start(2)          # a chain a = b + c = d: the next computation may start at the stated value
         start = m.start(1) + len(m.group(1)) - len(m.group(1).lstrip())
-        if _GLUED.search(t[:start]):
-            continue
         expr, stated = m.group(1), m.group(2)
+        if _GLUED.search(t[:start]):
+            expr = _extend(t, start, expr.strip())
+            if expr is None:
+                continue
         py = re.sub(NUM, lambda x: repr(_num(x.group(0))), expr)
         if not re.fullmatch(r'[\d.eE+\-*/() ]+', py):
             continue

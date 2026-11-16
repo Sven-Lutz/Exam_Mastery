@@ -56,6 +56,8 @@ def subject_sources():
 def _check_block(b, src, checks, where, course_blocks=()):
     if b.get('prov') == 'course' and b.get('type') == 'figure' and b.get('derived_from_block') in course_blocks:
         return                      # a visualisation of lecture data already in the chapter, named by its block id
+    if b.get('prov') == 'course' and b.get('restructures') and set(b['restructures']) <= set(course_blocks):
+        return                      # B32: re-written presentation of lecture content already in the chapter; anchors are copied by the engine
     if b.get('prov') == 'course':
         raise ContractError(f'EDITION_COURSE_CONTENT: {where} — an edition cannot add lecture content')
     if b.get('prov') == 'supplement':
@@ -109,15 +111,22 @@ def apply(book, ed):
         raise ContractError(f'EDITION_UNKNOWN_SECTION: {t}')
 
     course_blocks = {x['block_id'] for sec in b['sections'] for x in sec['blocks'] if x.get('block_id') and x.get('prov') in ('course', 'vision', 'interpretation')}
+    course_src = {x['block_id']: x.get('src') for sec in b['sections'] for x in sec['blocks'] if x.get('block_id') in course_blocks}
     b['figures'].update(ed.get('figures', {}))
+    # B32: lab requests of the edition (engine-built, deterministic); same lab_id = override of the author's request data
+    b['lab_requests'] = list(ed.get('labs', []))
     for n, op in enumerate(ed.get('ops', [])):
         kind = op['op']; where = f'op {n} ({kind})'
         for x in op.get('blocks', []) + ([op['block']] if op.get('block') else []):
             _check_block(x, src, checks, f'{where} {x.get("block_id", "")}', course_blocks)
             if x.get('type') == 'figure' and x['id'] not in b['figures']:
                 raise ContractError(f'EDITION_UNKNOWN_FIGURE: {where} {x["id"]}')
-            if x.get('type') == 'example' and x.get('figure') and x['figure'] not in b['figures']:
+            if x.get('type') in ('example', 'figtext') and x.get('figure') and x['figure'] not in b['figures']:
                 raise ContractError(f'EDITION_UNKNOWN_FIGURE: {where} {x["figure"]}')
+            if x.get('prov') == 'course' and x.get('restructures'):
+                if x.get('src'):
+                    raise ContractError(f'EDITION_COURSE_ANCHOR_AUTHORED: {where} — anchors of restructured lecture content come from the chapter')
+                x['src'] = '; '.join(dict.fromkeys(a for r in x['restructures'] for a in str(course_src.get(r) or '').split('; ') if a))
         if kind in ('insert_after', 'insert_before'):
             lst, i = locate(op['block_id'])
             lst[i + 1 if kind == 'insert_after' else i:i + 1 if kind == 'insert_after' else i] = op['blocks']

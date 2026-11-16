@@ -225,7 +225,7 @@ class ProductMode(Base):
         self.assertEqual(status['mode_policy'], 'production')
         self.assertTrue(status['budget']['approval_id'].startswith('policy-'))
         self.assertGreater(status['budget']['cost_usd_estimate'], 0)
-        self.assertEqual(set(dossier['dimensions']), {'coverage', 'subject_correctness', 'math_numeric', 'didactic_completeness',
+        self.assertEqual(set(dossier['dimensions']), {'coverage', 'competency_evidence', 'subject_correctness', 'math_numeric', 'didactic_completeness',
                                                       'items_and_solutions', 'formulas_and_figures', 'anki', 'rendering'})
         self.assertTrue(set(dossier['dimensions'].values()) <= {'PASS', 'FAIL', 'NOT_TESTED'})
         self.assertEqual(dossier['release']['academic'], 'ACADEMIC_RELEASE_NOT_GRANTED')

@@ -40,7 +40,7 @@ class ChapterPublishing(unittest.TestCase):
                 rec = st['chapters'][ch.name]
                 self.assertEqual(rec['publish']['status'], 'PUBLISHED_DRAFT')
                 art = ch / 'publish' / 'artifacts'
-                for f in ('kapitel.html', 'kompetenzmatrix.csv', '1_Lehrbuch.pdf', '2_Arbeitsbuch.pdf', '3_Musterloesungen.pdf'):
+                for f in ('kapitel.html', 'kompetenzmatrix.csv', '1_Lehrbuch.pdf', '2_Arbeitsbuch.pdf'):
                     self.assertTrue((art / f).is_file(), f)
                 n += 1
         self.assertGreaterEqual(n, 3)
@@ -55,8 +55,12 @@ class ChapterPublishing(unittest.TestCase):
                 self.assertIn('SYNTHETISCHES TESTMATERIAL', html)
                 if any(b.get('provenance') == 'AUTHOR_INFERENCE' for b in ast['blocks']):
                     self.assertIn('Einordnung (nicht aus der Vorlesung)', html)
-                wb = ''.join(p.get_text() for p in pymupdf.open(art / '2_Arbeitsbuch.pdf'))
-                sol = ''.join(p.get_text() for p in pymupdf.open(art / '3_Musterloesungen.pdf'))
+                # B32/B33: ONE workbook; the solutions part comes last, after tasks and mock exam
+                full = ''.join(p.get_text() for p in pymupdf.open(art / '2_Arbeitsbuch.pdf'))
+                cut = full.rfind('Lösungen\n') if 'Teil' in full else -1
+                cut = max(full.rfind('· Lösungen'), cut)
+                self.assertGreater(cut, 0, 'workbook has no solutions part')
+                wb, sol = full[:cut], full[cut:]
                 for a in ast['assessments']:
                     self.assertEqual(wb.count('Aufgabe ' + a['item_id']), 1, a['item_id'])
                     self.assertEqual(sol.count('Aufgabe ' + a['item_id']), 1, a['item_id'])

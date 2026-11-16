@@ -40,8 +40,8 @@ def _anchor_index(manifest):
     return out
 
 
-DOC_LABEL = {'1_Lehrbuch.pdf': 'Lehrbuch (PDF)', '2_Arbeitsbuch.pdf': 'Arbeitsbuch', '3_Musterloesungen.pdf': 'Musterlösungen',
-             '4_Probeklausur.pdf': 'Probeklausur', '5_Probeklausur_Loesungen.pdf': 'Probeklausur – Lösungen', '6_Quellenabbildungen.pdf': 'Quellenabbildungen'}
+DOC_LABEL = {'1_Lehrbuch.pdf': 'Lehrbuch (PDF)', '2_Arbeitsbuch.pdf': 'Arbeitsbuch mit Probeklausur und Lösungen', '3_Probeklausur_einzeln.pdf': 'Probeklausur (Einzelheft)',
+             '6_Quellenabbildungen.pdf': 'Quellenabbildungen'}
 
 
 def display_name(name):
@@ -689,6 +689,24 @@ def publish_visual_sources(ctx, manifest, assets_root, out_pdf, chapter_sources=
 
 # ------------------------------------------------------------------ entry point
 
+def _layout_lint(art, name):
+    """B33: what the typesetter's layout lint found and repaired (inline formulas reflowed) or could not repair."""
+    f = Path(art) / f'..{name}.main.layout_lint.json'
+    if not f.exists():
+        return {'status': 'NOT_RUN'}
+    d = json.loads(f.read_text(encoding='utf-8'))
+    d['status'] = 'FAIL' if d.get('overflow') or d.get('broken_images') else 'PASS'
+    pdf = Path(art) / f'{name}.pdf'
+    if pdf.exists():                 # B33: near-empty pages (orphaned headings, spilled tiles, stranded rubrics); cover excluded
+        import pymupdf
+        doc = pymupdf.open(pdf)
+        d['sparse_pages'] = [i + 1 for i in range(1, doc.page_count)
+                             if len(doc[i].get_text().strip()) < 350 and not doc[i].get_images() and len(doc[i].get_drawings()) < 40]
+        if d['sparse_pages'] and d['status'] == 'PASS':
+            d['status'] = 'WARN'
+    return d
+
+
 def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_root=None, edition=None):
     chapter_dir = Path(chapter_dir)
     ast = json.loads((chapter_dir / 'content_ast.json').read_text(encoding='utf-8'))
@@ -725,7 +743,15 @@ def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_r
     idx_ = _anchor_index(manifest)
     from .labs.integrate import catalog_requests
     _kcs = [k for k in (plan or {}).get('competencies', []) if k['kc_id'] in set(ast.get('kc_ids') or [])]
-    _reqs = list(ast.get('labs') or []); _reqs += catalog_requests(_kcs, {r.get('model') for r in _reqs})
+    _reqs = list(ast.get('labs') or [])
+    for _er in book.get('lab_requests') or []:          # B32: edition lab requests override / extend the author's
+        _old = next((r for r in _reqs if r.get('lab_id') == _er.get('lab_id')), None)
+        if _old is not None:
+            _old.update({k: v for k, v in _er.items() if k != 'data'}); _old['data'] = {**(_old.get('data') or {}), **(_er.get('data') or {})}
+        else:
+            _reqs.append(dict(_er))
+    _reqs += catalog_requests(_kcs, {r.get('model') for r in _reqs})
+    from .labs.integrate import ROUTED_OUT as _routed_out
     labs_report, lab_blocks = build_chapter_labs(_reqs, art / 'Lernumgebung', book['meta']['course'],
                                                  lambda refs: _anchors(refs, idx_), ast.get('kc_ids') or [],
                                                  {k['kc_id']: re.sub(r'^[^:]*(?:/[^:]*)?:\s*', '', k['statement']).strip() for k in _kcs},
@@ -754,14 +780,18 @@ def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_r
     anki = {'cards': 0, 'card_source': book['card_source'], 'dropped_by_card_rules': book['cards_dropped']}
     if book['cards']:
         # card identity = course FOLDER name + chapter title + key; never the display title (course-title can change)
+        from . import figures_svg as _fs
+        _figs = {c['figure']: _fs.render(book['figures'][c['figure']]) for c in book['cards'] if c.get('figure') in book.get('figures', {})}
         rep = anki_v2.build_deck(book['cards'], f"Exam Mastery::{book['meta']['course']}::{book['meta']['title']}",
-                                 anki_v2.slug(manifest.get('root_name') or book['meta']['course']), anki_v2.slug(book['meta']['title']), art / 'anki', state_dir=chapter_dir.parent)
+                                 anki_v2.slug(manifest.get('root_name') or book['meta']['course']), anki_v2.slug(book['meta']['title']), art / 'anki',
+                                 figures=_figs, state_dir=chapter_dir.parent)
         anki.update(rep, package=rep['package'])
         if verify_anki:
             anki.update(anki_v2.verify_package(rep['package']))
     # B15: integrated learning environment (interactive textbook, embedded labs, practice, exam, progress, tutor briefing)
     from . import learn_app
-    learn_app.build(book, art / 'Lernumgebung', labs=[r_ for r_ in labs_report if r_['status'] == 'BUILT'],
+    _built = list({r_['file']: dict(r_, title='MDP-Studio' if 'mdp-studio' in r_['file'] else r_['title']) for r_ in labs_report if r_['status'] == 'BUILT'}.values())
+    learn_app.build(book, art / 'Lernumgebung', labs=_built,
                     materials=[[DOC_LABEL.get(n, n), '../' + n] for n in sorted(files) if n.endswith('.pdf')] + [['Lehrbuch als Webseite', '../kapitel.html']],
                     anki=('../anki/' + Path(anki['package']).name) if anki.get('package') else None, chapter_id=m['chapter_id'])
     report = {'schema': 'em-chapter-publish-v1', 'chapter_id': m['chapter_id'], 'content_origin': m['origin'],
@@ -783,7 +813,9 @@ def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_r
               'errata': errata_applied,
               'edition': edition_report,
               'labs': labs_report or 'NOT_GENERATED: no lab requested by the author role (only deterministic lab models are built)',
-              'documents': {k: {'pages': v['pages'], 'toc_unresolved': v['toc_unresolved'], 'internal_links': v.get('internal_links')} for k, v in docs.items()},
+              'labs_routed_out': list(_routed_out),
+              'documents': {k: {'pages': v['pages'], 'toc_unresolved': v['toc_unresolved'], 'internal_links': v.get('internal_links'),
+                                'layout_lint': _layout_lint(art, k)} for k, v in docs.items()},
               'academic_status': m['academic_status'] or 'NOT_TESTED', 'source_verification': 'NONE_HUMAN'}
     if edition_report:
         write_json(pub / 'edition_report.json', edition_report)

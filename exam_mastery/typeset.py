@@ -1,8 +1,8 @@
 """Professional typesetting of the learning products (B9).
 
 One design system, five separate documents per chapter, each with its own cover and its own page numbering:
-  1_Lehrbuch (textbook), 2_Arbeitsbuch (workbook), 3_Musterloesungen (worked solutions),
-  4_Probeklausur (mock exam, questions only), 5_Probeklausur_Loesungen (exam solutions with rubrics).
+  1_Lehrbuch (textbook), 2_Arbeitsbuch (practice stages + integrated mock exam + all solutions at the end),
+  3_Probeklausur_einzeln (optional stand-alone exam booklet).
 Plus kapitel.html (the textbook for screens).
 
 Input is a book model (em-book-v1, see `book_from_ast`). Math is TeX (\\( \\) and \\[ \\]) typeset by MathJax inside
@@ -81,7 +81,8 @@ def md(s):
             continue
         if len(lines) == 1 and re.fullmatch(r'\x00CODE(\d+)\x00', lines[0].strip()):
             out.append(f'<pre class="code"><code>{E(code[int(lines[0].strip()[5:-1])])}</code></pre>')
-        elif all(l.strip().startswith('|') for l in lines):
+        elif len(lines) >= 2 and all(l.strip().startswith('|') and l.strip().endswith('|') for l in lines) and \
+                any(re.fullmatch(r'\|?[\s:|-]+\|?', l.strip()) and '-' in l for l in lines):
             rows = [[c.strip() for c in l.strip().strip('|').split('|')] for l in lines if not re.fullmatch(r'\|?[\s:|-]+\|?', l.strip())]
             out.append('<table><thead><tr>' + ''.join(f'<th>{inline(c)}</th>' for c in rows[0]) + '</tr></thead><tbody>'
                        + ''.join('<tr>' + ''.join(f'<td>{inline(c)}</td>' for c in r) + '</tr>' for r in rows[1:]) + '</tbody></table>')
@@ -109,150 +110,193 @@ def font_css(rel):
 
 
 CSS = r"""
-/* Exam Mastery book design v0.20 "Folio": text column + side column (sources, provenance, glosses), numbered
-   definitions/examples/figures, calm ink + one cool accent + one warm accent. Print first; the same HTML reads on screen. */
-:root{--ink:#18212b;--ink2:#36424f;--muted:#66717d;--line:#d9dee4;--hair:#e9ecef;--soft:#f5f6f4;--paper:#ffffff;
- --accent:#1f5673;--accent-soft:#e8f0f4;--warm:#a8641c;--warm-soft:#fbf3e8;--warn:#9b3d23;--warn-soft:#f9ece7;--ok:#3d6b4f;
+/* Exam Mastery editorial design system "Atlas" (B32). Tokens come from design_tokens.py; every semantic role has a
+   colour AND a non-colour cue (label, border style, glyph), so meaning survives greyscale print and colour-vision
+   deficiency. Layout: text column + side column; figure/text spreads; numbered components; print first. */
+:root{--ink:#1F2933;--ink2:#3A4652;--muted:#5B6878;--line:#CBD3DC;--hair:#E4E8EC;--soft:#F5F7FA;--paper:#FFFFFF;
+ --navy:#1B2A41;--petrol:#0F6E73;--petrol-l:#E2F0F0;--blue:#2F5D8A;--blue-l:#E8F0F8;--gold:#8C6416;--gold-l:#FBF2DE;
+ --coral:#C8483A;--coral-l:#FBE9E5;--green:#2E7D4F;--green-l:#E5F2EA;--violet:#5B4B9A;--violet-l:#EEEBF7;
+ --accent:var(--navy);--accent-soft:var(--petrol-l);--warm:var(--gold);--warm-soft:var(--gold-l);--warn:var(--coral);--warn-soft:var(--coral-l);--ok:var(--green);
  --serif:'Source Serif 4','Iowan Old Style',Georgia,serif;--sans:'Source Sans 3','Helvetica Neue',Arial,sans-serif;
- --mono:'JetBrains Mono',Menlo,monospace;--side:43mm;--gap:7mm}
+ --mono:'JetBrains Mono',Menlo,monospace;--side:40mm;--gap:7mm}
 *{box-sizing:border-box}
-html{font-size:10.4pt}
+html{font-size:10.6pt}
 body{margin:0;color:var(--ink);background:var(--paper);font-family:var(--serif);line-height:1.5;font-kerning:normal;
  font-variant-numeric:oldstyle-nums proportional-nums;hyphens:auto;-webkit-hyphens:auto;text-rendering:optimizeLegibility}
 main{padding-right:calc(var(--side) + var(--gap))}
-h1,h2,h3,h4,.sans{font-family:var(--sans);font-variant-numeric:lining-nums}
-h1{font-size:2.1rem;line-height:1.12;margin:0 0 .4em;font-weight:700;letter-spacing:-.012em}
-h2{font-size:1.5rem;line-height:1.2;margin:2.2em 0 .7em;font-weight:700;break-after:avoid;position:relative;letter-spacing:-.005em}
-h2 .no{color:var(--accent);font-weight:700;margin-right:.5em}
-h2::after{content:'';display:block;width:14mm;height:2.5px;background:var(--accent);margin-top:.35em}
-h3{font-size:1.1rem;margin:1.7em 0 .45em;break-after:avoid;font-weight:600;color:var(--ink)}
-h3 .no{color:var(--muted);font-weight:600;margin-right:.45em}
-h4{font-size:.98rem;margin:1.1em 0 .3em;break-after:avoid;font-weight:600}
+h1,h2,h3,h4,.sans{font-family:var(--sans);font-variant-numeric:lining-nums;color:var(--navy)}
+h1{font-size:2.2rem;line-height:1.1;margin:0 0 .4em;font-weight:700;letter-spacing:-.015em}
+h2{font-size:1.6rem;line-height:1.18;margin:0 0 .8em;font-weight:700;break-before:page;break-after:avoid;letter-spacing:-.008em;
+ padding-top:2mm;border-top:5px solid var(--navy)}
+h2 .no{display:inline-block;color:#fff;background:var(--navy);font-weight:700;padding:.05em .38em;margin-right:.45em;border-radius:2px}
+h3{font-size:1.16rem;margin:1.8em 0 .5em;break-after:avoid;font-weight:700;color:var(--navy)}
+h3 .no{color:var(--petrol);font-weight:700;margin-right:.45em}
+h4{font-size:1rem;margin:1.1em 0 .3em;break-after:avoid;font-weight:700}
 p{margin:0 0 .7em;orphans:3;widows:3}
-ul,ol{margin:.2em 0 .8em;padding-left:1.3em}li{margin:.2em 0}li::marker{color:var(--muted)}
-strong{font-weight:600}
-a{color:var(--accent)}
+ul,ol{margin:.2em 0 .8em;padding-left:1.3em}li{margin:.22em 0}li::marker{color:var(--petrol)}
+strong{font-weight:600;color:var(--navy)}
+a{color:var(--blue)}
 pre.code{font-family:var(--mono);font-size:.8rem;line-height:1.45;background:var(--soft);border-radius:3px;padding:.7em .9em;overflow-x:auto;break-inside:avoid;white-space:pre}
 code{font-family:var(--mono);font-size:.86em;background:var(--soft);padding:.05em .3em;border-radius:3px}
 .dmath{margin:.8em 0 1em;text-align:center;overflow-x:auto}
-/* B22: a display formula wider than its box (theorem/definition boxes are narrower than the text) is scaled to fit
-   instead of running across the box border in print */
+mjx-container{font-size:104%!important}
 mjx-container[display="true"]{display:block;max-width:100%}mjx-container[display="true"]>svg{max-width:100%;height:auto}
 /* side column */
-.blk{position:relative}
-.blk::after{content:'';display:table;clear:both}
+.blk{position:relative}.blk::after{content:'';display:table;clear:both}
 .side,.src{float:right;clear:right;width:var(--side);margin-right:calc(-1 * (var(--side) + var(--gap)));margin-top:.2em;
- font-family:var(--sans);font-size:.72rem;line-height:1.38;color:var(--muted);font-variant-numeric:lining-nums;hyphens:none;text-align:left}
-.side .prov,.src b{display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.64rem;margin-bottom:.15em}
-.prov.course{color:var(--accent)}.prov.supplement{color:var(--ok)}.prov.didactic{color:var(--warm)}.prov.interpretation,.prov.vision,.prov.unconfirmed{color:var(--muted)}
+ font-family:var(--sans);font-size:.72rem;line-height:1.38;color:var(--muted);font-variant-numeric:lining-nums;hyphens:none;text-align:left;
+ border-top:1px solid var(--line);padding-top:.25em}
+.side .prov,.src b{display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.62rem;margin-bottom:.15em}
+.prov.course{color:var(--navy)}.prov.supplement{color:var(--gold)}.prov.didactic{color:var(--blue)}.prov.interpretation,.prov.vision,.prov.unconfirmed{color:var(--muted)}
 .side .ref{display:block;margin-top:.15em}
-.lead{font-size:1.08rem;line-height:1.55;color:var(--ink2)}
+.lead{font-size:1.12rem;line-height:1.55;color:var(--ink2);border-left:4px solid var(--gold);padding:.1em 0 .1em .9em;margin:.4em 0 1.2em}
 /* chapter opener */
-.opener{break-after:page;padding-top:8mm}
-.opener .chno{font:700 5.2rem/1 var(--sans);color:var(--accent);letter-spacing:-.03em}
-.opener h1{font-size:2.5rem;margin:.15em 0 .5em;max-width:16em}
-.opener .goals{border-top:1px solid var(--ink);padding-top:.8em;margin-top:1.4em}
-.opener .goals h4,.opener .road h4{margin:0 0 .5em;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.opener .goals ol{columns:1;padding-left:1.4em}.opener .goals li{margin:.3em 0}
-.opener .road{margin-top:1.4em;display:grid;grid-template-columns:repeat(3,1fr);gap:.4em 1.2em;font-family:var(--sans);font-size:.86rem}
-.opener .road div{border-top:1px solid var(--line);padding-top:.35em}.opener .road b{color:var(--accent);margin-right:.35em}
-/* semantic blocks */
-.def,.box,.ex,.mis,.case,.sum{break-inside:avoid-page;margin:1.1em 0 1.2em}
-.ex{break-inside:auto}.ex>h4,.ex>.lab,.ex>.given{break-after:avoid}.ex ol.steps>li,.ex .res{break-inside:avoid}
+.opener{break-after:page;padding-top:4mm;margin-right:calc(-1 * (var(--side) + var(--gap)))}
+.opener .chno{font:800 4.4rem/1 var(--sans);color:var(--petrol);letter-spacing:-.04em}
+.opener h1{font-size:2.6rem;margin:.1em 0 .45em;max-width:16em}
+.opener .goals{background:var(--soft);border-top:4px solid var(--petrol);padding:.8em 1em .5em;margin-top:1.2em}
+.opener .goals h4,.opener .road h4{margin:0 0 .5em;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--petrol)}
+.opener .goals ol{padding-left:1.4em;columns:2;column-gap:2em}.opener .goals li{margin:.3em 0;break-inside:avoid;font-size:.94rem}
+.opener .road{margin-top:1em;break-inside:avoid;display:grid;grid-template-columns:repeat(5,1fr);gap:.5em .8em;font-family:var(--sans);font-size:.84rem}
+.opener .road div{border-top:3px solid var(--navy);padding-top:.35em;color:var(--ink2)}.opener .road b{display:block;color:var(--petrol);font-size:1.1rem}
+/* semantic components: role colour + label + border style */
+.def,.box,.ex,.mis,.case,.sum,.thm,.prf,.intu,.res-w,.rec,.take,.algo,.cmp,.ftx{margin:1.15em 0 1.25em}
+.def,.thm,.box,.intu,.rec,.take,.algo,.sum,.mis{break-inside:avoid-page}
 .keephead{break-inside:avoid-page}
-.lab{font-family:var(--sans);font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.3em}
-.def{background:var(--accent-soft);border-top:2px solid var(--accent);padding:.6em .95em .3em}
-.def .lab{color:var(--accent)}
-.def .term{font-family:var(--sans);font-weight:700;color:var(--ink);margin-right:.35em}
-.box{background:var(--soft);padding:.6em .95em .35em;border-left:3px solid var(--line)}
-.box.law{border-left-color:var(--warm);background:var(--warm-soft)}.box.law .lab{color:var(--warm)}
-.box.pitfall,.box.limit{border-left-color:var(--warn);background:var(--warn-soft)}.box.pitfall .lab,.box.limit .lab{color:var(--warn)}
-.box.key{border-left-color:var(--ink);background:#fff;border:1px solid var(--ink);border-left-width:3px}
-.box.research{border-left-color:var(--ok);background:#f1f6f2}.box.research .lab{color:var(--ok)}
-.ex{border-top:2px solid var(--warm);border-bottom:1px solid var(--line);padding:.55em 0 .35em}
-.ex>.lab{color:var(--warm)}
-.ex h4{margin:.05em 0 .45em;font-size:1.02rem}
-.ex .given{background:var(--warm-soft);padding:.5em .8em;border-radius:2px;margin:.3em 0 .7em}
-.ex .given p:last-child{margin-bottom:0}
-.ex ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:.4em 0}
-/* B22: wrapping row instead of a fixed grid - a formula wider than its column pushes the reason onto its own line
-   (the fixed grid let MathJax SVG overflow into the reason column, e.g. Bellman derivation steps) */
-.ex ol.steps>li{counter-increment:s;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:1em;padding:.38em 0;border-top:1px solid var(--hair)}
-.ex ol.steps>li:first-child{border-top:none}
-.ex ol.steps>li::before{content:counter(s);flex:0 0 1.7em;font:700 .78rem/1.6 var(--sans);color:var(--warm)}
-.ex ol.steps>li .why{display:block;flex:1 1 13em;color:var(--muted);font-size:.88em;font-family:var(--sans);line-height:1.4}
-.ex ol.steps>li>.do{flex:1.45 1 auto;max-width:100%}
-.ex .res{border-top:1px solid var(--ink);padding-top:.45em;margin-top:.4em}
-.ex .res::before{content:'Ergebnis';font:700 .7rem var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--ink);display:block;margin-bottom:.2em}
-.mis{display:grid;grid-template-columns:1fr 1fr;gap:.2em 1.4em;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:.55em 0}
-.mis .lab{grid-column:1/3}
-.mis .wrong::before{content:'Fehlvorstellung'}.mis .right::before{content:'Richtig ist'}
-.mis .wrong::before,.mis .right::before{display:block;font:600 .8rem var(--sans);margin-bottom:.15em}
-.mis .wrong{color:var(--ink2)}.mis .wrong::before{color:var(--warn)}.mis .right::before{color:var(--ok)}
-.mis .why{grid-column:1/3;color:var(--muted);font-size:.95em}
-.case{border-left:3px solid var(--muted);padding:.2em 0 .1em .95em}
-.sum{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);padding:.6em 0 .2em}
-.sum .lab{color:var(--ink)}
+.lab{font-family:var(--sans);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.3em}
+.lab .g{font-size:.95rem;margin-right:.35em;letter-spacing:0}
+.def{background:var(--petrol-l);border-left:5px solid var(--petrol);padding:.6em 1em .35em}
+.def .lab{color:var(--petrol)}.def .term{font-family:var(--sans);font-weight:700;color:var(--navy);margin-right:.35em}
+.thm{border:2px solid var(--petrol);border-radius:3px;padding:.6em 1em .35em;background:#fff}
+.thm .lab{color:var(--petrol)}.thm .name{font-family:var(--sans);font-weight:700;color:var(--navy)}
+.thm .ass{font-family:var(--sans);font-size:.84rem;color:var(--ink2);border-top:1px dashed var(--line);margin-top:.4em;padding-top:.3em}
+.prf{border-left:2px solid var(--petrol);padding:.1em 0 .2em 1em}
+.prf .lab{color:var(--petrol)}.prf .qed{float:right;color:var(--petrol);font-size:1.1rem;line-height:1}
+.prf ol.steps,.ex ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:.4em 0}
+.prf ol.steps>li,.ex ol.steps>li{counter-increment:s;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:1em;padding:.38em 0;border-top:1px solid var(--hair);break-inside:avoid}
+.prf ol.steps>li:first-child,.ex ol.steps>li:first-child{border-top:none}
+.prf ol.steps>li::before,.ex ol.steps>li::before{content:counter(s);flex:0 0 1.9em;font:700 .74rem/1.75 var(--sans);color:#fff;background:var(--blue);border-radius:50%;
+ width:1.65em;height:1.65em;text-align:center;margin-right:.25em}
+.prf ol.steps>li::before{background:var(--petrol)}
+.prf ol.steps>li .why,.ex ol.steps>li .why{display:block;flex:1 1 13em;color:var(--muted);font-size:.86em;font-family:var(--sans);line-height:1.4}
+.prf ol.steps>li>.do,.ex ol.steps>li>.do{flex:1.45 1 auto;max-width:100%}
+.ex{background:#fff;border:1px solid var(--blue);border-top:5px solid var(--blue);border-radius:3px;padding:.6em 1em .5em;break-inside:auto}
+.ex>.lab{color:var(--blue)}.ex h4{margin:.05em 0 .45em;font-size:1.04rem;color:var(--navy)}
+.ex>h4,.ex>.lab,.ex>.given{break-after:avoid}
+.ex .given{background:var(--blue-l);padding:.5em .8em;border-radius:2px;margin:.3em 0 .7em}.ex .given p:last-child{margin-bottom:0}
+.ex .res{border-top:2px solid var(--navy);padding-top:.45em;margin-top:.4em;break-inside:avoid}
+.ex .res::before{content:'Ergebnis';font:700 .68rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--green);display:block;margin-bottom:.2em}
+.intu{background:var(--gold-l);border-left:5px solid var(--gold);padding:.6em 1em .35em}
+.intu .lab{color:var(--gold)}
+.res-w{border:2px solid var(--gold);border-radius:4px;padding:0;break-inside:avoid-page;background:#fff}
+.res-w .rh{background:var(--gold);color:#fff;font-family:var(--sans);padding:.35em .9em;display:flex;justify-content:space-between;align-items:baseline;gap:1em}
+.res-w .rh b{font-size:.98rem}.res-w .rh span{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;opacity:.92}
+.res-w .rb{padding:.6em .95em .3em}
+.res-w .rq{font-family:var(--sans);font-weight:700;color:var(--navy);margin-bottom:.35em}
+.res-w .grid{display:grid;grid-template-columns:1fr 1fr;gap:.3em 1.2em;font-size:.93rem}
+.res-w .grid h5{margin:.2em 0 .1em;font:700 .66rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.res-w .cite{border-top:1px dashed var(--line);margin-top:.5em;padding-top:.35em;font-family:var(--sans);font-size:.76rem;color:var(--ink2)}
+.res-w .tag{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:2px;padding:0 .35em;font:700 .62rem var(--sans);letter-spacing:.08em;text-transform:uppercase;margin-right:.4em}
+.rec{border:2px dashed var(--violet);border-radius:4px;padding:.55em 1em .35em;background:var(--violet-l)}
+.rec .lab{color:var(--violet)}.rec ol{margin:.2em 0 .3em}.rec .ans{font-family:var(--sans);font-size:.78rem;color:var(--muted)}
+.take{border-left:5px double var(--green);background:var(--green-l);padding:.55em 1em .3em}
+.take .lab{color:var(--green)}.take ul{margin-bottom:.3em}
+.algo{border:1px solid var(--navy);border-radius:3px;font-family:var(--sans)}
+.algo .ah{background:var(--navy);color:#fff;padding:.3em .8em;font-weight:700;font-size:.92rem}
+.algo ol{margin:.5em 0 .5em;padding-left:2.4em;font-size:.94rem}.algo ol li::marker{color:var(--navy);font-weight:700}
+.algo .io{padding:.3em .8em;border-top:1px solid var(--line);font-size:.86rem;color:var(--ink2)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:3px;break-inside:avoid-page}
+.cmp>div{padding:.55em .9em .3em}.cmp>div+div{border-left:1px solid var(--line)}
+.cmp h5{margin:0 0 .3em;font:700 .9rem var(--sans);color:var(--navy);border-bottom:3px solid var(--petrol);padding-bottom:.2em}
+.cmp>div:nth-child(2) h5{border-bottom-color:var(--gold)}
+.cmp .row{display:contents}
+.ftx{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:1.1em;align-items:start;break-inside:avoid-page}
+.ftx.left{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr)}.ftx.left .ftx-fig{order:-1}
+.ftx.stack{display:block}.ftx.stack .ftx-fig{margin-top:.6em}.ftx.stack .ftx-txt{break-after:avoid}
+.ftx figure{margin:0}.ftx .ftx-txt>:first-child{margin-top:0}
+.box{background:var(--soft);padding:.6em .95em .35em;border-left:5px solid var(--line)}
+.box.law{border-left-color:var(--gold);background:var(--gold-l)}.box.law .lab{color:var(--gold)}
+.box.pitfall,.box.limit{border-left-color:var(--coral);background:var(--coral-l)}.box.pitfall .lab,.box.limit .lab{color:var(--coral)}
+.box.key{border:2px solid var(--navy);border-left-width:6px;background:#fff}.box.key .lab{color:var(--navy)}
+.box.research{border-left-color:var(--gold);background:var(--gold-l)}.box.research .lab{color:var(--gold)}
+.box.question{border-left-color:var(--violet);background:var(--violet-l)}.box.question .lab{color:var(--violet)}
+.mis{display:grid;grid-template-columns:1fr 1fr;gap:.2em 1.2em;border:1px solid var(--coral);border-top:5px solid var(--coral);border-radius:3px;padding:.55em .95em}
+.mis .lab{grid-column:1/3;color:var(--coral)}
+.mis .wrong::before{content:'✗ Fehlvorstellung'}.mis .right::before{content:'✓ Richtig ist'}
+.mis .wrong::before,.mis .right::before{display:block;font:700 .8rem var(--sans);margin-bottom:.15em}
+.mis .wrong{color:var(--ink2);text-decoration:none}.mis .wrong::before{color:var(--coral)}.mis .right::before{color:var(--green)}
+.mis .why{grid-column:1/3;color:var(--ink2);font-size:.94em;border-top:1px dashed var(--line);padding-top:.3em}
+.case{border-left:4px solid var(--muted);padding:.2em 0 .1em .95em}
+.sum{border-top:4px solid var(--navy);border-bottom:4px solid var(--navy);padding:.6em 0 .2em}.sum .lab{color:var(--navy)}
 figure{margin:1.3em 0 1.4em;break-inside:avoid}
-figure .fig{text-align:center}
+figure .fig{text-align:center;background:#fff}
 figure .fig svg{max-width:100%}
-figcaption,.tcap{font-family:var(--sans);font-size:.8rem;color:var(--ink2);margin-top:.5em;line-height:1.42}
-figcaption b,.tcap b{color:var(--accent);margin-right:.3em}
+/* B33: stand-alone figures use text + margin column (wide figure); vector graphics scale to the measure, capped in height */
+figure{margin-right:calc(-1 * (var(--side) + var(--gap)))}figure .fig svg{width:100%;height:auto;max-height:118mm}
+.ftx figure{margin-right:0}.ftx figure .fig svg{max-height:95mm}
+figcaption,.tcap{font-family:var(--sans);font-size:.8rem;color:var(--ink2);margin-top:.5em;line-height:1.42;border-left:3px solid var(--petrol);padding-left:.6em}
+figcaption b,.tcap b{color:var(--petrol);margin-right:.3em}
+figcaption .msg{font-weight:700;color:var(--navy)}
 .twrap{overflow-x:auto;margin:1em 0 1.2em;break-inside:avoid}
-table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.85rem;font-variant-numeric:lining-nums tabular-nums}
-th{text-align:left;font-weight:600;border-bottom:1.5px solid var(--ink);padding:.32em .5em;vertical-align:bottom;hyphens:none;-webkit-hyphens:none}
-td{hyphens:manual;-webkit-hyphens:manual}
-td{border-bottom:1px solid var(--hair);padding:.3em .5em;vertical-align:top}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.86rem;font-variant-numeric:lining-nums tabular-nums}
+th{text-align:left;font-weight:700;color:#fff;background:var(--navy);padding:.36em .55em;vertical-align:bottom;hyphens:none;-webkit-hyphens:none}
+td{hyphens:manual;-webkit-hyphens:manual;border-bottom:1px solid var(--hair);padding:.32em .55em;vertical-align:top}
+tbody tr:nth-child(even) td{background:var(--soft)}
 td.num,th.num{text-align:right}td.num{white-space:nowrap}
-tr.total td{border-top:1.5px solid var(--ink);font-weight:600}
-tr.neg td.num{color:var(--warn)}
+tr.total td{border-top:2px solid var(--navy);font-weight:700}
+tr.neg td.num{color:var(--coral)}
 .tcap{margin:0 0 .35em}
 /* cover & toc */
-.cover{height:252mm;display:flex;flex-direction:column;justify-content:space-between;padding:6mm 0 0}
-.cover .band{height:3px;background:var(--accent);width:100%}
-.cover .kicker{font:600 .82rem var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-top:28mm}
-.cover h1{font-size:3.1rem;margin:.25em 0 .2em;max-width:13em}
+.cover{height:252mm;display:flex;flex-direction:column;justify-content:space-between;padding:0;position:relative}
+.cover .band{height:58mm;background:var(--navy);margin:0 -1px;position:relative}
+.cover .band::after{content:'';position:absolute;left:0;bottom:-6px;width:42%;height:6px;background:var(--gold)}
+.cover .kicker{font:700 .82rem var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--petrol);margin-top:14mm}
+.cover h1{font-size:3.2rem;margin:.2em 0 .2em;max-width:13em}
 .cover .sub{font:400 1.3rem var(--sans);color:var(--ink2)}
-.cover .rule{height:1px;background:var(--ink);width:100%;margin:1.4em 0}
+.cover .rule{height:2px;background:var(--navy);width:100%;margin:1.3em 0}
 .cover .meta{font:400 .8rem var(--sans);color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.8em;max-width:150mm}
 .toc{break-after:page}
-.toc h2::after{display:none}
+.toc h2{border-top:none;break-before:auto}
 .toc a{color:inherit;text-decoration:none;display:flex;gap:.4em}
 .toc .e{display:flex;align-items:baseline;margin:.3em 0;font-family:var(--sans)}
-.toc .e.l1{font-weight:600;margin-top:.7em}
+.toc .e.l1{font-weight:700;margin-top:.8em;color:var(--navy)}
 .toc .e.l2{padding-left:1.8em;font-size:.93em;color:var(--ink2)}
 .toc .e .t{flex:0 1 auto}.toc .e .d{flex:1 1 auto;border-bottom:1px dotted #a6afb8;margin:0 .4em;transform:translateY(-.3em)}
 .toc .e .pg{flex:0 0 auto;font-variant-numeric:lining-nums}
 /* workbook */
-.item{break-inside:avoid-page;margin:0 0 1.5em}
-.item .head{font-family:var(--sans);display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--ink);margin-bottom:.45em;padding-bottom:.1em}
-.item .head .id{font-weight:700}.item .head .meta{font-size:.76rem;color:var(--muted);font-variant-numeric:lining-nums}
-.item .head .meta .op{display:inline-block;border:1px solid var(--line);border-radius:2px;padding:0 .35em;margin-right:.4em;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em;font-size:.68rem}
+.item{break-inside:avoid-page;margin:0 0 1.4em}
+#sec-psol .item,.item.sol{break-inside:auto}.item .head{break-after:avoid}.rubk{break-inside:avoid-page}
+.part>.ph{break-inside:avoid;break-after:avoid}.part .ph h2{break-before:avoid!important}
+.item .head{font-family:var(--sans);display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--violet);margin-bottom:.45em;padding-bottom:.12em}
+.item .head .id{font-weight:700;color:var(--navy)}.item .head .meta{font-size:.76rem;color:var(--muted);font-variant-numeric:lining-nums}
+.item .head .meta .op{display:inline-block;background:var(--violet-l);color:var(--violet);border-radius:2px;padding:0 .4em;margin-right:.4em;text-transform:uppercase;letter-spacing:.06em;font-size:.66rem;font-weight:700}
 .space{border:1px solid var(--line);border-radius:2px;background:repeating-linear-gradient(transparent,transparent 7.4mm,#e9ecef 7.4mm,#e9ecef 7.55mm);margin:.5em 0 0}
 .scaffold{counter-reset:s;list-style:none;padding:0;margin:.5em 0}
 .scaffold li{counter-increment:s;display:grid;grid-template-columns:1.6em 1fr;padding:.3em 0;border-top:1px solid var(--hair)}
-.scaffold li::before{content:counter(s);font:700 .78rem/1.6 var(--sans);color:var(--warm)}
+.scaffold li::before{content:counter(s);font:700 .78rem/1.6 var(--sans);color:var(--violet)}
 .scaffold .blank{display:inline-block;min-width:26mm;border-bottom:1px solid var(--ink);height:1.1em;vertical-align:baseline}
 .stage{break-before:page}.stage.first{break-before:auto}
-.stage .intro{font-family:var(--sans);font-size:.88rem;color:var(--ink2);border-left:3px solid var(--accent);padding-left:.8em;margin-bottom:1.2em}
+.stage h2{break-before:auto}
+.stage .intro{font-family:var(--sans);font-size:.88rem;color:var(--ink2);border-left:4px solid var(--violet);padding-left:.8em;margin-bottom:1.2em}
+.part{break-before:page}.part>.ph{background:var(--navy);color:#fff;font-family:var(--sans);padding:6mm 7mm;margin-bottom:6mm}
+.part>.ph .k{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;opacity:.8}.part>.ph h2{color:#fff;border:none;margin:.2em 0 0;break-before:auto}
 .rub td:last-child,.rub th:last-child{text-align:right;width:5em;white-space:nowrap;hyphens:none}
 .hint{font-family:var(--sans);font-size:.85rem;color:var(--muted)}
-.alt{border-left:3px solid var(--accent);padding-left:.8em;margin:.6em 0}
-.examhead{border:1.5px solid var(--ink);padding:.7em 1em;font-family:var(--sans);margin-bottom:1.2em}
-.examhead table{font-size:.9rem}.examhead td{border:none;padding:.15em .4em}
+.alt{border-left:3px solid var(--blue);padding-left:.8em;margin:.6em 0}
+.examhead{border:2px solid var(--navy);padding:.7em 1em;font-family:var(--sans);margin-bottom:1.2em}
+.examhead table{font-size:.9rem}.examhead td{border:none;padding:.15em .4em;background:none!important}
 .namefield{display:grid;grid-template-columns:1fr 1fr;gap:1em;margin:0 0 1.2em;font-family:var(--sans);font-size:.85rem}
 .namefield div{border-bottom:1px solid var(--ink);padding-top:1.6em;color:var(--muted)}
-.exam .item .head{border-bottom-width:2px}
+.exam .item .head{border-bottom-color:var(--navy)}
 .ptsbox{float:right;border:1.5px solid var(--ink);font-family:var(--sans);font-size:.8rem;padding:.15em .5em;margin-left:1em}
 @page{size:A4;margin:22mm 16mm 22mm 20mm}
 @media print{a{color:inherit;text-decoration:none}main{max-width:none}}
-@media screen{body{background:#f7f7f5}main{max-width:62rem;margin:0 auto;padding:2.5em 1.5em 5em;padding-right:calc(var(--side) + var(--gap) + 1.5em);background:#fff}
- .cover{height:auto;min-height:70vh}}
-@media screen and (max-width:760px){main{padding-right:1.2em}.side,.src{float:none;width:auto;margin:.2em 0 .6em}.opener .road{grid-template-columns:1fr}
- .ex ol.steps>li .why{flex-basis:100%;padding-left:2.7em}}
-@media screen and (prefers-color-scheme:dark){body{background:#12171c;color:#dde3e9}main{background:#171d23}
- :root{--ink:#dde3e9;--ink2:#c3ccd5;--muted:#9aa6b2;--line:#2e3740;--hair:#252d35;--soft:#1d242b;--accent:#8cc0dc;--accent-soft:#1a2a33;--warm:#e0a660;--warm-soft:#2a2219;--warn:#e08b70;--warn-soft:#2c1d18}
- .lead{color:#c9d2db}figure svg{background:#f6f7f9;border-radius:6px;padding:4px}.box.key{background:transparent}.box.research{background:#18241c}}
+@media screen{body{background:#eef1f4}main{max-width:64rem;margin:0 auto;padding:2.5em 1.5em 5em;padding-right:calc(var(--side) + var(--gap) + 1.5em);background:#fff}
+ .cover{height:auto;min-height:70vh}h2{break-before:auto;margin-top:2.4em}}
+@media screen and (max-width:760px){main{padding-right:1.2em}figure,.opener{margin-right:0}.side,.src{float:none;width:auto;margin:.2em 0 .6em}.opener .road{grid-template-columns:1fr 1fr}
+ .opener .goals ol{columns:1}.ftx,.cmp,.res-w .grid,.mis{grid-template-columns:1fr}.cmp>div+div{border-left:none;border-top:1px solid var(--line)}
+ .ex ol.steps>li .why,.prf ol.steps>li .why{flex-basis:100%;padding-left:2.7em}}
+html.grey{filter:grayscale(1)}
 """
 
 
@@ -263,6 +307,8 @@ class Doc:
         self.book, self.kind = book, kind
         self.fig_no, self.tab_no, self.toc = 0, 0, []
         self.def_no, self.ex_no = 0, 0
+        self.thm_no, self.rec_no, self.res_no, self.algo_no = 0, 0, 0, 0
+        self.fig_index = {}
 
     def side(self, b):
         """Side-column note: provenance label, source anchor and (for supplements) literature references."""
@@ -291,7 +337,10 @@ class Doc:
         spec = self.book['figures'][b['id']]
         self.fig_no += 1
         svg = figures_svg.render(spec)
-        cap = f'<b>Abbildung {self.book["meta"]["chapter_no"]}.{self.fig_no}</b> {inline(b.get("caption") or spec.get("caption") or spec.get("title", ""))}'
+        self.fig_index[b['id']] = f'{self.book["meta"]["chapter_no"]}.{self.fig_no}'
+        msg = b.get('message') or spec.get('message')
+        cap = (f'<b>Abbildung {self.book["meta"]["chapter_no"]}.{self.fig_no}</b> ' + (f'<span class="msg">{inline(msg)}</span> ' if msg else '')
+               + inline(b.get("caption") or spec.get("caption") or spec.get("title", "")))
         return f'<figure id="fig-{E(b["id"])}"><div class="fig">{svg}</div><figcaption>{cap}{self._capsrc(b)}</figcaption></figure>'
 
     def table(self, b):
@@ -310,7 +359,7 @@ class Doc:
     def block(self, b):
         """Every block is wrapped with its side note first, so the note floats beside the block's first line."""
         h = self._block(b)
-        side = '' if b['type'] in ('figure', 'table', 'lab', 'lead', 'summary', 'misconception') else self.side(b)
+        side = '' if b['type'] in ('figure', 'table', 'lab', 'lead', 'summary', 'misconception', 'research', 'figtext', 'compare') else self.side(b)
         return f'<div class="blk">{side}{h}</div>'
 
     def _block(self, b):
@@ -351,6 +400,53 @@ class Doc:
             return f'<div class="case"><span class="lab">{E(b.get("label","Fall"))}</span><h4>{inline(b["title"])}</h4>{md(b["md"])}</div>'
         if t == 'summary':
             return f'<div class="sum"><span class="lab">{E(b.get("title","Zusammenfassung"))}</span>{md(b["md"])}</div>'
+        if t == 'theorem':
+            self.thm_no += 1
+            ass = b.get('assumptions') or []
+            return (f'<div class="thm"><span class="lab"><span class="g">◆</span>{E(b.get("label", "Satz"))} {self.book["meta"]["chapter_no"]}.{self.thm_no}</span>'
+                    + (f'<span class="name">{inline(b["name"])}.</span> ' if b.get('name') else '') + md(b['md'])
+                    + (f'<div class="ass"><b>Voraussetzungen:</b> {inline("; ".join(ass))}</div>' if ass else '') + '</div>')
+        if t == 'proof':
+            steps = ''.join(f'<li><span class="do">{inline(x[0])}</span>' + (f'<span class="why">{inline(x[1])}</span>' if len(x) > 1 and x[1] else '') + '</li>' for x in b.get('steps', []))
+            return (f'<div class="prf"><span class="lab">{E(b.get("label", "Beweis"))}{(" · " + inline(b["title"])) if b.get("title") else ""}</span>'
+                    + md(b.get('md', '')) + (f'<ol class="steps">{steps}</ol>' if steps else '') + '<span class="qed">∎</span><div style="clear:both"></div></div>')
+        if t == 'intuition':
+            return f'<div class="intu"><span class="lab"><span class="g">◐</span>{E(b.get("title", "Intuition"))}</span>{md(b["md"])}</div>'
+        if t == 'takeaway':
+            pts = ''.join(f'<li>{inline(x)}</li>' for x in b.get('points', []))
+            return f'<div class="take"><span class="lab"><span class="g">✓</span>{E(b.get("title", "Das Wichtigste"))}</span>{md(b.get("md", ""))}' + (f'<ul>{pts}</ul>' if pts else '') + '</div>'
+        if t == 'recall':
+            self.rec_no += 1
+            qs = ''.join(f'<li>{inline(q[0])}</li>' for q in b['questions'])
+            self.book.setdefault('_recall_answers', []).append((f'{self.book["meta"]["chapter_no"]}.{self.rec_no}', b['questions']))
+            return (f'<div class="rec"><span class="lab"><span class="g">?</span>Kontrollfragen {self.book["meta"]["chapter_no"]}.{self.rec_no} – erst antworten, dann weiterlesen</span>'
+                    f'<ol>{qs}</ol><div class="ans">Antworten am Kapitelende (Abschnitt „Antworten zu den Kontrollfragen“).</div></div>')
+        if t == 'research':
+            self.res_no += 1
+            g = lambda k, h: f'<div><h5>{E(h)}</h5>{md(b[k])}</div>' if b.get(k) else ''
+            tags = ''.join(f'<span class="tag">{E(x)}</span>' for x in b.get('tags', []))
+            return (f'<div class="res-w"><div class="rh"><b>{inline(b["title"])}</b><span>Forschungsfenster {self.book["meta"]["chapter_no"]}.{self.res_no}</span></div>'
+                    f'<div class="rb"><div class="rq">Frage: {inline(b["question"])}</div><div class="grid">{g("finding", "Befund")}{g("link", "Bezug zum Kapitel")}'
+                    f'{g("limits", "Grenzen der Übertragung")}{g("status", "Einordnung")}</div>'
+                    f'<div class="cite">{tags}{"; ".join(inline(r) for r in b.get("refs", []))}</div></div></div>')
+        if t == 'algorithm':
+            self.algo_no += 1
+            steps = ''.join(f'<li>{inline(x)}</li>' for x in b['steps'])
+            return (f'<div class="algo"><div class="ah">Algorithmus {self.book["meta"]["chapter_no"]}.{self.algo_no} · {inline(b["title"])}</div>'
+                    + (f'<div class="io"><b>Eingabe:</b> {inline(b["input"])}</div>' if b.get('input') else '') + f'<ol>{steps}</ol>'
+                    + (f'<div class="io"><b>Ausgabe:</b> {inline(b["output"])}</div>' if b.get('output') else '')
+                    + (f'<div class="io"><b>Aufwand:</b> {inline(b["cost"])}</div>' if b.get('cost') else '') + '</div>')
+        if t == 'compare':
+            cols = ''.join(f'<div><h5>{inline(c["title"])}</h5>{md(c["md"])}</div>' for c in b['columns'])
+            return (f'<div class="cmp">{cols}</div>' + (f'<p class="hint">{inline(b["note"])}</p>' if b.get('note') else ''))
+        if t == 'figtext':
+            fig = self.figure({'id': b['figure'], 'caption': b.get('caption'), 'message': b.get('message'), 'prov': b.get('prov'), 'src': b.get('src'), 'refs': b.get('refs')})
+            # B33: a wide figure (aspect > 1.45) would shrink below legibility in a half column; it is set as a
+            # stacked text-figure unit instead (text, then the figure at full measure, kept together)
+            m_ = re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', fig)
+            wide = bool(m_) and float(m_.group(1)) / max(1.0, float(m_.group(2))) > 1.45
+            cls = 'ftx stack' if wide else 'ftx' + (' left' if b.get('side') == 'left' else '')
+            return f'<div class="{cls}"><div class="ftx-txt">{md(b["md"])}</div><div class="ftx-fig">{fig}</div></div>'
         raise ContractError(f'unknown book block type {t!r}')
 
 
@@ -416,6 +512,11 @@ def textbook(book):
     if head:
         parts.append(''.join(head)); head.clear()
     back = []
+    if book.get('_recall_answers'):
+        toc.append((1, 'kontrolle', 'Antworten zu den Kontrollfragen'))
+        back.append('<h2 id="kontrolle">Antworten zu den Kontrollfragen</h2>' + ''.join(
+            f'<h4>Kontrollfragen {E(no)}</h4><ol>' + ''.join(f'<li><b>{inline(q[0])}</b><br>{inline(q[1])}</li>' for q in qs) + '</ol>'
+            for no, qs in book.pop('_recall_answers')))
     if book.get('glossary'):
         toc.append((1, 'glossar', 'Begriffe und Symbole'))
         back.append('<h2 id="glossar">Begriffe und Symbole</h2><div class="twrap"><table><thead><tr><th>Begriff / Symbol</th><th>Bedeutung</th></tr></thead><tbody>'
@@ -458,9 +559,9 @@ def _item_html(d, it, solution=False, space=True, exam=False):
             h += '<h4>Typische Fehler und ihre Diagnose</h4><ul>' + ''.join(f'<li>{inline(e)}</li>' for e in s['errors']) + '</ul>'
         if s.get('rubric'):
             tot = sum(r[1] for r in s['rubric'])
-            h += ('<h4>Bewertung</h4><div class="twrap"><table class="rub"><thead><tr><th>Kriterium</th><th>Punkte</th></tr></thead><tbody>'
+            h += ('<div class="rubk"><h4>Bewertung</h4><div class="twrap"><table class="rub"><thead><tr><th>Kriterium</th><th>Punkte</th></tr></thead><tbody>'
                   + ''.join(f'<tr><td>{inline(c)}</td><td>{p:g}</td></tr>' for c, p in s['rubric'])
-                  + f'<tr class="total"><td>Summe</td><td>{tot:g}</td></tr></tbody></table></div>')
+                  + f'<tr class="total"><td>Summe</td><td>{tot:g}</td></tr></tbody></table></div></div>')
     return h + '</div>'
 
 
@@ -478,6 +579,39 @@ def workbook(book, solutions=False):
     sub = 'Lösungswege, typische Fehler und Bewertungsschemata zu allen Aufgaben des Arbeitsbuchs' if solutions else \
         'Aufgaben vom Grundverständnis bis zur Klausuraufgabe'
     body = _cover(book, title, sub) + _toc(toc) + (f'<section>{md(intro)}</section>' if intro else '') + ''.join(parts)
+    return body, toc
+
+
+ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
+
+
+def workbook_integrated(book):
+    """B32: ONE workbook — practice stages, the integrated mock exam, and all solutions at the END (never interleaved).
+    Item ids and numbering are identical in the task and the solution part."""
+    d = Doc(book, 'workbook'); m = book['meta']; parts, toc = [], []
+    stages = book.get('stages') or []
+    def part(k, kicker, title, inner, pid):
+        toc.append((1, pid, f'Teil {ROMAN[k]}\u2002{E(title)}'))
+        return f'<section class="part" id="sec-{pid}"><div class="ph"><div class="k">{E(kicker)}</div><h2 id="{pid}">Teil {ROMAN[k]} · {inline(title)}</h2></div>{inner}</section>'
+    for k, st in enumerate(stages):
+        inner = (f'<div class="stage-intro">{md(st.get("intro", ""))}</div>' if st.get('intro') else '') + ''.join(_item_html(d, it) for it in st['items'])
+        parts.append(part(k, 'Üben', st['title'], inner, f'p{k + 1}'))
+    k = len(stages)
+    ex = book.get('exam')
+    if ex:
+        probs = exam_check(book)
+        if probs:
+            raise ContractError('EXAM_INTEGRITY: ' + '; '.join(probs))
+        head = ('<div class="namefield"><div>Name</div><div>Matrikelnummer</div></div><div class="examhead"><table>'
+                + ''.join(f'<tr><td><b>{E(a)}</b></td><td>{inline(b_)}</td></tr>' for a, b_ in ex['header']) + '</table></div>' + md(ex['self_designed_notice']))
+        parts.append(part(k, 'Prüfungssimulation – ohne Hilfen bearbeiten', 'Probeklausur', head + '<div class="exam">' + ''.join(_item_html(d, it, exam=True) for it in ex['items']) + '</div>', 'pexam'))
+        k += 1
+    sol = ''.join(f'<h3>{E(st["title"])}</h3>' + ''.join(_item_html(d, it, solution=True) for it in st['items']) for st in stages)
+    if ex:
+        sol += '<h3>Probeklausur</h3>' + ''.join(_item_html(d, it, solution=True, exam=True) for it in ex['items'])
+    parts.append(part(k, 'Erst nach eigener Bearbeitung lesen', 'Lösungen', sol, 'psol'))
+    intro = book.get('workbook_intro', '')
+    body = _cover(book, 'Arbeitsbuch', 'Üben in fünf Stufen · integrierte Probeklausur · alle Lösungen am Ende') + _toc(toc) + (f'<section>{md(intro)}</section>' if intro else '') + ''.join(parts)
     return body, toc
 
 
@@ -579,11 +713,39 @@ HEADER = ('<div style="width:100%;font-family:Helvetica,Arial,sans-serif;font-si
           'display:flex;justify-content:space-between;letter-spacing:.08em;text-transform:uppercase"><span>{left}</span><span>{right}</span></div>')
 
 
+LAYOUT_LINT_JS = r'''() => {
+  const out = {inline_math_reflowed: [], overflow: [], broken_images: []};
+  const box = el => { let p = el.parentElement; while (p && getComputedStyle(p).display.startsWith('inline')) p = p.parentElement; return p; };
+  for (const m of document.querySelectorAll('mjx-container:not([display="true"])')) {
+    const p = box(m); if (!p) continue;
+    const pr = p.getBoundingClientRect(), r = m.getBoundingClientRect();
+    if (r.right > pr.right + 1 || r.width > pr.width) {
+      m.setAttribute('display', 'true'); m.style.display = 'block'; m.style.margin = '.35em 0';
+      const svg = m.querySelector('svg'); if (svg) { svg.style.maxWidth = '100%'; svg.style.height = 'auto'; }
+      out.inline_math_reflowed.push((m.getAttribute('aria-label') || m.textContent || '').slice(0, 80));
+    }
+  }
+  const vw = document.documentElement.clientWidth;
+  for (const el of document.querySelectorAll('figure, table, .ftx, .cmp, mjx-container[display="true"], svg')) {
+    const r = el.getBoundingClientRect();
+    if (r.width > 0 && r.right > vw + 2) out.overflow.push({tag: el.tagName.toLowerCase(), cls: String(el.className && el.className.baseVal !== undefined ? el.className.baseVal : el.className).slice(0, 40), right: Math.round(r.right), page_width: vw});
+  }
+  for (const img of document.images) if (!img.complete || img.naturalWidth === 0) out.broken_images.push(img.getAttribute('src'));
+  return out;
+}'''
+
+
 def _pdf(page, html_path, pdf_path, footer):
     page.goto(Path(html_path).resolve().as_uri())
     page.wait_for_function('window.MathJax && MathJax.startup && MathJax.startup.promise', timeout=60000)
     page.evaluate('MathJax.startup.promise')
     page.evaluate('document.fonts.ready')
+    # B33 layout lint: inline formulas wider than their text block are set as scaled display formulas (no clipping,
+    # no running into the margin); figures/tables that overflow are reported. The result is written next to the PDF.
+    page.emulate_media(media='print')
+    page.set_viewport_size({'width': 658, 'height': 1000})
+    lint = page.evaluate(LAYOUT_LINT_JS)
+    Path(pdf_path).with_name('.' + Path(pdf_path).stem + '.layout_lint.json').write_text(json.dumps(lint, ensure_ascii=False, indent=1), encoding='utf-8')
     head = '<span></span>'
     if footer and '\x1f' in footer:
         footer, head = footer.split('\x1f')
@@ -665,14 +827,9 @@ def publish_book(book, out_dir):
     body, toc = textbook(book)
     out['1_Lehrbuch'] = render_document(body, toc, f'{m["title"]} – Lehrbuch', out_dir, '1_Lehrbuch', left + ' · Lehrbuch')
     if book.get('stages'):
-        body, toc = workbook(book)
+        body, toc = workbook_integrated(book)
         out['2_Arbeitsbuch'] = render_document(body, toc, f'{m["title"]} – Arbeitsbuch', out_dir, '2_Arbeitsbuch', left + ' · Arbeitsbuch')
-        body, toc = workbook(book, solutions=True)
-        out['3_Musterloesungen'] = render_document(body, toc, f'{m["title"]} – Musterlösungen', out_dir, '3_Musterloesungen', left + ' · Musterlösungen')
-    if book.get('exam'):
+    if book.get('exam'):   # optional stand-alone exam booklet (the workbook already contains it)
         body, _ = exam(book)
-        out['4_Probeklausur'] = render_document(body, [], f'{m["title"]} – Probeklausur', out_dir, '4_Probeklausur', left + ' · Probeklausur')
-        body, _ = exam(book, solutions=True)
-        out['5_Probeklausur_Loesungen'] = render_document(body, [], f'{m["title"]} – Probeklausur Lösungen', out_dir, '5_Probeklausur_Loesungen',
-                                                          left + ' · Probeklausur, Lösungen')
+        out['3_Probeklausur_einzeln'] = render_document(body, [], f'{m["title"]} – Probeklausur', out_dir, '3_Probeklausur_einzeln', left + ' · Probeklausur')
     return out

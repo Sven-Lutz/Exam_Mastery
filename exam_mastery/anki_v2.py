@@ -19,12 +19,17 @@ import tempfile
 import time
 from pathlib import Path
 
+from html import escape as E
+
 from .common import ContractError, write_json
 
 KIND_LABEL = {'concept': 'Begriff', 'mechanism': 'Zusammenhang', 'compare': 'Vergleich', 'condition': 'Bedingung',
-              'math': 'Rechnen', 'visual': 'Abbildung', 'misconception': 'Denkfehler', 'cloze': 'Lückentext', 'fact': 'Kennzahl'}
-BASIC_FIELDS = ['Key', 'Front', 'Context', 'Answer', 'Explanation', 'Example', 'Pitfall', 'Source', 'Kind']
-CLOZE_FIELDS = ['Key', 'Text', 'Extra', 'Source', 'Kind']
+              'math': 'Rechnen', 'visual': 'Abbildung', 'misconception': 'Denkfehler', 'cloze': 'Lückentext', 'fact': 'Kennzahl',
+              # B32 card types
+              'symbol': 'Symbol & Annahme', 'derivation': 'Herleitungsschritt', 'trace': 'Algorithmus-Spur', 'transfer': 'Anwenden'}
+BASIC_FIELDS = ['Key', 'Front', 'Context', 'Answer', 'Explanation', 'Example', 'Pitfall', 'Source', 'Kind', 'Meta']
+NOTE_BASIC, NOTE_CLOZE = 'Exam Mastery · Basis (v3)', 'Exam Mastery · Lückentext (v3)'
+CLOZE_FIELDS = ['Key', 'Text', 'Extra', 'Source', 'Kind', 'Meta']
 
 CSS = r"""
 @font-face{font-family:"EM Sans";src:url("_em-sans-400.woff2") format("woff2");font-weight:400}
@@ -32,16 +37,17 @@ CSS = r"""
 @font-face{font-family:"EM Sans";src:url("_em-sans-700.woff2") format("woff2");font-weight:700}
 .card{font-family:"EM Sans","Source Sans 3","Helvetica Neue","Segoe UI",Roboto,Arial,sans-serif;font-size:19px;line-height:1.5;
  color:#18212b;background:#fbfbfa;text-align:left;margin:0;padding:0}
-.em{max-width:620px;margin:0 auto;padding:22px 20px 26px;border-top:3px solid #1f5673}
+.em{max-width:640px;margin:0 auto;padding:22px 20px 26px;border-top:5px solid #1B2A41}
+.em-meta{margin-top:10px;font-size:12px;color:#7a8592;border-top:1px dashed #d5dce4;padding-top:6px}
 .em-kind{display:inline-block;font-size:11px;border:1px solid #c9d6de;border-radius:2px;padding:1px 6px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1f5673;margin-bottom:10px}
 .em-q{font-size:22px;font-weight:600;line-height:1.36;color:#18212b;letter-spacing:-.005em}
 .em-ctx{margin-top:12px;font-size:16.5px;color:#46525f}
 .em-ctx img,.em-x img{max-width:100%;height:auto;display:block;margin:10px auto;border-radius:6px;background:#fff}
 hr#answer{border:none;border-top:1px solid #d5dce4;margin:20px 0 16px}
-.em-a{font-size:19px;font-weight:600;color:#18212b;border-left:3px solid #1f5673;padding:2px 0 2px 12px}
+.em-a{font-size:19px;font-weight:600;color:#18212b;border-left:5px solid #2E7D4F;background:#E5F2EA;padding:6px 10px 6px 12px;border-radius:0 6px 6px 0}
 .em-x{margin-top:14px;font-size:16.5px;color:#2c3a4b}
 .em-ex{margin-top:12px;font-size:16px;color:#2c3a4b;background:#fbf3e8;border-radius:6px;padding:9px 12px}
-.em-pit{margin-top:12px;font-size:16px;color:#2c3a4b;border-left:3px solid #a8641c;padding:2px 0 2px 12px}
+.em-pit{margin-top:12px;font-size:16px;color:#2c3a4b;border-left:4px solid #C8483A;background:#FBE9E5;padding:6px 10px 6px 12px;border-radius:0 6px 6px 0}
 .em-lab{display:block;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5b6878;margin-bottom:2px}
 .em-src{margin-top:18px;font-size:12.5px;color:#7a8592}
 .em ul,.em ol{margin:6px 0 6px;padding-left:22px}.em li{margin:3px 0}
@@ -70,10 +76,11 @@ BASIC_A = ('<div class="em"><div class="em-kind">{{Kind}}</div><div class="em-q"
            '{{#Explanation}}<div class="em-x">{{Explanation}}</div>{{/Explanation}}'
            '{{#Example}}<div class="em-ex"><span class="em-lab">Beispiel</span>{{Example}}</div>{{/Example}}'
            '{{#Pitfall}}<div class="em-pit"><span class="em-lab">Typischer Denkfehler</span>{{Pitfall}}</div>{{/Pitfall}}'
-           '{{#Source}}<div class="em-src">{{Source}}</div>{{/Source}}</div>')
+           '{{#Source}}<div class="em-src">{{Source}}</div>{{/Source}}{{#Meta}}<div class="em-meta">{{Meta}}</div>{{/Meta}}</div>')
 CLOZE_Q = '<div class="em"><div class="em-kind">{{Kind}}</div><div class="em-q" style="font-weight:500">{{cloze:Text}}</div></div>'
 CLOZE_A = ('<div class="em"><div class="em-kind">{{Kind}}</div><div class="em-q" style="font-weight:500">{{cloze:Text}}</div>'
-           '{{#Extra}}<hr id="answer"><div class="em-x">{{Extra}}</div>{{/Extra}}{{#Source}}<div class="em-src">{{Source}}</div>{{/Source}}</div>')
+           '{{#Extra}}<hr id="answer"><div class="em-x">{{Extra}}</div>{{/Extra}}{{#Source}}<div class="em-src">{{Source}}</div>{{/Source}}'
+           '{{#Meta}}<div class="em-meta">{{Meta}}</div>{{/Meta}}</div>')
 
 
 def _id(*parts, n=8, signed=True):
@@ -110,6 +117,47 @@ def _notetype(col, name, fields, qfmt, afmt, cloze=False):
     nt['css'] = CSS; nt['sortf'] = 1
     mm.update(nt, preserve_usn=True)
     return mm.get(nt['id'])
+
+
+DIFF = {1: 'Einstieg', 2: 'Standard', 3: 'Vertiefung'}
+
+
+def card_meta(c):
+    """Visible card provenance on the back: learning objective, card type rationale, difficulty, source status."""
+    bits = []
+    if c.get('learning_objective'):
+        bits.append('Lernziel: ' + c['learning_objective'])
+    if c.get('why'):
+        bits.append('Warum diese Karte: ' + c['why'])
+    if c.get('difficulty'):
+        bits.append('Stufe: ' + DIFF.get(c['difficulty'], str(c['difficulty'])))
+    if c.get('provenance'):
+        bits.append({'course': 'Vorlesung', 'didactic': 'eigene Übung', 'supplement': 'Fachliteratur'}.get(c['provenance'], c['provenance']))
+    return E(' · '.join(bits))
+
+
+_MDTAB = re.compile(r'<table')
+
+
+def render_lint(c, vals):
+    """B32 render gate on the final field HTML: absolute-value bars must never become a table, math delimiters
+    must balance, no markdown residue, no empty answer, cloze gaps only in cloze cards, media referenced exist."""
+    p = []
+    for k, v in vals.items():
+        if k in ('Key', 'Kind', 'Meta'):
+            continue
+        src = c.get({'Front': 'front', 'Answer': 'answer', 'Text': 'text', 'Explanation': 'explanation', 'Context': 'context'}.get(k, ''), '') or ''
+        if _MDTAB.search(v) and '|---' not in src.replace(' ', '') and '|:--' not in src.replace(' ', ''):
+            p.append(f'{k}: table produced from text without a table separator (|...| misread)')
+        if v.count('\\(') != v.count('\\)') or v.count('\\[') != v.count('\\]'):
+            p.append(f'{k}: unbalanced math delimiters')
+        if re.search(r'(?<![*\\])\*\*(?!\*)', re.sub(r'\\\(.*?\\\)', '', v)):
+            p.append(f'{k}: markdown residue **')
+        if k != 'Text' and '{{c' in v:
+            p.append(f'{k}: cloze marker outside a cloze card')
+    if c.get('kind') != 'cloze' and not re.sub(r'<[^>]+>', '', vals.get('Answer', '')).strip():
+        p.append('Answer empty')
+    return p
 
 
 def card_lint(c):
@@ -164,8 +212,8 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
     with tempfile.TemporaryDirectory(prefix='em-anki2-') as td:
         col = Collection(str(Path(td) / 'c.anki2'))
         try:
-            basic = _notetype(col, 'Exam Mastery · Basis (v2)', BASIC_FIELDS, BASIC_Q, BASIC_A)
-            cloze = _notetype(col, 'Exam Mastery · Lückentext (v2)', CLOZE_FIELDS, CLOZE_Q, CLOZE_A, cloze=True)
+            basic = _notetype(col, NOTE_BASIC, BASIC_FIELDS, BASIC_Q, BASIC_A)
+            cloze = _notetype(col, NOTE_CLOZE, CLOZE_FIELDS, CLOZE_Q, CLOZE_A, cloze=True)
             did = col.decks.id(deck_name)
             media = []
             from .typeset import NODE
@@ -176,14 +224,15 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
             for fid, svg in (figures or {}).items():
                 name = f'em-{chapter_slug}-{slug(fid)}.svg'
                 (Path(col.media.dir()) / name).write_text(svg, encoding='utf-8'); media.append(name)
-            hashes = {}
+            hashes = {}; gate = {'checked': 0, 'fail': {}}
             for c in cards:
                 nt = cloze if c['kind'] == 'cloze' else basic
                 n = col.new_note(nt)
                 n.guid = guid(course_slug, chapter_slug, c['key'])
+                meta = card_meta(c)
                 if c['kind'] == 'cloze':
                     vals = {'Key': c['key'], 'Text': _html(c['text']), 'Extra': _html(c.get('extra', '')),
-                            'Source': _html(c.get('source', '')), 'Kind': KIND_LABEL['cloze']}
+                            'Source': _html(c.get('source', '')), 'Kind': KIND_LABEL['cloze'], 'Meta': meta}
                 else:
                     ctx = _html(c.get('context', ''))
                     img = (f'<img src="em-{chapter_slug}-{slug(c["figure"])}.svg" alt="{c.get("figure_alt","Abbildung")}">'
@@ -194,12 +243,18 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
                     vals = {'Key': c['key'], 'Front': _html(c['front']), 'Context': ctx, 'Answer': _html(c['answer']),
                             'Explanation': ('' if front_fig else img) + _html(c.get('explanation', '')), 'Example': _html(c.get('example', '')),
                             'Pitfall': _html(c.get('pitfall', '')), 'Source': _html(c.get('source', '')),
-                            'Kind': KIND_LABEL[c['kind']]}
+                            'Kind': KIND_LABEL[c['kind']], 'Meta': meta}
+                bad = render_lint(c, vals)
+                if bad:
+                    gate['fail'][c['key']] = bad
+                gate['checked'] += 1
                 for k, v in vals.items():
                     n[k] = v
                 n.tags = [f'em::{chapter_slug}', f'em::typ::{KIND_LABEL[c["kind"]].lower()}'] + [f'em::{t}' for t in c.get('tags', [])]
                 col.add_note(n, did)
                 hashes[c['key']] = hashlib.sha256(json.dumps(vals, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+            if gate['fail']:
+                raise ContractError('ANKI_RENDER_GATE: ' + json.dumps(gate['fail'], ensure_ascii=False)[:1500])
             col.db.execute('update notes set mod=?', stamp)
             for nt in (basic, cloze):
                 nt['mod'] = stamp; col.models.update(nt, preserve_usn=True)
@@ -216,7 +271,7 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
     write_json(state_p, {'schema': 'em-anki-v2-state', 'last_export': stamp, 'hashes': hashes,
                          'seen': sorted(set(prev.get('seen', [])) | set(hashes))})
     rep = {'package': str(pkg), 'notes': notes, 'cards': n_cards, 'media': media, 'deck': deck_name,
-           'note_types': ['Exam Mastery · Basis (v2)', 'Exam Mastery · Lückentext (v2)'],
+           'note_types': [NOTE_BASIC, NOTE_CLOZE], 'render_gate': gate,
            'kinds': {k: sum(1 for c in cards if c['kind'] == k) for k in sorted({c['kind'] for c in cards})},
            'identity': 'GUID = hash(course slug, chapter slug, semantic key)', 'update_delta': delta}
     write_json(out_dir / 'anki_report.json', rep)

@@ -394,7 +394,7 @@ class B74Delivery(unittest.TestCase):
             ch = next((c for c in sorted((out / 'chapters').iterdir()) if (c / 'publish' / 'artifacts' / '1_Lehrbuch.pdf').exists()), None)
             self.assertIsNotNone(ch, {'failures': st.get('chapter_failures'), 'chapters': st.get('chapters')})   # show the publish error, not a bare StopIteration
             art = ch / 'publish' / 'artifacts'
-            for f in ('1_Lehrbuch.pdf', '2_Arbeitsbuch.pdf', '3_Musterloesungen.pdf'):
+            for f in ('1_Lehrbuch.pdf', '2_Arbeitsbuch.pdf'):
                 doc = pymupdf.open(art / f)
                 self.assertGreater(doc.page_count, 1, f)
                 self.assertIn(f'1 / {doc.page_count - 1}', doc[1].get_text(), f)    # own numbering after the cover

@@ -361,6 +361,8 @@ def adoption_curve(spec):
 
 
 RENDER.update({'line': line_chart, 'heat_matrix': heat_matrix, 'gantt': gantt, 'adoption_curve': adoption_curve})
+from .figure_kit import register as _register_kit  # noqa: E402  (B32 teaching figures)
+_register_kit(RENDER)
 
 
 def render(spec):
