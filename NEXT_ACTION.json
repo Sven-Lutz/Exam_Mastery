@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-15",
+  "updated": "2026-11-16",
   "repo": "Sven-Lutz/Exam_Mastery",
   "main": "PR #2 squash-merged (engine snapshot, CI green on ubuntu-latest)",
   "branch": "feat/nlp-reference-unit (PR #3: DRAFT, DO NOT MERGE; title updated 2026-11-15)",
@@ -43,7 +43,36 @@
     "didactic quality",
     "Anki/textbook/workbook/exams improvements (open product requirement)"
   ],
-  "next_action": "RL engine production pilot (owner prompt 2026-11-15): sources at ~/Documents/01_Studium/RL (02 - Optimal Decision Making.pdf, Exercises/, Tutorium/); old engine run course-a8fba2d65467. Step 1 done: located sources + surveyed engine (exam_mastery/*, prompts/). Next: read engine pipeline (workflow.py, production.py, publish.py, chapter_publish.py), add generic engine components (workbook with integrated exams+solutions, design tokens in renderer, MDP lab kind with math core, independent MDP oracle gate, research stage), then real engine run with agent provider; no paid calls.",
+  "next_action": "SEE rl_pilot_2026_11_16: RL chapter published, awaiting owner review (HUMAN_REVIEW_PENDING).",
+  "rl_pilot_2026_11_16": {
+    "branch": "feat/rl-engine-pilot (from 6ebdf40; PR #3 untouched)",
+    "engine_commit": "7b85869 B31 (on top of 98fb96e B30); installed from committed tree",
+    "tests": "unittest discover: 721 run, only failures were 7 modules missing pytest; after pip install pytest into the engine venv those 95 pass; tests/test_mdp_oracle.py 6 pass",
+    "run_dir": "~/Exam_Mastery_Output/course-a8fba2d65467/ch-20261116T085650Z-de894dce (COMPLETE, technical PASS, MACHINE_CHECKS_PASSED, published)",
+    "run_command": "EXAM_MASTERY_CALL_LEDGER=~/Exam_Mastery_Output/rl_pilot_call_ledger.json exam-mastery <course-folder>/RL --only-chapter ch-271642018f0467",
+    "state": "PUBLISHED; HUMAN_REVIEW_PENDING. Package: ~/Exam_Mastery_Output/rl_releases/RL_Kap03_OptimalDecisionMaking_v1_2026-11-16(.zip) with ABNAHMEBERICHT.md and SHA256SUMS",
+    "model_calls_used": 8,
+    "literature": "silver2015 course page and CS188 MDP TOC verified via web; Sutton&Barto site TLS error -> metadata only",
+    "not_committed": "none",
+    "release_status": "nothing produced yet; target HUMAN_REVIEW_PENDING",
+    "updated": "2026-11-16",
+    "engine_install": "installed venv package replaced by committed tree of 98fb96e (git archive HEAD exam_mastery); previous 0.21.0rc1 install backed up at ~/Exam_Mastery_Output/engine_backups/exam_mastery-0.21.0rc1-installed-20261113",
+    "old_run": "~/Exam_Mastery_Output/course-a8fba2d65467/ch-20261116T073108Z-4b20c5c9 (created by stale 0.21.0rc1 install without B30 gates; left untouched, not continued)",
+    "answer_builders": "session scratchpad (not in repo): infra.py, content_blocks.py, content_rest.py, assess.py, solutions.py; validated with engine functions before writing",
+    "replays": 6,
+    "mdp_oracle": "107/107 claims PASS, 5 models, 2 labs",
+    "errata": "stale 2026-11-13 errata archived as errata/ch-271642018f0467.superseded-2026-11-13.json; new errata (F7 slide numbering) applied",
+    "env_fixes": "playwright chromium (v1248) reinstalled into user cache; engine process hangs at exit in onnxruntime threads (killed after completion)",
+    "open_defects": [
+      "separate workbook/solutions/mock-exam PDFs instead of B30 single workbook on chapter publish path",
+      "foreign catalog lab analysis__folgen-epsilon auto-added",
+      "lab: English source chips, decimal comma",
+      "27 exam items from other lectures mapped to this chapter",
+      "proofs only model-reviewed (same session)",
+      "pre-existing test failures (playwright sync API in asyncio loop)"
+    ],
+    "next": "owner review of the package; then fix open_defects generically"
+  },
   "open_decisions_for_owner": [
     "Rate the v7 reference slice as products (textbook §6 pages 12-26, figures, lab simplex/attention, AT10, A19/B-19, Anki cards) per Issue #10 acceptance questions",
     "Only after acceptance: transfer quality to other chapters/modules",
