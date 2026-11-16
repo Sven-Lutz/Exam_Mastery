@@ -204,9 +204,12 @@ const draw = (V, pol, f) => sc.kind === 'grid' ? drawGrid(V, pol, f) : drawGraph
 function plot(series, ylab, xlab = 'Sweep k') {                                               // log residual plot
   const W = 520, H = 200, L = 46, B = 26, all = series.flatMap(s => s.v).filter(v => v > 0); if (!all.length) return '';
   const lo = Math.floor(Math.log10(Math.min(...all))), hi = Math.ceil(Math.log10(Math.max(...all))), n = Math.max(...series.map(s => s.v.length));
-  const X = i => L + i / Math.max(1, n - 1) * (W - L - 10), Y = v => 10 + (hi - Math.log10(v)) / Math.max(1, hi - lo) * (H - B - 10), out = [];
+  const X = i => L + 14 + i / Math.max(1, n - 1) * (W - L - 38), Y = v => 10 + (hi - Math.log10(v)) / Math.max(1, hi - lo) * (H - B - 10), out = [];
   for (let e = lo; e <= hi; e++) out.push(`<line x1="${L}" x2="${W - 10}" y1="${Y(10 ** e)}" y2="${Y(10 ** e)}" stroke="#E4E8EC"/><text x="${L - 4}" y="${Y(10 ** e) + 4}" font-size="10" text-anchor="end" fill="#5B6878">1e${e}</text>`);
   series.forEach((s, j) => { const pts = s.v.map((v, i) => v > 0 ? `${X(i)},${Y(v)}` : null).filter(Boolean);
+    if (s.v.length <= 12) {                 // B33: few iterations -> points, never a line that suggests a continuum
+      s.v.forEach((v, i) => { if (v > 0) out.push(`<circle cx="${X(i)}" cy="${Y(v)}" r="5" fill="${s.c}"/>` + (v <= 1e-12 ? `<text x="${X(i) - 8}" y="${Y(v) - 8}" font-size="11" text-anchor="end" fill="${s.c}" font-weight="700">exakt 0</text>` : `<text x="${X(i) + 8}" y="${Y(v) + 4}" font-size="11" fill="${s.c}">${v.toExponential(2)}</text>`)); });
+      out.push(`<text x="${W - 12}" y="${16 + j * 14}" text-anchor="end" font-size="11" fill="${s.c}" font-weight="700">${s.n}</text>`); return; }
     out.push(`<polyline points="${pts.join(' ')}" fill="none" stroke="${s.c}" stroke-width="2.2" ${s.dash ? 'stroke-dasharray="6 4"' : ''}/><text x="${W - 12}" y="${16 + j * 14}" text-anchor="end" font-size="11" fill="${s.c}" font-weight="700">${s.n}</text>`); });
   out.push(`<text x="${(W + L) / 2}" y="${H - 4}" font-size="11" text-anchor="middle" fill="#5B6878">${xlab}</text><text x="12" y="${H / 2}" font-size="11" fill="#5B6878" transform="rotate(-90 12 ${H / 2})" text-anchor="middle">${ylab}</text>`);
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Konvergenzverlauf, logarithmisch">${out.join('')}</svg>`;
@@ -294,7 +297,7 @@ function compare(m) {
   <div class="kpi"><div><b id="cmp-vi">${k}</b><span>VI-Sweeps bis Fehler &lt; 10⁻⁶ (je ${nA} Backups)</span></div><div><b id="cmp-vipol">${kPol ?? '—'}</b><span>kleinstes k, ab dem die gierige Policy zu V<sub>k</sub> optimal ist (gewählt im Sweep k+1)</span></div>
   <div><b id="cmp-pi">${pe.length}</b><span>PI-Bewertungen (je ein lineares Gleichungssystem mit ${S.length} Unbekannten)</span></div></div>
   <h3>Wertiteration: Fehler je Sweep</h3>${plot([{n: 'VI', v: vi, c: '#0F6E73'}], 'Fehler zu V* (log)', 'Sweep k')}
-  <h3>Policy Iteration: Fehler je Bewertung</h3>${plot([{n: 'PI', v: pe.length > 1 ? pe : pe.concat(pe), c: '#C8483A'}], 'Fehler zu V* (log)', 'Bewertung i (exaktes Gleichungssystem)')}
+  <h3>Policy Iteration: Fehler je Bewertung</h3>${plot([{n: 'PI', v: pe, c: '#C8483A'}], 'Fehler zu V* (log)', 'Bewertung i (exaktes Gleichungssystem)')}
   <p class="msg info">Lesen Sie die Achse als „Iteration“: Ein VI-Schritt ist ein billiger Sweep, ein PI-Schritt eine vollständige Bewertung. PI braucht wenige teure Schritte und erreicht V* exakt; VI viele billige und nähert sich geometrisch (Faktor γ). Die gierige VI-Policy ist oft lange vor den Werten optimal.</p></div>
   <div class="card"><h3>Protokoll der Policy Iteration</h3><table><thead><tr><th>Bewertung</th><th class="num">‖V<sup>π</sup> − V*‖<sub>∞</sub></th><th>Policy-Änderungen</th></tr></thead><tbody>${rows.join('')}</tbody></table>
   <h3>Frage zum Nachdenken</h3><p>Ändern Sie γ im Modell auf 0.99: Welche Zahl wächst stark, welche kaum? (VI-Sweeps wachsen etwa wie 1/(1−γ); die Zahl der PI-Bewertungen bleibt klein.)</p></div></div>`; }
