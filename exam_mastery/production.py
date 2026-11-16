@@ -202,7 +202,7 @@ def validate_author(x):
             raise ContractError(f"exam answer {e['item_id']}: an answer from the source needs source_refs")
 
 
-STAGE_GATE_CRITICAL = {'ANCHORS_ALLOWED', 'AUTO_SCOPE_TEXT_ONLY', 'EXAMPLE_TOTAL_CONSISTENCY_AFTER_REVISION', 'ONLY_PRODUCIBLE_KCS', 'COURSE_CLAIM_ANCHORED', 'NO_SELF_CERTIFICATION', 'STEP_ARITHMETIC'}
+STAGE_GATE_CRITICAL = {'ANCHORS_ALLOWED', 'AUTO_SCOPE_TEXT_ONLY', 'EXAMPLE_TOTAL_CONSISTENCY_AFTER_REVISION', 'ONLY_PRODUCIBLE_KCS', 'COURSE_CLAIM_ANCHORED', 'NO_SELF_CERTIFICATION', 'STEP_ARITHMETIC', 'MDP_ORACLE'}
 
 
 class StageGateFailed(ContractError):
@@ -401,7 +401,7 @@ def produce_chapter(plan, manifest, chapter_id, gate, out, provider, review=None
     stage_gate('chapter_author', author_checks)
     assess = call('chapter_assessment', v_assess, {'blocks': author['blocks']})
     sols = call('chapter_solutions', lambda x: v_solutions(x, assess['assessments']),
-                {'blocks': author['blocks'], 'assessments': assess['assessments']})
+                {'blocks': author['blocks'], 'assessments': assess['assessments'], 'models': author.get('models', {})})
     from .derivation_check import check_steps, declared_number_format
     fmt = declared_number_format(e.get('text') for e in ctx.get('source_elements') or [])
     sol_checks = [{'check': 'STEP_ARITHMETIC', 'object_id': so.get('solution_id'), 'status': r['status'], 'reason': r.get('reason'),
@@ -409,6 +409,14 @@ def produce_chapter(plan, manifest, chapter_id, gate, out, provider, review=None
                   for so in sols['solutions'] for r in check_steps(
                       [str(x.get('statement')) for x in so.get('steps') or [] if isinstance(x, dict)] + [str(so.get('answer') or '')], number_format=fmt)]
     stage_gate('chapter_solutions', sol_checks)
+    # B30: independent exact MDP oracle over every declared model, numeric model claim and MDP lab
+    from .mdp_oracle import stage_checks as mdp_stage_checks
+    mdp_rows, mdp_rep = mdp_stage_checks({**author, 'models': {**(author.get('models') or {}), **(sols.get('models') or {})}}, sols)
+    if mdp_rep is not None:
+        write_json(out / 'mdp_oracle_report.json', mdp_rep)
+        sol_claims = {c.get('claim_id') for c in sols.get('model_claims') or []}
+        bad = {r['object_id'] for r in mdp_rows if r['status'] == 'FAIL'}
+        stage_gate('chapter_solutions' if bad and bad <= sol_claims else 'chapter_author', mdp_rows)
     product = {'blocks': author['blocks'], 'assessments': assess['assessments'], 'solutions': sols['solutions'], 'figures': author['figures']}
     review = call('chapter_semantic_review', v_review, product)
     risk = None
@@ -477,7 +485,9 @@ def produce_chapter(plan, manifest, chapter_id, gate, out, provider, review=None
             'kc_ids': gate['producible_kc_ids'], 'blocked_kc_ids': sorted(gate['blocked_kcs']),
             'exam_answers': author.get('exam_answers', []),  # B6.7: concise answers per official question
             'cards': author.get('cards', []),  # B12: authored retrieval cards (DR-1.0 C1-C5); were dropped here
-            'labs': author.get('labs', []),  # B13: structured lab requests; built deterministically at publishing
+            'labs': author.get('labs', []),
+            'models': {**(author.get('models') or {}), **(sols.get('models') or {})}, 'model_claims': author.get('model_claims', []) + sols.get('model_claims', []),
+            'literature': author.get('literature', []),  # B13: structured lab requests; built deterministically at publishing
             'sources': [{'source_id': s['source_id'], 'relative_path': s['relative_path'], 'raw_sha256': s['raw_sha256'],
                          'authority': s['authority'], 'status': s['status']}
                         for s in manifest['sources'] if s['source_id'] in chapter['source_package']['source_ids']],

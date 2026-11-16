@@ -29,3 +29,11 @@ whose answer source is missing. Points are integers, and the solution rubric mus
 Write all prompts in German.
 
 B10 – Sachverhalte (DR-1.1): Fallaufgaben enthalten alle Tatsachen oder Annahmen, die die Lösung für ihre Subsumtion braucht (z. B. zu erwartende Zuflüsse bei einer Liquiditätsprüfung).
+
+B30 ARBEITSBUCH (ein zusammenhängendes Produkt): jedes Item hat "workbook_section" aus
+WORKED_EXAMPLE (vollständig vorgerechnet, Lernende erklären Schritte) | GUIDED_FADING (Schritte schrittweise ausgeblendet;
+mindestens drei Items mit abnehmender Hilfe, "faded_steps" nennt die offenen Schritte) | INDEPENDENT (eigenständige
+Rechnungen) | PROOF_DIAGNOSIS (Beweise und Fehlerdiagnose: ein fehlerhafter Lösungsweg wird gezeigt, Fehler finden und
+korrigieren) | CASE_TRANSFER (Fallstudie, anspruchsvoller Transfer) | MOCK_EXAM (integrierte Probeklausur, difficulty "exam").
+Jede Sektion hat mindestens zwei Items. Zahlen in Aufgaben zu einem Modell stammen aus "models" des Autors oder sind als
+neue Parameter vollständig angegeben.

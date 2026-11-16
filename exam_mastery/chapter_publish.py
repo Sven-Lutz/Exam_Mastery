@@ -104,7 +104,7 @@ def model(ast, manifest, plan=None):
     for a in sorted(ast.get('assessments', []), key=lambda a: (DIFFICULTY_ORDER.index(a['difficulty']) if a.get('difficulty') in DIFFICULTY_ORDER else 9, a['item_id'])):
         s = sol.get(a['item_id'], {})
         items.append({'id': a['item_id'], 'prompt': _txt(a.get('prompt')), 'difficulty': a.get('difficulty', ''), 'points': a.get('points'),
-                      'points_basis': a.get('points_basis'), 'evidence_gap': a['item_id'] in gaps,
+                      'points_basis': a.get('points_basis'), 'section': a.get('workbook_section') or ('MOCK_EXAM' if a.get('difficulty') == 'exam' else ''), 'faded_steps': [str(x) for x in a.get('faded_steps') or []], 'evidence_gap': a['item_id'] in gaps,
                       'operation': a.get('required_operation'), 'format': a.get('format', ''), 'kc_ids': a.get('kc_ids', []),
                       'provenance': a.get('provenance', ''), 'anchors': _anchors(a.get('source_refs'), idx),
                       'exam_links': a.get('exam_link_item_ids') or [], 'blocks': a.get('refers_to_block_ids') or [],
@@ -305,7 +305,21 @@ def _h_block(b, T=ESC, errata=()):
 
 def mock_exam_items(m):
     """B7.2: exam items without an evidence gap; gap items stay in the workbook, labelled, never in the mock exam."""
-    return [i for i in m['items'] if i['difficulty'] == 'exam' and not i.get('evidence_gap')]
+    return [i for i in m['items'] if (i.get('section') == 'MOCK_EXAM' or i['difficulty'] == 'exam') and not i.get('evidence_gap')]
+
+
+# B30: one workbook product, parts in this order; the mock exam is part 6, the complete solutions chapter comes last.
+WORKBOOK_PARTS = [('WORKED_EXAMPLE', 'Teil 1 · Worked Examples'), ('GUIDED_FADING', 'Teil 2 · Geführte Übungen mit Fading'),
+                  ('INDEPENDENT', 'Teil 3 · Eigenständige mathematische Aufgaben'), ('PROOF_DIAGNOSIS', 'Teil 4 · Beweise und Fehlerdiagnosen'),
+                  ('CASE_TRANSFER', 'Teil 5 · Fallstudien und Transferprobleme')]
+
+
+def workbook_parts(m):
+    """[(title, items)] for parts 1-5; items without a section fall back by difficulty (legacy ASTs)."""
+    exam = {i['id'] for i in mock_exam_items(m)}
+    fb = {'recall': 'WORKED_EXAMPLE', 'guided': 'GUIDED_FADING', 'standard': 'INDEPENDENT', 'transfer': 'CASE_TRANSFER'}
+    rest = [i for i in m['items'] if i['id'] not in exam]
+    return [(t, [i for i in rest if (i.get('section') or fb.get(i['difficulty'], 'INDEPENDENT')) == k]) for k, t in WORKBOOK_PARTS]
 
 
 def item_note(i):
@@ -489,14 +503,25 @@ def publish_pdf(m, out, mr=None):
             if r.get('supplement'): flow.append(P('Ergänzung (externe Quelle, nicht Vorlesung): ' + str(r['supplement']), 'small'))
             flow.append(P(f"{r['item_id']} · {EXAM_STATUS.get(r['status'], 'fehlt im Author-Output (Neugenerierung nötig)')}" +
                           (f" · Quelle: {r['anchors']}" if r['anchors'] else ''), 'small'))
-    flow += [PageBreak(), P('Arbeitsbuch', 'title'), P('Aufgaben zuerst ohne Lösungen bearbeiten.')]
-    for i in m['items']: flow += item(i, False)
-    flow += [PageBreak(), P('Musterlösungen', 'title')]
-    for i in m['items']: flow += item(i, True)
+    flow += [PageBreak(), P('Arbeitsbuch', 'title'),
+             P('Ein zusammenhängendes Arbeitsbuch: Teile 1–5 steigern die Selbstständigkeit, Teil 6 ist die integrierte Probeklausur, '
+               'Teil 7 enthält alle vollständigen Lösungen mit Zwischenrechnungen und Bewertungsschema.')]
+    for title, its in workbook_parts(m):
+        if not its: continue
+        flow.append(P(title, 'h1'))
+        for i in its:
+            flow += item(i, False)
+            if i.get('faded_steps'): flow.append(P('Offene Schritte: ' + '; '.join(i['faded_steps']), 'small'))
     exam = mock_exam_items(m)
     if exam:
-        flow += [PageBreak(), P(f"Probeklausur ({sum(i['points'] or 0 for i in exam)} Punkte)", 'title')]
+        flow += [PageBreak(), P(f"Teil 6 · Probeklausur ({sum(i['points'] or 0 for i in exam)} Punkte)", 'h1'),
+                 P('Bearbeitungszeit und Hilfsmittel wie in der Klausur; Lösungen in Teil 7.', 'small')]
         for i in exam: flow += item(i, False)
+    flow += [PageBreak(), P('Teil 7 · Lösungen', 'h1')]
+    for title, its in workbook_parts(m) + [('Teil 6 · Probeklausur', exam)]:
+        if not its: continue
+        flow.append(P('Lösungen zu ' + title, 'h2'))
+        for i in its: flow += item(i, True)
     flow += [PageBreak(), P('Kompetenzmatrix', 'title'),
              table([['KC', 'Kompetenz', 'Op.', 'Lehrbuch', 'Übung', 'Prüfungsbeleg', 'Nur Recall', 'Status']] +
                    [[r['kc_id'][-8:], r['statement'] + (' (blockiert)' if r['blocked'] else ''), r['required_operations'], r['treated_in_blocks'],
@@ -549,8 +574,7 @@ def publish_anki(m, pub_dir, verify=True):
 
 # ------------------------------------------------------------------ separate product files (B7.4)
 
-SECTION_FILES = [('Lehrbuch', '1_Lehrbuch.pdf'), ('Arbeitsbuch', '2_Arbeitsbuch.pdf'), ('Musterlösungen', '3_Musterloesungen.pdf'),
-                 ('Probeklausur', '4_Probeklausur.pdf'), ('Kompetenzmatrix', None)]
+SECTION_FILES = [('Lehrbuch', '1_Lehrbuch.pdf'), ('Arbeitsbuch', '2_Arbeitsbuch.pdf'), ('Kompetenzmatrix', None)]
 
 
 def split_products(pdf, out_dir, mock_ids=()):

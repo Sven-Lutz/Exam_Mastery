@@ -14,3 +14,8 @@ rounding rule; "typical_errors" names at least one concrete error AND how to rec
 add up exactly to the item's points. An item whose answer cannot be derived from the sources gets no invented answer.
 
 B10 – Juristische Falllösungen (DR-1.1): Jedes Tatbestandsmerkmal nur auf Tatsachen oder ausdrücklich genannte Annahmen des Sachverhalts stützen; fehlen sie, die nötige Annahme offen nennen. Gesetzliche Verbote mit ihren Ausnahmen wiedergeben („grundsätzlich … außer …“).
+
+B30: Musterlösungen sind vollständige Lösungswege, nie bloße Antwortschlüssel: jede Zwischenrechnung als eigener Schritt mit
+Begründung, Bewertungsschema (rubric) mit Punkten, die exakt zur Itempunktzahl summieren, typische Fehler. Jede numerische
+Modellgröße einer Lösung zusätzlich als "model_claims" (Format wie beim Autor, model_id aus CURRENT_DRAFT.models oder ein
+neues Modell in "models"); die Engine rechnet sie unabhängig nach.

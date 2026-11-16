@@ -168,7 +168,7 @@ def run_product(root, cfg=None, output_base=None, provider=None, only_chapter=No
 
 # ------------------------------------------------------------------ delivery folder (B7.4)
 
-DOC_NOTE = {'1_Lehrbuch.pdf': 'Lehrbuch', '2_Arbeitsbuch.pdf': 'Aufgaben ohne Lösungen', '3_Musterloesungen.pdf': 'Aufgaben mit Lösungen und Bewertung',
+DOC_NOTE = {'1_Lehrbuch.pdf': 'Lehrbuch', '2_Arbeitsbuch.pdf': 'Arbeitsbuch: Teile 1–5, integrierte Probeklausur, vollständige Lösungen am Ende', '3_Musterloesungen.pdf': 'Aufgaben mit Lösungen und Bewertung',
             '4_Probeklausur.pdf': 'Probeklausur', '5_Probeklausur_Loesungen.pdf': 'Lösungen der Probeklausur',
             '6_Quellenabbildungen.pdf': 'Folien mit Abbildungen, mit Quelle, Seite und Auswertungsstatus'}
 

@@ -94,3 +94,21 @@ mdp (endliches Markov-Entscheidungsproblem, höchstens 8 Zustände, mindestens e
 Aktionen, Belohnungen r(s,a), Übergangswahrscheinlichkeiten und γ exakt aus einem Beispiel der zitierten Quellen; Zustände ohne
 Aktion sind terminal (Wert 0). Die Engine rechnet Policy-Bewertung, Wertiteration und Policy-Iteration selbst.
 Kein JavaScript und keine Formeln für Labs schreiben: Die Engine rechnet alles selbst und lehnt andere Modelle ab.
+
+B30 – Lehrbuchtiefe, verifizierte Modelle und Literatur (generisch, für jedes Fach):
+- Tiefe: Das Lehrbuch geht über eine Vorlesungszusammenfassung hinaus. Jeder zentrale Satz bekommt Voraussetzungen, eine
+  vollständige Herleitung oder einen Beweis (DERIVATION/PROOF-Blöcke mit "steps":[{"statement","justification"}], jede
+  wesentliche Umformung einzeln begründet), mindestens ein vollständig durchgerechnetes Beispiel, eine Anwendung, ein
+  Gegenbeispiel oder einen Grenzfall. Ein Einstieg (INTUITION-Block) setzt geringes Vorwissen voraus. Dimensionen und Indizes
+  jeder Größe werden bei der ersten Verwendung genannt.
+- Durchgehende Fallstudie: Wenn die Quellen ein Beispielmodell enthalten, wird genau dieses Modell (gleiche Zahlen, gleiche
+  Notation) in Lehrbuch, Aufgaben, Karten und Lab verwendet; Erweiterungen sind als AUTHOR_CREATED gekennzeichnet.
+- "models": {"model_id": {...}} – jedes Rechenmodell, auf dem Zahlen im Text beruhen, in maschinenlesbarer Form. Für endliche
+  MDPs exakt das Lab-Format {"states","gamma","transitions":[{"s","a","r","next"}]} (Wahrscheinlichkeiten exakt, z. B. "1/3").
+- "model_claims": jede Zahl im Text, die aus einem Modell folgt, als Liste {"claim_id","model_id","quantity":
+  "V_pi"|"Q_pi"|"V_star"|"Q_star"|"VI_k"|"PE_k"|"greedy"|"optimal_policy","state","action","policy","k","gamma","value",
+  "object_ids":[block_ids]}. Die Engine rechnet jede Behauptung mit einem unabhängigen exakten Rechenkern nach; eine
+  Abweichung stoppt die Produktion. Keine Zahl ohne Claim.
+- "literature": [{"ref_id","cite","used_for","access"}] nur aus allowed_external_refs (verifiziertes Fachregister); Blöcke mit
+  provenance "supplement" nennen die ref_id in "external_refs". Selbst konstruierte Zahlenbeispiele heißen "konstruiertes
+  Beispiel", nie Forschungsergebnis.

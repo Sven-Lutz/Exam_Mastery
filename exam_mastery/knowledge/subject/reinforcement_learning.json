@@ -1,0 +1,10 @@
+{"schema": "em-subject-sources-v1", "subject": "reinforcement_learning", "version": "1.0.0", "date": "2026-11-16",
+ "keywords": ["markov decision", "mdp", "bellman", "value iteration", "policy iteration", "reinforcement learning", "wertiteration", "policy evaluation"],
+ "note": "'access' = what was actually checked in session 2026-11-16. Standard mathematical results (Bellman equations, contraction) are textbook knowledge; no verbatim copying.",
+ "sources": [
+  {"id": "silver2015", "kind": "lecture_notes", "cite": "Silver, D. (2015). Reinforcement Learning, Lecture 2: Markov Decision Processes; Lecture 3: Planning by Dynamic Programming. COMPM050/COMPGI13. https://davidstarsilver.wordpress.com/teaching/ (CC-BY-NC 4.0).", "year": 2015, "access": "course_page_verified", "use": "Weiterführende Lektüre; Gliederung (MDP -> DP-Planung). Keine Folien kopieren."},
+  {"id": "cs188_mdp", "kind": "open_course_notes", "cite": "Sharma, N. (2024). MDPs (Kap. 4: Markov Decision Processes, Solving MDPs, Value Iteration, Policy Iteration). CS 188 Introduction to Artificial Intelligence, UC Berkeley. https://inst.eecs.berkeley.edu/~cs188/textbook/mdp/", "year": 2024, "access": "toc_verified", "use": "Weiterführende Lektüre zu Value/Policy Iteration."},
+  {"id": "suttonbarto2018", "kind": "textbook", "cite": "Sutton, R. S., & Barto, A. G. (2018). Reinforcement Learning: An Introduction (2nd ed.). MIT Press.", "year": 2018, "access": "metadata", "use": "Nur als Standardliteratur nennen; keine Seiten-/Abschnittszitate (Online-Fassung in dieser Sitzung nicht abrufbar: TLS-Fehler)."},
+  {"id": "bellman1957", "kind": "monograph", "cite": "Bellman, R. (1957). Dynamic Programming. Princeton University Press.", "year": 1957, "access": "metadata", "use": "Historischer Ursprung des Optimalitätsprinzips; nur Nennung."},
+  {"id": "howard1960", "kind": "monograph", "cite": "Howard, R. A. (1960). Dynamic Programming and Markov Processes. MIT Press.", "year": 1960, "access": "metadata", "use": "Historischer Ursprung der Policy Iteration; nur Nennung."}
+ ]}

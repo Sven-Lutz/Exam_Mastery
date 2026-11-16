@@ -397,6 +397,21 @@ def production_preflight_auto(plan, gates, chapter_ids):
                     'human decisions only for escalated chapters; academic release stays NOT_TESTED'}
 
 
+def subject_register_refs(text):
+    """B30: verified subject-literature registers (knowledge/subject/*.json) whose keywords occur in the chapter text.
+    Only entries a human/agent actually checked ('access' != 'none') are offered; 'use' limits what may be taken."""
+    import json as _j, re as _re
+    out, low = [], text.lower()
+    for f in sorted((Path(__file__).parent / 'knowledge' / 'subject').glob('*.json')):
+        reg = _j.loads(f.read_text(encoding='utf-8'))
+        kws = reg.get('keywords') or []
+        if not kws or not any(_re.search(r'\b' + _re.escape(k.lower()) + r'\b', low) for k in kws):
+            continue
+        out += [{'ref_id': x['id'], 'cite': x['cite'], 'access': x.get('access'), 'use': x.get('use'), 'register': reg['subject']}
+                for x in reg['sources'] if x.get('access', 'none') != 'none']
+    return out
+
+
 def chapter_context(plan, manifest, chapter_id, gate, review=None):
     """Evidence bundle for one chapter. Source text is passed as untrusted data, never as instruction.
     review: optional evaluated review overlay (review_overlay.evaluate); its block for this chapter is added in full."""
@@ -412,6 +427,7 @@ def chapter_context(plan, manifest, chapter_id, gate, review=None):
                    for s in manifest['sources'] if s['authority'] == 'SUPPLEMENTARY' and s['status'] == 'extracted']
     supplements += [{'ref_id': r['ref_id'], 'url': r['url'], 'sha256': r.get('sha256')}
                     for r in manifest.get('online_references', []) if r['status'] == 'FETCHED']
+    supplements += subject_register_refs(c['title'] + ' ' + ' '.join(kcs[k]['statement'] for k in c['kc_ids']))
     ctx = {'schema': 'em-chapter-context-v1', 'course_id': plan['course_id'], 'chapter_id': chapter_id, 'title': c['title'],
             'position': c['position'], 'order_basis': c.get('order_basis'), 'domain_profile': plan['domain_profile'],
             'produce_kc_ids': gate['producible_kc_ids'],
