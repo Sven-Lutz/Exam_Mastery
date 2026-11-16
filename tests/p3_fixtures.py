@@ -61,6 +61,8 @@ def author(ctx, variant):
                 b['steps'] = [{**s, 'element': f'Tatbestandsmerkmal {j}'} for j, s in enumerate(b['steps'], 1)]
             if kind == 'WORKED_EXAMPLE':
                 b.update(problem=SYNTHETIC, result=SYNTHETIC, interpretation=SYNTHETIC)
+            if kind in ('THEOREM', 'PROOF', 'DERIVATION', 'MODEL'):
+                b['assumptions'] = [SYNTHETIC + ' Voraussetzung']   # B31: formal blocks state their domain of validity
             if kind in ('DERIVATION', 'PROOF') and 'formal_mathematics' in ctx['domain_profile']['active_profiles']:
                 b['shape_checks'] = {'symbols': {'A': [3, 2], 'x': [3 if variant == 'bad_shapes' else 2, 1], 'b': [3, 1]},
                                      'equations': [{'lhs': 'A^T A x', 'rhs': 'A^T b'}]}
@@ -141,6 +143,8 @@ def answer(role, prompt, variant=None):
         return review(ctx, draft)
     if role == 'chapter_risk_review':
         return {'verdict': 'NEEDS_REVIEW', 'findings': [{'severity': 'info', 'description': SYNTHETIC, 'object_id': None}]}
+    if role == 'chapter_revision':
+        return {'changes': {}}      # B31: the synthetic reviser changes nothing; negative fixtures must still trip the final gates
     raise AssertionError('unexpected role ' + role)
 
 

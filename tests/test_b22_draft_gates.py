@@ -12,29 +12,49 @@ def triggers(product):
     return sorted(f['code'] for f in draft_gate_findings(product, KCS) if f['trigger'])
 
 
+WE = {'problem': 'p', 'steps': [{'statement': 's', 'justification': 'j'}], 'result': 'r'}
+
+
 def test_clean_draft_has_no_findings():
-    p = {'blocks': [{'block_id': 'b1', 'kind': 'WORKED_EXAMPLE', 'kc_ids': ['kc-calc'], 'assumptions': ['γ = 0.9'], 'interpretation': 'x'}],
+    p = {'blocks': [{'block_id': 'b1', 'kind': 'WORKED_EXAMPLE', 'kc_ids': ['kc-calc'], 'assumptions': ['γ = 0.9'], 'interpretation': 'x', **WE}],
          'solutions': [{'solution_id': 's1', 'answer': 'V = 8.064516129', 'steps': [],
                         'numeric_checks': [{'expression': '2/0.248', 'expected': 8.064516129032258}]}]}
     assert codes(p) == []
 
 
 def test_rounded_expected_value_and_missing_statement_are_reported():
-    p = {'blocks': [{'block_id': 'b1', 'kind': 'WORKED_EXAMPLE', 'kc_ids': ['kc-calc'], 'assumptions': ['a'], 'interpretation': 'x'}],
+    p = {'blocks': [{'block_id': 'b1', 'kind': 'WORKED_EXAMPLE', 'kc_ids': ['kc-calc'], 'assumptions': ['a'], 'interpretation': 'x', **WE}],
          'solutions': [{'solution_id': 's1', 'answer': 'etwa 8.06', 'steps': [], 'numeric_checks': [{'expression': '2/0.248', 'expected': 8.0645}]},
                        {'solution_id': 's2', 'answer': 'gamma ist 0.19', 'steps': [], 'numeric_checks': [{'expression': '2*0.5', 'expected': 1}]}]}
     assert codes(p) == [('ANSWER_CONSISTENCY', 's2'), ('NUMERIC_CHECK_MISMATCH', 's1')]
 
 
 def test_calculation_without_assumptions_and_missing_exposition():
-    p = {'blocks': [{'block_id': 'b1', 'kind': 'WORKED_EXAMPLE', 'kc_ids': ['kc-calc'], 'interpretation': 'x'}], 'solutions': []}
+    p = {'blocks': [{'block_id': 'b1', 'kind': 'WORKED_EXAMPLE', 'kc_ids': ['kc-calc'], 'interpretation': 'x', **WE}], 'solutions': []}
     assert codes(p) == [('CALCULATION_WITHOUT_ASSUMPTIONS', 'b1')]
     p = {'blocks': [{'block_id': 'b1', 'kind': 'EXPLANATION', 'kc_ids': ['kc-calc']}], 'solutions': []}
     assert codes(p) == [('MISSING_EXPOSITION_CALCULATE', 'kc-calc')]
 
 
+def test_publish_blocking_structure_is_reported_before_the_revision():
+    # B31: G0 worked-example structure, G4.DOMAIN_FORMAL and shape checks block publishing, so they start the revision
+    p = {'blocks': [{'block_id': 'we', 'kind': 'WORKED_EXAMPLE', 'kc_ids': ['kc-exp'], 'steps': [{'statement': 's', 'justification': 'j'}],
+                     'result': 'r', 'interpretation': 'i'},
+                    {'block_id': 'pr', 'kind': 'PROOF', 'kc_ids': ['kc-exp'], 'steps': [{'statement': 's', 'justification': 'j'}]},
+                    {'block_id': 'mo', 'kind': 'MODEL', 'kc_ids': ['kc-exp'], 'assumptions': ['γ < 1'],
+                     'shape_checks': {'symbols': {'P': [2, 2], 'V': [2, 1], 'r': [2, 1]}, 'equations': [{'lhs': '(I - gamma P) V', 'rhs': 'r'}]}},
+                    {'block_id': 'ok', 'kind': 'THEOREM', 'kc_ids': ['kc-exp'], 'assumptions': ['γ < 1'],
+                     'shape_checks': {'symbols': {'P': [2, 2], 'V': [2, 1], 'r': [2, 1]}, 'equations': [{'lhs': 'P V', 'rhs': 'r'}]}}],
+         'solutions': []}
+    kcs = [{'kc_id': 'kc-exp', 'operations': ['EXPLAIN']}]
+    found = draft_gate_findings(p, kcs)
+    assert sorted((f['code'], f['object_id']) for f in found) == [
+        ('DIMENSION_MISMATCH', 'mo'), ('FORMAL_WITHOUT_ASSUMPTIONS', 'pr'), ('INCOMPLETE_WORKED_EXAMPLE', 'we')]
+    assert all(f['trigger'] for f in found)
+
+
 def test_only_blocking_findings_start_a_revision():
-    p = {'blocks': [{'block_id': 'b1', 'kind': 'WORKED_EXAMPLE', 'kc_ids': ['kc-calc'], 'interpretation': 'x'}],
+    p = {'blocks': [{'block_id': 'b1', 'kind': 'WORKED_EXAMPLE', 'kc_ids': ['kc-calc'], 'interpretation': 'x', **WE}],
          'solutions': [{'solution_id': 's2', 'answer': 'x', 'steps': [], 'numeric_checks': [{'expression': '2*0.5', 'expected': 1}]}]}
     assert triggers(p) == []          # assumptions / answer consistency ride along only
     p['solutions'][0]['numeric_checks'][0]['expected'] = 1.01

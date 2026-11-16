@@ -287,6 +287,21 @@ def draft_gate_findings(product, competencies):
             if op in EXPOSITION and not any(k in (b.get('kc_ids') or []) and b.get('kind') in EXPOSITION[op] for b in blocks):
                 add('MISSING_EXPOSITION_' + op, k, f'competency {k} demands {op} but no block of kind {sorted(EXPOSITION[op])} '
                     'teaches it; add the kc_id to a fitting existing block of that kind')
+    # B31: the remaining block-level gates that block publishing (G0 structure, G4.DIMENSIONS, G4.DOMAIN_FORMAL) and that
+    # a revision can fix. Before B31 they surfaced only after the one bounded revision, so a missing "problem" field or
+    # an undeclared shape symbol always ended in MACHINE_CHECKS_FAILED and no learning product was published.
+    from .validate import check_shapes
+    for b in blocks:
+        bid = b.get('block_id')
+        if b.get('kind') == 'WORKED_EXAMPLE' and (
+                not all(str(b.get(f) or '').strip() for f in ('problem', 'result', 'interpretation')) or not b.get('steps') or
+                any(not str(s.get('justification', '')).strip() for s in b.get('steps') or [] if isinstance(s, dict))):
+            add('INCOMPLETE_WORKED_EXAMPLE', bid, 'worked example needs "problem", justified "steps", "result" and "interpretation"')
+        if b.get('kind') in ('THEOREM', 'PROOF', 'DERIVATION', 'MODEL') and (not isinstance(b.get('assumptions'), list) or not b['assumptions']):
+            add('FORMAL_WITHOUT_ASSUMPTIONS', bid, f"{b.get('kind')} block needs a non-empty \"assumptions\" list (domain of validity)")
+        if isinstance(b.get('shape_checks'), dict):
+            for err in check_shapes(b['shape_checks']):
+                add('DIMENSION_MISMATCH', bid, f'shape_checks: {err}; declare every factor in "symbols" or remove the equation')
     return out
 
 
