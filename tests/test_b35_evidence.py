@@ -64,6 +64,18 @@ class Rules(unittest.TestCase):
         self.assertIn('nicht geprüft', EV.publish_label({'access': 'MODEL_INFERENCE'}))
 
 
+class SubjectSources(unittest.TestCase):
+    def test_legal_source_without_quote_and_validity_is_reported(self):
+        src = {'id': 'g', 'kind': 'official_guideline', 'cite': 'Richtlinien, Teil G, Abschnitt 5.2', 'access': 'fulltext',
+               'use': 'Gliederung des Aufgabe-Lösungs-Ansatzes nach Abschnitt 5.2.'}
+        c = EV.from_subject_source(src)
+        self.assertEqual((c['claim_type'], c['access']), ('NORMATIVE_LEGAL', 'PRIMARY_FULLTEXT'))
+        got = codes(c)
+        self.assertIn('E2', got); self.assertIn('E7', got); self.assertNotIn('E3', got, 'locator numbers are anchors, not new details')
+        full = dict(src, use='Aufgabe-Lösungs-Ansatz in drei Stufen (5.2).', quote='three main stages', text='The approach consists of three main stages', jurisdiction='EPO', valid_as_of='2026-03-01')
+        self.assertEqual(codes(EV.from_subject_source(full)), set())
+
+
 class Legacy(unittest.TestCase):
     def test_crossref_verified_is_metadata_only(self):
         kb = json.loads((ROOT / 'exam_mastery/knowledge/verification.json').read_text())['sources']

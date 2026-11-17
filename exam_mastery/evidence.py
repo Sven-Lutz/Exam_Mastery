@@ -99,7 +99,7 @@ def check_claim(c, graphs=None):
             f('E2', 'FAIL', 'quote does not occur in the accessed text')
         elif not txt:
             f('E2', 'WARN', 'accessed text not stored; quote cannot be re-checked')
-        missing = _numbers(st) - _numbers(quote + ' ' + txt)
+        missing = _numbers(st) - _numbers(quote + ' ' + txt + ' ' + (c.get('locator') or ''))   # locator numbers are anchors
         if missing:
             f('E3', 'FAIL', 'statement contains details not in the read passage: ' + ', '.join(sorted(missing)))
     if a == 'ABSTRACT_ONLY':
@@ -157,3 +157,19 @@ def from_legacy_verification(entry):
     if not entry.get('found'):
         return 'UNVERIFIED'
     return 'ABSTRACT_ONLY' if entry.get('abstract_stored') else 'METADATA_ONLY'
+
+
+_KIND_TYPE = {'official_guideline': 'NORMATIVE_LEGAL', 'statute': 'NORMATIVE_LEGAL', 'court_decision': 'NORMATIVE_LEGAL',
+              'clinical_guideline': 'CLINICAL', 'study': 'EMPIRICAL', 'textbook': 'DEFINITIONAL', 'paper': 'MATHEMATICAL'}
+_ACCESS = {'fulltext': 'PRIMARY_FULLTEXT', 'abstract': 'ABSTRACT_ONLY', 'metadata': 'METADATA_ONLY'}
+
+
+def from_subject_source(src):
+    """Claim draft from a knowledge/subject/*.json source record ('use' = what the chapter relies on). Structured
+    fields that the record does not carry stay empty, so the rules report them instead of guessing them."""
+    return {'id': src['id'], 'statement': src.get('use', ''), 'claim_type': _KIND_TYPE.get(src.get('kind'), 'DEFINITIONAL'),
+            'source': {'id': src['id'], 'citation': src.get('cite'), 'url': src.get('url')},
+            'access': _ACCESS.get(src.get('access'), 'UNVERIFIED'), 'locator': src.get('cite') if src.get('access') == 'fulltext' else None,
+            'accessed_text': src.get('text', ''), 'quote': src.get('quote', ''),
+            'jurisdiction': src.get('jurisdiction'), 'valid_as_of': src.get('valid_as_of'), 'evidence_grade': src.get('evidence_grade'),
+            'study_design': src.get('study_design'), 'review': {'status': 'UNREVIEWED'}}
