@@ -121,3 +121,29 @@ class NotationPrinted(unittest.TestCase):
     def test_convention_anchor_variants(self):
         for f in ('Welche zwei Gründe nennt die Vorlesung?', 'Welche drei Merkmale hat ein Vertrag laut Skript?'):
             self.assertEqual(status(card(f), 'ANSWERABILITY'), 'PASS', f)
+
+
+class ReviewFindings(unittest.TestCase):
+    """Cases from the adversarial answerability and cross-domain reviews."""
+    def test_cross_domain_false_positives_gone(self):
+        for f in ('Evaluate the significance of the Magna Carta?', 'What is the plot of Hamlet about?',
+                  'Which chart type best shows a distribution?'):
+            r = A.audit_card(A.card_view(card(f)))
+            self.assertNotEqual(r['ANSWERABILITY']['status'], 'FAIL', f); self.assertNotEqual(r['VISUAL_DEPENDENCY']['status'], 'FAIL', f)
+
+    def test_cross_domain_false_negatives_caught(self):
+        self.assertEqual(status(card('What does the image of this ECG show?'), 'VISUAL_DEPENDENCY'), 'FAIL')
+        self.assertEqual(status(card('Name the two types of cell division?'), 'ANSWERABILITY'), 'WARN')
+        self.assertEqual(status(card('What is the dose for this patient?'), 'ANSWERABILITY'), 'WARN')
+        self.assertEqual(status(card('Lesen Sie den Kipppunkt ab: Wo wechselt die Policy?'), 'VISUAL_DEPENDENCY'), 'FAIL')
+
+    def test_two_targets(self):
+        self.assertEqual(status(card('Welche Operation ersetzt das Mittel? Schreiben Sie die Gleichung auf.'), 'QUESTION_VALIDITY'), 'FAIL')
+        self.assertEqual(status(card('Welche Richtung ist optimal – und warum nicht Ost?'), 'QUESTION_VALIDITY'), 'FAIL')
+
+    def test_named_example_needs_definition(self):
+        ex = {'Roboter': 'Roboter: High/Low, search/wait/recharge (Modell).'}
+        c = card('Welche zwei Gleichungen gelten für den Roboter unter search/recharge?')
+        self.assertEqual(A.audit_card(A.card_view(c), examples=ex)['ANSWERABILITY']['status'], 'FAIL')
+        c['context'] = A.example_line(c, ex)
+        self.assertNotEqual(A.audit_card(A.card_view(c), examples=ex)['ANSWERABILITY']['status'], 'FAIL')

@@ -888,11 +888,15 @@ def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_r
         # hidden context, no quantities, leaked answer) never reaches the deck; per-dimension audit is written out.
         from . import answerability as _ans
         _nota = book.get('notation') or {}                      # {symbol: meaning}; printed where a card needs it
+        _exs = book.get('examples') or {}                       # {example name: one-line definition}; printed likewise
         for _c in book['cards']:
+            _el = _ans.example_line(_c, _exs)
+            if _el:
+                _c['context'] = ((_c.get('context') or '') + ' ' + _el).strip()
             _ln = _ans.notation_line(_c, _nota)
             if _ln:
                 _c['context'] = ((_c.get('context') or '') + ' ' + _ln).strip()
-        _aud = _ans.audit_deck([_ans.card_view(c) for c in book['cards']])
+        _aud = _ans.audit_deck([_ans.card_view(c) for c in book['cards']], examples=_exs)
         book['cards'] = [c for c in book['cards'] if c.get('key') not in _aud['blocking']]
         anki['answerability'] = {k: _aud[k] for k in ('scope', 'status', 'n_cards', 'blocking', 'tally', 'recall_share')}
         (art / 'anki').mkdir(parents=True, exist_ok=True)
