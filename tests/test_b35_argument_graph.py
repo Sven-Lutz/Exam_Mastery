@@ -58,7 +58,7 @@ class Mutations(unittest.TestCase):
         self.assertIn(('A5', 's8'), fails(self.mut(lambda g: g['steps'][7].update(relation='APPROXIMATION'))))
 
     def test_wrong_algebra_detected(self):
-        self.assertIn(('A6', 's2'), fails(self.mut(lambda g: g['steps'][1]['check'].update(rhs='1-g**n'))))
+        self.assertIn(('A6', 's2'), fails(self.mut(lambda g: next(x for x in g['steps'] if x['id'] == 's2')['check'].update(rhs='1-g**n'))))
 
     def test_conclusion_not_reached(self):
         self.assertIn(('A7', 's11'), fails(self.mut(lambda g: g['steps'][-1].update(to='V = 0'))))

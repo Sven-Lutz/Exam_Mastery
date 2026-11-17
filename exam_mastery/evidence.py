@@ -50,8 +50,11 @@ CLAIM_TYPES = {
     'CLINICAL': {'requires': ['valid_as_of', 'evidence_grade'], 'note': 'guideline or clinical evidence with date and grade'},
     'INTERPRETATION': {'requires': [], 'note': 'own reading or classification of a source; never attributed to it'},
 }
-_DETAIL = re.compile(r'\b(Beweis|beweist|Theorem|Satz\s+\d|Lemma|Korollar|Tabelle|Konstante|Abschnitt|Experiment(?:e|aufbau)?|'
-                     r'Hyperparameter|proof|proves|theorem|lemma|table|constant|section|experimental setup)\b', re.I)
+_DETAIL_TERMS = {'beweis': 'proof', 'theorem': 'theorem', 'lemma': 'lemma', 'korollar': 'corollary', 'tabelle': 'table',
+                 'konstante': 'constant', 'abschnitt': 'section', 'experiment': 'experiment', 'hyperparameter': 'hyperparameter',
+                 'schranke': 'bound', 'rate': 'rate', 'voraussetzung': 'assumption', 'satz': 'theorem'}
+# detail words also inside German compounds ('Konvergenzbeweis', 'Fehlerschranke'); English counterparts accepted in the quote
+_DETAIL = re.compile(r'(' + '|'.join(sorted(_DETAIL_TERMS, key=len, reverse=True)) + r'|proof|proves|theorem|lemma|table|constant|section|bound|rate|assumption)', re.I)
 _NUM = re.compile(r'(?<![\w.])\d+(?:[.,]\d+)?(?![\w])')
 
 
@@ -59,15 +62,17 @@ def _norm(s):
     return re.sub(r'\s+', ' ', (s or '').replace('­', '')).strip().lower()
 
 
+_REF = re.compile(r'(?:Abschnitt|Abs\.|Kap\.|Kapitel|Teil|Tab\.|Tabelle|S\.|§§?|Art\.|section|chapter|p\.)\s*[\d.,–-]+|\(\d+(?:\.\d+)+\)', re.I)
 _WORDS = {w: str(i) for i, ws in enumerate([('zero', 'null'), ('one', 'eins'), ('two', 'zwei'), ('three', 'drei'),
-          ('four', 'vier'), ('five', 'fünf'), ('six', 'sechs'), ('seven', 'sieben'), ('eight', 'acht'), ('nine', 'neun'), ('ten', 'zehn')]) for w in ws}
+          ('four', 'vier'), ('five', 'fünf'), ('six', 'sechs'), ('seven', 'sieben'), ('eight', 'acht'), ('nine', 'neun'), ('ten', 'zehn'), ('eleven', 'elf'), ('twelve', 'zwölf')]) for w in ws}
 
 
 def _numbers(s):
     s = re.sub(r'\b(' + '|'.join(_WORDS) + r')\b', lambda m: ' ' + _WORDS[m.group(1).lower()] + ' ', s or '', flags=re.I)
-    s = re.sub(r'\\\(.*?\\\)', ' ', s)                       # numbers inside formulas are the author's own notation
-    s = re.sub(r'\(\s*(?:19|20)\d{2}[a-z]?\s*\)|\b(?:19|20)\d{2}\b', ' ', s)   # citation years are bibliographic
-    return {n.replace(',', '.') for n in _NUM.findall(s)}
+    s = re.sub(r'\\\(|\\\)', ' ', s)                          # numbers inside formulas count too
+    s = re.sub(r'\b(dutzend|hälfte|doppelt|dozen|half|double|twice)\b', ' QUANTWORD ', s, flags=re.I)
+    s = re.sub(r'\(\s*(?:19|20)\d{2}[a-z]?\s*\)|(?<=[A-Za-zäöü.] )(?:19|20)\d{2}\b(?=\))', ' ', s)   # only citation years
+    return {n.replace(',', '.') for n in _NUM.findall(s)} | ({'QUANTWORD'} if 'QUANTWORD' in s else set())
 
 
 def level(c, graphs=None):
@@ -99,13 +104,16 @@ def check_claim(c, graphs=None):
             f('E2', 'FAIL', 'quote does not occur in the accessed text')
         elif not txt:
             f('E2', 'WARN', 'accessed text not stored; quote cannot be re-checked')
-        missing = _numbers(st) - _numbers(quote + ' ' + txt + ' ' + (c.get('locator') or ''))   # locator numbers are anchors
+        loc = c.get('locator') or ''
+        refs = {n for m in _REF.finditer(st) for n in _numbers(m.group(0))} & _numbers(loc)   # '(5.2)', 'Abschnitt 5.2' named by the locator
+        missing = _numbers(st) - _numbers(quote) - refs
         if missing:
             f('E3', 'FAIL', 'statement contains details not in the read passage: ' + ', '.join(sorted(missing)))
     if a == 'ABSTRACT_ONLY':
-        d = _DETAIL.search(st)
-        if d and d.group(0).lower() not in _norm(quote + ' ' + txt):
-            f('E4', 'FAIL', f'asserts a full-text detail ("{d.group(0)}") from an abstract')
+        for d in _DETAIL.finditer(st):
+            w = d.group(0).lower(); en = _DETAIL_TERMS.get(w, w)
+            if w not in _norm(quote) and en not in _norm(quote) and not (w == 'beweis' and 'prove' in _norm(quote)):
+                f('E4', 'FAIL', f'asserts a detail ("{d.group(0)}") that the quoted passage does not contain'); break
     if a in ('PRIMARY_FULLTEXT', 'SECONDARY_FULLTEXT', 'OFFICIAL_COURSE') and not c.get('locator'):
         f('E5', 'FAIL', 'no locator (page/section/slide/§)')
     if a == 'AUTHOR_DERIVATION':
@@ -148,7 +156,7 @@ def audit_registry(claims, graphs=None):
     return {'status': 'FAIL' if any(x['severity'] == 'FAIL' for x in F) else 'PASS',
             'n_claims': len(claims), 'by_level': by_level, 'findings': F,
             'human_reviewed': sum(1 for c in claims if (c.get('review') or {}).get('status') == 'HUMAN_REVIEWED'),
-            'scope': 'consistency of each claim with what was demonstrably read; NOT whether the source itself is right'}
+            'scope': 'LEXICAL consistency of each claim with the quoted passage (numbers, detail words, quote presence); it cannot verify that the statement MEANS what the quote says - every claim stays UNREVIEWED until a human or recorded model review; NOT whether the source itself is right'}
 
 
 def from_legacy_verification(entry):

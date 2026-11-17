@@ -87,3 +87,23 @@ class Legacy(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class ReviewLoopholes(unittest.TestCase):
+    """Loopholes found by the adversarial source-evidence review; each must now FAIL."""
+    T = 'We prove the method converges for 3 states. It does not converge in general.'
+
+    def c(self, statement, **kw):
+        return dict({'id': 'x', 'claim_type': 'MATHEMATICAL', 'access': 'ABSTRACT_ONLY', 'accessed_text': self.T,
+                     'quote': 'the method converges for 3 states', 'review': {'status': 'UNREVIEWED'}, 'source': {'id': 's'},
+                     'statement': statement}, **kw)
+
+    def test_loopholes_closed(self):
+        for st in ('Der Konvergenzbeweis gilt für 3 Zustände.', 'Das Verfahren konvergiert für 1999 Aktionen.',
+                   'Das Verfahren konvergiert mit Rate \\(0.5\\).', 'Es konvergiert für zwölf Zustände.', 'Doppelt so schnell für 3 Zustände.'):
+            self.assertTrue(codes(self.c(st)) & {'E3', 'E4'}, st)
+        self.assertIn('E3', codes(self.c('Satz 4 zeigt Konstante 77.', access='SECONDARY_FULLTEXT', locator='S. 77, Tab. 4')))
+        self.assertEqual(codes(self.c('Das Verfahren konvergiert für 3 Zustände.')), set())
+
+    def test_semantic_limit_is_declared(self):
+        self.assertIn('cannot verify', EV.audit_registry([self.c('Das Verfahren konvergiert für 3 Zustände.')])['scope'])
