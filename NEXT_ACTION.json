@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-17",
+ "updated": "2026-11-18",
  "repo": "Sven-Lutz/Exam_Mastery",
  "main": "PR #2 squash-merged (engine snapshot, CI green on ubuntu-latest)",
  "branch": "feat/nlp-reference-unit (PR #3: DRAFT, DO NOT MERGE; title updated 2026-11-15)",
@@ -16,7 +16,8 @@
   "rl_kap03_v1": "HUMAN_REJECTED (owner 1/5, 2026-11-16)",
   "rl_kap03_v2": "superseded by V3 (not rated)",
   "rl_kap03_v3": "HUMAN_REJECTED (owner 2/5, 2026-11-17)",
-  "rl_kap03_v4": "HUMAN_REJECTED (owner max 2.5/5; Anki 3/5, MDP studio 2/5; 2026-11-17)"
+  "rl_kap03_v4": "HUMAN_REJECTED (owner max 2.5/5; Anki 3/5, MDP studio 2/5; 2026-11-17)",
+  "rl_kap03_v5": "TECHNICAL_PASS · ACADEMIC_REVIEW_PENDING · HUMAN_ACCEPTANCE_PENDING (no self-release; owner rating per product requested)"
  },
  "product": {
   "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
@@ -158,11 +159,28 @@
    "P1 VI/PI comparison: instrumented ops, practical stopping rules, declared cost model (98cdaa6)",
    "answerability gate (exam_mastery/answerability.py) wired into chapter_publish; V4 deck: 7 blocking, 33 WARN",
    "argument graph + proof audit (exam_mastery/argument_graph.py); Bellman reference fixtures/arguments/bellman_expectation.json",
-   "docs/b35/ROOT_CAUSE_MATRIX.md"
+   "docs/b35/ROOT_CAUSE_MATRIX.md",
+   "argument graph tiers + general invertibility proof; Analysis-1 cross-check",
+   "claim evidence registry (evidence.py) + RL registry in private edition (Mnih claim blocked)",
+   "subject profiles (bilingual, 13 packs); calibration 40/42, holdout consumed",
+   "lab task model + sequences A/B/C (labs/task_model.py, labs/mdp_sequences.py)",
+   "exam timing audit with calibration status (exam_quality.py)",
+   "5 adversarial model reviews; critical findings fixed (docs/b35/B35_REPORT.md)",
+   "V5 built via edition v5 -> chapter_publish into ch-20261118T000000Z-v5 (first two runs v5, v5r2/r3 failed raw-math gate / inconsistency, kept as evidence)"
   ],
-  "tests": "full suite 885 passed, 7 skipped (after reinstalling Playwright chromium/webkit, cache had been cleared)",
-  "next_action": "evidence registry (claim-level access levels) -> domain profiles -> lab task model -> rewrite flagged V4 cards in private edition v5_build -> textbook argument sections (contraction, Banach, PI/VI convergence) -> RL V5 candidate -> cross-domain run -> adversarial reviews",
+  "tests": "final full suite 945 passed, 7 skipped, 0 failed (earlier run: 1 timing-flaky p0 interrupt test, 3/3 green in isolation)",
+  "next_action": "owner rating of V5 per product; human academic review of fixtures/arguments + evidence registry; timed independent solves of mock exams (both likely overloaded); real-course runs for medicine/chemistry/biology/physics/sports/humanities before claiming support; new holdout; semantic source check needs human/model review step",
   "model_calls_used": 0,
-  "status": "IN_PROGRESS; no release, no self-approval"
+  "status": "V5 candidate packaged; no release, no self-approval",
+  "engine_install": "venv package replaced by git archive of e805fbc (backup ~/Exam_Mastery_Output/engine_backups/exam_mastery-installed-before-B35-20261117T224021)",
+  "package": "~/Exam_Mastery_Output/rl_releases/RL_Kap03_OptimalDecisionMaking_v5_2026-11-18(.zip)",
+  "holdouts": "both consumed (fixtures/cross_domain/HOLDOUT_LOG.md); next generality claim needs a new independent holdout",
+  "open_risks": [
+   "semantic claim support not machine-checked",
+   "exam times uncalibrated",
+   "lab V* reference shares code with PI",
+   "regex signals DE/EN only",
+   "diskont/gewicht card trivial (kept)"
+  ]
  }
 }
