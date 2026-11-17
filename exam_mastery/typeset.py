@@ -45,11 +45,11 @@ def _mt(s):
 
 
 # bare notation the author wrote without \\( \\): V_2, V_{k+1}, V^{π_neu}, γ^k (single-letter base, not snake_case)
-_BARE = re.compile(r'(?<![\w\\])([A-Za-z\u0391-\u03a9\u03b1-\u03c9])([_^])(\{[^{}]*\}|-?\d+|[A-Za-z\u03b1-\u03c9*\u2032]{1,3})(?![\w{])')
+_BARE = re.compile(r'(?<![\w\\])([A-Za-z\u0391-\u03a9\u03b1-\u03c9])([_^])(\{[^{}]*\}|-?\d+|[A-Za-z\u03b1-\u03c9*\u2032][A-Za-z\u03b1-\u03c9*\u2032\d]{0,2})(?![\w{])')
 
 
 # B34: numeric powers written without \\( \\) ('100^14', '0.9^10') are typeset as real superscripts, never as raw carets
-_NUMPOW = re.compile(r'(?<![\w.])(\d+(?:[.,]\d+)?)\^(\{[^{}]*\}|[-−]?\d+)')
+_NUMPOW = re.compile(r'(?<![\w.])(\d+(?:[.,]\d+)?)\^(\{[^{}]*\}|[-−]?\d+|[A-Za-z](?![\w]))')
 
 
 def _bare(p):
@@ -783,7 +783,7 @@ def exam(book, solutions=False, ex=None):
         head = '<div class="namefield"><div>Name</div><div>Matrikelnummer</div></div>' + head
         head += ('<div class="twrap"><table><thead><tr><th>Aufgabe</th><th>Thema</th>' + ('<th class="num">Zeit</th>' if timed else '')
                  + '<th class="num">Punkte</th><th class="num">Erreicht</th></tr></thead><tbody>'
-                 + ''.join(f'<tr><td>{E(i["no"])}</td><td>{inline(i.get("title") or i["topic"])}</td>' + (f'<td class="num">{i["minutes"]:g} Min.</td>' if timed else '')
+                 + ''.join(f'<tr><td>{E(i["no"])}</td><td>{inline(i.get("title") or OPS.get(i.get("operation") or "", "") .capitalize() or "Aufgabe")}</td>' + (f'<td class="num">{i["minutes"]:g} Min.</td>' if timed else '')
                            + f'<td class="num">{i["points"]:g}</td><td></td></tr>' for i in ex['items'])
                  + '<tr class="total"><td></td><td>Summe</td>' + (f'<td class="num">{sum(i["minutes"] for i in ex["items"]):g} Min.</td>' if timed else '')
                  + f'<td class="num">{ex["total_points"]:g}</td><td></td></tr></tbody></table></div>')

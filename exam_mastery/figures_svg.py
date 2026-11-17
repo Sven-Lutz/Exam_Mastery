@@ -23,7 +23,8 @@ def _svg(w, h, body, title):
 
 def _t(x, y, s, size=13, anchor='middle', weight=400, fill=INK, italic=False):
     st = ' font-style="italic"' if italic else ''
-    return f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" text-anchor="{anchor}" font-weight="{weight}" fill="{fill}"{st}>{E(str(s))}</text>'
+    from .figure_kit import rich      # B34: chart labels get real sub-/superscripts too (no raw 'V_k' in the PDF)
+    return f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" text-anchor="{anchor}" font-weight="{weight}" fill="{fill}"{st}>{rich(s)}</text>'
 
 
 def _fmt(v, dec):

@@ -152,3 +152,23 @@ class Studio(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class Contrast(unittest.TestCase):
+    """B34 accessibility: every role colour used as TEXT reaches 4.5:1 on white and on its own tint (WCAG AA)."""
+    @staticmethod
+    def ratio(a, b):
+        def lum(h):
+            c = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+            c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+            return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+        la, lb = sorted((lum(a), lum(b)), reverse=True)
+        return (la + 0.05) / (lb + 0.05)
+
+    def test_role_colours(self):
+        css = typeset.CSS
+        var = dict(re.findall(r'--([a-z-]+):(#[0-9A-Fa-f]{6})', css))
+        for role in ('teal', 'blue', 'indigo', 'amber', 'plum', 'coral', 'crimson', 'green', 'slate', 'navy', 'muted'):
+            self.assertGreaterEqual(self.ratio(var[role], '#FFFFFF'), 4.5, role)
+            if role + '-l' in var:
+                self.assertGreaterEqual(self.ratio(var[role], var[role + '-l']), 4.5, role + ' on tint')
