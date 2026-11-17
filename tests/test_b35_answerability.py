@@ -41,19 +41,19 @@ class Negative(unittest.TestCase):
         self.assertEqual(status(c, 'ANSWERABILITY', notation={'T', 'V', 'U'}), 'PASS')
 
     def test_missing_model_assumptions_hidden_context(self):
-        self.assertEqual(status(card('Was ergibt der Backup East in Zelle (3,3) mit V(3,2) = 0.57?'), 'ANSWERABILITY'), 'FAIL')
+        self.assertEqual(status(card('Was ergibt der Backup Ost in Zelle (2,2) mit V(2,1) = 0.4?'), 'ANSWERABILITY'), 'FAIL')
         self.assertEqual(status(card('Warum ist die gierige Policy im Gitter ab Sweep 10 optimal?'), 'ANSWERABILITY'), 'FAIL')
 
     def test_compound_deictic_reference(self):
-        self.assertEqual(status(card('Wie stark werden die Gründer im HTGF-Beispiel verwässert?'), 'ANSWERABILITY'), 'FAIL')
+        self.assertEqual(status(card('Wie stark wird der Anteil im Fonds-Beispiel verwässert?'), 'ANSWERABILITY'), 'FAIL')
 
     def test_source_and_statute_anchors(self):
-        for f in ('Welche fünf Exit-Ereignisse nennen Cumming und MacIntosh (2003)?', 'Welche drei Insolvenzgründe nennt die InsO in §§ 17–19?',
-                  'In welche vier Kategorien ordnen Brandenburger et al. (2012) die Kriterien?'):
+        for f in ('Welche fünf Phasen nennen Müller und Schmidt (2010)?', 'Welche drei Gründe nennt das Gesetz in §§ 5–7?',
+                  'In welche vier Kategorien ordnen Meier et al. (2015) die Kriterien?'):
             self.assertEqual(status(card(f), 'ANSWERABILITY'), 'PASS', f)
 
     def test_recall_quantity_is_warn_not_fail(self):
-        self.assertEqual(status(card('Wie viel investiert der Fonds üblicherweise in der Seed-Phase?'), 'ANSWERABILITY'), 'WARN')
+        self.assertEqual(status(card('Wie viel investiert ein Fonds üblicherweise in der ersten Phase?'), 'ANSWERABILITY'), 'WARN')
 
     def test_unsolvable_computation(self):
         self.assertEqual(status(card('Berechnen Sie den Wert des Startzustands?'), 'ANSWERABILITY'), 'FAIL')
@@ -142,8 +142,8 @@ class ReviewFindings(unittest.TestCase):
         self.assertEqual(status(card('Welche Richtung ist optimal – und warum nicht Ost?'), 'QUESTION_VALIDITY'), 'FAIL')
 
     def test_named_example_needs_definition(self):
-        ex = {'Roboter': 'Roboter: High/Low, search/wait/recharge (Modell).'}
-        c = card('Welche zwei Gleichungen gelten für den Roboter unter search/recharge?')
+        ex = {'Roboter': 'Roboter: Zustände A/B, Aktionen x/y (Modell).'}
+        c = card('Welche zwei Gleichungen gelten für den Roboter unter Strategie X?')
         self.assertEqual(A.audit_card(A.card_view(c), examples=ex)['ANSWERABILITY']['status'], 'FAIL')
         c['context'] = A.example_line(c, ex)
         self.assertNotEqual(A.audit_card(A.card_view(c), examples=ex)['ANSWERABILITY']['status'], 'FAIL')
