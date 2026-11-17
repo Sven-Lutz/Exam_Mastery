@@ -34,14 +34,19 @@ DIMENSIONS = ('QUESTION_VALIDITY', 'ANSWER_CORRECTNESS', 'ANSWERABILITY', 'COGNI
 _VISUAL = re.compile(r'\b(Abbildung|Abb\.|Bild|Grafik|Diagramm|Skizze|Schaubild|Darstellung|Folie\s*\d+|Slide\s*\d+|figure|fig\.|'
                      r'diagram|graphic|picture|plot|chart|(?:gezeigte[nmrs]?|abgebildete[nmrs]?|obige[nmrs]?)\s+Graph\w*|(?:oben|unten|links|rechts)\s+(?:dargestellt|gezeigt|abgebildet)|'
                      r'(?:dargestellt|gezeigt|abgebildet)e[nmrs]?\b|shown (?:above|below|here))', re.I)
-_COMPUTE = re.compile(r'\b(berechne|berechnen Sie|bestimme|bestimmen Sie|wie gro(?:ß|ss)|welchen Wert|was ergibt|wie viel(?:e)?|'
-                      r'ermittle|ermitteln Sie|compute|calculate|evaluate|how (?:much|large|many))\b', re.I)
+_COMPUTE = re.compile(r'\b(berechne|berechnen Sie|bestimme|bestimmen Sie|welchen Wert|was ergibt|ermittle|ermitteln Sie|'
+                      r'compute|calculate|evaluate)\b', re.I)
+# a quantity question may be a recall fact ('Wie viel investiert X üblicherweise?') or need hidden data: WARN, not FAIL
+_QUANTITY = re.compile(r'\b(wie viel(?:e)?|wie gro(?:ß|ss)|how (?:much|large|many))\b', re.I)
 _GREEK = re.compile(r'[\u0370-\u03ff]')
-_DEICTIC = re.compile(r'\b(im|in der|in dem|aus dem|aus der|beim|für das|für die|des)\s+(obigen|vorigen|genannten|gezeigten|'
+_DEICTIC = re.compile(r'\b(?:des|im|beim|aus dem|in dem|vom)\s+[\wÄÖÜäöüß]+-(?:Beispiels?|Gitters?|Falls?|Szenarios?|Modells?)\b|'
+                      r'\b(im|in der|in dem|aus dem|aus der|beim|für das|für die|des)\s+(obigen|vorigen|genannten|gezeigten|'
                       r'Beispiel|Gitter|Graphen?|Fall|Szenario|Aufgabe\s*\d*|Tabelle|Modell)\b|\b(this|the above|the previous)\s+'
                       r'(example|grid|graph|table|case|exercise)\b|\b(Zelle|Feld|cell)\s*\(\s*\d+\s*,\s*\d+\s*\)', re.I)
 _COUNTED_ENUM = re.compile(r'\b(welche|aus welchen|nenne(?:n Sie)? die|which|name the)\s+(zwei|drei|vier|fünf|sechs|sieben|acht|\d+)\b', re.I)
-_CONVENTION = re.compile(r'\b(Vorlesung|Skript|Lehrbuch|Kurs|Konvention|Definition (?:von|nach)|laut|gemäß|according to|as defined|lecture|course|textbook)\b', re.I)
+_CONVENTION = re.compile(r'\b(Vorlesung|Skript|Lehrbuch|Kurs|Konvention|Definition (?:von|nach)|laut|gemäß|according to|as defined|lecture|course|textbook)\b'
+                         r'|[A-ZÄÖÜ][\wäöüß-]+(?: et al\.| (?:und|and|&) [A-ZÄÖÜ][\wäöüß-]+)? \(\d{4}[a-z]?\)'   # author (year)
+                         r'|§§?\s*\d+|\bArt\.\s*\d+', re.I)                                          # statute anchors
 _MATH = re.compile(r'\\\((.*?)\\\)|\\\[(.*?)\\\]', re.S)
 _NUM = re.compile(r'(?<![A-Za-z_\\])\d+(?:[.,]\d+)?')
 _STOP = set('der die das ein eine einer eines und oder ist sind wird werden von zu mit für auf im in den dem des nicht nur '
@@ -146,6 +151,9 @@ def audit_card(v, notation=frozenset()):
     if _COMPUTE.search(seen_plain) and not _NUM.search(_MATH.sub(lambda m: ' ' + (m.group(1) or m.group(2) or '') + ' ', seen)) \
             and not _MATH.search(seen) and not _GREEK.search(seen):     # symbolic questions ('in terms of gamma') are answerable
         flag('ANSWERABILITY', 'FAIL', 'computation requested but no quantities given on the question side')
+    if _QUANTITY.search(seen_plain) and not _COMPUTE.search(seen_plain) and not _NUM.search(seen) and not _MATH.search(seen) \
+            and not _GREEK.search(seen):
+        flag('ANSWERABILITY', 'WARN', 'quantity asked without given data: a recall fact, or hidden data the card lacks - check')
     m = _DEICTIC.search(seen_plain)
     if m and not _text(ctx) and not v['front_has_image']:
         flag('ANSWERABILITY', 'FAIL', f'refers to context the card does not contain ("{m.group(0)}")')

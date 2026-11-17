@@ -44,6 +44,17 @@ class Negative(unittest.TestCase):
         self.assertEqual(status(card('Was ergibt der Backup East in Zelle (3,3) mit V(3,2) = 0.57?'), 'ANSWERABILITY'), 'FAIL')
         self.assertEqual(status(card('Warum ist die gierige Policy im Gitter ab Sweep 10 optimal?'), 'ANSWERABILITY'), 'FAIL')
 
+    def test_compound_deictic_reference(self):
+        self.assertEqual(status(card('Wie stark werden die Gründer im HTGF-Beispiel verwässert?'), 'ANSWERABILITY'), 'FAIL')
+
+    def test_source_and_statute_anchors(self):
+        for f in ('Welche fünf Exit-Ereignisse nennen Cumming und MacIntosh (2003)?', 'Welche drei Insolvenzgründe nennt die InsO in §§ 17–19?',
+                  'In welche vier Kategorien ordnen Brandenburger et al. (2012) die Kriterien?'):
+            self.assertEqual(status(card(f), 'ANSWERABILITY'), 'PASS', f)
+
+    def test_recall_quantity_is_warn_not_fail(self):
+        self.assertEqual(status(card('Wie viel investiert der Fonds üblicherweise in der Seed-Phase?'), 'ANSWERABILITY'), 'WARN')
+
     def test_unsolvable_computation(self):
         self.assertEqual(status(card('Berechnen Sie den Wert des Startzustands?'), 'ANSWERABILITY'), 'FAIL')
 
@@ -85,8 +96,10 @@ class RealV4Deck(unittest.TestCase):
     def test_gate_finds_defects_old_rules_missed(self):
         r = A.audit_deck(A.views_from_apkg(V4))
         self.assertEqual(r['status'], 'FAIL')
-        for k in ('vi/gitter-backup', 'vi/gitter-vstar', 'pi/warten-start', 'vgl/roboter'):
+        for k in ('vi/gitter-backup', 'vi/gitter-vstar', 'grid/klippe'):
             self.assertIn(k, r['blocking'])
+        for k in ('pi/warten-start', 'vgl/roboter'):        # quantity questions without data: flagged, not blocking (trade-off)
+            self.assertNotEqual(r['cards'][k]['ANSWERABILITY']['status'], 'PASS')
         self.assertNotIn('anwendung/bellman-ford', r['blocking'])
 
 
