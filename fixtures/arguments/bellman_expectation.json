@@ -25,7 +25,10 @@
   "D_v": "V^\\pi(s) = \\mathbb{E}_\\pi[G_t \\mid S_t = s]",
   "D_policy": "π(a|s) = P(A_t = a | S_t = s)",
   "D_r": "r(s,a) = \\mathbb{E}[R_{t+1} | S_t=s, A_t=a],\\ r_\\pi(s) = \\sum_a π(a|s) r(s,a)",
-  "D_P": "P_\\pi(s,s') = \\sum_a π(a|s) p(s'|s,a)"
+  "D_P": "P_\\pi(s,s') = \\sum_a π(a|s) p(s'|s,a)",
+  "D_norm": "\\|x\\|_\\infty = \\max_s |x(s)|;\\ \\|M\\|_\\infty = \\max_s \\sum_{s'} |M(s,s')| (induzierte Zeilensummennorm)",
+  "D_rv": "S_t, A_t, R_{t+1}: Zufallsvariablen für Zustand, Aktion, Belohnung zur Zeit t (Großbuchstaben); s, a, s': feste Werte",
+  "D_E": "\\mathbb{E}_\\pi[\\,\\cdot \\mid \\cdot\\,]: bedingter Erwartungswert, wenn Aktionen nach π gewählt werden"
  },
  "steps": [
   {
@@ -53,7 +56,9 @@
      "r4"
     ],
     "lhs": "r0 + g*r1 + g**2*r2 + g**3*r3 + g**4*r4",
-    "rhs": "r0 + g*(r1 + g*r2 + g**2*r3 + g**3*r4)"
+    "rhs": "r0 + g*(r1 + g*r2 + g**2*r3 + g**3*r4)",
+    "scope": "partial",
+    "note": "truncation after 5 terms; the infinite case needs s2"
    }
   },
   {
@@ -86,7 +91,9 @@
      }
     },
     "lhs": "Sum(g**k,(k,0,n)).doit()*(1-g)",
-    "rhs": "1-g**(n+1)"
+    "rhs": "1-g**(n+1)",
+    "scope": "partial",
+    "note": "finite geometric sum identity; the limit n->inf uses gamma<1"
    }
   },
   {
@@ -96,7 +103,9 @@
    "to": "V^\\pi(s) = \\mathbb{E}_\\pi[R_{t+1}|S_t=s] + \\gamma\\,\\mathbb{E}_\\pi[G_{t+1}|S_t=s]",
    "rule": "Linearität der bedingten Erwartung",
    "uses_definitions": [
-    "D_v"
+    "D_v",
+    "D_rv",
+    "D_E"
    ],
    "uses_assumptions": [
     "A_bounded",
@@ -116,7 +125,9 @@
    "to": "\\mathbb{E}_\\pi[G_{t+1}|S_t=s] = \\sum_a \\pi(a|s) \\sum_{s'} p(s'|s,a)\\, \\mathbb{E}_\\pi[G_{t+1}|S_t=s,A_t=a,S_{t+1}=s']",
    "rule": "Satz von der totalen Erwartung (Turm-Eigenschaft), zweimal",
    "uses_definitions": [
-    "D_policy"
+    "D_policy",
+    "D_rv",
+    "D_E"
    ],
    "uses_assumptions": [
     "A_finite"
@@ -142,7 +153,12 @@
    ],
    "justification": "Alles ab t+1 (Aktionen, Übergänge, Belohnungen) hängt bei gegebenem S_{t+1} nicht mehr von S_t, A_t ab: die Umwelt ist Markov, und π benutzt nur den aktuellen Zustand.",
    "interpretation": "Die Vergangenheit ist im Zustand s' vollständig zusammengefasst.",
-   "pitfall": "Häufigster Fehler: diesen Schritt ohne Begründung vollziehen. Bei history-abhängiger Policy oder Nicht-Markov-Umwelt ist er falsch."
+   "pitfall": "Häufigster Fehler: diesen Schritt ohne Begründung vollziehen. Bei history-abhängiger Policy oder Nicht-Markov-Umwelt ist er falsch.",
+   "uses_definitions": [
+    "D_policy",
+    "D_rv",
+    "D_E"
+   ]
   },
   {
    "id": "s6",
@@ -151,7 +167,9 @@
    "to": "\\mathbb{E}_\\pi[G_{t+1}|S_{t+1}=s'] = V^\\pi(s')",
    "rule": "Zeitinvarianz",
    "uses_definitions": [
-    "D_v"
+    "D_v",
+    "D_rv",
+    "D_E"
    ],
    "uses_assumptions": [
     "A_stationary"
@@ -171,7 +189,9 @@
    "rule": "totale Erwartung über A_t",
    "uses_definitions": [
     "D_policy",
-    "D_r"
+    "D_r",
+    "D_rv",
+    "D_E"
    ],
    "uses_assumptions": [
     "A_finite"
@@ -202,7 +222,7 @@
   {
    "id": "s9",
    "relation": "EQUIVALENCE",
-   "from": "s8 für alle s",
+   "from": "\\text{s8 für alle } s",
    "to": "V^\\pi = r_\\pi + \\gamma P_\\pi V^\\pi",
    "rule": "Matrixschreibweise",
    "uses_definitions": [
@@ -223,9 +243,10 @@
    "relation": "IMPLICATION",
    "from": "\\|\\gamma P_\\pi\\|_\\infty",
    "to": "I-\\gamma P_\\pi \\text{ invertierbar}",
-   "rule": "Neumann-Reihe",
+   "rule": "trivialer Kern + Rangsatz",
    "uses_definitions": [
-    "D_P"
+    "D_P",
+    "D_norm"
    ],
    "uses_assumptions": [
     "A_gamma",
@@ -234,14 +255,43 @@
    "depends_on": [
     "s9"
    ],
-   "justification": "Zeilensummen von P_π sind 1, also ‖γP_π‖_∞ = γ < 1. Dann konvergiert Σ_k (γP_π)^k und ist die Inverse von I − γP_π.",
+   "justification": "Kern von I − γP_π ist trivial (Beweis unten); in endlicher Dimension ist eine lineare Abbildung mit trivialem Kern bijektiv.",
    "interpretation": "Für γ < 1 hat das Gleichungssystem immer genau eine Lösung.",
    "pitfall": "Für γ = 1 kann I − P_π singulär sein (jede stochastische Matrix hat Eigenwert 1).",
    "check": {
     "method": "numeric",
     "property": "invertible_I_minus_gP",
-    "trials": 500
-   }
+    "trials": 500,
+    "note": "regression test on random instances; the proof is the analytic argument above"
+   },
+   "proof": [
+    {
+     "id": "s10.1",
+     "statement": "P_\\pi(s,s') \\ge 0,\\ \\sum_{s'} P_\\pi(s,s') = 1",
+     "because": "P_π(s,s′) = Σ_a π(a|s) p(s′|s,a) ist eine Mischung von Wahrscheinlichkeitsverteilungen (D_P, D_policy)."
+    },
+    {
+     "id": "s10.2",
+     "statement": "\\|P_\\pi x\\|_\\infty \\le \\|x\\|_\\infty",
+     "because": "|Σ_{s′} P_π(s,s′) x(s′)| ≤ Σ_{s′} P_π(s,s′) |x(s′)| ≤ ‖x‖_∞ (Dreiecksungleichung, s10.1)."
+    },
+    {
+     "id": "s10.3",
+     "statement": "(I-\\gamma P_\\pi)x = 0 \\Rightarrow \\|x\\|_\\infty \\le \\gamma\\|x\\|_\\infty",
+     "because": "Aus x = γP_π x folgt ‖x‖ = γ‖P_π x‖ ≤ γ‖x‖ (s10.2)."
+    },
+    {
+     "id": "s10.4",
+     "statement": "x = 0",
+     "because": "(1−γ)‖x‖_∞ ≤ 0 und 1−γ > 0 (A_gamma) erzwingen ‖x‖_∞ = 0."
+    },
+    {
+     "id": "s10.5",
+     "statement": "I-\\gamma P_\\pi \\text{ invertierbar}",
+     "because": "Endlich-dimensional (A_finite): injektiv ⇔ surjektiv (Rangsatz)."
+    }
+   ],
+   "remark": "Zusätzlich gilt (I − γP_π)^{-1} = Σ_k γ^k P_π^k (Neumann-Reihe, konvergent wegen ‖γP_π‖_∞ = γ < 1) – das ist genau die iterative Policy Evaluation."
   },
   {
    "id": "s11",
@@ -264,5 +314,26 @@
   "A_markov": "Belohnung 1 genau dann, wenn der VORIGE Zustand B war: E[G_{t+1} | S_{t+1}=s'] hängt dann von S_t ab, Schritt s5 ist falsch.",
   "A_stationary": "Endlicher Horizont H: V_t(s) hängt von t ab (V_H ≡ 0); Schritt s6 ist falsch.",
   "A_finite": "NICHT NOTWENDIG: für abzählbares S mit beschränkten Belohnungen gilt die Gleichung weiter (Summen werden Reihen, ‖·‖_∞ auf beschränkten Funktionen). Die Annahme dient nur der Matrixschreibweise."
- }
+ },
+ "notation": [
+  "G",
+  "R",
+  "V",
+  "I",
+  "P",
+  "r",
+  "s",
+  "a",
+  "p",
+  "t",
+  "k",
+  "x",
+  "M",
+  "T",
+  "pi",
+  "gamma",
+  "S",
+  "A",
+  "E"
+ ]
 }

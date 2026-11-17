@@ -16,8 +16,11 @@ class Reference(unittest.TestCase):
     def test_reference_passes_and_reports_real_reach(self):
         r = G.audit(REF)
         self.assertEqual(r['status'], 'PASS', r['findings'])
-        self.assertEqual(r['verification']['s1'], 'SYMBOLIC_IDENTITY')
-        self.assertTrue(r['verification']['s10'].startswith('NUMERIC_EVIDENCE'))
+        self.assertEqual(r['verification']['s1'], ['SYMBOLIC_PARTIAL', 'ANALYTIC_ARGUMENT'])
+        s10 = r['verification']['s10']
+        self.assertTrue(any(t.startswith('NUMERIC_TESTED') and 'not a proof' in t for t in s10))
+        self.assertTrue(any(t.startswith('ANALYTIC_ARGUMENT (sub-proof') for t in s10))
+        self.assertFalse(any(t.startswith('FORMAL_VERIFIED') for v in r['verification'].values() for t in v))
         self.assertIn('NOT machine-verified', r['scope'])
         self.assertEqual(len(G.matrix(REF)), len(REF['steps']))
 
@@ -43,6 +46,18 @@ class Mutations(unittest.TestCase):
 
     def test_conclusion_not_reached(self):
         self.assertIn(('A7', 's11'), fails(self.mut(lambda g: g['steps'][-1].update(to='V = 0'))))
+
+    def test_numeric_test_is_not_a_proof(self):
+        self.assertIn(('A6', 's10'), fails(self.mut(lambda g: g['steps'][9].pop('proof'))))
+
+    def test_undeclared_symbol_warns(self):
+        r = G.audit(self.mut(lambda g: g['notation'].remove('S')))
+        self.assertIn('A9', {f['code'] for f in r['findings']})
+
+    def test_unrecorded_review_is_not_counted(self):
+        g = self.mut(lambda g: g['steps'][4].update(reviews=[{'by': 'model', 'verdict': 'ok'}, {'by': 'human', 'verdict': 'pending'}]))
+        t = G.audit(g)['verification']['s5']
+        self.assertIn('MODEL_REVIEWED', t); self.assertNotIn('HUMAN_REVIEWED', t)
 
     def test_missing_counterexample_warns(self):
         r = G.audit(self.mut(lambda g: g['counterexamples'].pop('A_gamma')))

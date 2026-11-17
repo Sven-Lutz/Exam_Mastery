@@ -55,13 +55,15 @@ def _text(s):
 
 def _symbols(tex):
     """Single-letter / Greek identifiers used in a TeX fragment (without commands like \\frac, \\max)."""
+    tex = re.sub(r'\\text\{[^}]*\}', ' ', tex)
     t = re.sub(r'\\(?:frac|max|min|sum|prod|mathbb|mathcal|operatorname|text|mathrm|left|right|big|Big|cdot|le|ge|leq|geq|'
                r'mid|in|to|infty|ldots|dots|sup|inf|lim|log|exp|arg|quad|qquad|lVert|rVert|Vert|tag|hat|bar|tilde|sqrt|'
-               r'mathbf|boldsymbol|approx|neq|ne|sim|forall|exists|subseteq|subset|cup|cap|times|circ|star|ast|prime)\b', ' ', tex)
+               r'mathbf|boldsymbol|approx|neq|ne|sim|forall|exists|subseteq|subset|cup|cap|times|circ|star|ast|prime)(?![A-Za-z])', ' ', tex)
     greek = set(re.findall(r'\\([a-zA-Z]+)', t))
     t = re.sub(r'\\[a-zA-Z]+', ' ', t)
     t = re.sub(r'_\{[^}]*\}|_\w|\^\{[^}]*\}|\^\w', ' ', t)               # sub/superscripts are indices, not new symbols
-    return {*(re.findall(r'(?<![A-Za-z])[A-Za-z](?![A-Za-z])', t)), *greek}
+    t = re.sub(r'\\text\{[^}]*\}', ' ', t)
+    return {*(re.findall(r'(?<![^\W\d_])[A-Za-z](?![^\W\d_])', t)), *greek}
 
 
 def _content_words(s):
