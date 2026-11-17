@@ -20,6 +20,11 @@ def V1(sc):
     return {s: max(q0(s, a) for (x, a) in TT if x == s) for s in sc['states']}
 
 
+def V2(sc):
+    v1 = V1(sc); TT = T(sc)
+    return {s: max(qv(sc, v1, s, a) for (x, a) in TT if x == s) for s in sc['states']}
+
+
 def qv(sc, V, s, a):
     t = T(sc)[(s, a)]; return t['r'] + sc['gamma'] * sum(p * V[n] for n, p in t['next'].items())
 
@@ -63,17 +68,41 @@ class TaskModelRules(unittest.TestCase):
 
 
 class Browser(unittest.TestCase):
+    def test_grid_living_reward_no_false_right(self):
+        from playwright.sync_api import sync_playwright
+        grid = {'id': 'g', 'title': 'Gitter', 'kind': 'grid', 'cols': 4, 'rows': 3, 'walls': ['2,2'], 'terminals': {'4,3': 1, '4,2': -1},
+                'noise': 0.2, 'living': -0.04, 'gamma': 0.9}
+        d = Path(tempfile.mkdtemp()); typeset._assets(d)
+        (d / 'g.html').write_text(MS.page([MS.validate(grid)], 'Studio', 'Kurs', mathjax='assets/tex-svg-full.js'))
+        with sync_playwright() as p:
+            b = p.chromium.launch(); pg = b.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
+            pg.goto((d / 'g.html').as_uri()); pg.wait_for_timeout(400); pg.click('nav.md button[data-m="seq"]')
+            r = pg.evaluate('''() => { const m = model(sc), x = RT.q_value(m); if (x.none) return {none: x.none};
+                const e = errModels(m, st.seqA.V, st.seqA.s, st.seqA.a); return {truth: x.truth, errs: Object.values(e).map(v => v[0])}; }''')
+            self.assertNotIn('none', r)
+            for v in r['errs']:
+                self.assertGreater(abs(v - r['truth']), 0.005, 'an error model must not be graded correct')
+            f = pg.evaluate('() => { const x = RT.gamma_threshold(model(sc)); return x.none ? null : x.truth; }')
+            if f is not None:
+                self.assertGreater(f, 0.02, 'no tie-breaking artefact flip near gamma = 0')
+            b.close()
+        self.assertEqual(errs, [])
+
     def test_sequences_end_to_end(self):
         from playwright.sync_api import sync_playwright
         d = Path(tempfile.mkdtemp()); typeset._assets(d)
         (d / 's.html').write_text(MS.page([MS.validate(json.loads(json.dumps(ROBOT)))], 'Studio', 'Kurs', mathjax='assets/tex-svg-full.js'))
-        V = V1(ROBOT); s, a = 'H', 'wait'                     # focus = first state with >1 actions; A2 uses its 2nd action
-        truth = qv(ROBOT, V, s, a); no_gamma = T(ROBOT)[(s, a)]['r'] + sum(p * V[n] for n, p in T(ROBOT)[(s, a)]['next'].items())
         with sync_playwright() as p:
             b = p.chromium.launch(); pg = b.new_page(); errs = []
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.goto((d / 's.html').as_uri()); pg.wait_for_timeout(400)
             pg.click('nav.md button[data-m="seq"]'); pg.click('#sq-next')                     # A1 worked example
+            import re as _re
+            s, a, vn = _re.search(r'Q\((\w+), (\w+)\) mit (V.)', pg.inner_text('#view')).groups()
+            V = V1(ROBOT) if vn == 'V₁' else V2(ROBOT)
+            truth = qv(ROBOT, V, s, a); t = T(ROBOT)[(s, a)]
+            no_gamma = t['r'] + sum(p_ * V[n] for n, p_ in t['next'].items())
+            self.assertGreater(abs(truth - no_gamma), 0.015, 'chosen step must separate truth and the typical error')
             pg.fill('#sq-in', f'{no_gamma:.4f}'); pg.click('#sq-check')                      # typical error
             self.assertIn('Diskont', pg.inner_text('#sq-fb'))
             self.assertNotIn(f'{truth:.4f}', pg.inner_text('#view'), 'solution must not be revealed after an error')
@@ -81,9 +110,10 @@ class Browser(unittest.TestCase):
             pg.fill('#sq-in', f'{truth:.4f}'.replace('.', ',')); pg.click('#sq-check')       # German decimal comma
             self.assertIn('Richtig', pg.inner_text('#sq-fb'))
             # model edit -> computed truth follows the model (no stale answer)
-            got = pg.evaluate("() => { st.transitions.find(t => t.s === 'H' && t.a === 'wait').r = 5; return RT.q_value(model(sc)).truth; }")
+            got = pg.evaluate("() => { st.transitions.find(t => t.s === 'H' && t.a === 'wait').r = 5; const r = RT.q_value(model(sc)); return [r.truth, st.seqA.s, st.seqA.a, st.seqA.nm]; }")
             mod = copy.deepcopy(ROBOT); next(t for t in mod['transitions'] if t['s'] == 'H' and t['a'] == 'wait')['r'] = 5
-            self.assertAlmostEqual(got, qv(mod, V1(mod), 'H', 'wait'), places=9)
+            Vm = V1(mod) if got[3] == 'V₁' else V2(mod)
+            self.assertAlmostEqual(got[0], qv(mod, Vm, got[1], got[2]), places=9)
             pg.click('nav.md button[data-m="tasks"]') if pg.query_selector('nav.md button[data-m="tasks"]') else None
             self.assertTrue(pg.query_selector('#tasks-orig') is not None or 'Keine Aufgaben' in pg.inner_text('#view'),
                             'legacy fixed-answer tasks must say they use the original model after an edit')

@@ -47,12 +47,12 @@ def validate(seq, runtime_functions):
         if kind in ANSWERABLE or (kind == 'transfer'):
             if s.get('compute') not in runtime_functions:
                 f('T2', f'compute function {s.get("compute")!r} not provided by the lab runtime', sid)
-        if kind == 'numeric':
+        if kind == 'numeric' or (kind in ('transfer', 'explore') and 'tolerance' in s):
             if 'tolerance' not in s:
                 f('T3', 'numeric step without tolerance', sid)
-            if not s.get('diagnose'):
+            if kind != 'explore' and not s.get('diagnose') and s.get('compute') in ('q_value', 'q_value_transfer', 'backup_max'):
                 f('T3', 'numeric step without diagnosable error models', sid)
-        if kind in ('numeric', 'predict') and len(s.get('hints') or []) < 2:
+        if (kind in ('numeric', 'predict', 'explore') or (kind == 'transfer' and s.get('compute'))) and len(s.get('hints') or []) < 2:
             f('T4', 'fewer than two hints: no way to continue after an error except seeing the solution', sid)
         for fld in ('explain', 'feedback'):
             if re.search(r'\d', str(s.get(fld) or '')):
