@@ -248,7 +248,7 @@ def apply(book, ed):
             continue
         elif kind == 'meta':
             for k in ('objectives', 'opener_lead', 'glossary', 'references', 'production_notes', 'workbook_intro', 'workbook_intro_solutions',
-                      'workbook_letters', 'workbook_subtitle', 'solutions_title'):
+                      'workbook_letters', 'workbook_subtitle', 'solutions_title', 'card_notation', 'card_examples'):
                 if k in op:
                     b[k] = op[k]
             b['meta'].update(op.get('meta', {}))
