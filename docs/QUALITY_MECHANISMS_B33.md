@@ -12,3 +12,17 @@
 | Studio comparison | `labs/mdp_studio.py` mode `compare` | Runs VI and PI on the same model and plots each error to V* on its own axis. Short series are drawn as points, and an exact 0 is labelled. | page |
 
 Calibration note: the page-audit thresholds and the mapping vocabulary rule were calibrated on one course (RL). Validate them on another subject before treating them as general.
+
+## B34 additions (V4 rebuild)
+
+| Mechanism | Module | What it decides | Evidence |
+|---|---|---|---|
+| Printed slide numbers | `slide_numbers.py` | Maps each PDF page of a slide deck to the number printed on the slide. Only bytes that still match the inventory hash are used, decks with ambiguous file names get no map, and unknown pages stay "PDF-S. n". | `publish_report.slide_numbers` |
+| Source levels A/B/C | `typeset.Doc.side` | Puts a level badge and a reference inside every block (A course, B verified supplement, C own derivation "zu Folie n"). The levels are explained on the opener. | PDF/HTML |
+| Raw-math gate | `chapter_publish._layout_lint`, `RAW_MATH` | Fails a document if its rendered PDF text contains caret/underscore notation or untypeset TeX. | `layout_lint.raw_math` |
+| Type-size audit | same | Reports which text sizes are actually used (share ≥ 1 %). | `layout_lint.type_sizes_main` |
+| Several mock exams | `edition` op `exam` with `label`, `typeset.exams` | Builds independent exams with their own item numbers (A1, B1), integrity checks per exam, and a stand-alone booklet each. | PDFs |
+| Studio work measure | `labs/mdp_studio.py` compare | Asks for a prediction before showing results, then plots the error against arithmetic operations, so VI and PI are compared on a shared unit. | E2E |
+| Anki cognitive chips | `anki_v2.COGNITIVE` | Shows one of seven cognitive demands on every card, with a structured back side and light/dark themes. | deck |
+
+Reliability note: full suites must run from a frozen copy of the code (e.g. `git worktree`). `runtime.py` correctly reports FAIL when engine files change during a run, which was the "flaky" V3 test.
