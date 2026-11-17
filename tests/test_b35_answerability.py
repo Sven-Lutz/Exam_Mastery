@@ -92,3 +92,19 @@ class RealV4Deck(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class NotationPrinted(unittest.TestCase):
+    def test_notation_line_makes_symbols_answerable(self):
+        c = card(r'Was gilt für \(V^\pi\) bei \(\gamma < 1\)?')
+        self.assertEqual(status(c, 'ANSWERABILITY'), 'WARN')
+        c['context'] = A.notation_line(c, {'V': 'Wertfunktion', 'pi': 'Policy', 'gamma': 'Diskont'})
+        self.assertIn('Wertfunktion', c['context'])
+        self.assertEqual(status(c, 'ANSWERABILITY'), 'PASS')
+
+    def test_no_line_when_nothing_missing(self):
+        self.assertEqual(A.notation_line(card('Was ist ein MDP?'), {'V': 'x'}), '')
+
+    def test_convention_anchor_variants(self):
+        for f in ('Welche zwei Gründe nennt die Vorlesung?', 'Welche drei Merkmale hat ein Vertrag laut Skript?'):
+            self.assertEqual(status(card(f), 'ANSWERABILITY'), 'PASS', f)

@@ -887,7 +887,12 @@ def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_r
         # B35 answerability gate: a card the learner cannot answer from what the question side shows (missing figure,
         # hidden context, no quantities, leaked answer) never reaches the deck; per-dimension audit is written out.
         from . import answerability as _ans
-        _aud = _ans.audit_deck([_ans.card_view(c) for c in book['cards']], notation=frozenset(book.get('notation_symbols') or ()))
+        _nota = book.get('notation') or {}                      # {symbol: meaning}; printed where a card needs it
+        for _c in book['cards']:
+            _ln = _ans.notation_line(_c, _nota)
+            if _ln:
+                _c['context'] = ((_c.get('context') or '') + ' ' + _ln).strip()
+        _aud = _ans.audit_deck([_ans.card_view(c) for c in book['cards']])
         book['cards'] = [c for c in book['cards'] if c.get('key') not in _aud['blocking']]
         anki['answerability'] = {k: _aud[k] for k in ('scope', 'status', 'n_cards', 'blocking', 'tally', 'recall_share')}
         (art / 'anki').mkdir(parents=True, exist_ok=True)

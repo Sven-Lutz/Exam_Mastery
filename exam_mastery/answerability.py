@@ -41,8 +41,7 @@ _DEICTIC = re.compile(r'\b(im|in der|in dem|aus dem|aus der|beim|für das|für d
                       r'Beispiel|Gitter|Graphen?|Fall|Szenario|Aufgabe\s*\d*|Tabelle|Modell)\b|\b(this|the above|the previous)\s+'
                       r'(example|grid|graph|table|case|exercise)\b|\b(Zelle|Feld|cell)\s*\(\s*\d+\s*,\s*\d+\s*\)', re.I)
 _COUNTED_ENUM = re.compile(r'\b(welche|aus welchen|nenne(?:n Sie)? die|which|name the)\s+(zwei|drei|vier|fünf|sechs|sieben|acht|\d+)\b', re.I)
-_CONVENTION = re.compile(r'(laut|nach|gemäß|in der|in dieser|im)\s+(Vorlesung|Skript|Lehrbuch|Kurs|Definition|Konvention|Sutton|'
-                         r'[A-ZÄÖÜ][a-zäöü]+\s*(?:&|und)\s*[A-ZÄÖÜ])|according to|as defined (?:in|by)|in (?:this|the) (?:course|lecture)', re.I)
+_CONVENTION = re.compile(r'\b(Vorlesung|Skript|Lehrbuch|Kurs|Konvention|Definition (?:von|nach)|laut|gemäß|according to|as defined|lecture|course|textbook)\b', re.I)
 _MATH = re.compile(r'\\\((.*?)\\\)|\\\[(.*?)\\\]', re.S)
 _NUM = re.compile(r'(?<![A-Za-z_\\])\d+(?:[.,]\d+)?')
 _STOP = set('der die das ein eine einer eines und oder ist sind wird werden von zu mit für auf im in den dem des nicht nur '
@@ -68,6 +67,17 @@ def _symbols(tex):
 
 def _content_words(s):
     return {w for w in re.findall(r'[a-zäöüß0-9]{4,}', _text(s).lower()) if w not in _STOP}
+
+
+def notation_line(c, notation):
+    """'Notation: V = Wertfunktion; γ = Diskont' for the symbols the question side uses but does not define, so a card
+    stays answerable out of chapter context. notation: {symbol (TeX name or letter): meaning}."""
+    front = (c.get('text') if c.get('kind') == 'cloze' else c.get('front')) or ''
+    used = set().union(*[_symbols(a or b) for a, b in _MATH.findall(front)]) if _MATH.search(front) else set()
+    have = set().union(*[_symbols(a or b) for a, b in _MATH.findall(c.get('context') or '')]) if _MATH.search(c.get('context') or '') else set()
+    need = [k for k in sorted(used - have - set(c.get('defines') or [])) if k in notation]
+    show = lambda k: '\\(\\' + k + '\\)' if len(k) > 1 else '\\(' + k + '\\)'
+    return ('Notation: ' + '; '.join(f'{show(k)} = {notation[k]}' for k in need)) if need else ''
 
 
 def card_view(c, *, front_has_image=None, image_ok=True):
