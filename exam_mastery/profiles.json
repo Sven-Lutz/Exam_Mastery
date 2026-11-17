@@ -17,9 +17,9 @@
    ],
    "quality_gate": "Each conclusion follows from named premises; no hidden division by zero or missing edge cases.",
    "signals": {
-    "prove": "\\bbeweis|\\bprove|\\bproof",
-    "derive": "herleit|\\bderive|aufstellen",
-    "calculate": "berechn|ausrechn|durchrechn|\\bcompute|\\bcalculate|lösen\\b|\\bsolve",
+    "prove": "\\bbeweis|\\bprove|\\bproof|show that|zeigen sie,? dass",
+    "derive": "herleit|\\bderive|aufstellen|set up the (?:equation|model)|leite[nt]?\\b.*\\bher\\b",
+    "calculate": "berechn|ausrechn|durchrechn|\\bcompute|\\bcalculate|\\blösen\\b|\\bsolve\\b|determine the (?:value|ph|speed|force|probability)|use conservation|apply [A-Z][a-z]+\\'s (?:law|theorem)|\\bsize a\\b",
     "optimize": "optimal|maximier|minimier|optimi"
    },
    "requires": {
@@ -65,9 +65,9 @@
    ],
    "quality_gate": "No legal claim without precise relevant authority and effective-date review.",
    "signals": {
-    "subsume": "subsumi|tatbestand|anspruch(?:sgrundlage)?\\b",
-    "apply-law": "§\\s*\\d|\\bart\\.\\s*\\d|\\bgesetz(?:es)?\\b|\\bverordnung",
-    "interpret": "\\bauslegen|\\bauslegung"
+    "subsume": "subsumi|tatbestand|anspruch(?:sgrundlage)?\\b|advise (?:the |a )?(?:claimant|defendant|client)|whether (?:a )?(?:valid )?contract|\\bliab(?:le|ility)\\b|negligence|enforceable|wirksam(?:keit)?\\b",
+    "apply-law": "§\\s*\\d|\\bart\\.\\s*\\d|\\bgesetz(?:es)?\\b|\\bverordnung|\\bstatute|\\bact \\d{4}|case law|precedent|common law",
+    "interpret": "\\bauslegen|\\bauslegung|statutory interpretation"
    },
    "requires": {
     "subsume": [
@@ -104,9 +104,9 @@
    ],
    "quality_gate": "Never issue clinical-ready materials without verified current medical sources and qualified review.",
    "signals": {
-    "diagnose": "diagnos|differential",
-    "treat": "therapi|behandl",
-    "interpret-evidence": "sensitivit|spezifit|leitlinie"
+    "diagnose": "diagnos|differential|differentiate .+ from|red flags?|warnzeichen",
+    "treat": "therapi|behandl|\\btreat|\\bmanage(?:ment)?\\b(?!.*(?:project|software))|prescrib|first-line|dosing|dosis|pflege|nursing care|contraindication|kontraindikation|mechanism of action|wirkmechanismus",
+    "interpret-evidence": "sensitivit(?:y|ät) (?:and|und) spe[cz]ifi|spezifität|specificity|diagnostic accuracy|leitlinie|guideline|interpret (?:an? )?(?:ecg|ekg|arterial blood gas|blood gas|lab)|randomi[sz]ed controlled"
    },
    "requires": {
     "diagnose": [
@@ -144,9 +144,9 @@
    ],
    "quality_gate": "Run tests on all claimed executable code; distinguish implementation failure from methodological failure.",
    "signals": {
-    "implement": "implementier|programmier|\\bcode\\b|pseudocode|algorithmus .*angeben|\\balgorithm",
-    "analyze-complexity": "laufzeit|komplexit|aufwand|complexity|runtime",
-    "test": "\\btest"
+    "implement": "implementier|programmier|\\bcode\\b|pseudocode|\\balgorithm|write (?:a )?function|\\bimplement\\b|refactor|\\bdebug|database schema|\\buml\\b|pull request",
+    "analyze-complexity": "laufzeit|komplexität|complexity|runtime|big-?o\\b",
+    "test": "unit[- ]?tests?|test cases?|teste(?:n sie)? (?:den|die) (?:code|funktion)|mocks?\\b"
    },
    "requires": {
     "implement": [
@@ -184,9 +184,9 @@
    ],
    "quality_gate": "No unsupported causal inferences or invented statistics.",
    "signals": {
-    "infer": "schätz|inferenz|signifikan|estimate",
-    "analyze-data": "daten|messung|experiment|\\bdata\\b",
-    "critique-study": "studie|studiendesign|bias"
+    "infer": "schätz|inferenz|signifikan|\\bestimate|hypothesis test|t-test|confidence interval|konfidenz|p-value|regression|bayes|effect size|effektstärke|posterior",
+    "analyze-data": "messdaten|daten(?:satz|analyse)|dataset|analy[sz]e (?:the )?data|experimental data|residual|concentration data|population density",
+    "critique-study": "studie|studiendesign|\\bbias\\b|internal validity|replication|randomi[sz]ed"
    },
    "requires": {
     "infer": [
@@ -225,8 +225,8 @@
    ],
    "quality_gate": "All numerical scenarios checked with independent reference values.",
    "signals": {
-    "value-decision": "kapitalwert|barwert|\\bnpv\\b|cashflow|unternehmensbewertung|investitionsentscheid|rendite",
-    "compare": "szenari|alternativ(?:en)? .*(?:kosten|nutzen)|kosten-nutzen"
+    "value-decision": "kapitalwert|barwert|\\bnpv\\b|net present value|cashflow|unternehmensbewertung|investitionsentscheid|rendite|sensitivity analysis",
+    "compare": "szenari|kosten-nutzen|supply and demand|angebot und nachfrage|price ceiling|zinserhöhung|interest rate|market"
    },
    "requires": {
     "value-decision": [
@@ -263,10 +263,10 @@
    ],
    "quality_gate": "No fabricated author intent, quotation, historical claims or empirical evidence.",
    "signals": {
-    "interpret": "deuten|interpretier|einordn",
-    "argue": "begründ|argumentier|\\bargue|\\bjustify",
-    "critique": "kritisch|grenzen|limit",
-    "compare": "unterscheid|vergleich|abgrenz"
+    "interpret": "deuten|interpretier|einordn|\\binterpret\\b(?! (?:an? )?(?:ecg|ekg|arterial|blood|lab))|close-read|imagery",
+    "argue": "begründ|argumentier|\\bargue|\\bjustify|\\bevaluate\\b|\\bassess\\b|\\bdiscuss\\b|erörter|beurteil|objections?|einwände",
+    "critique": "kritisch|critical(?:ly)?\\b|limitations?|grenzen (?:der|des|von)|weakness",
+    "compare": "unterscheid|vergleich|abgrenz|\\bcompare\\b|\\bcontrast\\b|distinguish|voice leading|parallel fifths"
    },
    "requires": {
     "interpret": [
@@ -304,8 +304,8 @@
    ],
    "quality_gate": "Each claimed competency matches an actually demanded performance.",
    "signals": {
-    "explain": "erklär|erläuter|explain",
-    "apply": "anwend|\\bapply",
+    "explain": "erklär|erläuter|\\bexplain|\\bdescribe|beschreib",
+    "apply": "anwend|\\bapply\\b",
     "transfer": "transfer|übertrag|neue[nmrs]? (?:problem|situation)"
    },
    "requires": {
@@ -338,7 +338,7 @@
    ],
    "quality_gate": "No redundant cards, generic explanations or untested Anki-client claims.",
    "signals": {
-    "retrieve": "\\bnennen|wiedergeben|definier|\\bstate\\b|\\brecall"
+    "retrieve": "\\bnennen|wiedergeben|definier|\\bstate the\\b|\\brecall\\b|\\blist the\\b"
    },
    "requires": {
     "retrieve": [
@@ -368,9 +368,9 @@
    ],
    "quality_gate": "All provided controls produce validated, finite outputs; no fake simulation.",
    "signals": {
-    "predict": "vorhersag|\\bpredict",
+    "predict": "(?:vorhersag|predict)\\w*\\b.*\\b(?:simul|lab|interaktiv|interactive)",
     "simulate": "simulier|\\bsimulat",
-    "experiment": "experimentier|variier|parameter"
+    "experiment": "experimentier(?:en sie)? mit|vary the parameters?|parameter(?:studie| study)"
    },
    "requires": {
     "predict": [
@@ -387,6 +387,126 @@
     "lab_task_model"
    ],
    "claim_types": []
+  },
+  {
+   "id": "experimental-science",
+   "operations": [
+    "design-experiment",
+    "measure",
+    "model-mechanism",
+    "balance"
+   ],
+   "methods": [
+    "mechanism before formula",
+    "units and dimensional analysis",
+    "measurement uncertainty and error propagation",
+    "controls and confounders",
+    "laboratory safety"
+   ],
+   "quality_gate": "Every quantity carries units; measurements carry uncertainty; mechanisms are separated from correlations; safety notes where a procedure is described.",
+   "signals": {
+    "design-experiment": "design (?:an? )?(?:experiment|pcr|primer|assay)|versuchsaufbau|experiment(?:ell)?(?!.*\\bdata\\b)",
+    "measure": "titrat|messunsicherheit|measurement uncertainty|spectr|\\bnmr\\b|\\bir\\b(?= and| spectr)|\\bph\\b|vo2max|calorimet",
+    "model-mechanism": "mechanism(?! of action)|reaktionsmechanismus|mitosis|meiosis|natural selection|photoelectric|orographic|rain shadow|punnett|sn[12]\\b|enzyme|stoffwechsel",
+    "balance": "balance (?:the )?(?:redox |chemical )?equations?|reaktionsgleichung|stoffmenge|molar|stoichiom"
+   },
+   "requires": {
+    "design-experiment": [
+     "worked_example",
+     "safety_note"
+    ],
+    "measure": [
+     "worked_example",
+     "uncertainty_note"
+    ],
+    "model-mechanism": [
+     "intuition|worked_example"
+    ],
+    "balance": [
+     "worked_example",
+     "practice_task"
+    ]
+   },
+   "validators": [
+    "numeric_checks",
+    "evidence_registry"
+   ],
+   "claim_types": [
+    "EMPIRICAL"
+   ]
+  },
+  {
+   "id": "historical-source-criticism",
+   "operations": [
+    "source-criticism",
+    "historiography"
+   ],
+   "methods": [
+    "provenance, date and perspective of each source",
+    "primary versus secondary sources",
+    "competing historiographical interpretations",
+    "contextualisation"
+   ],
+   "quality_gate": "No historical claim without a dated, attributed source; interpretations are marked as such.",
+   "signals": {
+    "source-criticism": "primary sources?|quellen(?:lage|kritik|analyse)?\\b|chronicle|chronik|source reliability|archiv",
+    "historiography": "historiograph|geschichtsschreibung|\\bhistor(?:y|ical|isch)|epoche|reformation|republic|world war|weltkrieg"
+   },
+   "requires": {
+    "source-criticism": [
+     "source_excerpt",
+     "competing_views"
+    ],
+    "historiography": [
+     "competing_views"
+    ]
+   },
+   "validators": [
+    "evidence_registry"
+   ],
+   "claim_types": [
+    "HISTORICAL",
+    "INTERPRETATION"
+   ]
+  },
+  {
+   "id": "practical-skills",
+   "operations": [
+    "perform-procedure",
+    "plan-intervention",
+    "coach"
+   ],
+   "methods": [
+    "step-by-step procedure with critical points",
+    "observable performance criteria",
+    "safety and contraindications",
+    "feedback on execution"
+   ],
+   "quality_gate": "Procedures are checklists with observable criteria; no claim of skill acquisition from reading alone.",
+   "signals": {
+    "perform-procedure": "\\bosce\\b|perform (?:a |the )?(?:focused )?(?:examination|procedure)|untersuchung durchführen|demonstrier",
+    "plan-intervention": "training(?:s)?(?:plan| plan|programme| program)|periodi[sz]|care plan|plan nursing care|pflegeplan",
+    "coach": "\\bcoach|technique faults|technikfehler|biomechanics of"
+   },
+   "requires": {
+    "perform-procedure": [
+     "procedure_checklist"
+    ],
+    "plan-intervention": [
+     "case_solution",
+     "procedure_checklist"
+    ],
+    "coach": [
+     "procedure_checklist"
+    ]
+   },
+   "validators": [
+    "evidence_registry"
+   ],
+   "claim_types": [
+    "EMPIRICAL",
+    "CLINICAL"
+   ]
   }
  ],
  "machine_rule": "B35: \"signals\" are cue patterns (regex, case-insensitive, German+English) that SUGGEST an operation from an objective text; declared operations always win and are merged, never replaced. \"requires\" lists didactic components per operation; \"validators\" names engine checks that must have run; \"claim_types\" are the evidence types the pack produces. A requirement \"a|b\" is met by either component (no single mandatory block form)."

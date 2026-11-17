@@ -1,0 +1,164 @@
+{
+ "note": "B35 HOLDOUT corpus, written before tuning the profile signals on the calibration corpus; evaluated once after tuning. Do not tune on it; a new holdout is required after any change made because of its result.",
+ "expected": "any of the listed packs counts as plausible",
+ "items": [
+  [
+   "Evaluate the internal validity of a randomised controlled trial on cognitive behavioural therapy",
+   [
+    "empirical-research",
+    "clinical-reasoning"
+   ]
+  ],
+  [
+   "Interpret the effect size and confidence interval reported in a psychology replication study",
+   [
+    "empirical-research"
+   ]
+  ],
+  [
+   "Plan nursing care for a post-operative patient at risk of pressure ulcers",
+   [
+    "clinical-reasoning",
+    "practical-skills"
+   ]
+  ],
+  [
+   "Calculate the correct infusion rate for a weight-based heparin order",
+   [
+    "clinical-reasoning",
+    "formal-mathematics"
+   ]
+  ],
+  [
+   "Derive the bending stress in a simply supported beam under a point load",
+   [
+    "formal-mathematics"
+   ]
+  ],
+  [
+   "Size a heat exchanger using the LMTD method and check units",
+   [
+    "formal-mathematics",
+    "experimental-science"
+   ]
+  ],
+  [
+   "Berechnen Sie die Kerbspannung an einer Welle mit Absatz",
+   [
+    "formal-mathematics"
+   ]
+  ],
+  [
+   "Erklären Sie die Wirkung einer Zinserhöhung der Zentralbank auf Investitionen",
+   [
+    "economic-modeling",
+    "conceptual-interpretative",
+    "instructional-design"
+   ]
+  ],
+  [
+   "Compute the net present value of a project and run a sensitivity analysis on the discount rate",
+   [
+    "economic-modeling"
+   ]
+  ],
+  [
+   "Analyse a market with a price ceiling using supply and demand curves",
+   [
+    "economic-modeling"
+   ]
+  ],
+  [
+   "Explain the formation of a rain shadow using an orographic model",
+   [
+    "experimental-science",
+    "conceptual-interpretative",
+    "instructional-design"
+   ]
+  ],
+  [
+   "Interpret a choropleth map of population density and discuss its limitations",
+   [
+    "empirical-research",
+    "conceptual-interpretative"
+   ]
+  ],
+  [
+   "Analyse the voice leading in a four-part chorale and identify parallel fifths",
+   [
+    "conceptual-interpretative"
+   ]
+  ],
+  [
+   "Compare Hume's and Kant's accounts of causation",
+   [
+    "conceptual-interpretative"
+   ]
+  ],
+  [
+   "Argumentieren Sie für und gegen den moralischen Status von Tieren",
+   [
+    "conceptual-interpretative"
+   ]
+  ],
+  [
+   "Explain the mechanism of action and main contraindications of beta blockers",
+   [
+    "clinical-reasoning"
+   ]
+  ],
+  [
+   "Calculate the half-life of a drug from plasma concentration data",
+   [
+    "formal-mathematics",
+    "empirical-research",
+    "experimental-science"
+   ]
+  ],
+  [
+   "Titrate an unknown acid and estimate the measurement uncertainty",
+   [
+    "experimental-science"
+   ]
+  ],
+  [
+   "Prüfen Sie, ob ein Anspruch auf Schadensersatz nach § 280 BGB besteht",
+   [
+    "legal-reasoning"
+   ]
+  ],
+  [
+   "Advise a client whether a non-compete clause in an employment contract is enforceable",
+   [
+    "legal-reasoning"
+   ]
+  ],
+  [
+   "Implement Dijkstra's algorithm and analyse its runtime with a binary heap",
+   [
+    "computational-reasoning"
+   ]
+  ],
+  [
+   "Debug a race condition in a multithreaded producer-consumer program",
+   [
+    "computational-reasoning"
+   ]
+  ],
+  [
+   "Design a resistance training programme for an older adult with osteoporosis",
+   [
+    "practical-skills",
+    "clinical-reasoning"
+   ]
+  ],
+  [
+   "Critically assess the source reliability of a medieval chronicle",
+   [
+    "historical-source-criticism"
+   ]
+  ]
+ ],
+ "status": "CONSUMED 2026-11-17: evaluated once (24/24 lenient match; 2/24 with discipline-specific extra packs, one real false positive: \"sensitivity analysis\" -> clinical). The clinical signal was then fixed, so this corpus is no longer a holdout; the next evaluation needs a new, independently written holdout.",
+ "limitations": "Written by the same author who designed the signals; lenient matching (any listed pack). Not independent evidence of domain coverage."
+}

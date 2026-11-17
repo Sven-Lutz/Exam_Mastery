@@ -43,7 +43,10 @@ COMPONENTS = {
     'competing_views': {'blocks': {'debate', 'competing_views'}},
     'uncertainty_note': {'box_kinds': {'uncertainty'}},
     'guideline_reference': {'blocks': {'guideline'}},
-    'sensitivity': {'blocks': {'sensitivity'}},
+    'sensitivity': {'blocks': {'sensitivity'}, 'text': r'Sensitivität|sensitivity analysis'},
+    'safety_note': {'box_kinds': {'safety', 'warning'}, 'text': r'Sicherheit|safety'},
+    'source_excerpt': {'blocks': {'quote', 'source', 'source_excerpt'}},
+    'procedure_checklist': {'blocks': {'checklist', 'procedure'}},
 }
 
 

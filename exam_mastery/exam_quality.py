@@ -19,6 +19,7 @@ from __future__ import annotations
 import re
 from statistics import median
 
+MODES = {'written': 1.0, 'essay': 1.4, 'case': 1.3}          # planning/outlining share on top of writing (declared assumption)
 PARAMS = {'READ_WPM': 120, 'WRITE_WPM': 12, 'MIN_PER_FORMULA': 0.6, 'MIN_PER_OP': 0.2, 'MIN_PER_DECISION': 1.0, 'RATIO': 1.8}
 STATUS = ('EMPIRICAL', 'INDEPENDENT_SOLVE', 'MODEL_ESTIMATE', 'AUTHOR_ASSUMPTION')
 LABEL = {'EMPIRICAL': 'empirisch kalibriert', 'INDEPENDENT_SOLVE': 'aus unabhängigen Lösungsversuchen geschätzt, nicht an Studierenden gemessen',
@@ -28,7 +29,7 @@ _OP = re.compile(r'\d\s*[-+*/·×]\s*\d')
 
 
 def _words(s):
-    return len(re.findall(r'[A-Za-zÄÖÜäöüß]{2,}', _MATH.sub(' ', s or '')))
+    return len(re.findall(r'[^\W\d_]{2,}', _MATH.sub(' ', s or '')))           # any script, accents included
 
 
 def workload(item):
@@ -45,6 +46,11 @@ def workload(item):
 
 def audit_exam(exam):
     items, F = exam.get('items') or [], []
+    mode = exam.get('mode', 'written')
+    if mode not in MODES:                        # performance exams (OSCE, lab practical, sport): no writing-time model exists
+        return {'calibration': (exam.get('calibration') or {}).get('status', 'AUTHOR_ASSUMPTION'), 'header_time': header_time(exam),
+                'items': [], 'findings': [{'code': 'X0', 'severity': 'WARN', 'msg': f'no workload model for exam mode {mode!r}: timing needs station-level or empirical calibration'}],
+                'model_total_minutes': None, 'params': PARAMS, 'scope': 'not applicable'}
     st = (exam.get('calibration') or {}).get('status', 'AUTHOR_ASSUMPTION')
     if st not in STATUS:
         F.append({'code': 'X1', 'severity': 'FAIL', 'msg': f'unknown calibration status {st}'})
@@ -52,7 +58,7 @@ def audit_exam(exam):
         F.append({'code': 'X1', 'severity': 'FAIL', 'msg': 'EMPIRICAL calibration without recorded sample size'})
     rows = []
     for it in items:
-        w = workload(it); m = it.get('minutes'); pts = it.get('points')
+        w = workload(it); w['model_minutes'] = round(w['model_minutes'] * MODES[mode], 1); m = it.get('minutes'); pts = it.get('points')
         rows.append(dict(w, no=it.get('no'), minutes=m, points=pts, ratio=round(m / w['model_minutes'], 2) if m and w['model_minutes'] else None))
     stated = [r['minutes'] for r in rows if r['minutes']]
     if exam.get('minutes') and stated and abs(sum(stated) - exam['minutes']) < 1e-9 and st == 'AUTHOR_ASSUMPTION':

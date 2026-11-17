@@ -45,9 +45,10 @@ CLAIM_TYPES = {
     'ALGORITHMIC': {'requires': [], 'note': 'algorithm property (correctness, complexity); theory separate from benchmarks'},
     'EMPIRICAL': {'requires': ['study_design'], 'note': 'observed result; design, sample, effect size, uncertainty'},
     'BENCHMARK': {'requires': ['study_design'], 'note': 'reported performance in a specific experimental setup'},
-    'HISTORICAL': {'requires': [], 'note': 'origin or development of an idea'},
-    'NORMATIVE_LEGAL': {'requires': ['jurisdiction', 'valid_as_of'], 'note': 'norm content / case law with version'},
-    'CLINICAL': {'requires': ['valid_as_of', 'evidence_grade'], 'note': 'guideline or clinical evidence with date and grade'},
+    'HISTORICAL': {'requires': ['source_kind', 'date'], 'note': 'historical fact/origin: primary or secondary source, date and provenance'},
+    'TEXTUAL': {'requires': ['edition', 'locator'], 'note': 'claim about a text (literature, philosophy, scripture): edition and passage'},
+    'NORMATIVE_LEGAL': {'requires': ['jurisdiction', 'valid_as_of'], 'note': 'statute (version date) or case law (court, citation, decision date as valid_as_of, overruling checked)'},
+    'CLINICAL': {'requires': ['valid_as_of', 'evidence_grade', 'jurisdiction'], 'note': 'guideline or clinical evidence with date, grade and issuing body/country (dosing and approval differ)'},
     'INTERPRETATION': {'requires': [], 'note': 'own reading or classification of a source; never attributed to it'},
 }
 _DETAIL_TERMS = {'beweis': 'proof', 'theorem': 'theorem', 'lemma': 'lemma', 'korollar': 'corollary', 'tabelle': 'table',
@@ -180,4 +181,5 @@ def from_subject_source(src):
             'access': _ACCESS.get(src.get('access'), 'UNVERIFIED'), 'locator': src.get('cite') if src.get('access') == 'fulltext' else None,
             'accessed_text': src.get('text', ''), 'quote': src.get('quote', ''),
             'jurisdiction': src.get('jurisdiction'), 'valid_as_of': src.get('valid_as_of'), 'evidence_grade': src.get('evidence_grade'),
-            'study_design': src.get('study_design'), 'review': {'status': 'UNREVIEWED'}}
+            'study_design': src.get('study_design'), 'source_kind': src.get('source_kind'), 'date': src.get('date'),
+            'edition': src.get('edition'), 'review': {'status': 'UNREVIEWED'}}

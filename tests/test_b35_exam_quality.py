@@ -40,3 +40,15 @@ class Timing(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class Modes(unittest.TestCase):
+    def test_osce_has_no_writing_model(self):
+        r = X.audit_exam({'mode': 'osce', 'minutes': 10, 'items': [item('1', 10, 10)]})
+        self.assertEqual(r['scope'], 'not applicable'); self.assertIn('X0', {f['code'] for f in r['findings']})
+
+    def test_essay_planning_and_unicode(self):
+        it = item('1', 30, 10); it['solution']['answer'] = 'été ελληνικά кириллица'
+        self.assertGreater(X.workload(it)['answer_words'], X.workload(item('1', 30, 10))['answer_words'])
+        w = X.audit_exam({'mode': 'essay', 'items': [item('1', 30, 10)]})['items'][0]['model_minutes']
+        self.assertGreater(w, X.audit_exam({'items': [item('1', 30, 10)]})['items'][0]['model_minutes'])

@@ -55,3 +55,15 @@ class V4Finding(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class CrossDomainCorpus(unittest.TestCase):
+    """Regression on the (consumed) cross-domain corpus; the numbers are a floor, not a quality claim."""
+    def test_corpus_floor_and_no_leaks(self):
+        H = json.loads((Path(__file__).resolve().parents[1] / 'fixtures/cross_domain/objectives_holdout.json').read_text())['items']
+        hit = sum(1 for t, exp in H if set(SP.resolve(t)['packs']) & set(exp))
+        self.assertGreaterEqual(hit, 22)
+        self.assertNotIn('clinical-reasoning', SP.resolve('Compute the net present value and run a sensitivity analysis')['packs'])
+        for t in ('Differentiate acute coronary syndrome from pulmonary embolism', 'Advise the claimant on negligence liability',
+                  'Critically assess the source reliability of a medieval chronicle', 'Balance redox equations in acidic solution'):
+            self.assertNotEqual(SP.resolve(t)['packs'], ['instructional-design'], t)
