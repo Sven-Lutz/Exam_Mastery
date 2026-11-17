@@ -1,0 +1,268 @@
+{
+ "id": "bellman-expectation",
+ "level": "standard+advanced",
+ "evidence_level": "AUTHOR_DERIVATION",
+ "claim": {
+  "kind": "theorem",
+  "statement": "V^\\pi = (I-\\gamma P_\\pi)^{-1} r_\\pi \\text{ ist die eindeutige Lösung von } V = r_\\pi + \\gamma P_\\pi V",
+  "assumptions": [
+   "A_bounded",
+   "A_gamma",
+   "A_markov",
+   "A_stationary",
+   "A_finite"
+  ]
+ },
+ "assumptions": {
+  "A_bounded": "Belohnungen beschränkt: |R_{t+1}| \\le R_{\\max} fast sicher.",
+  "A_gamma": "Diskont 0 \\le \\gamma < 1.",
+  "A_markov": "Markov-Eigenschaft: Verteilung von (S_{t+1}, R_{t+1}) hängt nur von (S_t, A_t) ab, nicht von der Vorgeschichte.",
+  "A_stationary": "Stationarität: π(a|s) und p(s',r|s,a) hängen nicht von t ab.",
+  "A_finite": "Endliche Zustands- und Aktionsmengen (für die Matrixform; vereinfachend)."
+ },
+ "definitions": {
+  "D_return": "G_t = \\sum_{k=0}^{\\infty} \\gamma^k R_{t+k+1}",
+  "D_v": "V^\\pi(s) = \\mathbb{E}_\\pi[G_t \\mid S_t = s]",
+  "D_policy": "π(a|s) = P(A_t = a | S_t = s)",
+  "D_r": "r(s,a) = \\mathbb{E}[R_{t+1} | S_t=s, A_t=a],\\ r_\\pi(s) = \\sum_a π(a|s) r(s,a)",
+  "D_P": "P_\\pi(s,s') = \\sum_a π(a|s) p(s'|s,a)"
+ },
+ "steps": [
+  {
+   "id": "s1",
+   "relation": "IDENTITY",
+   "from": "G_t",
+   "to": "G_t = R_{t+1} + \\gamma G_{t+1}",
+   "rule": "Indexverschiebung in der Reihe",
+   "uses_definitions": [
+    "D_return"
+   ],
+   "uses_assumptions": [],
+   "depends_on": [],
+   "justification": "Den ersten Summanden k = 0 abspalten und im Rest k = j + 1 setzen; der Rest ist γ mal die Reihe ab t + 1.",
+   "interpretation": "Ertrag = was jetzt kommt + abgezinster Ertrag ab morgen.",
+   "pitfall": "Die Abspaltung ist für die unendliche Reihe nur zulässig, wenn sie konvergiert (Schritt s2).",
+   "check": {
+    "method": "sympy",
+    "symbols": [
+     "g",
+     "r0",
+     "r1",
+     "r2",
+     "r3",
+     "r4"
+    ],
+    "lhs": "r0 + g*r1 + g**2*r2 + g**3*r3 + g**4*r4",
+    "rhs": "r0 + g*(r1 + g*r2 + g**2*r3 + g**3*r4)"
+   }
+  },
+  {
+   "id": "s2",
+   "relation": "IMPLICATION",
+   "from": "|R_{t+1}| \\le R_{\\max}, \\gamma<1",
+   "to": "|G_t| \\le R_{\\max}/(1-\\gamma)",
+   "rule": "Dreiecksungleichung + geometrische Reihe",
+   "uses_definitions": [
+    "D_return"
+   ],
+   "uses_assumptions": [
+    "A_bounded",
+    "A_gamma"
+   ],
+   "depends_on": [],
+   "justification": "|G_t| ≤ Σ γ^k |R_{t+k+1}| ≤ R_max Σ γ^k = R_max/(1−γ). Damit konvergiert die Reihe absolut, G_t ist integrierbar und alle bedingten Erwartungen unten existieren; Erwartung und Reihe dürfen vertauscht werden (majorisierte Konvergenz).",
+   "interpretation": "Ohne Diskont oder ohne beschränkte Belohnung kann der Ertrag unendlich sein – dann ist V gar nicht definiert.",
+   "pitfall": "γ < 1 allein genügt nicht, wenn die Belohnungen schneller wachsen als γ^{-k}.",
+   "check": {
+    "method": "sympy",
+    "symbols": [
+     "g",
+     "n"
+    ],
+    "assume": {
+     "n": {
+      "integer": true,
+      "nonnegative": true
+     }
+    },
+    "lhs": "Sum(g**k,(k,0,n)).doit()*(1-g)",
+    "rhs": "1-g**(n+1)"
+   }
+  },
+  {
+   "id": "s3",
+   "relation": "IMPLICATION",
+   "from": "V^\\pi(s)",
+   "to": "V^\\pi(s) = \\mathbb{E}_\\pi[R_{t+1}|S_t=s] + \\gamma\\,\\mathbb{E}_\\pi[G_{t+1}|S_t=s]",
+   "rule": "Linearität der bedingten Erwartung",
+   "uses_definitions": [
+    "D_v"
+   ],
+   "uses_assumptions": [
+    "A_bounded",
+    "A_gamma"
+   ],
+   "depends_on": [
+    "s1",
+    "s2"
+   ],
+   "justification": "Bedingte Erwartung von s1 bilden; Linearität gilt, weil beide Summanden nach s2 integrierbar sind.",
+   "interpretation": "Wert = erwartete Sofortbelohnung + γ · erwarteter Restertrag."
+  },
+  {
+   "id": "s4",
+   "relation": "IMPLICATION",
+   "from": "\\mathbb{E}_\\pi[G_{t+1}|S_t=s]",
+   "to": "\\mathbb{E}_\\pi[G_{t+1}|S_t=s] = \\sum_a \\pi(a|s) \\sum_{s'} p(s'|s,a)\\, \\mathbb{E}_\\pi[G_{t+1}|S_t=s,A_t=a,S_{t+1}=s']",
+   "rule": "Satz von der totalen Erwartung (Turm-Eigenschaft), zweimal",
+   "uses_definitions": [
+    "D_policy"
+   ],
+   "uses_assumptions": [
+    "A_finite"
+   ],
+   "depends_on": [
+    "s2"
+   ],
+   "justification": "Erst über die Aktion A_t bedingen (Gewichte π(a|s)), dann über den Nachfolger S_{t+1} (Gewichte p(s'|s,a)). Endliche Mengen machen daraus endliche Summen.",
+   "interpretation": "Man mittelt über alle Wege, die der nächste Schritt nehmen kann."
+  },
+  {
+   "id": "s5",
+   "relation": "IMPLICATION",
+   "from": "\\mathbb{E}_\\pi[G_{t+1}|S_t=s,A_t=a,S_{t+1}=s']",
+   "to": "\\mathbb{E}_\\pi[G_{t+1}|S_t=s,A_t=a,S_{t+1}=s'] = \\mathbb{E}_\\pi[G_{t+1}|S_{t+1}=s']",
+   "rule": "Markov-Eigenschaft (Umwelt) + Policy wählt nur nach aktuellem Zustand",
+   "uses_assumptions": [
+    "A_markov",
+    "A_stationary"
+   ],
+   "depends_on": [
+    "s4"
+   ],
+   "justification": "Alles ab t+1 (Aktionen, Übergänge, Belohnungen) hängt bei gegebenem S_{t+1} nicht mehr von S_t, A_t ab: die Umwelt ist Markov, und π benutzt nur den aktuellen Zustand.",
+   "interpretation": "Die Vergangenheit ist im Zustand s' vollständig zusammengefasst.",
+   "pitfall": "Häufigster Fehler: diesen Schritt ohne Begründung vollziehen. Bei history-abhängiger Policy oder Nicht-Markov-Umwelt ist er falsch."
+  },
+  {
+   "id": "s6",
+   "relation": "IMPLICATION",
+   "from": "\\mathbb{E}_\\pi[G_{t+1}|S_{t+1}=s']",
+   "to": "\\mathbb{E}_\\pi[G_{t+1}|S_{t+1}=s'] = V^\\pi(s')",
+   "rule": "Zeitinvarianz",
+   "uses_definitions": [
+    "D_v"
+   ],
+   "uses_assumptions": [
+    "A_stationary"
+   ],
+   "depends_on": [
+    "s5"
+   ],
+   "justification": "Da π und p nicht von t abhängen, hat der Prozess ab t+1 dieselbe Verteilung wie ab t; also ist die Funktion s' ↦ E[G_{t+1}|S_{t+1}=s'] dieselbe wie s ↦ E[G_t|S_t=s] = V^π.",
+   "interpretation": "Deshalb taucht auf beiden Seiten DIESELBE Funktion V^π auf – das macht die Gleichung rekursiv.",
+   "pitfall": "Bei endlichem Horizont gilt das nicht: dann ist V_t ≠ V_{t+1}, und optimale Policies sind i. A. nichtstationär."
+  },
+  {
+   "id": "s7",
+   "relation": "IMPLICATION",
+   "from": "\\mathbb{E}_\\pi[R_{t+1}|S_t=s]",
+   "to": "\\mathbb{E}_\\pi[R_{t+1}|S_t=s] = r_\\pi(s)",
+   "rule": "totale Erwartung über A_t",
+   "uses_definitions": [
+    "D_policy",
+    "D_r"
+   ],
+   "uses_assumptions": [
+    "A_finite"
+   ],
+   "depends_on": [],
+   "justification": "Über A_t bedingen: Σ_a π(a|s) E[R_{t+1}|S_t=s, A_t=a] = Σ_a π(a|s) r(s,a) = r_π(s)."
+  },
+  {
+   "id": "s8",
+   "relation": "IMPLICATION",
+   "from": "s3, s4, s5, s6, s7",
+   "to": "V^\\pi(s) = \\sum_a \\pi(a|s)\\big[r(s,a) + \\gamma \\sum_{s'} p(s'|s,a) V^\\pi(s')\\big]",
+   "rule": "Einsetzen",
+   "uses_definitions": [
+    "D_r"
+   ],
+   "uses_assumptions": [],
+   "depends_on": [
+    "s3",
+    "s4",
+    "s5",
+    "s6",
+    "s7"
+   ],
+   "justification": "s7 in den ersten, s4–s6 in den zweiten Summanden von s3 einsetzen und die Summe über a ausklammern.",
+   "interpretation": "Bellman-Erwartungsgleichung: eine lineare Gleichung je Zustand."
+  },
+  {
+   "id": "s9",
+   "relation": "EQUIVALENCE",
+   "from": "s8 für alle s",
+   "to": "V^\\pi = r_\\pi + \\gamma P_\\pi V^\\pi",
+   "rule": "Matrixschreibweise",
+   "uses_definitions": [
+    "D_r",
+    "D_P"
+   ],
+   "uses_assumptions": [
+    "A_finite"
+   ],
+   "depends_on": [
+    "s8"
+   ],
+   "justification": "Σ_a π(a|s) Σ_{s'} p(s'|s,a) V(s') = Σ_{s'} P_π(s,s') V(s') ist Zeile s des Produkts P_π V; r_π sammelt die Sofortbelohnungen.",
+   "interpretation": "|S| lineare Gleichungen mit |S| Unbekannten."
+  },
+  {
+   "id": "s10",
+   "relation": "IMPLICATION",
+   "from": "\\|\\gamma P_\\pi\\|_\\infty",
+   "to": "I-\\gamma P_\\pi \\text{ invertierbar}",
+   "rule": "Neumann-Reihe",
+   "uses_definitions": [
+    "D_P"
+   ],
+   "uses_assumptions": [
+    "A_gamma",
+    "A_finite"
+   ],
+   "depends_on": [
+    "s9"
+   ],
+   "justification": "Zeilensummen von P_π sind 1, also ‖γP_π‖_∞ = γ < 1. Dann konvergiert Σ_k (γP_π)^k und ist die Inverse von I − γP_π.",
+   "interpretation": "Für γ < 1 hat das Gleichungssystem immer genau eine Lösung.",
+   "pitfall": "Für γ = 1 kann I − P_π singulär sein (jede stochastische Matrix hat Eigenwert 1).",
+   "check": {
+    "method": "numeric",
+    "property": "invertible_I_minus_gP",
+    "trials": 500
+   }
+  },
+  {
+   "id": "s11",
+   "relation": "IMPLICATION",
+   "from": "s9, s10",
+   "to": "V^\\pi = (I-\\gamma P_\\pi)^{-1} r_\\pi \\text{ ist die eindeutige Lösung von } V = r_\\pi + \\gamma P_\\pi V",
+   "rule": "Lineare Algebra",
+   "uses_assumptions": [],
+   "depends_on": [
+    "s9",
+    "s10"
+   ],
+   "justification": "Nach s9 erfüllt V^π die Gleichung (I − γP_π)V = r_π; nach s10 hat sie genau eine Lösung, also ist es V^π.",
+   "interpretation": "Policy Evaluation = ein lineares Gleichungssystem lösen (oder T^π iterieren, das ist dieselbe Neumann-Reihe)."
+  }
+ ],
+ "counterexamples": {
+  "A_gamma": "γ = 1, ein Zustand mit Selbstschleife und Belohnung 1: G_t = ∞; I − P = 0 ist singulär.",
+  "A_bounded": "γ = 1/2, R_{t+1} = 2^{t+1}: jeder Summand γ^k R_{t+k+1} ist ≥ 1, die Reihe divergiert trotz γ < 1.",
+  "A_markov": "Belohnung 1 genau dann, wenn der VORIGE Zustand B war: E[G_{t+1} | S_{t+1}=s'] hängt dann von S_t ab, Schritt s5 ist falsch.",
+  "A_stationary": "Endlicher Horizont H: V_t(s) hängt von t ab (V_H ≡ 0); Schritt s6 ist falsch.",
+  "A_finite": "NICHT NOTWENDIG: für abzählbares S mit beschränkten Belohnungen gilt die Gleichung weiter (Summen werden Reihen, ‖·‖_∞ auf beschränkten Funktionen). Die Annahme dient nur der Matrixschreibweise."
+ }
+}

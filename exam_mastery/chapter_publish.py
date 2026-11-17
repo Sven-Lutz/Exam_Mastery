@@ -884,6 +884,15 @@ def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_r
         w = csv.DictWriter(f, fieldnames=list(m['matrix'][0]) if m['matrix'] else ['kc_id']); w.writeheader(); w.writerows(m['matrix'])
     anki = {'cards': 0, 'card_source': book['card_source'], 'dropped_by_card_rules': book['cards_dropped']}
     if book['cards']:
+        # B35 answerability gate: a card the learner cannot answer from what the question side shows (missing figure,
+        # hidden context, no quantities, leaked answer) never reaches the deck; per-dimension audit is written out.
+        from . import answerability as _ans
+        _aud = _ans.audit_deck([_ans.card_view(c) for c in book['cards']], notation=frozenset(book.get('notation_symbols') or ()))
+        book['cards'] = [c for c in book['cards'] if c.get('key') not in _aud['blocking']]
+        anki['answerability'] = {k: _aud[k] for k in ('scope', 'status', 'n_cards', 'blocking', 'tally', 'recall_share')}
+        (art / 'anki').mkdir(parents=True, exist_ok=True)
+        (art / 'anki' / 'answerability_audit.json').write_text(json.dumps(_aud, ensure_ascii=False, indent=1), encoding='utf-8')
+    if book['cards']:
         # card identity = course FOLDER name + chapter title + key; never the display title (course-title can change)
         from . import figures_svg as _fs
         _figs = {c['figure']: _fs.render(book['figures'][c['figure']]) for c in book['cards'] if c.get('figure') in book.get('figures', {})}

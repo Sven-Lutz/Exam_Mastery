@@ -1,153 +1,168 @@
 {
-  "updated": "2026-11-17",
-  "repo": "Sven-Lutz/Exam_Mastery",
-  "main": "PR #2 squash-merged (engine snapshot, CI green on ubuntu-latest)",
-  "branch": "feat/nlp-reference-unit (PR #3: DRAFT, DO NOT MERGE; title updated 2026-11-15)",
-  "release_status": {
-    "engine_rc_v0.21.0-rc1_products_incl_nlp_baseline": "HUMAN_REJECTED",
-    "nlp_reference_unit_v1": "HUMAN_REJECTED (Issue #4)",
-    "nlp_reference_unit_v2": "NOT RELEASABLE (Issues #4-#6)",
-    "nlp_reference_unit_v3": "HUMAN_REJECTED (Issue #7, mean 0.75/4 over 8 dimensions)",
-    "nlp_reference_unit_v4": "HUMAN_REJECTED (Issue #8, 17 ratings, mean 16/17=0.94/4; lab 0/4 in all 5 dimensions)",
-    "nlp_reference_unit_v5": "HUMAN_REJECTED (owner review received 2026-11-15; no further v5 review needed)",
-    "nlp_reference_unit_v6": "HUMAN_REVIEW_PENDING (Issue #9; docs/cross_domain/V6_REPORT.md); no self-release",
-    "v6": "HUMAN_REJECTED (v6.1, Issue #10, mean 8/6 = 1.333/4)",
-    "v7": "v7.1 (cd438a9): GitHub CI green (runs 43732994556, 43732999492); CONTENT_CORRECTNESS/DIDACTIC/PUBLISHING review required; no self-release",
-    "rl_kap03_v1": "HUMAN_REJECTED (owner 1/5, 2026-11-16)",
-    "rl_kap03_v2": "superseded by V3 (not rated)",
-    "rl_kap03_v3": "HUMAN_REJECTED (owner 2/5, 2026-11-17)",
-    "rl_kap03_v4": "TECHNICAL_PASS · RELIABILITY_PASS · ACADEMIC_REVIEW_PENDING · HUMAN_ACCEPTANCE_PENDING (no self-release; owner rating 1-5 per product requested)"
-  },
-  "product": {
-    "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
-    "build": "python -m exam_mastery.reference_unit build units/nlp_sequence_labeling --out ~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling",
-    "anki_preview": "python -m exam_mastery.reference_unit anki-preview units/nlp_sequence_labeling --out ~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling",
-    "open": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling/index.html",
-    "v2_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v2_snapshot/",
-    "reports": [
-      "docs/reference_unit/V5_REPORT.md",
-      "docs/reference_unit/review_v5/ (before/after evidence)",
-      "docs/reference_unit/V4_REPORT.md",
-      "docs/reference_unit/MATH_AUDIT.md",
-      "docs/reference_unit/CURRICULUM_MAP.md"
-    ],
-    "open_lab": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling/labor.html",
-    "v4_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v4_snapshot/",
-    "v7_report": "docs/reference_unit/V7_REFERENCE_SLICE.md (+ review_v7/before|after)",
-    "v6_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v6_snapshot/",
-    "v7_1_report": "docs/reference_unit/V7_1_CORRECTIONS.md (+ review_v7_1)"
-  },
-  "verified": [
-    "see final test run in commit message",
-    "QC: analysis1 all automatic dims PASS except proof_correctness NOT_VERIFIED; ENT literature_coverage FAIL (gap formen); NLP source_validity PASS after lafferty/su fix"
+ "updated": "2026-11-17",
+ "repo": "Sven-Lutz/Exam_Mastery",
+ "main": "PR #2 squash-merged (engine snapshot, CI green on ubuntu-latest)",
+ "branch": "feat/nlp-reference-unit (PR #3: DRAFT, DO NOT MERGE; title updated 2026-11-15)",
+ "release_status": {
+  "engine_rc_v0.21.0-rc1_products_incl_nlp_baseline": "HUMAN_REJECTED",
+  "nlp_reference_unit_v1": "HUMAN_REJECTED (Issue #4)",
+  "nlp_reference_unit_v2": "NOT RELEASABLE (Issues #4-#6)",
+  "nlp_reference_unit_v3": "HUMAN_REJECTED (Issue #7, mean 0.75/4 over 8 dimensions)",
+  "nlp_reference_unit_v4": "HUMAN_REJECTED (Issue #8, 17 ratings, mean 16/17=0.94/4; lab 0/4 in all 5 dimensions)",
+  "nlp_reference_unit_v5": "HUMAN_REJECTED (owner review received 2026-11-15; no further v5 review needed)",
+  "nlp_reference_unit_v6": "HUMAN_REVIEW_PENDING (Issue #9; docs/cross_domain/V6_REPORT.md); no self-release",
+  "v6": "HUMAN_REJECTED (v6.1, Issue #10, mean 8/6 = 1.333/4)",
+  "v7": "v7.1 (cd438a9): GitHub CI green (runs 43732994556, 43732999492); CONTENT_CORRECTNESS/DIDACTIC/PUBLISHING review required; no self-release",
+  "rl_kap03_v1": "HUMAN_REJECTED (owner 1/5, 2026-11-16)",
+  "rl_kap03_v2": "superseded by V3 (not rated)",
+  "rl_kap03_v3": "HUMAN_REJECTED (owner 2/5, 2026-11-17)",
+  "rl_kap03_v4": "HUMAN_REJECTED (owner max 2.5/5; Anki 3/5, MDP studio 2/5; 2026-11-17)"
+ },
+ "product": {
+  "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
+  "build": "python -m exam_mastery.reference_unit build units/nlp_sequence_labeling --out ~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling",
+  "anki_preview": "python -m exam_mastery.reference_unit anki-preview units/nlp_sequence_labeling --out ~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling",
+  "open": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling/index.html",
+  "v2_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v2_snapshot/",
+  "reports": [
+   "docs/reference_unit/V5_REPORT.md",
+   "docs/reference_unit/review_v5/ (before/after evidence)",
+   "docs/reference_unit/V4_REPORT.md",
+   "docs/reference_unit/MATH_AUDIT.md",
+   "docs/reference_unit/CURRICULUM_MAP.md"
   ],
-  "not_verified": [
-    "ChatGPT tutor sessions (protocols prepared, not run)",
-    "proof correctness (expert)",
-    "didactic quality",
-    "Anki/textbook/workbook/exams improvements (open product requirement)"
+  "open_lab": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling/labor.html",
+  "v4_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v4_snapshot/",
+  "v7_report": "docs/reference_unit/V7_REFERENCE_SLICE.md (+ review_v7/before|after)",
+  "v6_snapshot": "~/Exam_Mastery_Output/reference_units/nlp_sequence_labeling_v6_snapshot/",
+  "v7_1_report": "docs/reference_unit/V7_1_CORRECTIONS.md (+ review_v7_1)"
+ },
+ "verified": [
+  "see final test run in commit message",
+  "QC: analysis1 all automatic dims PASS except proof_correctness NOT_VERIFIED; ENT literature_coverage FAIL (gap formen); NLP source_validity PASS after lafferty/su fix"
+ ],
+ "not_verified": [
+  "ChatGPT tutor sessions (protocols prepared, not run)",
+  "proof correctness (expert)",
+  "didactic quality",
+  "Anki/textbook/workbook/exams improvements (open product requirement)"
+ ],
+ "next_action": "SEE b35_excellence_2026_11_17",
+ "rl_pilot_2026_11_16": {
+  "branch": "feat/rl-engine-pilot (from 6ebdf40; PR #3 untouched)",
+  "engine_commit": "7b85869 B31 (on top of 98fb96e B30); installed from committed tree",
+  "tests": "unittest discover: 721 run, only failures were 7 modules missing pytest; after pip install pytest into the engine venv those 95 pass; tests/test_mdp_oracle.py 6 pass",
+  "run_dir": "~/Exam_Mastery_Output/course-a8fba2d65467/ch-20261116T085650Z-de894dce (COMPLETE, technical PASS, MACHINE_CHECKS_PASSED, published)",
+  "run_command": "EXAM_MASTERY_CALL_LEDGER=~/Exam_Mastery_Output/rl_pilot_call_ledger.json exam-mastery <course-folder>/RL --only-chapter ch-271642018f0467",
+  "state": "PUBLISHED; HUMAN_REVIEW_PENDING. Package: ~/Exam_Mastery_Output/rl_releases/RL_Kap03_OptimalDecisionMaking_v1_2026-11-16(.zip) with ABNAHMEBERICHT.md and SHA256SUMS",
+  "model_calls_used": 8,
+  "literature": "silver2015 course page and CS188 MDP TOC verified via web; Sutton&Barto site TLS error -> metadata only",
+  "not_committed": "none",
+  "release_status": "nothing produced yet; target HUMAN_REVIEW_PENDING",
+  "updated": "2026-11-16",
+  "engine_install": "installed venv package replaced by committed tree of 98fb96e (git archive HEAD exam_mastery); previous 0.21.0rc1 install backed up at ~/Exam_Mastery_Output/engine_backups/exam_mastery-0.21.0rc1-installed-20261113",
+  "old_run": "~/Exam_Mastery_Output/course-a8fba2d65467/ch-20261116T073108Z-4b20c5c9 (created by stale 0.21.0rc1 install without B30 gates; left untouched, not continued)",
+  "answer_builders": "session scratchpad (not in repo): infra.py, content_blocks.py, content_rest.py, assess.py, solutions.py; validated with engine functions before writing",
+  "replays": 6,
+  "mdp_oracle": "107/107 claims PASS, 5 models, 2 labs",
+  "errata": "stale 2026-11-13 errata archived as errata/ch-271642018f0467.superseded-2026-11-13.json; new errata (F7 slide numbering) applied",
+  "env_fixes": "playwright chromium (v1248) reinstalled into user cache; engine process hangs at exit in onnxruntime threads (killed after completion)",
+  "open_defects": [
+   "separate workbook/solutions/mock-exam PDFs instead of B30 single workbook on chapter publish path",
+   "foreign catalog lab analysis__folgen-epsilon auto-added",
+   "lab: English source chips, decimal comma",
+   "27 exam items from other lectures mapped to this chapter",
+   "proofs only model-reviewed (same session)",
+   "pre-existing test failures (playwright sync API in asyncio loop)"
   ],
-  "next_action": "SEE rl_v3_2026_11_16: RL V3 review build packaged; awaiting owner rating per product (HUMAN_ACCEPTANCE_PENDING) and a human academic review (ACADEMIC_REVIEW_PENDING).",
-  "rl_pilot_2026_11_16": {
-    "branch": "feat/rl-engine-pilot (from 6ebdf40; PR #3 untouched)",
-    "engine_commit": "7b85869 B31 (on top of 98fb96e B30); installed from committed tree",
-    "tests": "unittest discover: 721 run, only failures were 7 modules missing pytest; after pip install pytest into the engine venv those 95 pass; tests/test_mdp_oracle.py 6 pass",
-    "run_dir": "~/Exam_Mastery_Output/course-a8fba2d65467/ch-20261116T085650Z-de894dce (COMPLETE, technical PASS, MACHINE_CHECKS_PASSED, published)",
-    "run_command": "EXAM_MASTERY_CALL_LEDGER=~/Exam_Mastery_Output/rl_pilot_call_ledger.json exam-mastery <course-folder>/RL --only-chapter ch-271642018f0467",
-    "state": "PUBLISHED; HUMAN_REVIEW_PENDING. Package: ~/Exam_Mastery_Output/rl_releases/RL_Kap03_OptimalDecisionMaking_v1_2026-11-16(.zip) with ABNAHMEBERICHT.md and SHA256SUMS",
-    "model_calls_used": 8,
-    "literature": "silver2015 course page and CS188 MDP TOC verified via web; Sutton&Barto site TLS error -> metadata only",
-    "not_committed": "none",
-    "release_status": "nothing produced yet; target HUMAN_REVIEW_PENDING",
-    "updated": "2026-11-16",
-    "engine_install": "installed venv package replaced by committed tree of 98fb96e (git archive HEAD exam_mastery); previous 0.21.0rc1 install backed up at ~/Exam_Mastery_Output/engine_backups/exam_mastery-0.21.0rc1-installed-20261113",
-    "old_run": "~/Exam_Mastery_Output/course-a8fba2d65467/ch-20261116T073108Z-4b20c5c9 (created by stale 0.21.0rc1 install without B30 gates; left untouched, not continued)",
-    "answer_builders": "session scratchpad (not in repo): infra.py, content_blocks.py, content_rest.py, assess.py, solutions.py; validated with engine functions before writing",
-    "replays": 6,
-    "mdp_oracle": "107/107 claims PASS, 5 models, 2 labs",
-    "errata": "stale 2026-11-13 errata archived as errata/ch-271642018f0467.superseded-2026-11-13.json; new errata (F7 slide numbering) applied",
-    "env_fixes": "playwright chromium (v1248) reinstalled into user cache; engine process hangs at exit in onnxruntime threads (killed after completion)",
-    "open_defects": [
-      "separate workbook/solutions/mock-exam PDFs instead of B30 single workbook on chapter publish path",
-      "foreign catalog lab analysis__folgen-epsilon auto-added",
-      "lab: English source chips, decimal comma",
-      "27 exam items from other lectures mapped to this chapter",
-      "proofs only model-reviewed (same session)",
-      "pre-existing test failures (playwright sync API in asyncio loop)"
-    ],
-    "next": "owner review of the package; then fix open_defects generically"
-  },
-  "open_decisions_for_owner": [
-    "Rate the v7 reference slice as products (textbook §6 pages 12-26, figures, lab simplex/attention, AT10, A19/B-19, Anki cards) per Issue #10 acceptance questions",
-    "Only after acceptance: transfer quality to other chapters/modules",
-    "Pilot budget (none authorised)",
-    "Weekly launchd (not activated)"
+  "next": "owner review of the package; then fix open_defects generically"
+ },
+ "open_decisions_for_owner": [
+  "Rate the v7 reference slice as products (textbook §6 pages 12-26, figures, lab simplex/attention, AT10, A19/B-19, Anki cards) per Issue #10 acceptance questions",
+  "Only after acceptance: transfer quality to other chapters/modules",
+  "Pilot budget (none authorised)",
+  "Weekly launchd (not activated)"
+ ],
+ "cleanup_candidates_not_touched": [
+  "Exam_Mastery_Studio/runs_v0_5_1_p0_dev (876M)",
+  "Exam_Mastery_Studio/output (223M)",
+  "review_exports (85M)"
+ ],
+ "budget": {
+  "paid_calls_authorised": 0,
+  "engine_provider_calls": 0,
+  "claude_code_session_tokens": "not exposed to the session; not measured",
+  "tutor_api_calls_authorised": 0
+ },
+ "workflow": {
+  "gemini": "removed from workflow (Issue #8)",
+  "paid_provider_calls": "none authorised",
+  "weekly_launchd": "not activated",
+  "pr3": "draft, DO NOT MERGE"
+ },
+ "v5_ratings": {
+  "scientific.textbook": "2/4",
+  "scientific.mathematics_derivations": "1/4",
+  "scientific.books_research_cases": "1/4",
+  "scientific.pdf_layout": "2/4",
+  "scientific.workbook": "1/4",
+  "scientific.worked_solutions": "1/4",
+  "scientific.mock_exams": "1/4",
+  "anki.academic_content": "1/4",
+  "anki.html_css_media": "1/4",
+  "anki.long_term_usefulness": "1/4",
+  "lab.mathematical_visualization": "2/4",
+  "lab.free_experimentation": "2/4",
+  "lab.interaction_feedback": "2/4",
+  "lab.understanding_gain": "1/4",
+  "lab.ux_design": "2/4",
+  "system_integration": "1/4",
+  "exam_core_vs_deeper_mastery": "NOT RATED"
+ },
+ "modules": {
+  "layer": "exam_mastery/modules (contract, sources, tutor, tutor_adapter, CLI python -m exam_mastery.modules build <dir> --out <out>)",
+  "analysis1_folgen": "modules/analysis1_folgen -> ~/Exam_Mastery_Output/modules/analysis1_folgen (labor.html, tutor/)",
+  "ent_funding": "modules/ent_funding -> ~/Exam_Mastery_Output/modules/ent_funding",
+  "nlp": "build-unit units/nlp_sequence_labeling (adapter); tutor/ also in reference unit output"
+ },
+ "priorities": "Issue #10: core study products + publication-grade lab first; tutor deferred (keep exports working, no new tutor work)",
+ "rl_v2_2026_11_16": {
+  "branch": "feat/rl-engine-pilot",
+  "engine_work": "B32/B33: design tokens + editorial typeset components, figure_kit (9 generic SVG kinds), layout lint (inline-math reflow, overflow, sparse pages), wide figures, MDP Studio lab, subject lab routing, Anki render gate + card rules, Bellman numeric parser fix, dossier from published book with competency_evidence fields, workbook single product (solutions last)",
+  "run_dir": "~/Exam_Mastery_Output/course-a8fba2d65467/ch-20261116T120000Z-v2edition (copy of V1 run de894dce + edition; V1 run untouched)",
+  "edition": "~/Exam_Mastery_Output/course-a8fba2d65467/editions/ch-271642018f0467.json (built by editions/v2_build/make_edition.py; content authored by the agent, not by engine role calls)",
+  "reproduce": "cd ~/Exam_Mastery_Output/course-a8fba2d65467 && PYTHONPATH=<repo> python editions/v2_build/make_edition.py ch-20261116T085650Z-de894dce && python editions/v2_build/publish_v2.py ch-20261116T085650Z-de894dce ch-20261116T120000Z-v2edition",
+  "package": "~/Exam_Mastery_Output/rl_releases/RL_Kap03_OptimalDecisionMaking_v2_2026-11-16(.zip) with LIES_MICH.md, SHA256SUMS, docs/ACCEPTANCE_MATRIX.md",
+  "model_calls_used": "8/30 (unchanged; V2 used 0 paid provider calls)",
+  "open_findings": "see package docs/ACCEPTANCE_MATRIX.md (P1-1 no independent expert review; P2-1..P2-6; P3-1..P3-3)",
+  "engine_install": "installed venv still at committed tree 98fb96e; V2 was built with PYTHONPATH=<repo working tree>. Reinstall from the new commit before the next product run.",
+  "next_human_step": "Owner rates V2 per product (Lehrbuch, Arbeitsbuch, Anki, MDP-Studio) 1-5 per ACCEPTANCE_MATRIX section Owner-Review"
+ },
+ "rl_v3_2026_11_16": {
+  "branch": "feat/rl-engine-pilot",
+  "engine_commit": "11c1802 (B33)",
+  "engine_installed": "exam-mastery-engine 0.22.0rc1 from git archive 11c1802 (byte-identical); previous install backed up at ~/Exam_Mastery_Output/engine_backups/exam_mastery-installed-before-0.22.0rc1-20261116",
+  "run_dir": "~/Exam_Mastery_Output/course-a8fba2d65467/ch-20261116T180000Z-v3 (copy of V1 run + edition + issue decisions; produced with the installed engine, no repo on path)",
+  "reproduce": "cd ~/Exam_Mastery_Output/course-a8fba2d65467 && <venv python> editions/v2_build/make_edition.py ch-20261116T085650Z-de894dce && python3 editions/v2_build/make_issue_decisions.py editions/v2_build/exam27_audit.json && <venv python> editions/v2_build/publish_v2.py ch-20261116T085650Z-de894dce ch-20261116T180000Z-v3",
+  "package": "~/Exam_Mastery_Output/rl_releases/RL_Kap03_OptimalDecisionMaking_v3_2026-11-16(.zip)",
+  "model_calls_used": "8/30 (unchanged; V3 used 0 paid provider calls; independent review by a separate Claude Code subagent, not a provider call)",
+  "open_findings": "package docs/ISSUES_UND_BEFUNDE.md section C (O1 no human academic review; O3 Anki GUI display; O4-O7 P3)",
+  "next_human_step": "Owner rates Lehrbuch, Arbeitsbuch, Anki, MDP-Studio 1-5 using LIES_MICH entry points; a human expert reviews proofs (docs/VALIDIERUNG.md lists what was model-reviewed)"
+ },
+ "current": "RL V4 review build packaged (engine 0.23.0rc1); awaiting owner ratings and human academic review",
+ "b35_excellence_2026_11_17": {
+  "branch": "feat/rl-engine-pilot",
+  "baseline": "bed6619 / 0.23.0rc1",
+  "done": [
+   "P1 print clipping fixed generically + negative test (98cdaa6)",
+   "P1 VI/PI comparison: instrumented ops, practical stopping rules, declared cost model (98cdaa6)",
+   "answerability gate (exam_mastery/answerability.py) wired into chapter_publish; V4 deck: 7 blocking, 33 WARN",
+   "argument graph + proof audit (exam_mastery/argument_graph.py); Bellman reference fixtures/arguments/bellman_expectation.json",
+   "docs/b35/ROOT_CAUSE_MATRIX.md"
   ],
-  "cleanup_candidates_not_touched": [
-    "Exam_Mastery_Studio/runs_v0_5_1_p0_dev (876M)",
-    "Exam_Mastery_Studio/output (223M)",
-    "review_exports (85M)"
-  ],
-  "budget": {
-    "paid_calls_authorised": 0,
-    "engine_provider_calls": 0,
-    "claude_code_session_tokens": "not exposed to the session; not measured",
-    "tutor_api_calls_authorised": 0
-  },
-  "workflow": {
-    "gemini": "removed from workflow (Issue #8)",
-    "paid_provider_calls": "none authorised",
-    "weekly_launchd": "not activated",
-    "pr3": "draft, DO NOT MERGE"
-  },
-  "v5_ratings": {
-    "scientific.textbook": "2/4",
-    "scientific.mathematics_derivations": "1/4",
-    "scientific.books_research_cases": "1/4",
-    "scientific.pdf_layout": "2/4",
-    "scientific.workbook": "1/4",
-    "scientific.worked_solutions": "1/4",
-    "scientific.mock_exams": "1/4",
-    "anki.academic_content": "1/4",
-    "anki.html_css_media": "1/4",
-    "anki.long_term_usefulness": "1/4",
-    "lab.mathematical_visualization": "2/4",
-    "lab.free_experimentation": "2/4",
-    "lab.interaction_feedback": "2/4",
-    "lab.understanding_gain": "1/4",
-    "lab.ux_design": "2/4",
-    "system_integration": "1/4",
-    "exam_core_vs_deeper_mastery": "NOT RATED"
-  },
-  "modules": {
-    "layer": "exam_mastery/modules (contract, sources, tutor, tutor_adapter, CLI python -m exam_mastery.modules build <dir> --out <out>)",
-    "analysis1_folgen": "modules/analysis1_folgen -> ~/Exam_Mastery_Output/modules/analysis1_folgen (labor.html, tutor/)",
-    "ent_funding": "modules/ent_funding -> ~/Exam_Mastery_Output/modules/ent_funding",
-    "nlp": "build-unit units/nlp_sequence_labeling (adapter); tutor/ also in reference unit output"
-  },
-  "priorities": "Issue #10: core study products + publication-grade lab first; tutor deferred (keep exports working, no new tutor work)",
-  "rl_v2_2026_11_16": {
-    "branch": "feat/rl-engine-pilot",
-    "engine_work": "B32/B33: design tokens + editorial typeset components, figure_kit (9 generic SVG kinds), layout lint (inline-math reflow, overflow, sparse pages), wide figures, MDP Studio lab, subject lab routing, Anki render gate + card rules, Bellman numeric parser fix, dossier from published book with competency_evidence fields, workbook single product (solutions last)",
-    "run_dir": "~/Exam_Mastery_Output/course-a8fba2d65467/ch-20261116T120000Z-v2edition (copy of V1 run de894dce + edition; V1 run untouched)",
-    "edition": "~/Exam_Mastery_Output/course-a8fba2d65467/editions/ch-271642018f0467.json (built by editions/v2_build/make_edition.py; content authored by the agent, not by engine role calls)",
-    "reproduce": "cd ~/Exam_Mastery_Output/course-a8fba2d65467 && PYTHONPATH=<repo> python editions/v2_build/make_edition.py ch-20261116T085650Z-de894dce && python editions/v2_build/publish_v2.py ch-20261116T085650Z-de894dce ch-20261116T120000Z-v2edition",
-    "package": "~/Exam_Mastery_Output/rl_releases/RL_Kap03_OptimalDecisionMaking_v2_2026-11-16(.zip) with LIES_MICH.md, SHA256SUMS, docs/ACCEPTANCE_MATRIX.md",
-    "model_calls_used": "8/30 (unchanged; V2 used 0 paid provider calls)",
-    "open_findings": "see package docs/ACCEPTANCE_MATRIX.md (P1-1 no independent expert review; P2-1..P2-6; P3-1..P3-3)",
-    "engine_install": "installed venv still at committed tree 98fb96e; V2 was built with PYTHONPATH=<repo working tree>. Reinstall from the new commit before the next product run.",
-    "next_human_step": "Owner rates V2 per product (Lehrbuch, Arbeitsbuch, Anki, MDP-Studio) 1-5 per ACCEPTANCE_MATRIX section Owner-Review"
-  },
-  "rl_v3_2026_11_16": {
-    "branch": "feat/rl-engine-pilot",
-    "engine_commit": "11c1802 (B33)",
-    "engine_installed": "exam-mastery-engine 0.22.0rc1 from git archive 11c1802 (byte-identical); previous install backed up at ~/Exam_Mastery_Output/engine_backups/exam_mastery-installed-before-0.22.0rc1-20261116",
-    "run_dir": "~/Exam_Mastery_Output/course-a8fba2d65467/ch-20261116T180000Z-v3 (copy of V1 run + edition + issue decisions; produced with the installed engine, no repo on path)",
-    "reproduce": "cd ~/Exam_Mastery_Output/course-a8fba2d65467 && <venv python> editions/v2_build/make_edition.py ch-20261116T085650Z-de894dce && python3 editions/v2_build/make_issue_decisions.py editions/v2_build/exam27_audit.json && <venv python> editions/v2_build/publish_v2.py ch-20261116T085650Z-de894dce ch-20261116T180000Z-v3",
-    "package": "~/Exam_Mastery_Output/rl_releases/RL_Kap03_OptimalDecisionMaking_v3_2026-11-16(.zip)",
-    "model_calls_used": "8/30 (unchanged; V3 used 0 paid provider calls; independent review by a separate Claude Code subagent, not a provider call)",
-    "open_findings": "package docs/ISSUES_UND_BEFUNDE.md section C (O1 no human academic review; O3 Anki GUI display; O4-O7 P3)",
-    "next_human_step": "Owner rates Lehrbuch, Arbeitsbuch, Anki, MDP-Studio 1-5 using LIES_MICH entry points; a human expert reviews proofs (docs/VALIDIERUNG.md lists what was model-reviewed)"
-  },
-  "current": "RL V4 review build packaged (engine 0.23.0rc1); awaiting owner ratings and human academic review"
+  "tests": "full suite 885 passed, 7 skipped (after reinstalling Playwright chromium/webkit, cache had been cleared)",
+  "next_action": "evidence registry (claim-level access levels) -> domain profiles -> lab task model -> rewrite flagged V4 cards in private edition v5_build -> textbook argument sections (contraction, Banach, PI/VI convergence) -> RL V5 candidate -> cross-domain run -> adversarial reviews",
+  "model_calls_used": 0,
+  "status": "IN_PROGRESS; no release, no self-approval"
+ }
 }
