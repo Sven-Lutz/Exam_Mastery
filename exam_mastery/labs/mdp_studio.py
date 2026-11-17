@@ -313,7 +313,7 @@ function compare(m) {
   <p class="msg info">Jetzt teilen beide Kurven eine Achse mit derselben Einheit, und der Vergleich ist fair. Bei wenigen Zuständen ist das Gleichungssystem billig und PI gewinnt oft; je mehr Zustände, desto teurer wird \\(n^3\\). Die VI-Policy ist oft lange vor den Werten optimal (Spalte k).</p>
   <h3>Reflexion</h3><p>Setzen Sie im Modell γ = 0.99 und vergleichen Sie erneut: Welche Zahl wächst stark, welche kaum? Begründen Sie mit der Kontraktionsrate γ.</p>
   <div class="btns"><button class="b warn" id="cmp-again">Neu vorhersagen</button></div></div>
-  <div class="card"><h3>Protokoll der Policy Iteration</h3><table><thead><tr><th>Iteration</th><th class="num">‖V<sup>π</sup> − V*‖<sub>∞</sub></th><th class="num">Operationen kumuliert</th><th>Policy-Änderungen</th></tr></thead><tbody>${rows.join('')}</tbody></table>
+  <div class="card"><h3>Protokoll der Policy Iteration</h3><table><thead><tr><th>Nr.</th><th class="num">Fehler ‖V<sup>π</sup> − V*‖<sub>∞</sub></th><th class="num">Operationen</th><th>Policy-Änderungen</th></tr></thead><tbody>${rows.join('')}</tbody></table>
   ${draw(o.V, o.pol, st.focus)}</div></div>`; }
 function plotXY(series, ylab, xlab) {                               // B34: shared x axis only when the unit is shared (work)
   const W = 520, H = 210, L = 46, B = 28, all = series.flatMap(s => s.v).filter(v => v > 0), xs = series.flatMap(s => s.x);
