@@ -163,7 +163,8 @@ def apply(book, ed):
                     else:
                         _check_item(it, where)
                         items.append(it)
-                stages.append({'title': st['title'], 'level': st.get('level', len(stages) + 1), 'intro': st.get('intro', ''), 'items': items})
+                stages.append({'title': st['title'], 'level': st.get('level', len(stages) + 1), 'intro': st.get('intro', ''), 'items': items,
+                               **({'kicker': st['kicker']} if st.get('kicker') else {})})
             dropped = sorted(set(old) - {i['id'] for st in stages for i in st['items']})
             if dropped and not op.get('dropped_reason'):
                 raise ContractError(f'EDITION_ITEMS_DROPPED_WITHOUT_REASON: {dropped}')
@@ -180,13 +181,17 @@ def apply(book, ed):
                     it = pool[it]
                 else:
                     _check_item(it, where)
-                items.append(dict(it, no=str(k), topic=it.get('title') or it['prompt'][:60]))
+                items.append(dict(it, no=f'{op["label"]}{k}' if op.get('label') else str(k), topic=it.get('title') or it['prompt'][:60]))
             tot = sum(i['points'] for i in items)
             ex = {k: v for k, v in op.items() if k not in ('op', 'items')}
             ex.update(items=items, total_points=tot)
             ex.setdefault('header', [['Punkte', f'{tot:g}'], ['Bearbeitungszeit', f'{op["minutes"]:g} Minuten' if op.get('minutes') else 'keine Vorgabe'],
                                      ['Hilfsmittel', op.get('aids', 'keine')]])
-            b['exam'] = ex
+            if op.get('label'):          # B34: several independent mock exams; `exam` stays the first one
+                b.setdefault('exams', []).append(ex)
+                b['exam'] = b['exams'][0]
+            else:
+                b['exam'] = ex
         elif kind == 'cards':
             cards = {c['key']: c for c in b['cards']}
             for key in op.get('remove', []):
@@ -211,8 +216,8 @@ def apply(book, ed):
                 lst, i = locate(op['block_id']); obj = lst[i]
             elif op.get('item_id'):
                 hits = [(st['items'], j) for st in b['stages'] for j, it in enumerate(st['items']) if it['id'] == op['item_id']]
-                if b.get('exam'):
-                    hits += [(b['exam']['items'], j) for j, it in enumerate(b['exam']['items']) if it['id'] == op['item_id']]
+                for ex_ in (b.get('exams') or ([b['exam']] if b.get('exam') else [])):
+                    hits += [(ex_['items'], j) for j, it in enumerate(ex_['items']) if it['id'] == op['item_id']]
                 if not hits:
                     raise ContractError(f'EDITION_UNKNOWN_ITEM: {where} {op["item_id"]}')
                 lst, i = hits[0]; obj = lst[i]
@@ -241,7 +246,8 @@ def apply(book, ed):
                         'review_finding': op.get('finding')})
             continue
         elif kind == 'meta':
-            for k in ('objectives', 'opener_lead', 'glossary', 'references', 'production_notes', 'workbook_intro', 'workbook_intro_solutions'):
+            for k in ('objectives', 'opener_lead', 'glossary', 'references', 'production_notes', 'workbook_intro', 'workbook_intro_solutions',
+                      'workbook_letters', 'workbook_subtitle', 'solutions_title'):
                 if k in op:
                     b[k] = op[k]
             b['meta'].update(op.get('meta', {}))

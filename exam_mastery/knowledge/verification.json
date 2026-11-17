@@ -765,6 +765,51 @@
    "verdict": "CONTENT_NOT_ACCESSIBLE",
    "checked_on": "2026-11-16",
    "method": "metadata (Crossref); full text not accessible"
+  },
+  "bellman1952": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "METADATA_ONLY",
+   "checked_on": "2026-11-17",
+   "method": "metadata (Crossref)"
+  },
+  "bertsekastsitsiklis1991": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED",
+   "checked_on": "2026-11-17",
+   "method": "abstract_read (Semantic Scholar API) + Crossref metadata"
+  },
+  "tsitsiklisvanroy1997": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": true,
+   "verdict": "VERIFIED",
+   "checked_on": "2026-11-17",
+   "method": "abstract_read (Semantic Scholar API) + Crossref metadata"
+  },
+  "sutton1988": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "METADATA_ONLY",
+   "checked_on": "2026-11-17",
+   "method": "metadata (Crossref)"
+  },
+  "watkinsdayan1992": {
+   "found": true,
+   "title_match": true,
+   "year_match": true,
+   "abstract_stored": false,
+   "verdict": "METADATA_ONLY",
+   "checked_on": "2026-11-17",
+   "method": "metadata (Crossref)"
   }
  },
  "claim_snippets": {
@@ -1139,6 +1184,30 @@
    {
     "source": "littman1995",
     "snippet": "although mdps can be solved efficiently in theory, more study is needed to reveal practical algorithms for solving large problems quickly",
+    "found_in_abstract": true
+   }
+  ],
+  "rl.bt1991": [
+   {
+    "source": "bertsekastsitsiklis1991",
+    "snippet": "reach a certain destination node with minimum expected cost",
+    "found_in_abstract": true
+   },
+   {
+    "source": "bertsekastsitsiklis1991",
+    "snippet": "removing the usual restriction that costs are either all nonnegative or all nonpositive",
+    "found_in_abstract": true
+   }
+  ],
+  "rl.tvr1997": [
+   {
+    "source": "tsitsiklisvanroy1997",
+    "snippet": "a linear function approximator online during a single endless trajectory",
+    "found_in_abstract": true
+   },
+   {
+    "source": "tsitsiklisvanroy1997",
+    "snippet": "a bound on the resulting approximation error",
     "found_in_abstract": true
    }
   ]

@@ -23,10 +23,14 @@ NODE = Path.home() / '.cache/exam-mastery-v05-node/node_modules'
 FONTS = [('Source Serif 4', 'source-serif-4', ['400-normal', '400-italic', '600-normal', '700-normal']),
          ('Source Sans 3', 'source-sans-3', ['400-normal', '400-italic', '600-normal', '700-normal']),
          ('JetBrains Mono', 'jetbrains-mono', ['400-normal'])]
+LEVEL = {'course': ('A', 'Vorlesung'), 'vision': ('A', 'Vorlesung (Folienabbildung)'), 'supplement': ('B', 'Verifizierte Ergänzung'),
+         'interpretation': ('C', 'Einordnung (nicht aus der Vorlesung)'), 'didactic': ('C', 'Eigenes Rechenbeispiel (nicht aus der Vorlesung)'),
+         'unconfirmed': ('C', 'Nicht bestätigt')}
 PROV = {'course': 'Vorlesung', 'supplement': 'Fachliche Ergänzung', 'didactic': 'Didaktisches Beispiel (selbst entworfen)',
         'interpretation': 'Einordnung (nicht aus der Vorlesung)', 'unconfirmed': 'Nicht bestätigt', 'vision': 'Abbildung der Vorlesung (vom Agenten ausgewertet)'}
 BOX = {'note': 'Hinweis', 'law': 'Rechtslage', 'pitfall': 'Typischer Fehler', 'key': 'Kernaussage', 'remark': 'Anmerkung',
-       'limit': 'Modellgrenze', 'question': 'Leitfrage'}
+       'limit': 'Modellgrenze', 'question': 'Leitfrage', 'exam': 'Prüfungsbezug', 'transfer': 'Transfer', 'deep': 'Vertiefung'}
+BOX_GLYPH = {'pitfall': '⚠', 'limit': '⚠', 'exam': '✎', 'transfer': '⇄', 'deep': '∑', 'key': '■', 'question': '?', 'research': '❧'}
 
 
 # ------------------------------------------------------------------ inline markup
@@ -44,7 +48,12 @@ def _mt(s):
 _BARE = re.compile(r'(?<![\w\\])([A-Za-z\u0391-\u03a9\u03b1-\u03c9])([_^])(\{[^{}]*\}|-?\d+|[A-Za-z\u03b1-\u03c9*\u2032]{1,3})(?![\w{])')
 
 
+# B34: numeric powers written without \\( \\) ('100^14', '0.9^10') are typeset as real superscripts, never as raw carets
+_NUMPOW = re.compile(r'(?<![\w.])(\d+(?:[.,]\d+)?)\^(\{[^{}]*\}|[-−]?\d+)')
+
+
 def _bare(p):
+    p = _NUMPOW.sub(lambda m: f'{m[1]}<sup>{m[2][1:-1] if m[2].startswith("{") else m[2]}</sup>', p)
     def one(m):
         tag = 'sub' if m[2] == '_' else 'sup'
         inner = m[3][1:-1] if m[3].startswith('{') else m[3]
@@ -67,6 +76,25 @@ def inline(s):
     return re.sub(r'\x02(\d+)\x03', lambda m: keep[int(m[1])], t)
 
 
+def _cells(line):
+    """B34: table cells split at '|' OUTSIDE math, so |r| or \\|x\\| inside \\( \\) never breaks a row."""
+    t = line.strip()
+    t = t[1:] if t.startswith('|') else t
+    t = t[:-1] if t.endswith('|') and not t.endswith('\\|') else t
+    out, cur, depth, i = [], '', 0, 0
+    while i < len(t):
+        two = t[i:i + 2]
+        if two in ('\\(', '\\['):
+            depth += 1; cur += two; i += 2; continue
+        if two in ('\\)', '\\]'):
+            depth = max(0, depth - 1); cur += two; i += 2; continue
+        if t[i] == '|' and depth == 0:
+            out.append(cur.strip()); cur = ''; i += 1; continue
+        cur += t[i]; i += 1
+    out.append(cur.strip())
+    return out
+
+
 def md(s):
     """Paragraphs, '- ' bullets, '1. ' numbered lists, display math on its own line."""
     s = str(s or '').strip()
@@ -83,7 +111,7 @@ def md(s):
             out.append(f'<pre class="code"><code>{E(code[int(lines[0].strip()[5:-1])])}</code></pre>')
         elif len(lines) >= 2 and all(l.strip().startswith('|') and l.strip().endswith('|') for l in lines) and \
                 any(re.fullmatch(r'\|?[\s:|-]+\|?', l.strip()) and '-' in l for l in lines):
-            rows = [[c.strip() for c in l.strip().strip('|').split('|')] for l in lines if not re.fullmatch(r'\|?[\s:|-]+\|?', l.strip())]
+            rows = [_cells(l) for l in lines if not re.fullmatch(r'\|?[\s:|-]+\|?', l.strip())]
             out.append('<table><thead><tr>' + ''.join(f'<th>{inline(c)}</th>' for c in rows[0]) + '</tr></thead><tbody>'
                        + ''.join('<tr>' + ''.join(f'<td>{inline(c)}</td>' for c in r) + '</tr>' for r in rows[1:]) + '</tbody></table>')
         elif all(re.match(r'\s*[-•] ', l) for l in lines):
@@ -110,137 +138,151 @@ def font_css(rel):
 
 
 CSS = r"""
-/* Exam Mastery editorial design system "Atlas" (B32). Tokens come from design_tokens.py; every semantic role has a
-   colour AND a non-colour cue (label, border style, glyph), so meaning survives greyscale print and colour-vision
-   deficiency. Layout: text column + side column; figure/text spreads; numbered components; print first. */
-:root{--ink:#1F2933;--ink2:#3A4652;--muted:#5B6878;--line:#CBD3DC;--hair:#E4E8EC;--soft:#F5F7FA;--paper:#FFFFFF;
- --navy:#1B2A41;--petrol:#0F6E73;--petrol-l:#E2F0F0;--blue:#2F5D8A;--blue-l:#E8F0F8;--gold:#8C6416;--gold-l:#FBF2DE;
- --coral:#C8483A;--coral-l:#FBE9E5;--green:#2E7D4F;--green-l:#E5F2EA;--violet:#5B4B9A;--violet-l:#EEEBF7;
- --accent:var(--navy);--accent-soft:var(--petrol-l);--warm:var(--gold);--warm-soft:var(--gold-l);--warn:var(--coral);--warn-soft:var(--coral-l);--ok:var(--green);
+/* Exam Mastery design system "Atlas 2" (B34). One typographic scale, one semantic palette, full measure.
+   Every semantic role has a colour AND a non-colour cue (label word, glyph, border style), so the role survives
+   greyscale print. Sources are a slim line inside the block (level A/B/C + slide number), never a margin column. */
+:root{--ink:#1C2430;--ink2:#344050;--muted:#556273;--line:#C9D1DA;--hair:#E3E8ED;--soft:#F4F6F9;--paper:#FFFFFF;
+ --navy:#16263D;--teal:#0B6E6E;--teal-l:#E3F2F1;--blue:#24578F;--blue-l:#E7EFF9;--indigo:#3D3F96;--indigo-l:#ECECF8;
+ --amber:#8A5A00;--amber-l:#FDF1D8;--petrol:var(--teal);--gold:var(--amber);--violet:var(--indigo);--plum:#7A3B76;--plum-l:#F6EAF4;--coral:#B53A2C;--coral-l:#FBE8E4;
+ --crimson:#9E1F3F;--crimson-l:#FBE6EC;--green:#26704A;--green-l:#E4F2EA;--slate:#4A5868;--slate-l:#EEF1F4;
  --serif:'Source Serif 4','Iowan Old Style',Georgia,serif;--sans:'Source Sans 3','Helvetica Neue',Arial,sans-serif;
- --mono:'JetBrains Mono',Menlo,monospace;--side:40mm;--gap:7mm}
-*{box-sizing:border-box}
-html{font-size:10.6pt}
-body{margin:0;color:var(--ink);background:var(--paper);font-family:var(--serif);line-height:1.5;font-kerning:normal;
- font-variant-numeric:oldstyle-nums proportional-nums;hyphens:auto;-webkit-hyphens:auto;text-rendering:optimizeLegibility}
-main{padding-right:calc(var(--side) + var(--gap))}
-h1,h2,h3,h4,.sans{font-family:var(--sans);font-variant-numeric:lining-nums;color:var(--navy)}
-h1{font-size:2.2rem;line-height:1.1;margin:0 0 .4em;font-weight:700;letter-spacing:-.015em}
-h2{font-size:1.6rem;line-height:1.18;margin:0 0 .8em;font-weight:700;break-before:page;break-after:avoid;letter-spacing:-.008em;
- padding-top:2mm;border-top:5px solid var(--navy)}
-h2 .no{display:inline-block;color:#fff;background:var(--navy);font-weight:700;padding:.05em .38em;margin-right:.45em;border-radius:2px}
-h3{font-size:1.16rem;margin:1.8em 0 .5em;break-after:avoid;font-weight:700;color:var(--navy)}
-h3 .no{color:var(--petrol);font-weight:700;margin-right:.45em}
-h4{font-size:1rem;margin:1.1em 0 .3em;break-after:avoid;font-weight:700}
-p{margin:0 0 .7em;orphans:3;widows:3}
-ul,ol{margin:.2em 0 .8em;padding-left:1.3em}li{margin:.22em 0}li::marker{color:var(--petrol)}
-strong{font-weight:600;color:var(--navy)}
-a{color:var(--blue)}
-pre.code{font-family:var(--mono);font-size:.8rem;line-height:1.45;background:var(--soft);border-radius:3px;padding:.7em .9em;overflow-x:auto;break-inside:avoid;white-space:pre}
-code{font-family:var(--mono);font-size:.86em;background:var(--soft);padding:.05em .3em;border-radius:3px}
-.dmath{margin:.8em 0 1em;text-align:center;overflow-x:auto}
-mjx-container{font-size:104%!important}
-mjx-container[display="true"]{display:block;max-width:100%}mjx-container[display="true"]>svg{max-width:100%;height:auto}
-/* side column */
-.blk{position:relative}.blk::after{content:'';display:table;clear:both}
-.side,.src{float:right;clear:right;width:var(--side);margin-right:calc(-1 * (var(--side) + var(--gap)));margin-top:.2em;
- font-family:var(--sans);font-size:.72rem;line-height:1.38;color:var(--muted);font-variant-numeric:lining-nums;hyphens:none;text-align:left;
- border-top:1px solid var(--line);padding-top:.25em}
-.side .prov,.src b{display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.62rem;margin-bottom:.15em}
-.prov.course{color:var(--navy)}.prov.supplement{color:var(--gold)}.prov.didactic{color:var(--blue)}.prov.interpretation,.prov.vision,.prov.unconfirmed{color:var(--muted)}
-.side .ref{display:block;margin-top:.15em}
-.lead{font-size:1.12rem;line-height:1.55;color:var(--ink2);border-left:4px solid var(--gold);padding:.1em 0 .1em .9em;margin:.4em 0 1.2em}
-/* chapter opener */
-.opener{break-after:page;padding-top:4mm;margin-right:calc(-1 * (var(--side) + var(--gap)))}
-.opener .chno{font:800 4.4rem/1 var(--sans);color:var(--petrol);letter-spacing:-.04em}
-.opener h1{font-size:2.6rem;margin:.1em 0 .45em;max-width:16em}
-.opener .goals{background:var(--soft);border-top:4px solid var(--petrol);padding:.8em 1em .5em;margin-top:1.2em}
-.opener .goals h4,.opener .road h4{margin:0 0 .5em;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--petrol)}
-.opener .goals ol{padding-left:1.4em;columns:2;column-gap:2em}.opener .goals li{margin:.3em 0;break-inside:avoid;font-size:.94rem}
-.opener .road{margin-top:1em;break-inside:avoid;display:grid;grid-template-columns:repeat(5,1fr);gap:.5em .8em;font-family:var(--sans);font-size:.84rem}
-.opener .road div{border-top:3px solid var(--navy);padding-top:.35em;color:var(--ink2)}.opener .road b{display:block;color:var(--petrol);font-size:1.1rem}
-/* semantic components: role colour + label + border style */
-.def,.box,.ex,.mis,.case,.sum,.thm,.prf,.intu,.res-w,.rec,.take,.algo,.cmp,.ftx{margin:1.15em 0 1.25em}
-.def,.thm,.box,.intu,.rec,.take,.algo,.sum,.mis{break-inside:avoid-page}
-.keephead{break-inside:avoid-page}
-.lab{font-family:var(--sans);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.3em}
-.lab .g{font-size:.95rem;margin-right:.35em;letter-spacing:0}
-.def{background:var(--petrol-l);border-left:5px solid var(--petrol);padding:.6em 1em .35em}
-.def .lab{color:var(--petrol)}.def .term{font-family:var(--sans);font-weight:700;color:var(--navy);margin-right:.35em}
-.thm{border:2px solid var(--petrol);border-radius:3px;padding:.6em 1em .35em;background:#fff}
-.thm .lab{color:var(--petrol)}.thm .name{font-family:var(--sans);font-weight:700;color:var(--navy)}
-.thm .ass{font-family:var(--sans);font-size:.84rem;color:var(--ink2);border-top:1px dashed var(--line);margin-top:.4em;padding-top:.3em}
-.prf{border-left:2px solid var(--petrol);padding:.1em 0 .2em 1em}
-.prf .lab{color:var(--petrol)}.prf .qed{float:right;color:var(--petrol);font-size:1.1rem;line-height:1}
-.prf ol.steps,.ex ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:.4em 0}
-.prf ol.steps>li,.ex ol.steps>li{counter-increment:s;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:1em;padding:.38em 0;border-top:1px solid var(--hair);break-inside:avoid}
-.prf ol.steps>li:first-child,.ex ol.steps>li:first-child{border-top:none}
-.prf ol.steps>li::before,.ex ol.steps>li::before{content:counter(s);flex:0 0 1.9em;font:700 .74rem/1.75 var(--sans);color:#fff;background:var(--blue);border-radius:50%;
- width:1.65em;height:1.65em;text-align:center;margin-right:.25em}
-.prf ol.steps>li::before{background:var(--petrol)}
-.prf ol.steps>li .why,.ex ol.steps>li .why{display:block;flex:1 1 13em;color:var(--muted);font-size:.86em;font-family:var(--sans);line-height:1.4}
-.prf ol.steps>li>.do,.ex ol.steps>li>.do{flex:1.45 1 auto;max-width:100%}
-.ex{background:#fff;border:1px solid var(--blue);border-top:5px solid var(--blue);border-radius:3px;padding:.6em 1em .5em;break-inside:auto}
-.ex>.lab{color:var(--blue)}.ex h4{margin:.05em 0 .45em;font-size:1.04rem;color:var(--navy)}
-.ex>h4,.ex>.lab,.ex>.given{break-after:avoid}
-.ex .given{background:var(--blue-l);padding:.5em .8em;border-radius:2px;margin:.3em 0 .7em}.ex .given p:last-child{margin-bottom:0}
+ --mono:'JetBrains Mono',Menlo,monospace;
+ /* type scale: only these sizes are used (lint-checked) */
+ --fs-xs:.78rem;--fs-s:.9rem;--fs-b:1rem;--fs-m:1.14rem;--fs-l:1.42rem;--fs-xl:1.9rem;--fs-xxl:2.7rem;
+ --lh:1.52;--sp:.75rem}
+html{font-size:10.5pt}
+body{margin:0;color:var(--ink);background:var(--paper);font-family:var(--serif);font-size:var(--fs-b);line-height:var(--lh);font-kerning:normal;
+ font-variant-numeric:lining-nums proportional-nums;hyphens:auto;-webkit-hyphens:auto;text-rendering:optimizeLegibility}
+h1,h2,h3,h4,h5,.sans{font-family:var(--sans);font-variant-numeric:lining-nums;color:var(--navy);font-weight:700}
+h1{font-size:var(--fs-xxl);line-height:1.08;margin:0 0 .4em;letter-spacing:-.015em}
+h2{font-size:var(--fs-xl);line-height:1.15;margin:0 0 .9em;break-before:page;break-after:avoid;letter-spacing:-.01em;padding-top:3mm}
+h2 .no{display:block;font-size:var(--fs-m);color:var(--teal);letter-spacing:.04em;margin-bottom:.15em}
+h3{font-size:var(--fs-l);margin:1.7em 0 .5em;break-after:avoid;line-height:1.2}
+h3 .no{color:var(--teal);margin-right:.5em}
+h4{font-size:var(--fs-m);margin:1.2em 0 .35em;break-after:avoid}
+h5{font-size:var(--fs-b);margin:.6em 0 .2em}
+p{margin:0 0 var(--sp)}.blk{margin:0 0 1.05em}.blk>p:last-child{margin-bottom:0}
+ul,ol{margin:.2em 0 var(--sp);padding-left:1.35em}li{margin:.25em 0}li::marker{color:var(--teal)}
+strong{font-weight:600;color:var(--navy)}em{font-style:italic}a{color:var(--blue)}
+pre.code{font-family:var(--mono);font-size:var(--fs-s);line-height:1.45;background:var(--soft);border-radius:3px;padding:.7em .9em;overflow-x:auto;break-inside:avoid;white-space:pre}
+code{font-family:var(--mono);font-size:.9em;background:var(--soft);padding:.05em .3em;border-radius:3px}
+mjx-container{font-size:100%!important}
+mjx-container[display="true"]{margin:.55em 0!important}
+.dmath{margin:.7em 0;text-align:center;break-inside:avoid}
+/* source line: level A/B/C + human-readable reference */
+.srcl{font-family:var(--sans);font-size:var(--fs-xs);color:var(--muted);line-height:1.35;margin:0 0 .3em;display:flex;flex-wrap:wrap;gap:.2em .5em;align-items:baseline;hyphens:none}
+.srcl .lv{display:inline-block;font-weight:700;letter-spacing:.05em;border-radius:2px;padding:0 .35em;color:#fff}
+.srcl .lv.A{background:var(--navy)}.srcl .lv.B{background:var(--amber)}.srcl .lv.C{background:var(--slate)}
+.srcl .ref{color:var(--ink2)}
+/* lead, opener */
+.lead{font-size:var(--fs-m);line-height:1.5;color:var(--ink2);border-left:4px solid var(--teal);padding:.1em 0 .1em .9em;margin:.4em 0 1.2em}
+.opener{break-after:page;padding-top:4mm}
+.opener .chno{font:800 4.6rem/1 var(--sans);color:var(--teal);letter-spacing:-.04em}
+.opener h1{margin:.1em 0 .45em;max-width:16em}
+.opener .goals{background:var(--teal-l);border-top:4px solid var(--teal);padding:.8em 1.1em .5em;margin-top:1.2em}
+.opener .goals h4,.opener .road h4,.levels h4{margin:0 0 .5em;font-size:var(--fs-xs);letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
+.opener .goals ol{padding-left:1.4em;columns:2;column-gap:2em}.opener .goals li{margin:.3em 0;break-inside:avoid;font-size:var(--fs-s)}
+.opener .road{margin-top:1.1em;break-inside:avoid;display:grid;grid-template-columns:repeat(3,1fr);gap:.6em 1em;font-family:var(--sans);font-size:var(--fs-s)}
+.opener .road div{border-top:3px solid var(--navy);padding-top:.35em;color:var(--ink2)}.opener .road b{display:block;color:var(--teal);font-size:var(--fs-m)}
+.levels{margin-top:1.2em;border:1px solid var(--line);padding:.7em 1em .5em;font-family:var(--sans);font-size:var(--fs-s);break-inside:avoid}
+.levels .row{display:grid;grid-template-columns:7.5em 1fr;gap:.6em;margin:.25em 0;align-items:baseline}
+/* components: label line shared by all roles */
+.lab{font-family:var(--sans);font-size:var(--fs-xs);font-weight:700;letter-spacing:.11em;text-transform:uppercase;display:block;margin-bottom:.35em}
+.lab .g{font-size:var(--fs-s);margin-right:.4em;letter-spacing:0}
+.lab .t{text-transform:none;letter-spacing:0;font-size:var(--fs-b);margin-left:.35em;color:var(--navy)}
+.card{padding:.7em 1.05em .45em;border-radius:3px;break-inside:avoid}
+.card>.srcl{margin-top:-.1em}
+.def{background:var(--teal-l);border-left:6px solid var(--teal)}.def .lab{color:var(--teal)}
+.def .term{font-family:var(--sans);font-weight:700;color:var(--navy);margin-right:.35em}
+.thm{border:2px solid var(--blue);background:#fff;padding:0;break-inside:avoid}
+.thm .th{background:var(--blue);color:#fff;font-family:var(--sans);padding:.35em 1em;font-size:var(--fs-xs);font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+.thm .th .t{text-transform:none;letter-spacing:0;font-size:var(--fs-b);margin-left:.4em}
+.thm .tb{padding:.65em 1em .4em}
+.thm .ass{font-family:var(--sans);font-size:var(--fs-s);color:var(--ink2);border-top:1px dashed var(--line);margin-top:.4em;padding-top:.35em}
+.prf>.lab,.drv>.lab,.drv>.srcl,.drv .goal,.prf>.srcl,.ex>.lab,.ex>h4,.thm .th{break-after:avoid}
+.prf{border-left:3px solid var(--slate);padding:.15em 0 .3em 1em;break-inside:auto}.prf .lab{color:var(--slate)}
+.prf .qed{display:block;text-align:right;color:var(--slate);font-size:var(--fs-m);line-height:1}
+/* derivation: aligned chain, every step justified in body type */
+.drv{border:1px solid var(--line);border-top:4px solid var(--indigo);background:#fff;padding:.6em 1.05em .5em;break-inside:auto}
+.drv>.lab{color:var(--indigo)}.drv .goal{margin-bottom:.5em}
+.drv ol.chain{list-style:none;counter-reset:d;padding:0;margin:.2em 0}
+.drv ol.chain>li{counter-increment:d;display:grid;grid-template-columns:2.1em minmax(0,1fr);column-gap:.6em;padding:.45em 0;border-top:1px solid var(--hair);break-inside:avoid}
+.drv ol.chain>li::before{content:'(' counter(d) ')';font:700 var(--fs-s)/2 var(--sans);color:var(--indigo)}
+.drv .eq{overflow-x:auto}.drv .eq mjx-container[display="true"]{margin:.1em 0!important;text-align:left!important}
+.drv .why{grid-column:2;color:var(--ink2);font-size:var(--fs-b);line-height:1.45}
+.drv .why::before{content:'↳ ';color:var(--indigo);font-family:var(--sans)}
+.drv .concl{border-top:2px solid var(--indigo);padding-top:.45em;margin-top:.3em}
+.prf ol.steps,.ex ol.steps{counter-reset:s;list-style:none;padding:0;margin:.4em 0}
+.prf ol.steps>li,.ex ol.steps>li{counter-increment:s;display:grid;grid-template-columns:1.9em minmax(0,1fr);column-gap:.6em;padding:.42em 0;border-top:1px solid var(--hair);break-inside:avoid}
+.prf ol.steps>li::before,.ex ol.steps>li::before{content:counter(s);font:700 var(--fs-xs)/1.9 var(--sans);color:#fff;background:var(--blue);border-radius:50%;width:1.9em;height:1.9em;text-align:center}
+.prf ol.steps>li::before{background:var(--slate)}
+.prf ol.steps>li .why,.ex ol.steps>li .why{grid-column:2;display:block;color:var(--ink2);font-size:var(--fs-s);line-height:1.45;margin-top:.15em}
+.prf ol.steps>li .do,.ex ol.steps>li .do{grid-column:2;min-width:0}
+.ex{background:#fff;border:1px solid var(--blue);border-top:5px solid var(--blue);border-radius:3px;padding:.65em 1.05em .5em;break-inside:auto}
+.ex>.lab{color:var(--blue)}.ex h4{margin:.05em 0 .45em;color:var(--navy)}
+.ex .given{background:var(--blue-l);padding:.5em .85em;border-radius:2px;margin:.3em 0 .7em}.ex .given p:last-child{margin-bottom:0}
 .ex .res{border-top:2px solid var(--navy);padding-top:.45em;margin-top:.4em;break-inside:avoid}
-.ex .res::before{content:'Ergebnis';font:700 .68rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--green);display:block;margin-bottom:.2em}
-.intu{background:var(--gold-l);border-left:5px solid var(--gold);padding:.6em 1em .35em}
-.intu .lab{color:var(--gold)}
-.res-w{border:2px solid var(--gold);border-radius:4px;padding:0;break-inside:avoid-page;background:#fff}
-.res-w .rh{background:var(--gold);color:#fff;font-family:var(--sans);padding:.35em .9em;display:flex;justify-content:space-between;align-items:baseline;gap:1em}
-.res-w .rh b{font-size:.98rem}.res-w .rh span{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;opacity:.92}
-.res-w .rb{padding:.6em .95em .3em}
-.res-w .rq{font-family:var(--sans);font-weight:700;color:var(--navy);margin-bottom:.35em}
-.res-w .grid{display:grid;grid-template-columns:1fr 1fr;gap:.3em 1.2em;font-size:.93rem}
-.res-w .grid h5{margin:.2em 0 .1em;font:700 .66rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
-.res-w .cite{border-top:1px dashed var(--line);margin-top:.5em;padding-top:.35em;font-family:var(--sans);font-size:.76rem;color:var(--ink2)}
-.res-w .tag{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:2px;padding:0 .35em;font:700 .62rem var(--sans);letter-spacing:.08em;text-transform:uppercase;margin-right:.4em}
-.rec{border:2px dashed var(--violet);border-radius:4px;padding:.55em 1em .35em;background:var(--violet-l)}
-.rec .lab{color:var(--violet)}.rec ol{margin:.2em 0 .3em}.rec .ans{font-family:var(--sans);font-size:.78rem;color:var(--muted)}
-.take{border-left:5px double var(--green);background:var(--green-l);padding:.55em 1em .3em}
-.take .lab{color:var(--green)}.take ul{margin-bottom:.3em}
-.algo{border:1px solid var(--navy);border-radius:3px;font-family:var(--sans)}
-.algo .ah{background:var(--navy);color:#fff;padding:.3em .8em;font-weight:700;font-size:.92rem}
-.algo ol{margin:.5em 0 .5em;padding-left:2.4em;font-size:.94rem}.algo ol li::marker{color:var(--navy);font-weight:700}
-.algo .io{padding:.3em .8em;border-top:1px solid var(--line);font-size:.86rem;color:var(--ink2)}
+.ex .res::before{content:'Ergebnis';font:700 var(--fs-xs) var(--sans);letter-spacing:.11em;text-transform:uppercase;color:var(--green);display:block;margin-bottom:.2em}
+.intu{background:var(--amber-l);border-left:6px solid var(--amber)}.intu .lab{color:var(--amber)}
+/* research: three forms */
+.res-w{border:2px solid var(--plum);border-radius:4px;padding:0;break-inside:avoid-page;background:#fff}
+.res-w .rh{background:var(--plum);color:#fff;font-family:var(--sans);padding:.4em 1em;display:flex;justify-content:space-between;align-items:baseline;gap:1em}
+.res-w .rh b{font-size:var(--fs-b)}.res-w .rh span{font-size:var(--fs-xs);letter-spacing:.11em;text-transform:uppercase;opacity:.92}
+.res-w .rb{padding:.65em 1em .5em}
+.res-w .rq{font-family:var(--sans);font-weight:700;color:var(--navy);margin-bottom:.4em}
+.res-w .grid{display:grid;grid-template-columns:1fr 1fr;gap:.35em 1.3em}
+.res-w .grid h5{margin:.2em 0 .1em;font:700 var(--fs-xs) var(--sans);letter-spacing:.11em;text-transform:uppercase;color:var(--plum)}
+.res-w .cite{border-top:1px dashed var(--line);margin-top:.5em;padding-top:.35em;font-family:var(--sans);font-size:var(--fs-s);color:var(--ink2)}
+.res-w .tag,.rn .tag{display:inline-block;border:1px solid var(--plum);color:var(--plum);border-radius:2px;padding:0 .35em;font:700 var(--fs-xs) var(--sans);letter-spacing:.06em;text-transform:uppercase;margin-right:.4em}
+.rn{border-left:4px double var(--plum);padding:.25em 0 .2em .95em;color:var(--ink2)}.rn .lab{color:var(--plum)}
+.rn .cite{font-family:var(--sans);font-size:var(--fs-s);color:var(--muted);margin-top:.2em}
+.hist{background:var(--plum-l);border-left:6px solid var(--plum)}.hist .lab{color:var(--plum)}
+.rec{border:2px dashed var(--indigo);border-radius:4px;padding:.6em 1.05em .4em;background:var(--indigo-l)}
+.rec .lab{color:var(--indigo)}.rec ol{margin:.2em 0 .3em}.rec .ans{font-family:var(--sans);font-size:var(--fs-xs);color:var(--muted)}
+.take{border-left:6px double var(--green);background:var(--green-l)}.take .lab{color:var(--green)}.take ul{margin-bottom:.3em}
+.algo{border:1px solid var(--navy);border-radius:3px;font-family:var(--sans);break-inside:avoid}
+.algo .ah{background:var(--navy);color:#fff;padding:.35em .9em;font-weight:700}
+.algo ol{margin:.5em 0;padding-left:2.4em}.algo ol li::marker{color:var(--navy);font-weight:700}
+.algo .io{padding:.35em .9em;border-top:1px solid var(--line);font-size:var(--fs-s);color:var(--ink2)}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:3px;break-inside:avoid-page}
-.cmp>div{padding:.55em .9em .3em}.cmp>div+div{border-left:1px solid var(--line)}
-.cmp h5{margin:0 0 .3em;font:700 .9rem var(--sans);color:var(--navy);border-bottom:3px solid var(--petrol);padding-bottom:.2em}
-.cmp>div:nth-child(2) h5{border-bottom-color:var(--gold)}
-.cmp .row{display:contents}
-.ftx{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:1.1em;align-items:start;break-inside:avoid-page}
-.ftx.left{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr)}.ftx.left .ftx-fig{order:-1}
-.ftx.stack{display:block}.ftx.stack .ftx-fig{margin-top:.6em}.ftx.stack figure{margin-right:calc(-1 * (var(--side) + var(--gap)))}.ftx.stack .ftx-txt{break-after:avoid}
+.cmp>div{padding:.6em .95em .35em}.cmp>div+div{border-left:1px solid var(--line)}
+.cmp h5{margin:0 0 .3em;font-size:var(--fs-b);color:var(--navy);border-bottom:3px solid var(--teal);padding-bottom:.2em}
+.cmp>div:nth-child(2) h5{border-bottom-color:var(--amber)}.cmp>div:nth-child(3) h5{border-bottom-color:var(--plum)}
+.ftx{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.2em;align-items:start;break-inside:avoid-page}
+.ftx.left .ftx-fig{order:-1}
+.ftx.stack{display:block}.ftx.stack .ftx-fig{margin-top:.6em}.ftx.stack .ftx-txt{break-after:avoid}
 .ftx figure{margin:0}.ftx .ftx-txt>:first-child{margin-top:0}
-.box{background:var(--soft);padding:.6em .95em .35em;border-left:5px solid var(--line)}
-.box.law{border-left-color:var(--gold);background:var(--gold-l)}.box.law .lab{color:var(--gold)}
-.box.pitfall,.box.limit{border-left-color:var(--coral);background:var(--coral-l)}.box.pitfall .lab,.box.limit .lab{color:var(--coral)}
+/* boxes by role: colour + label + border style */
+.box{background:var(--soft);border-left:6px solid var(--line)}
+.box .lab{color:var(--slate)}
+.box.law{border-left-color:var(--amber);background:var(--amber-l)}.box.law .lab{color:var(--amber)}
+.box.pitfall,.box.limit{border-left-color:var(--coral);border-left-style:solid;background:var(--coral-l)}.box.pitfall .lab,.box.limit .lab{color:var(--coral)}
 .box.key{border:2px solid var(--navy);border-left-width:6px;background:#fff}.box.key .lab{color:var(--navy)}
-.box.research{border-left-color:var(--gold);background:var(--gold-l)}.box.research .lab{color:var(--gold)}
-.box.question{border-left-color:var(--violet);background:var(--violet-l)}.box.question .lab{color:var(--violet)}
-.mis{display:grid;grid-template-columns:1fr 1fr;gap:.2em 1.2em;border:1px solid var(--coral);border-top:5px solid var(--coral);border-radius:3px;padding:.55em .95em}
+.box.research{border-left-color:var(--plum);background:var(--plum-l)}.box.research .lab{color:var(--plum)}
+.box.question{border-left-color:var(--indigo);background:var(--indigo-l)}.box.question .lab{color:var(--indigo)}
+.box.exam{border:2px solid var(--crimson);border-left-width:6px;background:var(--crimson-l)}.box.exam .lab{color:var(--crimson)}
+.box.transfer{border-left:6px dotted var(--green);background:var(--green-l)}.box.transfer .lab{color:var(--green)}
+.box.deep{border-left:6px solid var(--indigo);background:var(--indigo-l)}.box.deep .lab{color:var(--indigo)}
+.mis{display:grid;grid-template-columns:1fr 1fr;gap:.2em 1.2em;border:1px solid var(--coral);border-top:5px solid var(--coral);border-radius:3px;padding:.6em 1em}
 .mis .lab{grid-column:1/3;color:var(--coral)}
 .mis .wrong::before{content:'✗ Fehlvorstellung'}.mis .right::before{content:'✓ Richtig ist'}
-.mis .wrong::before,.mis .right::before{display:block;font:700 .8rem var(--sans);margin-bottom:.15em}
-.mis .wrong{color:var(--ink2);text-decoration:none}.mis .wrong::before{color:var(--coral)}.mis .right::before{color:var(--green)}
-.mis .why{grid-column:1/3;color:var(--ink2);font-size:.94em;border-top:1px dashed var(--line);padding-top:.3em}
+.mis .wrong::before,.mis .right::before{display:block;font:700 var(--fs-s) var(--sans);margin-bottom:.15em}
+.mis .wrong{color:var(--ink2)}.mis .wrong::before{color:var(--coral)}.mis .right::before{color:var(--green)}
+.mis .why{grid-column:1/3;color:var(--ink2);border-top:1px dashed var(--line);padding-top:.3em}
 .case{border-left:4px solid var(--muted);padding:.2em 0 .1em .95em}
 .sum{border-top:4px solid var(--navy);border-bottom:4px solid var(--navy);padding:.6em 0 .2em}.sum .lab{color:var(--navy)}
-figure{margin:1.3em 0 1.4em;break-inside:avoid}
+figure{margin:1.2em 0 1.3em;break-inside:avoid}
 figure .fig{text-align:center;background:#fff}
-figure .fig svg{max-width:100%}
-/* B33: stand-alone figures use text + margin column (wide figure); vector graphics scale to the measure, capped in height */
-figure{margin-right:calc(-1 * (var(--side) + var(--gap)))}figure .fig svg{width:100%;height:auto;max-height:118mm}
-.ftx figure{margin-right:0}.ftx figure .fig svg{max-height:95mm}
-figcaption,.tcap{font-family:var(--sans);font-size:.8rem;color:var(--ink2);margin-top:.5em;line-height:1.42;border-left:3px solid var(--petrol);padding-left:.6em}
-figcaption b,.tcap b{color:var(--petrol);margin-right:.3em}
+figure .fig svg{width:100%;height:auto;max-width:100%;max-height:125mm}
+.ftx figure .fig svg{max-height:95mm}
+figcaption,.tcap{font-family:var(--sans);font-size:var(--fs-s);color:var(--ink2);margin-top:.5em;line-height:1.45;border-left:3px solid var(--teal);padding-left:.65em}
+figcaption b,.tcap b{color:var(--teal);margin-right:.3em}
 figcaption .msg{font-weight:700;color:var(--navy)}
+figcaption .srcl{display:inline-flex;margin:0 0 0 .3em}
 .twrap{overflow-x:auto;margin:1em 0 1.2em;break-inside:avoid}
-table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.86rem;font-variant-numeric:lining-nums tabular-nums}
-th{text-align:left;font-weight:700;color:#fff;background:var(--navy);padding:.36em .55em;vertical-align:bottom;hyphens:none;-webkit-hyphens:none}
-td{hyphens:manual;-webkit-hyphens:manual;border-bottom:1px solid var(--hair);padding:.32em .55em;vertical-align:top}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:var(--fs-s);font-variant-numeric:lining-nums tabular-nums}
+th{text-align:left;font-weight:700;color:#fff;background:var(--navy);padding:.38em .6em;vertical-align:bottom;hyphens:none;-webkit-hyphens:none}
+td{hyphens:manual;-webkit-hyphens:manual;border-bottom:1px solid var(--hair);padding:.34em .6em;vertical-align:top}
 tbody tr:nth-child(even) td{background:var(--soft)}
 td.num,th.num{text-align:right}td.num{white-space:nowrap}
 tr.total td{border-top:2px solid var(--navy);font-weight:700}
@@ -248,55 +290,56 @@ tr.neg td.num{color:var(--coral)}
 .tcap{margin:0 0 .35em}
 /* cover & toc */
 .cover{height:252mm;display:flex;flex-direction:column;justify-content:space-between;padding:0;position:relative}
-.cover .band{height:58mm;background:var(--navy);margin:0 -1px;position:relative}
-.cover .band::after{content:'';position:absolute;left:0;bottom:-6px;width:42%;height:6px;background:var(--gold)}
-.cover .kicker{font:700 .82rem var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--petrol);margin-top:14mm}
-.cover h1{font-size:3.2rem;margin:.2em 0 .2em;max-width:13em}
-.cover .sub{font:400 1.3rem var(--sans);color:var(--ink2)}
+.cover .band{height:62mm;background:linear-gradient(100deg,var(--navy) 0 62%,var(--teal) 62% 100%);margin:0 -1px;position:relative}
+.cover .band::after{content:'';position:absolute;left:0;bottom:-6px;width:38%;height:6px;background:var(--amber)}
+.cover .kicker{font:700 var(--fs-s) var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-top:14mm}
+.cover h1{font-size:3.1rem;margin:.2em 0 .2em;max-width:13em}
+.cover .sub{font:400 var(--fs-l) var(--sans);color:var(--ink2)}
 .cover .rule{height:2px;background:var(--navy);width:100%;margin:1.3em 0}
-.cover .meta{font:400 .8rem var(--sans);color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.8em;max-width:150mm}
+.cover .meta{font:400 var(--fs-xs) var(--sans);color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.8em;max-width:150mm}
 .toc{break-after:page}
-.toc h2{border-top:none;break-before:auto}
+.toc h2{break-before:auto}
 .toc a{color:inherit;text-decoration:none;display:flex;gap:.4em}
 .toc .e{display:flex;align-items:baseline;margin:.3em 0;font-family:var(--sans)}
 .toc .e.l1{font-weight:700;margin-top:.8em;color:var(--navy)}
-.toc .e.l2{padding-left:1.8em;font-size:.93em;color:var(--ink2)}
+.toc .e.l2{padding-left:1.8em;font-size:var(--fs-s);color:var(--ink2)}
 .toc .e .t{flex:0 1 auto}.toc .e .d{flex:1 1 auto;border-bottom:1px dotted #a6afb8;margin:0 .4em;transform:translateY(-.3em)}
 .toc .e .pg{flex:0 0 auto;font-variant-numeric:lining-nums}
 /* workbook */
-.item{break-inside:avoid-page;margin:0 0 1.4em}
+.item{break-inside:avoid-page;margin:0 0 1.5em}
 #sec-psol .item,.item.sol{break-inside:auto}.item .head{break-after:avoid}.rubk{break-inside:avoid-page}
 .part>.ph{break-inside:avoid;break-after:avoid}.part .ph h2{break-before:avoid!important}
-.item .head{font-family:var(--sans);display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--violet);margin-bottom:.45em;padding-bottom:.12em}
-.item .head .id{font-weight:700;color:var(--navy)}.item .head .meta{font-size:.76rem;color:var(--muted);font-variant-numeric:lining-nums}
-.item .head .meta .op{display:inline-block;background:var(--violet-l);color:var(--violet);border-radius:2px;padding:0 .4em;margin-right:.4em;text-transform:uppercase;letter-spacing:.06em;font-size:.66rem;font-weight:700}
+.item .head{font-family:var(--sans);display:flex;justify-content:space-between;align-items:baseline;gap:1em;border-bottom:2px solid var(--indigo);margin-bottom:.5em;padding-bottom:.15em}
+.item .head .id{font-weight:700;color:var(--navy)}.item .head .meta{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap}
+.item .head .meta .op{display:inline-block;background:var(--indigo-l);color:var(--indigo);border-radius:2px;padding:0 .4em;margin-right:.4em;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.item .kc{font-family:var(--sans);font-size:var(--fs-xs);color:var(--muted);margin:-.2em 0 .45em}
 .space{border:1px solid var(--line);border-radius:2px;background:repeating-linear-gradient(transparent,transparent 7.4mm,#e9ecef 7.4mm,#e9ecef 7.55mm);margin:.5em 0 0}
+.space.grid{background:repeating-linear-gradient(0deg,transparent,transparent 4.9mm,#eef0f3 4.9mm,#eef0f3 5mm),repeating-linear-gradient(90deg,transparent,transparent 4.9mm,#eef0f3 4.9mm,#eef0f3 5mm)}
 .scaffold{counter-reset:s;list-style:none;padding:0;margin:.5em 0}
-.scaffold li{counter-increment:s;display:grid;grid-template-columns:1.6em 1fr;padding:.3em 0;border-top:1px solid var(--hair)}
-.scaffold li::before{content:counter(s);font:700 .78rem/1.6 var(--sans);color:var(--violet)}
+.scaffold li{counter-increment:s;display:grid;grid-template-columns:1.6em 1fr;padding:.35em 0;border-top:1px solid var(--hair)}
+.scaffold li::before{content:counter(s);font:700 var(--fs-s)/1.6 var(--sans);color:var(--indigo)}
 .scaffold .blank{display:inline-block;min-width:26mm;border-bottom:1px solid var(--ink);height:1.1em;vertical-align:baseline}
-.stage{break-before:page}.stage.first{break-before:auto}
-.stage h2{break-before:auto}
-.stage .intro{font-family:var(--sans);font-size:.88rem;color:var(--ink2);border-left:4px solid var(--violet);padding-left:.8em;margin-bottom:1.2em}
-.part{break-before:page}.part>.ph{background:var(--navy);color:#fff;font-family:var(--sans);padding:6mm 7mm;margin-bottom:6mm}
-.part>.ph .k{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;opacity:.8}.part>.ph h2{color:#fff;border:none;margin:.2em 0 0;break-before:auto}
+.stage-intro{border-left:4px solid var(--indigo);padding-left:.9em;margin-bottom:1.3em;color:var(--ink2)}
+.part{break-before:page}.part>.ph{background:var(--navy);color:#fff;font-family:var(--sans);padding:6mm 7mm;margin-bottom:6mm;border-bottom:5px solid var(--teal)}
+.part>.ph .k{font-size:var(--fs-xs);letter-spacing:.18em;text-transform:uppercase;opacity:.85}.part>.ph h2{color:#fff;margin:.2em 0 0;break-before:auto;padding:0}
 .rub td:last-child,.rub th:last-child{text-align:right;width:5em;white-space:nowrap;hyphens:none}
-.evid{font-family:var(--sans);font-size:.78rem;color:var(--gold);border-left:3px solid var(--gold);padding:.1em .6em;margin:.2em 0 .5em}
-.hint{font-family:var(--sans);font-size:.85rem;color:var(--muted)}
+.evid{font-family:var(--sans);font-size:var(--fs-s);color:var(--crimson);border-left:4px solid var(--crimson);background:var(--crimson-l);padding:.2em .7em;margin:.2em 0 .5em}
+.selfmade{font-family:var(--sans);font-size:var(--fs-xs);color:var(--muted)}
+.hint{font-family:var(--sans);font-size:var(--fs-s);color:var(--muted)}
 .alt{border-left:3px solid var(--blue);padding-left:.8em;margin:.6em 0}
+.sol-sec{margin:.6em 0 .2em;font-family:var(--sans);font-size:var(--fs-xs);font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--teal)}
 .examhead{border:2px solid var(--navy);padding:.7em 1em;font-family:var(--sans);margin-bottom:1.2em}
-.examhead table{font-size:.9rem}.examhead td{border:none;padding:.15em .4em;background:none!important}
-.namefield{display:grid;grid-template-columns:1fr 1fr;gap:1em;margin:0 0 1.2em;font-family:var(--sans);font-size:.85rem}
+.examhead td{border:none;padding:.15em .4em;background:none!important}
+.namefield{display:grid;grid-template-columns:1fr 1fr;gap:1em;margin:0 0 1.2em;font-family:var(--sans);font-size:var(--fs-s)}
 .namefield div{border-bottom:1px solid var(--ink);padding-top:1.6em;color:var(--muted)}
 .exam .item .head{border-bottom-color:var(--navy)}
-.ptsbox{float:right;border:1.5px solid var(--ink);font-family:var(--sans);font-size:.8rem;padding:.15em .5em;margin-left:1em}
-@page{size:A4;margin:22mm 16mm 22mm 20mm}
+@page{size:A4;margin:22mm 20mm 22mm 22mm}
 @media print{a{color:inherit;text-decoration:none}main{max-width:none}}
-@media screen{body{background:#eef1f4}main{max-width:64rem;margin:0 auto;padding:2.5em 1.5em 5em;padding-right:calc(var(--side) + var(--gap) + 1.5em);background:#fff}
+@media screen{body{background:#E9EDF2}main{max-width:52rem;margin:0 auto;padding:2.5em 2.2em 5em;background:#fff}
  .cover{height:auto;min-height:70vh}h2{break-before:auto;margin-top:2.4em}}
-@media screen and (max-width:760px){main{padding-right:1.2em}figure,.opener,.ftx.stack figure{margin-right:0}.side,.src{float:none;width:auto;margin:.2em 0 .6em}.opener .road{grid-template-columns:1fr 1fr}
+@media screen and (max-width:760px){html{font-size:15px}main{padding:1.2em 1em 3em}.opener .road{grid-template-columns:1fr 1fr}
  .opener .goals ol{columns:1}.ftx,.cmp,.res-w .grid,.mis{grid-template-columns:1fr}.cmp>div+div{border-left:none;border-top:1px solid var(--line)}
- .ex ol.steps>li .why,.prf ol.steps>li .why{flex-basis:100%;padding-left:2.7em}}
+ .item .head{flex-wrap:wrap}.item .head .meta{white-space:normal}}
 html.grey{filter:grayscale(1)}
 """
 
@@ -311,28 +354,44 @@ class Doc:
         self.thm_no, self.rec_no, self.res_no, self.algo_no = 0, 0, 0, 0
         self.fig_index = {}
 
+    def level(self, b):
+        """Source level A/B/C (B34). A = official course material, B = verified supplement, C = author derivation."""
+        return LEVEL.get(b.get('prov'), ('', ''))
+
+    def ref(self, b):
+        """Human-readable source reference: printed slide numbers when the slide map knows them (B34)."""
+        from .slide_numbers import label
+        maps = {f: {int(k): v for k, v in m.items()} for f, m in (self.book.get('slide_maps') or {}).items()}
+        src = str(b.get('src') or '')
+        lab = label(src, maps) if maps else ''
+        if not lab and src:
+            lab = re.sub(r'\S+\.pdf S\. (\d+)', r'PDF-S. \1', src)
+        return lab
+
     def side(self, b):
-        """Side-column note: provenance label, source anchor and (for supplements) literature references."""
-        prov = b.get('prov')
-        if not prov and not b.get('src') and not b.get('refs'):
+        """Source line inside the block: level badge + reference + literature (no margin column)."""
+        lv, word = self.level(b)
+        if not lv and not b.get('src') and not b.get('refs'):
             return ''
-        lab = PROV.get(prov, '')
-        out = f'<span class="prov {E(prov or "")}">{E(lab)}</span>' if lab else ''
-        if b.get('src'):
-            out += f'<span class="ref">{E(b["src"])}</span>'
-        for r in b.get('refs') or []:
-            out += f'<span class="ref">{inline(r)}</span>'
-        return f'<aside class="side">{out}</aside>'
+        out = f'<span class="lv {lv}">{lv}</span><span>{E(word)}</span>' if lv else ''
+        r = self.ref(b) if b.get('src') else ''
+        if r:          # level C names the slide it works out ("zu Folie 21"), it does not claim the slide says it
+            out += f'<span class="ref">{E(("zu " if lv == "C" else "") + r)}</span>'
+        for x in b.get('refs') or []:
+            out += f'<span class="ref">{inline(x)}</span>'
+        return f'<div class="srcl">{out}</div>'
 
     def src(self, b):
         return self.side(b)
 
     def _capsrc(self, b):
-        lab = PROV.get(b.get('prov'), '')
-        # engine-internal module paths are not a reader's source: shown as "eigenes, getestetes Referenzmodell"
-        refs = [('Eigenes, getestetes Referenzmodell' if 'exam_mastery/' in str(x) else x) for x in [*str(b.get('src') or '').split('; '), *(b.get('refs') or [])]]
-        bits = list(dict.fromkeys(x for x in [lab, *refs] if x))
-        return f' <span style="color:var(--muted)">({inline("; ".join(bits))})</span>' if bits else ''
+        lv, word = self.level(b)
+        refs = [('Eigenes, getestetes Referenzmodell' if 'exam_mastery/' in str(x) else x) for x in [self.ref(b) if lv == 'A' else '', *(b.get('refs') or [])]]
+        bits = list(dict.fromkeys(x for x in refs if x))
+        if not lv and not bits:
+            return ''
+        return (f' <span class="srcl">' + (f'<span class="lv {lv}">{lv}</span><span>{E(word)}</span>' if lv else '')
+                + ''.join(f'<span class="ref">{inline(x)}</span>' for x in bits) + '</span>')
 
     def figure(self, b):
         spec = self.book['figures'][b['id']]
@@ -358,10 +417,12 @@ class Doc:
         return f'<div class="twrap">{cap}<table><thead><tr>{head}</tr></thead><tbody>{rows}</tbody></table>{("<div class=\"tcap\" style=\"margin-top:.35em\">" + self._capsrc(b) + "</div>") if self._capsrc(b) else ""}</div>'
 
     def block(self, b):
-        """Every block is wrapped with its side note first, so the note floats beside the block's first line."""
+        """Every block carries its source line (level + reference). Components put it under their label."""
+        self._sl = '' if b['type'] in ('figure', 'table', 'lab', 'lead', 'summary', 'misconception', 'figtext', 'compare', 'research_note', 'history') else self.side(b)
         h = self._block(b)
-        side = '' if b['type'] in ('figure', 'table', 'lab', 'lead', 'summary', 'misconception', 'research', 'figtext', 'compare') else self.side(b)
-        return f'<div class="blk">{side}{h}</div>'
+        if self._sl and self._sl not in h:
+            h = self._sl + h
+        return f'<div class="blk">{h}</div>'
 
     def _block(self, b):
         t = b['type']
@@ -372,17 +433,19 @@ class Doc:
         if t == 'definition':
             self.def_no += 1
             body = md(b["md"])
-            return (f'<div class="def"><span class="lab">Definition {self.book["meta"]["chapter_no"]}.{self.def_no}</span>'
-                    f'<span class="term">{inline(b["term"])}</span>{body[3:] if body.startswith("<p>") else body}</div>')
+            return (f'<div class="card def"><span class="lab"><span class="g">≔</span>Definition {self.book["meta"]["chapter_no"]}.{self.def_no}</span>{self._sl}'
+                    f'<p><span class="term">{inline(b["term"])}</span>{body[3:] if body.startswith("<p>") else body}</div>')
         if t == 'box':
-            return f'<div class="box {E(b.get("kind","note"))}"><span class="lab">{E(b.get("title") or BOX.get(b.get("kind"), "Hinweis"))}</span>{md(b["md"])}</div>'
+            k = b.get('kind', 'note'); g = BOX_GLYPH.get(k)
+            return (f'<div class="card box {E(k)}"><span class="lab">' + (f'<span class="g">{g}</span>' if g else '')
+                    + f'{E(b.get("title") or BOX.get(k, "Hinweis"))}</span>{self._sl}{md(b["md"])}</div>')
         if t == 'example':
             self.ex_no += 1
             steps = ''.join(f'<li><span class="do">{inline(s[0])}</span>' + (f'<span class="why">{inline(s[1])}</span>' if len(s) > 1 and s[1] else '') + '</li>'
                             for s in b['steps'])
             tab = self.table(b['table']) if b.get('table') else ''
             fig = self.figure({'id': b['figure']}) if b.get('figure') else ''
-            return (f'<div class="ex"><span class="lab">Beispiel {self.book["meta"]["chapter_no"]}.{self.ex_no} · {E(b.get("label", "Durchgerechnet"))}</span><h4>{inline(b["title"])}</h4>'
+            return (f'<div class="ex"><span class="lab">Beispiel {self.book["meta"]["chapter_no"]}.{self.ex_no} · {E(b.get("label", "Durchgerechnet"))}</span>{self._sl}<h4>{inline(b["title"])}</h4>'
                     f'<div class="given">{md(b["given"])}</div>{tab}<ol class="steps">{steps}</ol>'
                     + (f'<div class="res">{md(b["result"])}</div>' if b.get('result') else '') + f'{fig}</div>')
         if t == 'table':
@@ -404,18 +467,18 @@ class Doc:
         if t == 'theorem':
             self.thm_no += 1
             ass = b.get('assumptions') or []
-            return (f'<div class="thm"><span class="lab"><span class="g">◆</span>{E(b.get("label", "Satz"))} {self.book["meta"]["chapter_no"]}.{self.thm_no}</span>'
-                    + (f'<span class="name">{inline(b["name"])}.</span> ' if b.get('name') else '') + md(b['md'])
-                    + (f'<div class="ass"><b>Voraussetzungen:</b> {inline("; ".join(ass))}</div>' if ass else '') + '</div>')
+            return (f'<div class="thm"><div class="th">◆ {E(b.get("label", "Satz"))} {self.book["meta"]["chapter_no"]}.{self.thm_no}'
+                    + (f'<span class="t">{inline(b["name"])}</span>' if b.get('name') else '') + f'</div><div class="tb">{self._sl}' + md(b['md'])
+                    + (f'<div class="ass"><b>Voraussetzungen:</b> {inline("; ".join(ass))}</div>' if ass else '') + '</div></div>')
         if t == 'proof':
             steps = ''.join(f'<li><span class="do">{inline(x[0])}</span>' + (f'<span class="why">{inline(x[1])}</span>' if len(x) > 1 and x[1] else '') + '</li>' for x in b.get('steps', []))
-            return (f'<div class="prf"><span class="lab">{E(b.get("label", "Beweis"))}{(" · " + inline(b["title"])) if b.get("title") else ""}</span>'
-                    + md(b.get('md', '')) + (f'<ol class="steps">{steps}</ol>' if steps else '') + '<span class="qed">∎</span><div style="clear:both"></div></div>')
+            return (f'<div class="prf"><span class="lab">{E(b.get("label", "Beweis"))}{(" · " + inline(b["title"])) if b.get("title") else ""}</span>{self._sl}'
+                    + md(b.get('md', '')) + (f'<ol class="steps">{steps}</ol>' if steps else '') + (md(b['end']) if b.get('end') else '') + '<span class="qed">∎</span></div>')
         if t == 'intuition':
-            return f'<div class="intu"><span class="lab"><span class="g">◐</span>{E(b.get("title", "Intuition"))}</span>{md(b["md"])}</div>'
+            return f'<div class="card intu"><span class="lab"><span class="g">◐</span>{E(b.get("title", "Intuition"))}</span>{self._sl}{md(b["md"])}</div>'
         if t == 'takeaway':
             pts = ''.join(f'<li>{inline(x)}</li>' for x in b.get('points', []))
-            return f'<div class="take"><span class="lab"><span class="g">✓</span>{E(b.get("title", "Das Wichtigste"))}</span>{md(b.get("md", ""))}' + (f'<ul>{pts}</ul>' if pts else '') + '</div>'
+            return f'<div class="card take"><span class="lab"><span class="g">✓</span>{E(b.get("title", "Das Wichtigste"))}</span>{md(b.get("md", ""))}' + (f'<ul>{pts}</ul>' if pts else '') + '</div>'
         if t == 'recall':
             self.rec_no += 1
             qs = ''.join(f'<li>{inline(q[0])}</li>' for q in b['questions'])
@@ -427,8 +490,8 @@ class Doc:
             g = lambda k, h: f'<div><h5>{E(h)}</h5>{md(b[k])}</div>' if b.get(k) else ''
             tags = ''.join(f'<span class="tag">{E(x)}</span>' for x in b.get('tags', []))
             return (f'<div class="res-w"><div class="rh"><b>{inline(b["title"])}</b><span>Forschungsfenster {self.book["meta"]["chapter_no"]}.{self.res_no}</span></div>'
-                    f'<div class="rb"><div class="rq">Frage: {inline(b["question"])}</div><div class="grid">{g("finding", "Befund")}{g("link", "Bezug zum Kapitel")}'
-                    f'{g("limits", "Grenzen der Übertragung")}{g("status", "Einordnung")}</div>'
+                    f'<div class="rb">{self._sl}<div class="rq">Problem: {inline(b["question"])}</div><div class="grid">{g("method", "Methode / Theorie")}{g("finding", "Zentrales Resultat")}'
+                    f'{g("assumptions", "Voraussetzungen")}{g("limits", "Grenzen")}{g("link", "Bezug zur Vorlesung")}{g("exam", "Klausur oder Vertiefung?")}{g("status", "Quellenzugang")}</div>'
                     f'<div class="cite">{tags}{"; ".join(inline(r) for r in b.get("refs", []))}</div></div></div>')
         if t == 'algorithm':
             self.algo_no += 1
@@ -448,6 +511,20 @@ class Doc:
             wide = bool(m_) and float(m_.group(1)) / max(1.0, float(m_.group(2))) > 1.45
             cls = 'ftx stack' if wide else 'ftx' + (' left' if b.get('side') == 'left' else '')
             return f'<div class="{cls}"><div class="ftx-txt">{md(b["md"])}</div><div class="ftx-fig">{fig}</div></div>'
+        if t == 'derivation':
+            # B34: an equation chain where every transition is justified in body type (no small grey notes)
+            rows = ''.join(f'<li><div class="eq">{E(r[0], quote=False) if r[0].strip().startswith("\\[") else inline(r[0])}</div>'
+                           + (f'<div class="why">{inline(r[1])}</div>' if len(r) > 1 and r[1] else '') + '</li>' for r in b['rows'])
+            return (f'<div class="drv"><span class="lab"><span class="g">⟹</span>Herleitung{(" · <span class=t>" + inline(b["title"]) + "</span>") if b.get("title") else ""}</span>{self._sl}'
+                    + (f'<div class="goal">{md(b["goal"])}</div>' if b.get('goal') else '') + f'<ol class="chain">{rows}</ol>'
+                    + (f'<div class="concl">{md(b["conclusion"])}</div>' if b.get('conclusion') else '') + '</div>')
+        if t == 'research_note':
+            # B34: short research note inside the running text (who, what, how it relates); access level is printed
+            return (f'<div class="rn"><span class="lab"><span class="g">❧</span>Forschungsnotiz · {inline(b["title"])}</span>{md(b["md"])}'
+                    f'<div class="cite">' + ''.join(f'<span class="tag">{E(x)}</span>' for x in b.get('tags', [])) + '; '.join(inline(r) for r in b.get('refs', [])) + '</div></div>')
+        if t == 'history':
+            return (f'<div class="card hist"><span class="lab"><span class="g">⌛</span>Historische Einordnung · {inline(b["title"])}</span>{md(b["md"])}'
+                    + (f'<div class="srcl">' + ''.join(f'<span class="ref">{inline(r)}</span>' for r in b.get('refs', [])) + '</div>' if b.get('refs') else '') + '</div>')
         raise ContractError(f'unknown book block type {t!r}')
 
 
@@ -490,7 +567,7 @@ def _opener(book):
     return (f'<section class="opener"><div class="chno">{E(str(m["chapter_no"]))}</div><h1>{inline(m["title"])}</h1>'
             + (f'<div class="lead">{md(book["opener_lead"])}</div>' if book.get('opener_lead') else '')
             + f'<div class="goals"><h4>Nach diesem Kapitel können Sie</h4><ol>' + ''.join(f'<li>{inline(g)}</li>' for g in goals) + '</ol></div>'
-            + f'<div class="road">{road}</div></section>')
+            + f'<div class="road">{road}</div>' + LEVELS_HTML + '</section>')
 
 
 def textbook(book):
@@ -540,6 +617,7 @@ def _item_html(d, it, solution=False, space=True, exam=False):
          f'<span class="meta">{f"<span class=op>{E(op)}</span>" if op else ""}{E(" · ".join(x for x in meta if x))}</span></div>'
          # B33: provenance of the task itself (official exam evidence vs. author-created practice) is printed, not only stored
          + (f'<p class="evid"><b>Offizielle Beispielfrage</b> · {inline(it.get("source_note") or "")}</p>' if it.get('evidence') == 'OFFICIAL_EXAM_EVIDENCE' else '')
+         + (f'<div class="kc">Kompetenz: {inline(it["kc_label"])}</div>' if it.get('kc_label') and not exam else '')
          + md(it["prompt"]))
     if it.get('figure'):
         h += d.figure({'id': it['figure']})
@@ -552,15 +630,21 @@ def _item_html(d, it, solution=False, space=True, exam=False):
     if solution:
         s = it['solution']
         if s.get('approach'):
-            h += f'<h4>Lösungsidee</h4>{md(s["approach"])}'
+            h += f'<div class="sol-sec">Ansatz</div>{md(s["approach"])}'
+        if s.get('assumptions'):
+            h += f'<div class="sol-sec">Annahmen und Definitionen</div>{md(s["assumptions"])}'
         if s.get('steps'):
             h += '<div class="ex" style="border:none;padding:0"><ol class="steps">' + ''.join(
                 f'<li><span class="do">{inline(x[0])}</span>' + (f'<span class="why">{inline(x[1])}</span>' if len(x) > 1 and x[1] else '') + '</li>' for x in s['steps']) + '</ol></div>'
-        h += f'<div class="box key"><span class="lab">Ergebnis</span>{md(s["answer"])}</div>'
+        if s.get('steps'):
+            h = h.replace('<div class="ex" style="border:none;padding:0">', '<div class="sol-sec">Lösungsweg</div><div class="ex" style="border:none;padding:0">', 1)
+        h += f'<div class="card box key"><span class="lab">Ergebnis</span>{md(s["answer"])}</div>'
+        if s.get('interpretation'):
+            h += f'<div class="sol-sec">Interpretation</div>{md(s["interpretation"])}'
         for alt in s.get('alternatives') or []:
             h += f'<div class="alt"><span class="lab">Alternativer Lösungsweg</span>{md(alt)}</div>'
         if s.get('errors'):
-            h += '<h4>Typische Fehler und ihre Diagnose</h4><ul>' + ''.join(f'<li>{inline(e)}</li>' for e in s['errors']) + '</ul>'
+            h += '<div class="sol-sec">Typische Fehler</div><ul>' + ''.join(f'<li>{inline(e)}</li>' for e in s['errors']) + '</ul>'
         if s.get('rubric'):
             tot = sum(r[1] for r in s['rubric'])
             h += ('<div class="rubk"><h4>Bewertung</h4><div class="twrap"><table class="rub"><thead><tr><th>Kriterium</th><th>Punkte</th></tr></thead><tbody>'
@@ -586,6 +670,12 @@ def workbook(book, solutions=False):
     return body, toc
 
 
+LEVELS_HTML = ('<div class="levels"><h4>Wie Sie die Quellenmarken lesen</h4>'
+               '<div class="row"><span class="srcl"><span class="lv A">A</span>Vorlesung</span><span>Steht so in den offiziellen Folien oder Übungen; die Foliennummer ist die auf der Folie gedruckte Nummer. <b>Prüfungsstoff.</b></span></div>'
+               '<div class="row"><span class="srcl"><span class="lv B">B</span>Ergänzung</span><span>Fachlich geprüfte Literatur, die eine Lücke der Folien schließt oder vertieft. Der Zugang zur Quelle (Volltext, Abstract) steht dabei.</span></div>'
+               '<div class="row"><span class="srcl"><span class="lv C">C</span>Herleitung</span><span>Vom Autor (Modell) ausgearbeitete Herleitungen, Beweise, Rechenbeispiele und Erklärungen; unabhängig nachgerechnet, aber nicht von einer Fachperson begutachtet.</span></div></div>')
+
+
 ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
 
 
@@ -594,34 +684,52 @@ def workbook_integrated(book):
     Item ids and numbering are identical in the task and the solution part."""
     d = Doc(book, 'workbook'); m = book['meta']; parts, toc = [], []
     stages = book.get('stages') or []
+    letters = book.get('workbook_letters')
     def part(k, kicker, title, inner, pid):
-        toc.append((1, pid, f'Teil {ROMAN[k]}\u2002{E(title)}'))
-        return f'<section class="part" id="sec-{pid}"><div class="ph"><div class="k">{E(kicker)}</div><h2 id="{pid}">Teil {ROMAN[k]} · {inline(title)}</h2></div>{inner}</section>'
+        # B34: k=None -> an unnumbered part (mock exams sit between the practice parts and the solutions)
+        no = None if k is None else chr(65 + k) if letters else ROMAN[k]
+        head = f'Teil {no} · ' if no else ''
+        toc.append((1, pid, (f'Teil {no}\u2002' if no else '') + E(title)))
+        return f'<section class="part" id="sec-{pid}"><div class="ph"><div class="k">{E(kicker)}</div><h2 id="{pid}">{head}{inline(title)}</h2></div>{inner}</section>'
     for k, st in enumerate(stages):
         inner = (f'<div class="stage-intro">{md(st.get("intro", ""))}</div>' if st.get('intro') else '') + ''.join(_item_html(d, it) for it in st['items'])
-        parts.append(part(k, 'Üben', st['title'], inner, f'p{k + 1}'))
+        parts.append(part(k, st.get('kicker', 'Üben'), st['title'], inner, f'p{k + 1}'))
     k = len(stages)
-    ex = book.get('exam')
-    if ex:
-        probs = exam_check(book)
+    exs = exams(book)
+    for j, ex in enumerate(exs):
+        probs = exam_check(book, ex)
         if probs:
             raise ContractError('EXAM_INTEGRITY: ' + '; '.join(probs))
         head = ('<div class="namefield"><div>Name</div><div>Matrikelnummer</div></div><div class="examhead"><table>'
                 + ''.join(f'<tr><td><b>{E(a)}</b></td><td>{inline(b_)}</td></tr>' for a, b_ in ex['header']) + '</table></div>' + md(ex['self_designed_notice']))
-        parts.append(part(k, 'Prüfungssimulation – ohne Hilfen bearbeiten', 'Probeklausur', head + '<div class="exam">' + ''.join(_item_html(d, it, exam=True) for it in ex['items']) + '</div>', 'pexam'))
-        k += 1
+        parts.append(part(None if letters else k, 'Prüfungssimulation – ohne Hilfen bearbeiten', ex.get('title') or 'Probeklausur', head + '<div class="exam">' + ''.join(_item_html(d, it, exam=True) for it in ex['items']) + '</div>', f'pexam{j or ""}'))
+        k += 0 if letters else 1
     sol = ''.join(f'<h3>{E(st["title"])}</h3>' + ''.join(_item_html(d, it, solution=True) for it in st['items']) for st in stages)
-    if ex:
-        sol += '<h3>Probeklausur</h3>' + ''.join(_item_html(d, it, solution=True, exam=True) for it in ex['items'])
-    parts.append(part(k, 'Erst nach eigener Bearbeitung lesen', 'Lösungen', sol, 'psol'))
+    for ex in exs:
+        sol += f'<h3>{E(ex.get("title") or "Probeklausur")}</h3>' + ''.join(_item_html(d, it, solution=True, exam=True) for it in ex['items'])
+    parts.append(part(k, 'Erst nach eigener Bearbeitung lesen', book.get('solutions_title') or 'Lösungen', sol, 'psol'))
     intro = book.get('workbook_intro', '')
-    body = _cover(book, 'Arbeitsbuch', 'Üben in fünf Stufen · integrierte Probeklausur · alle Lösungen am Ende') + _toc(toc) + (f'<section>{md(intro)}</section>' if intro else '') + ''.join(parts)
+    toc_html = _toc(toc)
+    if intro:                       # B34: the introduction shares the contents page instead of standing alone on a page
+        toc_html = toc_html[:-len('</section>')] + f'<div class="lead" style="margin-top:1.4em">{md(intro)}</div></section>'
+    body = _cover(book, 'Arbeitsbuch', book.get('workbook_subtitle') or 'Üben in Stufen · integrierte Probeklausur · alle Lösungen am Ende') + toc_html + ''.join(parts)
     return body, toc
 
 
-def exam_check(book):
-    """Blocking integrity rules for the mock exam (rule A5). Returns problems; empty = consistent."""
-    ex, probs = book.get('exam') or {}, []
+def exams(book):
+    """B34: a book may carry several independent mock exams (`exams`); `exam` stays supported."""
+    return list(book.get('exams') or ([book['exam']] if book.get('exam') else []))
+
+
+def exam_check(book, ex=None):
+    """Blocking integrity rules for a mock exam (rule A5). Returns problems; empty = consistent.
+    Without `ex`, every exam of the book is checked."""
+    if ex is None:
+        exs = exams(book)
+        if not exs:
+            return exam_check(book, {})
+        return [f'{e.get("label", "exam")}: {p_}' if len(exs) > 1 else p_ for e in exs for p_ in exam_check(book, e)]
+    probs = []
     items = ex.get('items') or []
     if not items:
         return ['EXAM_EMPTY']
@@ -661,11 +769,12 @@ def exam_check(book):
     return probs
 
 
-def exam(book, solutions=False):
-    probs = exam_check(book)
+def exam(book, solutions=False, ex=None):
+    ex = ex or exams(book)[0]
+    probs = exam_check(book, ex)
     if probs:
         raise ContractError('EXAM_INTEGRITY: ' + '; '.join(probs))
-    d = Doc(book, 'exam'); ex = book['exam']
+    d = Doc(book, 'exam')
     head = ('<div class="examhead"><table>'
             + ''.join(f'<tr><td><b>{E(k)}</b></td><td>{inline(v)}</td></tr>' for k, v in ex['header'])
             + '</table></div>' + md(ex['self_designed_notice']))
@@ -688,7 +797,7 @@ def exam(book, solutions=False):
                  f'<td class="num">{sum(r.get("minutes", 0) for r in bp["rows"]):g}</td></tr></tbody></table></div>'
                  + (md(bp['grading']) if bp.get('grading') else ''))
     items = ''.join(_item_html(d, it, solution=solutions) for it in ex['items'])
-    title = 'Probeklausur – Lösungen und Bewertung' if solutions else 'Probeklausur'
+    title = (ex.get('title') or 'Probeklausur') + (' – Lösungen und Bewertung' if solutions else '')
     body = _cover(book, title, ex['subtitle']) + f'<section>{head}</section><section class="exam" style="break-before:page">{items}</section>'
     return body, []
 
@@ -823,7 +932,7 @@ def render_document(body, toc, title, out_dir, name, footer_left):
 
 def publish_book(book, out_dir):
     """All five learning documents. Refuses an inconsistent exam before rendering anything."""
-    probs = exam_check(book) if book.get('exam') else []
+    probs = exam_check(book) if exams(book) else []
     if probs:
         raise ContractError('EXAM_INTEGRITY: ' + '; '.join(probs))
     m = book['meta']; left = f'{m["title"]} · Kapitel {m["chapter_no"]}'
@@ -833,7 +942,9 @@ def publish_book(book, out_dir):
     if book.get('stages'):
         body, toc = workbook_integrated(book)
         out['2_Arbeitsbuch'] = render_document(body, toc, f'{m["title"]} – Arbeitsbuch', out_dir, '2_Arbeitsbuch', left + ' · Arbeitsbuch')
-    if book.get('exam'):   # optional stand-alone exam booklet (the workbook already contains it)
-        body, _ = exam(book)
-        out['3_Probeklausur_einzeln'] = render_document(body, [], f'{m["title"]} – Probeklausur', out_dir, '3_Probeklausur_einzeln', left + ' · Probeklausur')
+    exs = exams(book)
+    for j, ex in enumerate(exs):   # stand-alone exam booklets without solutions (the workbook already contains them)
+        name = '3_Probeklausur_einzeln' if len(exs) == 1 else f'3_Probeklausur_{ex.get("label") or chr(65 + j)}_einzeln'
+        body, _ = exam(book, ex=ex)
+        out[name] = render_document(body, [], f'{m["title"]} – {ex.get("title") or "Probeklausur"}', out_dir, name, left + ' · ' + (ex.get('title') or 'Probeklausur'))
     return out

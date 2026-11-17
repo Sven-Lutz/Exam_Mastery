@@ -140,7 +140,7 @@ def check_book_numbers(book):
             res.append({'check': 'TABLE_TOTAL', 'object': t.get('caption', '')[:60], 'status': status, 'documented': bool(t.get('known_inconsistency')),
                         'detail': f"{r['column']}: rows sum to {r['sum']:g}, total row states {r['stated']:g}"})
     seen = set()
-    for src in (list(_blocks(book)), book.get('stages', []), book.get('exam', {}), book.get('cards', [])):
+    for src in (list(_blocks(book)), book.get('stages', []), *(book.get('exams') or [book.get('exam', {})]), book.get('cards', [])):
         for text in _texts(src):
             for expr, stated, val, ok in equations(text):
                 if (expr, stated) in seen:

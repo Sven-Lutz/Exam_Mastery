@@ -320,8 +320,15 @@ def flow(spec):
         k = st.get('kind', 'op')
         cx = x0 + bw / 2
         if k == 'decision':
-            body.append(f'<polygon points="{cx},{y} {x0 + bw},{y + h / 2 + 4} {cx},{y + h + 8} {x0},{y + h / 2 + 4}" fill="{T["gold_l"]}" stroke="{T["gold"]}" stroke-width="1.8"/>')
-            body.append(_lines(cx, y + h / 2 + 8 - 7.5 * (len(lines) - 1), lines, 12, 15, weight=700, fill=T['navy'])); h += 8
+            # B34: the text must fit INSIDE the diamond. At vertical offset d from the centre a diamond of half-height hh
+            # is bw * (1 - d / hh) wide, so hh is chosen such that the widest line fits at the outermost text line.
+            lines = _wrap(st['label'], max(8, int(bw * 0.6 / 7.3)))
+            maxw = max(len(l_) for l_ in lines) * 7.3 + 10
+            d = 7.5 * len(lines) + 4
+            hh = max(26.0, d / max(0.12, 1 - maxw / bw))
+            h = 2 * hh
+            body.append(f'<polygon points="{cx},{y} {x0 + bw},{y + hh} {cx},{y + h} {x0},{y + hh}" fill="{T["gold_l"]}" stroke="{T["gold"]}" stroke-width="1.8"/>')
+            body.append(_lines(cx, y + hh + 4 - 7.5 * (len(lines) - 1), lines, 12, 15, weight=700, fill=T['navy']))
         else:
             fill, stroke = {'start': (T['navy'], T['navy']), 'end': (T['green_l'], T['green'])}.get(k, (T['blue_l'], T['blue']))
             body.append(f'<rect x="{x0}" y="{y}" width="{bw}" height="{h}" rx="{h / 2 if k in ("start", "end") else 6}" fill="{fill}" stroke="{stroke}" stroke-width="1.6"/>')

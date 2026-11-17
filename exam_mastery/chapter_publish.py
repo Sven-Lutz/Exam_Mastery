@@ -737,7 +737,32 @@ def _layout_lint(art, name):
                            'max_chars_page': max((len(doc[i].get_text()) for i in range(1, doc.page_count)), default=0)}
         if runs and d['status'] == 'PASS' and name.startswith('1_'):
             d['status'] = 'WARN'
+        # B34 raw-math gate on the RENDERED pdf text: TeX that MathJax did not typeset (\\frac, \\( ...) or caret/underscore
+        # notation in running text ('100^14', 'V_{k+1}') is visible to the reader and fails the document.
+        raw = []
+        for i in range(doc.page_count):
+            t = doc[i].get_text()
+            for mm in RAW_MATH.finditer(t):
+                raw.append({'page': i + 1, 'text': t[max(0, mm.start() - 25):mm.end() + 25].replace('\n', ' ')})
+        d['raw_math'] = raw[:40]
+        if raw:
+            d['status'] = 'FAIL'
+        # B34 typographic discipline: distinct text sizes actually used (MathJax glyphs are paths and do not count)
+        sizes = {}
+        for i in range(1, doc.page_count):
+            for blk in doc[i].get_text('dict')['blocks']:
+                for ln in blk.get('lines', []):
+                    for sp in ln.get('spans', []):
+                        if sp['text'].strip():
+                            k = round(sp['size'] * 2) / 2
+                            sizes[k] = sizes.get(k, 0) + len(sp['text'])
+        tot = sum(sizes.values()) or 1
+        d['type_sizes'] = {f'{k:g}pt': round(v / tot, 4) for k, v in sorted(sizes.items())}
+        d['type_sizes_main'] = sorted(f'{k:g}pt' for k, v in sizes.items() if v / tot >= 0.01)
     return d
+
+
+RAW_MATH = re.compile(r'[A-Za-z0-9)\]]\^\{?[-\w(]|[A-Za-z]_\{|\\(?:frac|gamma|sum|pi|max|mathbb|mathcal|left|right|cdot)\b|\\[()\[\]]')
 
 
 QUALITY_METRICS = ('numeric_fail', 'didactic_fail', 'semantic_fail', 'anki_render_fail', 'open_blockers', 'layout_fail',
@@ -809,6 +834,15 @@ def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_r
     # B20: curated edition (supplements, examples, blueprint exam, cards) outside the lecture folder, no model call
     from . import edition as _edition
     book, edition_report = _edition.apply(book, edition if edition is not None else _edition.load(chapter_dir))
+    # B34: printed slide numbers (references read "Folie 24", not "PDF page 23"); unreadable decks keep PDF pages
+    from .slide_numbers import course_maps
+    _st = chapter_dir.parent.parent / 'status.json'
+    try:
+        _root = json.loads(_st.read_text(encoding='utf-8')).get('source_root') if _st.exists() else None
+    except ValueError:
+        _root = None
+    _chs = next((c for c in (plan or {}).get('chapters') or [] if c.get('chapter_id') == ast.get('chapter_id')), {})
+    book['slide_maps'], slide_report = course_maps(manifest or {}, _root, _chs.get('source_ids'))
     # B13: interactive labs from the author's structured requests (deterministic build; static figure in the book)
     from .labs.integrate import build_chapter_labs
     idx_ = _anchor_index(manifest)
@@ -882,7 +916,7 @@ def publish_chapter(chapter_dir, manifest, plan=None, verify_anki=True, assets_r
                                   'review': [r for r in sem if r['status'] == 'REVIEW'][:30],
                                   'counts': {k: sum(1 for r in sem if r['status'] == k) for k in ('PASS', 'REVIEW', 'FAIL')}},
               'errata': errata_applied,
-              'edition': edition_report,
+              'edition': edition_report, 'slide_numbers': slide_report,
               'labs': labs_report or 'NOT_GENERATED: no lab requested by the author role (only deterministic lab models are built)',
               'labs_routed_out': list(_routed_out),
               'documents': {k: {'pages': v['pages'], 'toc_unresolved': v['toc_unresolved'], 'internal_links': v.get('internal_links'),

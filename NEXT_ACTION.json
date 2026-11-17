@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-16",
+  "updated": "2026-11-17",
   "repo": "Sven-Lutz/Exam_Mastery",
   "main": "PR #2 squash-merged (engine snapshot, CI green on ubuntu-latest)",
   "branch": "feat/nlp-reference-unit (PR #3: DRAFT, DO NOT MERGE; title updated 2026-11-15)",
@@ -15,7 +15,7 @@
     "v7": "v7.1 (cd438a9): GitHub CI green (runs 43732994556, 43732999492); CONTENT_CORRECTNESS/DIDACTIC/PUBLISHING review required; no self-release",
     "rl_kap03_v1": "HUMAN_REJECTED (owner 1/5, 2026-11-16)",
     "rl_kap03_v2": "superseded by V3 (not rated)",
-    "rl_kap03_v3": "TECHNICAL_PASS · ACADEMIC_REVIEW_PENDING · HUMAN_ACCEPTANCE_PENDING (no self-release)"
+    "rl_kap03_v3": "HUMAN_REJECTED (owner 2/5, 2026-11-17)"
   },
   "product": {
     "source": "units/nlp_sequence_labeling/ (authoring: src/build_unit_json.py, src/sources.json, text.html)",
@@ -147,5 +147,6 @@
     "model_calls_used": "8/30 (unchanged; V3 used 0 paid provider calls; independent review by a separate Claude Code subagent, not a provider call)",
     "open_findings": "package docs/ISSUES_UND_BEFUNDE.md section C (O1 no human academic review; O3 Anki GUI display; O4-O7 P3)",
     "next_human_step": "Owner rates Lehrbuch, Arbeitsbuch, Anki, MDP-Studio 1-5 using LIES_MICH entry points; a human expert reviews proofs (docs/VALIDIERUNG.md lists what was model-reviewed)"
-  }
+  },
+  "current": "RL V4 excellence rebuild started (brief 2026-11-17)"
 }

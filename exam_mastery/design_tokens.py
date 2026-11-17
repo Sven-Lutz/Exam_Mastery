@@ -12,11 +12,12 @@ Roles (not decoration):
   practice   violet — active recall, transfer prompts, exercises
 """
 
-TOKENS = {
-    'navy': '#1B2A41', 'ink': '#1F2933', 'muted': '#5B6878', 'line': '#CBD3DC', 'paper': '#FFFFFF', 'wash': '#F5F7FA',
-    'petrol': '#0F6E73', 'petrol_l': '#E2F0F0', 'blue': '#2F5D8A', 'blue_l': '#E8F0F8',
-    'gold': '#8C6416', 'gold_l': '#FBF2DE', 'coral': '#C8483A', 'coral_l': '#FBE9E5',
-    'green': '#2E7D4F', 'green_l': '#E5F2EA', 'violet': '#5B4B9A', 'violet_l': '#EEEBF7',
+TOKENS = {   # B34 palette "Atlas 2": deeper, more saturated roles; every text colour >= 4.5:1 on white and on its tint
+    'navy': '#16263D', 'ink': '#1C2430', 'muted': '#556273', 'line': '#C9D1DA', 'paper': '#FFFFFF', 'wash': '#F4F6F9',
+    'petrol': '#0B6E6E', 'petrol_l': '#E3F2F1', 'blue': '#24578F', 'blue_l': '#E7EFF9',
+    'gold': '#8A5A00', 'gold_l': '#FDF1D8', 'coral': '#B53A2C', 'coral_l': '#FBE8E4',
+    'green': '#26704A', 'green_l': '#E4F2EA', 'violet': '#3D3F96', 'violet_l': '#ECECF8',
+    'plum': '#7A3B76', 'plum_l': '#F6EAF4', 'crimson': '#9E1F3F', 'crimson_l': '#FBE6EC',
 }
 ROLE = {'structure': 'navy', 'formal': 'petrol', 'example': 'blue', 'intuition': 'gold', 'warning': 'coral',
         'check': 'green', 'practice': 'violet'}

@@ -165,8 +165,9 @@ def _items(book):
     for st in book.get('stages', []):
         for it in st['items']:
             yield it
-    for it in (book.get('exam') or {}).get('items', []):
-        yield it
+    for ex in (book.get('exams') or [book.get('exam') or {}]):
+        for it in ex.get('items', []):
+            yield it
 
 
 def legal_subsumption(book):

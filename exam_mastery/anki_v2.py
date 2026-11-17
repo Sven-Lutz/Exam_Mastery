@@ -31,56 +31,72 @@ BASIC_FIELDS = ['Key', 'Front', 'Context', 'Answer', 'Explanation', 'Example', '
 NOTE_BASIC, NOTE_CLOZE = 'Exam Mastery · Basis (v3)', 'Exam Mastery · Lückentext (v3)'
 CLOZE_FIELDS = ['Key', 'Text', 'Extra', 'Source', 'Kind', 'Meta']
 
+# B34: every card kind belongs to one cognitive demand; the card shows it as a coloured chip (colour + word).
+COGNITIVE = {'concept': 'recall', 'symbol': 'recall', 'fact': 'recall', 'cloze': 'recall',
+             'mechanism': 'concept', 'compare': 'concept', 'condition': 'concept',
+             'math': 'math', 'derivation': 'math', 'trace': 'apply', 'visual': 'visual', 'misconception': 'diagnose', 'transfer': 'transfer'}
+COG_LABEL = {'recall': 'Wissen abrufen', 'concept': 'Verstehen', 'math': 'Mathematik abrufen', 'apply': 'Anwenden', 'visual': 'Visuell denken',
+             'diagnose': 'Fehler finden', 'transfer': 'Transfer'}
+
+
+def kind_html(kind):
+    cog = COGNITIVE.get(kind, 'recall')
+    return f'<span class="k k-{cog}">{E(COG_LABEL[cog])}</span><span class="k2">{E(KIND_LABEL.get(kind, kind))}</span>'
+
+
 CSS = r"""
 @font-face{font-family:"EM Sans";src:url("_em-sans-400.woff2") format("woff2");font-weight:400}
 @font-face{font-family:"EM Sans";src:url("_em-sans-600.woff2") format("woff2");font-weight:600}
 @font-face{font-family:"EM Sans";src:url("_em-sans-700.woff2") format("woff2");font-weight:700}
-.card{font-family:"EM Sans","Source Sans 3","Helvetica Neue","Segoe UI",Roboto,Arial,sans-serif;font-size:19px;line-height:1.5;
- color:#18212b;background:#fbfbfa;text-align:left;margin:0;padding:0}
-.em{max-width:640px;margin:0 auto;padding:22px 20px 26px;border-top:5px solid #1B2A41}
-.em-meta{margin-top:10px;font-size:12px;color:#7a8592;border-top:1px dashed #d5dce4;padding-top:6px}
-.em-kind{display:inline-block;font-size:11px;border:1px solid #c9d6de;border-radius:2px;padding:1px 6px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1f5673;margin-bottom:10px}
-.em-q{font-size:22px;font-weight:600;line-height:1.36;color:#18212b;letter-spacing:-.005em}
-.em-ctx{margin-top:12px;font-size:16.5px;color:#46525f}
-.em-ctx img,.em-x img{max-width:100%;height:auto;display:block;margin:10px auto;border-radius:6px;background:#fff}
-hr#answer{border:none;border-top:1px solid #d5dce4;margin:20px 0 16px}
-.em-a{font-size:19px;font-weight:600;color:#18212b;border-left:5px solid #2E7D4F;background:#E5F2EA;padding:6px 10px 6px 12px;border-radius:0 6px 6px 0}
-.em-x{margin-top:14px;font-size:16.5px;color:#2c3a4b}
-.em-ex{margin-top:12px;font-size:16px;color:#2c3a4b;background:#fbf3e8;border-radius:6px;padding:9px 12px}
-.em-pit{margin-top:12px;font-size:16px;color:#2c3a4b;border-left:4px solid #C8483A;background:#FBE9E5;padding:6px 10px 6px 12px;border-radius:0 6px 6px 0}
-.em-lab{display:block;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5b6878;margin-bottom:2px}
-.em-src{margin-top:18px;font-size:12.5px;color:#7a8592}
-.em ul,.em ol{margin:6px 0 6px;padding-left:22px}.em li{margin:3px 0}
+.card{--bg:#F6F7F9;--paper:#FFFFFF;--ink:#1C2430;--ink2:#3C4856;--muted:#667383;--line:#DCE2E8;--navy:#16263D;
+ --a:#26704A;--a-l:#E7F3EC;--why:#24578F;--why-l:#EAF1FA;--ex:#8A5A00;--ex-l:#FBF2DF;--pit:#B53A2C;--pit-l:#FBEAE6;
+ --c-recall:#16263D;--c-concept:#0B6E6E;--c-math:#3D3F96;--c-apply:#24578F;--c-visual:#7A3B76;--c-diagnose:#B53A2C;--c-transfer:#26704A;
+ font-family:"EM Sans","Source Sans 3","Helvetica Neue","Segoe UI",Roboto,Arial,sans-serif;font-size:18px;line-height:1.52;
+ color:var(--ink);background:var(--bg);text-align:left;margin:0;padding:0}
+.nightMode.card,.night_mode.card,.card.nightMode,.card.night_mode{--bg:#121519;--paper:#1A1F25;--ink:#E4E9EF;--ink2:#C2CBD5;--muted:#8D99A6;--line:#2C343D;--navy:#C9D6E6;
+ --a:#7CCB9F;--a-l:#18291F;--why:#8DB8E8;--why-l:#17222F;--ex:#E2B65C;--ex-l:#2A2416;--pit:#F0907F;--pit-l:#2C1A17;
+ --c-recall:#9FB2CC;--c-concept:#5FC2BE;--c-math:#A9AAF0;--c-apply:#8DB8E8;--c-visual:#D99BD4;--c-diagnose:#F0907F;--c-transfer:#7CCB9F}
+.em{max-width:660px;margin:14px auto;padding:20px 22px 18px;background:var(--paper);border-radius:10px;border:1px solid var(--line)}
+.em-head{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:12px}
+.k{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;border-radius:4px;padding:2px 8px;background:var(--c-recall)}
+.nightMode .k,.night_mode .k{color:#121519}
+.k-concept{background:var(--c-concept)}.k-math{background:var(--c-math)}.k-apply{background:var(--c-apply)}.k-visual{background:var(--c-visual)}
+.k-diagnose{background:var(--c-diagnose)}.k-transfer{background:var(--c-transfer)}
+.k2{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.em-q{font-size:21px;font-weight:600;line-height:1.38;color:var(--ink)}
+.em-ctx{margin-top:12px;font-size:16.5px;color:var(--ink2)}
+.em img{max-width:100%;max-height:340px;height:auto;display:block;margin:12px auto;border-radius:6px;background:#fff;padding:4px}
+hr#answer{border:none;border-top:1px dashed var(--line);margin:18px 0 14px}
+.em-sec{margin-top:12px;padding:8px 12px 9px;border-radius:0 8px 8px 0;font-size:16.5px;color:var(--ink2)}
+.em-sec>.lab{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.em-a{border-left:5px solid var(--a);background:var(--a-l);font-size:18.5px;font-weight:600;color:var(--ink)}.em-a>.lab{color:var(--a)}
+.em-x{border-left:5px solid var(--why);background:var(--why-l)}.em-x>.lab{color:var(--why)}
+.em-ex{border-left:5px solid var(--ex);background:var(--ex-l)}.em-ex>.lab{color:var(--ex)}
+.em-pit{border-left:5px solid var(--pit);background:var(--pit-l)}.em-pit>.lab{color:var(--pit)}
+.em-foot{margin-top:14px;padding-top:8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.45}
+.em-foot .src{color:var(--ink2);font-weight:600}
+.em ul,.em ol{margin:6px 0;padding-left:22px}.em li{margin:3px 0}
 .em table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0;display:block;overflow-x:auto}
-.em th{text-align:left;border-bottom:1.5px solid #18212b;padding:4px 8px}.em td{border-bottom:1px solid #d5dce4;padding:4px 8px;vertical-align:top}
-.cloze{font-weight:700;color:#1f5673}
+.em th{text-align:left;border-bottom:1.5px solid var(--ink);padding:4px 8px}.em td{border-bottom:1px solid var(--line);padding:4px 8px;vertical-align:top}
+.cloze{font-weight:700;color:var(--c-math)}
 mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
-.nightMode.card,.night_mode.card,.card.nightMode,.card.night_mode{background:#16191d;color:#dbe2ea}
-.nightMode .em-q,.night_mode .em-q,.nightMode .em-a,.night_mode .em-a{color:#e8edf2}
-.nightMode .em-kind,.night_mode .em-kind{color:#8fb4dc}
-.nightMode .em-ctx,.night_mode .em-ctx,.nightMode .em-x,.night_mode .em-x{color:#c3ccd5}
-.nightMode .em-a,.night_mode .em-a{border-left-color:#8fb4dc}
-.nightMode .em-ex,.night_mode .em-ex{background:#20262d;color:#c3ccd5}
-.nightMode .em-pit,.night_mode .em-pit{color:#c3ccd5;border-left-color:#d08a62}
-.nightMode hr#answer,.night_mode hr#answer{border-top-color:#2d3640}
-.nightMode .em th,.night_mode .em th{border-bottom-color:#c3ccd5}.nightMode .em td,.night_mode .em td{border-bottom-color:#2d3640}
-.nightMode .cloze,.night_mode .cloze{color:#8fb4dc}
-.nightMode .em-ctx img,.night_mode .em-ctx img,.nightMode .em-x img,.night_mode .em-x img{background:#f6f7f9;padding:4px}
-@media (max-width:480px){.card{font-size:17px}.em{padding:16px 14px 20px}.em-q{font-size:19px}.em-a{font-size:17.5px}}
+@media (max-width:480px){.card{font-size:16.5px}.em{margin:0;border-radius:0;border-left:none;border-right:none;padding:16px 14px}.em-q{font-size:18.5px}.em-sec{font-size:15.5px}.em-a{font-size:16.5px}}
 """
 
-BASIC_Q = ('<div class="em"><div class="em-kind">{{Kind}}</div><div class="em-q">{{Front}}</div>'
+_HEAD = '<div class="em-head">{{Kind}}</div>'
+BASIC_Q = ('<div class="em">' + _HEAD + '<div class="em-q">{{Front}}</div>'
            '{{#Context}}<div class="em-ctx">{{Context}}</div>{{/Context}}</div>')
-BASIC_A = ('<div class="em"><div class="em-kind">{{Kind}}</div><div class="em-q">{{Front}}</div>'
-           '{{#Context}}<div class="em-ctx">{{Context}}</div>{{/Context}}<hr id="answer"><div class="em-a">{{Answer}}</div>'
-           '{{#Explanation}}<div class="em-x">{{Explanation}}</div>{{/Explanation}}'
-           '{{#Example}}<div class="em-ex"><span class="em-lab">Beispiel</span>{{Example}}</div>{{/Example}}'
-           '{{#Pitfall}}<div class="em-pit"><span class="em-lab">Typischer Denkfehler</span>{{Pitfall}}</div>{{/Pitfall}}'
-           '{{#Source}}<div class="em-src">{{Source}}</div>{{/Source}}{{#Meta}}<div class="em-meta">{{Meta}}</div>{{/Meta}}</div>')
-CLOZE_Q = '<div class="em"><div class="em-kind">{{Kind}}</div><div class="em-q" style="font-weight:500">{{cloze:Text}}</div></div>'
-CLOZE_A = ('<div class="em"><div class="em-kind">{{Kind}}</div><div class="em-q" style="font-weight:500">{{cloze:Text}}</div>'
-           '{{#Extra}}<hr id="answer"><div class="em-x">{{Extra}}</div>{{/Extra}}{{#Source}}<div class="em-src">{{Source}}</div>{{/Source}}'
-           '{{#Meta}}<div class="em-meta">{{Meta}}</div>{{/Meta}}</div>')
+BASIC_A = ('<div class="em">' + _HEAD + '<div class="em-q">{{Front}}</div>'
+           '{{#Context}}<div class="em-ctx">{{Context}}</div>{{/Context}}<hr id="answer">'
+           '<div class="em-sec em-a"><span class="lab">Antwort</span>{{Answer}}</div>'
+           '{{#Explanation}}<div class="em-sec em-x"><span class="lab">Warum</span>{{Explanation}}</div>{{/Explanation}}'
+           '{{#Example}}<div class="em-sec em-ex"><span class="lab">Rechnung / Beispiel</span>{{Example}}</div>{{/Example}}'
+           '{{#Pitfall}}<div class="em-sec em-pit"><span class="lab">Typischer Denkfehler</span>{{Pitfall}}</div>{{/Pitfall}}'
+           '<div class="em-foot">{{#Source}}<span class="src">{{Source}}</span><br>{{/Source}}{{Meta}}</div></div>')
+CLOZE_Q = '<div class="em">' + _HEAD + '<div class="em-q" style="font-weight:500">{{cloze:Text}}</div></div>'
+CLOZE_A = ('<div class="em">' + _HEAD + '<div class="em-q" style="font-weight:500">{{cloze:Text}}</div>'
+           '{{#Extra}}<hr id="answer"><div class="em-sec em-x"><span class="lab">Warum</span>{{Extra}}</div>{{/Extra}}'
+           '<div class="em-foot">{{#Source}}<span class="src">{{Source}}</span><br>{{/Source}}{{Meta}}</div></div>')
 
 
 def _id(*parts, n=8, signed=True):
@@ -125,16 +141,16 @@ DIFF = {1: 'Einstieg', 2: 'Standard', 3: 'Vertiefung'}
 
 
 def card_meta(c):
-    """Visible card provenance on the back: learning objective, card type rationale, difficulty, source status."""
+    """Visible card provenance on the back: competency, level, source level (compact; the authoring rationale stays in
+    the deck report, not on the card)."""
     bits = []
     if c.get('learning_objective'):
-        bits.append('Lernziel: ' + c['learning_objective'])
-    if c.get('why'):
-        bits.append('Warum diese Karte: ' + c['why'])
+        bits.append('Kompetenz: ' + c['learning_objective'])
     if c.get('difficulty'):
         bits.append('Stufe: ' + DIFF.get(c['difficulty'], str(c['difficulty'])))
     if c.get('provenance'):
-        bits.append({'course': 'Vorlesung', 'didactic': 'eigene Übung', 'supplement': 'Fachliteratur'}.get(c['provenance'], c['provenance']))
+        bits.append({'course': 'Ebene A · Vorlesung', 'didactic': 'Ebene C · eigene Übung, nachgerechnet', 'supplement': 'Ebene B · Fachliteratur',
+                     'interpretation': 'Ebene C · eigene Erklärung'}.get(c['provenance'], c['provenance']))
     return E(' · '.join(bits))
 
 
@@ -234,7 +250,7 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
                 meta = card_meta(c)
                 if c['kind'] == 'cloze':
                     vals = {'Key': c['key'], 'Text': _html(c['text']), 'Extra': _html(c.get('extra', '')),
-                            'Source': _html(c.get('source', '')), 'Kind': KIND_LABEL['cloze'], 'Meta': meta}
+                            'Source': _html(c.get('source', '')), 'Kind': kind_html('cloze'), 'Meta': meta}
                 else:
                     ctx = _html(c.get('context', ''))
                     img = (f'<img src="em-{chapter_slug}-{slug(c["figure"])}.svg" alt="{c.get("figure_alt","Abbildung")}">'
@@ -245,14 +261,14 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
                     vals = {'Key': c['key'], 'Front': _html(c['front']), 'Context': ctx, 'Answer': _html(c['answer']),
                             'Explanation': ('' if front_fig else img) + _html(c.get('explanation', '')), 'Example': _html(c.get('example', '')),
                             'Pitfall': _html(c.get('pitfall', '')), 'Source': _html(c.get('source', '')),
-                            'Kind': KIND_LABEL[c['kind']], 'Meta': meta}
+                            'Kind': kind_html(c['kind']), 'Meta': meta}
                 bad = render_lint(c, vals)
                 if bad:
                     gate['fail'][c['key']] = bad
                 gate['checked'] += 1
                 for k, v in vals.items():
                     n[k] = v
-                n.tags = [f'em::{chapter_slug}', f'em::typ::{KIND_LABEL[c["kind"]].lower()}'] + [f'em::{t}' for t in c.get('tags', [])]
+                n.tags = [f'em::{chapter_slug}', f'em::typ::{KIND_LABEL[c["kind"]].lower()}', f'em::kognitiv::{COGNITIVE.get(c["kind"], "recall")}'] + [f'em::{t}' for t in c.get('tags', [])]
                 col.add_note(n, did)
                 hashes[c['key']] = hashlib.sha256(json.dumps(vals, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
             if gate['fail']:

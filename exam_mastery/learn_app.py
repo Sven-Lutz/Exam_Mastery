@@ -104,7 +104,9 @@ def app_model(book, labs=(), materials=(), anki=None, chapter_id='', lab_dir='la
         if best:
             best['cards'].append(cid)
     # items: all workbook stages + exam flags
-    exam_ids = {i['id'] for i in ((book.get('exam') or {}).get('items') or [])}
+    all_exams = book.get('exams') or ([book['exam']] if book.get('exam') else [])
+    exam = all_exams[0] if all_exams else {}
+    exam_ids = {i['id'] for ex_ in all_exams for i in ex_.get('items') or []}
     items = []
     for st in book.get('stages') or []:
         for it in st['items']:
@@ -124,9 +126,8 @@ def app_model(book, labs=(), materials=(), anki=None, chapter_id='', lab_dir='la
                           'evidence_gap': bool(it.get('evidence_gap'))})
             if sec:
                 sec['items'].append(it['id'])
-    exam = book.get('exam') or {}
     known = {i['id'] for i in items}
-    for it in exam.get('items') or []:          # edition exams carry their own items (not part of the workbook)
+    for it in [i for ex_ in all_exams for i in ex_.get('items') or []]:          # edition exams carry their own items (not part of the workbook)
         if it['id'] in known:
             continue
         s_ = it['solution']

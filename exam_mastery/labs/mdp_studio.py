@@ -90,6 +90,7 @@ button.b.alt{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}bu
 label.f{display:flex;align-items:center;gap:10px;margin:6px 0;font-weight:600}label.f input[type=range]{flex:1}
 input[type=number]{width:84px;padding:4px 6px;border:1px solid var(--line);border-radius:4px;font:inherit}
 select{padding:4px 6px;border:1px solid var(--line);border-radius:4px;font:inherit;background:#fff}
+.eqs{display:grid;gap:6px;margin:10px 0;padding:10px 12px;background:var(--wash);border-radius:6px;border-left:4px solid #3D3F96;font-size:15px}.eqs b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#3D3F96}
 .kpi{display:flex;gap:10px;flex-wrap:wrap}.kpi div{flex:1;min-width:120px;background:var(--wash);border-radius:6px;padding:8px 10px}
 .kpi b{display:block;font-size:20px;color:var(--navy)}.kpi span{font-size:12px;color:var(--muted)}
 .backup{font-family:'JetBrains Mono',Menlo,monospace;font-size:13px;background:var(--wash);border-radius:6px;padding:10px;white-space:pre-wrap;line-height:1.5}
@@ -161,28 +162,28 @@ function drawGraph(V, pol, focus) {
     for (const [dx, dy] of [[0, 0], [0, -14], [0, 14], [18, 0], [-18, 0], [0, -26], [0, 26], [26, -14], [-26, 14]]) {
       const b = [x + dx - w / 2, y + dy - h + 2, x + dx + w / 2, y + dy + 2]; if (!hit(b)) { boxes.push(b); return [x + dx, y + dy]; } }
     boxes.push([x - w / 2, y - h + 2, x + w / 2, y + 2]); return [x, y]; };
-  svg.push(`<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#0F6E73"/></marker>
-    <marker id="ac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#C8483A"/></marker></defs>`);
+  svg.push(`<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#0B6E6E"/></marker>
+    <marker id="ac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#B53A2C"/></marker></defs>`);
   for (const s of m.S) for (const [ai, a] of m.A[s].entries()) {
     const [x, y] = xy(s), on = pol && pol[s] === a, t = m.T[s + '|' + a];
     const ang = (-90 + (ai - (m.A[s].length - 1) / 2) * 52) * Math.PI / 180, AP = (sc.apos || {})[s + '|' + a];
     const ax = AP ? AP[0] : x + Math.cos(ang) * 58, ay = AP ? AP[1] : y + Math.sin(ang) * 58;
-    svg.push(`<line x1="${x}" y1="${y}" x2="${ax}" y2="${ay}" stroke="${on ? '#C8483A' : '#1B2A41'}" stroke-width="${on ? 3 : 1.4}"/>`);
+    svg.push(`<line x1="${x}" y1="${y}" x2="${ax}" y2="${ay}" stroke="${on ? '#B53A2C' : '#16263D'}" stroke-width="${on ? 3 : 1.4}"/>`);
     const atxt = `${a} · r=${fmt(t.r, 1)}`, [lx, ly] = place(ax, AP && AP[1] > y ? ay + 20 : ay - 11, atxt, 12.5);
-    svg.push(`<circle cx="${ax}" cy="${ay}" r="6.5" fill="${on ? '#C8483A' : '#1B2A41'}"/><text x="${lx}" y="${ly}" font-size="12.5" text-anchor="middle" font-weight="700" fill="${on ? '#C8483A' : '#1B2A41'}" paint-order="stroke" stroke="#fff" stroke-width="3">${a} · r=${fmt(t.r, 1)}</text>`);
+    svg.push(`<circle cx="${ax}" cy="${ay}" r="6.5" fill="${on ? '#B53A2C' : '#16263D'}"/><text x="${lx}" y="${ly}" font-size="12.5" text-anchor="middle" font-weight="700" fill="${on ? '#B53A2C' : '#16263D'}" paint-order="stroke" stroke="#fff" stroke-width="3">${a} · r=${fmt(t.r, 1)}</text>`);
     for (const [n, p] of Object.entries(t.next)) { const [nx, ny] = xy(n); const dx = nx - ax, dy = ny - ay, L = Math.hypot(dx, dy) || 1;
       if (n === s) { const dx0 = x - ax, dy0 = y - ay, L0 = Math.hypot(dx0, dy0) || 1, ex = x - dx0 / L0 * 34, ey = y - dy0 / L0 * 34, mx = (ax + ex) / 2 + dy0 / L0 * 26, my = (ay + ey) / 2 - dx0 / L0 * 26;
-        svg.push(`<path d="M${ax},${ay} Q${mx},${my} ${ex},${ey}" fill="none" stroke="${on ? '#C8483A' : '#0F6E73'}" stroke-dasharray="${on ? '' : '4 3'}" stroke-width="${on ? 2 : 1.3}" marker-end="url(#${on ? 'ac' : 'ar'})"/>`);
+        svg.push(`<path d="M${ax},${ay} Q${mx},${my} ${ex},${ey}" fill="none" stroke="${on ? '#B53A2C' : '#0B6E6E'}" stroke-dasharray="${on ? '' : '4 3'}" stroke-width="${on ? 2 : 1.3}" marker-end="url(#${on ? 'ac' : 'ar'})"/>`);
         const [qx, qy] = place(mx, my, `p=${fmt(p, 2)}`, 11.5);
-        svg.push(`<text x="${qx}" y="${qy}" font-size="11.5" font-weight="700" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" fill="${on ? '#C8483A' : '#0F6E73'}">p=${fmt(p, 2)}</text>`); continue; }
+        svg.push(`<text x="${qx}" y="${qy}" font-size="11.5" font-weight="700" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" fill="${on ? '#B53A2C' : '#0B6E6E'}">p=${fmt(p, 2)}</text>`); continue; }
       const ex = nx - dx / L * 34, ey = ny - dy / L * 34, mx = (ax + ex) / 2 - dy / L * 18, my = (ay + ey) / 2 + dx / L * 18;
-      svg.push(`<path d="M${ax},${ay} Q${mx},${my} ${ex},${ey}" fill="none" stroke="${on ? '#C8483A' : '#0F6E73'}" stroke-dasharray="${on ? '' : '4 3'}" stroke-width="${on ? 2 : 1.3}" marker-end="url(#${on ? 'ac' : 'ar'})"/>`);
+      svg.push(`<path d="M${ax},${ay} Q${mx},${my} ${ex},${ey}" fill="none" stroke="${on ? '#B53A2C' : '#0B6E6E'}" stroke-dasharray="${on ? '' : '4 3'}" stroke-width="${on ? 2 : 1.3}" marker-end="url(#${on ? 'ac' : 'ar'})"/>`);
       const [qx, qy] = place(mx, my, `p=${fmt(p, 2)}`, 11.5);
-      svg.push(`<text x="${qx}" y="${qy}" font-size="11.5" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" fill="${on ? '#C8483A' : '#0F6E73'}" text-anchor="middle">p=${fmt(p, 2)}</text>`); } }
+      svg.push(`<text x="${qx}" y="${qy}" font-size="11.5" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" fill="${on ? '#B53A2C' : '#0B6E6E'}" text-anchor="middle">p=${fmt(p, 2)}</text>`); } }
   for (const s of m.S) { const [x, y] = xy(s), term = !m.A[s].length;
-    svg.push(`<circle cx="${x}" cy="${y}" r="32" fill="${focus === s ? '#FBF2DE' : '#E2F0F0'}" stroke="${focus === s ? '#8C6416' : '#0F6E73'}" stroke-width="${focus === s ? 3.5 : 2}" ${term ? 'stroke-dasharray="4 3"' : ''}/>`);
-    svg.push(`<text x="${x}" y="${y - 3}" font-size="13.5" font-weight="800" text-anchor="middle" fill="#1B2A41">${label(s)}</text>`);
-    if (V) svg.push(`<text x="${x}" y="${y + 15}" font-size="12.5" text-anchor="middle" fill="#2F5D8A" font-weight="700" data-v="${s}">V=${fmt(V[s], 2)}</text>`); }
+    svg.push(`<circle cx="${x}" cy="${y}" r="32" fill="${focus === s ? '#FBF2DE' : '#E2F0F0'}" stroke="${focus === s ? '#8A5A00' : '#0B6E6E'}" stroke-width="${focus === s ? 3.5 : 2}" ${term ? 'stroke-dasharray="4 3"' : ''}/>`);
+    svg.push(`<text x="${x}" y="${y - 3}" font-size="13.5" font-weight="800" text-anchor="middle" fill="#16263D">${label(s)}</text>`);
+    if (V) svg.push(`<text x="${x}" y="${y + 15}" font-size="12.5" text-anchor="middle" fill="#24578F" font-weight="700" data-v="${s}">V=${fmt(V[s], 2)}</text>`); }
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Zustandsgraph mit Aktionen, Übergangswahrscheinlichkeiten und Werten">${svg.join('')}</svg>`;
 }
 function drawGrid(V, pol, focus) {
@@ -190,28 +191,28 @@ function drawGrid(V, pol, focus) {
   const vals = Object.entries(V || {}).filter(([k]) => k !== 'Ende').map(([, v]) => v), lo = Math.min(0, ...vals), hi = Math.max(0, ...vals);
   const arr = {N: [0, -1], E: [1, 0], S: [0, 1], W: [-1, 0]};
   for (let r = R; r >= 1; r--) for (let c = 1; c <= C; c++) { const k = c + ',' + r, x = pad + (c - 1) * s, y = 6 + (R - r) * s;
-    if (walls.has(k)) { out.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="#1B2A41"/>`); continue; }
-    out.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="${V ? heat(V[k], lo, hi) : '#fff'}" stroke="${focus === k ? '#8C6416' : '#CBD3DC'}" stroke-width="${focus === k ? 4 : 1}" data-cell="${k}" tabindex="0" role="button" aria-label="Zelle ${k}"/>`);
-    if (k in sc.terminals) out.push(`<rect x="${x + 4}" y="${y + 4}" width="${s - 8}" height="${s - 8}" fill="none" stroke="#1B2A41" stroke-width="2"/>`);
-    if (V) out.push(`<text x="${x + s / 2}" y="${y + s / 2 + 18}" font-size="14" font-weight="800" text-anchor="middle" fill="#1B2A41" data-v="${k}">${fmt(V[k], 2)}</text>`);
+    if (walls.has(k)) { out.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="#16263D"/>`); continue; }
+    out.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="${V ? heat(V[k], lo, hi) : '#fff'}" stroke="${focus === k ? '#8A5A00' : '#CBD3DC'}" stroke-width="${focus === k ? 4 : 1}" data-cell="${k}" tabindex="0" role="button" aria-label="Zelle ${k}"/>`);
+    if (k in sc.terminals) out.push(`<rect x="${x + 4}" y="${y + 4}" width="${s - 8}" height="${s - 8}" fill="none" stroke="#16263D" stroke-width="2"/>`);
+    if (V) out.push(`<text x="${x + s / 2}" y="${y + s / 2 + 18}" font-size="14" font-weight="800" text-anchor="middle" fill="#16263D" data-v="${k}">${fmt(V[k], 2)}</text>`);
     if (pol && pol[k] && pol[k] !== 'Exit') { const [dx, dy] = arr[pol[k]], cx = x + s / 2, cy = y + s / 2 - 8;
-      out.push(`<line x1="${cx - dx * 12}" y1="${cy - dy * 12}" x2="${cx + dx * 14}" y2="${cy + dy * 14}" stroke="#1B2A41" stroke-width="3" marker-end="url(#ag)"/>`); } }
-  for (let c = 1; c <= C; c++) out.push(`<text x="${pad + (c - .5) * s}" y="${6 + R * s + 16}" font-size="12" text-anchor="middle" fill="#5B6878">${c}</text>`);
-  for (let r = 1; r <= R; r++) out.push(`<text x="${12}" y="${6 + (R - r + .5) * s + 4}" font-size="12" text-anchor="middle" fill="#5B6878">${r}</text>`);
-  return `<svg viewBox="0 0 ${pad + C * s + 6} ${R * s + 28}" width="100%" role="img" aria-label="Gitterwelt mit Wert-Heatmap und Policy-Pfeilen"><defs><marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#1B2A41"/></marker></defs>${out.join('')}</svg>`;
+      out.push(`<line x1="${cx - dx * 12}" y1="${cy - dy * 12}" x2="${cx + dx * 14}" y2="${cy + dy * 14}" stroke="#16263D" stroke-width="3" marker-end="url(#ag)"/>`); } }
+  for (let c = 1; c <= C; c++) out.push(`<text x="${pad + (c - .5) * s}" y="${6 + R * s + 16}" font-size="12" text-anchor="middle" fill="#556273">${c}</text>`);
+  for (let r = 1; r <= R; r++) out.push(`<text x="${12}" y="${6 + (R - r + .5) * s + 4}" font-size="12" text-anchor="middle" fill="#556273">${r}</text>`);
+  return `<svg viewBox="0 0 ${pad + C * s + 6} ${R * s + 28}" width="100%" role="img" aria-label="Gitterwelt mit Wert-Heatmap und Policy-Pfeilen"><defs><marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#16263D"/></marker></defs>${out.join('')}</svg>`;
 }
 const draw = (V, pol, f) => sc.kind === 'grid' ? drawGrid(V, pol, f) : drawGraph(V, pol, f);
 function plot(series, ylab, xlab = 'Sweep k') {                                               // log residual plot
   const W = 520, H = 200, L = 46, B = 26, all = series.flatMap(s => s.v).filter(v => v > 0); if (!all.length) return '';
   const lo = Math.floor(Math.log10(Math.min(...all))), hi = Math.ceil(Math.log10(Math.max(...all))), n = Math.max(...series.map(s => s.v.length));
   const X = i => L + 14 + i / Math.max(1, n - 1) * (W - L - 38), Y = v => 10 + (hi - Math.log10(v)) / Math.max(1, hi - lo) * (H - B - 10), out = [];
-  for (let e = lo; e <= hi; e++) out.push(`<line x1="${L}" x2="${W - 10}" y1="${Y(10 ** e)}" y2="${Y(10 ** e)}" stroke="#E4E8EC"/><text x="${L - 4}" y="${Y(10 ** e) + 4}" font-size="10" text-anchor="end" fill="#5B6878">1e${e}</text>`);
+  for (let e = lo; e <= hi; e++) out.push(`<line x1="${L}" x2="${W - 10}" y1="${Y(10 ** e)}" y2="${Y(10 ** e)}" stroke="#E4E8EC"/><text x="${L - 4}" y="${Y(10 ** e) + 4}" font-size="10" text-anchor="end" fill="#556273">1e${e}</text>`);
   series.forEach((s, j) => { const pts = s.v.map((v, i) => v > 0 ? `${X(i)},${Y(v)}` : null).filter(Boolean);
     if (s.v.length <= 12) {                 // B33: few iterations -> points, never a line that suggests a continuum
       s.v.forEach((v, i) => { if (v > 0) out.push(`<circle cx="${X(i)}" cy="${Y(v)}" r="5" fill="${s.c}"/>` + (v <= 1e-12 ? `<text x="${X(i) - 8}" y="${Y(v) - 8}" font-size="11" text-anchor="end" fill="${s.c}" font-weight="700">exakt 0</text>` : `<text x="${X(i) + 8}" y="${Y(v) + 4}" font-size="11" fill="${s.c}">${v.toExponential(2)}</text>`)); });
       out.push(`<text x="${W - 12}" y="${16 + j * 14}" text-anchor="end" font-size="11" fill="${s.c}" font-weight="700">${s.n}</text>`); return; }
     out.push(`<polyline points="${pts.join(' ')}" fill="none" stroke="${s.c}" stroke-width="2.2" ${s.dash ? 'stroke-dasharray="6 4"' : ''}/><text x="${W - 12}" y="${16 + j * 14}" text-anchor="end" font-size="11" fill="${s.c}" font-weight="700">${s.n}</text>`); });
-  out.push(`<text x="${(W + L) / 2}" y="${H - 4}" font-size="11" text-anchor="middle" fill="#5B6878">${xlab}</text><text x="12" y="${H / 2}" font-size="11" fill="#5B6878" transform="rotate(-90 12 ${H / 2})" text-anchor="middle">${ylab}</text>`);
+  out.push(`<text x="${(W + L) / 2}" y="${H - 4}" font-size="11" text-anchor="middle" fill="#556273">${xlab}</text><text x="12" y="${H / 2}" font-size="11" fill="#556273" transform="rotate(-90 12 ${H / 2})" text-anchor="middle">${ylab}</text>`);
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Konvergenzverlauf, logarithmisch">${out.join('')}</svg>`;
 }
 function backupText(m, V, s, a) { const t = m.T[s + '|' + a]; let parts = [], sum = t.r;
@@ -224,7 +225,7 @@ function reset(keepModel) {
   if (!keepModel) st = {mode: st && st.mode, gamma: +sc.gamma, transitions: JSON.parse(JSON.stringify(sc.transitions || []))};
   const m = model(sc); st.policy = Object.fromEntries(m.S.filter(s => m.A[s].length).map(s => [s, (sc.policy && sc.policy[s]) || m.A[s][0]]));
   st.V = zeros(m); st.k = 0; st.res = []; st.vhist = [st.V]; st.pi = {pol: {...st.policy}, phase: 'evaluate', iter: 0, log: [], done: false};
-  st.focus = m.S.find(s => m.A[s].length > 1) || m.S[0]; st.task = 0; st.stage = 0; st.err = '';
+  st.focus = m.S.find(s => m.A[s].length > 1) || m.S[0]; st.task = 0; st.stage = 0; st.err = ''; st.cmpPred = null;
 }
 function setScenario(i) { sc = D.scenarios[i]; reset(false);
   document.querySelectorAll('nav.sc button').forEach((b, j) => b.setAttribute('aria-pressed', i === j)); render(); }
@@ -270,7 +271,7 @@ function vi(m) {
   <div class="btns"><button class="b" id="sw">Ein Sweep</button><button class="b alt" id="sw10">10 Sweeps</button><button class="b alt" id="conv">Bis Residuum &lt; 10⁻⁶</button><button class="b warn" id="vr">Zurück auf V₀ = 0</button></div>
   <div class="kpi"><div><b id="kk">${st.k}</b><span>Sweeps k</span></div><div><b id="rr">${res.length ? res[res.length - 1].toExponential(2) : '—'}</b><span>Residuum ‖V_k − V_{k−1}‖∞</span></div>
   <div><b id="bd">${res.length && m.g > 0 ? (m.g / (1 - m.g) * res[res.length - 1]).toExponential(2) : '—'}</b><span>Schranke γ/(1−γ)·Residuum für ‖V_k − V*‖∞</span></div></div>
-  <h3>Verlauf</h3>${plot([{n: 'Residuum', v: res, c: '#0F6E73'}, {n: 'Schranke', v: res.map(r => m.g / (1 - m.g) * r), c: '#C8483A', dash: 1}], 'log-Skala')}
+  <h3>Verlauf</h3>${plot([{n: 'Residuum', v: res, c: '#0B6E6E'}, {n: 'Schranke', v: res.map(r => m.g / (1 - m.g) * r), c: '#B53A2C', dash: 1}], 'log-Skala')}
   <table><thead><tr><th>k</th>${m.S.filter(s => s !== 'Ende').slice(0, 6).map(s => `<th class="num">${label(s)}</th>`).join('')}</tr></thead><tbody>${st.vhist.slice(-6).map((W, i, a) => `<tr><td>${st.k - a.length + 1 + i}</td>${m.S.filter(s => s !== 'Ende').slice(0, 6).map(s => `<td class="num">${fmt(W[s], 3)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
   <div class="card">${draw(V, pol, st.focus)}<h3>Backup im markierten Zustand (${label(st.focus)})</h3><div class="backup" id="bk">${(m.A[st.focus] || []).map(a => backupText(m, st.vhist[Math.max(0, st.vhist.length - 2)], st.focus, a)).join('\n') || '—'}</div>
   <p class="msg info">Pfeile/rote Aktionen = gierige Policy zu \\(V_k\\). Beobachten Sie: Die Policy steht oft fest, lange bevor die Werte konvergieren.</p></div></div>`; }
@@ -283,24 +284,50 @@ function pi(m) {
   ${P.V ? qtable(m, V, P.pol, P.prev) : ''}<h3>Protokoll</h3><ol id="plog">${P.log.map(x => `<li>${x}</li>`).join('')}</ol></div>
   <div class="card">${draw(P.V || null, P.pol, st.focus)}</div></div>`; }
 function compare(m) {
-  // B33: both algorithms on the same model, measured by their distance to V* (exact, from the oracle-equivalent solver)
-  const o = optimal(m), S = m.S.filter(s => m.A[s].length), nA = S.reduce((x, s) => x + m.A[s].length, 0);
-  let V = zeros(m); const vi = []; let k = 0, kPol = null;
-  while (k < 400) { V = sweep(m, V); k++; const e = norm(V, o.V); vi.push(e); const g = greedy(m, V);
+  // B34: both algorithms on the same model, measured against V* AND against the arithmetic they cost. A VI sweep is
+  // sum_s sum_a |succ(s,a)| multiply-adds; a PI step is an exact solve (~n^3/3 for Gauss) plus one improvement sweep.
+  const o = optimal(m), S = m.S.filter(s => m.A[s].length), nA = S.reduce((x, s) => x + m.A[s].length, 0), n = m.S.length;
+  const sweepOps = S.reduce((x, s) => x + m.A[s].reduce((y, a) => y + Object.keys(m.T[s + '|' + a].next).length, 0), 0);
+  const solveOps = Math.round(n * n * n / 3 + n * n);
+  let V = zeros(m); const vi = [], viW = []; let k = 0, kPol = null, w = 0;
+  while (k < 400) { V = sweep(m, V); k++; w += sweepOps; const e = norm(V, o.V); vi.push(e); viW.push(w); const g = greedy(m, V);
     if (kPol === null && S.every(s => q(m, o.V, s, g[s]) >= q(m, o.V, s, o.pol[s]) - 1e-9)) kPol = k; if (e < 1e-6) break; }
-  let pol = {...st.policy}; const pe = [], rows = [];
-  for (let it = 1; it <= 50; it++) { const Vp = evaluate(m, pol), e = norm(Vp, o.V); pe.push(Math.max(e, 1e-12)); const np = greedy(m, Vp, pol), ch = S.filter(s => np[s] !== pol[s]);
-    rows.push(`<tr><td>${it}</td><td class="num">${e < 1e-12 ? '0' : e.toExponential(2)}</td><td>${ch.length ? ch.map(s => `${label(s)}: ${pol[s]} → ${np[s]}`).join(', ') : 'keine → Stopp'}</td></tr>`);
+  let pol = {...st.policy}; const pe = [], peW = [], rows = []; w = 0;
+  for (let it = 1; it <= 50; it++) { const Vp = evaluate(m, pol), e = norm(Vp, o.V); w += solveOps + sweepOps; pe.push(Math.max(e, 1e-12)); peW.push(w);
+    const np = greedy(m, Vp, pol), ch = S.filter(s => np[s] !== pol[s]);
+    rows.push(`<tr><td>${it}</td><td class="num">${e < 1e-12 ? '0' : e.toExponential(2)}</td><td class="num">${w}</td><td>${ch.length ? ch.map(s => `${label(s)}: ${pol[s]} → ${np[s]}`).join(', ') : 'keine → Stopp'}</td></tr>`);
     if (!ch.length) break; pol = np; }
+  const pred = st.cmpPred, viWork = viW[viW.length - 1], piWork = peW[peW.length - 1];
+  const ask = `<div class="card"><h2>Erst vorhersagen</h2><p>Beide Verfahren lösen dasselbe MDP (γ = ${fmt(m.g, 2)}, ${n} Zustände, ${nA} Zustand-Aktion-Paare). Welches braucht <b>weniger Rechenoperationen</b>, bis es \\(V^*\\) erreicht hat (VI: Fehler &lt; 10⁻⁶)?</p>
+    <div class="btns"><button class="b alt" data-cmp="vi">Wertiteration</button><button class="b alt" data-cmp="pi">Policy Iteration</button><button class="b alt" data-cmp="eq">etwa gleich</button></div>
+    <p class="msg info">Tipp: Zählen Sie nicht Iterationen. Ein VI-Sweep kostet hier ${sweepOps} Multiplikationen, eine PI-Iteration ein Gleichungssystem (≈ ${solveOps}) plus einen Verbesserungssweep (${sweepOps}).</p></div>`;
+  if (!pred) return `<div class="grid2">${ask}<div class="card">${draw(null, null, st.focus)}</div></div>`;
+  const win = viWork < piWork ? 'vi' : 'pi', right = pred === win;
   return `<div class="grid2"><div class="card"><h2>Wertiteration und Policy Iteration im Vergleich</h2>
-  <p>Beide starten bei diesem Modell (γ = ${fmt(m.g, 2)}); gemessen wird jeweils der Abstand \\(\\|V - V^*\\|_\\infty\\) zur exakten Lösung. Startpolicy der PI: Ihre Wahl im Policy-Explorer.</p>
-  <div class="kpi"><div><b id="cmp-vi">${k}</b><span>VI-Sweeps bis Fehler &lt; 10⁻⁶ (je ${nA} Backups)</span></div><div><b id="cmp-vipol">${kPol ?? '—'}</b><span>kleinstes k, ab dem die gierige Policy zu V<sub>k</sub> optimal ist (gewählt im Sweep k+1)</span></div>
-  <div><b id="cmp-pi">${pe.length}</b><span>PI-Bewertungen (je ein lineares Gleichungssystem mit ${S.length} Unbekannten)</span></div></div>
-  <h3>Wertiteration: Fehler je Sweep</h3>${plot([{n: 'VI', v: vi, c: '#0F6E73'}], 'Fehler zu V* (log)', 'Sweep k')}
-  <h3>Policy Iteration: Fehler je Bewertung</h3>${plot([{n: 'PI', v: pe, c: '#C8483A'}], 'Fehler zu V* (log)', 'Bewertung i (exaktes Gleichungssystem)')}
-  <p class="msg info">Lesen Sie die Achse als „Iteration“: Ein VI-Schritt ist ein billiger Sweep, ein PI-Schritt eine vollständige Bewertung. PI braucht wenige teure Schritte und erreicht V* exakt; VI viele billige und nähert sich geometrisch (Faktor γ). Die gierige VI-Policy ist oft lange vor den Werten optimal.</p></div>
-  <div class="card"><h3>Protokoll der Policy Iteration</h3><table><thead><tr><th>Bewertung</th><th class="num">‖V<sup>π</sup> − V*‖<sub>∞</sub></th><th>Policy-Änderungen</th></tr></thead><tbody>${rows.join('')}</tbody></table>
-  <h3>Frage zum Nachdenken</h3><p>Ändern Sie γ im Modell auf 0.99: Welche Zahl wächst stark, welche kaum? (VI-Sweeps wachsen etwa wie 1/(1−γ); die Zahl der PI-Bewertungen bleibt klein.)</p></div></div>`; }
+  <p class="msg ${right ? 'ok' : 'bad'}" id="cmp-verdict">${right ? 'Ihre Vorhersage stimmt.' : 'Ihre Vorhersage stimmt nicht.'} Hier braucht <b>${win === 'vi' ? 'die Wertiteration' : 'die Policy Iteration'}</b> weniger Operationen (${Math.min(viWork, piWork)} gegen ${Math.max(viWork, piWork)}).</p>
+  <div class="eqs"><div><b>VI-Sweep</b> \\(V_{k+1}(s) = \\max_a \\big[r(s,a) + \\gamma \\sum_{s'} p(s'\\mid s,a) V_k(s')\\big]\\)</div><div><b>PI-Iteration</b> \\((I - \\gamma P_\\pi) V^\\pi = r_\\pi\\) lösen, dann \\(\\pi \\leftarrow \\arg\\max_a Q^\\pi(s,a)\\)</div></div>
+  <div class="kpi"><div><b id="cmp-vi">${k}</b><span>VI-Sweeps bis Fehler &lt; 10⁻⁶ (je ${sweepOps} Operationen)</span></div><div><b id="cmp-vipol">${kPol ?? '—'}</b><span>kleinstes k, ab dem die gierige Policy zu V<sub>k</sub> optimal ist</span></div>
+  <div><b id="cmp-pi">${pe.length}</b><span>PI-Iterationen (je ≈ ${solveOps + sweepOps} Operationen)</span></div>
+  <div><b id="cmp-work-vi">${viWork}</b><span>Operationen VI gesamt</span></div><div><b id="cmp-work-pi">${piWork}</b><span>Operationen PI gesamt</span></div></div>
+  <h3>Fehler über der geleisteten Arbeit</h3>${plotXY([{n: 'Wertiteration', x: viW, v: vi, c: '#0B6E6E'}, {n: 'Policy Iteration', x: peW, v: pe, c: '#B53A2C'}], 'Fehler ‖V − V*‖∞ (log)', 'Rechenoperationen (Multiplikationen, kumuliert)')}
+  <p class="msg info">Jetzt teilen beide Kurven eine Achse mit derselben Einheit, und der Vergleich ist fair. Bei wenigen Zuständen ist das Gleichungssystem billig und PI gewinnt oft; je mehr Zustände, desto teurer wird \\(n^3\\). Die VI-Policy ist oft lange vor den Werten optimal (Spalte k).</p>
+  <h3>Reflexion</h3><p>Setzen Sie im Modell γ = 0.99 und vergleichen Sie erneut: Welche Zahl wächst stark, welche kaum? Begründen Sie mit der Kontraktionsrate γ.</p>
+  <div class="btns"><button class="b warn" id="cmp-again">Neu vorhersagen</button></div></div>
+  <div class="card"><h3>Protokoll der Policy Iteration</h3><table><thead><tr><th>Iteration</th><th class="num">‖V<sup>π</sup> − V*‖<sub>∞</sub></th><th class="num">Operationen kumuliert</th><th>Policy-Änderungen</th></tr></thead><tbody>${rows.join('')}</tbody></table>
+  ${draw(o.V, o.pol, st.focus)}</div></div>`; }
+function plotXY(series, ylab, xlab) {                               // B34: shared x axis only when the unit is shared (work)
+  const W = 520, H = 210, L = 46, B = 28, all = series.flatMap(s => s.v).filter(v => v > 0), xs = series.flatMap(s => s.x);
+  const lo = Math.floor(Math.log10(Math.min(...all))), hi = Math.ceil(Math.log10(Math.max(...all))), xmax = Math.max(...xs);
+  const X = x => L + 10 + x / xmax * (W - L - 30), Y = v => 10 + (hi - Math.log10(v)) / Math.max(1, hi - lo) * (H - B - 10), out = [];
+  for (let e = lo; e <= hi; e++) out.push(`<line x1="${L}" x2="${W - 10}" y1="${Y(10 ** e)}" y2="${Y(10 ** e)}" stroke="#E4E8EC"/><text x="${L - 4}" y="${Y(10 ** e) + 4}" font-size="10" text-anchor="end" fill="#556273">1e${e}</text>`);
+  for (const t of [0, .25, .5, .75, 1]) out.push(`<text x="${X(t * xmax)}" y="${H - B + 14}" font-size="10" text-anchor="middle" fill="#556273">${Math.round(t * xmax)}</text>`);
+  series.forEach((s, j) => { const pts = s.v.map((v, i) => `${X(s.x[i])},${Y(Math.max(v, 1e-12))}`);
+    if (s.v.length > 12) out.push(`<polyline points="${pts.join(' ')}" fill="none" stroke="${s.c}" stroke-width="2.2"/>`);
+    else s.v.forEach((v, i) => out.push(`<circle cx="${X(s.x[i])}" cy="${Y(Math.max(v, 1e-12))}" r="5" fill="${s.c}"/>` + (v <= 1e-12 ? `<text x="${X(s.x[i])}" y="${Y(1e-12) - 9}" font-size="11" text-anchor="middle" fill="${s.c}" font-weight="700">exakt 0</text>` : '')));
+    out.push(`<text x="${W - 12}" y="${16 + j * 14}" text-anchor="end" font-size="11" fill="${s.c}" font-weight="700">${s.n} ${s.v.length > 12 ? '—' : '●'}</text>`); });
+  out.push(`<text x="${(W + L) / 2}" y="${H - 2}" font-size="11" text-anchor="middle" fill="#556273">${xlab}</text><text x="12" y="${H / 2}" font-size="11" fill="#556273" transform="rotate(-90 12 ${H / 2})" text-anchor="middle">${ylab}</text>`);
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Fehler über Rechenaufwand, logarithmisch">${out.join('')}</svg>`;
+}
 function gamma(m) {
   if (sc.kind === 'grid') return `<div class="card"><h2>Diskont im Gitter</h2><label class="f">γ = <input type="range" min="0" max="0.99" step="0.01" value="${st.gamma}" id="g"><output>${fmt(st.gamma, 2)}</output></label>${draw(optimal(m).V, optimal(m).pol)}<p class="msg info">Kleines γ: Nur nahe Belohnungen zählen, entfernte Zellen haben kaum Wert. Großes γ: Werte breiten sich weit aus.</p></div>`;
   const th = sc.threshold, G = [], pols = [];
@@ -311,10 +338,10 @@ function gamma(m) {
     let a = 0, b = .99; if (diff(a) * diff(b) < 0) { for (let i = 0; i < 60; i++) { const c = (a + b) / 2; if (diff(a) * diff(c) <= 0) b = c; else a = c; } exact = (a + b) / 2; } }
   const W = 560, X = g => 20 + g * (W - 40) / .99;
   const bars = segs.map((sg, i) => { const to = i + 1 < segs.length ? segs[i + 1].from : .99, P = JSON.parse(sg.p);
-    return `<rect x="${X(sg.from)}" y="20" width="${X(to) - X(sg.from)}" height="34" fill="${['#E2F0F0', '#FBF2DE', '#E8F0F8', '#EEEBF7'][i % 4]}" stroke="#CBD3DC"/><text x="${(X(sg.from) + X(to)) / 2}" y="42" font-size="12" text-anchor="middle" font-weight="700" fill="#1B2A41">${Object.entries(P).map(([s, a]) => label(s) + ': ' + a).join(', ')}</text>`; }).join('');
+    return `<rect x="${X(sg.from)}" y="20" width="${X(to) - X(sg.from)}" height="34" fill="${['#E2F0F0', '#FBF2DE', '#E8F0F8', '#EEEBF7'][i % 4]}" stroke="#CBD3DC"/><text x="${(X(sg.from) + X(to)) / 2}" y="42" font-size="12" text-anchor="middle" font-weight="700" fill="#16263D">${Object.entries(P).map(([s, a]) => label(s) + ': ' + a).join(', ')}</text>`; }).join('');
   const cur = optimal(m);
   return `<div class="grid2"><div class="card"><h2>Wann kippt die optimale Policy?</h2><label class="f">γ = <input type="range" min="0" max="0.99" step="0.01" value="${st.gamma}" id="g" aria-label="Diskontfaktor"><output>${fmt(st.gamma, 2)}</output></label>
-  <svg viewBox="0 0 ${W} 90" width="100%" role="img" aria-label="Regime der optimalen Policy über γ">${bars}<line x1="${X(m.g)}" x2="${X(m.g)}" y1="12" y2="62" stroke="#C8483A" stroke-width="3"/>${[0, .25, .5, .75, .99].map(t => `<text x="${X(t)}" y="78" font-size="11" text-anchor="middle" fill="#5B6878">${t}</text>`).join('')}</svg>
+  <svg viewBox="0 0 ${W} 90" width="100%" role="img" aria-label="Regime der optimalen Policy über γ">${bars}<line x1="${X(m.g)}" x2="${X(m.g)}" y1="12" y2="62" stroke="#B53A2C" stroke-width="3"/>${[0, .25, .5, .75, .99].map(t => `<text x="${X(t)}" y="78" font-size="11" text-anchor="middle" fill="#556273">${t}</text>`).join('')}</svg>
   ${th ? `<p class="msg ok" id="thr">Numerisch gefundene Schwelle: γ ≈ <b>${exact === null ? '—' : fmt(exact, 4)}</b>${sc.threshold.exact ? ` · exakter Wert aus dem Lehrbuch: <b>${sc.threshold.exact}</b> ≈ ${fmt(eval(sc.threshold.exact), 4)}` : ''}. Genau an der Schwelle sind beide Aktionen gleich gut (Gleichstand); beide Policies sind dann optimal.</p>` : ''}
   <h3>Optimale Werte bei diesem γ</h3><div class="kpi">${m.S.map(s => `<div><b>${fmt(cur.V[s], 3)}</b><span>V*(${label(s)})</span></div>`).join('')}</div></div>
   <div class="card">${draw(cur.V, cur.pol, th ? th.state : st.focus)}${th ? `<h3>Vergleich in ${label(th.state)}</h3><div class="backup">${backupText(m, cur.V, th.state, th.a)}\n${backupText(m, cur.V, th.state, th.b)}</div>` : ''}</div></div>`; }
@@ -356,6 +383,8 @@ function bind(m) {
       if (!ch.length) { P.done = true; P.log.push('Verbesserung: keine Änderung → optimal (Stoppkriterium).'); }
       else { P.log.push(`Verbesserung: ${ch.map(s => `${label(s)}: ${P.pol[s]} → ${np[s]}`).join(', ')}`); P.pol = np; P.phase = 'evaluate'; } }
     render(); };
+  document.querySelectorAll('[data-cmp]').forEach(el => el.onclick = () => { st.cmpPred = el.dataset.cmp; render(); });
+  if ($('cmp-again')) $('cmp-again').onclick = () => { st.cmpPred = null; render(); };
   if ($('preset')) $('preset').onclick = () => { st.pi = {pol: {...st.policy}, phase: 'evaluate', iter: 0, log: [], done: false}; render(); };
   if ($('commit')) $('commit').onclick = () => { const c = document.querySelector('input[name=opt]:checked'); if (!c) { alert('Bitte zuerst eine Vorhersage wählen.'); return; } st.choice = +c.value; st.stage = 1; render(); };
   if ($('simulate')) $('simulate').onclick = () => { st.stage = 2; render(); };
