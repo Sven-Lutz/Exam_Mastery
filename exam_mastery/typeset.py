@@ -838,6 +838,26 @@ LAYOUT_LINT_JS = r'''() => {
       out.inline_math_reflowed.push((m.getAttribute('aria-label') || m.textContent || '').slice(0, 80));
     }
   }
+  // B35 (V4 P1, textbook p. 49): a display formula wider than its block was silently clipped by an overflow-x:auto
+  // wrapper (in print a scroll area is just a cut-off). Over-wide display formulas are scaled down to the block width;
+  // below MIN_SCALE they would be unreadable and are reported as overflow (gate FAIL -> the author must break the line).
+  const MIN_SCALE = 0.72; out.display_math_scaled = []; out.clipped = [];
+  for (const m of document.querySelectorAll('mjx-container[display="true"]')) {
+    const svg = m.querySelector(':scope > svg'); if (!svg) continue;
+    const avail = box(m) ? box(m).clientWidth : m.clientWidth, w = svg.getBoundingClientRect().width;
+    if (avail > 0 && w > avail + 1) {
+      const scale = avail / w, label = (m.getAttribute('aria-label') || m.textContent || '').slice(0, 80);
+      svg.style.maxWidth = '100%'; svg.style.height = 'auto'; m.style.overflow = 'visible';
+      out.display_math_scaled.push({formula: label, scale: Math.round(scale * 100) / 100});
+      if (scale < MIN_SCALE) out.overflow.push({tag: 'mjx-container', cls: 'display-math-too-wide', scale: Math.round(scale * 100) / 100, formula: label});
+    }
+  }
+  // any remaining scroll/clip container whose content is wider than its box loses content on paper
+  for (const el of document.querySelectorAll('main *')) {
+    const ox = getComputedStyle(el).overflowX;
+    if ((ox === 'auto' || ox === 'scroll' || ox === 'hidden' || ox === 'clip') && el.scrollWidth > el.clientWidth + 2 && el.clientWidth > 0)
+      out.clipped.push({tag: el.tagName.toLowerCase(), cls: String(el.className).slice(0, 40), content: el.scrollWidth, box: el.clientWidth, text: (el.textContent || '').slice(0, 60)});
+  }
   const vw = document.documentElement.clientWidth;
   for (const el of document.querySelectorAll('figure, table, .ftx, .cmp, mjx-container[display="true"], svg')) {
     const r = el.getBoundingClientRect();

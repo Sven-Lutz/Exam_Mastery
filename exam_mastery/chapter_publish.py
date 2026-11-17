@@ -707,7 +707,7 @@ def _layout_lint(art, name):
     if not f.exists():
         return {'status': 'NOT_RUN'}
     d = json.loads(f.read_text(encoding='utf-8'))
-    d['status'] = 'FAIL' if d.get('overflow') or d.get('broken_images') else 'PASS'
+    d['status'] = 'FAIL' if d.get('overflow') or d.get('broken_images') or d.get('clipped') else 'PASS'
     pdf = Path(art) / f'{name}.pdf'
     if pdf.exists():                 # B33: near-empty pages (orphaned headings, spilled tiles, stranded rubrics); cover excluded
         import pymupdf

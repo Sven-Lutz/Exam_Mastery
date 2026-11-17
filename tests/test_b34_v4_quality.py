@@ -147,7 +147,7 @@ class Studio(unittest.TestCase):
         src = Path(mdp_studio.__file__).read_text()
         self.assertIn('Erst vorhersagen', src)
         self.assertIn('cmp-work-vi', src)
-        self.assertIn('Rechenoperationen', src)
+        self.assertIn('Multiplikationen', src)  # B35: counted under a declared cost model (was: estimated 'Rechenoperationen')
 
 
 if __name__ == '__main__':

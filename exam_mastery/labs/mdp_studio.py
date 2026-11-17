@@ -131,16 +131,18 @@ function model(s) {                                                          // 
   for (const t of st.transitions) { A[t.s].push(t.a); T[t.s + '|' + t.a] = {r: +t.r, next: Object.fromEntries(Object.entries(t.next).map(([k, v]) => [k, +v]))}; }
   return {S: s.states, A, T, g: +st.gamma};
 }
-const q = (m, V, s, a) => { const t = m.T[s + '|' + a]; let x = t.r; for (const [n, p] of Object.entries(t.next)) x += m.g * p * V[n]; return x; };
+const OPS = {mul: 0, cmp: 0};   // B35: instrumented counters (executed float multiplications/divisions; max-comparisons)
+const q = (m, V, s, a) => { const t = m.T[s + '|' + a]; let x = t.r; for (const [n, p] of Object.entries(t.next)) { x += m.g * p * V[n]; OPS.mul += 2; } return x; };
 function evaluate(m, pol) {                                                  // exact linear solve (Gauss-Jordan)
   const n = m.S.length, idx = Object.fromEntries(m.S.map((s, i) => [s, i])), M = m.S.map(() => Array(n + 1).fill(0));
   m.S.forEach((s, i) => { M[i][i] = 1; if (!m.A[s].length) return; const t = m.T[s + '|' + pol[s]]; M[i][n] += t.r;
-    for (const [k, p] of Object.entries(t.next)) M[i][idx[k]] -= m.g * p; });
+    for (const [k, p] of Object.entries(t.next)) { M[i][idx[k]] -= m.g * p; OPS.mul++; } });
   for (let c = 0; c < n; c++) { let p = c; for (let r = c; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
-    [M[c], M[p]] = [M[p], M[c]]; for (let r = 0; r < n; r++) if (r !== c && M[r][c] !== 0) { const f = M[r][c] / M[c][c]; for (let j = c; j <= n; j++) M[r][j] -= f * M[c][j]; } }
+    [M[c], M[p]] = [M[p], M[c]]; for (let r = 0; r < n; r++) if (r !== c && M[r][c] !== 0) { const f = M[r][c] / M[c][c]; OPS.mul++; for (let j = c; j <= n; j++) { M[r][j] -= f * M[c][j]; OPS.mul++; } } }
+  OPS.mul += n;
   return Object.fromEntries(m.S.map((s, i) => [s, M[i][n] / M[i][i]]));
 }
-function sweep(m, V, pol) { const W = {}; for (const s of m.S) W[s] = !m.A[s].length ? 0 : pol ? q(m, V, s, pol[s]) : Math.max(...m.A[s].map(a => q(m, V, s, a))); return W; }
+function sweep(m, V, pol) { const W = {}; for (const s of m.S) W[s] = !m.A[s].length ? 0 : pol ? q(m, V, s, pol[s]) : (OPS.cmp += m.A[s].length - 1, Math.max(...m.A[s].map(a => q(m, V, s, a)))); return W; }
 const greedy = (m, V, prev) => Object.fromEntries(m.S.filter(s => m.A[s].length).map(s => { const qs = m.A[s].map(a => q(m, V, s, a)), b = Math.max(...qs);
   return [s, prev && Math.abs(q(m, V, s, prev[s]) - b) < 1e-12 ? prev[s] : m.A[s][qs.findIndex(x => Math.abs(x - b) < 1e-12)]]; }));
 const norm = (U, V) => Math.max(...Object.keys(U).map(k => Math.abs(U[k] - V[k])));
@@ -284,36 +286,61 @@ function pi(m) {
   ${P.V ? qtable(m, V, P.pol, P.prev) : ''}<h3>Protokoll</h3><ol id="plog">${P.log.map(x => `<li>${x}</li>`).join('')}</ol></div>
   <div class="card">${draw(P.V || null, P.pol, st.focus)}</div></div>`; }
 function compare(m) {
-  // B34: both algorithms on the same model, measured against V* AND against the arithmetic they cost. A VI sweep is
-  // sum_s sum_a |succ(s,a)| multiply-adds; a PI step is an exact solve (~n^3/3 for Gauss) plus one improvement sweep.
+  // B35 (V4 P1): the V4 comparison set an ESTIMATED n^3/3 Gauss cost against COUNTED transitions, stopped VI with the
+  // oracle V* at 1e-6 but PI exactly, and called that "fair". Now: (1) both algorithms run with their own PRACTICAL
+  // stopping rule (no oracle), (2) cost = instrumented operations actually executed by this page's code under a
+  // declared cost model, (3) iterations, achieved accuracy and wall time are separate quantities, (4) V* is used only
+  // afterwards to MEASURE the error and is never counted as work. The verdict is derived from these numbers only.
   const o = optimal(m), S = m.S.filter(s => m.A[s].length), nA = S.reduce((x, s) => x + m.A[s].length, 0), n = m.S.length;
-  const sweepOps = S.reduce((x, s) => x + m.A[s].reduce((y, a) => y + Object.keys(m.T[s + '|' + a].next).length, 0), 0);
-  const solveOps = Math.round(n * n * n / 3 + n * n);
-  let V = zeros(m); const vi = [], viW = []; let k = 0, kPol = null, w = 0;
-  while (k < 400) { V = sweep(m, V); k++; w += sweepOps; const e = norm(V, o.V); vi.push(e); viW.push(w); const g = greedy(m, V);
-    if (kPol === null && S.every(s => q(m, o.V, s, g[s]) >= q(m, o.V, s, o.pol[s]) - 1e-9)) kPol = k; if (e < 1e-6) break; }
-  let pol = {...st.policy}; const pe = [], peW = [], rows = []; w = 0;
-  for (let it = 1; it <= 50; it++) { const Vp = evaluate(m, pol), e = norm(Vp, o.V); w += solveOps + sweepOps; pe.push(Math.max(e, 1e-12)); peW.push(w);
-    const np = greedy(m, Vp, pol), ch = S.filter(s => np[s] !== pol[s]);
-    rows.push(`<tr><td>${it}</td><td class="num">${e < 1e-12 ? '0' : e.toExponential(2)}</td><td class="num">${w}</td><td>${ch.length ? ch.map(s => `${label(s)}: ${pol[s]} → ${np[s]}`).join(', ') : 'keine → Stopp'}</td></tr>`);
+  const nnz = S.reduce((x, s) => x + m.A[s].reduce((y, a) => y + Object.keys(m.T[s + '|' + a].next).length, 0), 0);
+  const eps = 1e-6, g = m.g, thr = g > 0 ? eps * (1 - g) / (2 * g) : Infinity;
+  const isOpt = pol => S.every(s => q(m, o.V, s, pol[s]) >= q(m, o.V, s, o.pol[s]) - 1e-9);
+  const t0 = performance.now(); OPS.mul = 0; OPS.cmp = 0;
+  let V = zeros(m), k = 0, diff = Infinity; const viTrace = [];
+  while (k < 5000 && diff >= thr) { const W = sweep(m, V); diff = norm(W, V); V = W; k++; viTrace.push({k, mul: OPS.mul, V}); }
+  const viPol = greedy(m, V); const viOps = {...OPS}, viMs = performance.now() - t0;
+  const t1 = performance.now(); OPS.mul = 0; OPS.cmp = 0;
+  let pol = {...st.policy}, it = 0, Vp = null; const piTrace = [], rows = [];
+  while (it < 100) { Vp = evaluate(m, pol); it++; const np = greedy(m, Vp, pol); OPS.cmp += nA - S.length;
+    const ch = S.filter(s => np[s] !== pol[s]); piTrace.push({k: it, mul: OPS.mul, V: Vp});
+    rows.push(`<tr><td>${it}</td><td class="num">${OPS.mul}</td><td>${ch.length ? ch.map(s => `${label(s)}: ${pol[s]} → ${np[s]}`).join(', ') : 'keine → Stopp'}</td></tr>`);
     if (!ch.length) break; pol = np; }
-  const pred = st.cmpPred, viWork = viW[viW.length - 1], piWork = peW[peW.length - 1];
-  const ask = `<div class="card"><h2>Erst vorhersagen</h2><p>Beide Verfahren lösen dasselbe MDP (γ = ${fmt(m.g, 2)}, ${n} Zustände, ${nA} Zustand-Aktion-Paare). Welches braucht <b>weniger Rechenoperationen</b>, bis es \\(V^*\\) erreicht hat (VI: Fehler &lt; 10⁻⁶)?</p>
-    <div class="btns"><button class="b alt" data-cmp="vi">Wertiteration</button><button class="b alt" data-cmp="pi">Policy Iteration</button><button class="b alt" data-cmp="eq">etwa gleich</button></div>
-    <p class="msg info">Tipp: Zählen Sie nicht Iterationen. Ein VI-Sweep kostet hier ${sweepOps} Multiplikationen, eine PI-Iteration ein Gleichungssystem (≈ ${solveOps}) plus einen Verbesserungssweep (${sweepOps}).</p></div>`;
+  const piOps = {...OPS}, piMs = performance.now() - t1;
+  // measurement only (not counted): error of each iterate against the exact V*
+  const vi = viTrace.map(x => Math.max(norm(x.V, o.V), 1e-15)), pe = piTrace.map(x => Math.max(norm(x.V, o.V), 1e-15));
+  const viErr = vi[vi.length - 1], piErr = pe[pe.length - 1], viOk = isOpt(viPol), piOk = isOpt(pol);
+  const ratio = viOps.mul / piOps.mul, win = ratio < 0.8 ? 'vi' : ratio > 1.25 ? 'pi' : 'eq';
+  const pred = st.cmpPred, perVI = Math.round(viOps.mul / Math.max(k, 1)), perPI = Math.round(piOps.mul / Math.max(it, 1));
+  const name = {vi: 'die Wertiteration', pi: 'die Policy Iteration', eq: 'keines deutlich (Unterschied < 25 %)'};
+  const model = `<p class="msg info"><b>Kostenmodell (deklariert):</b> gezählt werden die von diesem Programm tatsächlich ausgeführten Gleitkomma-Multiplikationen und -Divisionen (je 1 Einheit). Nicht gezählt: Additionen, Speicherzugriffe, Vergleiche (separat ausgewiesen). Ein anderes Kostenmodell – etwa ein dünn besetzter Gleichungslöser oder Vektorisierung – kann das Ergebnis umkehren.</p>`;
+  const ask = `<div class="card"><h2>Erst vorhersagen</h2><p>Beide Verfahren lösen dasselbe MDP (γ = ${fmt(g, 2)}, ${n} Zustände, ${nA} Zustand-Aktion-Paare, ${nnz} Übergänge mit p &gt; 0). Jedes stoppt mit seiner <b>praktischen</b> Abbruchregel (ohne \\(V^*\\) zu kennen). Welches führt dabei <b>weniger Multiplikationen</b> aus?</p>
+    <div class="btns"><button class="b alt" data-cmp="vi">Wertiteration</button><button class="b alt" data-cmp="pi">Policy Iteration</button><button class="b alt" data-cmp="eq">etwa gleich (± 25 %)</button></div>
+    <p class="msg info">Überlegen Sie getrennt: Wie viele Iterationen braucht jedes Verfahren, und was kostet eine Iteration? Ein VI-Sweep berechnet für jedes Zustand-Aktion-Paar einen Erwartungswert; eine PI-Iteration löst ein lineares Gleichungssystem mit ${n} Unbekannten und macht dann einen Verbesserungssweep.</p>${model}</div>`;
   if (!pred) return `<div class="grid2">${ask}<div class="card">${draw(null, null, st.focus)}</div></div>`;
-  const win = viWork < piWork ? 'vi' : 'pi', right = pred === win;
+  const right = pred === win;
+  const why = win === 'eq' ? `Beide liegen innerhalb von 25 % (${viOps.mul} gegen ${piOps.mul}).`
+    : win === 'pi' ? `Eine PI-Iteration ist hier ${fmt(perPI / Math.max(perVI, 1), 1)}-mal so teuer wie ein VI-Sweep (${perPI} gegen ${perVI}), aber PI braucht nur ${it} statt ${k} Iterationen – der Faktor ${fmt(k / it, 1)} bei der Iterationszahl überwiegt.`
+    : `PI braucht zwar nur ${it} statt ${k} Iterationen, aber eine PI-Iteration kostet hier ${fmt(perPI / Math.max(perVI, 1), 1)}-mal so viel wie ein VI-Sweep (${perPI} gegen ${perVI}) – das Gleichungssystem überwiegt.`;
+  const caveat = !viOk ? ' Achtung: die VI-Policy beim Abbruch ist hier noch nicht optimal.' : '';
   return `<div class="grid2"><div class="card"><h2>Wertiteration und Policy Iteration im Vergleich</h2>
-  <p class="msg ${right ? 'ok' : 'bad'}" id="cmp-verdict">${right ? 'Ihre Vorhersage stimmt.' : 'Ihre Vorhersage stimmt nicht.'} Hier braucht <b>${win === 'vi' ? 'die Wertiteration' : 'die Policy Iteration'}</b> weniger Operationen (${Math.min(viWork, piWork)} gegen ${Math.max(viWork, piWork)}).</p>
+  <p class="msg ${right ? 'ok' : 'bad'}" id="cmp-verdict">${right ? 'Ihre Vorhersage stimmt.' : 'Ihre Vorhersage stimmt nicht.'} Weniger Multiplikationen braucht hier <b>${name[win]}</b>. ${why}${caveat}</p>
   <div class="eqs"><div><b>VI-Sweep</b> \\(V_{k+1}(s) = \\max_a \\big[r(s,a) + \\gamma \\sum_{s'} p(s'\\mid s,a) V_k(s')\\big]\\)</div><div><b>PI-Iteration</b> \\((I - \\gamma P_\\pi) V^\\pi = r_\\pi\\) lösen, dann \\(\\pi \\leftarrow \\arg\\max_a Q^\\pi(s,a)\\)</div></div>
-  <div class="kpi"><div><b id="cmp-vi">${k}</b><span>VI-Sweeps bis Fehler &lt; 10⁻⁶ (je ${sweepOps} Operationen)</span></div><div><b id="cmp-vipol">${kPol ?? '—'}</b><span>kleinstes k, ab dem die gierige Policy zu V<sub>k</sub> optimal ist</span></div>
-  <div><b id="cmp-pi">${pe.length}</b><span>PI-Iterationen (je ≈ ${solveOps + sweepOps} Operationen)</span></div>
-  <div><b id="cmp-work-vi">${viWork}</b><span>Operationen VI gesamt</span></div><div><b id="cmp-work-pi">${piWork}</b><span>Operationen PI gesamt</span></div></div>
-  <h3>Fehler über der geleisteten Arbeit</h3>${plotXY([{n: 'Wertiteration', x: viW, v: vi, c: '#0B6E6E'}, {n: 'Policy Iteration', x: peW, v: pe, c: '#B53A2C'}], 'Fehler ‖V − V*‖∞ (log)', 'Rechenoperationen (Multiplikationen, kumuliert)')}
-  <p class="msg info">Jetzt teilen beide Kurven eine Achse mit derselben Einheit, und der Vergleich ist fair. Bei wenigen Zuständen ist das Gleichungssystem billig und PI gewinnt oft; je mehr Zustände, desto teurer wird \\(n^3\\). Die VI-Policy ist oft lange vor den Werten optimal (Spalte k).</p>
-  <h3>Reflexion</h3><p>Setzen Sie im Modell γ = 0.99 und vergleichen Sie erneut: Welche Zahl wächst stark, welche kaum? Begründen Sie mit der Kontraktionsrate γ.</p>
+  <table id="cmp-table"><thead><tr><th>Größe</th><th class="num">Wertiteration</th><th class="num">Policy Iteration</th></tr></thead><tbody>
+  <tr><td>Abbruchregel (praktisch, ohne V*)</td><td>\\(\\|V_{k+1}-V_k\\|_\\infty &lt; \\varepsilon(1-\\gamma)/(2\\gamma)\\), ε = 10⁻⁶ – garantiert \\(\\|V_{k+1}-V^*\\|_\\infty &lt; \\varepsilon/2\\)</td><td>Policy ändert sich nicht mehr (exakt, bis auf Rundung)</td></tr>
+  <tr><td>Theoretische Kosten je Iteration</td><td class="num">O(|S|²|A|), dünn: O(Übergänge) = ${nnz}</td><td class="num">O(|S|³) Lösen + O(|S|²|A|) Verbessern</td></tr>
+  <tr><td>Iterationen</td><td class="num" id="cmp-vi">${k}</td><td class="num" id="cmp-pi">${it}</td></tr>
+  <tr><td>Instrumentierte Multiplikationen gesamt</td><td class="num" id="cmp-work-vi">${viOps.mul}</td><td class="num" id="cmp-work-pi">${piOps.mul}</td></tr>
+  <tr><td>… davon je Iteration (Mittel)</td><td class="num">${perVI}</td><td class="num">${perPI}</td></tr>
+  <tr><td>Vergleiche (max/argmax), nicht im Kostenmodell</td><td class="num">${viOps.cmp}</td><td class="num">${piOps.cmp}</td></tr>
+  <tr><td>Erreichter Fehler \\(\\|V-V^*\\|_\\infty\\) (nachträglich gemessen)</td><td class="num">${viErr.toExponential(1)}</td><td class="num">${piErr.toExponential(1)}</td></tr>
+  <tr><td>Policy beim Abbruch optimal?</td><td class="num">${viOk ? 'ja' : 'nein'}</td><td class="num">${piOk ? 'ja' : 'nein'}</td></tr>
+  <tr><td>Gemessene Laufzeit in diesem Browser (verrauscht)</td><td class="num">${viMs.toFixed(2)} ms</td><td class="num">${piMs.toFixed(2)} ms</td></tr></tbody></table>
+  <p class="msg info" id="cmp-accuracy">Die Verfahren enden <b>nicht</b> bei gleicher Genauigkeit: VI garantiert nur ε/2, PI liefert die exakte Lösung der Bewertungsgleichung. Wer gleiche Genauigkeit verlangt, muss VI weiterlaufen lassen; die Kurve unten zeigt, wie viel Arbeit jedes Verfahren für jede Fehlerschwelle bräuchte.</p>
+  ${model}
+  <h3>Fehler über instrumentierter Arbeit</h3>${plotXY([{n: 'Wertiteration', x: viTrace.map(x => x.mul), v: vi, c: '#0B6E6E'}, {n: 'Policy Iteration', x: piTrace.map(x => x.mul), v: pe, c: '#B53A2C'}], 'Fehler ‖V − V*‖∞ (log)', 'ausgeführte Multiplikationen (kumuliert)')}
+  <h3>Reflexion</h3><p>Setzen Sie im Modell γ = 0.99 und vergleichen Sie erneut: Welche Zeile der Tabelle ändert sich stark, welche kaum? Begründen Sie mit der Kontraktionsrate γ und der Abbruchschwelle \\(\\varepsilon(1-\\gamma)/(2\\gamma)\\).</p>
   <div class="btns"><button class="b warn" id="cmp-again">Neu vorhersagen</button></div></div>
-  <div class="card"><h3>Protokoll der Policy Iteration</h3><table><thead><tr><th>Nr.</th><th class="num">Fehler ‖V<sup>π</sup> − V*‖<sub>∞</sub></th><th class="num">Operationen</th><th>Policy-Änderungen</th></tr></thead><tbody>${rows.join('')}</tbody></table>
+  <div class="card"><h3>Protokoll der Policy Iteration</h3><table><thead><tr><th>Nr.</th><th class="num">Multiplikationen (kumuliert)</th><th>Policy-Änderungen</th></tr></thead><tbody>${rows.join('')}</tbody></table>
   ${draw(o.V, o.pol, st.focus)}</div></div>`; }
 function plotXY(series, ylab, xlab) {                               // B34: shared x axis only when the unit is shared (work)
   const W = 520, H = 210, L = 46, B = 28, all = series.flatMap(s => s.v).filter(v => v > 0), xs = series.flatMap(s => s.x);
