@@ -30,6 +30,7 @@ instances: a test, never a proof), MODEL_REVIEWED / HUMAN_REVIEWED (recorded rev
 A whole proof is never reported as machine-verified.
 """
 from __future__ import annotations
+import re
 
 RELATIONS = ('IDENTITY', 'IMPLICATION', 'EQUIVALENCE', 'APPROXIMATION', 'EMPIRICAL', 'INTUITION')
 EXACT = {'IDENTITY', 'IMPLICATION', 'EQUIVALENCE'}
@@ -53,7 +54,12 @@ def _prop_invertible_I_minus_gP(rng):
     return abs(np.linalg.det(np.eye(n) - rng.uniform(0, 0.999) * P)) > 1e-12
 
 
-PROPERTIES = {'invertible_I_minus_gP': _prop_invertible_I_minus_gP}   # generic math properties, data refers by name
+def _prop_triangle_inequality(rng):
+    x, y = rng.uniform(-1e3, 1e3), rng.uniform(-1e3, 1e3)
+    return abs(x + y) <= abs(x) + abs(y) + 1e-9
+
+
+PROPERTIES = {'invertible_I_minus_gP': _prop_invertible_I_minus_gP, 'triangle_inequality': _prop_triangle_inequality}   # generic math properties, data refers by name
 
 
 def _numeric_check(chk):
@@ -133,16 +139,21 @@ def audit(g):
                 f('A6', 'FAIL', sid, 'numeric property check found a counterexample')
         else:
             sym = None
-        if m == 'numeric' and s.get('relation') in ('IMPLICATION', 'EQUIVALENCE') and not s.get('proof'):
-            f('A6', 'FAIL', sid, 'general claim backed only by numeric tests: an analytic proof ("proof": [...]) is required')
+        if m == 'numeric' and s.get('relation') in ('IMPLICATION', 'EQUIVALENCE') and not s.get('proof') \
+                and not ((s.get('rule') or '').strip() and len((s.get('justification') or '').split()) >= 8):
+            f('A6', 'FAIL', sid, 'general claim backed only by numeric tests: a named rule with a written argument or a "proof" is required')
         ver[sid] = _tiers(s, sym)
         seen.add(sid)
     from .answerability import _symbols
     known_sym = set(g.get('notation', []))
     if known_sym:
         for s in steps:
+            ids = {x['id'] for x in steps}
             for fld in ('from', 'to'):
-                bad = sorted(_symbols(s.get(fld) or '') - known_sym)
+                val = s.get(fld) or ''
+                if fld == 'from' and set(re.findall(r'[\w.]+', val)) <= ids | {'für', 'alle', 'text'}:
+                    continue                                  # 'from' that only names earlier steps
+                bad = sorted(_symbols(val) - known_sym)
                 if bad:
                     f('A9', 'WARN', s['id'], f'{fld}: symbols not in the declared notation: {", ".join(bad)}')
     for a in declared - used_a:

@@ -1,0 +1,28 @@
+{
+ "id": "convergent-bounded",
+ "level": "standard",
+ "evidence_level": "AUTHOR_DERIVATION",
+ "claim": {"kind": "theorem", "statement": "\\exists M \\ge 0\\ \\forall n \\in \\mathbb{N}: |a_n| \\le M", "assumptions": ["A_conv"]},
+ "assumptions": {"A_conv": "(a_n) konvergiert gegen ein a \\in \\mathbb{R}."},
+ "definitions": {"D_conv": "a_n \\to a \\iff \\forall \\varepsilon > 0\\ \\exists N\\ \\forall n \\ge N: |a_n - a| < \\varepsilon",
+                 "D_bounded": "(a_n) beschränkt \\iff \\exists M\\ \\forall n: |a_n| \\le M"},
+ "notation": ["a", "n", "N", "M", "varepsilon"],
+ "steps": [
+  {"id": "s1", "relation": "IMPLICATION", "from": "a_n \\to a", "to": "\\exists N\\ \\forall n \\ge N: |a_n - a| < 1",
+   "rule": "Definition der Konvergenz mit \\varepsilon = 1", "uses_assumptions": ["A_conv"], "uses_definitions": ["D_conv"], "depends_on": [],
+   "justification": "Die Definition gilt für jedes positive ε, also insbesondere für ε = 1; das liefert ein N.",
+   "pitfall": "N hängt von ε ab; hier ist ε fest gewählt, deshalb ist N eine feste Zahl."},
+  {"id": "s2", "relation": "IMPLICATION", "from": "|a_n - a| < 1", "to": "|a_n| < 1 + |a| \\text{ für } n \\ge N",
+   "rule": "Dreiecksungleichung", "uses_assumptions": [], "uses_definitions": [], "depends_on": ["s1"],
+   "justification": "|a_n| = |(a_n − a) + a| ≤ |a_n − a| + |a| < 1 + |a| für alle n ≥ N nach s1.",
+   "check": {"method": "numeric", "property": "triangle_inequality", "trials": 500}},
+  {"id": "s3", "relation": "IMPLICATION", "from": "s2", "to": "\\exists M \\ge 0\\ \\forall n \\in \\mathbb{N}: |a_n| \\le M",
+   "rule": "Maximum endlich vieler Zahlen", "uses_assumptions": [], "uses_definitions": ["D_bounded"], "depends_on": ["s2"],
+   "justification": "Setze M = max(|a_1|, …, |a_{N−1}|, 1 + |a|). Das Maximum endlich vieler reeller Zahlen existiert; für n < N gilt |a_n| ≤ M direkt, für n ≥ N nach s2.",
+   "proof": [{"id": "s3.1", "statement": "n < N \\Rightarrow |a_n| \\le M", "because": "|a_n| ist einer der Werte im Maximum."},
+             {"id": "s3.2", "statement": "n \\ge N \\Rightarrow |a_n| < 1 + |a| \\le M", "because": "s2 und 1 + |a| ist einer der Werte im Maximum."}],
+   "pitfall": "Ohne die endlich vielen Anfangsglieder ist die Schranke nicht für alle n bewiesen."}
+ ],
+ "counterexamples": {"A_conv": "a_n = n ist unbeschränkt: Ohne Konvergenz gibt es kein N aus s1."},
+ "stronger_claims": [{"statement": "Jede beschränkte Folge konvergiert.", "counterexample": "a_n = (−1)^n ist beschränkt durch 1, konvergiert aber nicht: Die Bedingung ist notwendig, nicht hinreichend."}]
+}

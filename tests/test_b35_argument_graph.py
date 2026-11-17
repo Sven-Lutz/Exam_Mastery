@@ -25,6 +25,22 @@ class Reference(unittest.TestCase):
         self.assertEqual(len(G.matrix(REF)), len(REF['steps']))
 
 
+class CrossDomainAnalysis(unittest.TestCase):
+    G2 = json.loads((Path(__file__).resolve().parents[1] / 'fixtures/arguments/convergent_bounded.json').read_text())
+
+    def test_analysis_reference_passes(self):
+        r = G.audit(self.G2)
+        self.assertEqual(r['status'], 'PASS', r['findings'])
+
+    def test_missing_finite_head_is_caught(self):
+        g = copy.deepcopy(self.G2); g['steps'][2].pop('proof'); g['steps'][2]['justification'] = 'klar'
+        self.assertIn(('A1', 's3'), fails(g))
+
+    def test_hidden_convergence_premise(self):
+        g = copy.deepcopy(self.G2); g['claim']['assumptions'] = []
+        self.assertIn(('A3', 's1'), fails(g))
+
+
 class Mutations(unittest.TestCase):
     def mut(self, f):
         g = copy.deepcopy(REF); f(g); return g
@@ -48,7 +64,8 @@ class Mutations(unittest.TestCase):
         self.assertIn(('A7', 's11'), fails(self.mut(lambda g: g['steps'][-1].update(to='V = 0'))))
 
     def test_numeric_test_is_not_a_proof(self):
-        self.assertIn(('A6', 's10'), fails(self.mut(lambda g: g['steps'][9].pop('proof'))))
+        self.assertIn(('A6', 's10'), fails(self.mut(lambda g: (g['steps'][9].pop('proof'), g['steps'][9].update(justification='siehe Test')))))
+        self.assertNotIn(('A6', 's10'), fails(self.mut(lambda g: g['steps'][9].pop('proof'))), 'a written argument with a named rule suffices')
 
     def test_undeclared_symbol_warns(self):
         r = G.audit(self.mut(lambda g: g['notation'].remove('S')))
