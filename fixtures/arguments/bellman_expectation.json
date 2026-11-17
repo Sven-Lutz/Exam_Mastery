@@ -16,13 +16,13 @@
   ]
  },
  "assumptions": {
-  "A_bounded": "Belohnungen integrierbar beschränkt: sup_{s,a} E[|R_{t+1}| | S_t=s, A_t=a] ≤ R_max < ∞ (hinreichend; z. B. erfüllt bei |R| ≤ R_max).",
-  "A_gamma": "Diskont 0 \\le \\gamma < 1.",
-  "A_markov": "Markov-Eigenschaft: Verteilung von (S_{t+1}, R_{t+1}) hängt nur von (S_t, A_t) ab, nicht von der Vorgeschichte.",
-  "A_stationary": "Stationarität: π(a|s) und p(s',r|s,a) hängen nicht von t ab.",
+  "A_bounded": "Belohnungen integrierbar beschränkt: \\(\\sup_{s,a} \\mathbb{E}[|R_{t+1}| \\mid S_t=s, A_t=a] \\le R_{\\max} < \\infty\\) (hinreichend; erfüllt z. B. bei \\(|R| \\le R_{\\max}\\)).",
+  "A_gamma": "Diskont \\(0 \\le \\gamma < 1\\).",
+  "A_markov": "Markov-Eigenschaft: Die Verteilung von \\((S_{t+1}, R_{t+1})\\) hängt nur von \\((S_t, A_t)\\) ab, nicht von der Vorgeschichte.",
+  "A_stationary": "Stationarität: \\(\\pi(a \\mid s)\\) und \\(p(s^{\\prime}, r \\mid s, a)\\) hängen nicht von \\(t\\) ab.",
   "A_finite": "Endliche Zustands- und Aktionsmengen (für die Matrixform; vereinfachend).",
-  "A_markov_policy": "π ist eine stationäre Markov-Policy: P(A_t = a | S_0, A_0, …, S_t) = π(a | S_t) für alle t (Wahl nur nach dem aktuellen Zustand, zeitunabhängig).",
-  "A_start": "V^π(s) ist über den Start S_0 = s definiert (für jedes s; damit ist keine Bedingung auf ein Ereignis mit Wahrscheinlichkeit 0 nötig)."
+  "A_markov_policy": "\\(\\pi\\) ist eine stationäre Markov-Policy: \\(P(A_t = a \\mid S_0, A_0, \\ldots, S_t) = \\pi(a \\mid S_t)\\) für alle \\(t\\).",
+  "A_start": "\\(V^\\pi(s)\\) ist über den Start \\(S_0 = s\\) definiert (für jedes \\(s\\)); so wird nie auf ein Ereignis mit Wahrscheinlichkeit 0 bedingt."
  },
  "definitions": {
   "D_return": "G_t = \\sum_{k=0}^{\\infty} \\gamma^k R_{t+k+1}",
@@ -283,22 +283,22 @@
     {
      "id": "s10.1",
      "statement": "P_\\pi(s,s') \\ge 0,\\ \\sum_{s'} P_\\pi(s,s') = 1",
-     "because": "P_π(s,s′) = Σ_a π(a|s) p(s′|s,a) ist eine Mischung von Wahrscheinlichkeitsverteilungen (D_P, D_policy)."
+     "because": "\\(P_\\pi(s,s^{\\prime}) = \\sum_a \\pi(a\\mid s)\\, p(s^{\\prime}\\mid s,a)\\) ist eine Mischung von Wahrscheinlichkeitsverteilungen (D_P, D_policy)."
     },
     {
      "id": "s10.2",
      "statement": "\\|P_\\pi x\\|_\\infty \\le \\|x\\|_\\infty",
-     "because": "|Σ_{s′} P_π(s,s′) x(s′)| ≤ Σ_{s′} P_π(s,s′) |x(s′)| ≤ ‖x‖_∞ (Dreiecksungleichung, s10.1)."
+     "because": "\\(|\\sum_{s^{\\prime}} P_\\pi(s,s^{\\prime}) x(s^{\\prime})| \\le \\sum_{s^{\\prime}} P_\\pi(s,s^{\\prime}) |x(s^{\\prime})| \\le \\|x\\|_\\infty\\) (Dreiecksungleichung, s10.1)."
     },
     {
      "id": "s10.3",
      "statement": "(I-\\gamma P_\\pi)x = 0 \\Rightarrow \\|x\\|_\\infty \\le \\gamma\\|x\\|_\\infty",
-     "because": "Aus x = γP_π x folgt ‖x‖ = γ‖P_π x‖ ≤ γ‖x‖ (s10.2)."
+     "because": "Aus \\(x = \\gamma P_\\pi x\\) folgt \\(\\|x\\| = \\gamma\\|P_\\pi x\\| \\le \\gamma\\|x\\|\\) (s10.2)."
     },
     {
      "id": "s10.4",
      "statement": "x = 0",
-     "because": "(1−γ)‖x‖_∞ ≤ 0 und 1−γ > 0 (A_gamma) erzwingen ‖x‖_∞ = 0."
+     "because": "\\((1-\\gamma)\\|x\\|_\\infty \\le 0\\) und \\(1-\\gamma > 0\\) erzwingen \\(\\|x\\|_\\infty = 0\\)."
     },
     {
      "id": "s10.5",
@@ -306,7 +306,7 @@
      "because": "Endlich-dimensional (A_finite): injektiv ⇔ surjektiv (Rangsatz)."
     }
    ],
-   "remark": "Zusätzlich gilt (I − γP_π)^{-1} = Σ_k γ^k P_π^k (Neumann-Reihe, konvergent wegen ‖γP_π‖_∞ = γ < 1) – das ist genau die iterative Policy Evaluation."
+   "remark": "Zusätzlich gilt \\((I-\\gamma P_\\pi)^{-1} = \\sum_{k \\ge 0} \\gamma^k P_\\pi^k\\) (Neumann-Reihe, konvergent wegen \\(\\|\\gamma P_\\pi\\|_\\infty = \\gamma < 1\\)) – das ist genau die iterative Policy-Bewertung."
   },
   {
    "id": "s11",
@@ -324,13 +324,13 @@
   }
  ],
  "counterexamples": {
-  "A_gamma": "γ = 1, ein Zustand mit Selbstschleife und Belohnung 1: G_t = ∞; I − P = 0 ist singulär.",
-  "A_bounded": "NICHT NOTWENDIG (hinreichend): Es genügt sup_{s,a} E|R_{t+1}| < ∞ (z. B. exponentialverteilte Belohnung mit Mittel 1 ergibt V = 1/(1−γ)). Notwendig ist Integrierbarkeit: Ein Zustand mit Selbstschleife und Cauchy-verteilter Belohnung (stationär, Markov) hat E|R| = ∞ – dann ist V nicht definiert.",
-  "A_markov": "Belohnung 1 genau dann, wenn der VORIGE Zustand B war: E[G_{t+1} | S_{t+1}=s'] hängt dann von S_t ab, Schritt s5 ist falsch.",
-  "A_stationary": "Unendlicher Horizont, aber zeitabhängige Policy: in geraden Schritten Aktion a, in ungeraden b. Dann hängt E[G_t | S_t = s] von der Parität von t ab, Schritt s6 ist falsch (V wäre keine Funktion von s allein).",
-  "A_finite": "NICHT NOTWENDIG: für abzählbares S mit beschränkten Belohnungen gilt die Gleichung weiter (Summen werden Reihen, ‖·‖_∞ auf beschränkten Funktionen). Die Annahme dient nur der Matrixschreibweise.",
-  "A_markov_policy": "Policy, die die vorige Aktion wiederholt: E[G_{t+1} | S_t, A_t, S_{t+1}] hängt dann von A_t ab, Schritt s5 ist falsch.",
-  "A_start": "Ohne Startdefinition ist E[G_t | S_t = s] für einen von S_0 aus unerreichbaren Zustand s undefiniert (Bedingung auf ein Nullereignis)."
+  "A_gamma": "\\(\\gamma = 1\\), ein Zustand mit Selbstschleife und Belohnung 1: \\(G_t = \\infty\\), und \\(I - P = 0\\) ist singulär.",
+  "A_bounded": "Nicht notwendig (hinreichend): Es genügt \\(\\sup_{s,a} \\mathbb{E}|R_{t+1}| < \\infty\\), etwa exponentialverteilte Belohnungen mit Mittel 1 und \\(V = 1/(1-\\gamma)\\). Notwendig ist Integrierbarkeit: Ein Zustand mit Selbstschleife und Cauchy-verteilter Belohnung hat \\(\\mathbb{E}|R| = \\infty\\) – dann ist \\(V\\) nicht definiert.",
+  "A_markov": "Belohnung 1 genau dann, wenn der vorige Zustand B war: \\(\\mathbb{E}[G_{t+1} \\mid S_{t+1}=s^{\\prime}]\\) hängt dann von \\(S_t\\) ab; Schritt 5 ist falsch.",
+  "A_stationary": "Unendlicher Horizont, aber zeitabhängige Policy (in geraden Schritten Aktion a, in ungeraden b): \\(\\mathbb{E}[G_t \\mid S_t = s]\\) hängt von der Parität von \\(t\\) ab; Schritt 6 ist falsch.",
+  "A_finite": "Nicht notwendig: Für abzählbares \\(\\mathcal{S}\\) mit beschränkten Belohnungen gilt die Gleichung weiter (Summen werden Reihen, \\(\\|\\cdot\\|_\\infty\\) auf beschränkten Funktionen). Die Annahme dient nur der Matrixschreibweise.",
+  "A_markov_policy": "Eine Policy, die die vorige Aktion wiederholt: \\(\\mathbb{E}[G_{t+1} \\mid S_t, A_t, S_{t+1}]\\) hängt dann von \\(A_t\\) ab; Schritt 5 ist falsch.",
+  "A_start": "Ohne Startdefinition ist \\(\\mathbb{E}[G_t \\mid S_t = s]\\) für einen unerreichbaren Zustand \\(s\\) undefiniert (Bedingung auf ein Nullereignis)."
  },
  "notation": [
   "G",
