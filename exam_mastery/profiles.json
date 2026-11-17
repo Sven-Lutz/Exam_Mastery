@@ -33,7 +33,7 @@
     ],
     "calculate": [
      "worked_example",
-     "practice_calculation"
+     "practice_task"
     ],
     "optimize": [
      "worked_example"
@@ -157,7 +157,7 @@
      "complexity_statement"
     ],
     "test": [
-     "practice_calculation"
+     "practice_task"
     ]
    },
    "validators": [
@@ -310,11 +310,11 @@
    },
    "requires": {
     "explain": [
-     "intuition"
+     "intuition|worked_example"
     ],
     "apply": [
      "worked_example",
-     "practice_calculation"
+     "practice_task"
     ],
     "transfer": [
      "transfer_task"
@@ -389,5 +389,5 @@
    "claim_types": []
   }
  ],
- "machine_rule": "B35: \"signals\" are cue patterns (regex, case-insensitive, German+English) that SUGGEST an operation from an objective text; declared operations always win and are merged, never replaced. \"requires\" lists didactic components per operation; \"validators\" names engine checks that must have run; \"claim_types\" are the evidence types the pack produces."
+ "machine_rule": "B35: \"signals\" are cue patterns (regex, case-insensitive, German+English) that SUGGEST an operation from an objective text; declared operations always win and are merged, never replaced. \"requires\" lists didactic components per operation; \"validators\" names engine checks that must have run; \"claim_types\" are the evidence types the pack produces. A requirement \"a|b\" is met by either component (no single mandatory block form)."
 }

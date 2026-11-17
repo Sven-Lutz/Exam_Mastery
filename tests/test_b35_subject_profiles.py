@@ -50,7 +50,7 @@ class V4Finding(unittest.TestCase):
         r = SP.coverage(json.loads(V4.read_text()))
         self.assertGreaterEqual(r['operation_flattened'], 20)
         self.assertLess(r['linked_share'], 0.5)
-        self.assertTrue(any('practice_calculation' in o['missing'] for o in r['objectives']))
+        self.assertTrue(any('practice_task' in o['missing'] for o in r['objectives']))
 
 
 if __name__ == '__main__':

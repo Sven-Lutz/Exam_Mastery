@@ -28,7 +28,7 @@ COMPONENTS = {
     'derivation': {'blocks': {'derivation', 'proof'}},
     'counterexample': {'blocks': {'counterexample'}, 'box_kinds': {'counterexample', 'limit'}, 'text': r'Gegenbeispiel|counterexample'},
     'worked_example': {'blocks': {'example', 'worked_example'}},
-    'practice_calculation': {'items': {'CALCULATE', 'DERIVE', 'APPLY', 'PROVE'}},
+    'practice_task': {'items': {'CALCULATE', 'DERIVE', 'APPLY', 'PROVE', 'SUBSUME', 'IMPLEMENT', 'ANALYZE'}},
     'intuition': {'blocks': {'intuition', 'figtext'}},
     'comparison': {'blocks': {'compare', 'table'}},
     'limits': {'box_kinds': {'limit'}, 'text': r'Grenzen|limitation'},
@@ -38,8 +38,8 @@ COMPONENTS = {
     'justified_answer': {'items': {'EXPLAIN', 'JUSTIFY', 'ARGUE'}},
     'retrieval_card': {'cards': True},
     'lab_task': {'labs': True},
-    'case_solution': {'blocks': {'case', 'case_solution'}},
-    'norm_text': {'blocks': {'norm'}},
+    'case_solution': {'blocks': {'case', 'case_solution'}, 'items': {'SUBSUME', 'CASE', 'DIAGNOSE'}},
+    'norm_text': {'blocks': {'norm', 'law'}, 'box_kinds': {'law', 'norm'}},
     'competing_views': {'blocks': {'debate', 'competing_views'}},
     'uncertainty_note': {'box_kinds': {'uncertainty'}},
     'guideline_reference': {'blocks': {'guideline'}},
@@ -88,13 +88,19 @@ def _inventory(book):
     blocks = [b for s in book.get('sections', []) for b in s.get('blocks', [])]
     text = ' '.join(json.dumps(b, ensure_ascii=False) for b in blocks)
     items = [i for st in book.get('stages', []) for i in (st.get('items') or [])]
-    return {'types': {b.get('type') for b in blocks}, 'box_kinds': {b.get('kind') for b in blocks if b.get('type') == 'box'},
+    return {'blocks': blocks, 'types': {b.get('type') for b in blocks}, 'box_kinds': {b.get('kind') for b in blocks if b.get('type') == 'box'},
             'text': text, 'items': items, 'cards': bool(book.get('cards')), 'labs': bool(book.get('lab_requests'))}
 
 
 def _present(comp, inv, kc):
+    if '|' in comp:                                  # alternatives: the strongest evidence among them counts
+        got = [_present(c, inv, kc) for c in comp.split('|')]
+        return 'LINKED' if 'LINKED' in got else 'UNLINKED' if 'UNLINKED' in got else 'MISSING'
     spec = COMPONENTS.get(comp, {})
     if spec.get('items') and any(kc in (i.get('kc_keys') or []) and (i.get('operation') or '').upper() in spec['items'] for i in inv['items']):
+        return 'LINKED'
+    if any(kc in (b.get('kc_ids') or b.get('kc_keys') or []) and (b.get('type') in spec.get('blocks', set())
+           or (b.get('type') == 'box' and b.get('kind') in spec.get('box_kinds', set()))) for b in inv['blocks']):
         return 'LINKED'
     hit = (spec.get('blocks', set()) & inv['types'] or spec.get('box_kinds', set()) & inv['box_kinds']
            or (spec.get('text') and re.search(spec['text'], inv['text'], re.I))
