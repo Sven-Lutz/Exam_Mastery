@@ -222,7 +222,7 @@ function backupText(m, V, s, a) { const t = m.T[s + '|' + a]; let parts = [], su
   return `Q(${label(s)}, ${a}) = r + γ·Σ p·V(s')\n          = ${fmt(t.r, 2)} + ${fmt(m.g, 2)}·(${parts.join(' + ')})\n          = ${fmt(sum, 4)}`; }
 
 /* ---------- views ---------- */
-const MODES = [['start', 'Start'], ['model', 'Modell'], ['policy', 'Policy-Explorer'], ['vi', 'Wertiteration'], ['pi', 'Policy Iteration'], ['compare', 'VI vs. PI'], ['gamma', 'Diskont γ'], ['tasks', 'Aufgaben']];
+const MODES = [['start', 'Start'], ['model', 'Modell'], ['policy', 'Policy-Explorer'], ['vi', 'Wertiteration'], ['pi', 'Policy Iteration'], ['compare', 'VI vs. PI'], ['gamma', 'Diskont γ'], ['tasks', 'Aufgaben'], ['seq', 'Lernsequenzen']];
 function reset(keepModel) {
   if (!keepModel) st = {mode: st && st.mode, gamma: +sc.gamma, transitions: JSON.parse(JSON.stringify(sc.transitions || []))};
   const m = model(sc); st.policy = Object.fromEntries(m.S.filter(s => m.A[s].length).map(s => [s, (sc.policy && sc.policy[s]) || m.A[s][0]]));
@@ -232,7 +232,7 @@ function reset(keepModel) {
 function setScenario(i) { sc = D.scenarios[i]; reset(false);
   document.querySelectorAll('nav.sc button').forEach((b, j) => b.setAttribute('aria-pressed', i === j)); render(); }
 function setMode(id) { st.mode = id; document.querySelectorAll('nav.md button').forEach(b => b.setAttribute('aria-selected', b.dataset.m === id)); render(); }
-function render() { const m = model(sc), v = $('view'); v.innerHTML = ({start, model: modelView, policy, vi, pi, compare, gamma, tasks})[st.mode || 'start'](m); bind(m); if (window.MathJax && MathJax.typeset) MathJax.typeset(); }
+function render() { const m = model(sc), v = $('view'); v.innerHTML = ({start, model: modelView, policy, vi, pi, compare, gamma, tasks, seq: seqView})[st.mode || 'start'](m); bind(m); if (window.MathJax && MathJax.typeset) MathJax.typeset(); }
 function start(m) {
   return `<div class="grid2"><div><div class="card"><h2>${sc.title}</h2><p class="lead">${sc.intro || ''}</p>
   <h3>So arbeiten Sie mit dem Studio</h3><ol><li><b>Modell</b>: Zustände, Aktionen, Belohnungen und Übergänge ansehen (und begrenzt verändern).</li>
@@ -381,8 +381,13 @@ function gamma(m) {
   <div class="card">${draw(cur.V, cur.pol, th ? th.state : st.focus)}${th ? `<h3>Vergleich in ${label(th.state)}</h3><div class="backup">${backupText(m, cur.V, th.state, th.a)}\n${backupText(m, cur.V, th.state, th.b)}</div>` : ''}</div></div>`; }
 function tasks(m) {
   const T = sc.challenges || []; if (!T.length) return '<div class="card">Keine Aufgaben für dieses Szenario.</div>';
+  // B35: these challenges carry a FIXED answer written for the original model; after a model edit they are evaluated
+  // on the original model (stated visibly) instead of judging the learner against a stale answer.
+  const edited = JSON.stringify(st.transitions || []) !== JSON.stringify(sc.transitions || []) || +st.gamma !== +sc.gamma;
+  if (edited) { const keep = [st.transitions, st.gamma]; st.transitions = sc.transitions || []; st.gamma = +sc.gamma; m = model(sc); [st.transitions, st.gamma] = keep; }
   const t = T[st.task], stage = st.stage;
   return `<div class="grid2"><div class="card"><h2>Aufgabe ${st.task + 1} von ${T.length}: ${t.title}</h2><div class="steps4"><span class="${stage === 0 ? 'on' : ''}">Vorhersagen</span><span class="${stage === 1 ? 'on' : ''}">Erkunden</span><span class="${stage === 2 ? 'on' : ''}">Erklären</span><span class="${stage === 3 ? 'on' : ''}">Prüfen</span></div>
+  ${edited ? '<p class="msg info" id="tasks-orig">Sie haben das Modell verändert. Diese Aufgaben beziehen sich auf das <b>Originalmodell</b> der Vorlesung; Aufgaben, die sich mit Ihrem Modell mitrechnen, finden Sie unter „Lernsequenzen“.</p>' : ''}
   <p><b>${t.q}</b></p><div class="opts" role="radiogroup">${t.options.map((o, i) => `<label><input type="radio" name="opt" value="${i}" ${st.choice === i ? 'checked' : ''} ${stage ? 'disabled' : ''}> ${o}</label>`).join('')}</div>
   <div class="btns">${stage === 0 ? '<button class="b" id="commit">Vorhersage festlegen</button>' : ''}${stage === 1 ? '<button class="b" id="simulate">Simulation ausführen</button>' : ''}${stage >= 2 ? `<button class="b alt" id="next">Nächste Aufgabe</button>` : ''}</div>
   <div id="fb">${stage >= 2 ? `<p class="msg ${st.choice === t.answer ? 'ok' : 'bad'}">${st.choice === t.answer ? 'Ihre Vorhersage stimmt.' : 'Ihre Vorhersage stimmt nicht – das ist der interessante Fall: Woran lag es?'} Richtig: <b>${t.options[t.answer]}</b></p><p>${t.explain}</p>${t.transfer ? `<p class="msg info"><b>Transfer:</b> ${t.transfer}</p>` : ''}` : ''}</div></div>
@@ -419,6 +424,13 @@ function bind(m) {
     render(); };
   document.querySelectorAll('[data-cmp]').forEach(el => el.onclick = () => { st.cmpPred = el.dataset.cmp; render(); });
   if ($('cmp-again')) $('cmp-again').onclick = () => { st.cmpPred = null; render(); };
+  document.querySelectorAll('[data-seq]').forEach(el => el.onclick = () => { st.seq = el.dataset.seq; render(); });
+  const sqp = () => st.sp[st.seq];
+  if ($('sq-check')) $('sq-check').onclick = () => seqCheck(m);
+  if ($('sq-next')) $('sq-next').onclick = () => { const p = sqp(), sq = D.sequences.find(x => x.id === st.seq); const s0 = sq.steps[p.i];
+    if (s0.kind === 'worked_example') p.solved[s0.id] = true; p.i = Math.min(p.i + 1, sq.steps.length - 1); p.fb = ''; render(); };
+  if ($('sq-hint')) $('sq-hint').onclick = () => { const p = sqp(), id = D.sequences.find(x => x.id === st.seq).steps[p.i].id; p.shown[id] = (p.shown[id] || 0) + 1; p.hints++; render(); };
+  if ($('sq-g')) $('sq-g').oninput = () => { st.sqg = +$('sq-g').value; render(); };
   if ($('preset')) $('preset').onclick = () => { st.pi = {pol: {...st.policy}, phase: 'evaluate', iter: 0, log: [], done: false}; render(); };
   if ($('commit')) $('commit').onclick = () => { const c = document.querySelector('input[name=opt]:checked'); if (!c) { alert('Bitte zuerst eine Vorhersage wählen.'); return; } st.choice = +c.value; st.stage = 1; render(); };
   if ($('simulate')) $('simulate').onclick = () => { st.stage = 2; render(); };
@@ -436,7 +448,12 @@ setScenario(0); setMode('start');
 def page(scenarios, title, course, back_link='../index.html', mathjax='../../assets/tex-svg-full.js'):
     for s in scenarios:
         validate(s)
-    data = json.dumps({'scenarios': scenarios}, ensure_ascii=False).replace('</', '<\\/')
+    from .mdp_sequences import SEQUENCES, SEQ_JS, RUNTIME
+    from .task_model import validate as _vt
+    bad = [f for q in SEQUENCES for f in _vt(q, RUNTIME)]
+    if bad:
+        raise StudioError(f'learning sequences violate the task model: {bad}')
+    data = json.dumps({'scenarios': scenarios, 'sequences': SEQUENCES}, ensure_ascii=False).replace('</', '<\\/')
     return (f'<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             f'<title>{E(title)}</title><style>{CSS}</style>'
             '<script>window.MathJax={tex:{inlineMath:[["\\\\(","\\\\)"]]},svg:{fontCache:"global"}};</script>'
@@ -444,4 +461,4 @@ def page(scenarios, title, course, back_link='../index.html', mathjax='../../ass
             f'<header><div><h1>{E(title)}</h1><div class="sub">{E(course)} · alle Rechnungen im Browser, exakt aus dem Modell</div></div><nav class="sc" aria-label="Szenario"></nav></header>'
             f'<nav class="md" role="tablist" aria-label="Arbeitsmodus"></nav><main id="view" aria-live="polite"></main>'
             f'<footer><a href="{E(back_link)}">← Zur Lernumgebung</a> · Zahlen im Kursformat (Dezimalpunkt). Modelle aus der Vorlesung bzw. als selbst entworfene Übung gekennzeichnet.</footer>'
-            f'<script type="application/json" id="studio-data">{data}</script><script>{JS}</script></body></html>')
+            f'<script type="application/json" id="studio-data">{data}</script><script>{SEQ_JS}{JS}</script></body></html>')
