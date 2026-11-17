@@ -147,3 +147,21 @@ class ReviewFindings(unittest.TestCase):
         self.assertEqual(A.audit_card(A.card_view(c), examples=ex)['ANSWERABILITY']['status'], 'FAIL')
         c['context'] = A.example_line(c, ex)
         self.assertNotEqual(A.audit_card(A.card_view(c), examples=ex)['ANSWERABILITY']['status'], 'FAIL')
+
+
+NLP = Path.home() / 'Exam_Mastery_Output/reference_units/nlp_sequence_labeling/nlp-sequence-labeling.apkg'
+
+
+@unittest.skipUnless(NLP.exists(), 'NLP deck not present')
+class ForeignDeckFormat(unittest.TestCase):
+    """Consumed holdout: current Anki package format (zstd, schema 18) with a foreign note type must be readable."""
+    def test_reads_and_audits(self):
+        v = A.views_from_apkg(NLP)
+        self.assertEqual(len(v), 50); self.assertEqual(len({x['key'] for x in v}), 50)
+        self.assertTrue(all(A._text(x['front']) for x in v))
+        r = A.audit_deck(v)
+        self.assertLessEqual(len(r['blocking']), 2)
+
+    def test_imperative_and_formula_answers_not_blocked(self):
+        self.assertEqual(status(card('Fehler finden: „Die Ausgabeschicht hat 5 Parameter.“'), 'QUESTION_VALIDITY'), 'PASS')
+        self.assertNotIn('mapsto', A._symbols(r'k_j \mapsto k_j + u'))

@@ -49,6 +49,9 @@ _CONVENTION = re.compile(r'\b(Vorlesung|Skript|Lehrbuch|Kurs|Konvention|Definiti
                          r'|§§?\s*\d+|\bArt\.\s*\d+', re.I)                                          # statute anchors
 _TWO_TARGETS = re.compile(r'\?[^?]*\b(Schreiben|Nennen|Geben|Begründen|Erklären|Zeigen|Berechnen|Skizzieren) Sie\b|'
                           r'\s[–-]\s*und\s+(welche|warum|wie|was|wann|wo)\b|\?\s*(?:Write|Name|Give|Explain|Show|Compute) ', re.I)
+_IMPERATIVE = re.compile(r'^\s*(?:[\w-]+\s+)?(?:finden|bestimmen|berechnen|nennen|zeigen|beweisen|erklären|korrigieren|ordnen|ergänzen|skizzieren)\b[^.]*:|'
+                         r'\b(?:Bestimmen|Berechnen|Nennen|Zeigen|Beweisen|Erklären|Korrigieren|Ordnen|Ergänzen|Skizzieren|Begründen|Geben) Sie\b|'
+                         r'^\s*(?:find|determine|compute|name|show|prove|explain|correct|identify|fix)\b', re.I)
 _THIS = re.compile(r'\b(this|that|these|those)\s+(?!is\b|are\b|means?\b|way\b|case\b)[a-z]{3,}', re.I)
 _MATH = re.compile(r'\\\((.*?)\\\)|\\\[(.*?)\\\]', re.S)
 _NUM = re.compile(r'(?<![A-Za-z_\\])\d+(?:[.,]\d+)?')
@@ -60,16 +63,18 @@ def _text(s):
     return re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', s or '')).strip()
 
 
+_GREEK_NAMES = {'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'varepsilon', 'zeta', 'eta', 'theta', 'vartheta', 'iota', 'kappa', 'lambda',
+                'mu', 'nu', 'xi', 'pi', 'rho', 'sigma', 'tau', 'upsilon', 'phi', 'varphi', 'chi', 'psi', 'omega',
+                'Gamma', 'Delta', 'Theta', 'Lambda', 'Xi', 'Pi', 'Sigma', 'Phi', 'Psi', 'Omega'}
+
+
 def _symbols(tex):
-    """Single-letter / Greek identifiers used in a TeX fragment (without commands like \\frac, \\max)."""
-    tex = re.sub(r'\\text\{[^}]*\}', ' ', tex)
-    t = re.sub(r'\\(?:frac|max|min|sum|prod|mathbb|mathcal|operatorname|text|mathrm|left|right|big|Big|cdot|le|ge|leq|geq|'
-               r'mid|in|to|infty|ldots|dots|sup|inf|lim|log|exp|arg|quad|qquad|lVert|rVert|Vert|tag|hat|bar|tilde|sqrt|'
-               r'mathbf|boldsymbol|approx|neq|ne|sim|forall|exists|subseteq|subset|cup|cap|times|circ|star|ast|prime)(?![A-Za-z])', ' ', tex)
-    greek = set(re.findall(r'\\([a-zA-Z]+)', t))
-    t = re.sub(r'\\[a-zA-Z]+', ' ', t)
-    t = re.sub(r'_\{[^}]*\}|_\w|\^\{[^}]*\}|\^\w', ' ', t)               # sub/superscripts are indices, not new symbols
-    t = re.sub(r'\\text\{[^}]*\}', ' ', t)
+    """Single-letter identifiers and Greek letters in a TeX fragment. Every other command (\\mapsto, \\partial, \\top,
+    \\operatorname{..}, \\mathrm{..}, \\text{..}) is notation, not a symbol to be defined; sub/superscripts are indices."""
+    tex = re.sub(r'\\(?:text|mathrm|operatorname|mathbf|mathit|textrm)\{[^}]*\}', ' ', tex)
+    greek = {g for g in re.findall(r'\\([a-zA-Z]+)', tex) if g in _GREEK_NAMES}
+    t = re.sub(r'\\[a-zA-Z]+', ' ', tex)
+    t = re.sub(r'_\{[^}]*\}|_\w|\^\{[^}]*\}|\^\w', ' ', t)
     return {*(re.findall(r'(?<![^\W\d_])[A-Za-z](?![^\W\d_])', t)), *greek}
 
 
@@ -153,14 +158,17 @@ def audit_card(v, notation=frozenset(), examples=None):
     # QUESTION_VALIDITY
     if v['kind'] != 'cloze':
         q = _MATH.sub('X', _text(front)).count('?')
-        if q == 0:
-            flag('QUESTION_VALIDITY', 'FAIL', 'no question on the front')
+        if q == 0 and not _IMPERATIVE.search(_MATH.sub('X', _text(front))):
+            flag('QUESTION_VALIDITY', 'FAIL', 'no question or task on the front')
         elif q > 1:
             flag('QUESTION_VALIDITY', 'FAIL', f'{q} questions on one card')
         elif _TWO_TARGETS.search(_MATH.sub(' ', _text(front))):
             flag('QUESTION_VALIDITY', 'FAIL', 'two retrieval targets on one card (question plus a second task)')
-    ans = _content_words(_MATH.sub(' ', _text(v['answer'])))          # leak = the answer adds nothing the front lacks
-    if v['kind'] != 'cloze' and ans and len(ans) <= 12 and not (ans - _content_words(seen_plain)):
+    at = _text(v['answer'])                                           # leak = a verbal answer that adds no token the front lacks
+    tok = lambda x: set(re.findall(r'[^\W_]+(?:-[^\W_]+)*', x.lower()))
+    ans = _content_words(_MATH.sub(' ', at))
+    if v['kind'] != 'cloze' and len(ans) >= 1 and len(ans) <= 12 and not _MATH.search(at) and not re.search(r'\d', at) \
+            and not (tok(at) - tok(seen_plain) - _STOP):
         flag('QUESTION_VALIDITY', 'FAIL', 'answer is already given on the front')
     if not _text(v['answer']) and v['kind'] != 'cloze':
         flag('QUESTION_VALIDITY', 'FAIL', 'no answer')
@@ -228,18 +236,46 @@ def views_from_apkg(path):
     d = Path(tempfile.mkdtemp())
     with zipfile.ZipFile(path) as z:
         z.extractall(d)
-    db = sqlite3.connect(d / ('collection.anki21' if (d / 'collection.anki21').exists() else 'collection.anki2'))
-    media = json.loads((d / 'media').read_text() or '{}') if (d / 'media').exists() else {}
-    have = set(media.values())
-    models = json.loads(db.execute('select models from col').fetchone()[0])
+    col = d / 'collection.anki21'
+    if (d / 'collection.anki21b').exists():                     # newer packages: zstd-compressed collection
+        import shutil, subprocess
+        col = d / 'collection.unzstd'
+        try:
+            import zstandard
+            col.write_bytes(zstandard.ZstdDecompressor().decompress((d / 'collection.anki21b').read_bytes(), max_output_size=1 << 30))
+        except ImportError:
+            if not shutil.which('zstd'):
+                raise RuntimeError('collection.anki21b needs the zstandard module or the zstd CLI')
+            subprocess.run(['zstd', '-d', '-q', '-f', str(d / 'collection.anki21b'), '-o', str(col)], check=True)
+    elif not col.exists():
+        col = d / 'collection.anki2'
+    db = sqlite3.connect(col)
+    db.create_collation('unicase', lambda x, y: (x.lower() > y.lower()) - (x.lower() < y.lower()))   # Anki's collation (schema 18+)
+    try:
+        media = json.loads((d / 'media').read_text(encoding='utf-8') or '{}') if (d / 'media').exists() else {}
+        have = set(media.values())
+    except (UnicodeDecodeError, ValueError):                    # zstd/protobuf media map: existence not checkable here
+        have = None
+    raw = db.execute('select models from col').fetchone()[0]
+    if raw:                                                     # legacy schema: note types as JSON in col
+        models = json.loads(raw)
+    else:                                                       # schema 18+: notetypes / fields tables
+        models, rows = {}, db.execute('select ntid, ord, name from fields').fetchall()   # no WHERE: the index uses Anki's own collation
+        for ntid, o, n in sorted(rows):
+            models.setdefault(str(ntid), {'flds': []})['flds'].append({'name': n})
     out = []
-    for mid, flds in db.execute('select mid, flds from notes'):
-        names = [f['name'] for f in models[str(mid)]['flds']]
+    first = lambda f, *names: next((f[n] for n in names if f.get(n)), '')
+    for mid, guid, flds in db.execute('select mid, guid, flds from notes'):
+        names = [x['name'] for x in models[str(mid)]['flds']]
         f = dict(zip(names, flds.split('\x1f')))
-        front = f.get('Front', f.get('Text', ''))
-        imgs = re.findall(r'<img[^>]+src="([^"]+)"', front + f.get('Context', ''))
-        out.append({'key': f.get('Key', '?'), 'kind': 'cloze' if 'Text' in f else (f.get('Kind') or ''), 'kind_label': f.get('Kind', ''),
-                    'front': front, 'context': f.get('Context', ''), 'answer': f.get('Answer', f.get('Extra', '')),
-                    'explanation': f.get('Explanation', ''), 'front_has_image': bool(imgs), 'image_ok': all(i in have for i in imgs),
+        # field aliases of common note types (engine, Anki basic/cloze, other generators); the template itself is not parsed
+        front = first(f, 'Front', 'Prompt', 'Text', 'Question', 'Frage', 'Vorderseite')
+        context = first(f, 'Context', 'Kontext')
+        media = first(f, 'DiagramMedia', 'Image')                 # ASSUMPTION: a filled media field is shown on the question side
+        imgs = re.findall(r'<img[^>]+src="([^"]+)"', front + context + media)
+        cloze = 'Text' in f and not f.get('Front') and '{{c' in (f.get('Text') or '')
+        out.append({'key': first(f, 'Key', 'StableID') or guid, 'kind': 'cloze' if cloze else (f.get('Kind') or ''), 'kind_label': f.get('Kind', ''),
+                    'front': front, 'context': context, 'answer': first(f, 'Answer', 'CanonicalAnswer', 'Back', 'Extra', 'Back Extra', 'Antwort', 'Rückseite'),
+                    'explanation': first(f, 'Explanation', 'Why'), 'front_has_image': bool(imgs or media), 'image_ok': True if have is None else all(i in have for i in imgs),
                     'source': f.get('Source', ''), 'check': None, 'defines': []})
     return out
