@@ -8,7 +8,8 @@ from exam_mastery.chapter_publish import _layout_lint
 
 V4_STEP3 = (r'\|T^\pi V-T^\pi V^\pi\|_\infty\le\gamma\|V-V^\pi\|_\infty\le\gamma\big(\|V-V^*\|_\infty+\|V^*-V^\pi\|_\infty\big)'
             r'\le\gamma\varepsilon+\gamma\|V^*-V^\pi\|_\infty')
-ABSURD = r'+'.join(f'a_{{{i}}}x^{{{i}}}' for i in range(60))   # cannot be shown readably on one line
+ABSURD = r'\frac{' + '+'.join(f'a_{{{i}}}x^{{{i}}}' for i in range(60)) + '}{b}'   # one fraction: no legal break point
+LONG_SUM = 'S=' + '+'.join(f'a_{{{i}}}x^{{{i}}}' for i in range(40))           # breakable only at top-level +
 
 
 def _render(tex):
@@ -29,10 +30,17 @@ def _render(tex):
 class PrintClipping(unittest.TestCase):
     def test_v4_p49_formula_fits_text_block(self):
         lint, right, pw, d = _render(V4_STEP3)
-        self.assertTrue(lint['display_math_scaled'], 'the over-wide V4 formula must be detected')
+        self.assertTrue(lint['display_math_broken'], 'the over-wide V4 formula must be detected and broken')
+        self.assertTrue(lint['display_math_broken'][0]['fits'])
+        self.assertEqual(lint['display_math_scaled'], [], 'line breaking first; scaling is only the fallback')
         self.assertEqual(lint['clipped'], [])
         self.assertLessEqual(right, pw - 16 / 25.4 * 72 + 1, 'formula ink must stay inside the right margin')
         self.assertEqual(_layout_lint(d, 'x')['status'] in ('PASS', 'WARN'), True)
+
+    def test_long_sum_breaks_at_plus(self):
+        lint, right, pw, d = _render(LONG_SUM)
+        self.assertTrue(lint['display_math_broken'] and lint['display_math_broken'][0]['lines'] >= 2)
+        self.assertEqual([o for o in lint['overflow'] if o.get('cls') == 'display-math-too-wide'], [])
 
     def test_unreadably_wide_formula_fails_gate(self):
         lint, _, _, d = _render(ABSURD)

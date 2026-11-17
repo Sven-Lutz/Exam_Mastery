@@ -839,14 +839,46 @@ LAYOUT_LINT_JS = r'''() => {
     }
   }
   // B35 (V4 P1, textbook p. 49): a display formula wider than its block was silently clipped by an overflow-x:auto
-  // wrapper (in print a scroll area is just a cut-off). Over-wide display formulas are scaled down to the block width;
-  // below MIN_SCALE they would be unreadable and are reported as overflow (gate FAIL -> the author must break the line).
-  const MIN_SCALE = 0.72; out.display_math_scaled = []; out.clipped = [];
-  for (const m of document.querySelectorAll('mjx-container[display="true"]')) {
-    const svg = m.querySelector(':scope > svg'); if (!svg) continue;
-    const avail = box(m) ? box(m).clientWidth : m.clientWidth, w = svg.getBoundingClientRect().width;
-    if (avail > 0 && w > avail + 1) {
-      const scale = avail / w, label = (m.getAttribute('aria-label') || m.textContent || '').slice(0, 80);
+  // wrapper (in print a scroll area is just a cut-off). Repair order: (1) re-set the formula as an aligned block,
+  // breaking only at TOP-LEVEL relations (=, \le, \Rightarrow ...) and, if still needed, at top-level + / -; never
+  // inside braces, \left..\right or brackets. (2) Only if no break fits: scale, down to MIN_SCALE. (3) Below that the
+  // formula is reported as overflow (gate FAIL -> the author must restructure the equation).
+  const MIN_SCALE = 0.85; out.display_math_scaled = []; out.display_math_broken = []; out.clipped = [];
+  const REL = ['\\Longrightarrow', '\\Leftrightarrow', '\\Rightarrow', '\\leq', '\\geq', '\\le', '\\ge', '\\approx', '\\equiv', '=', '<', '>'];
+  const cuts = (tex, ops) => { const at = []; let d = 0;
+    for (let i = 0; i < tex.length; i++) { const c = tex[i];
+      if (c === '\\') { const w = (tex.slice(i).match(/^\\[A-Za-z]+/) || [tex.slice(i, i + 2)])[0];
+        if (w === '\\left') d++; else if (w === '\\right') { d--; i += w.length; continue; }
+        if (d === 0 && ops.includes(w) && i > 0) at.push(i);
+        i += w.length - 1; continue; }
+      if ('{(['.includes(c)) d++; else if ('})]'.includes(c)) d--;
+      else if (d === 0 && i > 0 && ops.includes(c)) { const prev = tex.slice(0, i).trimEnd().slice(-1);
+        if ('+-'.includes(c) ? /[A-Za-z0-9})\]]/.test(prev) : true) at.push(i); } }
+    return at; };
+  const breakTex = (tex, ratio) => {
+    if (/\\begin|\\\\|\\tag/.test(tex)) return null;
+    for (const ops of [REL, [...REL, '+', '-']]) {
+      const at = cuts(tex, ops); if (!at.length) continue;
+      const seg = [0, ...at, tex.length].slice(0, -1).map((x, i, a) => tex.slice(x, i + 1 < a.length ? a[i + 1] : tex.length));
+      const budget = Math.max(12, Math.floor(tex.length * ratio * 0.92)); const lines = [[seg[0]]]; let len = seg[0].length;
+      for (const s of seg.slice(1)) { if (len + s.length > budget && lines[lines.length - 1].length > (lines.length === 1 ? 1 : 0)) { lines.push([]); len = 0; } lines[lines.length - 1].push(s); len += s.length; }
+      if (lines.length < 2) continue;
+      const first = lines[0][0] + ' &' + lines[0].slice(1).join(' ');
+      const rest = lines.slice(1).map(l => '&' + (REL.some(r => l[0].trimStart().startsWith(r)) ? '' : '\\quad ') + l.join(' '));
+      return '\\begin{aligned}' + [first, ...rest].join(' \\\\ ') + '\\end{aligned}'; }
+    return null; };
+  const doc = window.MathJax && MathJax.startup && MathJax.startup.document;
+  for (let m of [...document.querySelectorAll('mjx-container[display="true"]')]) {
+    let svg = m.querySelector(':scope > svg'); if (!svg) continue;
+    const avail = box(m) ? box(m).clientWidth : m.clientWidth; let w = svg.getBoundingClientRect().width;
+    if (!(avail > 0 && w > avail + 1)) continue;
+    const label = (m.getAttribute('aria-label') || m.textContent || '').slice(0, 80);
+    const item = doc && doc.getMathItemsWithin(m.parentElement).find(x => x.typesetRoot === m);
+    const nt = item && breakTex(item.math, avail / w);
+    if (nt) { try { const n = MathJax.tex2svg(nt, {display: true}); m.replaceWith(n); m = n; svg = m.querySelector(':scope > svg');
+        w = svg.getBoundingClientRect().width; out.display_math_broken.push({formula: label, lines: nt.split('\\\\').length, fits: w <= avail + 1}); } catch (e) { } }
+    if (w > avail + 1) {
+      const scale = avail / w;
       svg.style.maxWidth = '100%'; svg.style.height = 'auto'; m.style.overflow = 'visible';
       out.display_math_scaled.push({formula: label, scale: Math.round(scale * 100) / 100});
       if (scale < MIN_SCALE) out.overflow.push({tag: 'mjx-container', cls: 'display-math-too-wide', scale: Math.round(scale * 100) / 100, formula: label});
