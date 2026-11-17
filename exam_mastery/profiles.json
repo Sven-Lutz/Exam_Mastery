@@ -1,16 +1,393 @@
 {
-  "schema": "skill-pack-registry-v1",
-  "rule": "Choose skills by reasoning operations and evidence requirements, never by a closed list of course names. Unknown operations are allowed and must be documented as capability gaps.",
-  "packs": [
-    {"id":"formal-mathematics","operations":["derive","prove","calculate","optimize"],"methods":["explicit assumptions and domains","proof obligations and boundary cases","symbolic and numerical cross-checks"],"quality_gate":"Each conclusion follows from named premises; no hidden division by zero or missing edge cases."},
-    {"id":"legal-reasoning","operations":["subsume","interpret","apply-law","argue"],"methods":["norm hierarchy and as-of-date","elements and legal consequences","fact-to-element subsumption","competing interpretations","case citations and exceptions"],"quality_gate":"No legal claim without precise relevant authority and effective-date review."},
-    {"id":"clinical-reasoning","operations":["diagnose","treat","triage","interpret-evidence"],"methods":["differential diagnosis","guideline and evidence levels","red flags, uncertainty and escalation","independent medical review"],"quality_gate":"Never issue clinical-ready materials without verified current medical sources and qualified review."},
-    {"id":"computational-reasoning","operations":["implement","debug","test","analyze-complexity"],"methods":["executable examples and unit tests","complexity and invariant proofs","negative cases and error-handling","reproducible environments"],"quality_gate":"Run tests on all claimed executable code; distinguish implementation failure from methodological failure."},
-    {"id":"empirical-research","operations":["infer","estimate","analyze-data","critique-study"],"methods":["design and population","sampling and biases","effect size and uncertainty","correlation versus causation","reproducibility"],"quality_gate":"No unsupported causal inferences or invented statistics."},
-    {"id":"economic-modeling","operations":["calculate","compare","optimize","value-decision"],"methods":["decision assumptions","counterfactual scenarios","cashflow and sensitivity analysis","unit consistency","opportunity costs"],"quality_gate":"All numerical scenarios checked with independent reference values."},
-    {"id":"conceptual-interpretative","operations":["interpret","compare","argue","critique","synthesize"],"methods":["explicit premises and claims","represent opposing interpretations fairly","case-grounded examples","argument maps","counterarguments"],"quality_gate":"No fabricated author intent, quotation, historical claims or empirical evidence."},
-    {"id":"instructional-design","operations":["explain","teach","apply","transfer"],"methods":["intuition followed by formalization","worked examples then faded guidance","misconception diagnosis","unassisted transfer","scaffolding calibrated to prerequisites"],"quality_gate":"Each claimed competency matches an actually demanded performance."},
-    {"id":"flashcard-engineering","operations":["retrieve","recognize","differentiate"],"methods":["one retrieval target per card","stable first-field identity","card-specific explanation","tested mobile templates"],"quality_gate":"No redundant cards, generic explanations or untested Anki-client claims."},
-    {"id":"interactive-learning","operations":["experiment","simulate","predict","diagnose"],"methods":["prediction before feedback","valid model boundaries and reference fixtures","transfer variation","explain why no lab when unnecessary"],"quality_gate":"All provided controls produce validated, finite outputs; no fake simulation."}
-  ]
+ "schema": "skill-pack-registry-v2",
+ "rule": "Choose skills by reasoning operations and evidence requirements, never by a closed list of course names. Unknown operations are allowed and must be documented as capability gaps.",
+ "packs": [
+  {
+   "id": "formal-mathematics",
+   "operations": [
+    "derive",
+    "prove",
+    "calculate",
+    "optimize"
+   ],
+   "methods": [
+    "explicit assumptions and domains",
+    "proof obligations and boundary cases",
+    "symbolic and numerical cross-checks"
+   ],
+   "quality_gate": "Each conclusion follows from named premises; no hidden division by zero or missing edge cases.",
+   "signals": {
+    "prove": "\\bbeweis|\\bprove|\\bproof",
+    "derive": "herleit|\\bderive|aufstellen",
+    "calculate": "berechn|ausrechn|durchrechn|\\bcompute|\\bcalculate|lösen\\b|\\bsolve",
+    "optimize": "optimal|maximier|minimier|optimi"
+   },
+   "requires": {
+    "prove": [
+     "theorem_statement",
+     "proof",
+     "counterexample"
+    ],
+    "derive": [
+     "derivation"
+    ],
+    "calculate": [
+     "worked_example",
+     "practice_calculation"
+    ],
+    "optimize": [
+     "worked_example"
+    ]
+   },
+   "validators": [
+    "argument_graph",
+    "derivation_check",
+    "numeric_checks"
+   ],
+   "claim_types": [
+    "MATHEMATICAL"
+   ]
+  },
+  {
+   "id": "legal-reasoning",
+   "operations": [
+    "subsume",
+    "interpret",
+    "apply-law",
+    "argue"
+   ],
+   "methods": [
+    "norm hierarchy and as-of-date",
+    "elements and legal consequences",
+    "fact-to-element subsumption",
+    "competing interpretations",
+    "case citations and exceptions"
+   ],
+   "quality_gate": "No legal claim without precise relevant authority and effective-date review.",
+   "signals": {
+    "subsume": "subsumi|tatbestand|anspruch(?:sgrundlage)?\\b",
+    "apply-law": "§\\s*\\d|\\bart\\.\\s*\\d|\\bgesetz(?:es)?\\b|\\bverordnung",
+    "interpret": "\\bauslegen|\\bauslegung"
+   },
+   "requires": {
+    "subsume": [
+     "case_solution",
+     "norm_text"
+    ],
+    "apply-law": [
+     "norm_text"
+    ],
+    "interpret": [
+     "competing_views"
+    ]
+   },
+   "validators": [
+    "evidence_registry"
+   ],
+   "claim_types": [
+    "NORMATIVE_LEGAL"
+   ]
+  },
+  {
+   "id": "clinical-reasoning",
+   "operations": [
+    "diagnose",
+    "treat",
+    "triage",
+    "interpret-evidence"
+   ],
+   "methods": [
+    "differential diagnosis",
+    "guideline and evidence levels",
+    "red flags, uncertainty and escalation",
+    "independent medical review"
+   ],
+   "quality_gate": "Never issue clinical-ready materials without verified current medical sources and qualified review.",
+   "signals": {
+    "diagnose": "diagnos|differential",
+    "treat": "therapi|behandl",
+    "interpret-evidence": "sensitivit|spezifit|leitlinie"
+   },
+   "requires": {
+    "diagnose": [
+     "case_solution",
+     "uncertainty_note"
+    ],
+    "treat": [
+     "guideline_reference",
+     "uncertainty_note"
+    ],
+    "interpret-evidence": [
+     "worked_example"
+    ]
+   },
+   "validators": [
+    "evidence_registry"
+   ],
+   "claim_types": [
+    "CLINICAL"
+   ]
+  },
+  {
+   "id": "computational-reasoning",
+   "operations": [
+    "implement",
+    "debug",
+    "test",
+    "analyze-complexity"
+   ],
+   "methods": [
+    "executable examples and unit tests",
+    "complexity and invariant proofs",
+    "negative cases and error-handling",
+    "reproducible environments"
+   ],
+   "quality_gate": "Run tests on all claimed executable code; distinguish implementation failure from methodological failure.",
+   "signals": {
+    "implement": "implementier|programmier|\\bcode\\b|pseudocode|algorithmus .*angeben|\\balgorithm",
+    "analyze-complexity": "laufzeit|komplexit|aufwand|complexity|runtime",
+    "test": "\\btest"
+   },
+   "requires": {
+    "implement": [
+     "algorithm",
+     "worked_example"
+    ],
+    "analyze-complexity": [
+     "complexity_statement"
+    ],
+    "test": [
+     "practice_calculation"
+    ]
+   },
+   "validators": [
+    "numeric_checks"
+   ],
+   "claim_types": [
+    "ALGORITHMIC"
+   ]
+  },
+  {
+   "id": "empirical-research",
+   "operations": [
+    "infer",
+    "estimate",
+    "analyze-data",
+    "critique-study"
+   ],
+   "methods": [
+    "design and population",
+    "sampling and biases",
+    "effect size and uncertainty",
+    "correlation versus causation",
+    "reproducibility"
+   ],
+   "quality_gate": "No unsupported causal inferences or invented statistics.",
+   "signals": {
+    "infer": "schätz|inferenz|signifikan|estimate",
+    "analyze-data": "daten|messung|experiment|\\bdata\\b",
+    "critique-study": "studie|studiendesign|bias"
+   },
+   "requires": {
+    "infer": [
+     "uncertainty_note",
+     "worked_example"
+    ],
+    "analyze-data": [
+     "worked_example"
+    ],
+    "critique-study": [
+     "competing_views"
+    ]
+   },
+   "validators": [
+    "evidence_registry"
+   ],
+   "claim_types": [
+    "EMPIRICAL",
+    "BENCHMARK"
+   ]
+  },
+  {
+   "id": "economic-modeling",
+   "operations": [
+    "calculate",
+    "compare",
+    "optimize",
+    "value-decision"
+   ],
+   "methods": [
+    "decision assumptions",
+    "counterfactual scenarios",
+    "cashflow and sensitivity analysis",
+    "unit consistency",
+    "opportunity costs"
+   ],
+   "quality_gate": "All numerical scenarios checked with independent reference values.",
+   "signals": {
+    "value-decision": "kapitalwert|barwert|\\bnpv\\b|cashflow|unternehmensbewertung|investitionsentscheid|rendite",
+    "compare": "szenari|alternativ(?:en)? .*(?:kosten|nutzen)|kosten-nutzen"
+   },
+   "requires": {
+    "value-decision": [
+     "worked_example",
+     "sensitivity"
+    ],
+    "compare": [
+     "comparison"
+    ]
+   },
+   "validators": [
+    "numeric_checks",
+    "derivation_check"
+   ],
+   "claim_types": [
+    "EMPIRICAL"
+   ]
+  },
+  {
+   "id": "conceptual-interpretative",
+   "operations": [
+    "interpret",
+    "compare",
+    "argue",
+    "critique",
+    "synthesize"
+   ],
+   "methods": [
+    "explicit premises and claims",
+    "represent opposing interpretations fairly",
+    "case-grounded examples",
+    "argument maps",
+    "counterarguments"
+   ],
+   "quality_gate": "No fabricated author intent, quotation, historical claims or empirical evidence.",
+   "signals": {
+    "interpret": "deuten|interpretier|einordn",
+    "argue": "begründ|argumentier|\\bargue|\\bjustify",
+    "critique": "kritisch|grenzen|limit",
+    "compare": "unterscheid|vergleich|abgrenz"
+   },
+   "requires": {
+    "interpret": [
+     "intuition"
+    ],
+    "argue": [
+     "justified_answer"
+    ],
+    "critique": [
+     "limits"
+    ],
+    "compare": [
+     "comparison"
+    ]
+   },
+   "validators": [],
+   "claim_types": [
+    "INTERPRETATION"
+   ]
+  },
+  {
+   "id": "instructional-design",
+   "operations": [
+    "explain",
+    "teach",
+    "apply",
+    "transfer"
+   ],
+   "methods": [
+    "intuition followed by formalization",
+    "worked examples then faded guidance",
+    "misconception diagnosis",
+    "unassisted transfer",
+    "scaffolding calibrated to prerequisites"
+   ],
+   "quality_gate": "Each claimed competency matches an actually demanded performance.",
+   "signals": {
+    "explain": "erklär|erläuter|explain",
+    "apply": "anwend|\\bapply",
+    "transfer": "transfer|übertrag|neue[nmrs]? (?:problem|situation)"
+   },
+   "requires": {
+    "explain": [
+     "intuition"
+    ],
+    "apply": [
+     "worked_example",
+     "practice_calculation"
+    ],
+    "transfer": [
+     "transfer_task"
+    ]
+   },
+   "validators": [],
+   "claim_types": []
+  },
+  {
+   "id": "flashcard-engineering",
+   "operations": [
+    "retrieve",
+    "recognize",
+    "differentiate"
+   ],
+   "methods": [
+    "one retrieval target per card",
+    "stable first-field identity",
+    "card-specific explanation",
+    "tested mobile templates"
+   ],
+   "quality_gate": "No redundant cards, generic explanations or untested Anki-client claims.",
+   "signals": {
+    "retrieve": "\\bnennen|wiedergeben|definier|\\bstate\\b|\\brecall"
+   },
+   "requires": {
+    "retrieve": [
+     "retrieval_card"
+    ]
+   },
+   "validators": [
+    "answerability"
+   ],
+   "claim_types": [
+    "DEFINITIONAL"
+   ]
+  },
+  {
+   "id": "interactive-learning",
+   "operations": [
+    "experiment",
+    "simulate",
+    "predict",
+    "diagnose"
+   ],
+   "methods": [
+    "prediction before feedback",
+    "valid model boundaries and reference fixtures",
+    "transfer variation",
+    "explain why no lab when unnecessary"
+   ],
+   "quality_gate": "All provided controls produce validated, finite outputs; no fake simulation.",
+   "signals": {
+    "predict": "vorhersag|\\bpredict",
+    "simulate": "simulier|\\bsimulat",
+    "experiment": "experimentier|variier|parameter"
+   },
+   "requires": {
+    "predict": [
+     "lab_task"
+    ],
+    "simulate": [
+     "lab_task"
+    ],
+    "experiment": [
+     "lab_task"
+    ]
+   },
+   "validators": [
+    "lab_task_model"
+   ],
+   "claim_types": []
+  }
+ ],
+ "machine_rule": "B35: \"signals\" are cue patterns (regex, case-insensitive, German+English) that SUGGEST an operation from an objective text; declared operations always win and are merged, never replaced. \"requires\" lists didactic components per operation; \"validators\" names engine checks that must have run; \"claim_types\" are the evidence types the pack produces."
 }
