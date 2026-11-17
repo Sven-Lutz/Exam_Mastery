@@ -185,7 +185,8 @@ def apply(book, ed):
             tot = sum(i['points'] for i in items)
             ex = {k: v for k, v in op.items() if k not in ('op', 'items')}
             ex.update(items=items, total_points=tot)
-            ex.setdefault('header', [['Punkte', f'{tot:g}'], ['Bearbeitungszeit', f'{op["minutes"]:g} Minuten' if op.get('minutes') else 'keine Vorgabe'],
+            from .exam_quality import header_time           # B35: the time always carries its calibration status
+            ex.setdefault('header', [['Punkte', f'{tot:g}'], ['Bearbeitungszeit', header_time(op)],
                                      ['Hilfsmittel', op.get('aids', 'keine')]])
             if op.get('label'):          # B34: several independent mock exams; `exam` stays the first one
                 b.setdefault('exams', []).append(ex)
