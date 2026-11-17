@@ -306,6 +306,12 @@ function compare(m) {
     rows.push(`<tr><td>${it}</td><td class="num">${OPS.mul}</td><td>${ch.length ? ch.map(s => `${label(s)}: ${pol[s]} → ${np[s]}`).join(', ') : 'keine → Stopp'}</td></tr>`);
     if (!ch.length) break; pol = np; }
   const piOps = {...OPS}, piMs = performance.now() - t1;
+  // modelled cost (closed form, dense worst case) - shown NEXT TO the instrumented count, never instead of it.
+  // VI: 2 mul per (s,a,s') per sweep + one extraction sweep. PI per iteration: assembly <= nnz, dense Gauss-Jordan
+  // sum_c (n-1)(1 + n+1-c) + n final divisions, improvement sweep 2*nnz. Instrumented counts are lower when the
+  // elimination skips zero entries.
+  const gj = n => { let t = n; for (let c = 0; c < n; c++) t += (n - 1) * (1 + (n + 1 - c)); return t; };
+  const modelVI = (k + 1) * 2 * nnz, modelPI = it * (gj(n) + 3 * nnz);
   // measurement only (not counted): error of each iterate against the exact V*
   const vi = viTrace.map(x => Math.max(norm(x.V, o.V), 1e-15)), pe = piTrace.map(x => Math.max(norm(x.V, o.V), 1e-15));
   const viErr = vi[vi.length - 1], piErr = pe[pe.length - 1], viOk = isOpt(viPol), piOk = isOpt(pol);
@@ -328,6 +334,7 @@ function compare(m) {
   <table id="cmp-table"><thead><tr><th>Größe</th><th class="num">Wertiteration</th><th class="num">Policy Iteration</th></tr></thead><tbody>
   <tr><td>Abbruchregel (praktisch, ohne V*)</td><td>\\(\\|V_{k+1}-V_k\\|_\\infty &lt; \\varepsilon(1-\\gamma)/(2\\gamma)\\), ε = 10⁻⁶ – garantiert \\(\\|V_{k+1}-V^*\\|_\\infty &lt; \\varepsilon/2\\)</td><td>Policy ändert sich nicht mehr (exakt, bis auf Rundung)</td></tr>
   <tr><td>Theoretische Kosten je Iteration</td><td class="num">O(|S|²|A|), dünn: O(Übergänge) = ${nnz}</td><td class="num">O(|S|³) Lösen + O(|S|²|A|) Verbessern</td></tr>
+  <tr><td>Modellierte Kosten (geschlossene Formel, dichte Worst-Case-Obergrenze)</td><td class="num" id="cmp-model-vi">${modelVI}</td><td class="num" id="cmp-model-pi">${modelPI}</td></tr>
   <tr><td>Iterationen</td><td class="num" id="cmp-vi">${k}</td><td class="num" id="cmp-pi">${it}</td></tr>
   <tr><td>Instrumentierte Multiplikationen gesamt</td><td class="num" id="cmp-work-vi">${viOps.mul}</td><td class="num" id="cmp-work-pi">${piOps.mul}</td></tr>
   <tr><td>… davon je Iteration (Mittel)</td><td class="num">${perVI}</td><td class="num">${perPI}</td></tr>

@@ -52,14 +52,17 @@ class Comparison(unittest.TestCase):
             pg.click('nav.md button[data-m="compare"]'); pg.click('[data-cmp="eq"]')
             k = int(pg.inner_text('#cmp-vi')); ops = int(pg.inner_text('#cmp-work-vi'))
             it = int(pg.inner_text('#cmp-pi')); pops = int(pg.inner_text('#cmp-work-pi'))
+            mvi = int(pg.inner_text('#cmp-model-vi')); mpi = int(pg.inner_text('#cmp-model-pi'))
             verdict = pg.inner_text('#cmp-verdict'); table = pg.inner_text('#cmp-table'); b.close()
+        self.assertGreaterEqual(mvi, ops, 'model is an upper bound of the instrumented VI count')
+        self.assertGreaterEqual(mpi, pops, 'model is an upper bound of the instrumented PI count')
         self.assertEqual(errs, [])
         self.assertEqual((k, ops), (k_py, ops_py), 'VI iterations/operations must equal the independent count')
         self.assertGreater(pops, 0); self.assertGreaterEqual(it, 1)
         win = 'Wertiteration' if ops / pops < 0.8 else 'Policy Iteration' if ops / pops > 1.25 else 'keines deutlich'
         self.assertIn(win, verdict)
         self.assertIn(str(k), verdict); self.assertIn(str(it), verdict)
-        for row in ('Abbruchregel', 'Theoretische Kosten', 'Iterationen', 'Instrumentierte', 'Erreichter Fehler', 'Laufzeit'):
+        for row in ('Abbruchregel', 'Theoretische Kosten', 'Modellierte Kosten', 'Iterationen', 'Instrumentierte', 'Erreichter Fehler', 'Laufzeit'):
             self.assertIn(row, table)
 
 
