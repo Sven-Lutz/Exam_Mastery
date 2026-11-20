@@ -137,7 +137,7 @@ def test_commit_injected_replace_error_restores_every_original_byte(monkeypatch,
     failed = []
 
     def fail_once(source, target):
-        if target == tmp_path / "Anki.apkg" and not failed:
+        if target == tmp_path / "Interaktiv" / "index.html" and not failed:
             failed.append(True)
             raise OSError("Injected commit failure")
         return original_replace(source, target)
