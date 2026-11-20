@@ -204,3 +204,14 @@ def test_browser_prediction_gates_and_interaction(tmp_path):
             assert all(x.startswith("file://") for x in requests), requests
         finally:
             browser.close()
+
+
+def test_checked_in_synthetic_fixture_produces_real_offline_html(tmp_path):
+    from pathlib import Path
+    fixture = Path(__file__).resolve().parents[1] / "fixtures" / "experience_reference.json"
+    unit = json.loads(fixture.read_text(encoding="utf-8"))
+    assert unit["source_mode"] == "synthetic"
+    assert ex.validate(unit)["valid"]
+    r = ir.publish(unit, tmp_path)
+    assert r["status"] == "CREATED_OR_UPDATED"
+    assert (tmp_path / "Interaktiv" / "index.html").stat().st_size > 1000

@@ -37,3 +37,15 @@ Numeric lab specifications require `numeric.prediction_target`, a finite slider-
 ## Mathematical & Visual Quality candidate v0.5
 
 See `docs/MATHEMATICAL_VISUAL_SPECIFICATION.md`. Canonical offline TeX records, vector scientific figures, operation-specific reading patterns and actual cross-media geometry gates extend the existing publishers. Legacy author contracts remain readable but receive no advanced-mathematics validation claim. The one-path interface remains unchanged. Dedicated dependencies are installed by `scripts/SETUP_MATH_RUNTIME.sh` outside the Documents source tree; no previous environment is modified. Native Anki clients, historical migration and independent external review remain separate mandatory gates. This is a working candidate, not a released freeze.
+
+## Source-free Experience prototype (draft)
+
+The new experience layer is validated with synthetic cross-domain fixtures **before any lecture inputs**. It creates an actual **single offline interactive HTML**, not fake textbook or Anki output:
+
+```bash
+python -m exam_mastery.cli experience validate fixtures/experience_reference.json
+python -m exam_mastery.cli experience render fixtures/experience_reference.json --out /tmp/em-reference
+# Open /tmp/em-reference/Interaktiv/index.html
+```
+
+Supported deterministic exploratory models: lower-bound binary search and finite discounted returns. The player requires a numerical prediction before revealing its stepwise trace, uses verified Python reference calculations, and unlocks solutions only after an independent answer attempt. Browser code runs offline without network access or LLMs; it **does not execute learner code**, certify scientific accuracy, or provide a secure coding sandbox. Other domains remain contract-valid but require their own tested renderers. Obsidian is an optional Markdown view and Anki remains the only repetition scheduler.

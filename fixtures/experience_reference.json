@@ -1,0 +1,142 @@
+{
+  "schema": "em-experience-v1",
+  "unit_id": "cs/binary-search-reference",
+  "title": "Binary Search: trace, prove, transfer",
+  "source_mode": "synthetic",
+  "knowledge_modes": [
+    "computational",
+    "formal_reasoning"
+  ],
+  "sources": [
+    {
+      "id": "synthetic/reference",
+      "kind": "synthetic",
+      "locator": "Trusted Python lower-bound reference algorithm"
+    }
+  ],
+  "claims": [
+    {
+      "id": "synthetic/search-correctness",
+      "text": "The half-open search interval preserves the lower-bound invariant.",
+      "source_refs": [
+        "synthetic/reference"
+      ],
+      "evidence_status": "synthetic"
+    }
+  ],
+  "competencies": [
+    {
+      "id": "binary/search-trace",
+      "operation": "trace",
+      "prerequisites": []
+    }
+  ],
+  "teaching": [
+    {
+      "id": "teach/intuition",
+      "competency_ids": [
+        "binary/search-trace"
+      ],
+      "claim_ids": [
+        "synthetic/search-correctness"
+      ],
+      "content": "Find the first element greater than or equal to the target, not merely any matching element. The candidate interval [lo,hi) shrinks while retaining this boundary. Predict the insertion index before showing steps."
+    },
+    {
+      "id": "teach/proof",
+      "competency_ids": [
+        "binary/search-trace"
+      ],
+      "claim_ids": [
+        "synthetic/search-correctness"
+      ],
+      "content": "The loop maintains: indices < lo are less than the target, and indices >= hi are greater than or equal to the target. Each update strictly reduces hi-lo, ensuring termination. At lo=hi the unique boundary is the lower bound."
+    }
+  ],
+  "assessments": [
+    {
+      "id": "task/prove",
+      "competency_ids": [
+        "binary/search-trace"
+      ],
+      "prompt": "Prove lower-bound binary search correct for duplicates and an empty array.",
+      "solution": "Initially [lo,hi)=[0,n), so both outside assertions hold vacuously. When a[mid]<x, all indices <=mid are below x and lo moves to mid+1; otherwise all indices >=mid have values >=x and hi moves to mid. Every iteration decreases the nonnegative interval length hi-lo. At termination lo=hi, with all earlier elements <x and all later ones >=x; this is the first qualifying index, or n if no such element exists. For an empty array, lo=hi=0 immediately.",
+      "rubric": [
+        {
+          "criterion": "States invariant",
+          "points": 2
+        },
+        {
+          "criterion": "Preserves it in both branches",
+          "points": 4
+        },
+        {
+          "criterion": "Shows termination",
+          "points": 2
+        },
+        {
+          "criterion": "Explains boundary cases",
+          "points": 2
+        }
+      ],
+      "attempt_before_reveal": true
+    }
+  ],
+  "cards": [
+    {
+      "key": "binary/lower-bound-invariant",
+      "kind": "concept",
+      "front": "Which invariant does lower-bound binary search maintain?",
+      "answer": "Indices before lo have values < target; indices at/after hi have values >= target.",
+      "competency_ids": [
+        "binary/search-trace"
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "id": "interaction/binary-search",
+      "type": "code_trace",
+      "competency_ids": [
+        "binary/search-trace"
+      ],
+      "model_ref": "binary_search_lower_bound",
+      "prediction_prompt": "Predict the first index with a value at least the target.",
+      "feedback_rule": "Compare each updated interval to the invariant.",
+      "transfer_prompt": "Which branch comparison would change if searching for the first value strictly greater than the target?",
+      "variants": [
+        {
+          "label": "In-between target",
+          "parameters": {
+            "values": [
+              2,
+              5,
+              8,
+              12
+            ],
+            "target": 7
+          }
+        },
+        {
+          "label": "Duplicates",
+          "parameters": {
+            "values": [
+              2,
+              5,
+              5,
+              12
+            ],
+            "target": 5
+          }
+        },
+        {
+          "label": "Empty sequence",
+          "parameters": {
+            "values": [],
+            "target": 7
+          }
+        }
+      ]
+    }
+  ]
+}
