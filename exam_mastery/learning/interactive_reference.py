@@ -105,6 +105,59 @@ def discounted_return_trace(parameters):
     }
 
 
+def binomial_area_trace(parameters):
+    """Exact partition of a square with side a+b into four rectangles.
+
+    This trusted oracle only supports positive bounded real side lengths. Its
+    underlying polynomial identity is independently checked in the semantic
+    proof fixture; the numerical trace is a visual reference, not a proof.
+    """
+    if not isinstance(parameters, dict) or set(parameters) != {"a", "b"}:
+        raise InteractionError("binomial_area: only a and b parameters permitted")
+    a = _number(parameters["a"], "a")
+    b = _number(parameters["b"], "b")
+    if not 0.5 <= a <= 6 or not 0.5 <= b <= 6:
+        raise InteractionError("binomial_area: side lengths must be in [0.5, 6]")
+    parts = [a*a, a*b, b*a, b*b]
+    expanded = math.fsum(parts)
+    total = (a + b)**2
+    if not math.isclose(expanded, total, rel_tol=1e-13, abs_tol=1e-13):
+        raise InteractionError("binomial_area: independent numeric oracle mismatch")
+    names = ["a²", "ab", "ab", "b²"]
+    base = {"kind": "area", "a": a, "b": b}
+    return {
+        "model": "binomial_area_partition",
+        "result": total,
+        "result_label": "(a+b)^2 square area",
+        "steps": [
+            {
+                "title": "Ausgangsfrage: eine Quadratfläche",
+                "body": f"Die Seitenlänge ist a+b={a:g}+{b:g}={a+b:g}. "
+                        "Welche Fläche hat das gesamte Quadrat?",
+                "state": {**base, "highlight": "all"},
+            },
+            {
+                "title": "Zerlegen: vier Rechtecke",
+                "body": "Die Seiten werden jeweils bei a und b geteilt. "
+                        "Die vier Teilflächen haben die Inhalte a², ab, ab und b². "
+                        "Jeder Teil ist disjunkt; zusammen bedecken sie das Quadrat.",
+                "state": {**base, "highlight": "parts"},
+            },
+            {
+                "title": "Zusammenführen: distributive Identität",
+                "body": f"Die Summe der vier Flächen ist {parts[0]:g} + "
+                        f"{parts[1]:g} + {parts[2]:g} + {parts[3]:g} = "
+                        f"{expanded:g}. Damit gilt (a+b)² = a² + 2ab + b².",
+                "state": {**base, "highlight": "all"},
+            },
+        ],
+        "invariant": (
+            "Die vier disjunkten Teilrechtecke füllen exakt das Quadrat "
+            "mit der Seite a+b; es wird weder Fläche überlappt noch ausgelassen."
+        ),
+    }
+
+
 def parsons_reference(parameters):
     """Check the ordering of provided code blocks, never execute learner code.
 
@@ -153,6 +206,7 @@ MODELS = {
     "parsons_reference": parsons_reference,
     "binary_search_lower_bound": binary_search_trace,
     "finite_discounted_return": discounted_return_trace,
+    "binomial_area_partition": binomial_area_trace,
 }
 
 
@@ -214,6 +268,14 @@ p { max-width:70ch; }
 .cell.inside { border-color:#91adf5; }
 .cell.mid { color:#081c3b; background:#a8d8fd; border-color:#a8d8fd; font-weight:750; }
 .cell.done { background:#173c47; border-color:#5dcfba; }
+.area-grid { display:grid; width:min(100%,320px); aspect-ratio:1;
+  border:2px solid #a8d8fd; border-radius:8px; overflow:hidden; margin:.7rem 0; }
+.area-region { display:flex; align-items:center; justify-content:center;
+  padding:.2rem; overflow:hidden; font-size:clamp(.68rem,1.7vw,.95rem);
+  text-align:center; font-weight:700; border:1px solid #11223a; }
+.area-region.pure { background:#96bff8; color:#0b2448; }
+.area-region.mixed { background:#3da7a2; color:#052f34; }
+.area-guide { font-size:.82rem; color:#c0d6f8; }
 .controls { display:flex; gap:.6rem; flex-wrap:wrap; margin:.8rem 0; }
 button,select,input,textarea { font:inherit; }
 button { background:var(--blue); color:white; border:0; padding:.6rem .9rem; border-radius:10px; cursor:pointer; }
@@ -237,6 +299,8 @@ textarea { min-height:90px; }
 .proof-steps { padding-left:1.4rem; }
 .proof-steps li { padding:.4rem 0; }
 .proof-statement { font-weight:650; margin-bottom:.25rem; }
+.proof-equation { display:block; font-size:1.08rem; white-space:normal; overflow-wrap:anywhere; padding:.4rem .65rem; background:#edf4fd; border-radius:8px; margin:.35rem 0; }
+.proof-verification { display:block; font-size:.78rem; color:var(--muted); margin-bottom:.35rem; }
 .proof-steps summary { cursor:pointer; color:var(--blue); font-size:.93rem; }
 .proof-steps details[open] { border-left:3px solid var(--accent); padding-left:.75rem; }
 .parsons-lines { padding-left:1.5rem; }
@@ -304,6 +368,29 @@ function draw(stage, step) {
           + (i === s.mid ? ", current midpoint" : ""));
       visual.append(cell);
     });
+  } else if (s.kind === "area") {
+    const grid = el("div", "area-grid");
+    // Exact ratio of physical segment lengths; the semantic oracle supplies
+    // positive bounded sides and the four area terms, not arbitrary HTML.
+    grid.style.gridTemplateColumns = s.a + "fr " + s.b + "fr";
+    grid.style.gridTemplateRows = s.a + "fr " + s.b + "fr";
+    const regions = [
+      ["a²", s.a * s.a, "pure"],
+      ["ab", s.a * s.b, "mixed"],
+      ["ab", s.a * s.b, "mixed"],
+      ["b²", s.b * s.b, "pure"],
+    ];
+    regions.forEach(([label,value,kind],index)=>{
+      const region = el("div", "area-region " + kind, label);
+      region.setAttribute("aria-label", "Teilfläche " + (index + 1) +
+        ": " + label + " = " + fmt(value));
+      region.title = label + " = " + fmt(value);
+      grid.append(region);
+    });
+    visual.append(grid);
+    visual.append(el("span", "area-guide",
+      "Seiten a = " + fmt(s.a) + ", b = " + fmt(s.b) +
+      ". Die Breiten und Höhen stehen im Verhältnis a : b."));
   } else if (s.kind === "rewards") {
     (s.values || []).forEach((v, i) => {
       const cell = el("span", "cell" + (i >= s.index ? " done" : "")
@@ -665,6 +752,7 @@ def render_html(unit):
     compiled = []
     for i in unit["interactions"]:
         compiled.append(build_interaction(i))
+    from .experience_proof_checks import verify as verify_polynomial
     if not compiled:
         raise InteractionError("No executable interactions; cannot claim an interactive learning product")
     parts = [
@@ -705,9 +793,23 @@ def render_html(unit):
             ])
             for step in proof["steps"]:
                 parts.append('<li><div class="proof-statement">' +
-                             _h(step["statement"]) + '</div>' +
-                             '<details><summary>Warum ist dieser Schritt zulässig?</summary>' +
-                             '<p>' + _h(step["justification"]) + '</p></details></li>')
+                             _h(step["statement"]) + '</div>')
+                if "math_check" in step:
+                    proof_check = step["math_check"]
+                    # Exactly the same authored identity is checked in the
+                    # canonical validator and typeset into the PDF.
+                    verify_polynomial(proof_check)
+                    parts.append(
+                        '<code class="proof-equation">' +
+                        _h(proof_check["lhs"] + " = " + proof_check["rhs"]) +
+                        '</code><small class="proof-verification">'
+                        'Exakt symbolisch geprüft: nur diese Polynomgleichung, '
+                        'nicht der gesamte Beweis.</small>'
+                    )
+                parts.append(
+                    '<details><summary>Warum ist dieser Schritt zulässig?</summary>' +
+                    '<p>' + _h(step["justification"]) + '</p></details></li>'
+                )
             parts.extend(['</ol><p class="answer"><strong>Ergebnis:</strong> ' +
                           _h(proof["result"]) + '</p></article>'])
     parts.append('</section>')

@@ -1,0 +1,260 @@
+{
+  "schema": "em-experience-v1",
+  "unit_id": "math/binomial-geometry-reference",
+  "title": "Binomische Identität als Flächenzerlegung",
+  "source_mode": "synthetic",
+  "knowledge_modes": [
+    "formal_reasoning",
+    "conceptual",
+    "experimental"
+  ],
+  "sources": [
+    {
+      "id": "synthetic/polynomial-oracle",
+      "kind": "synthetic",
+      "locator": "Eigenständige synthetische Polynom- und Flächenzerlegung; keine Vorlesungsquelle"
+    }
+  ],
+  "claims": [
+    {
+      "id": "synthetic/binomial-identity",
+      "text": "Für alle reellen a,b gilt (a+b)^2=a^2+2ab+b^2; für positive a,b ist eine geometrische Flächenzerlegung möglich.",
+      "source_refs": [
+        "synthetic/polynomial-oracle"
+      ],
+      "evidence_status": "synthetic"
+    }
+  ],
+  "competencies": [
+    {
+      "id": "math/binomial-derive",
+      "operation": "derive",
+      "prerequisites": []
+    },
+    {
+      "id": "math/binomial-transfer",
+      "operation": "transfer",
+      "prerequisites": [
+        "math/binomial-derive"
+      ]
+    }
+  ],
+  "teaching": [
+    {
+      "id": "teach/area-intuition",
+      "competency_ids": [
+        "math/binomial-derive"
+      ],
+      "claim_ids": [
+        "synthetic/binomial-identity"
+      ],
+      "content": "Betrachte zunächst a>0 und b>0. Ein Quadrat mit Seitenlänge a+b lässt sich entlang beider Seiten bei a unterteilen. Es entstehen vier disjunkte Rechtecke: eines mit Fläche a², zwei mit Fläche ab und eines mit Fläche b². Da diese Flächen das Quadrat vollständig und ohne Überlappung füllen, müssen ihre Flächeninhalte die Gesamtfläche ergeben."
+    },
+    {
+      "id": "teach/symbolic-proof",
+      "competency_ids": [
+        "math/binomial-derive"
+      ],
+      "claim_ids": [
+        "synthetic/binomial-identity"
+      ],
+      "content": "Die Geometrie erklärt die Identität bei positiven Seitenlängen. Der formale Beweis nutzt nur Distributivität und Kommutativität der reellen Zahlen und gilt deshalb auch bei negativen a oder b. Die angezeigten algebraischen Gleichungen werden exakt als Polynome geprüft; diese maschinelle Prüfung zertifiziert weder die sprachliche Begründung noch andere Sätze.",
+      "derivation": {
+        "title": "Vom Quadrat zur algebraischen Identität",
+        "given": "a und b sind beliebige reelle Zahlen. Es gilt das Distributivgesetz und die Kommutativität der Multiplikation.",
+        "steps": [
+          {
+            "statement": "Die zweite Potenz bedeutet Multiplikation eines Ausdrucks mit sich selbst.",
+            "justification": "Definition der zweiten Potenz, für jeden reellen Ausdruck a+b.",
+            "claim_ids": [
+              "synthetic/binomial-identity"
+            ],
+            "math_check": {
+              "kind": "polynomial_identity",
+              "lhs": "(a+b)^2",
+              "rhs": "(a+b)*(a+b)",
+              "variables": [
+                "a",
+                "b"
+              ]
+            }
+          },
+          {
+            "statement": "Multipliziere beide Summanden der ersten Klammer mit beiden Summanden der zweiten.",
+            "justification": "Zweifache Anwendung des Distributivgesetzes.",
+            "claim_ids": [
+              "synthetic/binomial-identity"
+            ],
+            "math_check": {
+              "kind": "polynomial_identity",
+              "lhs": "(a+b)*(a+b)",
+              "rhs": "a*a+a*b+b*a+b*b",
+              "variables": [
+                "a",
+                "b"
+              ]
+            }
+          },
+          {
+            "statement": "Ordne gleichartige Terme, und fasse die beiden gemischten Produkte zusammen.",
+            "justification": "Abelsche Gruppenstruktur der Addition und Kommutativität von a*b=b*a.",
+            "claim_ids": [
+              "synthetic/binomial-identity"
+            ],
+            "math_check": {
+              "kind": "polynomial_identity",
+              "lhs": "a*a+a*b+b*a+b*b",
+              "rhs": "a^2+2*a*b+b^2",
+              "variables": [
+                "a",
+                "b"
+              ]
+            }
+          }
+        ],
+        "result": "Damit ist (a+b)^2=a^2+2ab+b^2 für alle reellen a,b bewiesen. Geometrische Rechtecklängen erklären die Struktur nur im Fall a,b>0."
+      }
+    },
+    {
+      "id": "teach/transfer",
+      "competency_ids": [
+        "math/binomial-transfer"
+      ],
+      "claim_ids": [
+        "synthetic/binomial-identity"
+      ],
+      "content": "Transfer: Ersetze b durch -b. Aus (a+b)²=a²+2ab+b² folgt (a-b)²=a²-2ab+b². Die gemischten Terme ändern ihr Vorzeichen; der quadratische Term b² nicht. Diese Substitution ist erlaubt, weil die Identität für alle reellen Argumente gilt."
+    }
+  ],
+  "assessments": [
+    {
+      "id": "task/area-derivation",
+      "role": "core",
+      "competency_ids": [
+        "math/binomial-derive"
+      ],
+      "claim_ids": [
+        "synthetic/binomial-identity"
+      ],
+      "prompt": "Leite (a+b)²=a²+2ab+b² auf zwei Wegen her: zuerst über die vier Teilflächen für a,b>0, danach algebraisch für beliebige reelle a,b.",
+      "solution": "Für a,b>0 teilen die Schnitte bei a beide Seiten des Quadrats. Die Teilflächen sind a², ab, ba und b². Die Summe a²+ab+ba+b² ist die Gesamtfläche (a+b)². Algebraisch gilt für alle a,b∈R: (a+b)²=(a+b)(a+b)=a²+ab+ba+b²=a²+2ab+b². Der geometrische Beweis allein deckt negative Seitenlängen nicht ab; der algebraische Beweis schon.",
+      "rubric": [
+        {
+          "criterion": "Geometrische Zerlegung mit vier Teilflächen",
+          "points": 3
+        },
+        {
+          "criterion": "Distributive Umformung Schritt für Schritt",
+          "points": 3
+        },
+        {
+          "criterion": "Geltungsbereich von Geometrie und Algebra getrennt",
+          "points": 2
+        }
+      ],
+      "attempt_before_reveal": true,
+      "hints": [
+        "Skizziere eine Quadratseite als a+b und führe zwei Schnitte durch.",
+        "Welche vier Produkte entstehen aus (a+b)(a+b)?",
+        "Welche Voraussetzung benötigen die geometrischen Seitenlängen?"
+      ]
+    },
+    {
+      "id": "task/sign-transfer",
+      "role": "transfer",
+      "competency_ids": [
+        "math/binomial-transfer"
+      ],
+      "claim_ids": [
+        "synthetic/binomial-identity"
+      ],
+      "prompt": "Leite (a-b)² für beliebige reelle a,b aus der zuvor bewiesenen Identität her. Erkläre, warum das mittlere Vorzeichen negativ, b² aber positiv ist.",
+      "solution": "Setze b'=-b. Dann (a-b)²=(a+(-b))²=a²+2a(-b)+(-b)²=a²-2ab+b². Die Mittelglieder tragen genau einen Faktor -b; (-b)² besitzt zwei negative Faktoren und ist daher b².",
+      "rubric": [
+        {
+          "criterion": "Korrekte Substitution b'=-b",
+          "points": 2
+        },
+        {
+          "criterion": "Vorzeichen und Quadratterm korrekt hergeleitet",
+          "points": 2
+        },
+        {
+          "criterion": "Geltungsbereich explizit",
+          "points": 1
+        }
+      ],
+      "attempt_before_reveal": true,
+      "hints": [
+        "Nutze die Substitution b'=-b.",
+        "Beachte, wie oft das Minuszeichen in jedem Term vorkommt."
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "key": "math/binomial-area",
+      "kind": "math",
+      "front": "Welche Identität ergibt die Zerlegung der Quadratfläche (a+b)² in vier Rechtecke?",
+      "answer": "(a+b)² = a² + 2ab + b².",
+      "explanation": "Die vier Flächen sind a², ab, ab, b². Der formale algebraische Beweis gilt für alle reellen a,b.",
+      "competency_ids": [
+        "math/binomial-derive"
+      ],
+      "claim_ids": [
+        "synthetic/binomial-identity"
+      ]
+    },
+    {
+      "key": "math/binomial-sign",
+      "kind": "math",
+      "front": "Wie ergibt sich (a-b)² aus der ersten binomischen Identität?",
+      "answer": "Setze b durch -b: (a-b)² = a² - 2ab + b².",
+      "competency_ids": [
+        "math/binomial-transfer"
+      ],
+      "claim_ids": [
+        "synthetic/binomial-identity"
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "id": "interaction/binomial-area",
+      "type": "explorable_model",
+      "competency_ids": [
+        "math/binomial-derive"
+      ],
+      "claim_ids": [
+        "synthetic/binomial-identity"
+      ],
+      "model_ref": "binomial_area_partition",
+      "prediction_prompt": "Sage die Fläche eines Quadrats mit Seitenlänge a+b voraus, bevor du die Zerlegung untersuchst.",
+      "feedback_rule": "Vergleiche die Gesamtfläche mit der Summe der vier disjunkten Teilflächen.",
+      "transfer_prompt": "Welche Terme verändern sich, wenn b durch -b ersetzt wird? Warum ist die geometrische Interpretation dafür nicht ohne Weiteres geeignet?",
+      "variants": [
+        {
+          "label": "a=1, b=2",
+          "parameters": {
+            "a": 1,
+            "b": 2
+          }
+        },
+        {
+          "label": "a=2, b=3",
+          "parameters": {
+            "a": 2,
+            "b": 3
+          }
+        },
+        {
+          "label": "a=4, b=1",
+          "parameters": {
+            "a": 4,
+            "b": 1
+          }
+        }
+      ]
+    }
+  ]
+}
