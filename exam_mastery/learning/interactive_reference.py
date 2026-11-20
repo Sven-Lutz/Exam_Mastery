@@ -226,6 +226,8 @@ textarea { min-height:90px; }
 .help { color:var(--muted); font-size:.9rem; }
 .answer { margin-top:.75rem; border-left:4px solid var(--accent); padding:.65rem 1rem; background:#effaf6; }
 .attempt-status { color:var(--muted); font-size:.9rem; }
+.adaptive-guidance { background:#f2f7fc; border-left:3px solid var(--blue); padding:.65rem .85rem; margin:.8rem 0; font-size:.94rem; }
+.adaptive-guidance a { color:var(--blue); text-decoration:underline; }
 .hint-text { border-left:3px solid var(--blue); padding:.6rem 1rem; background:#edf3ff; }
 .proof-steps { padding-left:1.4rem; }
 .proof-steps li { padding:.4rem 0; }
@@ -474,6 +476,41 @@ model.interactions.forEach(spec => {
   else setup(spec);
 });
 const byTask = new Map(model.assessments.map(x=>[x.id,x]));
+const policyEvents = []; // ephemeral: evaluated diagnostics never enter exported event logs
+function explainPolicy(taskId, diagnosis, container) {
+  const decision = window.EMT.decide(model.adaptive_track, policyEvents);
+  container.replaceChildren();
+  container.dataset.rule = decision.rule;
+  if (diagnosis.result === "unverified") {
+    container.append(el("strong", "", "Fachliche Prüfung erforderlich. "));
+    container.append(el("span", "", "Die Antwort wurde nicht bewertet; Regel " +
+      decision.rule + ". Keine Kompetenzfreigabe, kein Mastery-Nachweis."));
+    return;
+  }
+  if (diagnosis.result === "invalid") {
+    container.textContent = "Die Eingabe ist numerisch ungültig. " +
+      "Korrigiere deine Eingabe und beginne einen neuen Versuch.";
+    return;
+  }
+  const labels = {
+    correct:"Numerisch passend", incorrect:"Numerische Abweichung",
+    partial:"Numerisch teilweise passend"
+  };
+  container.append(el("strong", "", (labels[diagnosis.result] || "Geprüft") +
+    " (lokaler Autoren-Referenzwert). "));
+  container.append(el("span", "", decision.rationale + " " + decision.uncertainty));
+  const nextId = decision.next_task;
+  if (nextId && byTask.has(nextId)) {
+    const slug = nextId.replace(/[^a-z0-9_-]/g,"-");
+    const target = document.getElementById("exercise-" + slug);
+    if (target) {
+      const jump = document.createElement("a");
+      jump.href = "#exercise-" + slug;
+      jump.textContent = " Nächste Lernhandlung öffnen";
+      container.append(jump);
+    }
+  }
+}
 document.querySelectorAll(".assessment").forEach(root=>{
   const taskId = root.dataset.taskId;
   const definition = byTask.get(taskId);
@@ -485,6 +522,7 @@ document.querySelectorAll(".assessment").forEach(root=>{
   const hintButton = root.querySelector(".hint-button");
   const hintText = root.querySelector(".hint-text");
   const status = root.querySelector(".attempt-status");
+  const guidance = root.querySelector(".adaptive-guidance");
   let submitted = false, hintIndex = 0, solutionSeen = false;
 
   input.addEventListener("input",()=>{
@@ -499,9 +537,28 @@ document.querySelectorAll(".assessment").forEach(root=>{
     retry.disabled = false;
     reveal.disabled = false;
     if (hintButton && hintIndex < definition.hints.length) hintButton.disabled = false;
-    status.textContent = "Versuch dokumentiert; Freitext ist noch nicht bewertet.";
-    // Store length, never the content of a student's private response.
+    // Reuse the existing, browser/Python-parity-tested diagnosis and policy.
+    // Numeric results are formative; authored expected values are not
+    // independent proof of scientific correctness.
+    const spec = definition.machine_check;
+    const checked = spec ? window.EMT.diagnose({
+      ...spec, id:taskId, kc_id:definition.competency_ids[0]
+    }, answer) : {
+      task_id:taskId, result:"unverified", error_category:null,
+      method:"open", evidence:"UNVERIFIED"
+    };
+    const diagnosis = {
+      task_id:taskId, result:checked.result,
+      error_category:checked.error_category,
+      method:checked.method, evidence:checked.evidence
+    }; // deliberately omit observed raw response
+    status.textContent = diagnosis.result === "unverified"
+      ? "Versuch dokumentiert; Freitext ist noch nicht bewertet."
+      : "Numerisch formativ geprüft; die wissenschaftliche Referenzprüfung bleibt offen.";
+    // Export records the action and length only, not the answer or grade.
     recordPractice({type:"attempt",task_id:taskId,response_chars:answer.length});
+    policyEvents.push({type:"attempt",task:taskId,t:new Date().toISOString(),diagnosis});
+    explainPolicy(taskId, diagnosis, guidance);
   });
   retry.addEventListener("click",()=>{
     if (!submitted) return;
@@ -513,6 +570,8 @@ document.querySelectorAll(".assessment").forEach(root=>{
     reveal.disabled = true;
     solution.classList.add("hidden");
     status.textContent = "Neuer Lösungsversuch. Frühere Hilfen bleiben im Protokoll.";
+    guidance.replaceChildren();
+    if (hintButton) hintButton.disabled = true;
     input.focus();
   });
   if (hintButton) hintButton.addEventListener("click",()=>{
@@ -520,6 +579,7 @@ document.querySelectorAll(".assessment").forEach(root=>{
     hintText.textContent = definition.hints[hintIndex];
     hintText.classList.remove("hidden");
     recordPractice({type:"hint",task_id:taskId,hint_index:hintIndex});
+    policyEvents.push({type:"hint",task:taskId,t:new Date().toISOString()});
     hintIndex += 1;
     hintButton.disabled = hintIndex >= definition.hints.length;
     status.textContent = "Hinweis verwendet. Die nächste Antwort gilt nicht als unabhängig.";
@@ -529,6 +589,7 @@ document.querySelectorAll(".assessment").forEach(root=>{
     solution.classList.remove("hidden");
     if (!solutionSeen) {
       recordPractice({type:"solution_reveal",task_id:taskId});
+      policyEvents.push({type:"solution",task:taskId,t:new Date().toISOString()});
       solutionSeen = true;
     }
     status.textContent = "Lösung eingesehen – kein Nachweis selbstständiger Beherrschung.";
@@ -550,6 +611,14 @@ def _h(value):
 def render_html(unit):
     from .experience import validate
     from .experience_evidence import assessment_revision
+    from .experience_adaptation import track_for_unit
+
+    # Bundle the already-tested legacy diagnosis/policy runtime once, instead
+    # of implementing a second JS evaluator or decision engine.
+    tutor_js = (Path(__file__).resolve().parents[1] /
+                "templates" / "em_tutor.js").read_text(encoding="utf-8")
+    if "</script" in tutor_js.lower():
+        raise InteractionError("Unsafe script delimiter in trusted tutor runtime")
 
     report = validate(unit)
     if not report["valid"]:
@@ -572,7 +641,8 @@ def render_html(unit):
         if unit["source_mode"] == "synthetic" else 'Quellengebundene Einheit – Fachprüfung erforderlich') + '</p>',
         '<section class="card" aria-label="Lernprotokoll"><h2>Lokal üben</h2>',
         '<p>Versuche und Hilfen werden nur im Arbeitsspeicher dieser Sitzung dokumentiert.',
-        ' Keine Antworten werden übertragen oder automatisch bewertet.',
+        ' Keine Antworten werden übertragen. Freitext bleibt unbewertet;',
+        ' rein numerische Aufgaben können lokal gegen Autoren-Sollwerte geprüft werden.',
         ' Zur Aufbewahrung das Protokoll vor dem Schließen exportieren.</p>',
         '<button type="button" id="evidence-export">Lernprotokoll als JSON exportieren</button>',
         '<p id="evidence-status" class="attempt-status" role="status" aria-live="polite">',
@@ -663,6 +733,7 @@ def render_html(unit):
              if task.get("hints") else ''),
             '<button class="answer-button secondary" type="button" disabled>Musterlösung anzeigen</button>',
             '</div><p class="attempt-status" role="status" aria-live="polite"></p>',
+            '<div class="adaptive-guidance" role="status" aria-live="polite"></div>',
             ('<p class="hint-text hidden" role="status" aria-live="polite"></p>'
              if task.get("hints") else ''),
             '<div class="answer hidden"><strong>Musterlösung</strong><p>' + _h(task["solution"]) + '</p>',
@@ -672,15 +743,20 @@ def render_html(unit):
             parts.append('<li>' + _h(part["criterion"]) + ' (' + _h(part["points"]) + ' Punkte)</li>')
         parts.append('</ul></div></article>')
     parts.extend([
-        '</section><p class="help">Diese Demo speichert keine Lernhistorie, '
-        'führt keinen fremden Code aus und zertifiziert keine fachliche Qualität.</p>',
+        '</section><p class="help">Diese Demo protokolliert nur Lernhandlungen',
+        ' im Sitzungsspeicher, führt keinen fremden Code aus und zertifiziert',
+        ' keine fachliche Qualität.</p>',
         '<script id="em-interactive-data" type="application/json">',
         _json_script({"schema": SCHEMA, "unit_id": unit["unit_id"],
                       "assessment_revision": assessment_revision(unit),
                       "interactions": compiled,
-                      "assessments": [{"id": x["id"], "hints": x.get("hints", [])}
+                      "adaptive_track": track_for_unit(unit),
+                      "assessments": [{"id": x["id"], "hints": x.get("hints", []),
+                                       "machine_check": x.get("machine_check"),
+                                       "competency_ids": x["competency_ids"]}
                                       for x in unit["assessments"]]}),
-        '</script><script>' + RUNTIME + '</script></main></body></html>',
+        '</script><script>' + tutor_js + '</script><script>' + RUNTIME +
+        '</script></main></body></html>',
     ])
     return "".join(parts)
 
