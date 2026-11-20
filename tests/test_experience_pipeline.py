@@ -214,3 +214,37 @@ def test_symlinked_managed_directories_fail_closed(tmp_path, managed):
     with pytest.raises(ValueError, match="nonregular managed directory"):
         pipeline.preflight(fixture(), tmp_path)
     assert list(outside.iterdir()) == []
+
+
+def test_real_staged_four_product_publish_and_idempotent_rebuild(tmp_path):
+    """Full integration uses real PDF, real Anki APKG, offline HTML, and manifests."""
+    pytest.importorskip("playwright.sync_api")
+    fitz = pytest.importorskip("pymupdf")
+    pytest.importorskip("anki")
+    from zipfile import ZipFile
+
+    first = pipeline.build(fixture(), tmp_path)
+    assert first["publication"]["status"] == "STAGED_COMMIT"
+    assert first["publication"]["replaced_files"] >= 4
+    assert pipeline.preflight(fixture(), tmp_path)["status"] == "PREFLIGHT_PASS"
+    with fitz.open(tmp_path / "Lehrbuch.pdf") as textbook:
+        assert textbook.page_count >= 2
+    with fitz.open(tmp_path / "Arbeitsbuch.pdf") as workbook:
+        assert workbook.page_count >= 2
+    with ZipFile(tmp_path / "Anki.apkg") as package:
+        assert any(name.startswith("collection.") for name in package.namelist())
+    html = (tmp_path / "Interaktiv" / "index.html").read_text(encoding="utf-8")
+    assert html.startswith("<!doctype html>")
+    assert "window.EMT" in html
+    assert not list(tmp_path.glob(".em-stage-*"))
+    assert not list(tmp_path.glob(".em-recovery-*"))
+    visible = sorted(p.name for p in tmp_path.iterdir() if not p.name.startswith("."))
+    assert visible == ["Anki.apkg", "Arbeitsbuch.pdf", "Interaktiv", "Lehrbuch.pdf"]
+
+    prior_bytes = _managed_bytes(tmp_path)
+    output_paths = [tmp_path / p for p in pipeline.PRODUCTS.values()]
+    old_mtimes = [p.stat().st_mtime_ns for p in output_paths]
+    second = pipeline.build(fixture(), tmp_path)
+    assert second["publication"]["status"] == "UNCHANGED"
+    assert _managed_bytes(tmp_path) == prior_bytes
+    assert [p.stat().st_mtime_ns for p in output_paths] == old_mtimes
