@@ -127,6 +127,14 @@ def _derivation(item, known_claims, source_mode, errors):
         _references(refs, known_claims, f"teaching.{key}.derivation.steps[{index}].claim_ids", errors)
         if source_mode == "grounded" and not refs:
             errors.append(f"teaching.{key}.derivation.steps[{index}]: grounded justification needs claim refs")
+        if "math_check" in step:
+            from .experience_proof_checks import ProofCheckError, verify
+            try:
+                verify(step["math_check"])
+            except ProofCheckError as exc:
+                errors.append(
+                    f"teaching.{key}.derivation.steps[{index}].math_check: {exc}"
+                )
 
 
 def validate(unit):
