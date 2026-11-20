@@ -45,7 +45,7 @@ def _as_answer_indices(answers, events):
     return result
 
 
-def _track(unit):
+def track_for_unit(unit):
     """Minimum legacy-policy contract; no fabricated diagnoses or knowledge."""
     tasks = []
     for task in unit["assessments"]:
@@ -125,7 +125,7 @@ def recommend(unit, log, answers=None):
             })
 
     # Same policy as the existing learning engine, not a replacement.
-    decision = policy.decide(_track(unit), policy_events)
+    decision = policy.decide(track_for_unit(unit), policy_events)
     review_required = bool(
         recent_grade is not None and recent_grade["result"] == "unverified"
     )
