@@ -34,6 +34,11 @@ def preflight(unit, output_dir):
     if not valid["valid"]:
         raise ValueError("Invalid learning unit: " + "; ".join(valid["errors"]))
     root = Path(output_dir)
+    # A symlinked managed directory could redirect files outside the requested
+    # publication directory, even when index.html itself is a regular file.
+    for managed in (root / ".em-state", root / "Interaktiv"):
+        if managed.is_symlink() or (managed.exists() and not managed.is_dir()):
+            raise ValueError(f"Refusing nonregular managed directory {managed.name}")
     suffix = hashlib.sha256(unit["unit_id"].encode()).hexdigest()[:12]
     records = {
         "books": _load(root / ".em-state" / ("books-" + suffix + ".json")),
@@ -55,6 +60,28 @@ def preflight(unit, output_dir):
                 raise ValueError(f"Refusing to overwrite unmanaged {relative}")
             if _hash(path) != checksum:
                 raise ValueError(f"Refusing to overwrite manually modified {relative}")
+    # Structural validity is not equivalent to publisher compatibility:
+    # validate() intentionally allows NOT_APPLICABLE cards/interactions and
+    # arbitrary model_ref identifiers for future domain adapters. The current
+    # four-artifact builder must reject unsupported units *before* books or
+    # Anki are written; later releases can implement explicit fallbacks.
+    if not unit["cards"]:
+        raise ValueError(
+            "Four-product build not supported: no Anki cards. "
+            "Valid learning units may omit cards, but the current APKG publisher cannot."
+        )
+    if not unit["interactions"]:
+        raise ValueError(
+            "Four-product build not supported: no interactive model. "
+            "Valid learning units may omit interactions, but the current HTML publisher cannot."
+        )
+    from .interactive_reference import build_interaction
+    for item in unit["interactions"]:
+        # Compile trusted reference models and parameter variants without
+        # producing files. Unknown models, unsorted inputs, non-finite values,
+        # and invalid Parsons puzzles are rejected here, not after PDF export.
+        build_interaction(item)
+
     return {"status": "PREFLIGHT_PASS", "existing_products": [
         key for key in expected if (root / key).is_file()
     ], "expected_products": list(expected), "model_calls": 0}
