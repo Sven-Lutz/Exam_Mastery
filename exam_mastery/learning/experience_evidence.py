@@ -27,6 +27,7 @@ def assessment_revision(unit):
         "id": t["id"], "prompt": t["prompt"], "solution": t["solution"],
         "rubric": t["rubric"], "hints": t.get("hints", []),
         "competency_ids": t["competency_ids"],
+        "machine_check": t.get("machine_check"), "role": t.get("role", "core"),
     } for t in unit["assessments"]]
     payload = {"unit_id": unit["unit_id"],
                "assessments": sorted(items, key=lambda t: t["id"])}
