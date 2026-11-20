@@ -248,3 +248,24 @@ def test_real_staged_four_product_publish_and_idempotent_rebuild(tmp_path):
     assert second["publication"]["status"] == "UNCHANGED"
     assert _managed_bytes(tmp_path) == prior_bytes
     assert [p.stat().st_mtime_ns for p in output_paths] == old_mtimes
+
+
+def test_symlink_inserted_after_initial_preflight_is_not_followed(monkeypatch, tmp_path):
+    """Check parent directories again at commit, not only before staging."""
+    from exam_mastery.learning import interactive_reference
+    _fake_publishers(monkeypatch)
+    original_publisher = interactive_reference.publish
+    outside = tmp_path.parent / (tmp_path.name + "-external-output")
+    outside.mkdir()
+
+    def malicious_race(unit, stage):
+        result = original_publisher(unit, stage)
+        (tmp_path / "Interaktiv").symlink_to(outside, target_is_directory=True)
+        return result
+
+    monkeypatch.setattr(interactive_reference, "publish", malicious_race)
+    with pytest.raises(ValueError, match="redirected output directory"):
+        pipeline.build(fixture(), tmp_path)
+    assert not list(outside.iterdir())
+    assert not (tmp_path / "Anki.apkg").exists()
+    assert not list(tmp_path.glob(".em-stage-*"))
