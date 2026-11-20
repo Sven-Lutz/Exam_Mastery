@@ -268,6 +268,14 @@ p { max-width:70ch; }
 .cell.inside { border-color:#91adf5; }
 .cell.mid { color:#081c3b; background:#a8d8fd; border-color:#a8d8fd; font-weight:750; }
 .cell.done { background:#173c47; border-color:#5dcfba; }
+.area-grid { display:grid; width:min(100%,320px); aspect-ratio:1;
+  border:2px solid #a8d8fd; border-radius:8px; overflow:hidden; margin:.7rem 0; }
+.area-region { display:flex; align-items:center; justify-content:center;
+  padding:.2rem; overflow:hidden; font-size:clamp(.68rem,1.7vw,.95rem);
+  text-align:center; font-weight:700; border:1px solid #11223a; }
+.area-region.pure { background:#96bff8; color:#0b2448; }
+.area-region.mixed { background:#3da7a2; color:#052f34; }
+.area-guide { font-size:.82rem; color:#c0d6f8; }
 .controls { display:flex; gap:.6rem; flex-wrap:wrap; margin:.8rem 0; }
 button,select,input,textarea { font:inherit; }
 button { background:var(--blue); color:white; border:0; padding:.6rem .9rem; border-radius:10px; cursor:pointer; }
@@ -360,6 +368,29 @@ function draw(stage, step) {
           + (i === s.mid ? ", current midpoint" : ""));
       visual.append(cell);
     });
+  } else if (s.kind === "area") {
+    const grid = el("div", "area-grid");
+    // Exact ratio of physical segment lengths; the semantic oracle supplies
+    // positive bounded sides and the four area terms, not arbitrary HTML.
+    grid.style.gridTemplateColumns = s.a + "fr " + s.b + "fr";
+    grid.style.gridTemplateRows = s.a + "fr " + s.b + "fr";
+    const regions = [
+      ["a²", s.a * s.a, "pure"],
+      ["ab", s.a * s.b, "mixed"],
+      ["ab", s.a * s.b, "mixed"],
+      ["b²", s.b * s.b, "pure"],
+    ];
+    regions.forEach(([label,value,kind],index)=>{
+      const region = el("div", "area-region " + kind, label);
+      region.setAttribute("aria-label", "Teilfläche " + (index + 1) +
+        ": " + label + " = " + fmt(value));
+      region.title = label + " = " + fmt(value);
+      grid.append(region);
+    });
+    visual.append(grid);
+    visual.append(el("span", "area-guide",
+      "Seiten a = " + fmt(s.a) + ", b = " + fmt(s.b) +
+      ". Die Breiten und Höhen stehen im Verhältnis a : b."));
   } else if (s.kind === "rewards") {
     (s.values || []).forEach((v, i) => {
       const cell = el("span", "cell" + (i >= s.index ? " done" : "")
