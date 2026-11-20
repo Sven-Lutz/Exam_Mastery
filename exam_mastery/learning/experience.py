@@ -228,6 +228,10 @@ def validate(unit):
                     errors.append(f"assessments.{key}: criterion-level positive rubric required")
                 if item.get("attempt_before_reveal") is not True:
                     errors.append(f"assessments.{key}: independent attempt required before reveal")
+                hints = item.get("hints", [])
+                if (not isinstance(hints, list) or len(hints) > 6 or
+                    any(not _text(h) or len(h) > 800 for h in hints)):
+                    errors.append(f"assessments.{key}: hints must be 0..6 nonempty bounded strings")
             elif section == "cards":
                 _references(item.get("claim_ids", []), claim_ids, f"cards.{key}.claim_ids", errors)
                 if source_mode == "grounded" and not item.get("claim_ids"):
@@ -303,9 +307,10 @@ def obsidian_note(unit):
 def command(args):
     """CLI: exam-mastery experience validate|plan|obsidian|render unit.json [--out dir]."""
     parser = argparse.ArgumentParser(prog="exam-mastery experience")
-    parser.add_argument("action", choices=("validate", "plan", "obsidian", "render", "anki", "books", "build"))
+    parser.add_argument("action", choices=("validate", "plan", "obsidian", "render", "anki", "books", "build", "evidence"))
     parser.add_argument("input")
     parser.add_argument("--out")
+    parser.add_argument("--log", help="Evidence JSON exported explicitly from the offline lesson")
     a = parser.parse_args(args)
     unit = json.loads(Path(a.input).read_text(encoding="utf-8"))
     if a.action == "validate":
@@ -314,6 +319,18 @@ def command(args):
         return 0 if result["valid"] else 1
     if a.action == "plan":
         print(json.dumps(plan(unit), ensure_ascii=False, indent=2))
+        return 0
+    if a.action == "evidence":
+        if not a.log:
+            parser.error("evidence requires --log <file.json>")
+        from .experience_evidence import EvidenceError, summarize
+        try:
+            log = json.loads(Path(a.log).read_text(encoding="utf-8"))
+            summary = summarize(log, unit)
+        except (EvidenceError, OSError, ValueError) as exc:
+            print(json.dumps({"status": "REJECTED", "error": str(exc)}, ensure_ascii=False, indent=2))
+            return 1
+        print(json.dumps(summary, ensure_ascii=False, indent=2))
         return 0
     if a.action == "build":
         if not a.out:

@@ -225,6 +225,8 @@ input,select,textarea { border:1px solid #94a5ba; border-radius:8px; background:
 textarea { min-height:90px; }
 .help { color:var(--muted); font-size:.9rem; }
 .answer { margin-top:.75rem; border-left:4px solid var(--accent); padding:.65rem 1rem; background:#effaf6; }
+.attempt-status { color:var(--muted); font-size:.9rem; }
+.hint-text { border-left:3px solid var(--blue); padding:.6rem 1rem; background:#edf3ff; }
 .proof-steps { padding-left:1.4rem; }
 .proof-steps li { padding:.4rem 0; }
 .proof-statement { font-weight:650; margin-bottom:.25rem; }
@@ -248,6 +250,30 @@ RUNTIME = r"""(function () {
 "use strict";
 const script = document.getElementById("em-interactive-data");
 const model = JSON.parse(script.textContent);
+const practice = {schema:"em-practice-evidence-v1",unit_id:model.unit_id,
+  assessment_revision:model.assessment_revision,events:[]};
+const evidenceStatus = document.getElementById("evidence-status");
+function recordPractice(event) {
+  if (practice.events.length >= 10000) {
+    evidenceStatus.textContent = "Protokollgrenze erreicht. Bitte jetzt exportieren.";
+    return;
+  }
+  practice.events.push({...event,at:new Date().toISOString()});
+  evidenceStatus.textContent = practice.events.length
+    + " Aktionen nur in dieser Sitzung erfasst; keine Antwort wird bewertet. "
+    + "Zur Sicherung JSON exportieren.";
+}
+document.getElementById("evidence-export").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(practice,null,2)+"\n"],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "exam-mastery-" + model.unit_id.replace(/[^a-z0-9_-]/g,"-") + "-evidence.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+});
 function el(tag, cls, text) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -447,12 +473,66 @@ model.interactions.forEach(spec => {
   if (spec.type === "code_parsons") setupParsons(spec);
   else setup(spec);
 });
+const byTask = new Map(model.assessments.map(x=>[x.id,x]));
 document.querySelectorAll(".assessment").forEach(root=>{
+  const taskId = root.dataset.taskId;
+  const definition = byTask.get(taskId);
   const input = root.querySelector("textarea");
+  const submit = root.querySelector(".submit-attempt");
+  const retry = root.querySelector(".retry-attempt");
   const reveal = root.querySelector(".answer-button");
   const solution = root.querySelector(".answer");
-  input.addEventListener("input",()=>{reveal.disabled = !input.value.trim(); solution.classList.add("hidden");});
-  reveal.addEventListener("click",()=>{if(input.value.trim()) solution.classList.remove("hidden");});
+  const hintButton = root.querySelector(".hint-button");
+  const hintText = root.querySelector(".hint-text");
+  const status = root.querySelector(".attempt-status");
+  let submitted = false, hintIndex = 0, solutionSeen = false;
+
+  input.addEventListener("input",()=>{
+    if (!submitted) submit.disabled = !input.value.trim();
+  });
+  submit.addEventListener("click",()=>{
+    const answer = input.value.trim();
+    if (submitted || !answer || answer.length > 20000) return;
+    submitted = true;
+    input.readOnly = true;
+    submit.disabled = true;
+    retry.disabled = false;
+    reveal.disabled = false;
+    if (hintButton && hintIndex < definition.hints.length) hintButton.disabled = false;
+    status.textContent = "Versuch dokumentiert; Freitext ist noch nicht bewertet.";
+    // Store length, never the content of a student's private response.
+    recordPractice({type:"attempt",task_id:taskId,response_chars:answer.length});
+  });
+  retry.addEventListener("click",()=>{
+    if (!submitted) return;
+    submitted = false;
+    input.readOnly = false;
+    input.value = "";
+    submit.disabled = true;
+    retry.disabled = true;
+    reveal.disabled = true;
+    solution.classList.add("hidden");
+    status.textContent = "Neuer Lösungsversuch. Frühere Hilfen bleiben im Protokoll.";
+    input.focus();
+  });
+  if (hintButton) hintButton.addEventListener("click",()=>{
+    if (!submitted || hintIndex >= definition.hints.length) return;
+    hintText.textContent = definition.hints[hintIndex];
+    hintText.classList.remove("hidden");
+    recordPractice({type:"hint",task_id:taskId,hint_index:hintIndex});
+    hintIndex += 1;
+    hintButton.disabled = hintIndex >= definition.hints.length;
+    status.textContent = "Hinweis verwendet. Die nächste Antwort gilt nicht als unabhängig.";
+  });
+  reveal.addEventListener("click",()=>{
+    if (!submitted) return;
+    solution.classList.remove("hidden");
+    if (!solutionSeen) {
+      recordPractice({type:"solution_reveal",task_id:taskId});
+      solutionSeen = true;
+    }
+    status.textContent = "Lösung eingesehen – kein Nachweis selbstständiger Beherrschung.";
+  });
 });
 })();"""
 
@@ -469,6 +549,7 @@ def _h(value):
 
 def render_html(unit):
     from .experience import validate
+    from .experience_evidence import assessment_revision
 
     report = validate(unit)
     if not report["valid"]:
@@ -489,6 +570,13 @@ def render_html(unit):
         'zum verifizierten Experiment und zum Transfer.</p>',
         '<p class="badge">' + ('Synthetische Referenzeinheit – keine Vorlesungsquellen'
         if unit["source_mode"] == "synthetic" else 'Quellengebundene Einheit – Fachprüfung erforderlich') + '</p>',
+        '<section class="card" aria-label="Lernprotokoll"><h2>Lokal üben</h2>',
+        '<p>Versuche und Hilfen werden nur im Arbeitsspeicher dieser Sitzung dokumentiert.',
+        ' Keine Antworten werden übertragen oder automatisch bewertet.',
+        ' Zur Aufbewahrung das Protokoll vor dem Schließen exportieren.</p>',
+        '<button type="button" id="evidence-export">Lernprotokoll als JSON exportieren</button>',
+        '<p id="evidence-status" class="attempt-status" role="status" aria-live="polite">',
+        'Noch keine Lernhandlungen erfasst.</p></section>',
         '<section aria-label="Wissenschaftliche Erklärung"><h2>Verstehen</h2>',
     ]
     for block in unit["teaching"]:
@@ -563,11 +651,20 @@ def render_html(unit):
     for task in unit["assessments"]:
         slug = re_slug(task["id"])
         parts.extend([
-            '<article class="card assessment" id="exercise-' + slug + '">',
+            '<article class="card assessment" id="exercise-' + slug + '" data-task-id="' +
+            _h(task["id"]) + '">',
             '<p class="eyebrow">Erst selbst lösen</p><h3>' + _h(task["prompt"]) + '</h3>',
             '<label for="attempt-' + slug + '">Dein Lösungsversuch</label>',
-            '<textarea id="attempt-' + slug + '"></textarea>',
-            '<div class="controls"><button class="answer-button" type="button" disabled>Musterlösung anzeigen</button></div>',
+            '<textarea id="attempt-' + slug + '" maxlength="20000"></textarea>',
+            '<div class="controls">',
+            '<button class="submit-attempt" type="button" disabled>Versuch abgeben</button>',
+            '<button class="retry-attempt secondary" type="button" disabled>Neuer Versuch</button>',
+            ('<button class="hint-button secondary" type="button" disabled>Hinweis</button>'
+             if task.get("hints") else ''),
+            '<button class="answer-button secondary" type="button" disabled>Musterlösung anzeigen</button>',
+            '</div><p class="attempt-status" role="status" aria-live="polite"></p>',
+            ('<p class="hint-text hidden" role="status" aria-live="polite"></p>'
+             if task.get("hints") else ''),
             '<div class="answer hidden"><strong>Musterlösung</strong><p>' + _h(task["solution"]) + '</p>',
             '<strong>Bewertungskriterien</strong><ul>',
         ])
@@ -578,7 +675,11 @@ def render_html(unit):
         '</section><p class="help">Diese Demo speichert keine Lernhistorie, '
         'führt keinen fremden Code aus und zertifiziert keine fachliche Qualität.</p>',
         '<script id="em-interactive-data" type="application/json">',
-        _json_script({"schema": SCHEMA, "interactions": compiled}),
+        _json_script({"schema": SCHEMA, "unit_id": unit["unit_id"],
+                      "assessment_revision": assessment_revision(unit),
+                      "interactions": compiled,
+                      "assessments": [{"id": x["id"], "hints": x.get("hints", [])}
+                                      for x in unit["assessments"]]}),
         '</script><script>' + RUNTIME + '</script></main></body></html>',
     ])
     return "".join(parts)
