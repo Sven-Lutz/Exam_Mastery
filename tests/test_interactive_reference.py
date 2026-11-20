@@ -139,7 +139,11 @@ def test_pipeline_validates_and_publishes_only_one_html_file(tmp_path):
     again = ir.publish(lesson, tmp_path)
     assert again["status"] == "UNCHANGED"
     assert filename.stat().st_mtime_ns == before
-    assert sorted(p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*") if p.is_file()) == ["Interaktiv/index.html"]
+    assert sorted(p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*")
+                  if p.is_file() and ".em-state" not in p.parts) == ["Interaktiv/index.html"]
+    filename.write_text("manual modification", encoding="utf-8")
+    with pytest.raises(ValueError, match="modified"):
+        ir.publish(lesson, tmp_path)
 
 
 def test_html_embedding_is_safe_and_model_results_verified():

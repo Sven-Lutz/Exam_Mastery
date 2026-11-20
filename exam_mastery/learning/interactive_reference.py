@@ -422,20 +422,54 @@ def re_slug(name):
 
 
 def publish(unit, out_dir):
-    """Write *only* Interaktiv/index.html, atomically and without repeat writes."""
+    """Write exactly one offline HTML and an internal integrity manifest.
+
+    Never overwrite unknown or manually modified study content. Identical
+    builds do not rewrite the file. No model calls or network access.
+    """
+    import hashlib
+
     content = render_html(unit)
-    folder = Path(out_dir) / "Interaktiv"
-    folder.mkdir(parents=True, exist_ok=True)
+    data = content.encode("utf-8")
+    sha = hashlib.sha256(data).hexdigest()
+    root = Path(out_dir)
+    folder = root / "Interaktiv"
     target = folder / "index.html"
-    if target.exists() and target.read_text(encoding="utf-8") == content:
-        return {"status": "UNCHANGED", "path": str(target), "bytes": target.stat().st_size}
+    key = hashlib.sha256(unit["unit_id"].encode()).hexdigest()[:12]
+    state = root / ".em-state" / ("interactive-" + key + ".json")
+    prev = json.loads(state.read_text(encoding="utf-8")) if state.exists() else None
+    if target.exists():
+        if not prev:
+            raise ValueError("Refusing to overwrite unmanaged Interaktiv/index.html")
+        actual = hashlib.sha256(target.read_bytes()).hexdigest()
+        if actual != prev.get("sha256") or prev.get("unit_id") != unit["unit_id"]:
+            raise ValueError("Refusing to overwrite modified Interaktiv/index.html")
+        if actual == sha:
+            return {"status": "UNCHANGED", "path": str(target),
+                    "bytes": target.stat().st_size, "sha256": sha, "model_calls": 0}
+    folder.mkdir(parents=True, exist_ok=True)
     fd, temporary = tempfile.mkstemp(prefix=".em-interactive-", suffix=".tmp", dir=folder)
     try:
-        with os.fdopen(fd, "w", encoding="utf-8") as handle:
-            handle.write(content)
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(data)
         os.replace(temporary, target)
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
+    state.parent.mkdir(parents=True, exist_ok=True)
+    record = {
+        "schema": "em-interactive-publish-v1",
+        "unit_id": unit["unit_id"], "sha256": sha,
+        "academic_status": "HUMAN_REVIEW_PENDING",
+    }
+    fd, temporary = tempfile.mkstemp(prefix=".em-state-", suffix=".tmp", dir=state.parent)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(record, handle, ensure_ascii=False, sort_keys=True)
+            handle.write("\n")
+        os.replace(temporary, state)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
     return {"status": "CREATED_OR_UPDATED", "path": str(target),
-            "bytes": target.stat().st_size}
+            "bytes": target.stat().st_size, "sha256": sha, "model_calls": 0}

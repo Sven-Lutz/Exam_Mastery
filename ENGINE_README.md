@@ -59,3 +59,11 @@ python -m exam_mastery.cli experience books fixtures/experience_reference.json -
 ```
 
 The workbook contains both tasks and complete solutions in distinct sections; there is no separate solution or mock-exam file. Outputs are exactly `Lehrbuch.pdf` and `Arbeitsbuch.pdf`, with hidden incremental integrity state. The source-free fixture is a technical test, not proof of book-level scientific depth. Existing outputs with unknown provenance or manual modifications are never overwritten.
+
+### One-command four-product publishing (source-free development)
+
+```bash
+python -m exam_mastery.cli experience build fixtures/experience_reference.json --out /tmp/em-reference
+```
+
+This dispatches the **existing** PDF typesetting and Anki pipelines plus the offline interactive player. The only visible artifacts are `Lehrbuch.pdf`, `Arbeitsbuch.pdf` (with solutions), `Anki.apkg`, `Interaktiv/index.html`. A hidden `.em-state/` directory holds manifest hashes and stable Anki update state. All existing targets undergo overwrite preflight before any production. An interruption may yield a resumable partial build; publication remains at **HUMAN_REVIEW_PENDING**, not an academic release.

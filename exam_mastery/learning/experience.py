@@ -263,7 +263,7 @@ def obsidian_note(unit):
 def command(args):
     """CLI: exam-mastery experience validate|plan|obsidian|render unit.json [--out dir]."""
     parser = argparse.ArgumentParser(prog="exam-mastery experience")
-    parser.add_argument("action", choices=("validate", "plan", "obsidian", "render", "anki", "books"))
+    parser.add_argument("action", choices=("validate", "plan", "obsidian", "render", "anki", "books", "build"))
     parser.add_argument("input")
     parser.add_argument("--out")
     a = parser.parse_args(args)
@@ -274,6 +274,12 @@ def command(args):
         return 0 if result["valid"] else 1
     if a.action == "plan":
         print(json.dumps(plan(unit), ensure_ascii=False, indent=2))
+        return 0
+    if a.action == "build":
+        if not a.out:
+            parser.error("build requires --out <directory>")
+        from .experience_pipeline import build
+        print(json.dumps(build(unit, a.out), ensure_ascii=False, indent=2))
         return 0
     if a.action == "books":
         if not a.out:
