@@ -57,6 +57,12 @@ def validate_patterns(
             text = spec.get(field)
             if not _nonempty(text) or len(text) > MAX_FEEDBACK_CHARS:
                 errors.append(f"misconceptions.{key}: bounded {field} required")
+        # An explicit counterexample/explanation is essential. Otherwise an
+        # identified error would only produce a generic hint, not instruction.
+        for field in ("wrong_example", "corrected_example", "explanation"):
+            text = spec.get(field)
+            if not _nonempty(text) or len(text) > 4000:
+                errors.append(f"misconceptions.{key}: bounded {field} required")
         refs = spec.get("competency_ids")
         if not isinstance(refs, list) or not refs or any(
             not isinstance(x, str) or x not in skill_ids for x in refs
@@ -166,6 +172,9 @@ def to_policy_categories(unit):
             "kind": spec["kind"],
             "label": spec["label"],
             "feedback": spec["feedback"],
+            "wrong_example": spec["wrong_example"],
+            "corrected_example": spec["corrected_example"],
+            "explanation": spec["explanation"],
         }
         if spec.get("worked_example_id"):
             data["support"] = {
