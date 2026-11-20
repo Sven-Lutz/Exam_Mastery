@@ -177,3 +177,29 @@ def test_correctness_never_inferred_from_two_calendar_days():
     report = recommend(unit, log(unit, first, second), answers={0: "2", 1: "2"})
     assert report["mastery"] == "NOT_EVALUATED"
     assert report["evidence"]["mastery"] == "NOT_EVALUATED"
+
+
+def test_adaptive_cli_uses_existing_policy_without_echoing_answers(tmp_path, capsys):
+    from exam_mastery.learning.experience import command
+
+    unit = lesson()
+    unit_file = tmp_path / "unit.json"
+    log_file = tmp_path / "evidence.json"
+    answer_file = tmp_path / "ephemeral-answers.json"
+    unit_file.write_text(json.dumps(unit), encoding="utf-8")
+    log_file.write_text(json.dumps(log(unit, event("attempt", response_chars=1))),
+                        encoding="utf-8")
+    answer_file.write_text(json.dumps({"0": "2"}), encoding="utf-8")
+
+    assert command(["advise", str(unit_file), "--log", str(log_file),
+                    "--answers-file", str(answer_file)]) == 0
+    response = json.loads(capsys.readouterr().out)
+    assert response["policy"]["rule"] == "RD"
+    assert response["recommended_task"] == "task/new-transfer"
+    assert response["mastery"] == "NOT_EVALUATED"
+
+    # No answers supplied: do not magically reconstruct or grade private text.
+    assert command(["advise", str(unit_file), "--log", str(log_file)]) == 0
+    ungraded = json.loads(capsys.readouterr().out)
+    assert ungraded["policy"]["rule"] == "RL5"
+    assert ungraded["requires_human_or_tutor_review"]
