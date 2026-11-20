@@ -119,6 +119,9 @@ def _managed_files(root):
 def _snapshot(root):
     """Detect concurrent/manual changes before committing a complete build."""
     root = Path(root)
+    for managed in (root, root / ".em-state", root / "Interaktiv"):
+        if managed.is_symlink() or (managed.exists() and not managed.is_dir()):
+            raise ValueError(f"Refusing nonregular or redirected output directory {managed}")
     files = {}
     for relative in _managed_files(root):
         candidate = root / relative
