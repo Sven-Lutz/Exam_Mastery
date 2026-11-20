@@ -338,10 +338,11 @@ def obsidian_note(unit):
 def command(args):
     """CLI: exam-mastery experience validate|plan|obsidian|render unit.json [--out dir]."""
     parser = argparse.ArgumentParser(prog="exam-mastery experience")
-    parser.add_argument("action", choices=("validate", "plan", "obsidian", "render", "anki", "books", "build", "evidence"))
+    parser.add_argument("action", choices=("validate", "plan", "obsidian", "render", "anki", "books", "build", "evidence", "advise"))
     parser.add_argument("input")
     parser.add_argument("--out")
     parser.add_argument("--log", help="Evidence JSON exported explicitly from the offline lesson")
+    parser.add_argument("--answers-file", help="Optional local, ephemeral answer map for numeric formative checking")
     a = parser.parse_args(args)
     unit = json.loads(Path(a.input).read_text(encoding="utf-8"))
     if a.action == "validate":
@@ -362,6 +363,22 @@ def command(args):
             print(json.dumps({"status": "REJECTED", "error": str(exc)}, ensure_ascii=False, indent=2))
             return 1
         print(json.dumps(summary, ensure_ascii=False, indent=2))
+        return 0
+    if a.action == "advise":
+        if not a.log:
+            parser.error("advise requires --log <file.json>")
+        from .experience_adaptation import recommend
+        from .experience_evidence import EvidenceError
+        try:
+            log = json.loads(Path(a.log).read_text(encoding="utf-8"))
+            answers = (json.loads(Path(a.answers_file).read_text(encoding="utf-8"))
+                       if a.answers_file else None)
+            guidance = recommend(unit, log, answers=answers)
+        except (EvidenceError, OSError, ValueError) as exc:
+            print(json.dumps({"status": "REJECTED", "error": str(exc)},
+                             ensure_ascii=False, indent=2))
+            return 1
+        print(json.dumps(guidance, ensure_ascii=False, indent=2))
         return 0
     if a.action == "build":
         if not a.out:
