@@ -80,8 +80,12 @@ def test_binary_search_matches_bisect_left(values):
         assert len(trace["steps"]) <= 7
         for step in trace["steps"]:
             state = step["state"]
-            assert state["lo"] <= state["mid"] < state["hi"]
-            assert state["next_hi"] - state["next_lo"] < state["hi"] - state["lo"]
+            if not values:
+                assert state["mid"] == -1
+                assert state["lo"] == state["hi"] == 0
+            else:
+                assert state["lo"] <= state["mid"] < state["hi"]
+                assert state["next_hi"] - state["next_lo"] < state["hi"] - state["lo"]
 
 
 @pytest.mark.parametrize("gamma", [0, .25, .5, .8, .99])

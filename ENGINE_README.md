@@ -51,3 +51,11 @@ python -m exam_mastery.cli experience render fixtures/experience_reference.json 
 Supported deterministic exploratory models: lower-bound binary search and finite discounted returns. The player requires a numerical prediction before revealing its stepwise trace, uses verified Python reference calculations, and unlocks solutions only after an independent answer attempt. Browser code runs offline without network access or LLMs; it **does not execute learner code**, certify scientific accuracy, or provide a secure coding sandbox. Other domains remain contract-valid but require their own tested renderers. Obsidian is an optional Markdown view and Anki remains the only repetition scheduler.
 
 The same checked synthetic unit may also be exported through the **existing** Anki engine: `python -m exam_mastery.cli experience anki fixtures/experience_reference.json --out /tmp/em-reference`. Only `Anki.apkg` is user-visible; the incremental, stable-identity metadata resides in a hidden state folder. Exports never modify a learner's Anki collection; imported scheduling remains Anki/FSRS's responsibility. Do not interpret a successful export as proof of card quality.
+
+Two **consolidated PDF** products from the same canonical unit now reuse the existing MathJax/Chromium typesetter (not a second rendering engine):
+
+```bash
+python -m exam_mastery.cli experience books fixtures/experience_reference.json --out /tmp/em-reference
+```
+
+The workbook contains both tasks and complete solutions in distinct sections; there is no separate solution or mock-exam file. Outputs are exactly `Lehrbuch.pdf` and `Arbeitsbuch.pdf`, with hidden incremental integrity state. The source-free fixture is a technical test, not proof of book-level scientific depth. Existing outputs with unknown provenance or manual modifications are never overwritten.

@@ -61,7 +61,7 @@ def publish(unit, output_dir, state_dir=None):
     # stable across title and content changes
     deck = "Exam Mastery::" + unit["title"]
     fingerprint = hashlib.sha256(json.dumps(
-        {"cards": cards, "course": course, "chapter": chapter, "notetype": "v2"},
+        {"cards": cards, "course": course, "chapter": chapter, "deck": deck, "notetype": "v2"},
         sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
     package = output / "Anki.apkg"
     manifest = state / ("anki-" + digest_id + ".json")
