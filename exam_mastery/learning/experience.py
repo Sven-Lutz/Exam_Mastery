@@ -261,9 +261,9 @@ def obsidian_note(unit):
 
 
 def command(args):
-    """CLI: exam-mastery experience validate|plan|obsidian unit.json [--out note.md]."""
+    """CLI: exam-mastery experience validate|plan|obsidian|render unit.json [--out dir]."""
     parser = argparse.ArgumentParser(prog="exam-mastery experience")
-    parser.add_argument("action", choices=("validate", "plan", "obsidian"))
+    parser.add_argument("action", choices=("validate", "plan", "obsidian", "render"))
     parser.add_argument("input")
     parser.add_argument("--out")
     a = parser.parse_args(args)
@@ -274,6 +274,12 @@ def command(args):
         return 0 if result["valid"] else 1
     if a.action == "plan":
         print(json.dumps(plan(unit), ensure_ascii=False, indent=2))
+        return 0
+    if a.action == "render":
+        if not a.out:
+            parser.error("render requires --out <directory>")
+        from .interactive_reference import publish
+        print(json.dumps(publish(unit, a.out), ensure_ascii=False, indent=2))
         return 0
     if not a.out or Path(a.out).suffix.lower() != ".md":
         parser.error("obsidian requires --out <file.md>")
