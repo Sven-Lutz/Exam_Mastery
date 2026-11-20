@@ -228,6 +228,11 @@ textarea { min-height:90px; }
 .attempt-status { color:var(--muted); font-size:.9rem; }
 .adaptive-guidance { background:#f2f7fc; border-left:3px solid var(--blue); padding:.65rem .85rem; margin:.8rem 0; font-size:.94rem; }
 .adaptive-guidance a { color:var(--blue); text-decoration:underline; }
+.misconception-example { margin-top:.85rem; padding:.75rem; border:1px solid var(--line); border-radius:10px; background:white; }
+.misconception-example details { margin-top:.65rem; }
+.misconception-example summary { cursor:pointer; font-weight:650; }
+.misconception-example p { margin:.55rem 0; }
+.misconception-actions { display:flex; flex-wrap:wrap; gap:1rem; margin-top:.7rem; }
 .hint-text { border-left:3px solid var(--blue); padding:.6rem 1rem; background:#edf3ff; }
 .proof-steps { padding-left:1.4rem; }
 .proof-steps li { padding:.4rem 0; }
@@ -499,6 +504,40 @@ function explainPolicy(taskId, diagnosis, container) {
   container.append(el("strong", "", (labels[diagnosis.result] || "Geprüft") +
     " (lokaler Autoren-Referenzwert). "));
   container.append(el("span", "", decision.rationale + " " + decision.uncertainty));
+  const category = diagnosis.error_category
+    ? model.adaptive_track.categories[diagnosis.error_category] : null;
+  if (category && (diagnosis.result === "incorrect" || diagnosis.result === "partial")) {
+    const panel = el("section", "misconception-example");
+    panel.append(el("strong", "", "Mögliche Fehlstrategie: " + category.label));
+    panel.append(el("p", "", category.feedback));
+    const details = document.createElement("details");
+    const head = document.createElement("summary");
+    head.textContent = "Beispiel einer Fehlstrategie und begründete Korrektur";
+    details.append(head,
+      el("p", "", category.wrong_example),
+      el("p", "", category.corrected_example),
+      el("p", "", category.explanation));
+    panel.append(details);
+    const actions = el("div", "misconception-actions");
+    if (category.support && category.support.type === "worked_example") {
+      const id = "teaching-" + category.support.ref.replace(/[^a-z0-9_-]/g,"-");
+      if (document.getElementById(id)) {
+        const link = document.createElement("a");
+        link.href = "#" + id; link.textContent = "Herleitung im Lehrtext";
+        actions.append(link);
+      }
+    }
+    if (category.visual && category.visual.type === "interactive_reference") {
+      const id = "interaction-" + category.visual.ref.replace(/[^a-z0-9_-]/g,"-");
+      if (document.getElementById(id)) {
+        const link = document.createElement("a");
+        link.href = "#" + id; link.textContent = "Modell untersuchen";
+        actions.append(link);
+      }
+    }
+    panel.append(actions);
+    container.append(panel);
+  }
   const nextId = decision.next_task;
   if (nextId && byTask.has(nextId)) {
     const slug = nextId.replace(/[^a-z0-9_-]/g,"-");
@@ -650,8 +689,8 @@ def render_html(unit):
         '<section aria-label="Wissenschaftliche Erklärung"><h2>Verstehen</h2>',
     ]
     for block in unit["teaching"]:
-        parts.append('<article class="card" data-competencies="' +
-                     _h(",".join(block["competency_ids"])) +
+        parts.append('<article class="card" id="teaching-' + re_slug(block["id"]) +
+                     '" data-competencies="' + _h(",".join(block["competency_ids"])) +
                      '" data-claims="' + _h(",".join(block.get("claim_ids", []))) +
                      '"><p>' + _h(block["content"]) + '</p></article>')
         proof = block.get("derivation")
