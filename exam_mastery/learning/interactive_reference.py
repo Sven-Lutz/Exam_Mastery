@@ -237,6 +237,8 @@ textarea { min-height:90px; }
 .proof-steps { padding-left:1.4rem; }
 .proof-steps li { padding:.4rem 0; }
 .proof-statement { font-weight:650; margin-bottom:.25rem; }
+.proof-equation { display:block; font-size:1.08rem; white-space:normal; overflow-wrap:anywhere; padding:.4rem .65rem; background:#edf4fd; border-radius:8px; margin:.35rem 0; }
+.proof-verification { display:block; font-size:.78rem; color:var(--muted); margin-bottom:.35rem; }
 .proof-steps summary { cursor:pointer; color:var(--blue); font-size:.93rem; }
 .proof-steps details[open] { border-left:3px solid var(--accent); padding-left:.75rem; }
 .parsons-lines { padding-left:1.5rem; }
@@ -665,6 +667,7 @@ def render_html(unit):
     compiled = []
     for i in unit["interactions"]:
         compiled.append(build_interaction(i))
+    from .experience_proof_checks import verify as verify_polynomial
     if not compiled:
         raise InteractionError("No executable interactions; cannot claim an interactive learning product")
     parts = [
@@ -705,9 +708,23 @@ def render_html(unit):
             ])
             for step in proof["steps"]:
                 parts.append('<li><div class="proof-statement">' +
-                             _h(step["statement"]) + '</div>' +
-                             '<details><summary>Warum ist dieser Schritt zulässig?</summary>' +
-                             '<p>' + _h(step["justification"]) + '</p></details></li>')
+                             _h(step["statement"]) + '</div>')
+                if "math_check" in step:
+                    proof_check = step["math_check"]
+                    # Exactly the same authored identity is checked in the
+                    # canonical validator and typeset into the PDF.
+                    verify_polynomial(proof_check)
+                    parts.append(
+                        '<code class="proof-equation">' +
+                        _h(proof_check["lhs"] + " = " + proof_check["rhs"]) +
+                        '</code><small class="proof-verification">'
+                        'Exakt symbolisch geprüft: nur diese Polynomgleichung, '
+                        'nicht der gesamte Beweis.</small>'
+                    )
+                parts.append(
+                    '<details><summary>Warum ist dieser Schritt zulässig?</summary>' +
+                    '<p>' + _h(step["justification"]) + '</p></details></li>'
+                )
             parts.extend(['</ol><p class="answer"><strong>Ergebnis:</strong> ' +
                           _h(proof["result"]) + '</p></article>'])
     parts.append('</section>')
