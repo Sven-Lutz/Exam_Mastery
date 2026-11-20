@@ -69,7 +69,7 @@ def _inspect(ast, names, budget, depth=0):
         budget[0] += 1
         if (budget[0] > MAX_AST_NODES or exponent[0] != "n"
                 or type(exponent[1]) not in (float, int)
-                or not exponent[1].is_integer()
+                or not float(exponent[1]).is_integer()
                 or not 1 <= exponent[1] <= MAX_POWER):
             raise ProofCheckError("only bounded positive integer powers are supported")
         degree = base_degree * int(exponent[1])
