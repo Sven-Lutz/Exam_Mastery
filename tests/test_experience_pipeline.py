@@ -1,4 +1,5 @@
 """Four-product orchestrator must detect conflicts before any publication."""
+import hashlib
 import json
 from pathlib import Path
 
@@ -37,40 +38,142 @@ def test_unknown_user_output_prevents_all_writes(tmp_path, name):
     assert not (tmp_path / "Lehrbuch.pdf").exists() or name == "Lehrbuch.pdf"
 
 
-def test_coherent_four_product_dispatch_without_extra_outputs(monkeypatch, tmp_path):
+def _fake_publishers(monkeypatch, suffix=b"v1", failure=None, wrong_manifest=False):
+    """Simulate real publisher manifests and content without PDF/browser deps."""
     from exam_mastery.learning import experience_books, experience_anki, interactive_reference
     calls = []
+    digest = hashlib.sha256(fixture()["unit_id"].encode()).hexdigest()[:12]
 
-    def books(unit, output_dir):
+    def state(out, name, data):
+        path = Path(out) / ".em-state" / f"{name}-{digest}.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data), encoding="utf-8")
+
+    def books(unit, out):
         calls.append("books")
+        hashes = {}
         for name in ("Lehrbuch.pdf", "Arbeitsbuch.pdf"):
-            (Path(output_dir) / name).write_bytes(b"pdf")
-        return {"status": "CREATED_OR_UPDATED", "products": ["Lehrbuch.pdf", "Arbeitsbuch.pdf"]}
+            data = b"fake-pdf-" + name.encode() + suffix
+            (Path(out) / name).write_bytes(data)
+            hashes[name] = hashlib.sha256(data).hexdigest()
+        state(out, "books", {"files": hashes})
+        return {"status": "CREATED_OR_UPDATED", "products": list(hashes)}
 
-    def anki(unit, output_dir):
+    def anki(unit, out):
         calls.append("anki")
-        (Path(output_dir) / "Anki.apkg").write_bytes(b"apkg")
+        if failure == "anki":
+            raise RuntimeError("Injected downstream failure")
+        data = b"fake-anki" + suffix
+        (Path(out) / "Anki.apkg").write_bytes(data)
+        state(out, "anki", {"package_sha256":
+                              hashlib.sha256(data).hexdigest() if not wrong_manifest else "bad"})
         return {"status": "CREATED_OR_UPDATED"}
 
-    def interactive(unit, output_dir):
+    def interactive(unit, out):
         calls.append("interactive")
-        target = Path(output_dir) / "Interaktiv" / "index.html"
+        target = Path(out) / "Interaktiv" / "index.html"
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text("html", encoding="utf-8")
+        data = b"<html>" + suffix + b"</html>"
+        target.write_bytes(data)
+        state(out, "interactive", {"sha256": hashlib.sha256(data).hexdigest()})
         return {"status": "CREATED_OR_UPDATED"}
 
     monkeypatch.setattr(experience_books, "publish", books)
     monkeypatch.setattr(experience_anki, "publish", anki)
     monkeypatch.setattr(interactive_reference, "publish", interactive)
-    lesson = fixture()
-    result = pipeline.build(lesson, tmp_path)
+    return calls
+
+
+def test_coherent_four_product_dispatch_without_extra_outputs(monkeypatch, tmp_path):
+    calls = _fake_publishers(monkeypatch)
+    result = pipeline.build(fixture(), tmp_path)
     assert calls == ["books", "anki", "interactive"]
     assert result["status"] == "READY_FOR_TECHNICAL_REVIEW"
     assert result["academic_status"] == "HUMAN_REVIEW_PENDING"
     assert result["model_calls"] == result["network_calls"] == 0
+    assert result["publication"]["status"] == "STAGED_COMMIT"
+    assert result["publication"]["guarantee"].endswith("NOT_CRASH_ATOMIC")
     assert set(result["products"].values()) == {
         "Lehrbuch.pdf", "Arbeitsbuch.pdf", "Anki.apkg", "Interaktiv/index.html"
     }
+    assert pipeline.preflight(fixture(), tmp_path)["status"] == "PREFLIGHT_PASS"
+
+
+def _managed_bytes(root):
+    paths = [Path(p) for p in pipeline.PRODUCTS.values()]
+    paths += pipeline._state_files(root)
+    return {p.as_posix(): (root / p).read_bytes()
+            for p in paths if (root / p).is_file()}
+
+
+def test_failed_third_party_publisher_does_not_change_existing_products(monkeypatch, tmp_path):
+    _fake_publishers(monkeypatch, suffix=b"old")
+    pipeline.build(fixture(), tmp_path)
+    before = _managed_bytes(tmp_path)
+    _fake_publishers(monkeypatch, suffix=b"new", failure="anki")
+    with pytest.raises(RuntimeError, match="Injected downstream failure"):
+        pipeline.build(fixture(), tmp_path)
+    assert _managed_bytes(tmp_path) == before
+    assert pipeline.preflight(fixture(), tmp_path)["status"] == "PREFLIGHT_PASS"
+    assert not list(tmp_path.glob(".em-stage-*"))
+
+
+def test_bad_stage_manifest_cannot_corrupt_live_release(monkeypatch, tmp_path):
+    _fake_publishers(monkeypatch, suffix=b"old")
+    pipeline.build(fixture(), tmp_path)
+    before = _managed_bytes(tmp_path)
+    _fake_publishers(monkeypatch, suffix=b"bad", wrong_manifest=True)
+    with pytest.raises(ValueError, match="modified"):
+        pipeline.build(fixture(), tmp_path)
+    assert _managed_bytes(tmp_path) == before
+
+
+def test_commit_injected_replace_error_restores_every_original_byte(monkeypatch, tmp_path):
+    _fake_publishers(monkeypatch, suffix=b"old")
+    pipeline.build(fixture(), tmp_path)
+    before = _managed_bytes(tmp_path)
+    _fake_publishers(monkeypatch, suffix=b"new")
+    original_replace = pipeline.os.replace
+    failed = []
+
+    def fail_once(source, target):
+        if target == tmp_path / "Interaktiv" / "index.html" and not failed:
+            failed.append(True)
+            raise OSError("Injected commit failure")
+        return original_replace(source, target)
+
+    monkeypatch.setattr(pipeline.os, "replace", fail_once)
+    with pytest.raises(OSError, match="Injected commit failure"):
+        pipeline.build(fixture(), tmp_path)
+    assert failed == [True]
+    assert _managed_bytes(tmp_path) == before
+    assert pipeline.preflight(fixture(), tmp_path)["status"] == "PREFLIGHT_PASS"
+    assert not list(tmp_path.glob(".em-recovery-*"))
+
+
+def test_unchanged_staged_build_does_not_touch_product_mtimes(monkeypatch, tmp_path):
+    _fake_publishers(monkeypatch, suffix=b"stable")
+    pipeline.build(fixture(), tmp_path)
+    paths = [tmp_path / p for p in pipeline.PRODUCTS.values()]
+    before = [p.stat().st_mtime_ns for p in paths]
+    _fake_publishers(monkeypatch, suffix=b"stable")
+    result = pipeline.build(fixture(), tmp_path)
+    assert result["publication"]["status"] == "UNCHANGED"
+    assert result["publication"]["replaced_files"] == 0
+    assert [p.stat().st_mtime_ns for p in paths] == before
+
+
+def test_nested_state_symlink_rejected_before_any_stage(monkeypatch, tmp_path):
+    state = tmp_path / ".em-state"
+    state.mkdir()
+    outside = tmp_path.parent / (tmp_path.name + "-external-ledger")
+    outside.write_text("Private user content", encoding="utf-8")
+    (state / "malicious-link.json").symlink_to(outside)
+    _fake_publishers(monkeypatch)
+    with pytest.raises(ValueError, match="symlinked publisher state entry"):
+        pipeline.build(fixture(), tmp_path)
+    assert outside.read_text(encoding="utf-8") == "Private user content"
+    assert not list(tmp_path.glob(".em-stage-*"))
 
 
 @pytest.mark.parametrize("case", [
@@ -111,3 +214,58 @@ def test_symlinked_managed_directories_fail_closed(tmp_path, managed):
     with pytest.raises(ValueError, match="nonregular managed directory"):
         pipeline.preflight(fixture(), tmp_path)
     assert list(outside.iterdir()) == []
+
+
+def test_real_staged_four_product_publish_and_idempotent_rebuild(tmp_path):
+    """Full integration uses real PDF, real Anki APKG, offline HTML, and manifests."""
+    pytest.importorskip("playwright.sync_api")
+    fitz = pytest.importorskip("pymupdf")
+    pytest.importorskip("anki")
+    from zipfile import ZipFile
+
+    first = pipeline.build(fixture(), tmp_path)
+    assert first["publication"]["status"] == "STAGED_COMMIT"
+    assert first["publication"]["replaced_files"] >= 4
+    assert pipeline.preflight(fixture(), tmp_path)["status"] == "PREFLIGHT_PASS"
+    with fitz.open(tmp_path / "Lehrbuch.pdf") as textbook:
+        assert textbook.page_count >= 2
+    with fitz.open(tmp_path / "Arbeitsbuch.pdf") as workbook:
+        assert workbook.page_count >= 2
+    with ZipFile(tmp_path / "Anki.apkg") as package:
+        assert any(name.startswith("collection.") for name in package.namelist())
+    html = (tmp_path / "Interaktiv" / "index.html").read_text(encoding="utf-8")
+    assert html.startswith("<!doctype html>")
+    assert "window.EMT" in html
+    assert not list(tmp_path.glob(".em-stage-*"))
+    assert not list(tmp_path.glob(".em-recovery-*"))
+    visible = sorted(p.name for p in tmp_path.iterdir() if not p.name.startswith("."))
+    assert visible == ["Anki.apkg", "Arbeitsbuch.pdf", "Interaktiv", "Lehrbuch.pdf"]
+
+    prior_bytes = _managed_bytes(tmp_path)
+    output_paths = [tmp_path / p for p in pipeline.PRODUCTS.values()]
+    old_mtimes = [p.stat().st_mtime_ns for p in output_paths]
+    second = pipeline.build(fixture(), tmp_path)
+    assert second["publication"]["status"] == "UNCHANGED"
+    assert _managed_bytes(tmp_path) == prior_bytes
+    assert [p.stat().st_mtime_ns for p in output_paths] == old_mtimes
+
+
+def test_symlink_inserted_after_initial_preflight_is_not_followed(monkeypatch, tmp_path):
+    """Check parent directories again at commit, not only before staging."""
+    from exam_mastery.learning import interactive_reference
+    _fake_publishers(monkeypatch)
+    original_publisher = interactive_reference.publish
+    outside = tmp_path.parent / (tmp_path.name + "-external-output")
+    outside.mkdir()
+
+    def malicious_race(unit, stage):
+        result = original_publisher(unit, stage)
+        (tmp_path / "Interaktiv").symlink_to(outside, target_is_directory=True)
+        return result
+
+    monkeypatch.setattr(interactive_reference, "publish", malicious_race)
+    with pytest.raises(ValueError, match="redirected output directory"):
+        pipeline.build(fixture(), tmp_path)
+    assert not list(outside.iterdir())
+    assert not (tmp_path / "Anki.apkg").exists()
+    assert not list(tmp_path.glob(".em-stage-*"))
