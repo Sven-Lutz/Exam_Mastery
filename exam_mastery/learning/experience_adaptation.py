@@ -15,6 +15,7 @@ from __future__ import annotations
 from . import diagnose, policy
 from .experience import validate
 from .experience_evidence import EvidenceError, summarize
+from .experience_misconceptions import to_policy_categories
 
 
 SCHEMA = "em-experience-adaptive-recommendation-v1"
@@ -59,7 +60,7 @@ def track_for_unit(unit):
     return {
         "flow": [t["id"] for t in tasks],
         "tasks": tasks, "kcs": [{"id": k["id"]} for k in unit["competencies"]],
-        "categories": {}, "worked_examples": {}, "anki_tags": [],
+        "categories": to_policy_categories(unit), "worked_examples": {}, "anki_tags": [],
     }
 
 

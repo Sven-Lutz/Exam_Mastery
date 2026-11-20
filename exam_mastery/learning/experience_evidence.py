@@ -30,7 +30,9 @@ def assessment_revision(unit):
         "machine_check": t.get("machine_check"), "role": t.get("role", "core"),
     } for t in unit["assessments"]]
     payload = {"unit_id": unit["unit_id"],
-               "assessments": sorted(items, key=lambda t: t["id"])}
+               "assessments": sorted(items, key=lambda t: t["id"]),
+               "misconceptions": sorted(unit.get("misconceptions", []),
+                                        key=lambda t: t["id"])}
     encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True,
                          separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()

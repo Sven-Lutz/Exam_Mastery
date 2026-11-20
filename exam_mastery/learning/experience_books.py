@@ -49,6 +49,14 @@ def book_model(unit):
     claim_map = {c["id"]: c for c in unit["claims"]}
     synthetic = unit["source_mode"] == "synthetic"
     sections = []
+    # Attach each authored counterexample to exactly one matching teaching
+    # section; never scatter repeated errors throughout the textbook.
+    placement = {}
+    for spec in unit.get("misconceptions", []):
+        placement[spec["id"]] = spec.get("worked_example_id") or next(
+            block["id"] for block in unit["teaching"] if
+            set(block["competency_ids"]).intersection(spec["competency_ids"])
+        )
     for i, item in enumerate(unit["teaching"], 1):
         provenance = []
         for claim_id in item.get("claim_ids", []):
@@ -75,6 +83,26 @@ def book_model(unit):
                 "block_id": item["id"] + "/derivation",
                 "prov": "didactic" if synthetic else "unconfirmed",
                 "src": "; ".join(provenance),
+            })
+        for spec in unit.get("misconceptions", []):
+            if placement[spec["id"]] != item["id"]:
+                continue
+            cited = []
+            for claim_id in spec.get("claim_ids", []):
+                for source_id in claim_map[claim_id]["source_refs"]:
+                    label = ("Synthetische Referenz: " if synthetic else
+                             "Quellenangabe (Fachprüfung erforderlich): ") + source_map[source_id]["locator"]
+                    if label not in cited:
+                        cited.append(label)
+            section_blocks.append({
+                "type": "misconception",
+                "wrong": spec["wrong_example"],
+                "right": spec["corrected_example"],
+                "why": spec["explanation"],
+                "kc_ids": spec["competency_ids"],
+                "block_id": spec["id"],
+                "prov": "didactic" if synthetic else "unconfirmed",
+                "src": "; ".join(cited),
             })
         sections.append({
             "title": item.get("section_title") or

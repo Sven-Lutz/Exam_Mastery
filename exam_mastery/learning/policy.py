@@ -102,11 +102,11 @@ def decide(track, events, now=None):
         cid = d.get('error_category') or 'unclassified'; cat = category(track, cid)
         same = sum(1 for _, e in atts if e['diagnosis'].get('error_category') == cid)
         if cat['kind'] == 'prerequisite':
-            retry = task.get('prereq_retry') or _role(track, 'prereq_retry', exclude_solved=events) or task['id']
+            retry = task.get('prereq_retry') or cat.get('retry_task_id') or _role(track, 'prereq_retry', exclude_solved=events) or task['id']
             return _dec('RA', 'worked_example', retry, obs, f'Die Antwort passt zu einer fehlenden Voraussetzung ({cat["label"]}). Ein durchgerechnetes Beispiel zeigt sie; danach eine parallele Aufgabe zur Voraussetzung.',
                         'Dieselbe Zahl kann auch durch einen Flüchtigkeitsfehler entstehen.', support=cat.get('support'), focus=cat.get('visual'))
         if cat['kind'] == 'misconception' and same >= 2:
-            nxt = _role(track, 'contrast', exclude_solved=events) or _role(track, 'transfer', exclude_solved=events) or task['id']
+            nxt = cat.get('contrast_task_id') or _role(track, 'contrast', exclude_solved=events) or _role(track, 'transfer', exclude_solved=events) or task['id']
             return _dec('RC2', 'contrast_example', nxt, obs + f' Dieselbe Verwechslung zum {same}. Mal.',
                         'Die Verwechslung wiederholt sich. Ein Kontrastbeispiel stellt beide Begriffe nebeneinander; danach eine Aufgabe, in der sie sich deutlich unterscheiden.',
                         'Zwei gleiche Fehler sind ein Muster, kein Beweis einer festen Fehlvorstellung.', support=cat.get('contrast') or cat.get('support'), focus=cat.get('visual'))

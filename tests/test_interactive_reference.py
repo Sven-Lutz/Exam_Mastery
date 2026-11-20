@@ -427,3 +427,52 @@ def test_unverified_browser_proof_does_not_move_to_transfer(tmp_path):
             assert guide.locator("a").count() == 0
         finally:
             browser.close()
+
+
+def test_misconception_feedback_and_targeted_contrast_in_real_browser(tmp_path):
+    """Reference-calculated wrong values route through canonical content/legacy policy."""
+    pytest.importorskip("playwright.sync_api")
+    from playwright.sync_api import sync_playwright
+
+    unit = json.loads((Path(__file__).resolve().parents[1] /
+        "fixtures" / "experience_misconception_reference.json").read_text(encoding="utf-8"))
+    ir.publish(unit, tmp_path)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+        try:
+            page = browser.new_page(accept_downloads=True)
+            page.goto((tmp_path / "Interaktiv" / "index.html").as_uri())
+            assessment = page.locator("#exercise-task-prove")
+            assessment.locator("textarea").fill("2")
+            assessment.locator(".submit-attempt").click()
+            guide = assessment.locator(".adaptive-guidance")
+            assert guide.get_attribute("data-rule") == "RC1"
+            assert "Mögliche Fehlstrategie" in guide.inner_text()
+            assert "Grenze" in guide.inner_text()
+            assert guide.locator("details").count() == 1
+            assert guide.locator("a[href='#teaching-teach-proof']").count() == 1
+            assert guide.locator("a[href='#interaction-interaction-binary-search']").count() == 1
+            guide.locator("summary").click()
+            assert "Index 1" in guide.inner_text()
+            assessment.locator(".retry-attempt").click()
+            assessment.locator("textarea").fill("2")
+            assessment.locator(".submit-attempt").click()
+            assert guide.get_attribute("data-rule") == "RC2"
+            assert guide.locator("a[href='#exercise-task-contrast-unique']").count() == 1
+            with page.expect_download() as d:
+                page.locator("#evidence-export").click()
+            events = json.loads(Path(d.value.path()).read_text(encoding="utf-8"))
+            assert [e["type"] for e in events["events"]] == ["attempt", "attempt"]
+            assert "corrected_example" not in json.dumps(events)
+            assert "wrong_example" not in json.dumps(events)
+        finally:
+            browser.close()
+
+
+def test_author_misconception_content_cannot_inject_html_or_scripts():
+    unit = json.loads((Path(__file__).resolve().parents[1] /
+        "fixtures" / "experience_misconception_reference.json").read_text(encoding="utf-8"))
+    unit["misconceptions"][0]["feedback"] = "</script><script>alert(42)</script>"
+    page = ir.render_html(unit)
+    assert "<script>alert(42)</script>" not in page
+    assert "\\u003c/script\\u003e" in page
