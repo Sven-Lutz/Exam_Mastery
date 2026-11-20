@@ -163,3 +163,13 @@ def test_unsupported_derivation_claim_id_is_blocked():
         "result": "Complete.",
     }
     assert any("unknown reference" in e for e in ex.validate(sample)["errors"])
+
+
+def test_progressive_hint_contract_rejects_inert_or_unbounded_entries():
+    sample = unit()
+    sample["assessments"][0]["hints"] = ["First useful hint", "Next useful hint"]
+    assert ex.validate(sample)["valid"]
+    for invalid in ("not a list", ["", "Useful"], ["x" * 801], ["x"] * 7):
+        sample["assessments"][0]["hints"] = invalid
+        report = ex.validate(sample)
+        assert any("hints must be" in error for error in report["errors"])
