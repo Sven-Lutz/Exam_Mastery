@@ -8,6 +8,8 @@ spaced-repetition schedule. Reuses semantic assessment IDs.
 from __future__ import annotations
 
 from datetime import datetime
+import hashlib
+import json
 
 SCHEMA = "em-practice-evidence-v1"
 MAX_EVENTS = 10000
@@ -17,6 +19,20 @@ TYPES = {"attempt", "hint", "solution_reveal"}
 
 class EvidenceError(ValueError):
     """An invalid or ambiguous learner log must not produce a competence claim."""
+
+
+def assessment_revision(unit):
+    """Bind a local evidence log to the assessment wording and rubric version."""
+    items = [{
+        "id": t["id"], "prompt": t["prompt"], "solution": t["solution"],
+        "rubric": t["rubric"], "hints": t.get("hints", []),
+        "competency_ids": t["competency_ids"],
+    } for t in unit["assessments"]]
+    payload = {"unit_id": unit["unit_id"],
+               "assessments": sorted(items, key=lambda t: t["id"])}
+    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True,
+                         separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def _timestamp(value):
@@ -39,10 +55,12 @@ def summarize(log, unit):
     not inferred from a browser clock. Real correctness needs independent
     grading and a distinct assessment protocol.
     """
-    if not isinstance(log, dict) or set(log) != {"schema", "unit_id", "events"}:
-        raise EvidenceError("expected exact schema, unit_id, events keys")
+    if not isinstance(log, dict) or set(log) != {"schema", "unit_id", "assessment_revision", "events"}:
+        raise EvidenceError("expected exact schema, unit_id, assessment_revision, events keys")
     if log["schema"] != SCHEMA or log["unit_id"] != unit.get("unit_id"):
         raise EvidenceError("wrong event schema or learning unit")
+    if log["assessment_revision"] != assessment_revision(unit):
+        raise EvidenceError("assessment revision differs: never reuse progress on changed tasks")
     events = log["events"]
     if not isinstance(events, list) or len(events) > MAX_EVENTS:
         raise EvidenceError("events must be a bounded list")
