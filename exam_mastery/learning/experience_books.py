@@ -45,6 +45,7 @@ def book_model(unit):
     checked = validate(unit)
     if not checked["valid"]:
         raise ValueError("Invalid learning unit: " + "; ".join(checked["errors"]))
+    from .experience_proof_checks import verify as verify_polynomial
     source_map = {s["id"]: s for s in unit["sources"]}
     claim_map = {c["id"]: c for c in unit["claims"]}
     synthetic = unit["source_mode"] == "synthetic"
@@ -77,8 +78,13 @@ def book_model(unit):
             section_blocks.append({
                 "type": "example", "label": "Herleitung · Schritt für Schritt",
                 "title": derivation["title"], "given": derivation["given"],
-                "steps": [[step["statement"], step["justification"]]
-                          for step in derivation["steps"]],
+                "steps": [[
+                    step["statement"] + (
+                        " " + verify_polynomial(step["math_check"])["latex"]
+                        if "math_check" in step else ""
+                    ),
+                    step["justification"],
+                ] for step in derivation["steps"]],
                 "result": derivation["result"], "kc_ids": item["competency_ids"],
                 "block_id": item["id"] + "/derivation",
                 "prov": "didactic" if synthetic else "unconfirmed",
