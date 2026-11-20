@@ -30,7 +30,7 @@ OPERATIONS = {
 INTERACTIONS = {
     "explorable_model", "visual_derivation", "code_trace", "coding_workbench",
     "scenario_decision", "case_reasoning", "spatial_exploration",
-    "simulation", "interactive_explanation",
+    "simulation", "interactive_explanation", "code_parsons",
 }
 SEMANTIC_ID = re.compile(r"^[a-z0-9][a-z0-9/_-]{2,100}$")
 

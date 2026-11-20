@@ -188,6 +188,75 @@
       "claim_ids": [
         "synthetic/search-correctness"
       ]
+    },
+    {
+      "id": "interaction/code-reconstruction",
+      "type": "code_parsons",
+      "model_ref": "parsons_reference",
+      "competency_ids": [
+        "binary/search-trace"
+      ],
+      "claim_ids": [
+        "synthetic/search-correctness"
+      ],
+      "prediction_prompt": "Rekonstruiere die Reihenfolge der Referenzimplementierung für lower_bound.",
+      "feedback_rule": "Zeige, warum die Intervallinvariante in beiden Verzweigungen erhalten bleibt.",
+      "transfer_prompt": "Ändere die Vergleichsbedingung für upper_bound. Wo liegt die entscheidende Änderung?",
+      "variants": [
+        {
+          "label": "Binary Search – Referenzcode",
+          "parameters": {
+            "lines": [
+              {
+                "id": "setup",
+                "code": "lo, hi = 0, len(a)",
+                "why": "Initialisierung eines halboffenen Kandidatenintervalls."
+              },
+              {
+                "id": "loop",
+                "code": "while lo < hi:",
+                "why": "Iteriere nur, solange das Kandidatenintervall noch Elemente enthält."
+              },
+              {
+                "id": "middle",
+                "code": "    mid = (lo + hi) // 2",
+                "why": "Berechne einen Index innerhalb des verbleibenden Intervalls."
+              },
+              {
+                "id": "condition",
+                "code": "    if a[mid] < x: lo = mid + 1",
+                "why": "Alle Positionen bis mid sind zu klein; der Kandidatenbereich beginnt rechts davon."
+              },
+              {
+                "id": "alternative",
+                "code": "    else: hi = mid",
+                "why": "mid kann die erste passende Position sein, daher bleibt es im Kandidatenbereich."
+              },
+              {
+                "id": "finish",
+                "code": "return lo",
+                "why": "Bei lo == hi liegt der kleinste passende Einfügeindex vor."
+              }
+            ],
+            "initial_order": [
+              "finish",
+              "condition",
+              "setup",
+              "alternative",
+              "loop",
+              "middle"
+            ],
+            "solution_order": [
+              "setup",
+              "loop",
+              "middle",
+              "condition",
+              "alternative",
+              "finish"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

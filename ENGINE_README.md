@@ -67,3 +67,5 @@ python -m exam_mastery.cli experience build fixtures/experience_reference.json -
 ```
 
 This dispatches the **existing** PDF typesetting and Anki pipelines plus the offline interactive player. The only visible artifacts are `Lehrbuch.pdf`, `Arbeitsbuch.pdf` (with solutions), `Anki.apkg`, `Interaktiv/index.html`. A hidden `.em-state/` directory holds manifest hashes and stable Anki update state. All existing targets undergo overwrite preflight before any production. An interruption may yield a resumable partial build; publication remains at **HUMAN_REVIEW_PENDING**, not an academic release.
+
+A small, offline, accessible **Parsons/code-reconstruction exercise** now complements numeric code tracing. It checks the ordering of supplied reference fragments and reveals per-step explanations only after a correct attempt. It does **not** execute arbitrary learner code or claim to validate every semantically equivalent solution. The implementation stays within the existing interactive product and has Playwright tests.

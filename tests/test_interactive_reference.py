@@ -237,3 +237,65 @@ def test_reasoned_derivation_is_in_offline_story():
         assert html.escape(step["statement"], quote=True) in page
         assert html.escape(step["justification"], quote=True) in page
     assert page.count("Warum ist dieser Schritt zulässig?") == len(proof["steps"])
+
+
+def test_parsons_exact_reference_order_without_execution():
+    from pathlib import Path
+    u = json.loads((Path(__file__).resolve().parents[1] /
+                    "fixtures" / "experience_reference.json").read_text(encoding="utf-8"))
+    candidate = u["interactions"][-1]
+    compiled = ir.build_interaction(candidate)
+    assert compiled["type"] == "code_parsons"
+    v = compiled["variants"][0]
+    assert v["solution_order"] != v["initial_order"]
+    assert {line["id"] for line in v["lines"]} == set(v["solution_order"])
+    page = ir.render_html(u)
+    assert "parsons-lines" in page
+    assert "setupParsons" in page
+    assert "Rekonstruiere die Reihenfolge" in page
+
+
+@pytest.mark.parametrize("invalid", [
+    {"lines": [], "solution_order": [], "initial_order": []},
+    {"lines": [{"id": "x", "code": "a", "why": "b"}] * 3,
+     "solution_order": ["x", "x", "x"], "initial_order": ["x", "x", "x"]},
+    {"lines": [{"id": "ab", "code": "a", "why": "b"},
+               {"id": "cd", "code": "c", "why": "d"},
+               {"id": "ef", "code": "e", "why": "f"}],
+     "solution_order": ["ab", "cd", "ef"], "initial_order": ["ab", "cd", "ef"]},
+])
+def test_parsons_rejects_invalid_or_trivial_challenge(invalid):
+    with pytest.raises(ir.InteractionError):
+        ir.parsons_reference(invalid)
+
+
+def test_real_parsons_browser_interaction(tmp_path):
+    pytest.importorskip("playwright.sync_api")
+    from pathlib import Path
+    u = json.loads((Path(__file__).resolve().parents[1] /
+                    "fixtures" / "experience_reference.json").read_text(encoding="utf-8"))
+    ir.publish(u, tmp_path)
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+        try:
+            page = browser.new_page()
+            page.goto((tmp_path / "Interaktiv" / "index.html").as_uri())
+            root = page.locator("#interaction-interaction-code-reconstruction")
+            root.locator(".check-order").click()
+            assert "Noch nicht" in root.locator(".parsons-feedback").inner_text()
+            solution = u["interactions"][-1]["variants"][0]["parameters"]["solution_order"]
+            for position, expected in enumerate(solution):
+                for _ in range(len(solution)):
+                    target = root.locator(".parsons-lines li[data-id='" + expected + "']")
+                    current = target.evaluate("(node) => Array.from(node.parentElement.children).indexOf(node)")
+                    if current == position:
+                        break
+                    assert current > position
+                    target.locator("button.up").click()
+                assert root.locator(".parsons-lines li").nth(position).get_attribute("data-id") == expected
+            root.locator(".check-order").click()
+            assert "Referenzreihenfolge getroffen" in root.locator(".parsons-feedback").inner_text()
+            assert root.locator(".parsons-reasons li").count() == len(solution)
+        finally:
+            browser.close()

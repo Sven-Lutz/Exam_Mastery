@@ -105,7 +105,52 @@ def discounted_return_trace(parameters):
     }
 
 
+def parsons_reference(parameters):
+    """Check the ordering of provided code blocks, never execute learner code.
+
+    The exercise checks one supplied reference sequence, not the semantic
+    equivalence of independently authored implementations.
+    """
+    import re
+
+    if not isinstance(parameters, dict):
+        raise InteractionError("parsons: parameters must be an object")
+    lines = parameters.get("lines")
+    if not isinstance(lines, list) or not (3 <= len(lines) <= 12):
+        raise InteractionError("parsons: 3..12 code fragments required")
+    seen = set()
+    for item in lines:
+        if not isinstance(item, dict):
+            raise InteractionError("parsons: fragment must be an object")
+        key = item.get("id")
+        if not isinstance(key, str) or not re.fullmatch(r"[a-z][a-z0-9_-]{1,40}", key):
+            raise InteractionError("parsons: invalid fragment ID")
+        if key in seen:
+            raise InteractionError("parsons: duplicate fragment ID")
+        seen.add(key)
+        for field in ("code", "why"):
+            value = item.get(field)
+            if not isinstance(value, str) or not value.strip() or len(value) > 300:
+                raise InteractionError(f"parsons: fragment {key} requires bounded {field}")
+    expected = parameters.get("solution_order")
+    initial = parameters.get("initial_order")
+    if not (isinstance(expected, list) and isinstance(initial, list)
+            and len(expected) == len(initial) == len(lines)
+            and all(isinstance(v, str) for v in [*expected, *initial])
+            and len(set(expected)) == len(set(initial)) == len(lines)
+            and set(expected) == set(initial) == seen):
+        raise InteractionError("parsons: initial/solution orders must be ID permutations")
+    if expected == initial:
+        raise InteractionError("parsons: the initial order must not already be solved")
+    return {
+        "model": "parsons_reference", "lines": lines,
+        "solution_order": expected, "initial_order": initial,
+        "assessment_scope": "exact reference sequence, not arbitrary code semantics",
+    }
+
+
 MODELS = {
+    "parsons_reference": parsons_reference,
     "binary_search_lower_bound": binary_search_trace,
     "finite_discounted_return": discounted_return_trace,
 }
@@ -116,6 +161,8 @@ def build_interaction(interaction):
     ref = interaction.get("model_ref")
     if ref not in MODELS:
         raise InteractionError(f"Unsupported executable model {ref!r}; refusing invented feedback")
+    if (interaction.get("type") == "code_parsons") != (ref == "parsons_reference"):
+        raise InteractionError("parsons model requires code_parsons interaction type")
     variants = interaction.get("variants")
     if not isinstance(variants, list) or not (1 <= len(variants) <= 12):
         raise InteractionError("interaction.variants: 1..12 variants required")
@@ -183,6 +230,12 @@ textarea { min-height:90px; }
 .proof-statement { font-weight:650; margin-bottom:.25rem; }
 .proof-steps summary { cursor:pointer; color:var(--blue); font-size:.93rem; }
 .proof-steps details[open] { border-left:3px solid var(--accent); padding-left:.75rem; }
+.parsons-lines { padding-left:1.5rem; }
+.parsons-lines li { background:#f0f5fc; margin:.5rem 0; padding:.6rem .8rem; border:1px solid var(--line); border-radius:10px; }
+.parsons-lines code { display:block; white-space:pre-wrap; overflow-wrap:anywhere; color:#173554; }
+.parsons-lines .controls { margin-bottom:0; }
+.parsons-reasons li { margin:.5rem 0; }
+.parsons-reasons code { font-size:.9rem; }
 .hidden { display:none!important; }
 .small { font-size:.85rem; color:#c0d6f8; }
 @media (max-width:800px) { .experience-grid { grid-template-columns:1fr; } .stage { top:.5rem; order:-1; }
@@ -319,7 +372,81 @@ function setup(spec) {
   picker.value = "0";
   reset();
 }
-model.interactions.forEach(setup);
+function setupParsons(spec) {
+  const root = document.getElementById("interaction-" + spec.id.replace(/[^a-z0-9_-]/g, "-"));
+  const picker = root.querySelector(".variant-picker");
+  const list = root.querySelector(".parsons-lines");
+  const feedback = root.querySelector(".parsons-feedback");
+  const reasons = root.querySelector(".parsons-reasons");
+  let variant = null, order = [];
+  spec.variants.forEach((v, i) => {
+    const o = document.createElement("option");
+    o.value = String(i); o.textContent = v.label; picker.add(o);
+  });
+  function redraw() {
+    list.replaceChildren();
+    const byId = new Map(variant.lines.map(line => [line.id, line]));
+    order.forEach((id, i) => {
+      const item = byId.get(id);
+      const li = document.createElement("li");
+      li.dataset.id = id;
+      li.append(el("code", "", item.code));
+      const buttons = el("div", "controls");
+      const up = el("button", "secondary up", "Nach oben");
+      const down = el("button", "secondary down", "Nach unten");
+      up.type = "button"; down.type = "button";
+      up.disabled = i === 0; down.disabled = i === order.length - 1;
+      up.setAttribute("aria-label", "Baustein " + item.code.trim() + " nach oben");
+      down.setAttribute("aria-label", "Baustein " + item.code.trim() + " nach unten");
+      function move(direction) {
+        const j = i + direction;
+        const old = order[i]; order[i] = order[j]; order[j] = old;
+        feedback.textContent = "";
+        reasons.classList.add("hidden");
+        redraw();
+      }
+      up.addEventListener("click", () => move(-1));
+      down.addEventListener("click", () => move(1));
+      buttons.append(up, down); li.append(buttons); list.append(li);
+    });
+  }
+  function reset() {
+    variant = spec.variants[Number(picker.value)];
+    order = variant.initial_order.slice();
+    feedback.textContent = "";
+    reasons.replaceChildren();
+    reasons.classList.add("hidden");
+    redraw();
+  }
+  picker.addEventListener("change", reset);
+  root.querySelector(".check-order").addEventListener("click", () => {
+    const correct = order.every((id, i) => id === variant.solution_order[i]);
+    if (!correct) {
+      feedback.textContent = "Noch nicht die vorgegebene Referenzreihenfolge. "
+        + "Prüfe Initialisierung, Schleifenkörper und Rückgabe.";
+      reasons.classList.add("hidden");
+      return;
+    }
+    feedback.textContent = "Referenzreihenfolge getroffen. "
+      + "Begründe jeden Schritt; das ist noch kein Test selbst geschriebenen Codes. "
+      + spec.feedback_rule;
+    reasons.replaceChildren();
+    const byId = new Map(variant.lines.map(line => [line.id, line]));
+    variant.solution_order.forEach(id => {
+      const li = el("li");
+      li.append(el("code", "", byId.get(id).code),
+                el("p", "", byId.get(id).why));
+      reasons.append(li);
+    });
+    reasons.classList.remove("hidden");
+  });
+  picker.value = "0"; reset();
+}
+
+model.interactions.forEach(spec => {
+  if (spec.type === "code_parsons") setupParsons(spec);
+  else setup(spec);
+});
 document.querySelectorAll(".assessment").forEach(root=>{
   const input = root.querySelector("textarea");
   const reveal = root.querySelector(".answer-button");
@@ -389,6 +516,24 @@ def render_html(unit):
     parts.append('</section>')
     for spec in compiled:
         slug = re_slug(spec["id"])
+        if spec["type"] == "code_parsons":
+            parts.extend([
+                '<section class="experience" id="interaction-' + slug + '">',
+                '<p class="eyebrow">Programmieren · Code rekonstruieren</p>',
+                '<h2>' + _h(spec["prediction_prompt"]) + '</h2>',
+                '<div class="card">',
+                '<label for="variant-' + slug + '">Referenzaufgabe wählen</label>',
+                '<select id="variant-' + slug + '" class="variant-picker"></select>',
+                '<p class="help">Bringe die vorgegebenen Codebausteine mit den Tasten '
+                'in die richtige Reihenfolge. Es wird kein eingegebener Code ausgeführt.</p>',
+                '<ol class="parsons-lines" aria-label="Sortierbare Codebausteine"></ol>',
+                '<button type="button" class="check-order">Reihenfolge prüfen</button>',
+                '<p class="parsons-feedback" role="status" aria-live="polite"></p>',
+                '<ol class="parsons-reasons hidden" aria-label="Begründung jedes Schrittes"></ol>',
+                '</div><article class="card"><h3>Transfer</h3><p>' +
+                _h(spec["transfer_prompt"]) + '</p></article></section>',
+            ])
+            continue
         parts.extend([
             '<section class="experience" id="interaction-' + slug + '">',
             '<p class="eyebrow">Vorhersagen · experimentieren · erklären</p>',
