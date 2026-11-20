@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 from pathlib import Path
 
@@ -228,6 +229,36 @@ def validate(unit):
                     errors.append(f"assessments.{key}: criterion-level positive rubric required")
                 if item.get("attempt_before_reveal") is not True:
                     errors.append(f"assessments.{key}: independent attempt required before reveal")
+                # Optional formative numerical checking reuses the *existing*
+                # learning.diagnose engine. An author-supplied expected value
+                # is not an independently verified scientific oracle.
+                check = item.get("machine_check")
+                if check is not None:
+                    if not isinstance(check, dict) or check.get("type") != "numeric":
+                        errors.append(f"assessments.{key}: unsupported machine_check (numeric only)")
+                    else:
+                        expected = check.get("expected")
+                        tolerance = check.get("tolerance", 1e-6)
+                        if (type(expected) not in (int, float) or
+                                not math.isfinite(expected) or
+                                type(tolerance) not in (int, float) or
+                                not math.isfinite(tolerance) or tolerance < 0):
+                            errors.append(f"assessments.{key}: invalid numeric machine_check oracle")
+                        if not isinstance(refs, list) or len(refs) != 1:
+                            errors.append(f"assessments.{key}: numeric machine_check requires exactly one competency")
+                        errors_spec = check.get("errors", [])
+                        if (not isinstance(errors_spec, list) or len(errors_spec) > 16 or
+                                any(not isinstance(err, dict) or
+                                        type(err.get("value")) not in (int, float) or
+                                        not math.isfinite(err["value"]) or
+                                        err.get("category") not in (
+                                            "sign_error", "unit_scale", "rounding",
+                                            "constant_factor", "unclassified")
+                                        for err in errors_spec)):
+                            errors.append(f"assessments.{key}: invalid numerical error categories")
+                role = item.get("role", "core")
+                if role not in ("core", "transfer", "similar", "contrast", "harder", "retest"):
+                    errors.append(f"assessments.{key}: unsupported adaptive role")
                 hints = item.get("hints", [])
                 if (not isinstance(hints, list) or len(hints) > 6 or
                     any(not _text(h) or len(h) > 800 for h in hints)):
@@ -307,10 +338,11 @@ def obsidian_note(unit):
 def command(args):
     """CLI: exam-mastery experience validate|plan|obsidian|render unit.json [--out dir]."""
     parser = argparse.ArgumentParser(prog="exam-mastery experience")
-    parser.add_argument("action", choices=("validate", "plan", "obsidian", "render", "anki", "books", "build", "evidence"))
+    parser.add_argument("action", choices=("validate", "plan", "obsidian", "render", "anki", "books", "build", "evidence", "advise"))
     parser.add_argument("input")
     parser.add_argument("--out")
     parser.add_argument("--log", help="Evidence JSON exported explicitly from the offline lesson")
+    parser.add_argument("--answers-file", help="Optional local, ephemeral answer map for numeric formative checking")
     a = parser.parse_args(args)
     unit = json.loads(Path(a.input).read_text(encoding="utf-8"))
     if a.action == "validate":
@@ -331,6 +363,22 @@ def command(args):
             print(json.dumps({"status": "REJECTED", "error": str(exc)}, ensure_ascii=False, indent=2))
             return 1
         print(json.dumps(summary, ensure_ascii=False, indent=2))
+        return 0
+    if a.action == "advise":
+        if not a.log:
+            parser.error("advise requires --log <file.json>")
+        from .experience_adaptation import recommend
+        from .experience_evidence import EvidenceError
+        try:
+            log = json.loads(Path(a.log).read_text(encoding="utf-8"))
+            answers = (json.loads(Path(a.answers_file).read_text(encoding="utf-8"))
+                       if a.answers_file else None)
+            guidance = recommend(unit, log, answers=answers)
+        except (EvidenceError, OSError, ValueError) as exc:
+            print(json.dumps({"status": "REJECTED", "error": str(exc)},
+                             ensure_ascii=False, indent=2))
+            return 1
+        print(json.dumps(guidance, ensure_ascii=False, indent=2))
         return 0
     if a.action == "build":
         if not a.out:

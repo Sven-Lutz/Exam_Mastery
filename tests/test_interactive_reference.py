@@ -355,3 +355,75 @@ def test_offline_practice_evidence_browser_workflow(tmp_path):
             assert summary["assessments"]["assessment/transfer"]["independent_attempts_before_help"] == 1
         finally:
             browser.close()
+
+
+def test_numeric_formative_adaptation_in_real_offline_browser(tmp_path):
+    """The four-product HTML calls the *existing* JS diagnose/decide engine."""
+    pytest.importorskip("playwright.sync_api")
+    from playwright.sync_api import sync_playwright
+
+    u = json.loads((Path(__file__).resolve().parents[1] /
+                    "fixtures" / "experience_reference.json").read_text(encoding="utf-8"))
+    task = u["assessments"][0]
+    task["prompt"] = "Find the first index >= 7 in [2,5,8,12]."
+    task["solution"] = "The answer is index 2."
+    task["machine_check"] = {"type": "numeric", "expected": 2, "tolerance": 0}
+    task["role"] = "core"
+    transfer = copy.deepcopy(task)
+    transfer["id"] = "task/numeric-transfer"
+    transfer["role"] = "transfer"
+    transfer["prompt"] = "Find the first index >= 5 in [1,3,5,5,7]."
+    transfer["solution"] = "Again the answer is index 2."
+    u["assessments"].append(transfer)
+    ir.publish(u, tmp_path)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+        try:
+            page = browser.new_page(accept_downloads=True)
+            page.goto((tmp_path / "Interaktiv" / "index.html").as_uri())
+            task = page.locator("#exercise-task-prove")
+            assert page.evaluate("!!window.EMT && !!window.EMT.diagnose && !!window.EMT.decide")
+            task.locator("textarea").fill("2")
+            task.locator(".submit-attempt").click()
+            guidance = task.locator(".adaptive-guidance")
+            assert guidance.get_attribute("data-rule") == "RD"
+            assert "Transfer" in guidance.inner_text()
+            assert guidance.locator("a[href='#exercise-task-numeric-transfer']").count() == 1
+
+            with page.expect_download() as download:
+                page.locator("#evidence-export").click()
+            exported = json.loads(Path(download.value.path()).read_text(encoding="utf-8"))
+            assert exported["events"][0]["type"] == "attempt"
+            assert set(exported["events"][0]) == {"type","task_id","response_chars","at"}
+            assert "expected" not in json.dumps(exported)
+
+            task.locator(".retry-attempt").click()
+            task.locator("textarea").fill("-2")
+            task.locator(".submit-attempt").click()
+            assert task.locator(".adaptive-guidance").get_attribute("data-rule") == "RB"
+            assert "Vorzeichen" in task.locator(".adaptive-guidance").inner_text()
+        finally:
+            browser.close()
+
+
+def test_unverified_browser_proof_does_not_move_to_transfer(tmp_path):
+    pytest.importorskip("playwright.sync_api")
+    from playwright.sync_api import sync_playwright
+
+    lesson = json.loads((Path(__file__).resolve().parents[1] /
+                         "fixtures" / "experience_reference.json").read_text(encoding="utf-8"))
+    ir.publish(lesson, tmp_path)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+        try:
+            page = browser.new_page()
+            page.goto((tmp_path / "Interaktiv" / "index.html").as_uri())
+            task = page.locator("#exercise-task-prove")
+            task.locator("textarea").fill("My own proof, not checked.")
+            task.locator(".submit-attempt").click()
+            guide = task.locator(".adaptive-guidance")
+            assert guide.get_attribute("data-rule") == "RL5"
+            assert "Fachliche Prüfung erforderlich" in guide.inner_text()
+            assert guide.locator("a").count() == 0
+        finally:
+            browser.close()
