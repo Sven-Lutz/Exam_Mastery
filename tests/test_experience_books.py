@@ -25,7 +25,13 @@ def test_book_model_keeps_sources_and_complete_solutions():
     assert book["stages"][0]["items"][0]["solution"]["answer"] == unit["assessments"][0]["solution"]
     assert book["stages"][0]["items"][0]["solution"]["rubric"]
     assert any("Synthetisch" in b["src"] for s in book["sections"] for b in s["blocks"])
-    assert [b["kc_ids"] for s in book["sections"] for b in s["blocks"]] == [
+    # The new structured derivation is an additional block with the same
+    # canonical competency; compare the original teaching IDs separately.
+    teaching_blocks = {b["block_id"]: b for section in book["sections"]
+                       for b in section["blocks"] if b["block_id"] in {
+                           x["id"] for x in unit["teaching"]
+                       }}
+    assert [teaching_blocks[x["id"]]["kc_ids"] for x in unit["teaching"]] == [
         x["competency_ids"] for x in unit["teaching"]
     ]
 

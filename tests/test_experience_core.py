@@ -140,6 +140,9 @@ def test_grounded_claim_dependencies_are_explicit():
     sample["source_mode"] = "grounded"
     sample["sources"][0]["kind"] = "research"
     sample["claims"][0]["evidence_status"] = "verified"
+    # The fixture already cites a claim in teaching. Remove it deliberately
+    # so each publication surface is tested for missing provenance.
+    sample["teaching"][0].pop("claim_ids")
     report = ex.validate(sample)
     assert not report["valid"]
     for category in ["teaching", "assessments", "cards", "interactions"]:

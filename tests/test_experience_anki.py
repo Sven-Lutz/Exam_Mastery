@@ -93,13 +93,18 @@ def test_anki_card_refs_resolve_to_canonical_source(tmp_path):
     lesson["cards"][0]["claim_ids"] = ["synthetic/claim"]
     report = bridge.publish(lesson, tmp_path)
     assert report["notes"] == 1
-    # Source appears in the package via the existing Anki Source field.
-    import sqlite3
-    from zipfile import ZipFile
-    with ZipFile(tmp_path / "Anki.apkg") as archive:
-        data = archive.read("collection.anki2")
-    database = tmp_path / "readback.sqlite"
-    database.write_bytes(data)
-    with sqlite3.connect(database) as connection:
-        fields = connection.execute("SELECT flds FROM notes").fetchone()[0]
-    assert "Synthetic reference" in fields
+    # Modern APKG may contain a compatibility-only collection.anki2.
+    # Import via Anki's public API rather than reading its placeholder DB.
+    from anki.collection import Collection, ImportAnkiPackageRequest, ImportAnkiPackageOptions
+    collection = Collection(str(tmp_path / "readback.anki2"))
+    try:
+        collection.import_anki_package(ImportAnkiPackageRequest(
+            package_path=str(tmp_path / "Anki.apkg"),
+            options=ImportAnkiPackageOptions(),
+        ))
+        note_ids = collection.find_notes("")
+        assert len(note_ids) == 1
+        note = collection.get_note(note_ids[0])
+        assert "Synthetic reference" in note["Source"]
+    finally:
+        collection.close()

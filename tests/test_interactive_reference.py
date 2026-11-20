@@ -232,7 +232,8 @@ def test_reasoned_derivation_is_in_offline_story():
     page = ir.render_html(unit)
     proof = unit["teaching"][1]["derivation"]
     assert proof["title"] in page
+    import html
     for step in proof["steps"]:
-        assert step["statement"].replace("<", "&lt;") in page
-        assert step["justification"].replace("<", "&lt;") in page
+        assert html.escape(step["statement"], quote=True) in page
+        assert html.escape(step["justification"], quote=True) in page
     assert page.count("Warum ist dieser Schritt zulässig?") == len(proof["steps"])
