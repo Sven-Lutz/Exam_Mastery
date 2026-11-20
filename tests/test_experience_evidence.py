@@ -134,3 +134,23 @@ def test_edited_assessment_invalidates_prior_learning_evidence(unit):
     updated["assessments"][0]["prompt"] += " Revised wording."
     with pytest.raises(EvidenceError, match="assessment revision differs"):
         summarize(record, updated)
+
+
+def test_evidence_cli_emits_bounded_nonmastery_summary(unit, tmp_path, capsys):
+    from exam_mastery.learning.experience import command
+
+    definition = tmp_path / "unit.json"
+    evidence = tmp_path / "evidence.json"
+    definition.write_text(json.dumps(unit), encoding="utf-8")
+    evidence.write_text(json.dumps(log(event("attempt", response_chars=6), lesson=unit)),
+                        encoding="utf-8")
+    assert command(["evidence", str(definition), "--log", str(evidence)]) == 0
+    report = json.loads(capsys.readouterr().out)
+    assert report["assessments"]["task/prove"]["status"] == "ATTEMPTED_UNVERIFIED"
+    assert report["mastery"] == "NOT_EVALUATED"
+
+    broken = log(event("solution_reveal"), lesson=unit)
+    evidence.write_text(json.dumps(broken), encoding="utf-8")
+    assert command(["evidence", str(definition), "--log", str(evidence)]) == 1
+    refusal = json.loads(capsys.readouterr().out)
+    assert refusal["status"] == "REJECTED"
