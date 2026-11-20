@@ -250,7 +250,8 @@ RUNTIME = r"""(function () {
 "use strict";
 const script = document.getElementById("em-interactive-data");
 const model = JSON.parse(script.textContent);
-const practice = {schema:"em-practice-evidence-v1",unit_id:model.unit_id,events:[]};
+const practice = {schema:"em-practice-evidence-v1",unit_id:model.unit_id,
+  assessment_revision:model.assessment_revision,events:[]};
 const evidenceStatus = document.getElementById("evidence-status");
 function recordPractice(event) {
   if (practice.events.length >= 10000) {
@@ -548,6 +549,7 @@ def _h(value):
 
 def render_html(unit):
     from .experience import validate
+    from .experience_evidence import assessment_revision
 
     report = validate(unit)
     if not report["valid"]:
@@ -674,6 +676,7 @@ def render_html(unit):
         'führt keinen fremden Code aus und zertifiziert keine fachliche Qualität.</p>',
         '<script id="em-interactive-data" type="application/json">',
         _json_script({"schema": SCHEMA, "unit_id": unit["unit_id"],
+                      "assessment_revision": assessment_revision(unit),
                       "interactions": compiled,
                       "assessments": [{"id": x["id"], "hints": x.get("hints", [])}
                                       for x in unit["assessments"]]}),
