@@ -105,6 +105,59 @@ def discounted_return_trace(parameters):
     }
 
 
+def binomial_area_trace(parameters):
+    """Exact partition of a square with side a+b into four rectangles.
+
+    This trusted oracle only supports positive bounded real side lengths. Its
+    underlying polynomial identity is independently checked in the semantic
+    proof fixture; the numerical trace is a visual reference, not a proof.
+    """
+    if not isinstance(parameters, dict) or set(parameters) != {"a", "b"}:
+        raise InteractionError("binomial_area: only a and b parameters permitted")
+    a = _number(parameters["a"], "a")
+    b = _number(parameters["b"], "b")
+    if not 0.5 <= a <= 6 or not 0.5 <= b <= 6:
+        raise InteractionError("binomial_area: side lengths must be in [0.5, 6]")
+    parts = [a*a, a*b, b*a, b*b]
+    expanded = math.fsum(parts)
+    total = (a + b)**2
+    if not math.isclose(expanded, total, rel_tol=1e-13, abs_tol=1e-13):
+        raise InteractionError("binomial_area: independent numeric oracle mismatch")
+    names = ["a²", "ab", "ab", "b²"]
+    base = {"kind": "area", "a": a, "b": b}
+    return {
+        "model": "binomial_area_partition",
+        "result": total,
+        "result_label": "(a+b)^2 square area",
+        "steps": [
+            {
+                "title": "Ausgangsfrage: eine Quadratfläche",
+                "body": f"Die Seitenlänge ist a+b={a:g}+{b:g}={a+b:g}. "
+                        "Welche Fläche hat das gesamte Quadrat?",
+                "state": {**base, "highlight": "all"},
+            },
+            {
+                "title": "Zerlegen: vier Rechtecke",
+                "body": "Die Seiten werden jeweils bei a und b geteilt. "
+                        "Die vier Teilflächen haben die Inhalte a², ab, ab und b². "
+                        "Jeder Teil ist disjunkt; zusammen bedecken sie das Quadrat.",
+                "state": {**base, "highlight": "parts"},
+            },
+            {
+                "title": "Zusammenführen: distributive Identität",
+                "body": f"Die Summe der vier Flächen ist {parts[0]:g} + "
+                        f"{parts[1]:g} + {parts[2]:g} + {parts[3]:g} = "
+                        f"{expanded:g}. Damit gilt (a+b)² = a² + 2ab + b².",
+                "state": {**base, "highlight": "all"},
+            },
+        ],
+        "invariant": (
+            "Die vier disjunkten Teilrechtecke füllen exakt das Quadrat "
+            "mit der Seite a+b; es wird weder Fläche überlappt noch ausgelassen."
+        ),
+    }
+
+
 def parsons_reference(parameters):
     """Check the ordering of provided code blocks, never execute learner code.
 
@@ -153,6 +206,7 @@ MODELS = {
     "parsons_reference": parsons_reference,
     "binary_search_lower_bound": binary_search_trace,
     "finite_discounted_return": discounted_return_trace,
+    "binomial_area_partition": binomial_area_trace,
 }
 
 
