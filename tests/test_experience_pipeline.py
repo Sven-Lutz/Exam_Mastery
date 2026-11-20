@@ -71,3 +71,43 @@ def test_coherent_four_product_dispatch_without_extra_outputs(monkeypatch, tmp_p
     assert set(result["products"].values()) == {
         "Lehrbuch.pdf", "Arbeitsbuch.pdf", "Anki.apkg", "Interaktiv/index.html"
     }
+
+
+@pytest.mark.parametrize("case", [
+    "no_cards", "no_interactions", "unknown_model", "invalid_parameters",
+])
+def test_unpublishable_but_structurally_valid_unit_fails_before_any_write(tmp_path, case):
+    """A passed schema check must never authorize a half-published package."""
+    from exam_mastery.learning.experience import validate
+
+    lesson = fixture()
+    if case == "no_cards":
+        lesson["cards"] = []
+        lesson["anki_not_applicable_reason"] = "Not an appropriate retrieval target."
+        expected = "no Anki cards"
+    elif case == "no_interactions":
+        lesson["interactions"] = []
+        lesson["interaction_not_applicable_reason"] = "No validated simulation available."
+        expected = "no interactive model"
+    elif case == "unknown_model":
+        lesson["interactions"][0]["model_ref"] = "unregistered_model"
+        expected = "Unsupported executable model"
+    else:
+        lesson["interactions"][0]["variants"][0]["parameters"]["values"] = [8, 2]
+        expected = "sorted ascending"
+
+    assert validate(lesson)["valid"]
+    with pytest.raises(ValueError, match=expected):
+        pipeline.build(lesson, tmp_path)
+    assert not list(tmp_path.iterdir()), "No publisher may start before preflight completes"
+
+
+@pytest.mark.parametrize("managed", [".em-state", "Interaktiv"])
+def test_symlinked_managed_directories_fail_closed(tmp_path, managed):
+    """A symlinked parent could redirect otherwise regular output files."""
+    outside = tmp_path.parent / (tmp_path.name + "-external")
+    outside.mkdir()
+    (tmp_path / managed).symlink_to(outside, target_is_directory=True)
+    with pytest.raises(ValueError, match="nonregular managed directory"):
+        pipeline.preflight(fixture(), tmp_path)
+    assert list(outside.iterdir()) == []
