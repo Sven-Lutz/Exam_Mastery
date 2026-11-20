@@ -206,6 +206,9 @@ def test_browser_prediction_gates_and_interaction(tmp_path):
             assessment = page.locator(".assessment").first
             assert assessment.locator(".answer-button").is_disabled()
             assessment.locator("textarea").fill("My own reasoning")
+            assert assessment.locator(".submit-attempt").is_enabled()
+            assert assessment.locator(".answer-button").is_disabled()
+            assessment.locator(".submit-attempt").click()
             assert assessment.locator(".answer-button").is_enabled()
             assessment.locator(".answer-button").click()
             assert assessment.locator(".answer").is_visible()
@@ -297,5 +300,57 @@ def test_real_parsons_browser_interaction(tmp_path):
             root.locator(".check-order").click()
             assert "Referenzreihenfolge getroffen" in root.locator(".parsons-feedback").inner_text()
             assert root.locator(".parsons-reasons li").count() == len(solution)
+        finally:
+            browser.close()
+
+
+def test_offline_practice_evidence_browser_workflow(tmp_path):
+    """Real UI: attempt before hints/solution; evidence export excludes answer text."""
+    pytest.importorskip("playwright.sync_api")
+    from playwright.sync_api import sync_playwright
+
+    lesson = synthetic_unit()
+    lesson["assessments"][0]["hints"] = [
+        "Keep the lower-bound invariant.",
+        "Explain both branches and termination.",
+    ]
+    ir.publish(lesson, tmp_path)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+        try:
+            page = browser.new_page(accept_downloads=True)
+            page.goto((tmp_path / "Interaktiv" / "index.html").as_uri())
+            assessment = page.locator(".assessment").first
+            assert assessment.locator(".hint-button").is_disabled()
+            assert assessment.locator(".answer-button").is_disabled()
+            assessment.locator("textarea").fill("Private proof attempt 123")
+            assert assessment.locator(".answer-button").is_disabled()
+            assessment.locator(".submit-attempt").click()
+            assert assessment.locator("textarea").get_attribute("readonly") is not None
+            assert assessment.locator(".hint-button").is_enabled()
+            assessment.locator(".hint-button").click()
+            assert "lower-bound" in assessment.locator(".hint-text").inner_text()
+            assessment.locator(".answer-button").click()
+            assert assessment.locator(".answer").is_visible()
+            assert "kein Nachweis" in assessment.locator(".attempt-status").inner_text()
+            assessment.locator(".retry-attempt").click()
+            assert assessment.locator(".answer-button").is_disabled()
+            assessment.locator("textarea").fill("Another independent looking answer")
+            assessment.locator(".submit-attempt").click()
+            with page.expect_download() as dl:
+                page.locator("#evidence-export").click()
+            download = dl.value
+            data = json.loads(Path(download.path()).read_text(encoding="utf-8"))
+            assert data["schema"] == "em-practice-evidence-v1"
+            assert data["unit_id"] == lesson["unit_id"]
+            assert [e["type"] for e in data["events"]] == [
+                "attempt", "hint", "solution_reveal", "attempt"
+            ]
+            assert "Private proof attempt" not in json.dumps(data)
+            from exam_mastery.learning.experience_evidence import summarize
+            summary = summarize(data, lesson)
+            assert summary["correctness"] == summary["mastery"] == "NOT_EVALUATED"
+            assert summary["assessments"]["assessment/transfer"]["assisted_attempts"] == 1
+            assert summary["assessments"]["assessment/transfer"]["independent_attempts_before_help"] == 1
         finally:
             browser.close()
