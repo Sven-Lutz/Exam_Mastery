@@ -50,7 +50,49 @@
       "claim_ids": [
         "synthetic/search-correctness"
       ],
-      "content": "The loop maintains: indices < lo are less than the target, and indices >= hi are greater than or equal to the target. Each update strictly reduces hi-lo, ensuring termination. At lo=hi the unique boundary is the lower bound."
+      "content": "The loop maintains: indices < lo are less than the target, and indices >= hi are greater than or equal to the target. Each update strictly reduces hi-lo, ensuring termination. At lo=hi the unique boundary is the lower bound.",
+      "derivation": {
+        "title": "Warum ist die untere Schranke korrekt?",
+        "given": "Gegeben sei ein aufsteigend sortiertes Array a und ein halboffenes Suchintervall [lo, hi). Ziel: der kleinste Index i mit a[i] >= x.",
+        "steps": [
+          {
+            "statement": "Initialisierung: lo = 0, hi = n",
+            "justification": "Vor dem ersten Element gibt es keine Werte < x; hinter dem letzten Element gibt es keine Werte >= x innerhalb des Arrays. Die beiden Aussagen der Invariante gelten daher anfangs leer.",
+            "claim_ids": [
+              "synthetic/search-correctness"
+            ]
+          },
+          {
+            "statement": "Fall a[mid] < x: lo = mid + 1",
+            "justification": "Da a sortiert ist, sind auch alle Indizes bis einschließlich mid zu klein. Sie können nicht die gesuchte Grenze sein.",
+            "claim_ids": [
+              "synthetic/search-correctness"
+            ]
+          },
+          {
+            "statement": "Fall a[mid] >= x: hi = mid",
+            "justification": "Da a sortiert ist, sind alle Indizes ab mid groß genug. Der gesuchte erste passende Index kann höchstens mid sein.",
+            "claim_ids": [
+              "synthetic/search-correctness"
+            ]
+          },
+          {
+            "statement": "Fortschritt: hi - lo nimmt strikt ab",
+            "justification": "Für lo < hi gilt lo <= mid < hi. Beide Updates verkleinern deshalb die nichtnegative ganzzahlige Intervalllänge.",
+            "claim_ids": [
+              "synthetic/search-correctness"
+            ]
+          },
+          {
+            "statement": "Termination: lo = hi",
+            "justification": "Die Invariante liefert: links von lo sind alle Werte < x und ab hi alle Werte >= x. Bei gleicher Grenze ist lo der erste passende Index, oder n, falls kein Wert passt.",
+            "claim_ids": [
+              "synthetic/search-correctness"
+            ]
+          }
+        ],
+        "result": "Binary Search liefert den unteren Einfügeindex auch bei Duplikaten und leeren Arrays."
+      }
     }
   ],
   "assessments": [
@@ -79,7 +121,10 @@
           "points": 2
         }
       ],
-      "attempt_before_reveal": true
+      "attempt_before_reveal": true,
+      "claim_ids": [
+        "synthetic/search-correctness"
+      ]
     }
   ],
   "cards": [
@@ -90,6 +135,9 @@
       "answer": "Indices before lo have values < target; indices at/after hi have values >= target.",
       "competency_ids": [
         "binary/search-trace"
+      ],
+      "claim_ids": [
+        "synthetic/search-correctness"
       ]
     }
   ],
@@ -136,6 +184,9 @@
             "target": 7
           }
         }
+      ],
+      "claim_ids": [
+        "synthetic/search-correctness"
       ]
     }
   ]

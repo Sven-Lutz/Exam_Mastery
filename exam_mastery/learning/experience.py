@@ -100,6 +100,34 @@ def _check_prerequisites(competencies, known, errors):
         visit(key)
 
 
+def _derivation(item, known_claims, source_mode, errors):
+    """Validate explicit proof/derivation steps, never hallucinate justifications."""
+    proof = item.get("derivation")
+    if proof is None:
+        return
+    key = item.get("id")
+    if not isinstance(proof, dict):
+        errors.append(f"teaching.{key}.derivation: expected object")
+        return
+    for field in ("title", "given", "result"):
+        if not _text(proof.get(field)):
+            errors.append(f"teaching.{key}.derivation: {field} required")
+    steps = proof.get("steps")
+    if not isinstance(steps, list) or not (2 <= len(steps) <= 32):
+        errors.append(f"teaching.{key}.derivation: 2..32 reasoned steps required")
+        return
+    for index, step in enumerate(steps):
+        if not isinstance(step, dict):
+            errors.append(f"teaching.{key}.derivation.steps[{index}]: expected object")
+            continue
+        if not _text(step.get("statement")) or not _text(step.get("justification")):
+            errors.append(f"teaching.{key}.derivation.steps[{index}]: statement and justification required")
+        refs = step.get("claim_ids", [])
+        _references(refs, known_claims, f"teaching.{key}.derivation.steps[{index}].claim_ids", errors)
+        if source_mode == "grounded" and not refs:
+            errors.append(f"teaching.{key}.derivation.steps[{index}]: grounded justification needs claim refs")
+
+
 def validate(unit):
     """Structural QA only; not a scientific or learning-effectiveness certificate."""
     if not isinstance(unit, dict):
@@ -182,7 +210,13 @@ def validate(unit):
                 if not _text(item.get("content")):
                     errors.append(f"teaching.{key}: explanation required")
                 _references(item.get("claim_ids", []), claim_ids, f"teaching.{key}.claim_ids", errors)
+                _derivation(item, claim_ids, source_mode, errors)
+                if source_mode == "grounded" and not item.get("claim_ids"):
+                    errors.append(f"teaching.{key}: grounded explanation requires claim refs")
             elif section == "assessments":
+                _references(item.get("claim_ids", []), claim_ids, f"assessments.{key}.claim_ids", errors)
+                if source_mode == "grounded" and not item.get("claim_ids"):
+                    errors.append(f"assessments.{key}: grounded solution needs claim refs")
                 if not all(_text(item.get(n)) for n in ("prompt", "solution")):
                     errors.append(f"assessments.{key}: prompt and full worked solution required")
                 rubric = item.get("rubric")
@@ -195,10 +229,16 @@ def validate(unit):
                 if item.get("attempt_before_reveal") is not True:
                     errors.append(f"assessments.{key}: independent attempt required before reveal")
             elif section == "cards":
+                _references(item.get("claim_ids", []), claim_ids, f"cards.{key}.claim_ids", errors)
+                if source_mode == "grounded" and not item.get("claim_ids"):
+                    errors.append(f"cards.{key}: grounded card requires claim refs")
                 from ..anki_v2 import card_lint
                 for issue in card_lint(item):
                     errors.append(f"cards.{key}: {issue}")
             elif section == "interactions":
+                _references(item.get("claim_ids", []), claim_ids, f"interactions.{key}.claim_ids", errors)
+                if source_mode == "grounded" and not item.get("claim_ids"):
+                    errors.append(f"interactions.{key}: grounded model needs claim refs")
                 if item.get("type") not in INTERACTIONS:
                     errors.append(f"interactions.{key}: unsupported interaction type")
                 for field in ("prediction_prompt", "feedback_rule", "transfer_prompt", "model_ref"):

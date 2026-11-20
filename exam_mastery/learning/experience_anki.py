@@ -46,7 +46,21 @@ def publish(unit, output_dir, state_dir=None):
     check = validate(unit)
     if not check["valid"]:
         raise ValueError("Invalid learning unit: " + "; ".join(check["errors"]))
-    cards = unit.get("cards", [])
+    cards = []
+    claims = {claim["id"]: claim for claim in unit.get("claims", [])}
+    sources = {source["id"]: source for source in unit.get("sources", [])}
+    for original in unit.get("cards", []):
+        card = dict(original)
+        references = []
+        for claim_id in card.get("claim_ids", []):
+            for source_id in claims[claim_id]["source_refs"]:
+                locator = sources[source_id]["locator"]
+                if locator not in references:
+                    references.append(locator)
+        if references:
+            explicit_source = card.get("source", "").strip()
+            card["source"] = "; ".join(([explicit_source] if explicit_source else []) + references)
+        cards.append(card)
     if not cards:
         raise ValueError("No retrieval cards: refusing to publish an empty Anki package")
     output = Path(output_dir)

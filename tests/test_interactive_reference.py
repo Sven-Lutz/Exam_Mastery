@@ -223,3 +223,16 @@ def test_checked_in_synthetic_fixture_produces_real_offline_html(tmp_path):
     r = ir.publish(unit, tmp_path)
     assert r["status"] == "CREATED_OR_UPDATED"
     assert (tmp_path / "Interaktiv" / "index.html").stat().st_size > 1000
+
+
+def test_reasoned_derivation_is_in_offline_story():
+    from pathlib import Path
+    source = Path(__file__).resolve().parents[1] / "fixtures" / "experience_reference.json"
+    unit = json.loads(source.read_text(encoding="utf-8"))
+    page = ir.render_html(unit)
+    proof = unit["teaching"][1]["derivation"]
+    assert proof["title"] in page
+    for step in proof["steps"]:
+        assert step["statement"].replace("<", "&lt;") in page
+        assert step["justification"].replace("<", "&lt;") in page
+    assert page.count("Warum ist dieser Schritt zulässig?") == len(proof["steps"])

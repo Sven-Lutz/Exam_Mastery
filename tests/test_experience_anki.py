@@ -85,3 +85,21 @@ def test_changed_card_keeps_semantic_identity(tmp_path):
     new_guid = anki_v2.guid("cs", "trace-demo-" +
                             __import__("hashlib").sha256(b"cs/trace-demo").hexdigest()[:8], "trace/why")
     assert old_guid == new_guid
+
+
+def test_anki_card_refs_resolve_to_canonical_source(tmp_path):
+    pytest.importorskip("anki")
+    lesson = synthetic_unit()
+    lesson["cards"][0]["claim_ids"] = ["synthetic/claim"]
+    report = bridge.publish(lesson, tmp_path)
+    assert report["notes"] == 1
+    # Source appears in the package via the existing Anki Source field.
+    import sqlite3
+    from zipfile import ZipFile
+    with ZipFile(tmp_path / "Anki.apkg") as archive:
+        data = archive.read("collection.anki2")
+    database = tmp_path / "readback.sqlite"
+    database.write_bytes(data)
+    with sqlite3.connect(database) as connection:
+        fields = connection.execute("SELECT flds FROM notes").fetchone()[0]
+    assert "Synthetic reference" in fields

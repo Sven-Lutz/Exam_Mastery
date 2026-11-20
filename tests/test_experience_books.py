@@ -76,3 +76,19 @@ def test_real_pdf_rendering_and_zero_duplicate_visible_files(tmp_path):
     (tmp_path / "Lehrbuch.pdf").write_bytes(b"unexpected local change")
     with pytest.raises(ValueError, match="modified"):
         books.publish(lesson, tmp_path)
+
+
+def test_derivation_and_provenance_share_the_existing_pdf_model():
+    unit = fixture()
+    assert "derivation" in unit["teaching"][1]
+    model = books.book_model(unit)
+    steps = [block for section in model["sections"] for block in section["blocks"]
+             if block["type"] == "example"]
+    assert len(steps) == 1
+    block = steps[0]
+    proof = unit["teaching"][1]["derivation"]
+    assert block["title"] == proof["title"]
+    assert block["result"] == proof["result"]
+    assert block["steps"] == [[s["statement"], s["justification"]]
+                              for s in proof["steps"]]
+    assert "Synthetisch" in block["src"]

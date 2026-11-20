@@ -60,13 +60,26 @@ def book_model(unit):
                 label = prefix + ": " + source["locator"]
                 if label not in provenance:
                     provenance.append(label)
+        section_blocks = [{"type": "lead" if i == 1 else "text", "md": item["content"],
+                           "kc_ids": item["competency_ids"], "block_id": item["id"],
+                           "prov": "didactic" if synthetic else "unconfirmed",
+                           "src": "; ".join(provenance)}]
+        if item.get("derivation"):
+            derivation = item["derivation"]
+            section_blocks.append({
+                "type": "example", "label": "Herleitung · Schritt für Schritt",
+                "title": derivation["title"], "given": derivation["given"],
+                "steps": [[step["statement"], step["justification"]]
+                          for step in derivation["steps"]],
+                "result": derivation["result"], "kc_ids": item["competency_ids"],
+                "block_id": item["id"] + "/derivation",
+                "prov": "didactic" if synthetic else "unconfirmed",
+                "src": "; ".join(provenance),
+            })
         sections.append({
             "title": item.get("section_title") or
                      item["id"].rsplit("/", 1)[-1].replace("-", " ").capitalize(),
-            "blocks": [{"type": "lead" if i == 1 else "text", "md": item["content"],
-                        "kc_ids": item["competency_ids"], "block_id": item["id"],
-                        "prov": "didactic" if synthetic else "unconfirmed",
-                        "src": "; ".join(provenance)}],
+            "blocks": section_blocks,
         })
     items = []
     for index, task in enumerate(unit["assessments"], 1):

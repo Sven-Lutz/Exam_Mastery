@@ -178,6 +178,11 @@ input,select,textarea { border:1px solid #94a5ba; border-radius:8px; background:
 textarea { min-height:90px; }
 .help { color:var(--muted); font-size:.9rem; }
 .answer { margin-top:.75rem; border-left:4px solid var(--accent); padding:.65rem 1rem; background:#effaf6; }
+.proof-steps { padding-left:1.4rem; }
+.proof-steps li { padding:.4rem 0; }
+.proof-statement { font-weight:650; margin-bottom:.25rem; }
+.proof-steps summary { cursor:pointer; color:var(--blue); font-size:.93rem; }
+.proof-steps details[open] { border-left:3px solid var(--accent); padding-left:.75rem; }
 .hidden { display:none!important; }
 .small { font-size:.85rem; color:#c0d6f8; }
 @media (max-width:800px) { .experience-grid { grid-template-columns:1fr; } .stage { top:.5rem; order:-1; }
@@ -362,7 +367,25 @@ def render_html(unit):
     for block in unit["teaching"]:
         parts.append('<article class="card" data-competencies="' +
                      _h(",".join(block["competency_ids"])) +
+                     '" data-claims="' + _h(",".join(block.get("claim_ids", []))) +
                      '"><p>' + _h(block["content"]) + '</p></article>')
+        proof = block.get("derivation")
+        if proof:
+            parts.extend([
+                '<article class="card derivation" data-claims="' +
+                _h(",".join(block.get("claim_ids", []))) + '">',
+                '<p class="eyebrow">Herleitung und Begründung</p>',
+                '<h3>' + _h(proof["title"]) + '</h3>',
+                '<p>' + _h(proof["given"]) + '</p>',
+                '<ol class="proof-steps">',
+            ])
+            for step in proof["steps"]:
+                parts.append('<li><div class="proof-statement">' +
+                             _h(step["statement"]) + '</div>' +
+                             '<details><summary>Warum ist dieser Schritt zulässig?</summary>' +
+                             '<p>' + _h(step["justification"]) + '</p></details></li>')
+            parts.extend(['</ol><p class="answer"><strong>Ergebnis:</strong> ' +
+                          _h(proof["result"]) + '</p></article>'])
     parts.append('</section>')
     for spec in compiled:
         slug = re_slug(spec["id"])

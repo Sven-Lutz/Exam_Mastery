@@ -118,3 +118,45 @@ def test_no_external_sources_required_before_lecture_ingestion():
     u = unit()
     assert all(s["kind"] == "synthetic" for s in u["sources"])
     assert ex.plan(u)["source_mode"] == "synthetic"
+
+
+def test_explicit_derivation_requires_justified_steps():
+    sample = unit()
+    sample["teaching"][0]["derivation"] = {
+        "title": "A proof", "given": "Assume a finite input.",
+        "steps": [
+            {"statement": "First", "justification": "By the assumption."},
+            {"statement": "Second", "justification": "By the first step."},
+        ],
+        "result": "Claim holds.",
+    }
+    assert ex.validate(sample)["valid"]
+    sample["teaching"][0]["derivation"]["steps"][1]["justification"] = ""
+    assert any("statement and justification" in e for e in ex.validate(sample)["errors"])
+
+
+def test_grounded_claim_dependencies_are_explicit():
+    sample = unit()
+    sample["source_mode"] = "grounded"
+    sample["sources"][0]["kind"] = "research"
+    sample["claims"][0]["evidence_status"] = "verified"
+    report = ex.validate(sample)
+    assert not report["valid"]
+    for category in ["teaching", "assessments", "cards", "interactions"]:
+        assert any(category in error and "claim refs" in error for error in report["errors"])
+    for category in ["teaching", "assessments", "cards", "interactions"]:
+        sample[category][0]["claim_ids"] = ["synthetic/claim"]
+    assert ex.validate(sample)["valid"]
+
+
+def test_unsupported_derivation_claim_id_is_blocked():
+    sample = unit()
+    sample["teaching"][0]["derivation"] = {
+        "title": "Proof", "given": "Known premise.",
+        "steps": [
+            {"statement": "One", "justification": "Known reason.", "claim_ids": ["wrong/claim"]},
+            {"statement": "Two", "justification": "Known reason.", "claim_ids": ["synthetic/claim"]},
+        ],
+        "result": "Complete.",
+    }
+    assert any("unknown reference" in e for e in ex.validate(sample)["errors"])
