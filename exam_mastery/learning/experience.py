@@ -155,10 +155,10 @@ def validate(unit):
     sources, source_ids = _objects(unit, "sources", errors)
     claims, claim_ids = _objects(unit, "claims", errors)
     skills, skill_ids = _objects(unit, "competencies", errors)
-    teaching, _ = _objects(unit, "teaching", errors)
-    tasks, _ = _objects(unit, "assessments", errors)
+    teaching, teaching_ids = _objects(unit, "teaching", errors)
+    tasks, task_ids = _objects(unit, "assessments", errors)
     cards, _ = _objects(unit, "cards", errors)
-    interactions, _ = _objects(unit, "interactions", errors)
+    interactions, interaction_ids = _objects(unit, "interactions", errors)
 
     for name, seq in (("competencies", skills), ("teaching", teaching), ("assessments", tasks)):
         if not seq:
@@ -251,13 +251,12 @@ def validate(unit):
                                 any(not isinstance(err, dict) or
                                         type(err.get("value")) not in (int, float) or
                                         not math.isfinite(err["value"]) or
-                                        err.get("category") not in (
-                                            "sign_error", "unit_scale", "rounding",
-                                            "constant_factor", "unclassified")
+                                        not isinstance(err.get("category"), str) or
+                                        not SEMANTIC_ID.fullmatch(err["category"])
                                         for err in errors_spec)):
                             errors.append(f"assessments.{key}: invalid numerical error categories")
                 role = item.get("role", "core")
-                if role not in ("core", "transfer", "similar", "contrast", "harder", "retest"):
+                if role not in ("diagnostic", "prereq_retry", "core", "transfer", "similar", "contrast", "harder", "retest"):
                     errors.append(f"assessments.{key}: unsupported adaptive role")
                 hints = item.get("hints", [])
                 if (not isinstance(hints, list) or len(hints) > 6 or
@@ -279,6 +278,13 @@ def validate(unit):
                 for field in ("prediction_prompt", "feedback_rule", "transfer_prompt", "model_ref"):
                     if not _text(item.get(field)):
                         errors.append(f"interactions.{key}: {field} required")
+
+    from .experience_misconceptions import validate_patterns
+    errors.extend(validate_patterns(
+        unit, skill_ids=skill_ids, claim_ids=claim_ids,
+        teaching_ids=teaching_ids, task_ids=task_ids,
+        interaction_ids=interaction_ids,
+    ))
 
     for section in ("teaching", "assessments"):
         missing = skill_ids - coverage[section]
