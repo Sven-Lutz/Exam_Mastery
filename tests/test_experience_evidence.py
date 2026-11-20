@@ -5,15 +5,19 @@ from pathlib import Path
 
 import pytest
 
-from exam_mastery.learning.experience_evidence import EvidenceError, SCHEMA, summarize
+from exam_mastery.learning.experience_evidence import (EvidenceError, SCHEMA, summarize, assessment_revision)
 
 
-@pytest.fixture
-def unit():
+def sample_unit():
     p = Path(__file__).resolve().parents[1] / "fixtures" / "experience_reference.json"
     result = json.loads(p.read_text(encoding="utf-8"))
     result["assessments"][0]["hints"] = ["First hint", "Second hint"]
     return result
+
+
+@pytest.fixture
+def unit():
+    return sample_unit()
 
 
 def event(kind, **extra):
@@ -21,8 +25,10 @@ def event(kind, **extra):
             "at": "2026-11-20T17:55:00.000Z", **extra}
 
 
-def log(*events):
-    return {"schema": SCHEMA, "unit_id": "cs/binary-search-reference",
+def log(*events, lesson=None):
+    source = lesson if lesson is not None else sample_unit()
+    return {"schema": SCHEMA, "unit_id": source["unit_id"],
+            "assessment_revision": assessment_revision(source),
             "events": list(events)}
 
 
@@ -114,7 +120,17 @@ def test_assistance_stays_scoped_to_its_assessment(unit):
         event("attempt", response_chars=8),
         event("hint", hint_index=0),
         event("attempt", task_id="task/other", response_chars=4),
+        lesson=unit,
     ), unit)
     other = report["assessments"]["task/other"]
     assert other["status"] == "ATTEMPTED_UNVERIFIED"
     assert other["ever_helped"] is False
+
+
+def test_edited_assessment_invalidates_prior_learning_evidence(unit):
+    record = log(event("attempt", response_chars=4), lesson=unit)
+    assert summarize(record, unit)["events_checked"] == 1
+    updated = copy.deepcopy(unit)
+    updated["assessments"][0]["prompt"] += " Revised wording."
+    with pytest.raises(EvidenceError, match="assessment revision differs"):
+        summarize(record, updated)
