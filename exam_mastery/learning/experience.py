@@ -78,7 +78,7 @@ def _check_prerequisites(competencies, known, errors):
             errors.append(f"competencies.{key}: unsupported learning operation")
         values = item.get("prerequisites", [])
         _references(values, known, f"competencies.{key}.prerequisites", errors)
-        if key in values:
+        if isinstance(values, list) and key in values:
             errors.append(f"competencies.{key}: cannot depend on itself")
         if isinstance(values, list) and isinstance(key, str):
             graph[key] = [v for v in values if isinstance(v, str)]
