@@ -228,6 +228,10 @@ def validate(unit):
                     errors.append(f"assessments.{key}: criterion-level positive rubric required")
                 if item.get("attempt_before_reveal") is not True:
                     errors.append(f"assessments.{key}: independent attempt required before reveal")
+                hints = item.get("hints", [])
+                if (not isinstance(hints, list) or len(hints) > 6 or
+                    any(not _text(h) or len(h) > 800 for h in hints)):
+                    errors.append(f"assessments.{key}: hints must be 0..6 nonempty bounded strings")
             elif section == "cards":
                 _references(item.get("claim_ids", []), claim_ids, f"cards.{key}.claim_ids", errors)
                 if source_mode == "grounded" and not item.get("claim_ids"):
