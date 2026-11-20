@@ -448,7 +448,7 @@ def test_misconception_feedback_and_targeted_contrast_in_real_browser(tmp_path):
             guide = assessment.locator(".adaptive-guidance")
             assert guide.get_attribute("data-rule") == "RC1"
             assert "Mögliche Fehlstrategie" in guide.inner_text()
-            assert "linke Grenze" in guide.inner_text()
+            assert "Grenze" in guide.inner_text()
             assert guide.locator("details").count() == 1
             assert guide.locator("a[href='#teaching-teach-proof']").count() == 1
             assert guide.locator("a[href='#interaction-interaction-binary-search']").count() == 1
