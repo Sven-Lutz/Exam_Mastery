@@ -68,7 +68,10 @@ def summarize(log, unit):
     if not isinstance(events, list) or len(events) > MAX_EVENTS:
         raise EvidenceError("events must be a bounded list")
 
-    tasks = {t["id"]: t for t in unit.get("assessments", [])}
+    assessments = unit.get("assessments", [])
+    tasks = {t["id"]: t for t in assessments}
+    if len(tasks) != len(assessments):
+        raise EvidenceError("duplicate assessment IDs make evidence attribution ambiguous")
     if not tasks:
         raise EvidenceError("learning unit has no assessments")
     evidence = {

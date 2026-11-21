@@ -154,3 +154,22 @@ def test_evidence_cli_emits_bounded_nonmastery_summary(unit, tmp_path, capsys):
     assert command(["evidence", str(definition), "--log", str(evidence)]) == 1
     refusal = json.loads(capsys.readouterr().out)
     assert refusal["status"] == "REJECTED"
+
+
+def test_duplicate_assessment_ids_fail_closed_even_with_valid_revision(unit):
+    duplicate = copy.deepcopy(unit["assessments"][0])
+    duplicate["prompt"] = "A conflicting task with the same identifier"
+    unit["assessments"].append(duplicate)
+    record = log(event("attempt", response_chars=8), lesson=unit)
+    with pytest.raises(EvidenceError, match="duplicate assessment IDs"):
+        summarize(record, unit)
+
+
+def test_distinct_assessment_ids_remain_independently_auditable(unit):
+    second = copy.deepcopy(unit["assessments"][0])
+    second["id"] = "task/distinct"
+    unit["assessments"].append(second)
+    record = log(event("attempt", task_id="task/distinct", response_chars=8), lesson=unit)
+    report = summarize(record, unit)
+    assert report["assessments"]["task/prove"]["attempts"] == 0
+    assert report["assessments"]["task/distinct"]["attempts"] == 1
