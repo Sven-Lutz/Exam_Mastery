@@ -596,3 +596,58 @@ def mdp_optimal(m, tol=1e-12, max_iter=100000):
             return W
         V = W
     raise ValueError('value iteration did not converge')
+
+
+def scaled_attention(parameters):
+    """Bounded real matrix attention, row-wise softmax; all-masked rows fail.
+
+    Scaling/temperature are explicit experimental choices, not proof of training
+    benefit. Max-shift avoids exponential overflow; finite input bounds prevent
+    overflow in dot products. Mask True means allowed. No dropout here.
+    """
+    allowed = {'Q', 'K', 'V', 'mask', 'temperature', 'scaled'}
+    if not isinstance(parameters, dict) or set(parameters) - allowed:
+        raise ValueError('attention: unexpected fields')
+    def matrix(name):
+        value = parameters.get(name)
+        if not isinstance(value, list) or not 1 <= len(value) <= 8:
+            raise ValueError(name + ': 1..8 rows required')
+        width = len(value[0]) if isinstance(value[0], list) else 0
+        if not 1 <= width <= 8: raise ValueError(name + ': 1..8 columns required')
+        for row in value:
+            if not isinstance(row, list) or len(row) != width:
+                raise ValueError(name + ': rectangular matrix required')
+            if any(type(x) not in (int, float) or not math.isfinite(x) or abs(x) > 10000 for x in row):
+                raise ValueError(name + ': finite entries bounded by 10000 required')
+        return value
+    Q, K, V = matrix('Q'), matrix('K'), matrix('V')
+    if len(Q[0]) != len(K[0]) or len(K) != len(V):
+        raise ValueError('attention: incompatible dimensions Q/K/V')
+    temperature = parameters.get('temperature', 1)
+    if type(temperature) not in (int, float) or not math.isfinite(temperature) or not 0.05 <= temperature <= 20:
+        raise ValueError('attention: temperature must be in [0.05,20]')
+    scaled = parameters.get('scaled', True)
+    if type(scaled) is not bool: raise ValueError('attention: scaled must be boolean')
+    mask = parameters.get('mask', [[True] * len(K) for _ in Q])
+    if (not isinstance(mask, list) or len(mask) != len(Q) or
+            any(not isinstance(row, list) or len(row) != len(K) or
+                any(type(x) is not bool for x in row) for row in mask)):
+        raise ValueError('attention: boolean mask must match score matrix')
+    if any(not any(row) for row in mask):
+        raise ValueError('attention: fully masked row is undefined, not a uniform distribution')
+    divisor = math.sqrt(len(Q[0])) if scaled else 1.0
+    raw = [[math.fsum(a*b for a,b in zip(q,k)) for k in K] for q in Q]
+    scores = [[x/divisor/temperature for x in row] for row in raw]
+    weights, shifted = [], []
+    for row, on in zip(scores, mask):
+        maximum = max(x for x, allowed in zip(row,on) if allowed)
+        exp = [math.exp(x-maximum) if allowed else 0.0 for x, allowed in zip(row,on)]
+        total = math.fsum(exp)
+        weights.append([x/total for x in exp])
+        shifted.append([x-maximum if allowed else None for x,allowed in zip(row,on)])
+    contributions = [[[w*v for v in values] for w,values in zip(row,V)] for row in weights]
+    output = [[math.fsum(c[j] for c in row) for j in range(len(V[0]))] for row in contributions]
+    return {'Q':Q,'K':K,'V':V,'mask':mask,'raw':raw,'scores':scores,'shifted':shifted,
+            'weights':weights,'contributions':contributions,'output':output,
+            'divisor':divisor,'temperature':temperature,'scaled':scaled,
+            'shape': {'n_q':len(Q),'n_k':len(K),'d_k':len(Q[0]),'d_v':len(V[0])}}

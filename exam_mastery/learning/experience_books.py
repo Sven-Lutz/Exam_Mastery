@@ -47,11 +47,16 @@ def book_model(unit):
     checked = validate(unit)
     if not checked["valid"]:
         raise ValueError("Invalid learning unit: " + "; ".join(checked["errors"]))
+    from .experience_math import project
+    unit = project(unit)
     from .experience_proof_checks import verify as verify_polynomial
     source_map = {s["id"]: s for s in unit["sources"]}
     claim_map = {c["id"]: c for c in unit["claims"]}
     synthetic = unit["source_mode"] == "synthetic"
     sections = []
+    figures = {}
+    from .experience_graphics import specifications
+    graphic_frames = specifications(unit)
     # Attach each authored counterexample to exactly one matching teaching
     # section; never scatter repeated errors throughout the textbook.
     placement = {}
@@ -112,6 +117,12 @@ def book_model(unit):
                 "prov": "didactic" if synthetic else "unconfirmed",
                 "src": "; ".join(cited),
             })
+        for graphic, frame, spec in graphic_frames:
+            if graphic['teaching_id'] == item['id']:
+                gid = graphic['id'] + '-state-' + str(frame)
+                figures[gid] = spec
+                section_blocks.append({'type':'figure','id':gid,'caption':graphic['caption'] + ' ' + graphic['alt'],
+                                       'kc_ids':graphic['competency_ids'],'prov':'didactic'})
         sections.append({
             "title": item.get("section_title") or
                      item["id"].rsplit("/", 1)[-1].replace("-", " ").capitalize(),
@@ -141,7 +152,7 @@ def book_model(unit):
                 if synthetic else "**FACHLICH NICHT UNABHÄNGIG GEPRÜFT.** "
             ) + "Automatisch gesetzter und strukturell validierter Entwurf.",
         },
-        "figures": {}, "sections": sections,
+        "figures": figures, "sections": sections,
         "stages": [{"title": "Selbstständige Anwendung und Transfer", "level": 4, "items": items}],
         "exam": None, "cards": unit["cards"],
         "competencies": [{"key": c["id"], "operation": c["operation"]} for c in unit["competencies"]],
@@ -155,7 +166,8 @@ def book_model(unit):
             if synthetic else
             "Quellenstatus und fachliche Korrektheit erfordern unabhängige Prüfung. "
             "Technische Validierung ist kein wissenschaftlicher Freigabenachweis."
-        ),
+        ) + ("\n\n" + "\n\n".join(unit['authorship'].get(key,'') for key in
+                 ('content','automatic','independent','sources_read')) if unit.get('authorship') else ""),
     }
 
 
@@ -170,6 +182,8 @@ def _combined_workbook(book):
     sections.append('<section><h2 id="aufgaben">Teil I · Aufgaben</h2>'
                     '<p>Bearbeiten Sie die Aufgaben vor dem Blick auf die Musterlösungen.</p></section>')
     toc.append((1, "aufgaben", "Teil I · Aufgaben"))
+    for graphic_id, spec in book['figures'].items():
+        sections.append(d.figure({'type':'figure','id':graphic_id,'caption':spec['title']}))
     for idx, stage in enumerate(book["stages"], 1):
         tag = f"aufgaben-{idx}"
         toc.append((2, tag, stage["title"]))
@@ -217,9 +231,11 @@ def publish(unit, output_dir):
     record_path = state_dir / f"books-{unit_key}.json"
     record = json.loads(record_path.read_text(encoding="utf-8")) if record_path.exists() else None
     from .experience_runtime import fingerprint, fonts
-    from . import experience_books, experience_proof_checks
+    from . import experience_books, experience_proof_checks, experience_math, experience_graphics
+    from ..labs import models
+    from .. import math_publishing
     runtime = fingerprint(
-        [experience_books, experience_proof_checks, typeset, typeset.figures_svg],
+        [experience_books, experience_proof_checks, experience_math, experience_graphics, models, math_publishing, typeset, typeset.figures_svg],
         assets=[("mathjax", typeset.NODE / "mathjax-full/es5/tex-svg-full.js"),
                 *fonts(typeset.NODE, [(pkg, variants) for _, pkg, variants in typeset.FONTS])],
         packages=["playwright", "PyMuPDF"], settings=[("css", typeset.CSS)])

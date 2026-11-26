@@ -256,5 +256,33 @@
         }
       ]
     }
+  ],
+  "graphics": [
+    {
+      "id": "graphic/binomial-area",
+      "model_ref": "binomial_area_partition",
+      "interaction_id": "interaction/binomial-area",
+      "teaching_id": "teach/area-intuition",
+      "assessment_ids": [
+        "task/area-derivation",
+        "task/sign-transfer"
+      ],
+      "claim_ids": [
+        "synthetic/binomial-identity"
+      ],
+      "competency_ids": [
+        "math/binomial-derive"
+      ],
+      "objects": {
+        "square": "Quadratseite a+b",
+        "mixed": "Zwei verschiedene Rechtecke mit identischer Fläche ab",
+        "pure": "Quadrate mit Flächen a² und b²"
+      },
+      "keyframes": [
+        1
+      ],
+      "alt": "Quadrat mit proportionalen Seitenabschnitten a=2 und b=3. Die Teilflächen 4,6,6,9 ergeben 25.",
+      "caption": "Warum der gemischte Term zweimal auftritt"
+    }
   ]
 }

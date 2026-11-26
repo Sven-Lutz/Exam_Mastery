@@ -49,6 +49,8 @@ def publish(unit, output_dir, state_dir=None):
     check = validate(unit)
     if not check["valid"]:
         raise ValueError("Invalid learning unit: " + "; ".join(check["errors"]))
+    from .experience_math import project
+    unit = project(unit)
     cards = []
     claims = {claim["id"]: claim for claim in unit.get("claims", [])}
     sources = {source["id"]: source for source in unit.get("sources", [])}

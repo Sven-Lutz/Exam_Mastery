@@ -159,7 +159,8 @@ mjx-container[display="true"]{display:block;max-width:100%}mjx-container[display
 /* semantic blocks */
 .def,.box,.ex,.mis,.case,.sum{break-inside:avoid-page;margin:1.1em 0 1.2em}
 .ex{break-inside:auto}.ex>h4,.ex>.lab,.ex>.given{break-after:avoid}.ex ol.steps>li,.ex .res{break-inside:avoid}
-.keephead{break-inside:avoid-page}
+.keephead,.ex-intro{break-inside:avoid-page}
+.ex ol.steps.continued{counter-reset:s 1}
 .lab{font-family:var(--sans);font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.3em}
 .def{background:var(--accent-soft);border-top:2px solid var(--accent);padding:.6em .95em .3em}
 .def .lab{color:var(--accent)}
@@ -328,12 +329,13 @@ class Doc:
             return f'<div class="box {E(b.get("kind","note"))}"><span class="lab">{E(b.get("title") or BOX.get(b.get("kind"), "Hinweis"))}</span>{md(b["md"])}</div>'
         if t == 'example':
             self.ex_no += 1
-            steps = ''.join(f'<li><span class="do">{inline(s[0])}</span>' + (f'<span class="why">{inline(s[1])}</span>' if len(s) > 1 and s[1] else '') + '</li>'
-                            for s in b['steps'])
+            step_parts = [f'<li><span class="do">{inline(s[0])}</span>' + (f'<span class="why">{inline(s[1])}</span>' if len(s) > 1 and s[1] else '') + '</li>'
+                            for s in b['steps']]
             tab = self.table(b['table']) if b.get('table') else ''
             fig = self.figure({'id': b['figure']}) if b.get('figure') else ''
-            return (f'<div class="ex"><span class="lab">Beispiel {self.book["meta"]["chapter_no"]}.{self.ex_no} · {E(b.get("label", "Durchgerechnet"))}</span><h4>{inline(b["title"])}</h4>'
-                    f'<div class="given">{md(b["given"])}</div>{tab}<ol class="steps">{steps}</ol>'
+            return (f'<div class="ex"><div class="ex-intro"><span class="lab">Beispiel {self.book["meta"]["chapter_no"]}.{self.ex_no} · {E(b.get("label", "Durchgerechnet"))}</span><h4>{inline(b["title"])}</h4>'
+                    f'<div class="given">{md(b["given"])}</div>{tab}<ol class="steps">{"".join(step_parts[:1])}</ol></div>'
+                    + (f'<ol class="steps continued">{"".join(step_parts[1:])}</ol>' if len(step_parts) > 1 else '')
                     + (f'<div class="res">{md(b["result"])}</div>' if b.get('result') else '') + f'{fig}</div>')
         if t == 'table':
             return self.table(b)
@@ -426,7 +428,7 @@ def textbook(book):
                                                           for g, refs in book['references']))
     if book.get('production_notes'):
         toc.append((1, 'entstehung', 'Anhang: Entstehung und Qualitätsstatus'))
-        back.append('<h2 id="entstehung">Anhang: Entstehung und Qualitätsstatus</h2>' + md(book['production_notes']))
+        back.append('<section class="keephead"><h2 id="entstehung">Anhang: Entstehung und Qualitätsstatus</h2>' + md(book['production_notes']) + '</section>')
     body = _cover(book, 'Lehrbuch', m.get('subtitle', '')) + _toc(toc) + _opener(book) + ''.join(parts) + ''.join(back)
     return body, toc
 

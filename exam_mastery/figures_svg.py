@@ -367,3 +367,57 @@ def render(spec):
     if spec.get('type') not in RENDER:
         raise ValueError(f"unknown figure type {spec.get('type')!r}")
     return RENDER[spec['type']](spec)
+
+
+def binomial_partition(spec):
+    from .learning.interactive_reference import binomial_area_trace
+    p = spec['parameters']; reference = binomial_area_trace(p)
+    a,b = p['a'],p['b']; side=240; cut=side*a/(a+b); x,y=45,42
+    body=[]
+    for name,rx,ry,rw,rh,color,area in [
+        ('a²',x,y,cut,cut,'#d7e7f5',a*a),
+        ('ab',x+cut,y,side-cut,cut,'#f8ddab',a*b),
+        ('ab',x,y+cut,cut,side-cut,'#f8ddab',a*b),
+        ('b²',x+cut,y+cut,side-cut,side-cut,'#bde5da',b*b)]:
+        body.append(f'<rect x="{rx:g}" y="{ry:g}" width="{rw:g}" height="{rh:g}" fill="{color}" stroke="{INK}"/>')
+        body.append(_t(rx+rw/2,ry+rh/2+4,f'{name} = {area:g}',12,weight=600))
+    body += [_t(x+cut/2,25,f'a = {a:g}'),_t(x+cut+(side-cut)/2,25,f'b = {b:g}'),
+             _t(322,85,'Vier disjunkte Teilflächen',18,'start',700),
+             _t(322,122,f'{a*a:g} + {a*b:g} + {a*b:g} + {b*b:g}',18,'start'),
+             _t(322,158,f'= {reference["result"]:g} = ({a:g} + {b:g})²',18,'start',700),
+             _t(322,209,'Gemischte Flächen: zweimal ab.',14,'start'),
+             _t(322,237,'Längen positiv; Algebra gilt auch',13,'start'),
+             _t(322,257,'für negative reelle a und b.',13,'start')]
+    return _svg(660,320,''.join(body),spec.get('alt',spec['title']))
+
+
+def attention_pipeline(spec):
+    from .labs.models import scaled_attention
+    m = scaled_attention(spec['parameters']); n=len(m['K']); h=180+n*47
+    if n > 4 or len(m['V'][0]) > 2:
+        raise ValueError('Attention graphic currently supports at most four Keys and two Value components')
+    body = [_t(24,27,'1 · Vergleichen',16,'start',700),
+            _t(260,27,'2 · Normalisieren',16,'start',700),
+            _t(500,27,'3 · Mischen',16,'start',700)]
+    def text(field,x,y,value,**kwargs):
+        return _t(x,y,value,**kwargs).replace('<text ',f'<text data-field="{field}" ',1)
+    body += [_t(25,60,'Key',12,'start'),_t(93,60,'q · k',12),_t(176,60,'Logit z',12),
+             _t(310,60,'Gewicht α',12),_t(460,60,'Value v',12),_t(583,60,'Beitrag αv',12)]
+    for j in range(n):
+        y=95+j*47
+        body += [_t(25,y,f'k{j+1}',14,'start',600),text(f'raw-{j}',93,y,f'{m["raw"][0][j]:.5g}'),
+                 text(f'score-{j}',176,y,f'{m["scores"][0][j]:.5g}'),
+                 f'<rect x="240" y="{y-18}" width="{125*m["weights"][0][j]:.6g}" height="27" fill="#bde5da" data-bar="{j}"/>',
+                 text(f'weight-{j}',305,y,f'{m["weights"][0][j]:.5g}',weight=600),
+                 text(f'value-{j}',460,y,', '.join(f'{x:.5g}' for x in m['V'][j])),
+                 text(f'contribution-{j}',583,y,', '.join(f'{x:.5g}' for x in m['contributions'][0][j]))]
+    y=105+n*47
+    body += [f'<line x1="20" y1="{y-20}" x2="650" y2="{y-20}" stroke="{LINE}"/>',
+             _t(25,y+10,'Ausgabe der ersten Query',15,'start',600),
+             text('output',430,y+10,', '.join(f'{x:.6g}' for x in m['output'][0]),size=20,weight=700,fill='#0d7a70'),
+             _t(25,y+43,'Grün: Gewichte · Zahlen und Labels bleiben ohne Farbe lesbar.',12,'start')]
+    return _svg(680,h,''.join(body),spec.get('alt',spec['title']))
+
+
+RENDER.update({'binomial_area_partition':binomial_partition,
+               'scaled_dot_product_attention':attention_pipeline})
