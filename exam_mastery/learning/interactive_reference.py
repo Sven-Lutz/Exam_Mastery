@@ -7,6 +7,8 @@ provide their own independently tested traces.
 """
 from __future__ import annotations
 
+from .publication_lock import locked_publisher
+
 import argparse
 import html
 import json
@@ -907,6 +909,7 @@ def re_slug(name):
     return re.sub(r"[^a-z0-9_-]", "-", name)
 
 
+@locked_publisher
 def publish(unit, out_dir):
     """Write exactly one offline HTML and an internal integrity manifest.
 

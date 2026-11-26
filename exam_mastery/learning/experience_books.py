@@ -6,6 +6,8 @@ PDF engine, and it never pretends a synthetic fixture is an academic release.
 """
 from __future__ import annotations
 
+from .publication_lock import locked_publisher
+
 import hashlib
 import json
 import os
@@ -198,6 +200,7 @@ def _combined_workbook(book):
     return body, toc
 
 
+@locked_publisher
 def publish(unit, output_dir):
     """Publish exactly Lehrbuch.pdf and Arbeitsbuch.pdf with reuse and overwrite guards.
 

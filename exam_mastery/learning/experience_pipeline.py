@@ -7,6 +7,8 @@ asserted without successful completion and explicit human review.
 """
 from __future__ import annotations
 
+from .publication_lock import locked_publisher
+
 import hashlib
 import json
 import os
@@ -159,6 +161,7 @@ def _prepare_previous(root, stage):
             shutil.copy2(source, target)
 
 
+@locked_publisher
 def recover(output_dir):
     """Explicitly restore a process-interrupted publication, never user edits.
 
@@ -300,6 +303,7 @@ def _commit_staged(root, stage, before):
     return {"status": "STAGED_COMMIT", "replaced_files": len(changed)}
 
 
+@locked_publisher
 def build(unit, output_dir):
     """Stage all four publishers before any visible product is changed.
 
