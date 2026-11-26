@@ -22,7 +22,7 @@ def main():
         parser.error("Evidence must be outside the public repository")
     output.mkdir(parents=True, exist_ok=True)
     reports = {}
-    for name in ("experience_binomial_reference", "experience_reference", "experience_finance_reference"):
+    for name in ("experience_binomial_reference", "experience_reference", "experience_finance_reference", "experience_attention_reference"):
         unit = json.loads((repository / "fixtures" / (name + ".json")).read_text())
         root = output / name
         first = build(unit, root)
@@ -61,6 +61,14 @@ def main():
                     "nodes => nodes.map(a=>a.getAttribute('href').slice(1)).filter(id=>!document.getElementById(id))")
                 assert not missing, missing
                 browser_checks.append({"width": width, "overflow": overflow, "page_errors": errors})
+                if page.locator('.attention-lab').count():
+                    lab=page.locator('.attention-lab')
+                    lab.screenshot(path=str(review/f"attention-lab-{width}.png"))
+                    lab.locator('input[data-matrix=V]').first.fill('4')
+                    lab.locator('input[data-matrix=Q]').first.fill('2')
+                    lab.screenshot(path=str(review/f"attention-intervention-{width}.png"))
+                    lab.locator('.attention-reset').click()
+                    page.locator('.derivation').first.screenshot(path=str(review/f"attention-derivation-{width}.png"))
                 page.close()
             browser.close()
         card_checks = anki_v2.screenshot(preview, names, preview, width=390)

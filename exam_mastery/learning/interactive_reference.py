@@ -7,6 +7,8 @@ provide their own independently tested traces.
 """
 from __future__ import annotations
 
+from .publication_lock import locked_publisher
+
 import argparse
 import html
 import json
@@ -158,6 +160,21 @@ def binomial_area_trace(parameters):
     }
 
 
+def attention_trace(parameters):
+    from ..labs.models import scaled_attention
+    from .. import figures_svg
+    try:
+        data = scaled_attention(parameters)
+    except ValueError as exc:
+        raise InteractionError(str(exc)) from exc
+    return {'model':'scaled_dot_product_attention','result':data['output'][0][0],
+            'result_label':'erste Komponente der ersten Ausgabe',
+            'invariant':'Jede Gewichtszeile summiert sich zu eins; maskierte Positionen tragen null bei.',
+            'steps':[{'title':'Vergleichen → gewichten → mischen',
+                      'body':'Scores bestimmen Gewichte; die Ausgabe mischt Values, nicht Keys.',
+                      'state':{'kind':'attention', 'svg':figures_svg.render({'type':'scaled_dot_product_attention','parameters':parameters,'title':'Attention-Zwischenwerte','alt':'Zwischenwerte der ersten Query'}), **data}}]}
+
+
 def parsons_reference(parameters):
     """Check the ordering of provided code blocks, never execute learner code.
 
@@ -203,6 +220,7 @@ def parsons_reference(parameters):
 
 
 MODELS = {
+    "scaled_dot_product_attention": attention_trace,
     "parsons_reference": parsons_reference,
     "binary_search_lower_bound": binary_search_trace,
     "finite_discounted_return": discounted_return_trace,
@@ -243,6 +261,11 @@ def build_interaction(interaction):
 
 
 STYLES = r"""
+.attention-graphic {overflow-x:auto} .attention-graphic svg{min-width:640px} .attention-alternative dl{padding:.7rem;background:#f2f7fc;border-radius:8px} .attention-alternative dt{font-weight:650} .attention-alternative dd{margin:0 0 .4rem} .semantic-figure{overflow-x:auto} .semantic-figure svg{min-width:580px} .task-prompt {font-weight:650;font-size:1.1rem} .attention-editors {display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem} .attention-editors fieldset {border:1px solid #cad5e3;border-radius:8px} .attention-editors label {display:inline-block;width:45%;margin:.3rem} .attention-lab input[type=checkbox] {width:auto} .attention-lab svg,.semantic-figure svg {height:auto;max-width:100%} .semantic-figure {margin:1.5rem 0;padding:1rem;background:white;border:1px solid #d9e2ef;border-radius:12px} .semantic-figure figcaption {font-size:.9rem;color:#405778}
+.em-math { display:inline-block; max-width:100%; overflow-x:auto; vertical-align:middle; }
+.em-math svg { max-width:none; }
+.dmath { margin:1rem 0; overflow-x:auto; }
+
 :root { color-scheme: light; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   --ink:#14243a; --muted:#50647a; --line:#d9e2ec; --paper:#f7f9fc; --blue:#155ee7;
   --accent:#0d7a70; background:var(--paper); color:var(--ink); }
@@ -391,6 +414,9 @@ function draw(stage, step) {
     visual.append(el("span", "area-guide",
       "Seiten a = " + fmt(s.a) + ", b = " + fmt(s.b) +
       ". Die Breiten und Höhen stehen im Verhältnis a : b."));
+  } else if (s.kind === "attention") {
+    const parsed = new DOMParser().parseFromString(s.svg, "image/svg+xml");
+    visual.append(document.importNode(parsed.documentElement, true));
   } else if (s.kind === "rewards") {
     (s.values || []).forEach((v, i) => {
       const cell = el("span", "cell" + (i >= s.index ? " done" : "")
@@ -736,6 +762,8 @@ def _h(value):
 
 def render_html(unit):
     from .experience import validate
+    from .experience_math import markup
+    rich = lambda text: markup(unit, text)
     from .experience_evidence import assessment_revision
     from .experience_adaptation import track_for_unit
 
@@ -776,11 +804,13 @@ def render_html(unit):
         'Noch keine Lernhandlungen erfasst.</p></section>',
         '<section aria-label="Wissenschaftliche Erklärung"><h2>Verstehen</h2>',
     ]
+    from .experience_graphics import html_frames
     for block in unit["teaching"]:
         parts.append('<article class="card" id="teaching-' + re_slug(block["id"]) +
                      '" data-competencies="' + _h(",".join(block["competency_ids"])) +
                      '" data-claims="' + _h(",".join(block.get("claim_ids", []))) +
-                     '"><p>' + _h(block["content"]) + '</p></article>')
+                     '"><div>' + rich(block["content"]) + '</div></article>')
+        parts.append(html_frames(unit, block["id"]))
         proof = block.get("derivation")
         if proof:
             parts.extend([
@@ -788,30 +818,30 @@ def render_html(unit):
                 _h(",".join(block.get("claim_ids", []))) + '">',
                 '<p class="eyebrow">Herleitung und Begründung</p>',
                 '<h3>' + _h(proof["title"]) + '</h3>',
-                '<p>' + _h(proof["given"]) + '</p>',
+                '<div>' + rich(proof["given"]) + '</div>',
                 '<ol class="proof-steps">',
             ])
             for step in proof["steps"]:
                 parts.append('<li><div class="proof-statement">' +
-                             _h(step["statement"]) + '</div>')
+                             rich(step["statement"]) + '</div>')
                 if "math_check" in step:
                     proof_check = step["math_check"]
                     # Exactly the same authored identity is checked in the
                     # canonical validator and typeset into the PDF.
                     verify_polynomial(proof_check)
                     parts.append(
-                        '<code class="proof-equation">' +
-                        _h(proof_check["lhs"] + " = " + proof_check["rhs"]) +
-                        '</code><small class="proof-verification">'
+                        '<div class="proof-equation">' +
+                        rich(verify_polynomial(proof_check)["latex"]) +
+                        '</div><small class="proof-verification">'
                         'Exakt symbolisch geprüft: nur diese Polynomgleichung, '
                         'nicht der gesamte Beweis.</small>'
                     )
                 parts.append(
                     '<details><summary>Warum ist dieser Schritt zulässig?</summary>' +
-                    '<p>' + _h(step["justification"]) + '</p></details></li>'
+                    '<div>' + rich(step["justification"]) + '</div></details></li>'
                 )
-            parts.extend(['</ol><p class="answer"><strong>Ergebnis:</strong> ' +
-                          _h(proof["result"]) + '</p></article>'])
+            parts.extend(['</ol><div class="answer"><strong>Ergebnis:</strong> ' +
+                          rich(proof["result"]) + '</div></article>'])
     parts.append('</section>')
     for spec in compiled:
         slug = re_slug(spec["id"])
@@ -858,13 +888,35 @@ def render_html(unit):
             '</aside></div><article class="card"><h3>Transfer</h3><p>' +
             _h(spec["transfer_prompt"]) + '</p></article></section>',
         ])
+    from .. import figures_svg
+    for spec in compiled:
+        if spec['variants'][0].get('model') != 'scaled_dot_product_attention':
+            continue
+        parameters = spec['variants'][0]['parameters']
+        parts.extend([
+            '<section class="attention-lab card" aria-label="Freies Attention-Experiment">',
+            '<p class="eyebrow">Freies Experiment · Q, K und V verändern</p>',
+            '<h2>Vergleichen ist nicht Mischen</h2>',
+            '<p>Ändere zuerst nur einen Value. Die Gewichte sollten gleich bleiben, die Ausgabe kann sich bewegen. '
+            'Ändere danach eine Query oder einen Key: Welche Gewichte ändern sich? '
+            'Konstruiere anschließend eine vollständig maskierte Zeile und begründe die Fehlermeldung.</p>',
+            '<div class="attention-graphic" tabindex="0" aria-label="Schaubild horizontal erkunden">'+figures_svg.render({'type':'scaled_dot_product_attention','parameters':parameters,
+                                'title':'Attention aus denselben Modellobjekten','alt':'Scores, Gewichte, Values und Beiträge der ersten Query'})+'</div>',
+            '<details><summary>Alle Zwischenwerte als lesbarer Text</summary><div class="attention-alternative"></div></details><div class="attention-editors"></div><details><summary>Maske: erlaubte Verbindungen</summary><div class="attention-masks"></div></details>',
+            '<label>Temperatur T (0,05 bis 20)<input class="attention-temperature" type="number" min="0.05" max="20" step="0.05"></label>',
+            '<label><input class="attention-scale" type="checkbox"> Durch die Quadratwurzel der Key-Dimension skalieren</label>',
+            '<p class="attention-status" role="status" aria-live="polite"></p><p class="attention-readout" aria-live="polite"></p>',
+            '<button class="attention-reset" type="button">Ausgangsbeispiel wiederherstellen</button> ',
+            '<button class="attention-export secondary" type="button">Experimentparameter speichern</button>',
+            '<script class="attention-parameters" type="application/json">'+_json_script(parameters)+'</script></section>',
+        ])
     parts.append('<section aria-label="Selbstständige Übungsaufgaben"><h2>Selbstständig anwenden</h2>')
     for task in unit["assessments"]:
         slug = re_slug(task["id"])
         parts.extend([
             '<article class="card assessment" id="exercise-' + slug + '" data-task-id="' +
             _h(task["id"]) + '">',
-            '<p class="eyebrow">Erst selbst lösen</p><h3>' + _h(task["prompt"]) + '</h3>',
+            '<p class="eyebrow">Erst selbst lösen</p><div class="task-prompt">' + rich(task["prompt"]) + '</div>',
             '<label for="attempt-' + slug + '">Dein Lösungsversuch</label>',
             '<textarea id="attempt-' + slug + '" maxlength="20000"></textarea>',
             '<div class="controls">',
@@ -877,12 +929,24 @@ def render_html(unit):
             '<div class="adaptive-guidance" role="status" aria-live="polite"></div>',
             ('<p class="hint-text hidden" role="status" aria-live="polite"></p>'
              if task.get("hints") else ''),
-            '<div class="answer hidden"><strong>Musterlösung</strong><p>' + _h(task["solution"]) + '</p>',
+            '<div class="answer hidden"><strong>Musterlösung</strong><div>' + rich(task["solution"]) + '</div>',
             '<strong>Bewertungskriterien</strong><ul>',
         ])
         for part in task["rubric"]:
             parts.append('<li>' + _h(part["criterion"]) + ' (' + _h(part["points"]) + ' Punkte)</li>')
         parts.append('</ul></div></article>')
+    parts.append('</section><section aria-label="Quellen und Erstellung"><h2>Quellen und Erstellung</h2>')
+    import re as source_re
+    for source in unit['sources']:
+        parts.append('<article class="card" id="source-'+re_slug(source['id'])+'"><p>'+_h(source['locator'])+'</p>')
+        for url in source_re.findall(r'https?://[^\s<>]+', source['locator']):
+            parts.append('<a rel="noopener noreferrer" href="'+_h(url)+'">Öffentliches Original öffnen</a>')
+        parts.append('</article>')
+    if unit.get('authorship'):
+        parts.append('<div class="card"><h3>Wie diese Einheit entstand</h3>')
+        for key in ('content','automatic','independent'):
+            parts.append('<p>'+_h(unit['authorship'].get(key,''))+'</p>')
+        parts.append('<p>Fachliche und menschliche Abnahme: ausstehend.</p></div>')
     parts.extend([
         '</section><p class="help">Diese Demo protokolliert nur Lernhandlungen',
         ' im Sitzungsspeicher, führt keinen fremden Code aus und zertifiziert',
@@ -897,7 +961,7 @@ def render_html(unit):
                                        "competency_ids": x["competency_ids"]}
                                       for x in unit["assessments"]]}),
         '</script><script>' + tutor_js + '</script><script>' + RUNTIME +
-        '</script></main></body></html>',
+        '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_experience.js').read_text() + '</script></main></body></html>',
     ])
     return "".join(parts)
 
@@ -907,6 +971,7 @@ def re_slug(name):
     return re.sub(r"[^a-z0-9_-]", "-", name)
 
 
+@locked_publisher
 def publish(unit, out_dir):
     """Write exactly one offline HTML and an internal integrity manifest.
 

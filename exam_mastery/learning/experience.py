@@ -142,6 +142,12 @@ def validate(unit):
     if not isinstance(unit, dict):
         return {"valid": False, "errors": ["root: expected object"], "warnings": []}
     errors, warnings = [], []
+    from . import experience_math
+    from ..common import ContractError
+    try:
+        experience_math.validate(unit)
+    except (ContractError, ValueError, KeyError, TypeError) as exc:
+        errors.append("mathematics: " + str(exc))
     if unit.get("schema") != SCHEMA:
         errors.append(f"schema: expected {SCHEMA}")
     uid = unit.get("unit_id")
@@ -309,6 +315,12 @@ def validate(unit):
         if objects and missing:
             warnings.append(f"{target}: some competencies do not need dedicated coverage: {', '.join(sorted(missing))}")
 
+    if not errors:
+        from .experience_graphics import specifications
+        try:
+            specifications(unit)
+        except (ValueError, KeyError, TypeError) as exc:
+            errors.append("graphics: " + str(exc))
     return {
         "valid": not errors, "errors": sorted(set(errors)), "warnings": sorted(set(warnings)),
         "coverage": {"competencies": len(skill_ids), **{k: len(v) for k, v in coverage.items()}},

@@ -5,6 +5,8 @@ Anki itself. Persistent state remains separate from the visible deck package.
 """
 from __future__ import annotations
 
+from .publication_lock import locked_publisher
+
 import hashlib
 import json
 import os
@@ -37,6 +39,7 @@ def _write_atomic(path, data):
             os.unlink(temp)
 
 
+@locked_publisher
 def publish(unit, output_dir, state_dir=None):
     """Create or update ONLY Anki.apkg in the user-visible output directory.
 
@@ -46,6 +49,8 @@ def publish(unit, output_dir, state_dir=None):
     check = validate(unit)
     if not check["valid"]:
         raise ValueError("Invalid learning unit: " + "; ".join(check["errors"]))
+    from .experience_math import project
+    unit = project(unit)
     cards = []
     claims = {claim["id"]: claim for claim in unit.get("claims", [])}
     sources = {source["id"]: source for source in unit.get("sources", [])}

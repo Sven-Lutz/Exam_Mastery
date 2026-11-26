@@ -82,3 +82,16 @@ Run `python scripts/verify_experience_references.py --out /tmp/em-reference-evid
 for synthetic mathematics, algorithmic and finance four-product builds, no-op rebuild
 checks, PDF page renders and offline browser/Anki previews. Outputs stay outside the
 repository. See `docs/ENGINEERING_RECOVERY_20261126.md` for findings and limitations.
+
+### Attention Golden Reference candidate
+
+`fixtures/experience_attention_reference.json` is an explicitly curated, publicly
+source-grounded candidate, with synthetic matrices and original prose/tasks.
+It is not evidence of automatic academic authoring or human acceptance.
+`experience build` produces exactly the four existing products; publishers and
+recovery now take a process-exclusive POSIX directory lock.
+
+`python scripts/verify_experience_references.py --out /tmp/em-golden-reference`
+builds the Attention, geometry, algorithmic and finance references and captures
+PDF pages, Anki previews and real offline browser interventions.
+See `docs/GOLDEN_ATTENTION_20261126.md` for sources, provenance, tests and limits.
