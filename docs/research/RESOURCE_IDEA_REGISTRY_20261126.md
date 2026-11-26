@@ -1,6 +1,6 @@
 # Exam Mastery — Reference, Idea & Resource Registry (2026-11-26)
 
-**Scope:** Preserve and evaluate all previously considered resources, not copy their products. This is a **research inventory**, NOT endorsement, validated learning effectiveness, license clearance or a finished implementation plan. Related [R7 issue](https://github.com/Sven-Lutz/Exam_Mastery/issues/28) and [research charter](RESEARCH_FIRST_PROGRAM_20261126.md).
+**Scope:** Preserve and evaluate all previously considered resources, not copy their products. This is a **research inventory**, NOT endorsement, validated learning effectiveness, license clearance or a finished implementation plan. Related [R7 issue](https://github.com/Sven-Lutz/Exam_Mastery/issues/29) and [research charter](RESEARCH_FIRST_PROGRAM_20261126.md).
 
 ## Guardrails
 - Preserve the full 4-product vision (Lehrbuch, Arbeitsbuch, Anki, Interaktiv). Obsidian optional, not a fifth product; FSRS scheduling stays in Anki. Relevant examples and decks previously supplied by owner were illustrative, not new test fixtures.
