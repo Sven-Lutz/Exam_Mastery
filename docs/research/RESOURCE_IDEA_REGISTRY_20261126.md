@@ -84,3 +84,18 @@ Favor educational correctness, independent transfer, epistemic humility, low opp
 - Exercism practice exercise model: https://exercism.org/docs/building/tracks/practice-exercises
 - JupyterLite: https://jupyterlite.readthedocs.io/
 - R8 covers official Anki and Obsidian technical sources.
+
+## F. Explicit tutoring references retained (R9)
+
+The owner also supplied **tutoring-specific resources** beyond general learning platform references. Preserve them separately rather than reducing tutoring to a generic chat interface:
+
+- **DeepTutor** — https://github.com/HKUDS/DeepTutor (shared tutoring, research, visualization, quiz, mastery context).
+- **OATutor** — https://github.com/CAHLR/OATutor (BKT, adaptive step-by-step help).
+- **LMU SMART-RAG Tutor** — https://github.com/digillab-lmu/smart-rag (hybrid retrieval, persistent context, course concept maps).
+- **TutorBench** — https://labs.scale.com/leaderboard/tutorbench (1,490 expert-constructed tutor scenarios; not an educational outcomes trial).
+- **OpenTutor** — https://github.com/zijinz456/OpenTutor (local-first, knowledge-graph-linked tutoring).
+- **PAIDEIA** — https://github.com/OPTIMETA/PAIDEIA and https://github.com/TaewoooPark/PAIDEIA (resolve codebase identity/version before evaluation, exam drills, diagnosis).
+- **Education Agent Skills** — https://github.com/GarethManning/education-agent-skills (retrieve-first, hints, teach-back, error diagnosis, transfer, unassisted testing).
+- **ChatGPT Study Mode and portable tutor context packs, NotebookLM, Khanmigo, YouLearn, StudyFetch, Math Academy, RemNote Guided Learn Mode, Margin Study, Utterseen** (verify exact scope and current platform behavior).
+
+Dedicated research/evaluation brief [TUTORING_RESOURCE_REGISTRY_20261126.md](TUTORING_RESOURCE_REGISTRY_20261126.md), [Issue R9 #31](https://github.com/Sven-Lutz/Exam_Mastery/issues/31). The fourth product **Interaktiv** may host tutoring or link to an external tutor context. Preserve the distinction from numerical labs, Anki scheduling, and source/assessment evaluation. No tutoring efficacy asserted by existence of an app or benchmark.
