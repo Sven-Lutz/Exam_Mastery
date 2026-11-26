@@ -171,7 +171,7 @@ def _combined_workbook(book):
     for idx, stage in enumerate(book["stages"], 1):
         tag = f"aufgaben-{idx}"
         toc.append((2, tag, stage["title"]))
-        parts = [f'<section class="stage"><h2 id="{tag}">{typeset.inline(stage["title"])}</h2>']
+        parts = [f'<section class="stage{" first" if idx == 1 else ""}"><h2 id="{tag}">{typeset.inline(stage["title"])}</h2>']
         for task in stage["items"]:
             parts.append(typeset._item_html(d, task, solution=False))
         parts.append("</section>")
@@ -184,7 +184,7 @@ def _combined_workbook(book):
     for idx, stage in enumerate(book["stages"], 1):
         tag = f"loesungen-{idx}"
         toc.append((2, tag, stage["title"] + " · Lösungen"))
-        parts = [f'<section class="stage"><h2 id="{tag}">{typeset.inline(stage["title"])}</h2>']
+        parts = [f'<section class="stage{" first" if idx == 1 else ""}"><h2 id="{tag}">{typeset.inline(stage["title"])}</h2>']
         for task in stage["items"]:
             # The same semantic task receives a distinct PDF anchor for the solution.
             copy = dict(task, id="loesung-" + task["id"])
@@ -213,8 +213,15 @@ def publish(unit, output_dir):
     state_dir.mkdir(parents=True, exist_ok=True)
     record_path = state_dir / f"books-{unit_key}.json"
     record = json.loads(record_path.read_text(encoding="utf-8")) if record_path.exists() else None
+    from .experience_runtime import fingerprint, fonts
+    from . import experience_books, experience_proof_checks
+    runtime = fingerprint(
+        [experience_books, experience_proof_checks, typeset, typeset.figures_svg],
+        assets=[("mathjax", typeset.NODE / "mathjax-full/es5/tex-svg-full.js"),
+                *fonts(typeset.NODE, [(pkg, variants) for _, pkg, variants in typeset.FONTS])],
+        packages=["playwright", "PyMuPDF"], settings=[("css", typeset.CSS)])
     inputs = hashlib.sha256(json.dumps(
-        {"unit": unit, "adapter": SCHEMA, "typeset": "existing-v1"},
+        {"unit": unit, "adapter": SCHEMA, "runtime": runtime},
         sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
     names = ("Lehrbuch.pdf", "Arbeitsbuch.pdf")
     for name in names:

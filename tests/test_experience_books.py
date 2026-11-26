@@ -73,6 +73,13 @@ def test_real_pdf_rendering_and_zero_duplicate_visible_files(tmp_path):
         text = "\n".join(page.get_text() for page in pdf)
         assert "Musterlösungen" in text
         assert "Binary" in text
+        for page in pdf:
+            content = page.get_text()
+            # A part heading must not be stranded on a separate nearly empty page.
+            if "Teil I · Aufgaben" in content and "Bearbeiten Sie" in content:
+                assert lesson["assessments"][0]["prompt"][:20] in content
+            if "Teil II · Vollständige Musterlösungen" in content and "Bewertungskriterien" in content:
+                assert lesson["assessments"][0]["prompt"][:20] in content
     mtime = {file: (tmp_path / file).stat().st_mtime_ns for file in report["products"]}
     other = books.publish(lesson, tmp_path)
     assert other["status"] == "UNCHANGED"
@@ -98,3 +105,14 @@ def test_derivation_and_provenance_share_the_existing_pdf_model():
     assert block["steps"] == [[s["statement"], s["justification"]]
                               for s in proof["steps"]]
     assert "Synthetisch" in block["src"]
+
+
+def test_typesetting_change_invalidates_pdf_cache(monkeypatch, tmp_path):
+    # Mock only the expensive PDF renderer; exercise real caching and manifests.
+    def render(body, toc, title, out, name, header):
+        (out / (name + ".pdf")).write_bytes(books.typeset.CSS.encode())
+        return {"pages": 2}
+    monkeypatch.setattr(books.typeset, "render_document", render)
+    books.publish(fixture(), tmp_path)
+    monkeypatch.setattr(books.typeset, "CSS", books.typeset.CSS + "\n/* revised design */")
+    assert books.publish(fixture(), tmp_path)["status"] == "CREATED_OR_UPDATED"

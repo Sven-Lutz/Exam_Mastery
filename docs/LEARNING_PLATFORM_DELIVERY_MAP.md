@@ -67,3 +67,12 @@ All milestones require runnable artifact, exact commit, automated test results a
 - No comparison to unconstrained ChatGPT baseline has yet been performed. The evaluation protocol remains NOT_RUN.
 
 **Change control:** When a feature is implemented, update this map with its precise test/PR evidence. Do not mark something DONE from documentation, generated text, green synthetic-only tests, or an agent's self-evaluation alone.
+
+## Engineering evidence update — 26 November 2026
+
+Integration branch from PR #18 adds explicit journal-based process-interruption
+recovery, renderer/template/font dependency cache invalidation and a workbook
+pagination correction. Synthetic math/CS/finance reference runs and actual Anki
+backend reimport tests cover these changes. Durable learner-state import, exclusive
+publisher locking, full-group atomic visibility, academic writing/visual quality and
+human acceptance remain open. Details: `ENGINEERING_RECOVERY_20261126.md`.

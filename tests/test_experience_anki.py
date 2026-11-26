@@ -108,3 +108,49 @@ def test_anki_card_refs_resolve_to_canonical_source(tmp_path):
         assert "Synthetic reference" in note["Source"]
     finally:
         collection.close()
+
+
+def test_template_change_invalidates_package_cache(monkeypatch, tmp_path):
+    from exam_mastery import anki_v2
+    lesson = synthetic_unit()
+    bridge.publish(lesson, tmp_path)
+    monkeypatch.setattr(anki_v2, "CSS", anki_v2.CSS + "\n/* revised design */")
+    result = bridge.publish(lesson, tmp_path)
+    assert result["status"] == "CREATED_OR_UPDATED"
+    assert result["update_delta"]["unchanged"] == ["trace/why"]
+
+
+def test_real_reimport_preserves_reviews_and_schedule_after_template_update(monkeypatch, tmp_path):
+    from anki.collection import Collection, ImportAnkiPackageRequest, ImportAnkiPackageOptions
+    from exam_mastery import anki_v2
+    import time
+    unit = synthetic_unit()
+    bridge.publish(unit, tmp_path / "products")
+    col = Collection(str(tmp_path / "isolated.anki2"))
+    def load():
+        col.import_anki_package(ImportAnkiPackageRequest(
+            package_path=str(tmp_path / "products/Anki.apkg"),
+            options=ImportAnkiPackageOptions(merge_notetypes=True, update_notes=1,
+                                            with_scheduling=False, with_deck_configs=False)))
+    try:
+        load()
+        card = col.get_card(col.find_cards("")[0])
+        card.reps, card.ivl, card.due = 7, 13, 42
+        col.update_card(card)
+        col.db.execute('insert into revlog (id,cid,usn,ease,ivl,lastIvl,factor,time,type) values (?,?,?,?,?,?,?,?,?)',
+                       int(time.time()*1000), card.id, -1, 3, 13, 5, 2500, 1200, 1)
+        before = col.db.all('select id,nid,reps,ivl,due from cards order by id')
+        history = col.db.all('select * from revlog')
+        unit['title'] = 'Revised title with the same semantic unit identity'
+        unit['cards'][0]['answer'] += ' Revised explanation.'
+        monkeypatch.setattr(anki_v2, 'CSS', anki_v2.CSS + '\n/* new-template-version */')
+        bridge.publish(unit, tmp_path / "products")
+        load()
+        assert col.note_count() == 1
+        assert col.db.all('select id,nid,reps,ivl,due from cards order by id') == before
+        assert col.db.all('select * from revlog') == history
+        note = col.get_note(col.find_notes("")[0])
+        assert 'Revised explanation.' in note['Answer']
+        assert 'new-template-version' in note.note_type()['css']
+    finally:
+        col.close()
