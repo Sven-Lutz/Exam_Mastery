@@ -269,3 +269,114 @@ def test_symlink_inserted_after_initial_preflight_is_not_followed(monkeypatch, t
     assert not list(outside.iterdir())
     assert not (tmp_path / "Anki.apkg").exists()
     assert not list(tmp_path.glob(".em-stage-*"))
+
+
+def test_interrupted_commit_requires_explicit_recovery(monkeypatch, tmp_path):
+    _fake_publishers(monkeypatch, suffix=b"old")
+    pipeline.build(fixture(), tmp_path)
+    before = _managed_bytes(tmp_path)
+    _fake_publishers(monkeypatch, suffix=b"new")
+    replace = pipeline.os.replace
+
+    def interrupt(source, target):
+        if target == tmp_path / "Interaktiv" / "index.html":
+            raise KeyboardInterrupt("simulate process termination")
+        return replace(source, target)
+
+    monkeypatch.setattr(pipeline.os, "replace", interrupt)
+    with pytest.raises(KeyboardInterrupt):
+        pipeline.build(fixture(), tmp_path)
+    monkeypatch.setattr(pipeline.os, "replace", replace)
+    with pytest.raises(ValueError, match="recovery"):
+        pipeline.build(fixture(), tmp_path)
+    assert pipeline.recover(tmp_path)["status"] == "RECOVERED_PREVIOUS_RELEASE"
+    assert _managed_bytes(tmp_path) == before
+    assert not list(tmp_path.glob(".em-recovery-*"))
+    assert pipeline.build(fixture(), tmp_path)["publication"]["status"] == "STAGED_COMMIT"
+
+
+def test_recovery_refuses_post_crash_manual_change(monkeypatch, tmp_path):
+    _fake_publishers(monkeypatch, suffix=b"old")
+    pipeline.build(fixture(), tmp_path)
+    _fake_publishers(monkeypatch, suffix=b"new")
+    replace = pipeline.os.replace
+
+    def interrupt(source, target):
+        if target == tmp_path / "Interaktiv" / "index.html":
+            raise KeyboardInterrupt()
+        return replace(source, target)
+
+    monkeypatch.setattr(pipeline.os, "replace", interrupt)
+    with pytest.raises(KeyboardInterrupt):
+        pipeline.build(fixture(), tmp_path)
+    monkeypatch.setattr(pipeline.os, "replace", replace)
+    (tmp_path / "Anki.apkg").write_bytes(b"manual edit after interruption")
+    before = _managed_bytes(tmp_path)
+    with pytest.raises(ValueError, match="modified"):
+        pipeline.recover(tmp_path)
+    assert _managed_bytes(tmp_path) == before
+    assert list(tmp_path.glob(".em-recovery-*"))
+
+
+@pytest.mark.parametrize("name", ["experience_reference", "experience_binomial_reference", "experience_finance_reference"])
+def test_redistributable_reference_preflight(name, tmp_path):
+    lesson = json.loads((Path(__file__).parents[1] / "fixtures" / (name + ".json")).read_text())
+    assert lesson["source_mode"] == "synthetic"
+    assert pipeline.preflight(lesson, tmp_path)["status"] == "PREFLIGHT_PASS"
+
+
+def test_finance_fixture_oracle_independent_decimal_sum():
+    from decimal import Decimal
+    from exam_mastery.learning.interactive_reference import build_interaction
+    lesson = json.loads((Path(__file__).parents[1] / "fixtures/experience_finance_reference.json").read_text())
+    for variant in lesson["interactions"][0]["variants"]:
+        p = variant["parameters"]
+        exact = sum(Decimal(str(c)) * Decimal(str(p["gamma"])) ** t
+                    for t, c in enumerate(p["rewards"]))
+        from exam_mastery.learning.interactive_reference import discounted_return_trace
+        assert discounted_return_trace(p)["result"] == pytest.approx(float(exact), abs=1e-10)
+
+
+@pytest.mark.parametrize("replacements", [1, 4, 7])
+def test_real_process_exit_recovers_at_product_and_metadata_boundaries(monkeypatch, tmp_path, replacements):
+    import subprocess
+    import sys
+    _fake_publishers(monkeypatch, suffix=b"old")
+    root = tmp_path / "release"
+    root.mkdir()
+    pipeline.build(fixture(), root)
+    before = _managed_bytes(root)
+    stage = tmp_path / "stage"
+    stage.mkdir()
+    _fake_publishers(monkeypatch, suffix=b"new")
+    pipeline.build(fixture(), stage)
+    code = '''
+import os, sys
+from pathlib import Path
+from exam_mastery.learning import experience_pipeline as p
+root, stage, limit = Path(sys.argv[1]), Path(sys.argv[2]), int(sys.argv[3])
+replace, count = p.os.replace, 0
+def die_after_replace(source, target):
+    global count
+    replace(source, target)
+    count += 1
+    if count == limit:
+        os._exit(73)
+p.os.replace = die_after_replace
+p._commit_staged(root, stage, p._snapshot(root))
+'''
+    result = subprocess.run([sys.executable, "-c", code, str(root), str(stage), str(replacements)], check=False)
+    assert result.returncode == 73
+    assert pipeline.recover(root)["status"] == "RECOVERED_PREVIOUS_RELEASE"
+    assert _managed_bytes(root) == before
+
+
+def test_recovery_rejects_traversal_journal_before_writes(tmp_path):
+    recovery = tmp_path / ".em-recovery-test"
+    recovery.mkdir()
+    (recovery / "transaction.json").write_text(json.dumps({
+        "schema": "em-publication-recovery-v1", "before": {},
+        "after": {".em-state/../../outside": "0" * 64}}))
+    with pytest.raises(ValueError, match="Invalid recovery path"):
+        pipeline.recover(tmp_path)
+    assert (recovery / "transaction.json").is_file()

@@ -1,0 +1,202 @@
+{
+  "schema": "em-experience-v1",
+  "unit_id": "finance/discounted-cashflow-reference",
+  "title": "Abgezinste Zahlungsströme: Zeitpunkt und Barwert",
+  "source_mode": "synthetic",
+  "knowledge_modes": [
+    "economic",
+    "conceptual",
+    "computational"
+  ],
+  "sources": [
+    {
+      "id": "synthetic/cashflow",
+      "kind": "synthetic",
+      "locator": "Eigenständig definierter endlicher Zahlungsstrom; keine empirischen Finanzdaten oder externe Literatur"
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim/present-value",
+      "text": "Bei konstantem Periodenzins r>0 und Zahlungen C_t am Periodenanfang t ist der Zeitpunkt-0-Barwert die endliche Summe C_t/(1+r)^t.",
+      "source_refs": [
+        "synthetic/cashflow"
+      ],
+      "evidence_status": "synthetic"
+    }
+  ],
+  "competencies": [
+    {
+      "id": "finance/present-value",
+      "operation": "calculate",
+      "prerequisites": []
+    }
+  ],
+  "cards": [
+    {
+      "key": "finance/time-zero",
+      "kind": "concept",
+      "front": "Wird eine Zahlung C_0 zum Bewertungszeitpunkt 0 abgezinst?",
+      "answer": "Nein: Ihr Faktor ist (1+r)^0=1.",
+      "explanation": "Nur zukünftige Zeitabstände erhalten einen Diskontfaktor kleiner als eins; hier gilt r>0.",
+      "competency_ids": [
+        "finance/present-value"
+      ],
+      "claim_ids": [
+        "claim/present-value"
+      ]
+    },
+    {
+      "key": "finance/discount-factor",
+      "kind": "math",
+      "front": "Wie hängen bei konstantem Periodenzins r>0 der Diskontfaktor γ und der Barwert von C_t zusammen?",
+      "answer": "γ=1/(1+r); Barwert von C_t zum Zeitpunkt 0: γ^t C_t.",
+      "explanation": "Die Umkehrung der t-fachen Aufzinsung teilt durch (1+r)^t.",
+      "competency_ids": [
+        "finance/present-value"
+      ],
+      "claim_ids": [
+        "claim/present-value"
+      ]
+    }
+  ],
+  "assessments": [
+    {
+      "id": "task/present-value",
+      "role": "core",
+      "prompt": "Zahlungen 100 zu t=0,1,2; konstanter Jahreszins r=1/9. Berechne den Barwert zum Zeitpunkt 0 und begründe den Faktor für jede Zahlung.",
+      "solution": "γ=1/(1+1/9)=9/10. Der Barwert ist 100·1+100·9/10+100·81/100=100+90+81=271. Die sofortige Zahlung wird nicht abgezinst.",
+      "rubric": [
+        {
+          "criterion": "Diskontfaktor aus Zinssatz",
+          "points": 1
+        },
+        {
+          "criterion": "Zeitpunkte und drei Teilwerte",
+          "points": 2
+        },
+        {
+          "criterion": "Summe 271",
+          "points": 1
+        }
+      ],
+      "machine_check": {
+        "type": "numeric",
+        "expected": 271,
+        "tolerance": 1e-09
+      },
+      "attempt_before_reveal": true,
+      "hints": [
+        "Welche Zahlung erfolgt sofort?"
+      ],
+      "competency_ids": [
+        "finance/present-value"
+      ],
+      "claim_ids": [
+        "claim/present-value"
+      ]
+    },
+    {
+      "id": "task/timing-transfer",
+      "role": "transfer",
+      "prompt": "Dieselben drei Zahlungen von je 100 erfolgen jetzt zu t=1,2,3. Bei γ=0,9: Welcher Barwert ergibt sich zu t=0? Begründe die Beziehung zum vorherigen Fall.",
+      "solution": "Jede Zahlung ist um eine Periode verschoben. Daher wird jeder vorherige Summand mit γ multipliziert: 0,9·271=243,9. Direkt: 90+81+72,9=243,9.",
+      "rubric": [
+        {
+          "criterion": "Zusätzliche Diskontierung begründet",
+          "points": 2
+        },
+        {
+          "criterion": "Barwert 243,9",
+          "points": 1
+        }
+      ],
+      "machine_check": {
+        "type": "numeric",
+        "expected": 243.9,
+        "tolerance": 1e-09
+      },
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "finance/present-value"
+      ],
+      "claim_ids": [
+        "claim/present-value"
+      ]
+    }
+  ],
+  "teaching": [
+    {
+      "id": "teach/timing",
+      "content": "Ein Euro heute und ein Euro später haben in diesem Modell unterschiedliche Zeitpunkte. Wir bewerten ausschließlich bekannte Zahlungen; Risiko, Steuern und Inflation bleiben außerhalb des Modells. Eine Periode ist ein Jahr. Der konstante effektive Jahreszins r=1/9 ergibt den Diskontfaktor γ=1/(1+r)=0,9. Die Zahlung C_0 erfolgt sofort, C_1 nach einem Jahr und C_2 nach zwei Jahren. Für C_0=C_1=C_2=100 ist der heutige Barwert 100+90+81=271. Das ist eine Modellrechnung und keine Anlageempfehlung.",
+      "competency_ids": [
+        "finance/present-value"
+      ],
+      "claim_ids": [
+        "claim/present-value"
+      ]
+    },
+    {
+      "id": "teach/backward",
+      "content": "Rückwärts rechnen liefert denselben Wert: Setze G_3=0 und G_t=C_t+γG_{t+1}. Dann G_2=100, G_1=100+0,9·100=190 und G_0=100+0,9·190=271. Jede G_t bewertet nur die verbleibenden Zahlungen relativ zum Zeitpunkt t. Beim Einsetzen in die vorherige Periode wird genau einmal zusätzlich abgezinst. Wer bereits C_0 abzinst, verschiebt sämtliche Zeitpunkte und erhält irrtümlich 243,9.",
+      "competency_ids": [
+        "finance/present-value"
+      ],
+      "claim_ids": [
+        "claim/present-value"
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "id": "interaction/cashflow",
+      "type": "explorable_model",
+      "model_ref": "finite_discounted_return",
+      "prediction_prompt": "Sage den heutigen Barwert voraus. Achte auf die sofortige Zahlung zu t=0.",
+      "feedback_rule": "Vergleiche die direkte Summe mit der Rückwärtsrekursion G_t=C_t+γG_{t+1}.",
+      "transfer_prompt": "Was ändert sich, wenn alle Zahlungen um eine Periode später erfolgen?",
+      "variants": [
+        {
+          "label": "Zahlungen zu 0,1,2",
+          "parameters": {
+            "rewards": [
+              100,
+              100,
+              100
+            ],
+            "gamma": 0.9
+          }
+        },
+        {
+          "label": "Zahlungen zu 1,2,3",
+          "parameters": {
+            "rewards": [
+              0,
+              100,
+              100,
+              100
+            ],
+            "gamma": 0.9
+          }
+        },
+        {
+          "label": "Auszahlung jetzt, Rückfluss später",
+          "parameters": {
+            "rewards": [
+              -200,
+              100,
+              150
+            ],
+            "gamma": 0.9
+          }
+        }
+      ],
+      "competency_ids": [
+        "finance/present-value"
+      ],
+      "claim_ids": [
+        "claim/present-value"
+      ]
+    }
+  ]
+}

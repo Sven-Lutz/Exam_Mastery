@@ -352,12 +352,16 @@ def obsidian_note(unit):
 def command(args):
     """CLI: exam-mastery experience validate|plan|obsidian|render unit.json [--out dir]."""
     parser = argparse.ArgumentParser(prog="exam-mastery experience")
-    parser.add_argument("action", choices=("validate", "plan", "obsidian", "render", "anki", "books", "build", "evidence", "advise"))
+    parser.add_argument("action", choices=("validate", "plan", "obsidian", "render", "anki", "books", "build", "evidence", "advise", "recover"))
     parser.add_argument("input")
     parser.add_argument("--out")
     parser.add_argument("--log", help="Evidence JSON exported explicitly from the offline lesson")
     parser.add_argument("--answers-file", help="Optional local, ephemeral answer map for numeric formative checking")
     a = parser.parse_args(args)
+    if a.action == "recover":
+        from .experience_pipeline import recover
+        print(json.dumps(recover(a.input), ensure_ascii=False, indent=2))
+        return 0
     unit = json.loads(Path(a.input).read_text(encoding="utf-8"))
     if a.action == "validate":
         result = validate(unit)

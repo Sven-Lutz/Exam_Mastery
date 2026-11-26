@@ -74,8 +74,17 @@ def publish(unit, output_dir, state_dir=None):
     chapter = re.sub(r"[^a-z0-9_-]", "-", "-".join(tokens[1:])) + "-" + digest_id[:8]
     # stable across title and content changes
     deck = "Exam Mastery::" + unit["title"]
+    from .experience_runtime import fingerprint as runtime_fingerprint, fonts
+    from . import experience_anki
+    from ..typeset import NODE
+    runtime = runtime_fingerprint(
+        [experience_anki, anki_v2],
+        assets=fonts(NODE, [("source-sans-3", ["400-normal", "600-normal", "700-normal"])]),
+        packages=["anki"], settings=[("css", anki_v2.CSS),
+            ("basic_q", anki_v2.BASIC_Q), ("basic_a", anki_v2.BASIC_A),
+            ("cloze_q", anki_v2.CLOZE_Q), ("cloze_a", anki_v2.CLOZE_A)])
     fingerprint = hashlib.sha256(json.dumps(
-        {"cards": cards, "course": course, "chapter": chapter, "deck": deck, "notetype": "v2"},
+        {"cards": cards, "course": course, "chapter": chapter, "deck": deck, "notetype": "v2", "runtime": runtime},
         sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
     package = output / "Anki.apkg"
     manifest = state / ("anki-" + digest_id + ".json")

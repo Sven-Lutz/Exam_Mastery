@@ -33,6 +33,8 @@ def _load(path):
 
 def preflight(unit, output_dir):
     """Check all four existing targets against *their* publisher manifests."""
+    if list(Path(output_dir).glob(".em-recovery-*")):
+        raise ValueError("Pending publication recovery; run experience recover before rebuilding")
     valid = validate(unit)
     if not valid["valid"]:
         raise ValueError("Invalid learning unit: " + "; ".join(valid["errors"]))
@@ -42,6 +44,7 @@ def preflight(unit, output_dir):
     for managed in (root / ".em-state", root / "Interaktiv"):
         if managed.is_symlink() or (managed.exists() and not managed.is_dir()):
             raise ValueError(f"Refusing nonregular managed directory {managed.name}")
+    _snapshot(root)  # Reject redirected metadata before reading any manifest.
     suffix = hashlib.sha256(unit["unit_id"].encode()).hexdigest()[:12]
     records = {
         "books": _load(root / ".em-state" / ("books-" + suffix + ".json")),
@@ -156,13 +159,83 @@ def _prepare_previous(root, stage):
             shutil.copy2(source, target)
 
 
+def recover(output_dir):
+    """Explicitly restore a process-interrupted publication, never user edits.
+
+    The journal and every recovery source/live destination are checked before
+    the first write. Recovery copies backups rather than consuming them, so a
+    second interruption can be retried. This covers process termination, not
+    power-loss durability or hostile concurrent filesystem mutation.
+    """
+    root = Path(output_dir)
+    current = _snapshot(root)
+    pending = sorted(root.glob(".em-recovery-*"))
+    if not pending:
+        return {"status": "NO_RECOVERY_NEEDED"}
+    if len(pending) != 1:
+        raise ValueError("Multiple recovery directories require manual inspection")
+    backup = pending[0]
+    if backup.is_symlink() or not backup.is_dir():
+        raise ValueError("Refusing redirected recovery directory")
+    journal = backup / "transaction.json"
+    if journal.is_symlink() or not journal.is_file():
+        raise ValueError("Missing or redirected recovery journal; manual inspection required")
+    record = _load(journal)
+    if not isinstance(record, dict) or set(record) != {"schema", "before", "after"} or record["schema"] != "em-publication-recovery-v1":
+        raise ValueError("Invalid recovery journal")
+    before, after = record["before"], record["after"]
+    for manifest in (before, after):
+        if not isinstance(manifest, dict):
+            raise ValueError("Invalid recovery manifest")
+        for name, checksum in manifest.items():
+            path = Path(name)
+            allowed = name in PRODUCTS.values() or (
+                len(path.parts) > 1 and path.parts[0] == ".em-state")
+            if (not allowed or path.is_absolute() or ".." in path.parts
+                    or path.as_posix() != name or not isinstance(checksum, str)
+                    or len(checksum) != 64 or any(c not in "0123456789abcdef" for c in checksum)):
+                raise ValueError("Invalid recovery path or checksum")
+    if not set(before).issubset(after):
+        raise ValueError("Invalid recovery file set")
+    if set(current) - set(after):
+        raise ValueError("Managed state modified after interruption")
+    for name in after:
+        live_hash = current.get(name)
+        if live_hash not in {before.get(name), after[name]}:
+            raise ValueError("Managed output modified after interruption: " + name)
+        if name in before and live_hash is None:
+            raise ValueError("Managed output modified after interruption: " + name)
+    for name, checksum in before.items():
+        source = backup / name
+        if any(parent.is_symlink() for parent in source.parents if parent != root.parent):
+            raise ValueError("Refusing symlinked recovery source")
+        if not source.is_file() or source.is_symlink() or _hash(source) != checksum:
+            raise ValueError("Recovery backup modified or missing: " + name)
+    # Keep the journal and all original backups intact until restoration ends.
+    for name in sorted(after, key=lambda p: (p.startswith(".em-state/"), p)):
+        target = root / name
+        if current.get(name) == before.get(name):
+            continue
+        if name not in before:
+            target.unlink()
+        else:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            temporary = backup / "restore.tmp"
+            shutil.copy2(backup / name, temporary)
+            os.replace(temporary, target)
+    if _snapshot(root) != before:
+        raise RuntimeError("Recovery verification failed; backups retained")
+    shutil.rmtree(backup)
+    return {"status": "RECOVERED_PREVIOUS_RELEASE", "restored_files": len(before)}
+
+
 def _commit_staged(root, stage, before):
-    """Publish a fully prepared group with in-process rollback.
+    """Publish a fully prepared group with rollback and explicit crash recovery.
 
     This is NOT an atomic multi-file filesystem transaction. If the process is
     forcibly terminated during replacement, an incomplete group can remain.
-    The unchanged original bytes are stored in a hidden recovery directory
-    during commit; ordinary publisher errors never touch the visible files.
+    Original bytes and a hash journal remain in a hidden recovery directory
+    until commit completes; recover() can restore a process-interrupted group.
     """
     root, stage = Path(root), Path(stage)
     current = _snapshot(root)
@@ -185,11 +258,16 @@ def _commit_staged(root, stage, before):
     backup = Path(tempfile.mkdtemp(prefix=".em-recovery-", dir=root))
     committed = []
     try:
-        for relative in changed:
+        for relative in sorted(before):
             if relative in before:
                 target = backup / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(root / relative, target)
+        journal = backup / "transaction.json"
+        journal.write_text(json.dumps({
+            "schema": "em-publication-recovery-v1", "before": before, "after": staged,
+        }, sort_keys=True), encoding="utf-8")
+        # All backups and the closed journal exist before the first replacement.
         # Retain old metadata until all new products are in place, so any
         # interruption fails closed during the next preflight.
         changed.sort(key=lambda p: (p.startswith(".em-state/"), p))
@@ -204,7 +282,9 @@ def _commit_staged(root, stage, before):
             target = root / relative
             try:
                 if relative in before:
-                    os.replace(backup / relative, target)
+                    temporary = backup / "restore.tmp"
+                    shutil.copy2(backup / relative, temporary)
+                    os.replace(temporary, target)
                 else:
                     target.unlink(missing_ok=True)
             except Exception as rollback_error:
@@ -225,7 +305,8 @@ def build(unit, output_dir):
 
     On a normal publisher error, the existing four products and their metadata
     remain byte-for-byte intact. Reuse of prior Anki state preserves semantic
-    note identity. Process-kill atomicity remains a documented release blocker.
+    note identity. Process interruption requires explicit recovery before rebuild;
+    concurrent writers and power-loss atomicity are not guaranteed.
     """
     check = preflight(unit, output_dir)
     from . import experience_books, experience_anki, interactive_reference
@@ -261,7 +342,7 @@ def build(unit, output_dir):
                     "interactive": interaction["status"]},
         "publication": {
             **committed,
-            "guarantee": "STAGED_WITH_IN_PROCESS_ROLLBACK_NOT_CRASH_ATOMIC",
+            "guarantee": "STAGED_WITH_EXPLICIT_PROCESS_RECOVERY_NOT_CRASH_ATOMIC",
         },
         "model_calls": 0,
         "network_calls": 0,
