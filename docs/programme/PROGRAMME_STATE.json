@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T17:36:58+01:00",
+ "updated": "2026-11-27T18:03:41+01:00",
  "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -98,9 +98,11 @@
    "issue": 30
   },
   "R9": {
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "wp": "WP-R9",
-   "issue": 31
+   "issue": 31,
+   "pr": 42,
+   "note": "owner decisions listed in TUTOR_ADOPTION_DECISION.md §6; independent review pending"
   }
  },
  "architecture_decisions": [
@@ -179,6 +181,13 @@
    "id": "CD-6",
    "severity": "P1",
    "text": "Unmerged draft stack #11-#19/#28 and the local RL pilot drift apart from main; integration plan needed before engineering (P4)."
+  },
+  {
+   "id": "CD-7",
+   "severity": "P1",
+   "text": "PR #19 tutor brief embeds the full reference solution; only a prompt instruction keeps it from the learner and the chat provider receives it (R9 TUTOR_ADOPTION_DECISION.md). Conflicts with R5-POL-03/R9-POL-04 (answer key only for practice items; never for mock/retest items).",
+   "status": "OPEN",
+   "fix": "P4: brief carries only practice-item keys; mock/retest items never leave the engine"
   }
  ],
  "agents": [
@@ -244,7 +253,7 @@
    "id": "R9",
    "kind": "background subagent of LEAD",
    "scope": "R9 tutoring resources, behavioural contract, evaluation protocol",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R9.json",
    "worktree": "Exam_Mastery-r9"
   }
@@ -461,16 +470,42 @@
   {
    "id": "WP-R9",
    "title": "R9 tutoring resource excellence",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 6,
    "autostart": true,
    "issue": 31,
    "branch": "research/r9-tutoring-resources-20261127",
    "base": "research/r1-learning-science-20261127",
-   "next_step": "Specialist R9 (background subagent of LEAD): r9_resources.json (preservation of every named resource, claim classes, reuse/adapt/emulate/defer/reject), evidence register + search log, r9_tutor_policies.json, the four issue documents, contract test, draft PR.",
+   "next_step": "None autonomous; PR #42 awaits independent review and owner decisions (§6).",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
-   "updated": "2026-11-27T17:36:58+01:00",
-   "worktree": "Exam_Mastery-r9"
+   "updated": "2026-11-27T18:03:41+01:00",
+   "worktree": "Exam_Mastery-r9",
+   "pr": 42,
+   "blockers": [],
+   "done": [
+    "R9 specialist: r9_resources.json 18 resource cards, 72 claims classed marketing/documented_function/benchmark/learning_outcome; decisions reuse 1, adapt 1, emulate 7, defer 4, reject 5 (121fbeb)",
+    "r9_evidence.json 18 sources (1 fulltext_partial, 17 abstract) + search log S01-S11 (fe08a17)",
+    "r9_tutor_policies.json R9-POL-01..10 (3b72878)",
+    "TUTORING_RESOURCE_COMPARISON.md, TUTOR_BEHAVIORAL_CONTRACT.md, TUTOR_EVALUATION_PROTOCOL.md, TUTOR_ADOPTION_DECISION.md + tests (c63e002); draft PR #42",
+    "lead spot-check 2026-11-27: PAIDEIA identity confirmed (both URLs -> repo id 1216957019); 18 source identities resolve via arXiv/Crossref with matching first authors; tests 48 run OK (1 skip); no local paths"
+   ],
+   "open": [
+    "independent review of PR #42",
+    "owner decisions in TUTOR_ADOPTION_DECISION.md §6 (keyless brief default, full-solution request before first attempt, engine-checked unassisted evidence only, budget for paid calls/independent case authors, named chats/Study Mode, licence policy, TutorBench public sample, registry corrections)",
+    "NBER Khanmigo working papers full text; IZA DP 18792, Barcaui only as snippets; no ERIC/PsycINFO search; no tutor studies for proof/law/clinical/CAD",
+    "PR #19 tutor brief embeds the reference solution (only an instruction withholds it; provider receives it): engineering finding for P4"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/r9/r9_resources.json",
+    "docs/research/workstreams/r9/r9_evidence.json",
+    "docs/research/workstreams/r9/r9_tutor_policies.json",
+    "docs/research/workstreams/TUTORING_RESOURCE_COMPARISON.md",
+    "docs/research/workstreams/TUTOR_BEHAVIORAL_CONTRACT.md",
+    "docs/research/workstreams/TUTOR_EVALUATION_PROTOCOL.md",
+    "docs/research/workstreams/TUTOR_ADOPTION_DECISION.md",
+    "tests/test_r9_tutoring_resources.py"
+   ],
+   "tests": "cd tests && python3 -m unittest test_r9_tutoring_resources test_r1_learning_policies: OK (skipped=1)"
   },
   {
    "id": "WP-R7",
