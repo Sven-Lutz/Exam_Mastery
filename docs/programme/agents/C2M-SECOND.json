@@ -1,0 +1,65 @@
+{
+ "agent": "C2M-SECOND",
+ "updated": "2026-11-28",
+ "state": "DONE_HUMAN_REVIEW_PENDING",
+ "branch": "feat/c2m-second-linalg-20261127",
+ "worktree": "Exam_Mastery-c2m-second",
+ "base": "integration/mastery-v1-20261127 @ 9f202b0",
+ "commits": [
+  "257dd16 c2m: course import generalises to a proof-heavy math course",
+  "95ea432 feat(experience): reusable plane-transformation scene (linear map as continuous morph)",
+  "f3ac1a2 fix(experience): print-first plane figure, shared keyframe scale, stable ids, coincident columns, status"
+ ],
+ "pushed": true,
+ "pull_request": null,
+ "tests": {
+  "ci_pytest_list_incl_new_test_plane_map_lab": "279 passed (frozen copy)",
+  "unittest_discover_incl_new_test_course_import_math": "928 tests: 927 OK, 13 skipped; 1 error in test_p0_resource_budget (process-timeout timing under concurrent build load, code untouched by this branch) - module re-run in isolation: 29 tests OK",
+  "where": "frozen git-archive copy in a uniquely named scratch dir"
+ },
+ "import": {
+  "course": "second contrasting course (proof-heavy mathematics, Lineare Algebra 1), slug lina1, private under MASTERY_HOME",
+  "files": 55,
+  "pages": 736,
+  "pages_with_text": 677,
+  "pages_needing_vision": 421,
+  "kinds": {
+   "exercise": 29,
+   "lecture_slides": 15,
+   "script": 1,
+   "solution": 10
+  },
+  "before_fixes": {
+   "chapters": "16 unnumbered 'x-folien-n' in string order + one 297-page script chapter holding 26 of 29 exercises",
+   "warnings": 71,
+   "solutions_matched": 0
+  },
+  "after_fixes": {
+   "chapters": "15 numbered deck chapters titled from the title page + 9 script-section chapters",
+   "warnings": 48,
+   "solutions_matched": "10 of 10 (Uebungsblatt 1-10); 19 remaining EXERCISE_WITHOUT_SOLUTION are real (Tutorium, Zusatzaufgaben, Blatt 11-13)",
+   "exercises_attached": "26 of 29, monotone in course order"
+  }
+ },
+ "chapter": {
+  "unit_id": "course/lina1/15-lineare-abbildungen-darstellen",
+  "location": "MASTERY_HOME/courses/lina1/chapters/15-lineare-abbildungen-darstellen (private, outside Git)",
+  "library_slug": "lina1-15-lineare-abbildungen-darstellen",
+  "academic_status": "HUMAN_REVIEW_PENDING",
+  "learning_effect": "NOT_RUN",
+  "contents": "7 sections, 4 complete proofs/derivations (Satz 9.6, 9.11, 9.21, det along the morph), 17 tasks (worked 2, guided 6, independent 3, transfer 2, exam 4; 7 deterministic numeric step checks, 3 free-text proofs self-assessed with rubric, 3 flawed proofs), 19 Anki cards (4 with scene keyframe), 2 interactions (flagship plane morph + proof-order Parsons), 3 graphics / 6 keyframes from the same scene, 5 misconceptions/slips",
+  "verification": "27 sympy assertions + 1 engine polynomial-identity check; every proof step checked against the script and recorded in authoring.json",
+  "page_qa": "Lehrbuch 16 p., Arbeitsbuch 21 p. inspected; defects fixed (figure legend 5-6 pt, keyframe zoom jump, task numbering, unrelated figure, hidden coincident column, duplicate 'Kapitel'); explorable driven in a browser"
+ },
+ "flagship_explorable": "plane_linear_map: continuous morph M(t)=(1-t)I+tA, predict-first lock (A v and sign of det A), step/scrub (snaps to det=0)/play (reduced motion respected), columns = basis images, signed area by colour, rank drop with kernel/image, colour-linked equation terms with hover/focus highlight, drag column tips for free exploration; textbook/Anki keyframes rendered from the same model; own palette and wording",
+ "paid_calls": 0,
+ "open_points": [
+  "Owner/human review of the chapter (books, cards, explorable) and of the flagship visual against the learning standard.",
+  "Plan editing cannot attach/detach individual exercises (only title/skip/order/merge); one relevant sheet stayed unattached.",
+  "Exercise-to-chapter matching remains a heuristic (3 of 29 unattached; basis shown).",
+  "Explorable is 2x2 only; 3x3 (kernel planes, volume) not implemented.",
+  "Pages needing vision are over-reported for formula-dense math (421/736); no OCR/formula reconstruction offline.",
+  "Re-importing the first (RL) course will re-read files once (analysis cache versioned); numbering of its files is unchanged by design (trailing number only after a series word)."
+ ],
+ "next_step": "Owner opens bin/mastery from this branch and reviews unit lina1-15-lineare-abbildungen-darstellen; feedback goes into unit.json via the private tools/author_unit.py (same unit_id, stable Anki GUIDs). Lead may cite plane_linear_map as reference example of the learning standard."
+}

@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T23:41:16+01:00",
+ "updated": "2026-11-28T00:24:10+01:00",
  "updated_by": "LEAD (interactive, issue #51)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -377,7 +377,7 @@
    "id": "C2M-SECOND",
    "kind": "background subagent of LEAD",
    "scope": "second contrasting course (linear algebra) end to end",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/C2M-SECOND.json",
    "worktree": "Exam_Mastery-c2m-second"
   },
@@ -385,23 +385,42 @@
    "id": "MOTION",
    "kind": "background subagent of LEAD",
    "scope": "Mastery Motion engine + RL flagship",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/MOTION.json",
    "worktree": "Exam_Mastery-motion"
   }
  ],
  "work_packages": [
   {
+   "id": "WP-MOTION-2",
+   "title": "Mastery Motion consolidation and polish: port the plane scene onto Motion, wire keyframes into textbook/Anki builds, RL scene visual polish (3b1b-level clarity), dark mode",
+   "status": "PLANNED",
+   "priority": 0.07,
+   "autostart": true,
+   "branch": "feat/mastery-motion-2",
+   "base": "integration/mastery-v1-20261127",
+   "next_step": "Bounded step: (1) port the plane-transformation explorable onto mastery-motion-v1 (linear_map_2d + kernel/image for det=0) and remove the duplicate model only after parity tests; (2) wire Motion keyframes into experience textbook figures and Anki card figures; (3) RL scene polish per the lead's notes. Tests + CI-equivalent suite on a frozen copy; push branch, draft PR against integration; no main, no private material."
+  },
+  {
    "id": "WP-MOTION",
    "title": "Mastery Motion engine (scene grammar, runtime, keyframe export) + RL flagship scene (softmax policy gradient on the simplex)",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 0.06,
    "autostart": false,
    "branch": "feat/mastery-motion-20261128",
    "base": "integration/mastery-v1-20261127 (a7de21d)",
    "worktree": "Exam_Mastery-motion",
-   "updated": "2026-11-27T23:41:16+01:00",
-   "next_step": "Specialist MOTION; lead then ports the linear-algebra plane scene onto Motion and integrates."
+   "updated": "2026-11-28T00:24:10+01:00",
+   "next_step": "follow-ups in WP-MOTION-2",
+   "done": [
+    "42aa984/b211dc8/d290742: mastery-motion-v1 grammar (models in Python+JS: softmax_simplex_pg, linear_map_2d), runtime (step/scrub primary, prediction locks, colour+pattern term coupling, reduced motion, aria per step), keyframe SVG export, app demo page + home link, learner events em-motion-v1 shown as 'kein Nachweis von Können', experience hook; tests/test_mastery_motion.py (27)",
+    "lead: screenshots reviewed; merged into integration"
+   ],
+   "open": [
+    "RL scene: pale colours, crowded gradient plane, pi(theta) label overlaps a2, final step should explain b=J worse than b=0 near the corner",
+    "keyframes not yet wired into textbook/Anki builds of experience units",
+    "German only, no dark mode, mobile/screen reader untested"
+   ]
   },
   {
    "id": "WP-STANDARD",
@@ -422,14 +441,28 @@
   {
    "id": "WP-C2M-SECOND",
    "title": "Second contrasting owner course end-to-end (candidates: Lineare Algebra 1 with proofs; Patentrecht/Entrepreneurship)",
-   "status": "RUNNING",
+   "status": "COMPLETED_PENDING_OWNER_REVIEW",
    "priority": 0.7,
    "autostart": false,
    "depends_on": [],
    "branch": "feat/c2m-second-linalg-20261127",
    "base": "integration/mastery-v1-20261127 (9f202b0)",
    "worktree": "Exam_Mastery-c2m-second",
-   "next_step": "Specialist C2M-SECOND: import the owner's linear algebra course through the product path, fix generic pipeline gaps, author one proof-rich chapter, page QA; lead integrates."
+   "next_step": "Specialist C2M-SECOND: import the owner's linear algebra course through the product path, fix generic pipeline gaps, author one proof-rich chapter, page QA; lead integrates.",
+   "updated": "2026-11-28T00:24:10+01:00",
+   "done": [
+    "import of the owner's linear algebra course (55 files, 736 pages) through the product path; first import failed (unnumbered 'Folien n', 297-page script as one chapter, 0/10 solutions) -> generic fixes 257dd16 (trailing series numbers, title-slide titles with mismatch warning, TOC-based script splitting, series-scoped solution matching, course-order exercise assignment, TeX extraction repair, theorem-based competency proposals); after: 24 chapters, 10/10 solutions, 26/29 exercises attached; tests/test_course_import_math.py",
+    "chapter course/lina1/15-lineare-abbildungen-darstellen (private): 7 sections with complete proofs (injectivity/kernel, rank-nullity, columns as images of the basis) and counterexamples per hypothesis, 17 graded tasks (7 exact numeric, 3 self-assessed proofs with rubric, 3 flawed proofs), 19 cards (4 with scene figures), plane-transformation explorable (prediction lock, scrub, det=0 snap with kernel/image) + proof-step ordering; 27 sympy assertions; page QA 16+21 pages",
+    "95ea432/f3ac1a2 reusable plane-transformation scene in the experience engine; tests/test_plane_map_lab.py",
+    "lead: merged into integration with CI list union; theorem numbers in fixture neutralised (125a1c6); frozen suite 306 pytest + 931 unittest OK; explorable checked in the browser"
+   ],
+   "open": [
+    "owner review",
+    "plan editing cannot attach single exercises (sheet 8 unattached)",
+    "explorable 2x2 only",
+    "needs-vision over-reported on formula-dense pages",
+    "duplicate plane models (experience plane_linear_map vs Motion linear_map_2d) -> consolidate in WP-MOTION-2"
+   ]
   },
   {
    "id": "WP-C2M-ANALYTICS",
@@ -1283,5 +1316,6 @@
   "Do not pause: continue continuously within account limits (lead pacing ceiling removed; supervisor ceilings raised to 0.97/0.98 via local config, max 8 runs/24h; supervisor pause reset)",
   "Before inserting more RL chapters, core concepts, evidence and vision must be fixed -> docs/MASTERY_LEARNING_STANDARD.md (a7de21d) posted for approval in #51",
   "3Blue1Brown-level visual quality is missing -> Mastery Motion engine (WP-MOTION) and flagship scenes"
- ]
+ ],
+ "generalisation_finding": "Second course (proof-heavy maths) broke every layout assumption of the first (RL) import; fixing needed course-order and document-type rules, not more word matching. Authoring, validation and build generalised once a domain model existed (plane map); the step/proof contract fit without schema changes."
 }
