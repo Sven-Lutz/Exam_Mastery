@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T17:11:36+01:00",
+ "updated": "2026-11-27T17:35:45+01:00",
  "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -62,14 +62,18 @@
    "note": "batch5 added (algorithms, complexity, quantitative problem solving/modelling); independent review pending; finance modelling + causal inference remain gaps"
   },
   "R3": {
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "wp": "WP-R3",
-   "issue": 24
+   "issue": 24,
+   "pr": 40,
+   "note": "independent review pending"
   },
   "R4": {
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "wp": "WP-R4",
-   "issue": 25
+   "issue": 25,
+   "pr": 41,
+   "note": "independent review pending"
   },
   "R5": {
    "status": "COMPLETED",
@@ -224,7 +228,7 @@
    "id": "R3",
    "kind": "background subagent of LEAD",
    "scope": "R3 legal, philosophical, case and clinical reasoning",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R3.json",
    "worktree": "Exam_Mastery-r3"
   },
@@ -232,7 +236,7 @@
    "id": "R4",
    "kind": "background subagent of LEAD",
    "scope": "R4 embodied, laboratory, spatial/CAD and craft learning",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R4.json",
    "worktree": "Exam_Mastery-r4"
   }
@@ -375,30 +379,76 @@
   {
    "id": "WP-R3",
    "title": "R3 legal, clinical, economic and philosophical reasoning",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 4,
    "autostart": true,
    "issue": 24,
    "branch": "research/r3-contextual-reasoning-20261127",
    "base": "research/r1-learning-science-20261127",
-   "next_step": "Specialist R3 (background subagent of LEAD): evidence register with search log, r3_learning_policies.json, R3_ARGUMENT_CASE_DIAGNOSIS.md, contract test, draft PR against research/r1-learning-science-20261127.",
+   "next_step": "None autonomous; PR #40 awaits independent review.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
-   "updated": "2026-11-27T17:08:02+01:00",
-   "worktree": "Exam_Mastery-r3"
+   "updated": "2026-11-27T17:35:45+01:00",
+   "worktree": "Exam_Mastery-r3",
+   "pr": 40,
+   "done": [
+    "R3 specialist: 35 sources (4 fulltext_claim_review, 9 fulltext_partial, 22 abstract; law 10, philosophy 6, management 4, clinical 12, grading 3), 23 logged searches (a99f12f, 8e45b77)",
+    "r3_learning_policies.json: 12 design-hypothesis policies (3 normative boundaries: dated legal authority + abstention, simulation is not practice authority, human grading of ambiguous answers) + tests/test_r3_learning_policies.py (036903c)",
+    "R3_ARGUMENT_CASE_DIAGNOSIS.md (b675dec); draft PR #40",
+    "lead spot-check 2026-11-27: 32 DOIs resolve with matching first authors; dahl2024 (58-88%) and magesh2025 (17-33%) figures match the published abstracts; tests 32 OK (1 skip)"
+   ],
+   "open": [
+    "independent review of PR #40",
+    "Schwarcz & Farganis law-school feedback study not accessible (SSRN blocked)",
+    "Nesbit & Liu 2025 argument-mapping review abstract only",
+    "no controlled evidence on business case method, counterfactual training, interpretive charity, LLM grading of philosophy essays",
+    "German legal/medical education research barely searched",
+    "deliberate-reflection evidence mostly from one research group"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/R3_ARGUMENT_CASE_DIAGNOSIS.md",
+    "docs/research/workstreams/r3/r3_evidence.json",
+    "docs/research/workstreams/r3/r3_learning_policies.json",
+    "tests/test_r3_learning_policies.py"
+   ],
+   "tests": "cd tests && python3 -m unittest test_r3_learning_policies test_r1_learning_policies: 32 OK, 1 skipped",
+   "blockers": []
   },
   {
    "id": "WP-R4",
    "title": "R4 engineering, CAD, experimental and embodied learning (incl. cooking, baking, woodworking)",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 5,
    "autostart": true,
    "issue": 25,
    "branch": "research/r4-embodied-20261127",
    "base": "research/r1-learning-science-20261127",
-   "next_step": "Specialist R4 (background subagent of LEAD): evidence register with search log, r4_learning_policies.json, R4_EMBODIED_EXPERIMENTAL_DESIGN.md, contract test with certification-boundary check, draft PR against research/r1-learning-science-20261127.",
+   "next_step": "None autonomous; PR #41 awaits independent review.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
-   "updated": "2026-11-27T17:11:36+01:00",
-   "worktree": "Exam_Mastery-r4"
+   "updated": "2026-11-27T17:35:45+01:00",
+   "worktree": "Exam_Mastery-r4",
+   "pr": 41,
+   "done": [
+    "R4 specialist: 32 sources (4 fulltext_claim_review, 4 fulltext_partial, 23 abstract, 1 metadata), 22 logged searches incl. failures (9d68eac)",
+    "r4_learning_policies.json: 15 design-hypothesis policies incl. two-track competence model (R4-POL-01) and safety gate (R4-POL-13), certification_boundary field + tests (cc6affe)",
+    "R4_EMBODIED_EXPERIMENTAL_DESIGN.md with the four issue scenarios (9282860); draft PR #41",
+    "lead spot-check 2026-11-27: 32 DOIs resolve with matching first authors; tests 34 OK (1 skip)"
+   ],
+   "open": [
+    "independent review of PR #41",
+    "no learning studies for woodworking/hand tools or baking; cooking evidence mostly qualitative",
+    "no CAD intervention studies read; sketching not covered",
+    "chemistry-specific virtual-lab sources (Brinson 2015, Chan 2021) not retrievable",
+    "measurement uncertainty/materials characterisation as learning goals, haptics/welding VR not covered",
+    "single search batch, not a systematic search"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/R4_EMBODIED_EXPERIMENTAL_DESIGN.md",
+    "docs/research/workstreams/r4/r4_evidence.json",
+    "docs/research/workstreams/r4/r4_learning_policies.json",
+    "tests/test_r4_learning_policies.py"
+   ],
+   "tests": "cd tests && python3 -m unittest test_r4_learning_policies test_r1_learning_policies: 34 OK, 1 skipped",
+   "blockers": []
   },
   {
    "id": "WP-R9",
