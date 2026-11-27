@@ -1854,7 +1854,7 @@
   "order": [
    "OD-20 Hygiene entscheiden (Bezeichner liegt in #11-#19)",
    "Engine-Stapel linear: #11 -> #12 -> #13 -> #14 -> #15 -> #16 -> #17 -> #18 -> #19 -> #28 -> #37 -> #43",
-   "CD-8-Fix als neuer Entwurfs-PR auf #43 (M0)",
+   "CD-8-Fix als Entwurfs-PR #46 auf #43 (M0; setzt Defaults von OD-31 und OD-03 um), CD-9 (RT-26) als Entwurfs-PR #47 auf #46",
    "Forschung: #20 -> #32 -> #35 -> {#38, #39, #40, #41, #42, #44, #45} -> R6",
    "#33 und #36 unabhängig; Präsentationsänderungen aus #36 erst nach G1; #3 erst nach menschlicher Prüfung"
   ],
@@ -1870,7 +1870,8 @@
    "Vorlagen",
    "neue Schemas"
   ],
-  "local_rl_pilot": "nicht verändert; 66 Commits divergiert, nicht öffentlich, kursbasiert; kein MCS-Kandidat; Übertragung von Fixes entscheidet der Owner nach G1"
+  "local_rl_pilot": "nicht verändert; 66 Commits divergiert, nicht öffentlich, kursbasiert; kein MCS-Kandidat; Übertragung von Fixes entscheidet der Owner nach G1",
+  "status_note": "Lead 2026-11-27: #46 (CD-8) und #47 (CD-9/RT-26) offen als Entwurf; Stapel #11 -> ... -> #43 -> #46 -> #47; Owner-Änderungen an OD-31/OD-03/OD-04 werden vor Merge eingearbeitet"
  },
  "red_team_reconciliation": {
   "status": "reconciled_by_author_pending_lead_review",
