@@ -1,0 +1,10 @@
+{
+ "agent_id": "R2",
+ "wp": "WP-R2",
+ "status": "RUNNING",
+ "updated": "2026-11-27T10:00:00+01:00",
+ "done": ["read:charter,issue23,R1 synthesis,R1 policy schema,R0 audit s7-8"],
+ "open": ["search+screen Q1-Q5", "r2_evidence.json", "r2_learning_policies.json", "R2_FORMAL_QUANTITATIVE.md"],
+ "artifacts": [],
+ "next_step": "metadata sweep via OpenAlex/Crossref, then full-text reads (proof comprehension first)"
+}

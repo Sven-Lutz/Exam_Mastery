@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T10:12:00+01:00",
+ "updated": "2026-11-27T10:30:00+01:00",
  "updated_by": "lead (interactive Claude Code session)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -372,18 +372,28 @@
   {
    "id": "WP-BRAND-B",
    "title": "Mastery brand phase B: inventory and compatibility/risk matrix, presentation-only changes",
-   "status": "PLANNED",
+   "status": "COMPLETED",
    "priority": 7.5,
    "autostart": false,
    "issue": 34,
    "branch": "feat/mastery-brand-phase-b",
    "base": "origin/main",
-   "next_step": "Inventory UI headings, export metadata, README/docs/CLI strings, package/CLI/data dirs/semantic ids/Anki/automation/CI/repo/external refs; propose exact changes with compatibility/risk matrix; change presentation only where safe; never rename identifiers listed in product_identity.unchanged_identifiers.",
+   "next_step": "none until P4 integration",
    "acceptance": [
     "no forced technical renames",
     "no data loss or review-history reset",
     "active autonomous continuation unbroken",
     "owner follow-up marked only where irreversible/public/legal"
+   ],
+   "pr": 36,
+   "updated": "2026-11-27T10:30:00+01:00",
+   "done": [
+    "docs/brand/MASTERY_BRAND_PHASE_B.md",
+    "draft PR #36"
+   ],
+   "open": [
+    "presentation changes after P4 integration (one display constant)",
+    "owner: public name/trademark, phase C, repo rename"
    ]
   },
   {
@@ -413,7 +423,7 @@
    "depends_on": [
     "WP-R6"
    ],
-   "next_step": "Lead plans the integration of the draft stack #11-#19/#28 with main and the R6 slice before any headless engineering."
+   "next_step": "Lead plans the integration of the draft stack #11-#19/#28 with main and the R6 slice before any headless engineering. Include Mastery presentation changes (PR #36 §4 step 2) and CD-2 kc_status fix (R1 measurement contract)."
   },
   {
    "id": "WP-BRAND-C",
@@ -471,7 +481,7 @@
   "decision": "owner, issue #34 (2026-11-27)",
   "not_implied": "no certification of physical or clinical skills from simulation; no trademark clearance",
   "phase_A": "DONE 2026-11-27: identity recorded here; forward-looking prose updated; historical titles, paths, artifacts and provenance preserved",
-  "phase_B": "WP-BRAND-B: isolated PR with inventory and compatibility/risk matrix; presentation-only changes where safe",
+  "phase_B": "DONE as documentation (PR #36): inventory + compatibility/risk matrix; presentation changes deferred to after the P4 integration via one display-name constant; coupled strings (Anki notetype filter, editorial.py figure-page detection) need joint change + regression test",
   "phase_C": "HUMAN_DECISION_REQUIRED: technical/repository migration (module, CLI, Anki deck names/GUIDs, schemas, state dirs, launchd labels, worktree paths, GitHub repo name) only after separate owner approval",
   "unchanged_identifiers": [
    "exam_mastery Python module",

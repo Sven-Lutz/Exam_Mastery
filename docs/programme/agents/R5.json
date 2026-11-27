@@ -1,0 +1,10 @@
+{
+ "agent_id": "R5",
+ "wp": "WP-R5",
+ "status": "RUNNING",
+ "updated": "2026-11-27T10:00:00+01:00",
+ "done": ["read:charter,issue26,KB_GAP_AUDIT§2/§5/§6,R1 report+schema,EVALUATION_PROTOCOL,policy/tutor/evaluation code"],
+ "open": ["RQ1 ITS effects","RQ2 knowledge tracing","RQ3 GenAI RCTs incl. Bastani SI, Kestin VoR","RQ4 measurement validity","RQ5 privacy/architecture","report","policies"],
+ "artifacts": [],
+ "next_step": "search + evidence extraction RQ3 (Bastani/Kestin first), append to r5_evidence.json every ~5 sources"
+}
