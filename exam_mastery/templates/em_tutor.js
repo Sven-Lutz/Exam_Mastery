@@ -12,6 +12,7 @@ function normalise(s) {
   for (const [a, b] of [['·', '*'], ['×', '*'], ['⋅', '*'], ['−', '-'], ['–', '-'], ['′', "'"], ['’', "'"], ['²', '^2'], ['δ', 'delta'], ['Δ', 'delta']]) s = s.split(a).join(b);
   s = s.replace(/\b([fg])'\s*\(\s*z_?o\s*\)/g, '$1po').replace(/\b([fg])'\s*\(\s*z_?(\d)\s*\)/g, '$1p$2').replace(/\bsigma'\s*\(\s*z_?(\d)\s*\)/g, 'fp$1');
   s = s.replace(/\bdelta_?o\b|\bdeltao\b/g, 'delta_o').replace(/\bdelta_?(\d)\b/g, 'delta_$1').replace(/(\d),(\d)/g, '$1.$2');
+  s = s.split('√').join('sqrt').replace(/\|([^|]+)\|/g, 'abs($1)');   // mirrors expr.normalise (CD-10)
   return s;
 }
 function tokens(s) {
@@ -31,6 +32,7 @@ function parse(src, variables) {
   const peek = () => ts[i] || ['e', null], take = () => ts[i++] || ['e', null], is = (t, o) => t[0] === 'o' && t[1] === o;
   const atom = () => { const t = take();
     if (t[0] === 'n') return ['n', t[1]];
+    if (t[0] === 'v' && FUNCS.includes(t[1]) && is(peek(), '(')) { take(); const e = sum(); if (!is(take(), ')')) throw new Error('Klammer nicht geschlossen'); return ['f', t[1], e]; }
     if (t[0] === 'v') { if (!vs.has(t[1])) throw new Error('Unbekanntes Symbol: ' + t[1]); return ['v', t[1]]; }
     if (is(t, '(')) { const e = sum(); if (!is(take(), ')')) throw new Error('Klammer nicht geschlossen'); return e; }
     throw new Error('Ausdruck unvollständig'); };
@@ -45,14 +47,17 @@ function parse(src, variables) {
 }
 function evaluate(a, env) {
   const k = a[0]; if (k === 'n') return a[1]; if (k === 'v') return env[a[1]]; if (k === 'neg') return -evaluate(a[1], env);
+  if (k === 'f') { const v = evaluate(a[2], env); return a[1] === 'abs' ? Math.abs(v) : (v >= 0 ? Math.sqrt(v) : NaN); }
   const x = evaluate(a[1], env), y = evaluate(a[2], env);
   if (k === '+') return x + y; if (k === '-') return x - y; if (k === '*') return x * y; if (k === '/') return y !== 0 ? x / y : NaN; if (k === '^') return Math.pow(x, y);
   throw new Error(k);
 }
 function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-function samplePoints(variables, defs, n = 12, seed = 20261110) {
+const FUNCS = ['abs', 'sqrt'], DEFAULT_MAGNITUDE = [0.15, 2.5];   // mirror expr.FUNCS / DEFAULT_MAGNITUDE (CD-10)
+function samplePoints(variables, defs, n = 12, seed = 20261110, domains = null) {
   const r = mulberry32(seed); const base = variables.filter(v => !(defs && v in defs)).sort(); const pts = [];
-  for (let k = 0; k < n; k++) { const env = {}; for (const v of base) env[v] = 0.15 + 0.8 * r(); for (const [d, e] of Object.entries(defs || {})) env[d] = evaluate(parse(e, base), env); pts.push(env); }
+  for (let k = 0; k < n; k++) { const env = {}; for (const v of base) { const sgn = r(), m = r(), d = domains && domains[v];
+      env[v] = d ? d[0] + (d[1] - d[0]) * m : (DEFAULT_MAGNITUDE[0] + (DEFAULT_MAGNITUDE[1] - DEFAULT_MAGNITUDE[0]) * m) * (sgn < 0.5 ? -1 : 1); } for (const [d, e] of Object.entries(defs || {})) env[d] = evaluate(parse(e, base), env); pts.push(env); }
   return pts;
 }
 const same = (f, g, pts, rel = 1e-9) => pts.every(env => { const a = evaluate(f, env), b = evaluate(g, env); return Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= rel * Math.max(1, Math.abs(a), Math.abs(b)); });
@@ -86,7 +91,7 @@ function diagnose(task, answer) {
   if (t === 'numeric') { const [r, c, d] = numeric(task, answer); return out(task, answer, 'numeric', r, r === 'invalid' ? null : c, 'DETERMINISTIC', d); }
   if (t === 'expression') {
     let f; try { f = parse(answer, task.variables); } catch (e) { return out(task, answer, 'expression', 'invalid', null, 'DETERMINISTIC', e.message); }
-    const pts = samplePoints(task.variables, task.defs), g = parse(task.expected_expr, task.variables);
+    const pts = samplePoints(task.variables, task.defs, 12, 20261110, task.domains), g = parse(task.expected_expr, task.variables);
     if (pts.some(env => !Number.isFinite(evaluate(f, env)))) return out(task, answer, 'expression', 'invalid', null, 'DETERMINISTIC', 'Ausdruck ist an Prüfstellen nicht definiert (z. B. Division durch null).');
     if (same(f, g, pts)) return out(task, answer, 'expression', 'correct', null, 'RANDOMIZED_IDENTITY_TEST');
     for (const b of task.bugs || []) if (same(f, parse(b.expr, task.variables), pts)) return out(task, answer, 'expression', 'incorrect', b.category, 'RANDOMIZED_IDENTITY_TEST');

@@ -26,6 +26,7 @@ def _r(x, d=4):
 
 ML_VARS = ['delta_o', 'v1', 'v2', 'a1', 'a2', 'x1', 'x2', 'fp1', 'fp2']
 ML_DEFS = {'fp1': 'a1*(1-a1)', 'fp2': 'a2*(1-a2)'}
+ML_DOMAINS = {'a1': [0.05, 0.95], 'a2': [0.05, 0.95]}   # sigmoid activations; all other symbols are signed reals (CD-10)
 
 
 def _ml_bugs(j, i):
@@ -101,7 +102,7 @@ def ml_track():
          'hints': ['Dieselbe Formel wie im Beispiel.'], 'solution': ['σ′(z) = 0,3 · 0,7 = 0,21.']},
         {'id': 'ml-core', 'role': 'core', 'kc_id': 'ml/backpropagation', 'type': 'expression', 'title': 'Gradient ∂L/∂w₁₁ herleiten',
          'prompt': 'Leiten Sie ∂L/∂w₁₁ als Produkt her. Verwenden Sie δ_o = (ŷ − t)·g′(z_o) für den Fehler am Ausgang und schreiben Sie σ′(z₁) als f′(z1) oder a1(1−a1).',
-         'variables': ML_VARS, 'defs': ML_DEFS, 'expected_expr': 'delta_o*v1*fp1*x1', 'bugs': _ml_bugs(1, 1),
+         'variables': ML_VARS, 'defs': ML_DEFS, 'domains': ML_DOMAINS, 'expected_expr': 'delta_o*v1*fp1*x1', 'bugs': _ml_bugs(1, 1),
          'symbols': [['δ_o', 'delta_o'], ['v₁', 'v1'], ['v₂', 'v2'], ['a₁', 'a1'], ['a₂', 'a2'], ['x₁', 'x1'], ['x₂', 'x2'], ['f′(z₁)', "f'(z1)"], ['f′(z₂)', "f'(z2)"]],
          'hints': ['Gehen Sie den Weg von L zurück bis w₁₁: L → ŷ → z_o → a₁ → z₁ → w₁₁.', 'Jedes Glied liefert einen Faktor: δ_o, dann ∂z_o/∂a₁ = v₁, dann ∂a₁/∂z₁ = f′(z₁), dann ∂z₁/∂w₁₁.', 'z₁ = w₁₁·x₁ + w₁₂·x₂ + b₁ – wonach ändert sich z₁, wenn w₁₁ wächst?'],
          'solution': ['∂L/∂w₁₁ = δ_o · v₁ · f′(z₁) · x₁.', f'Mit den Werten des Labs: {P(bw["delta_o"])} · {P(p["W2"][0])} · {P(fw["a1"][0] * (1 - fw["a1"][0]))} · {P(x[0])} = {f(g11, 6)}.'],
@@ -109,7 +110,7 @@ def ml_track():
          'reference_value': g11},
         {'id': 'ml-similar', 'role': 'similar', 'kc_id': 'ml/backpropagation', 'type': 'expression', 'title': 'Ähnliche Aufgabe ohne Hinweise: ∂L/∂w₂₂',
          'prompt': 'Jetzt für das Gewicht von x₂ in Neuron 2: Schreiben Sie ∂L/∂w₂₂ als Produkt.',
-         'variables': ML_VARS, 'defs': ML_DEFS, 'expected_expr': 'delta_o*v2*fp2*x2',
+         'variables': ML_VARS, 'defs': ML_DEFS, 'domains': ML_DOMAINS, 'expected_expr': 'delta_o*v2*fp2*x2',
          'bugs': [{'expr': b['expr'].replace('v1', 'V').replace('v2', 'v1').replace('V', 'v2').replace('fp1', 'F').replace('fp2', 'fp1').replace('F', 'fp2').replace('a1', 'A').replace('a2', 'a1').replace('A', 'a2').replace('x1', 'x2'), 'category': b['category']} for b in _ml_bugs(1, 1)],
          'symbols': [['δ_o', 'delta_o'], ['v₁', 'v1'], ['v₂', 'v2'], ['a₁', 'a1'], ['a₂', 'a2'], ['x₁', 'x1'], ['x₂', 'x2'], ['f′(z₁)', "f'(z1)"], ['f′(z₂)', "f'(z2)"]],
          'hints': [], 'solution': ['∂L/∂w₂₂ = δ_o · v₂ · f′(z₂) · x₂.'], 'visual': {'kind': 'network_path', 'edges': ['x2-h2', 'h2-o'], 'nodes': ['x2', 'h2', 'o']}},
@@ -133,7 +134,7 @@ def ml_track():
          'hints': ['θ ← θ − η·∂L/∂θ.'], 'solution': [f'w₁₁ ← {f(p["W1"][0][0], 3)} − {f(lr, 1)}·{f(g11, 6)} = {f(w11_new, 6)}.', 'Gegen den Gradienten: Für kleine η sinkt der Verlust.']},
         {'id': 'ml-retest', 'role': 'retest', 'kc_id': 'ml/backpropagation', 'type': 'expression', 'title': 'Spätere Prüfung: ∂L/∂w₂₁',
          'prompt': 'Ohne Hilfen: Schreiben Sie ∂L/∂w₂₁ (Gewicht von x₁ in Neuron 2) als Produkt.',
-         'variables': ML_VARS, 'defs': ML_DEFS, 'expected_expr': 'delta_o*v2*fp2*x1', 'bugs': [{'expr': 'delta_o*v2*fp2', 'category': 'missing_input_factor'}, {'expr': 'delta_o*v2*x1', 'category': 'missing_activation_derivative'}],
+         'variables': ML_VARS, 'defs': ML_DEFS, 'domains': ML_DOMAINS, 'expected_expr': 'delta_o*v2*fp2*x1', 'bugs': [{'expr': 'delta_o*v2*fp2', 'category': 'missing_input_factor'}, {'expr': 'delta_o*v2*x1', 'category': 'missing_activation_derivative'}],
          'symbols': [['δ_o', 'delta_o'], ['v₂', 'v2'], ['a₂', 'a2'], ['x₁', 'x1'], ['f′(z₂)', "f'(z2)"]], 'hints': [], 'solution': ['∂L/∂w₂₁ = δ_o · v₂ · f′(z₂) · x₁.']},
         {'id': 'ml-why', 'role': 'open', 'kc_id': 'ml/backpropagation', 'type': 'open', 'title': 'In eigenen Worten',
          'prompt': 'Warum ist der Gradient von w₁₁ null, wenn x₁ = 0 ist? Begründen Sie in zwei Sätzen.', 'hints': [], 'solution': []},
