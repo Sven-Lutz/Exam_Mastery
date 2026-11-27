@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T23:29:10+01:00",
+ "updated": "2026-11-27T23:41:16+01:00",
  "updated_by": "LEAD (interactive, issue #51)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -380,9 +380,45 @@
    "status": "RUNNING",
    "checkpoint": "docs/programme/agents/C2M-SECOND.json",
    "worktree": "Exam_Mastery-c2m-second"
+  },
+  {
+   "id": "MOTION",
+   "kind": "background subagent of LEAD",
+   "scope": "Mastery Motion engine + RL flagship",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/MOTION.json",
+   "worktree": "Exam_Mastery-motion"
   }
  ],
  "work_packages": [
+  {
+   "id": "WP-MOTION",
+   "title": "Mastery Motion engine (scene grammar, runtime, keyframe export) + RL flagship scene (softmax policy gradient on the simplex)",
+   "status": "RUNNING",
+   "priority": 0.06,
+   "autostart": false,
+   "branch": "feat/mastery-motion-20261128",
+   "base": "integration/mastery-v1-20261127 (a7de21d)",
+   "worktree": "Exam_Mastery-motion",
+   "updated": "2026-11-27T23:41:16+01:00",
+   "next_step": "Specialist MOTION; lead then ports the linear-algebra plane scene onto Motion and integrates."
+  },
+  {
+   "id": "WP-STANDARD",
+   "title": "Mastery learning standard v1 (vision, learning chain, evidence tiers, Mastery Motion, acceptance criteria)",
+   "status": "HUMAN_DECISION_REQUIRED",
+   "priority": 0.05,
+   "autostart": false,
+   "branch": "integration/mastery-v1-20261127",
+   "updated": "2026-11-27T23:41:16+01:00",
+   "done": [
+    "docs/MASTERY_LEARNING_STANDARD.md (a7de21d); issue #51 comment 7229522803"
+   ],
+   "blockers": [
+    "owner approval or corrections (§9 questions)"
+   ],
+   "next_step": "apply owner corrections; then gates for §5 in the build"
+  },
   {
    "id": "WP-C2M-SECOND",
    "title": "Second contrasting owner course end-to-end (candidates: Lineare Algebra 1 with proofs; Patentrecht/Entrepreneurship)",
@@ -446,7 +482,8 @@
     "slides on importance sampling/PPO only referenced",
     "prediction check tolerance 8 digits (rounded hand answers show 'differs')",
     "prerequisite lectures not materialised, linked by number only"
-   ]
+   ],
+   "note": "further RL chapters wait for owner approval of the learning standard"
   },
   {
    "id": "WP-C2M-IMPORT",
@@ -1179,7 +1216,7 @@
    "max_runs_per_24h": 4
   },
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents.",
-  "lead_pacing": "Issue #49: continue within account limits. Lead stops spawning new specialists at seven_day >= 0.92 and leaves remaining packages to the supervisor after the 2026-11-29 07:00 reset (supervisor ceiling 0.85 leaves room for the owner)."
+  "lead_pacing": "Owner 2026-11-28: no pausing; work continuously until the provider limit; never bypass it. Supervisor resumes after resets (local config ceilings 0.97/0.98)."
  },
  "next_milestone": "Issue #51 thin vertical slice: real lecture import wizard + one real RL chapter with four connected products and inspectable PDFs; then quality, tutor, Anki QA, analytics; second contrasting course.",
  "product_identity": {
@@ -1240,5 +1277,10 @@
  "external_reviewers": {
   "codex": "owner-run Codex session reviewed code (PR #52, issue #51 comment 7228973004); findings integrated",
   "gemini": "briefing prepared locally (private), not yet run"
- }
+ },
+ "owner_directives_20261128": [
+  "Do not pause: continue continuously within account limits (lead pacing ceiling removed; supervisor ceilings raised to 0.97/0.98 via local config, max 8 runs/24h; supervisor pause reset)",
+  "Before inserting more RL chapters, core concepts, evidence and vision must be fixed -> docs/MASTERY_LEARNING_STANDARD.md (a7de21d) posted for approval in #51",
+  "3Blue1Brown-level visual quality is missing -> Mastery Motion engine (WP-MOTION) and flagship scenes"
+ ]
 }
