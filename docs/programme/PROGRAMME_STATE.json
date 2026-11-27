@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T23:02:20+01:00",
+ "updated": "2026-11-27T23:29:10+01:00",
  "updated_by": "LEAD (interactive, issue #51)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -361,7 +361,7 @@
    "id": "C2M-IMPORT",
    "kind": "background subagent of LEAD",
    "scope": "course import pipeline + wizard",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/C2M-IMPORT.json",
    "worktree": "Exam_Mastery-c2m-import"
   },
@@ -442,14 +442,24 @@
   {
    "id": "WP-C2M-IMPORT",
    "title": "P0 course import: bin/mastery import + local wizard (inventory, iCloud materialisation, completeness, chapter/competency proposal, authoring packets, status)",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 0.1,
    "autostart": false,
-   "next_step": "Specialist: build on exam_mastery.fidelity.inventory/impact (PDF/PPTX/DOCX/LaTeX/MD/notebook parsers exist); courses live in ~/Mastery/courses/<slug> (private); authoring packet contract shared with WP-C2M-AUTHOR.",
+   "next_step": "none (merged into integration)",
    "branch": "feat/c2m-import-20261127",
    "base": "integration/mastery-v1-20261127",
    "worktree": "Exam_Mastery-c2m-import",
-   "contract": "docs/COURSE_TO_MASTERY_CONTRACT.md (350dce0)"
+   "contract": "docs/COURSE_TO_MASTERY_CONTRACT.md (350dce0)",
+   "updated": "2026-11-27T23:29:10+01:00",
+   "done": [
+    "ef6cfc0..1348bbd: bin/mastery import/courses/course/plan/packet/build-chapter/reimport + Kurse wizard; inventory (kinds, pages, text coverage, vision pages, duplicates), warnings (numbering gaps, VERSION_CONFLICT, exercises without solutions, chapters without exercises), iCloud placeholders only with consent (brctl), chapter plan with overrides, deterministic competency proposals ('Vorschlag'), packets, build-chapter with stable unit_id, reimport via fidelity.impact -> STALE; docs/COURSE_IMPORT.md; tests/test_course_import.py (10)",
+    "real-course smoke (private): RL course 31 files/1335 pages, gaps 03/11/18, 5 version conflicts, 17 chapters; lead: wizard checked in the browser; chapter 05 built via the regular build-chapter (UNCHANGED, Anki identity kept)",
+    "Codex review PR #52 merged into integration (same-second snapshots, Git-checkout guard, Office limits); open findings 4/5 fixed by lead in 9f202b0 (reimport baseline journal, page pixel budget); 09462ab adds the pytest-style policy-gradient tests to CI; frozen suite 252 pytest + 922 unittest OK"
+   ],
+   "open": [
+    "no PPTX slide rendering, no OCR",
+    "exercise matching and competency proposals are simple heuristics"
+   ]
   },
   {
    "id": "WP-V1-NEXT",
@@ -1142,6 +1152,16 @@
      "resets": "2026-11-29T07:00:00+01:00"
     },
     "note": "after V1APP + V1CONTENT"
+   },
+   {
+    "at": "2026-11-27T23:29",
+    "five_hour": {
+     "utilization": 0.02
+    },
+    "seven_day": {
+     "utilization": 0.88,
+     "resets": "2026-11-29T07:00+01:00"
+    }
    }
   ],
   "supervisor_ceilings": {
@@ -1207,5 +1227,9 @@
    "a proof-heavy mathematics course (linear algebra) with exercise sheets",
    "a law or business course"
   ]
+ },
+ "external_reviewers": {
+  "codex": "owner-run Codex session reviewed code (PR #52, issue #51 comment 7228973004); findings integrated",
+  "gemini": "briefing prepared locally (private), not yet run"
  }
 }
