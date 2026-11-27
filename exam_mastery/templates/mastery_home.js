@@ -4,7 +4,7 @@
 (() => {
 'use strict';
 const EMT = window.EMT;
-const TKEY = 'em-tutor-v1', PKEY = 'em-practice-v1';
+const TKEY = 'em-tutor-v1', PKEY = 'em-practice-v1', MKEY = 'em-motion-v1';
 const app = document.getElementById('app');
 const el = (tag, attrs, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs || {})) { if (v === null || v === undefined || v === false) continue; if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v); } for (const c of kids.flat()) if (c !== null && c !== undefined && c !== false) e.append(c.nodeType ? c : document.createTextNode(String(c))); return e; };
 const readJSON = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
@@ -115,6 +115,10 @@ function viewStart(lib) {
       el('a', { href: tr.href, 'data-product': 'workbench' }, tr.label), el('small', {}, 'Regelbasierte Prüfung von Zahlen, Ausdrücken und Rechenschritten; Hinweise; Tutor-Brief.')))));
     s.append(card);
   }
+  if ((lib.motion_demos || []).length) s.append(el('article', { class: 'm-card', id: 'motion-demos' }, el('p', { class: 'ds-eyebrow' }, 'Mastery Motion (Demo-Szenen, synthetische Zahlen)'),
+    el('h2', { class: 'm-h2' }, 'Mathematik in Bewegung'),
+    el('p', { class: 'm-note' }, 'Schritt für Schritt oder an der Zeitachse ziehen; an Wendepunkten zuerst vorhersagen, dann aufdecken. Formelterme und Bildobjekte sind farbgleich gekoppelt.'),
+    el('ul', { class: 'm-products' }, lib.motion_demos.map(d => el('li', {}, el('a', { href: d.href, 'data-motion': d.id }, d.title), el('small', {}, d.claim))))));
   s.append(el('article', { class: 'm-card', id: 'due' }, el('p', { class: 'ds-eyebrow' }, 'Fällige spätere Prüfungen (nur zur Information)'),
     due.length ? el('ul', {}, due.map(d => el('li', { 'data-due': d.kc }, d.kc + (d.task ? ' – Prüfaufgabe „' + d.task + '“' : '') + ' in ', el('a', { href: d.href }, d.where))))
       : el('p', {}, 'Keine. Eine Prüfaufgabe wird frühestens 20 Stunden nach einer selbstständigen Lösung fällig.'),
@@ -170,6 +174,14 @@ function viewProgress(lib) {
     s.append(table('Interaktiv: ' + u.title, kcRows(u.adaptive_track, practiceRecord(u).policy, labels, 'explorable'),
       'Freitext wird nicht bewertet: Versuche zählen als „ohne/mit Hilfe“, ändern aber keinen Zustand. Zuordnung über die erste Kompetenz der Aufgabe.'));
   }
+  const scenes = Object.entries(((readJSON(MKEY) || {}).scenes) || {});
+  if (scenes.length) s.append(el('div', { class: 'm-card', id: 'motion-progress' }, el('h2', { class: 'm-h2' }, 'Mastery Motion: Vorhersagen'),
+    el('p', { class: 'm-note' }, 'Vorhersagen sind Lernhandlungen vor dem Aufdecken, kein Nachweis von Können. Sie ändern keinen Kompetenzzustand und keinen Wert oben.'),
+    el('div', { class: 'm-scroll' }, el('table', { class: 'm-table' }, el('thead', {}, el('tr', {}, ['Szene', 'Vorhersagen', 'davon zutreffend', 'aufgedeckt', 'Aufträge geprüft', 'davon erreicht'].map(h => el('th', { scope: 'col' }, h)))),
+      el('tbody', {}, scenes.map(([id, r]) => { const ev = Array.isArray(r.events) ? r.events : [], pr = ev.filter(e => e.type === 'predict'), ta = ev.filter(e => e.type === 'task_attempt');
+        const d = (LIB.motion_demos || []).find(x => x.id === id);
+        return el('tr', { 'data-motion-scene': id, 'data-predictions': String(pr.length) }, el('th', { scope: 'row' }, d ? el('a', { href: d.href }, d.title) : id), el('td', {}, String(pr.length)), el('td', {}, String(pr.filter(e => e.correct === true).length)),
+          el('td', {}, String(ev.filter(e => e.type === 'reveal').length)), el('td', {}, String(ta.length)), el('td', {}, String(ta.filter(e => e.met === true).length))); }))))));
   return s;
 }
 
@@ -305,7 +317,7 @@ function reload(hash) {
 }
 
 /* ------------------------------------------------------------ backup: file export/import and local server copy */
-function snapshot() { return { schema: 'mastery-state-v1', saved_at: new Date().toISOString(), origin: location.origin, storage: { [TKEY]: readJSON(TKEY), [PKEY]: readJSON(PKEY) } }; }
+function snapshot() { return { schema: 'mastery-state-v1', saved_at: new Date().toISOString(), origin: location.origin, storage: { [TKEY]: readJSON(TKEY), [PKEY]: readJSON(PKEY), [MKEY]: readJSON(MKEY) } }; }
 function mergeState(o) {
   if (!o || o.schema !== 'mastery-state-v1' || !o.storage) throw new Error('Keine Mastery-Sicherung (mastery-state-v1).');
   let n = 0; const key = (e, a, b) => [e[a], e.type, e[b] || ''].join('|');
@@ -316,6 +328,11 @@ function mergeState(o) {
       const cur = d.units[k]; if (cur.assessment_revision !== r.assessment_revision) { (d.archived = d.archived || {})[k + '@' + r.assessment_revision] = r; continue; }
       merge(cur.events, r.events, 'at', 'task_id'); merge(cur.policy, r.policy, 't', 'task'); }
     writeJSON(PKEY, d); }
+  const m = o.storage[MKEY]; if (m && m.schema === 1 && m.scenes) { const d = readJSON(MKEY) || { schema: 1, scenes: {} }; d.scenes = d.scenes || {};
+    for (const [k, r] of Object.entries(m.scenes)) { if (!r || typeof r.revision !== 'string') continue; const cur = d.scenes[k] = d.scenes[k] || { revision: r.revision, events: [] };
+      if (cur.revision !== r.revision) { (d.archived = d.archived || {})[k + '@' + r.revision] = r; continue; }
+      merge(cur.events, (r.events || []).filter(e => e && ['predict', 'reveal', 'task_attempt'].includes(e.type)), 't', 'question'); }
+    writeJSON(MKEY, d); }
   return n;
 }
 function postState(msg) {

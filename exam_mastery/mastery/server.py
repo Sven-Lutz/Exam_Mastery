@@ -23,7 +23,7 @@ from urllib.parse import unquote, urlsplit
 from . import MAX_STATE_BYTES, MasteryError, state_meta, store_state
 
 ALLOWED = re.compile(
-    r"^/(index\.html|library\.json|assets/[A-Za-z0-9_.-]+\.(?:css|js)"
+    r"^/(index\.html|library\.json|assets/[A-Za-z0-9_.-]+\.(?:css|js)|motion/[a-z0-9][a-z0-9-]{0,60}\.html"
     r"|units/[a-z0-9][a-z0-9-]*/(?:Lehrbuch\.pdf|Arbeitsbuch\.pdf|Anki\.apkg|anki_report\.json|Interaktiv/index\.html"
     r"|tracks/[A-Za-z0-9_.-]+\.(?:html|json))"
     r"|courses/[a-z0-9][a-z0-9-]*/chapters/[a-z0-9][a-z0-9-]*/build/(?:Lehrbuch\.pdf|Arbeitsbuch\.pdf|Anki\.apkg"

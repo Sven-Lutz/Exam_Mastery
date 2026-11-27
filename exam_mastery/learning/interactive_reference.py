@@ -1113,6 +1113,8 @@ def render_html(unit):
             '<div class="pg-plot"></div><p class="pg-status attempt-status" role="status" aria-live="polite"></p>',
             '<script class="pg-parameters" type="application/json">' + _json_script(parameters) + '</script></section>',
         ])
+    from ..motion.embed import unit_html as motion_html  # Mastery Motion scenes that belong to this unit's models
+    parts.append(motion_html(unit))
     parts.append('<section aria-label="Selbstständige Übungsaufgaben"><h2>Selbstständig anwenden</h2>')
     for task in unit["assessments"]:
         slug = re_slug(task["id"])

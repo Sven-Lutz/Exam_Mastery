@@ -284,3 +284,135 @@ def test_browser_interpolation_is_continuous_and_lands_on_keyframes(tmp_path):
     assert jumps.max() < 0.08  # pi, b and J move continuously (no teleporting between keyframes)
     n = seq[:, 2]
     assert (np.diff(n[200:400]) >= 0).all() and n[300] == 12 and n[400] == 200  # the cloud grows monotonically
+
+
+# ------------------------------------------------------------------ the Mastery app, end to end in a real browser
+
+try:
+    from playwright.sync_api import sync_playwright
+    HAVE_BROWSER = True
+except ImportError:  # pragma: no cover
+    HAVE_BROWSER = False
+
+SCENE = ".mm-scene.mm-ready"
+
+
+def _wait_step(pg, step):
+    pg.wait_for_function(f"() => document.querySelector('{SCENE}').dataset.step === '{step}' && "
+                         f"Number(document.querySelector('{SCENE}').dataset.pos) % 1 === 0")
+
+
+def _events(pg):
+    return json.loads(pg.evaluate("localStorage.getItem('em-motion-v1')"))["scenes"][RL]["events"]
+
+
+@pytest.mark.skipif(not HAVE_BROWSER, reason="playwright not installed")
+def test_mastery_app_demo_scene_end_to_end(tmp_path):
+    from exam_mastery.mastery import build, validate_state
+    from exam_mastery.mastery.server import start_in_thread
+    home = tmp_path / "Mastery"
+    build(home, only="-no-unit-", log=lambda *_: None)  # shell + motion demos only (no unit build needed here)
+    lib = json.loads((home / "library.json").read_text(encoding="utf-8"))
+    assert lib["units"] == [] and [d["id"] for d in lib["motion_demos"]] == [RL]
+    server, base = start_in_thread(home)
+    errors, external = [], []
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+            ctx = browser.new_context(viewport={"width": 1280, "height": 1000})
+            pg = ctx.new_page()
+            pg.on("pageerror", lambda e: errors.append(str(e)))
+            pg.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
+            pg.on("request", lambda r: external.append(r.url) if not r.url.startswith((base, "data:", "blob:")) else None)
+            pg.goto(base)
+            pg.wait_for_selector('#app[data-ready="1"]')
+            pg.click(f'#motion-demos a[data-motion="{RL}"]')
+            pg.wait_for_selector(SCENE)
+            assert pg.get_attribute(SCENE, "data-error") is None
+            assert pg.is_hidden(".mm-fallback") and pg.locator(".mm-term").count() == 5
+            assert pg.get_attribute(SCENE, "data-step") == "policy-point"
+            assert pg.is_visible("[data-action=play]") and pg.is_disabled("[data-action=back]")
+
+            # step forward by keyboard; the next step is a reveal, so the timeline is locked behind a prediction
+            pg.focus(SCENE)
+            pg.keyboard.press("ArrowRight")
+            _wait_step(pg, "value-lines")
+            assert pg.is_disabled("[data-action=next]") and pg.inner_text("[data-action=next]") == "Erst vorhersagen"
+            pg.eval_on_selector(".mm-scrub", "e => { e.value = '6'; e.dispatchEvent(new Event('input')); }")
+            assert float(pg.get_attribute(SCENE, "data-pos")) == 1.0  # scrubbing past the checkpoint is refused
+            assert pg.is_disabled('[data-step="exact-gradient"] button')
+            assert pg.is_disabled("[data-action=commit]") and pg.is_disabled("[data-action=reveal]")
+            pg.click('[data-question="grad-direction"] [data-answer="SE"]')  # a wrong prediction is recorded honestly
+            pg.click("[data-action=commit]")
+            assert pg.is_enabled("[data-action=reveal]")
+            pg.click("[data-action=reveal]")
+            _wait_step(pg, "exact-gradient")
+            fb = pg.locator('[data-feedback="exact-gradient"] [data-correct]')
+            assert fb.get_attribute("data-correct") == "false" and "↖" in fb.inner_text()
+
+            # scrub into the sampling transition: the cloud grows continuously and the coupled term lights up
+            pg.eval_on_selector(".mm-scrub", "e => { e.value = '3.5'; e.dispatchEvent(new Event('input')); }")
+            st = json.loads(pg.get_attribute(SCENE, "data-state"))
+            assert float(pg.get_attribute(SCENE, "data-pos")) == 3.5 and 12 < st["n"] < 200
+            assert pg.locator('.mm-term.mm-term-on[data-term="ret"]').count() == 1
+            assert pg.locator('[data-o="cloud"] circle').count() == st["n"]
+            pg.focus('.mm-term[data-term="grad"]')
+            assert pg.locator('g.mm-hl[data-o="grad-arrow"]').count() == 1
+            pg.eval_on_selector(".mm-scrub", "e => { e.value = '4'; e.dispatchEvent(new Event('input')); }")
+            _wait_step(pg, "cloud-grows")
+            pg.click('[data-question="baseline-mean"] [data-answer="same"]')
+            pg.click('[data-question="baseline-spread"] [data-answer="smaller"]')
+            pg.click("[data-action=commit]")
+            pg.click("[data-action=reveal]")
+            _wait_step(pg, "baseline-on")
+            assert [x.get_attribute("data-correct") for x in pg.locator('[data-feedback="baseline-on"] [data-correct]').all()] == ["true", "true"]
+            assert pg.is_enabled("[data-action=next]")
+
+            # mission with one slider: the computed goal decides, the attempt is recorded
+            ids = [s["id"] for s in scene()["steps"]]
+            b_opt = softmax_simplex_pg({**M.params_at(scene(), ids.index("baseline-on")), "lam": 0.0})["b_opt"]
+            pg.eval_on_selector('[data-param="b0"]', "(e, v) => { e.value = String(v); e.dispatchEvent(new Event('input')); }",
+                                round(b_opt / 0.05) * 0.05)
+            pg.click("[data-action=mission-check]")
+            assert pg.get_attribute(".mm-mission-status", "data-met") == "true"
+            ev = _events(pg)
+            assert [e["type"] for e in ev] == ["predict", "reveal", "predict", "predict", "reveal", "task_attempt"]
+            assert [e["correct"] for e in ev if e["type"] == "predict"] == [False, True, True]
+
+            # reload: reveals persist, so the whole timeline is open; long jumps via the step ticks work
+            pg.reload()
+            pg.wait_for_selector(SCENE)
+            assert pg.is_enabled('[data-step="many-steps"] button')
+            pg.click('[data-step="many-steps"] button')
+            _wait_step(pg, "many-steps")
+            st = json.loads(pg.get_attribute(SCENE, "data-state"))
+            assert math.isclose(st["J"], M.states(scene())[-1]["J"], rel_tol=1e-12)
+
+            # home: honest progress (predictions are not evidence) and the server backup accepts em-motion-v1
+            pg.goto(base + "#lernstand")
+            pg.wait_for_selector('#app[data-ready="1"]')
+            row = pg.locator(f'#motion-progress tr[data-motion-scene="{RL}"]')
+            assert row.get_attribute("data-predictions") == "3"
+            assert "kein Nachweis von Können" in pg.inner_text("#motion-progress")
+            pg.wait_for_function("() => document.getElementById('backup-status').dataset.saved")
+            latest = json.loads((home / "state" / "latest.json").read_text(encoding="utf-8"))
+            validate_state({k: latest[k] for k in ("schema", "saved_at", "origin", "storage")})
+            assert len(latest["storage"]["em-motion-v1"]["scenes"][RL]["events"]) == 6
+
+            # reduced motion: step-only (no play button), the next keyframe is reached without animation frames
+            rctx = browser.new_context(reduced_motion="reduce")
+            rp = rctx.new_page()
+            rp.on("pageerror", lambda e: errors.append(str(e)))
+            rp.goto(base + f"motion/{RL}.html")
+            rp.wait_for_selector(SCENE)
+            assert rp.get_attribute(SCENE, "data-reduced-motion") == "1" and rp.is_hidden("[data-action=play]")
+            rp.evaluate("() => { window.requestAnimationFrame = () => { throw new Error('animation in reduced motion'); }; }")
+            rp.click("[data-action=next]")
+            assert rp.get_attribute(SCENE, "data-step") == "value-lines" and rp.get_attribute(SCENE, "data-pos") == "1.000"
+            assert rp.locator("svg.mm-stage title").text_content().startswith(scene()["title"])  # aria text per step
+            browser.close()
+    finally:
+        server.shutdown()
+        server.server_close()
+    assert not errors, errors
+    assert not external, external
