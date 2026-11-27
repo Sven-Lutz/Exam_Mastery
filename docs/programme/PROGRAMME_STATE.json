@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T19:03:26+01:00",
+ "updated": "2026-11-27T19:10:40+01:00",
  "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -165,7 +165,8 @@
    "severity": "P0",
    "text": "policy.kc_status counts distinct calendar dates as spacing/mastery evidence; two dates can be minutes apart (R0 §2).",
    "status": "FIX_IN_DRAFT_PR",
-   "fix": "PR #37 (stacked on #28): elapsed time >= 20 h (provisional) + different task; Python/JS parity; old code fails 3/5 new checks; 112 related tests OK locally"
+   "fix": "PR #37 (stacked on #28): elapsed time >= 20 h (provisional) + different task; Python/JS parity; old code fails 3/5 new checks; 112 related tests OK locally",
+   "note": "RT-26: fix narrows, does not close the hole -> CD-9"
   },
   {
    "id": "CD-3",
@@ -192,7 +193,8 @@
    "severity": "P1",
    "text": "PR #19 tutor brief embeds the full reference solution; only a prompt instruction keeps it from the learner and the chat provider receives it (R9 TUTOR_ADOPTION_DECISION.md). Conflicts with R5-POL-03/R9-POL-04 (answer key only for practice items; never for mock/retest items).",
    "status": "FIX_IN_DRAFT_PR",
-   "fix": "PR #43 (stacked on #37): no answer key in the tutor brief for similar/transfer/retest (role from engine track); 'tutor' event counts as assistance in policy.py + em_tutor.js; 7 new checks (5 fail on 5bdfb6f); CI-equivalent suite 215 pytest + 643 unittest OK locally; 5ad257d: chapter app em_app.js logs item tutor briefings as help (3 browser checks; suite 215 pytest + 646 unittest OK)"
+   "fix": "PR #43 (stacked on #37): no answer key in the tutor brief for similar/transfer/retest (role from engine track); 'tutor' event counts as assistance in policy.py + em_tutor.js; 7 new checks (5 fail on 5bdfb6f); CI-equivalent suite 215 pytest + 643 unittest OK locally; 5ad257d: chapter app em_app.js logs item tutor briefings as help (3 browser checks; suite 215 pytest + 646 unittest OK)",
+   "note": "RT-27: fix narrows; evidence-task prompts still go into the brief without key, help in outside chats is invisible, practice roles get the key without a prior attempt (instruction-only)"
   },
   {
    "id": "CD-8",
@@ -201,6 +203,30 @@
    "text": "Anki export identity (anki_v2.build_deck, used by chapter_publish, anki_bridge, experience_anki): (a) every export sets mod=stamp on ALL notes and both note types, so an 'update if newer' import overwrites learner edits to note fields and templates even when content is unchanged; (b) note-type IDs are hashed from the display name ('Exam Mastery · Basis (v2)'), so any rename (Mastery brand) creates new note types; (c) GUID includes the chapter slug, moving a card creates a new note; (d) deck names follow unit titles; (e) '_'-prefixed font media are never updated by Anki. Review history itself is preserved (cards are not changed). Source: R8 EF-1..EF-8 (PR #44), confirmed in code by lead.",
    "fix": "PR #46 (stacked on #43): conditional restamping of notes/note types by content hash (per-key state, legacy fallback), frozen note-type ID seeds; real anki 26.9.3 imports into throwaway collections show learner edit + ivl + revlog survive; previous commit loses the edit; suite 215 pytest + 650 unittest OK",
    "open": "GUID includes chapter slug (owner decision R8 §13); deck names from titles; '_' font media never updated; mobile import unchecked"
+  },
+  {
+   "id": "CD-9",
+   "severity": "P0",
+   "status": "OPEN",
+   "source": "R6 red team RT-26 (091ead4), reproduced by lead on the PR #46 head",
+   "text": "kc_status still reports RETAINED_ON_LATER_DAY (a) when the learner viewed the solution of a sibling task of the same competency one minute before the later success (help is counted per task, not per competency) and (b) when an attempt carries a future timestamp (client/imported clock). CD-2's fix (PR #37) narrows but does not close the hole. Blocks any use of kc_status as an evaluation endpoint; in-product states stay proximal indicators (R5-POL-05).",
+   "fix": "P4 candidate stacked on #46: help on any task of the same competency taints later attempts within a declared window (provisional parameter); ignore/clamp events after the reference instant and reject future timestamps on import; Python/JS parity tests."
+  },
+  {
+   "id": "CD-10",
+   "severity": "P1",
+   "status": "OPEN",
+   "source": "R6 red team RT-11, reproduced by lead",
+   "text": "Randomised expression identity test (learning/expr.py sample_points) samples every variable only in (0.15, 0.95) with a fixed public seed: (x^2)^(1/2) is judged equal to x. Adequate for the current tracks' positive quantities (activations, probabilities) but a false-equivalence risk for any general symbolic task.",
+   "fix": "declare variable domains per task (sign, range) and sample across them; prefer the exact sympy gate (PR #17) where available; report the verifier class per task (R2-POL-14)."
+  },
+  {
+   "id": "CD-11",
+   "severity": "P1",
+   "status": "OPEN",
+   "source": "R6 red team RT-10 (not yet reproduced by lead)",
+   "text": "Premise-selection ('constraints') tasks count as evidence for the proof competency although they test recognition of premises, not proof construction (R2-POL-02: comprehension, validation and construction measured separately).",
+   "fix": "tag task operation (recognition/validation/construction) and keep construction evidence separate in kc_status."
   }
  ],
  "agents": [
@@ -290,7 +316,7 @@
    "id": "R6RT",
    "kind": "background subagent of LEAD",
    "scope": "R6 independent red-team review",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R6RT.json",
    "worktree": "Exam_Mastery-r6rt"
   },
@@ -737,9 +763,12 @@
    "branch": "research/r6-architecture-20261127",
    "next_step": "Two specialists: R6-RT independent red team (branch research/r6-red-team-20261127, merged by lead) and R6-ADR synthesis/ADR on research/r6-architecture-20261127; lead reconciles, opens one draft PR; owner acceptance required before architecture-dependent coding.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
-   "updated": "2026-11-27T18:54:54+01:00",
+   "updated": "2026-11-27T19:10:40+01:00",
    "worktree": "Exam_Mastery-r6",
-   "base": "research/r1-learning-science-20261127"
+   "base": "research/r1-learning-science-20261127",
+   "done": [
+    "R6-RT red team (091ead4 on research/r6-red-team-20261127): RED_TEAM_REVIEW.md, red_team_findings.json 43 findings (1 blocker RT-26, 39 major, 3 minor; 18 certainty spot-checks, 6 over-claims), tests 10 OK; lead reproduced RT-26 and RT-11 -> CD-9, CD-10"
+   ]
   },
   {
    "id": "WP-P4",

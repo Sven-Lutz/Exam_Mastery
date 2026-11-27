@@ -1,0 +1,23 @@
+{
+ "agent_id": "R6RT",
+ "wp": "WP-R6-RT",
+ "status": "COMPLETED",
+ "updated": "2026-11-27T22:05:00+01:00",
+ "done": [
+  "read: issue #27, charter A/B/C, policy_index.json (116 policies), 30 engine_rules in principles.json, PROGRAMME_STATE critical_defects/architecture_decisions/product_quality, R0 sections 2/5-D6/6, R1 section 5, R2/R4 conflict rules, R4 risk audit, R9 TUTOR_ADOPTION_DECISION sections 3-6 and r9 conflict_resolution",
+  "joined all policy evidence ids with the R1-R9 evidence registers (316 entries); 18 certainty spot-checks",
+  "PR #37/#43 diffs read; read-only probes on a scratch copy of 5ad257d: expr.same accepts x for (x^2)^(1/2); kc_status returns RETAINED_ON_LATER_DAY after a sibling-task solution view and for a future-dated imported timestamp",
+  "RED_TEAM_REVIEW.md, r6/red_team_findings.json (43 findings), tests/test_r6_red_team.py (10 tests OK); commit 091ead4 pushed to research/r6-red-team-20261127 (no PR, lead merges into R6)"
+ ],
+ "open": [
+  "independent human review (the red team is the same model family as the authors)",
+  "owner decisions RT-37..RT-43",
+  "R3/R5/R7/R8 reports were read only selectively; R7 later changes not covered"
+ ],
+ "artifacts": [
+  "docs/research/workstreams/RED_TEAM_REVIEW.md",
+  "docs/research/workstreams/r6/red_team_findings.json",
+  "tests/test_r6_red_team.py"
+ ],
+ "next_step": "none autonomous; lead merges research/r6-red-team-20261127 into the R6 branch and opens one R6 draft PR"
+}
