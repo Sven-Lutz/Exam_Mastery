@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T15:05:00+01:00",
+ "updated": "2026-11-27T16:20:00+01:00",
  "updated_by": "headless WP-R5",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -72,9 +72,11 @@
    "issue": 25
   },
   "R5": {
-   "status": "CHECKPOINTED",
+   "status": "COMPLETED",
    "wp": "WP-R5",
-   "issue": 26
+   "issue": 26,
+   "pr": 39,
+   "note": "independent review pending"
   },
   "R6": {
    "status": "PLANNED",
@@ -309,27 +311,28 @@
   {
    "id": "WP-R5",
    "title": "R5 AI tutoring, adaptation and learning measurement",
-   "status": "CHECKPOINTED",
+   "status": "COMPLETED",
    "priority": 3,
-   "autostart": true,
+   "autostart": false,
    "issue": 26,
    "branch": "research/r5-tutoring-measurement-20261127",
    "base": "research/r1-learning-science-20261127 (bec1f62)",
-   "next_step": "Batch4 evidence (RQ3 offloading + RQ5 privacy/fairness) with logged search queries into r5_evidence.json; reconcile report §2/§9 and R5-POL-03/07; then spot-check, test, draft PR against research/r1-learning-science-20261127.",
+   "next_step": "None for headless runs; awaits independent review of draft PR #39.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
    "worktree": "Exam_Mastery-r5",
    "done": [
     "specialist brief issued; policy file in R1 schema",
     "evidence register committed (23 sources; 70f9d59)",
-    "report AI_TUTOR_MEASUREMENT.md + r5_tutoring_policies.json (7 policies, all NOT_RUN) + contract test (3703542), branch pushed"
+    "report AI_TUTOR_MEASUREMENT.md + r5_tutoring_policies.json (7 policies, all NOT_RUN) + contract test (3703542), branch pushed",
+    "batch4: 7 sources (fan2025metacognitive, lehmann2025aiclassroom, darvishi2024agency, pardos2024chatgpthints, doroudi2019fairkt, eu2024aiact, eu2016gdpr) + search_log with exact queries; R5-POL-01/02/03/04/07 and report §1/2/3/6/9/10 reconciled; lead spot-check bastani2025 VoR figures (0920bbc)",
+    "draft PR #39 against research/r1-learning-science-20261127"
    ],
    "open": [
-    "batch4 evidence: RQ3 offloading/dependency (Fan 2025, Lehmann, Darvishi, Pardos LLM hints); RQ5 fairness KT (Doroudi 2019), privacy/GDPR principles, browser/API-key, local LLM",
-    "search log (exact queries/dates) per SEARCH_PROTOCOL.md; gate item not met",
-    "update report/policies after batch4; lead spot-check of 2-3 locators",
-    "draft PR (base research/r1-learning-science-20261127)"
+    "independent review of PR #39 (questions in report §10)",
+    "search queries of batches 1-3 not reconstructible (documented gap)",
+    "Darvishi full text; delayed unassisted GenAI-tutor endpoint; post-2019 KT bias audits; legal review of GDPR/AI Act applicability"
    ],
-   "updated": "2026-11-27T15:05:00+01:00",
+   "updated": "2026-11-27T16:20:00+01:00",
    "artifacts": [
     "docs/research/workstreams/r5/r5_evidence.json",
     "docs/research/workstreams/r5/r5_tutoring_policies.json",
@@ -337,9 +340,10 @@
     "tests/test_r5_tutoring_policies.py"
    ],
    "tests": [
-    "python3 -m unittest tests.test_r5_tutoring_policies tests.test_r1_learning_policies: OK (skipped=1), 2026-11-27"
+    "python3 -m unittest tests.test_r5_tutoring_policies tests.test_r1_learning_policies: 26 OK (skipped=1), 2026-11-27"
    ],
-   "blockers": []
+   "blockers": [],
+   "pr": 39
   },
   {
    "id": "WP-R3",
@@ -525,7 +529,7 @@
   },
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents."
  },
- "next_milestone": "WP-R5 draft PR, then R3/R4/R9/R7/R8, then R6 architecture decision.",
+ "next_milestone": "R3/R4/R9/R7/R8, then R6 architecture decision.",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
