@@ -347,6 +347,14 @@
    "status": "RUNNING",
    "checkpoint": "docs/programme/agents/V1APP.json",
    "worktree": "Exam_Mastery-v1app"
+  },
+  {
+   "id": "V1CONTENT",
+   "kind": "background subagent of LEAD",
+   "scope": "V1 attention content + deterministic track",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/V1CONTENT.json",
+   "worktree": "Exam_Mastery-v1content"
   }
  ],
  "work_packages": [
@@ -365,13 +373,14 @@
   {
    "id": "WP-V1-CONTENT",
    "title": "Deepen the V1 AI unit to university excellence (attention): derivations/proofs, worked + original unassisted problems with full solutions, deterministic attention practice track, Anki retrieval cards",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 0.8,
    "autostart": false,
-   "depends_on": [
-    "WP-V1-APP"
-   ],
-   "next_step": "After V1APP: compare the attention unit with a strong textbook chapter + frontier-LLM tutoring; author an em-track-v1 attention track (softmax, scaling variance, masking, gradient through softmax) with engine-computed answers and bug libraries; extend em-experience unit; public fixtures synthetic only."
+   "depends_on": [],
+   "next_step": "Specialist V1CONTENT: content audit vs textbook+LLM baseline, deepened attention unit (same unit_id), deterministic ai/attention-track, tests; lead merges into integration.",
+   "branch": "feat/mastery-v1-attention-content-20261127",
+   "base": "integration/mastery-v1-20261127",
+   "worktree": "Exam_Mastery-v1content"
   },
   {
    "id": "WP-V1-APP",
@@ -978,6 +987,17 @@
      "resets": "2026-11-29T07:00+01:00"
     },
     "note": "after R9 (~0.33M subagent tokens = ~1 point of the 7-day window)"
+   },
+   {
+    "at": "2026-11-27T20:47+01:00",
+    "five_hour": {
+     "utilization": 0.49,
+     "resets": "2026-11-27T23:20+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.84,
+     "resets": "2026-11-29T07:00+01:00"
+    }
    }
   ],
   "supervisor_ceilings": {
@@ -986,7 +1006,7 @@
    "max_runs_per_24h": 4
   },
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents.",
-  "lead_pacing": "Lead keeps seven_day <= 0.85 like the supervisor: one specialist while five_hour > 0.6; stop spawning at seven_day >= 0.83 and hand remaining packages to the supervisor after the 2026-11-29 07:00 reset."
+  "lead_pacing": "Issue #49: continue within account limits. Lead stops spawning new specialists at seven_day >= 0.92 and leaves remaining packages to the supervisor after the 2026-11-29 07:00 reset (supervisor ceiling 0.85 leaves room for the owner)."
  },
  "next_milestone": "Mastery V1 local release candidate (WP-V1-APP), then content deepening (WP-V1-CONTENT) and owner hands-on acceptance.",
  "product_identity": {
