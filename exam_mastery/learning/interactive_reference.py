@@ -175,6 +175,39 @@ def attention_trace(parameters):
                       'state':{'kind':'attention', 'svg':figures_svg.render({'type':'scaled_dot_product_attention','parameters':parameters,'title':'Attention-Zwischenwerte','alt':'Zwischenwerte der ersten Query'}), **data}}]}
 
 
+def policy_gradient_trace(parameters):
+    """Softmax bandit: exact gradient, one seeded REINFORCE batch and exact estimator variances."""
+    from ..labs.policy_gradient import compute
+    from .. import figures_svg
+    try:
+        m = compute(parameters)
+    except ValueError as exc:
+        raise InteractionError(str(exc)) from exc
+    f = lambda xs: "(" + "; ".join(f"{x:.4g}" for x in xs) + ")"
+    svg = figures_svg.render({"type": "softmax_policy_gradient", "parameters": parameters,
+                              "title": "Politik, Gradient und Varianz",
+                              "alt": "Politik, exakter Gradient und Schätzervarianz über der Baseline"})
+    state = {"kind": "svg", "svg": svg}
+    return {
+        "model": "softmax_policy_gradient", "result": m["grad"][0],
+        "result_label": "exakte Gradientenkomponente ∂J/∂θ₁",
+        "invariant": "Die Komponenten von ∇J summieren sich zu null; eine von der Aktion unabhängige Baseline "
+                     "ändert den Erwartungswert der Schätzung nicht, nur ihre Varianz.",
+        "steps": [
+            {"title": "1 · Politik aus Logits", "state": state,
+             "body": f"π = softmax(θ) = {f(m['pi'])}; J(θ) = Σ π(a) r(a) = {m['J']:.4g}."},
+            {"title": "2 · Exakter Gradient", "state": state,
+             "body": f"∂J/∂θₖ = πₖ (rₖ − J) = {f(m['grad'])}. Arme mit r > J gewinnen Wahrscheinlichkeit."},
+            {"title": "3 · REINFORCE mit N Episoden", "state": state,
+             "body": f"Gezogene Häufigkeiten {m['counts']}; Baseline b = {m['baseline']:.4g}; "
+                     f"ĝ = {f(m['estimate'])}; Update θ ← θ + αĝ = {f(m['theta_new'])}, J = {m['J_new']:.4g}."},
+            {"title": "4 · Varianz mit und ohne Baseline", "state": state,
+             "body": f"Spur der Kovarianz von ĝ: ohne Baseline {m['variance_none']:.4g}, mit b {m['variance_baseline']:.4g}, "
+                     f"mit b = J {m['variance_expected']:.4g}, minimal bei b* = {m['b_opt']:.4g}: {m['variance_optimal']:.4g}."},
+        ],
+    }
+
+
 def parsons_reference(parameters):
     """Check the ordering of provided code blocks, never execute learner code.
 
@@ -225,6 +258,7 @@ MODELS = {
     "binary_search_lower_bound": binary_search_trace,
     "finite_discounted_return": discounted_return_trace,
     "binomial_area_partition": binomial_area_trace,
+    "softmax_policy_gradient": policy_gradient_trace,
 }
 
 
@@ -262,6 +296,7 @@ def build_interaction(interaction):
 
 STYLES = r"""
 .attention-graphic {overflow-x:auto} .attention-graphic svg{min-width:640px} .attention-alternative dl{padding:.7rem;background:#f2f7fc;border-radius:8px} .attention-alternative dt{font-weight:650} .attention-alternative dd{margin:0 0 .4rem} .semantic-figure{overflow-x:auto} .semantic-figure svg{min-width:580px} .task-prompt {font-weight:650;font-size:1.1rem} .attention-editors {display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem} .attention-editors fieldset {border:1px solid #cad5e3;border-radius:8px} .attention-editors label {display:inline-block;width:45%;margin:.3rem} .attention-lab input[type=checkbox] {width:auto} .attention-lab svg,.semantic-figure svg {height:auto;max-width:100%} .semantic-figure {margin:1.5rem 0;padding:1rem;background:white;border:1px solid #d9e2ef;border-radius:12px} .semantic-figure figcaption {font-size:.9rem;color:#405778}
+.pg-controls {display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.3rem 1rem} .pg-control {font-weight:600;font-size:.9rem} .pg-control input[type=range]{padding:0} .pg-control output{font-variant-numeric:tabular-nums;color:var(--muted)} .pg-equations{font-family:ui-monospace,Menlo,monospace;font-size:.86rem;background:#f2f7fc;border-radius:10px;padding:.7rem .9rem;margin:.8rem 0;overflow-x:auto;white-space:pre-wrap} .pg-choice{display:inline-block;border:1px solid var(--line);border-radius:8px;margin:.2rem .4rem .2rem 0} .pg-choice label{display:inline;font-weight:500;margin-right:.6rem} .pg-choice input{width:auto} .pg-feedback div{font-family:ui-monospace,Menlo,monospace;font-size:.85rem} .pg-plot svg{width:100%;height:auto;background:white;border:1px solid var(--line);border-radius:10px} .pg-plot text{font-size:11px;fill:#1d2a3a} .pg-plot .pg-title{font-weight:700;font-size:12px} .pg-error{color:#a3341f}
 .em-math { display:inline-block; max-width:100%; overflow-x:auto; vertical-align:middle; }
 .em-math svg { max-width:none; }
 .dmath { margin:1rem 0; overflow-x:auto; }
@@ -488,7 +523,7 @@ function draw(stage, step) {
     visual.append(el("span", "area-guide",
       "Seiten a = " + fmt(s.a) + ", b = " + fmt(s.b) +
       ". Die Breiten und Höhen stehen im Verhältnis a : b."));
-  } else if (s.kind === "attention") {
+  } else if (s.kind === "attention" || s.kind === "svg") {
     const parsed = new DOMParser().parseFromString(s.svg, "image/svg+xml");
     visual.append(document.importNode(parsed.documentElement, true));
   } else if (s.kind === "rewards") {
@@ -949,6 +984,14 @@ def render_html(unit):
                      '" data-competencies="' + _h(",".join(block["competency_ids"])) +
                      '" data-claims="' + _h(",".join(block.get("claim_ids", []))) +
                      '"><div>' + rich(block["content"]) + '</div></article>')
+        for extra in block.get("blocks", []):
+            if extra["type"] == "definition":
+                parts.append('<article class="card"><p class="eyebrow">Definition</p><h3>' + _h(extra["term"]) +
+                             '</h3><div>' + rich(extra["md"]) + '</div></article>')
+            elif extra["type"] in ("box", "summary"):
+                label = extra.get("title") or ("Zusammenfassung" if extra["type"] == "summary" else "Hinweis")
+                parts.append('<article class="card"><p class="eyebrow">' + _h(label) + '</p><div>' +
+                             rich(extra["md"]) + '</div></article>')
         parts.append(html_frames(unit, block["id"]))
         proof = block.get("derivation")
         if proof:
@@ -1049,6 +1092,27 @@ def render_html(unit):
             '<button class="attention-export secondary" type="button">Experimentparameter speichern</button>',
             '<script class="attention-parameters" type="application/json">'+_json_script(parameters)+'</script></section>',
         ])
+    for spec in compiled:
+        if spec['variants'][0].get('model') != 'softmax_policy_gradient':
+            continue
+        parameters = spec['variants'][0]['parameters']
+        parts.extend([
+            '<section class="pg-lab card" id="pg-lab-' + re_slug(spec['id']) + '" aria-label="Freies Policy-Gradient-Experiment">',
+            '<p class="eyebrow">Freies Experiment · vorhersagen, sampeln, aktualisieren</p>',
+            '<h2>Gradientenrichtung vorhersagen, dann REINFORCE beobachten</h2>',
+            '<p>1. Regler einstellen. 2. Für jeden Arm vorhersagen, ob sein Logit beim exakten Gradientenschritt steigt. '
+            '3. Episoden ziehen: Die Balken zeigen die Schätzung ĝ, die schwarzen Striche den exakten Gradienten. '
+            '4. Wiederholt sampeln und die Streuung ohne und mit Baseline vergleichen. 5. Updates anwenden und die Lernkurve verfolgen.</p>',
+            '<div class="pg-controls"></div>',
+            '<div class="pg-equations" aria-live="polite"></div>',
+            '<div class="pg-predict"></div><div class="pg-feedback" role="status" aria-live="polite"></div>',
+            '<div class="controls"><button type="button" class="pg-sample" disabled>Stichprobe ziehen</button>',
+            '<button type="button" class="pg-update secondary" disabled>Update θ ← θ + αĝ</button>',
+            '<button type="button" class="pg-run secondary" disabled>20 Updates</button>',
+            '<button type="button" class="pg-reset secondary">Zurücksetzen</button></div>',
+            '<div class="pg-plot"></div><p class="pg-status attempt-status" role="status" aria-live="polite"></p>',
+            '<script class="pg-parameters" type="application/json">' + _json_script(parameters) + '</script></section>',
+        ])
     parts.append('<section aria-label="Selbstständige Übungsaufgaben"><h2>Selbstständig anwenden</h2>')
     for task in unit["assessments"]:
         slug = re_slug(task["id"])
@@ -1109,7 +1173,7 @@ def render_html(unit):
                                        for c in unit["competencies"]},
                       "assessments": [_tutor_view(unit, x) for x in unit["assessments"]]}),
         '</script><script>' + tutor_js + '</script><script>' + RUNTIME +
-        '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_experience.js').read_text() + '</script></main></body></html>',
+        '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_experience.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/policy_gradient_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/policy_gradient_lab.js').read_text() + '</script></main></body></html>',
     ])
     return "".join(parts)
 
