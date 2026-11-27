@@ -1,7 +1,7 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T10:55:00+01:00",
- "updated_by": "lead (interactive Claude Code session)",
+ "updated": "2026-11-27T13:05:00+01:00",
+ "updated_by": "headless WP-R2",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
   "Never merge to main; draft PRs only.",
@@ -272,23 +272,33 @@
   {
    "id": "WP-R2",
    "title": "R2 formal, quantitative and computational mastery",
-   "status": "RUNNING",
+   "status": "CHECKPOINTED",
    "priority": 2,
    "autostart": true,
    "issue": 23,
    "branch": "research/r2-formal-quantitative-20261127",
    "base": "research/r1-learning-science-20261127 (bec1f62)",
-   "next_step": "If the specialist checkpoint is COMPLETED: lead review, spot-check, test, commit, draft PR. Otherwise continue the specialist part from its checkpoint (only its files).",
+   "next_step": "Write docs/research/workstreams/R2_FORMAL_QUANTITATIVE.md from r2_evidence.json + r2_learning_policies.json (search log, mechanism chains, worked+adversarial example, verifier matrix, risk audit, reviewer questions, declared gaps). Then lead spot-check and draft PR against base.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
    "worktree": "Exam_Mastery-r2",
    "done": [
-    "specialist brief issued; policy file in R1 schema"
+    "specialist brief issued; policy file in R1 schema",
+    "evidence register 40 entries committed (717e254)",
+    "r2_learning_policies.json: 16 design-hypothesis policies + contract test (4c1f02f); unittest R1+R2 27 ok, 1 skip"
    ],
    "open": [
-    "specialist report + evidence + policies",
+    "R2_FORMAL_QUANTITATIVE.md report incl. search log and coverage gaps",
     "lead review/spot-check",
     "draft PR"
-   ]
+   ],
+   "artifacts": [
+    "docs/research/workstreams/r2/r2_evidence.json",
+    "docs/research/workstreams/r2/r2_learning_policies.json",
+    "tests/test_r2_learning_policies.py"
+   ],
+   "tests": "python3 -m unittest test_r2_learning_policies test_r1_learning_policies (from tests/): 27 ok, 1 skipped",
+   "blockers": [],
+   "updated": "2026-11-27T13:05:00+01:00"
   },
   {
    "id": "WP-R5",
