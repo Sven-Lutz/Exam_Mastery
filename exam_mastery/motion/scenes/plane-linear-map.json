@@ -14,8 +14,8 @@
     1.0,
     1.0
    ],
-   "min": -4,
-   "max": 4,
+   "min": -6,
+   "max": 6,
    "label": "Matrix A"
   },
   "v": {
@@ -23,8 +23,8 @@
     1.0,
     2.0
    ],
-   "min": -3,
-   "max": 3,
+   "min": -6,
+   "max": 6,
    "label": "Testvektor v"
   },
   "t": {

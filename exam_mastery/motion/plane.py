@@ -14,7 +14,7 @@ import json
 import re
 
 from . import SCHEMA, panels_for, state_svg, validate
-from .models import linear_map_2d, plane_extent, plane_params
+from .models import PLANE_LIMIT, linear_map_2d, plane_extent, plane_params
 
 TITLE = "Lineare Abbildung als stetige Verformung der Ebene"
 CLAIM = ("Die Spalten von A sind die Bilder von e₁ und e₂; Av kombiniert sie mit den Koordinaten von v. det A ist die "
@@ -123,8 +123,8 @@ def build_scene(presets, scene_id="plane-linear-map", title=TITLE, claim=CLAIM, 
     scene = {
         "schema": SCHEMA, "id": scene_id, "lang": "de", "public": bool(public), "title": title, "claim": claim,
         "model": "linear_map_2d",
-        "params": {"A": {"value": first["A"], "min": -4, "max": 4, "label": "Matrix A"},
-                   "v": {"value": first["v"], "min": -3, "max": 3, "label": "Testvektor v"},
+        "params": {"A": {"value": first["A"], "min": -PLANE_LIMIT, "max": PLANE_LIMIT, "label": "Matrix A"},
+                   "v": {"value": first["v"], "min": -PLANE_LIMIT, "max": PLANE_LIMIT, "label": "Testvektor v"},
                    "t": {"value": 0.0, "min": 0, "max": 1}},
         "view": {"width": 780, "height": 470, "panels": [
             {"id": "plane", "title": "Die Ebene unter M(t)", "x": 16, "y": 30, "w": 430, "h": 430,
@@ -175,7 +175,8 @@ def unit_presets(variants):
         if key in seen:
             continue
         seen.add(key)
-        out.append({"id": f"p{len(out) + 1}", "label": str(v["label"]).split(",")[0].strip() or f"Beispiel {len(out) + 1}",
+        label = str(v.get("label", "")).split(",")[0].strip()[:80].strip()
+        out.append({"id": f"p{len(out) + 1}", "label": label or f"Beispiel {len(out) + 1}",
                     "matrix": p["matrix"], "vector": p["vector"]})
     return out[:8]
 
@@ -183,15 +184,16 @@ def unit_presets(variants):
 def unit_scene(spec):
     """Scene of a compiled explorable_model interaction with model_ref plane_linear_map (schema unchanged)."""
     slug = re.sub(r"[^a-z0-9]+", "-", str(spec["id"]).lower()).strip("-")[:40] or "plane"
+    prompt = spec.get("prediction_prompt")
     return build_scene(unit_presets(spec["variants"]), scene_id="plane-" + slug,
-                       prompt=spec.get("prediction_prompt") or None)
+                       prompt=prompt if isinstance(prompt, str) and prompt.strip() and len(prompt) <= 600 else None)
 
 
 def figure_svg(parameters, title=None, alt=None, theme="light"):
     """Book/card figure of one parameter set {matrix, vector[, t]}: a keyframe of the same scene (same palette, object
     ids and scale as the explorable), drawn with the readouts. Deterministic; no script, no external reference."""
     p = plane_params(parameters)
-    item = {"id": "fig", "label": title or "Figur", "matrix": parameters["matrix"], "vector": parameters["vector"]}
+    item = {"id": "fig", "label": "Figur", "matrix": parameters["matrix"], "vector": parameters["vector"]}
     scene = build_scene([item])
     state = linear_map_2d(p)
     near = min(range(len(STEPS_T)), key=lambda k: abs(STEPS_T[k][1] - p["t"]))

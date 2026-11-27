@@ -109,6 +109,13 @@ def test_figure_and_trace_use_the_same_model():
                               "title": "t", "alt": "a"})
     assert "Orientierung umgekehrt" in neg and PALETTE["area"]["color"] in neg
     assert 'fill="url(#' in neg and '-hatch)"' in neg                                     # orientation flip: hatched
+    long = figures_svg.render({"type": "plane_linear_map", "parameters": p, "title": "Eine sehr lange Bildunterschrift " * 12,
+                               "alt": "a"})                                   # long captions/labels from real units
+    assert "Rang M = 1" in long
+    from exam_mastery.motion.plane import unit_scene
+    sc = unit_scene({"id": "i/plane", "prediction_prompt": "x" * 900,
+                     "variants": [{"label": "Sehr langer Name " * 10 + ", t = 1", "parameters": p}]})
+    assert len(sc["presets"][0]["label"]) <= 80 and sc["steps"][1]["checkpoint"]["predict"][0]["prompt"].startswith("Vorhersage")
     spec = build_interaction({"id": "i/plane", "type": "explorable_model", "model_ref": "plane_linear_map",
                               "prediction_prompt": "p", "feedback_rule": "f", "transfer_prompt": "t",
                               "variants": [{"label": "A, t = 1", "parameters": {"matrix": [[2, -1], [1, 1]], "vector": [1, 2]}}]})
