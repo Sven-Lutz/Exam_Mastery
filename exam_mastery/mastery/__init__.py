@@ -31,7 +31,8 @@ LIBRARY_SCHEMA = "mastery-library-v1"
 STATE_SCHEMA = "mastery-state-v1"
 BACKUP_SCHEMA = "mastery-backup-v1"
 STORE_CONTEXT = "mastery"          # workbench storage namespace: localStorage em-tutor-v1, key "mastery|<track id>"
-STORAGE_KEYS = ("em-tutor-v1", "em-practice-v1")
+STORAGE_KEYS = ("em-tutor-v1", "em-practice-v1", "em-motion-v1")  # em-motion-v1: Mastery Motion predictions (no evidence)
+MOTION_EVENTS = {"predict", "reveal", "task_attempt"}
 MAX_STATE_BYTES = 4_000_000
 MAX_EVENTS = 20_000
 SLUG = re.compile(r"^[a-z0-9][a-z0-9-]{0,40}$")
@@ -323,7 +324,9 @@ def build(home=None, force=False, log=print, only=None):
         units.append(_build_unit(root, item, log))
         built.append(slug)
     _write_shell(root)
+    from ..motion.embed import write_demo_pages
     library = {"schema": LIBRARY_SCHEMA, "app": "Mastery", "version": 1, "engine": engine, "built_at": now(),
+               "motion_demos": write_demo_pages(root),
                "default_port": DEFAULT_PORT, "units": units, "model_calls": 0, "network_calls": 0}
     _write_json(root / "library.json", library)
     return {"home": str(root), "built": built, "units": [u["slug"] for u in units]}
@@ -335,6 +338,9 @@ def is_outdated(home=None):
     if not lib or lib.get("schema") != LIBRARY_SCHEMA or not (root / "index.html").is_file():
         return True
     if any(not (root / "assets" / a).is_file() for a in ASSETS):
+        return True
+    from ..motion.embed import ASSETS as MOTION_ASSETS
+    if "motion_demos" not in lib or any(not (root / "assets" / a).is_file() for a in MOTION_ASSETS):
         return True
     have = {u["slug"]: u for u in lib["units"]}
     for item in plan(root):
@@ -417,6 +423,16 @@ def validate_state(obj):
                 raise MasteryError("em-practice-v1: invalid unit record")
             _check_events(rec.get("events", []), "em-practice-v1/" + key)
             _check_events(rec.get("policy", []), "em-practice-v1/" + key)
+    motion = storage.get("em-motion-v1")
+    if motion is not None:
+        if not isinstance(motion, dict) or motion.get("schema") != 1 or not isinstance(motion.get("scenes"), dict):
+            raise MasteryError("em-motion-v1: invalid")
+        for key, rec in list(motion["scenes"].items()) + list((motion.get("archived") or {}).items()):
+            if not isinstance(rec, dict) or not isinstance(rec.get("revision"), str):
+                raise MasteryError("em-motion-v1: invalid scene record")
+            _check_events(rec.get("events", []), "em-motion-v1/" + key)
+            if any(e["type"] not in MOTION_EVENTS for e in rec.get("events", [])):
+                raise MasteryError("em-motion-v1: only predict, reveal and task_attempt events")
     return obj
 
 
@@ -446,8 +462,9 @@ def state_meta(root):
     storage = latest.get("storage", {})
     tutor = sum(len(r.get("events", [])) for r in ((storage.get("em-tutor-v1") or {}).get("tracks") or {}).values())
     practice = sum(len(r.get("policy", [])) for r in ((storage.get("em-practice-v1") or {}).get("units") or {}).values())
+    motion = sum(len(r.get("events", [])) for r in ((storage.get("em-motion-v1") or {}).get("scenes") or {}).values())
     return {"received_at": latest.get("received_at"), "saved_at": latest.get("saved_at"),
-            "workbench_events": tutor, "explorable_events": practice}
+            "workbench_events": tutor, "explorable_events": practice, "motion_events": motion}
 
 
 def export(home=None, out=None):
