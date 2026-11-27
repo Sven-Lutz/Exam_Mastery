@@ -20,7 +20,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-from . import MAX_STATE_BYTES, MasteryError, state_meta, store_state
+from . import TEMPLATES, MAX_STATE_BYTES, MasteryError, state_meta, store_state
 
 ALLOWED = re.compile(
     r"^/(index\.html|library\.json|assets/[A-Za-z0-9_.-]+\.(?:css|js)"
@@ -30,7 +30,8 @@ ALLOWED = re.compile(
     r"|anki_report\.json|Interaktiv/index\.html|tracks/[A-Za-z0-9_.-]+\.(?:html|json)))$")
 COURSE_GET = re.compile(r"^/api/courses(?:/([a-z0-9][a-z0-9-]{0,40}))?$")
 COURSE_POST = re.compile(r"^/api/(?:import|courses/([a-z0-9][a-z0-9-]{0,40})/(reimport|materialize|plan"
-                         r"|chapters/([a-z0-9][a-z0-9-]{0,70})/(packet|build)))$")
+                         r"|chapters/([a-z0-9][a-z0-9-]{0,70})/(packet|build|feedback)))$")
+CARD_VIEW = re.compile(r"/cards/([a-z0-9][a-z0-9-]{0,40})/([a-z0-9][a-z0-9-]{0,70})/(.*)")
 MAX_API_BYTES = 64_000
 TYPES = {".html": "text/html; charset=utf-8", ".json": "application/json; charset=utf-8",
          ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".pdf": "application/pdf",
@@ -80,6 +81,9 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, {"app": "mastery", "version": 1})
         if path == "/api/state/meta":
             return self._send(200, state_meta(self.server.root))
+        cards = CARD_VIEW.fullmatch(path)
+        if cards:
+            return self._cards(*cards.groups())
         m = COURSE_GET.match(path)
         if m:
             from . import courses as C
@@ -99,6 +103,36 @@ class Handler(BaseHTTPRequestHandler):
             extra["Content-Disposition"] = 'attachment; filename="Anki.apkg"'
         ctype = TYPES.get(target.suffix) or mimetypes.guess_type(target.name)[0] or "application/octet-stream"
         return self._send(200, target.read_bytes(), ctype, extra)
+
+    def _cards(self, slug, cid, resource):
+        from . import card_feedback as F
+        root = self.server.root
+        try:
+            if resource in ("", "browser.js"):
+                name = "card_browser.js" if resource else "card_browser.html"
+                return self._send(200, (TEMPLATES / name).read_bytes(), TYPES[Path(name).suffix])
+            if resource == "data":
+                _, index = F.preview(root, slug, cid)
+                return self._send(200, {"package": index["package"], "cards": index["cards"],
+                                        "report": F.report(root, slug, cid), "kinds": F.KINDS})
+            media = re.fullmatch(r"([0-9a-f]{64})/([^/]+)", resource)
+            if media:
+                digest, name = media.groups()
+                dest = F.chapter_dir(root, slug, cid) / "card-previews" / digest
+                index = F._read_json(F.confined(root, dest / "index.json"))
+                if index and name in index["files"]:
+                    asset = F.confined(root, dest / name)
+                    body = asset.read_bytes()
+                    runtime = f"http://{self.headers['Host']}/cards/{slug}/{cid}/{digest}/tex-svg-full.js"
+                    policy = (f"default-src 'none'; script-src {runtime}; style-src 'unsafe-inline'; "
+                              "img-src 'self' data:; font-src 'self' data:; form-action 'none'; base-uri 'none'; "
+                              "frame-ancestors 'self'; sandbox allow-same-origin allow-scripts")
+                    return self._send(200, body, TYPES.get(asset.suffix) or
+                                      mimetypes.guess_type(name)[0] or "application/octet-stream",
+                                      {"Content-Security-Policy": policy})
+        except (MasteryError, FileNotFoundError) as exc:
+            return self._send(404, {"error": str(exc)[:200]})
+        return self._send(404, {"error": "not found"})
 
     def do_POST(self):
         if not self._host_ok():
@@ -159,6 +193,9 @@ class Handler(BaseHTTPRequestHandler):
                     return self._send(200, C.reimport(slug, root, materialize_files=True, log=log))
                 if action == "plan":
                     return self._send(200, C.set_overrides(slug, body.get("overrides") or {}, root))
+                if chapter_action == "feedback":
+                    from .card_feedback import record
+                    return self._send(200, record(root, slug, chapter, body))
                 if chapter_action == "packet":
                     C.make_packet(slug, chapter, root, log=log)
                     return self._send(200, C.course_status(slug, root))

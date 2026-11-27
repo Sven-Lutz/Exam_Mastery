@@ -206,6 +206,7 @@ function chapterAction(c, ch) {
   const base = 'api/courses/' + c.slug + '/chapters/' + ch.id + '/';
   const packetBtn = label => { const b = el('button', { type: 'button', class: 'ds-btn', 'data-action': 'packet', onclick: () => busy(b, msg, 'Paket wird geschrieben …', () => api(base + 'packet')) }, label); return b; };
   const box = el('div', { class: 'm-action' });
+  if (ch.products) box.append(el('a', { class: 'ds-btn', href: '/cards/' + c.slug + '/' + ch.id + '/' }, 'Anki-Karten und Feedback'));
   if (ch.stale) box.append(el('p', { class: 'm-badge m-stale', 'data-stale': '1' }, 'Quellen geändert seit dem Paket: ' + ch.stale.sources.slice(0, 4).join(', ') + ' – Paket erneuern und Kapitel überarbeiten.'));
   if (ch.status === 'NICHT_ERARBEITET') box.append(packetBtn('Paket erstellen'));
   if (ch.status === 'PAKET_BEREIT' && ch.instruction) {

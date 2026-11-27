@@ -147,6 +147,12 @@ def cmd_packet(args):
     return 0
 
 
+def cmd_card_feedback(args):
+    from .card_feedback import author_export
+    print(author_export(args.slug, args.chapter, args.home))
+    return 0
+
+
 def cmd_build_chapter(args):
     from .courses import build_chapter
     r = build_chapter(args.slug, args.chapter, args.home)
@@ -157,6 +163,8 @@ def cmd_build_chapter(args):
               f"({r['anki']['package_status']}, {r['anki']['restamped']} neu gestempelt). Fachliche Prüfung: ausstehend.")
     else:
         print(f"Unverändert – '{r['library_slug']}' ist aktuell, nichts neu gebaut. Fachliche Prüfung: ausstehend.")
+    for key in r["anki"]["restamped_keys"]:
+        print(f"  Neu gestempelt: {key}")
     for k, v in r["products"].items():
         print(f"  {k}: {v}")
     return 0
@@ -205,6 +213,9 @@ def main(argv=None):
     pk.add_argument("slug")
     pk.add_argument("chapter")
     pk.add_argument("--force", action="store_true", help="auch ein nicht vom Import erzeugtes packet.json ersetzen")
+    feedback = sub.add_parser("card-feedback", help="Kartenfeedback für die nächste Autorenrunde exportieren")
+    feedback.add_argument("slug")
+    feedback.add_argument("chapter")
     bc = sub.add_parser("build-chapter", help="erarbeitete unit.json prüfen, vier Produkte bauen, in Bibliothek eintragen")
     bc.add_argument("slug")
     bc.add_argument("chapter")
@@ -216,7 +227,7 @@ def main(argv=None):
         args = parser.parse_args([*(["--home", args.home] if args.home else []), "start"])
     try:
         return {"start": cmd_start, "build": cmd_build, "status": cmd_status, "export": cmd_export,
-                "import": cmd_import, "courses": cmd_courses, "course": cmd_course, "plan": cmd_plan,
+                "import": cmd_import, "courses": cmd_courses, "course": cmd_course, "plan": cmd_plan, "card-feedback": cmd_card_feedback,
                 "packet": cmd_packet, "build-chapter": cmd_build_chapter, "reimport": cmd_reimport}[args.cmd](args)
     except MasteryError as exc:
         print(f"Mastery: {exc}", file=sys.stderr)
