@@ -1,0 +1,691 @@
+{
+ "schema": "r1-evidence/1",
+ "agent": "R7",
+ "updated": "2026-11-27",
+ "scope_note": "Gezielte Belegauswahl nur dort, wo sie eine R7-Entscheidung ändert (Animation vs. statisch, Lernerkontrolle, Video, Verständnisillusion durch flüssige Erklärung, Fehlvorstellungs-Widerlegung, Vorhersage in Visualisierungen, interaktive Artikel, automatisches Programmierfeedback, OpenDSA-Nutzung). Keine systematische Übersichtsarbeit: Auswahl als known-item-Verifikation bekannter Schlüsselarbeiten plus Zitationen aus hohman2020; Identität per Crossref (und OpenAlex/PubMed für Abstracts). Algorithmenvisualisierung (R2: hundhausen2002avmeta, naps2002engagement u. a.), PhET/virtuelle Labore (R4: finkelstein2005cck, reeves2021virtuallabs), Predict-Run (R2: sentance2019primm) und Autograder (R2: baniassad2021autograder, messer2024autograding) werden nicht erneut recherchiert. Semantic-Scholar-TLDRs sind maschinell erzeugt und werden nirgends als Beleg verwendet. Zahlen nur mit Locator aus tatsächlich gelesenem Abstract/Text.",
+ "entries": [
+  {
+   "source_id": "hoffler2007animation",
+   "study_family_id": "animation-vs-static-meta",
+   "citation": "Höffler, T. N., & Leutner, D. (2007). Instructional animation versus static pictures: A meta-analysis. Learning and Instruction, 17(6), 722-738.",
+   "doi_or_url": "https://doi.org/10.1016/j.learninstruc.2007.09.013",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "domain": "animation",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works (Titel, Autoren, Jahr, Band, Seiten stimmen). Erster DOI-Versuch 10.1016/j.learninstruc.2006.09.001 löste auf Ayres (2006) auf und wurde verworfen.",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "https://doi.org/10.1016/j.learninstruc.2007.09.013 (Weiterleitung zu ScienceDirect; Abstractseite HTTP 403; OpenAlex/Crossref ohne Abstract)"
+   },
+   "design": "Meta-Analyse animierter vs. statischer Abbildungen (Details nicht gelesen)",
+   "population": "unknown (nicht gelesen)",
+   "operation": "unknown",
+   "intervention": "instruktionale Animation",
+   "comparator": "statische Bilder",
+   "outcome": {
+    "measure": "unknown",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "unknown",
+    "note": "Effektgröße nicht aus gelesenem Text; Semantic-Scholar-TLDR nicht verwendet"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "nicht bewertet (nur Metadaten)",
+   "verdict": "unresolved",
+   "decision_impact": "nur Kontext; R7-POL-05 stützt sich auf berney2016animation und ploetzner2020animationdemands"
+  },
+  {
+   "source_id": "berney2016animation",
+   "study_family_id": "animation-vs-static-meta",
+   "citation": "Berney, S., & Bétrancourt, M. (2016). Does animation enhance learning? A meta-analysis. Computers & Education, 101, 150-167.",
+   "doi_or_url": "https://doi.org/10.1016/j.compedu.2016.06.005",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "domain": "animation",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works; OpenAlex oa_status green mit Repository-Eintrag",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://archive-ouverte.unige.ch/unige:92234 (Repository-Datensatz der Published Version; Abstract über Fetch-Werkzeug gelesen, OCR-Fehler im Abstracttext vermerkt)"
+   },
+   "design": "Random-effects-Meta-Analyse, 50 Arbeiten, 61 Primärstudien, 140 paarweise Vergleiche animiert vs. statisch",
+   "population": "N = 7.036 (laut Abstract); Bildungsstufen nicht gelesen",
+   "operation": "Verständnis/Lernen aus Abbildungen (nicht nach Operation aufgeschlüsselt gelesen)",
+   "intervention": "Animation",
+   "comparator": "statische Grafiken",
+   "outcome": {
+    "measure": "Lerntests der Primärstudien",
+    "assisted": false,
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "0.226 [0.12, 0.33] gesamt; Moderatoren: systemgesteuerte Animation 0.309, mit Audiokommentar 0.336, ohne begleitenden Text 0.883",
+    "ci": "95 % CI gesamt wie angegeben; für Moderatoren im Abstract nicht gelesen",
+    "k_or_n": "140 Vergleiche / 61 Studien / N = 7.036",
+    "locator": "Abstract"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Gesamteffekt klein; Moderatoren sind Assoziationen zwischen Studien, keine Kausalvergleiche. Der größere Effekt systemgesteuerter Animation steht in Spannung zu 'lernergesteuert ist besser' und muss bei R7-POL-05 als Gegenbefund geführt werden. Publikationsbias und Studienqualität nicht gelesen.",
+   "claim_edges": [
+    {
+     "claim_id": "mm.1",
+     "relation": "context_only",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported",
+   "decision_impact": "R7-POL-05: Animation hat im Mittel einen kleinen Vorteil gegenüber statisch; Einzelschritt-Standard ist durch diese Quelle nicht gestützt, sondern relativiert"
+  },
+  {
+   "source_id": "tversky2002animation",
+   "study_family_id": "tversky2002animation",
+   "citation": "Tversky, B., Morrison, J. B., & Bétrancourt, M. (2002). Animation: can it facilitate? International Journal of Human-Computer Studies, 57(4), 247-262.",
+   "doi_or_url": "https://doi.org/10.1006/ijhc.2002.1017",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "domain": "animation",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "https://doi.org/10.1006/ijhc.2002.1017 (closed; kein Abstract über Crossref/OpenAlex)"
+   },
+   "design": "kritischer Review (Inhalt nicht gelesen)",
+   "population": "not_applicable",
+   "operation": "unknown",
+   "intervention": "Animation",
+   "comparator": "statische Grafik",
+   "outcome": {
+    "measure": "unknown",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not_applicable",
+    "value": "unknown"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Nicht gelesen. hohman2020interactivearticles zitiert die Arbeit als Beleg für eine offene 'Debatte', ob Animation mehr leistet als eine gut gestaltete statische Grafik (Sekundärzitat).",
+   "verdict": "unresolved",
+   "decision_impact": "Kontext für R7-POL-05 (Informationsäquivalenz bei Vergleichen); kein tragender Beleg"
+  },
+  {
+   "source_id": "ploetzner2020animationdemands",
+   "study_family_id": "animation-vs-static-meta",
+   "citation": "Ploetzner, R., Berney, S., & Bétrancourt, M. (2020). A review of learning demands in instructional animations: The educational effectiveness of animations unfolds if the features of change need to be learned. Journal of Computer Assisted Learning, 36(6), 838-860.",
+   "doi_or_url": "https://doi.org/10.1111/jcal.12476",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "domain": "animation",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works inkl. Abstract; OpenAlex oa_status hybrid",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.1111/jcal.12476"
+   },
+   "design": "Systematischer Review von 194 Studien zu Lernen aus Animation plus Reanalyse einer Meta-Analyse mit neuem Moderator (Veränderungsmerkmale lernrelevant ja/nein)",
+   "population": "unknown (nicht gelesen)",
+   "operation": "konzeptuelle vs. kinematische mentale Modelle",
+   "intervention": "Animation",
+   "comparator": "statische Bilder",
+   "outcome": {
+    "measure": "Lerntests der Primärstudien",
+    "assisted": false,
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "unknown",
+    "note": "Abstract nennt keine Zahl; nur Richtung: signifikant erfolgreicher, wenn die Merkmale der dargestellten Veränderung gelernt werden mussten",
+    "locator": "Abstract"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Moderator post hoc an bestehendem Datensatz (Mitautorin der reanalysierten Meta-Analyse); Assoziation, kein Experiment. Hochschulrelevanz plausibel, nicht geprüft.",
+   "verdict": "partially_supported",
+   "decision_impact": "R7-POL-05: Animation dort, wo Veränderung in Raum/Zeit selbst Lerngegenstand ist; sonst statische Keyframes"
+  },
+  {
+   "source_id": "karich2014learnercontrol",
+   "study_family_id": "karich2014learnercontrol",
+   "citation": "Karich, A. C., Burns, M. K., & Maki, K. E. (2014). Updated meta-analysis of learner control within educational technology. Review of Educational Research, 84(3), 392-410.",
+   "doi_or_url": "https://doi.org/10.3102/0034654314526064",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "domain": "learner_control",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works inkl. Abstract",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.3102/0034654314526064"
+   },
+   "design": "Meta-Analyse; 85 Artikel gesichtet, 18 eingeschlossen, 29 Effekte",
+   "population": "unknown (nicht gelesen)",
+   "operation": "verschiedene; akademische und Verhaltensoutcomes",
+   "intervention": "Lernerkontrolle in Bildungstechnologie",
+   "comparator": "Programmsteuerung",
+   "outcome": {
+    "measure": "akademische und Verhaltensoutcomes",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "0.05 gesamt; für die meisten Kontroll- und Kontextmerkmale ebenfalls nahe null; moderate Effekte nur für Sozialkunde/Geschichte und umfassende Programme",
+    "k_or_n": "18 Artikel / 29 Effekte",
+    "locator": "Abstract"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Kleine Zahl Effekte; heterogene Kontrollbegriffe; Null-Ergebnis ist kein Äquivalenznachweis.",
+   "verdict": "supported_within_scope",
+   "decision_impact": "R7-POL-03: freie Manipulation/Lernerkontrolle ist kein Lernmechanismus an sich; Ziel und Aufgabe nötig"
+  },
+  {
+   "source_id": "mayer2001learnerpacing",
+   "study_family_id": "mayer2001learnerpacing",
+   "citation": "Mayer, R. E., & Chandler, P. (2001). When learning is just a click away: Does simple user interaction foster deeper understanding of multimedia messages? Journal of Educational Psychology, 93(2), 390-397.",
+   "doi_or_url": "https://doi.org/10.1037/0022-0663.93.2.390",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "domain": "animation",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works; Abstract über OpenAlex",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.openalex.org/works/https://doi.org/10.1037/0022-0663.93.2.390"
+   },
+   "design": "2 Experimente, randomisierte Bedingungen (Teil-Ganzes vs. Ganzes-Teil; Teil-Teil vs. Ganzes-Ganzes)",
+   "population": "Studierende (N nicht im Abstract)",
+   "operation": "Erklärung eines kausalen Prozesses (Blitzentstehung)",
+   "intervention": "lernergesteuertes Tempo einer erzählten Animation (segmentweise)",
+   "comparator": "durchlaufende Animation in normalem Tempo",
+   "outcome": {
+    "measure": "Behaltens- und Transfertest",
+    "assisted": false,
+    "delay": "unmittelbar (nicht anders angegeben)",
+    "transfer": "Transfertest"
+   },
+   "estimate": {
+    "metric": "direction_only",
+    "value": "Richtung: besserer Transfer, kein Unterschied im Behalten (beide Experimente)",
+    "locator": "Abstract"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Kurzes Laborexperiment, ein Thema, unmittelbarer Test; Übertragung auf Mathe-/Algorithmusszenen indirekt.",
+   "verdict": "supported_within_scope",
+   "decision_impact": "R7-POL-05: Einzelschritt-Steuerung als Standard; widerspricht teilweise dem Moderatorbefund in berney2016animation (verschiedene Vergleichsfragen)"
+  },
+  {
+   "source_id": "noetel2021video",
+   "study_family_id": "noetel2021video",
+   "citation": "Noetel, M., Griffith, S., Delaney, O., Sanders, T., Parker, P., del Pozo Cruz, B., & Lonsdale, C. (2021). Video improves learning in higher education: A systematic review. Review of Educational Research, 91(2), 204-236.",
+   "doi_or_url": "https://doi.org/10.3102/0034654321990713",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "domain": "video",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works inkl. Abstract; Preprint osf.io/kynez existiert (nicht gelesen)",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.3102/0034654321990713"
+   },
+   "design": "Systematischer Review mit Mehrebenen-Random-effects-Meta-Analyse randomisierter Studien; 9.677 Treffer, 329 Volltexte, 105 eingeschlossen; Screening und RoB doppelt",
+   "population": "College-Studierende, gepoolt N = 7.776",
+   "operation": "unspezifisch (Lernleistung)",
+   "intervention": "Video (asynchrone Multimedia) als Ersatz bzw. Ergänzung",
+   "comparator": "bestehende Lehrmethoden",
+   "outcome": {
+    "measure": "Lernleistung",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "Ersatz durch Video 0.28; Ergänzung durch Video 0.80",
+    "k_or_n": "105 Studien / N = 7.776",
+    "locator": "Abstract"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Autoren nennen mögliche experimentelle und Publikationsbiases; 'Ergänzung' konfundiert zusätzliche Lernzeit. Aussage betrifft Video gegenüber Lehre, nicht Video gegenüber aktiver Übung.",
+   "verdict": "partially_supported",
+   "decision_impact": "R7-POL-06: Video/Erklärszene darf ergänzen; kein Beleg, dass Zuschauen aktive Übung ersetzt; Zuschauen zählt nicht als Fortschritt"
+  },
+  {
+   "source_id": "carpenter2013fluency",
+   "study_family_id": "instructor-fluency",
+   "citation": "Carpenter, S. K., Wilford, M. M., Kornell, N., & Mullaney, K. M. (2013). Appearances can be deceiving: instructor fluency increases perceptions of learning without increasing actual learning. Psychonomic Bulletin & Review, 20(6), 1350-1356.",
+   "doi_or_url": "https://doi.org/10.3758/s13423-013-0442-z",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "domain": "explanation_fluency",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works; PubMed PMID 23645413 (efetch)",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/23645413/ (Springer-PDF leitete auf Login um)"
+   },
+   "design": "2 Experimente; kurzes Video, flüssiger vs. unflüssiger Vortrag desselben Inhalts",
+   "population": "Studienteilnehmende (N nicht im Abstract)",
+   "operation": "Erklärung eines naturwissenschaftlichen Konzepts; Behalten",
+   "intervention": "flüssige Darbietung",
+   "comparator": "unflüssige Darbietung",
+   "outcome": {
+    "measure": "vorhergesagtes Behalten, Instruktorbewertung, gelernte Menge",
+    "assisted": false,
+    "delay": "unknown",
+    "transfer": "nicht gemessen"
+   },
+   "estimate": {
+    "metric": "direction_only",
+    "value": "Richtung: Lernurteil und Instruktorbewertung höher bei flüssig; gelernte Menge nicht signifikant verschieden",
+    "locator": "Abstract"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Kurzes Video, Behaltenstest; 'nicht signifikant' ist kein Äquivalenznachweis. Übertragung auf polierte Animationen ist Analogie (Darbietungsflüssigkeit), nicht direkt getestet.",
+   "verdict": "supported_within_scope",
+   "decision_impact": "R7-POL-06: polierte Erklärung darf nicht als Lernnachweis oder Fortschritt gelten; Lernurteil nach Erklärung ist kein Kompetenzsignal (R1-POL-A09)"
+  },
+  {
+   "source_id": "carpenter2016fluency",
+   "study_family_id": "instructor-fluency",
+   "citation": "Carpenter, S. K., Mickes, L., Rahman, S., & Fernandez, C. (2016). The effect of instructor fluency on students' perceptions of instructors, confidence in learning, and actual learning. Journal of Experimental Psychology: Applied, 22(2), 161-172.",
+   "doi_or_url": "https://doi.org/10.1037/xap0000077",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "domain": "explanation_fluency",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works; PubMed PMID 26844368 (efetch)",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/26844368/"
+   },
+   "design": "3 Experimente; 22-minütige Videovorlesung, gleicher Dozent flüssig vs. unflüssig; Test sofort, nach 10 min, nach 1 Tag",
+   "population": "Studierende (N nicht im Abstract)",
+   "operation": "Behalten von Vorlesungsinhalt (Multiple Choice)",
+   "intervention": "flüssige Darbietung",
+   "comparator": "unflüssige Darbietung",
+   "outcome": {
+    "measure": "Instruktorbewertung, vorhergesagte Punktzahl, MC-Test",
+    "assisted": false,
+    "delay": "0 min / 10 min / 1 Tag (Exp. 1-3)",
+    "transfer": "nicht gemessen"
+   },
+   "estimate": {
+    "metric": "direction_only",
+    "value": "Richtung: Bewertung höher bei flüssig; Testleistung nicht konsistent verschieden; Exp. 3: wer Zuversicht auf den Dozenten stützt, ist bei flüssig eher überzuversichtlich",
+    "locator": "Abstract"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Gegenüber carpenter2013 längeres Material und Verzögerung bis 1 Tag; weiterhin nur MC-Behalten.",
+   "verdict": "supported_within_scope",
+   "decision_impact": "R7-POL-06 (wie carpenter2013fluency); stützt die Trennung von Zuschauen und Kompetenznachweis"
+  },
+  {
+   "source_id": "muller2008misconceptions",
+   "study_family_id": "muller2008misconceptions",
+   "citation": "Muller, D. A., Bewes, J., Sharma, M. D., & Reimann, P. (2008). Saying the wrong thing: improving learning with multimedia by including misconceptions. Journal of Computer Assisted Learning, 24(2), 144-155.",
+   "doi_or_url": "https://doi.org/10.1111/j.1365-2729.2007.00248.x",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "domain": "explanation_fluency",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works inkl. Abstract",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.1111/j.1365-2729.2007.00248.x"
+   },
+   "design": "Randomisierte Zuteilung zu 4 Online-Multimedia-Bedingungen; Prä-/Posttest mit Konzeptinventar-Items",
+   "population": "364 Physik-Erstsemester",
+   "operation": "konzeptuelles Verständnis (Newtonsche Gesetze)",
+   "intervention": "Refutation (Exposition plus ausdrücklich genannte und widerlegte Fehlvorstellungen) bzw. Dialog Lernende-Tutor mit gleichem Inhalt",
+   "comparator": "knappe Exposition; erweiterte Exposition mit Zusatzinformation",
+   "outcome": {
+    "measure": "Konzeptinventar-Items",
+    "assisted": false,
+    "delay": "Posttest nach Bearbeitung (Verzögerung nicht im Abstract)",
+    "transfer": "Konzeptfragen"
+   },
+   "estimate": {
+    "metric": "Effektgröße (Typ im Abstract nicht genannt)",
+    "value": "Refutation 0.79, Dialog 0.83 gegenüber Exposition; größter Nutzen bei geringem Vorwissen, kein Nachteil bei hohem Vorwissen",
+    "k_or_n": "N = 364",
+    "locator": "Abstract"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Ein Fach, eine Einrichtung, Effekttyp im Abstract unbestimmt; Prä-Post ohne verzögerten Test im Abstract. Sehr relevant für Erklärszenen: klare Exposition allein schnitt am schwächsten ab.",
+   "verdict": "supported_within_scope",
+   "decision_impact": "R7-POL-06: Erklärszenen nennen und widerlegen die typische Fehlvorstellung (em_scene.js hat bereits ein Feld 'Typische Fehlvorstellung')"
+  },
+  {
+   "source_id": "keuning2019programmingfeedback",
+   "study_family_id": "keuning2019programmingfeedback",
+   "citation": "Keuning, H., Jeuring, J., & Heeren, B. (2019). A systematic literature review of automated feedback generation for programming exercises. ACM Transactions on Computing Education, 19(1), Article 3, 1-43. (online 2018)",
+   "doi_or_url": "https://doi.org/10.1145/3231711",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "domain": "coding",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works inkl. Abstract (issued 2019-03-31)",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.1145/3231711"
+   },
+   "design": "Systematischer Literaturreview; 101 Werkzeuge kodiert (Feedbackinhalt nach Narciss)",
+   "population": "not_applicable (Werkzeuge)",
+   "operation": "computational_construction",
+   "intervention": "automatisches Feedback zu Programmieraufgaben",
+   "comparator": "not_applicable",
+   "outcome": {
+    "measure": "Feedbacktyp, Technik, Anpassbarkeit, Evaluationsart der Werkzeuge",
+    "assisted": "not_applicable",
+    "delay": "not_applicable",
+    "transfer": "not_applicable"
+   },
+   "estimate": {
+    "metric": "count",
+    "value": "101 Werkzeuge; Feedback meist Fehleridentifikation, seltener Behebung/nächster Schritt; Lehrende können Werkzeuge kaum anpassen",
+    "locator": "Abstract"
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Beschreibt Werkzeuge, nicht Lernwirkung.",
+   "verdict": "supported_within_scope",
+   "decision_impact": "R7-POL-08: Testausgabe allein identifiziert Fehler; Werkbank braucht zusätzlich gestufte Hinweise zum nächsten Schritt (R1-POL-A08) und darf Testbestehen nicht als Kompetenz zählen"
+  },
+  {
+   "source_id": "fouh2014opendsa",
+   "study_family_id": "opendsa-usage",
+   "citation": "Fouh, E., Breakiron, D. A., Hamouda, S., Farghally, M. F., & Shaffer, C. A. (2014). Exploring students learning behavior with an interactive etextbook in computer science courses. Computers in Human Behavior, 41, 478-485.",
+   "doi_or_url": "https://doi.org/10.1016/j.chb.2014.09.061",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "domain": "coding",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "https://doi.org/10.1016/j.chb.2014.09.061 (closed; kein Abstract über Crossref/OpenAlex)"
+   },
+   "design": "Nutzungsdatenanalyse eines interaktiven eTextbooks (OpenDSA); Details nicht gelesen",
+   "population": "Informatikkurse (laut Titel)",
+   "operation": "computational_construction",
+   "intervention": "OpenDSA",
+   "comparator": "unknown",
+   "outcome": {
+    "measure": "unknown",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not_applicable",
+    "value": "unknown"
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "nicht gelesen; belegt nur, dass Verhaltensdaten zu OpenDSA publiziert sind",
+   "verdict": "unresolved",
+   "decision_impact": "Lücke: Credit-Seeking-/Durchklickverhalten in OpenDSA ungeprüft; R7-EV-OPENDSA-2 misst es selbst"
+  },
+  {
+   "source_id": "hohman2020interactivearticles",
+   "study_family_id": "hohman2020interactivearticles",
+   "citation": "Hohman, F., Conlen, M., Heer, J., & Chau, D. H. (2020). Communicating with interactive articles. Distill, 5(9), e28.",
+   "doi_or_url": "https://doi.org/10.23915/distill.00028",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "domain": "interactive_articles",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works; Artikelseite",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "https://distill.pub/2020/communicating-with-interactive-articles/ (über Fetch-Werkzeug gelesen und werkzeugseitig zusammengefasst)",
+    "sections_read": [
+     "Interactive Articles: Theory & Practice (Prompting Self-Reflection; Reducing Cognitive Load)",
+     "Critical Reflections",
+     "Reuse/Lizenz-Footer"
+    ]
+   },
+   "design": "Narrativer Design-Review mit Beispielen und Literaturbezügen",
+   "population": "not_applicable",
+   "operation": "Verstehen/Lesen interaktiver Artikel",
+   "intervention": "interaktive Artikelelemente",
+   "comparator": "statische Artikel (in zitierten Studien)",
+   "outcome": {
+    "measure": "not_applicable",
+    "assisted": "not_applicable",
+    "delay": "not_applicable",
+    "transfer": "not_applicable"
+   },
+   "estimate": {
+    "metric": "not_applicable",
+    "value": "keine eigene Schätzung; Aussagen: 'limited empirical evaluation' interaktiver Artikel; Sekundärzitate: McKenna et al. 2017 kein signifikanter Engagement-Unterschied Scroll vs. Step; Zhi et al. 2019 besseres Verständnis bei Slideshow als Scroll; NYT-Aussage, nur ein Bruchteil der Lesenden interagiere (ohne Zahl)",
+    "locator": "Critical Reflections; Reducing Cognitive Load"
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Autoren sind Befürworter interaktiver Artikel; Sekundärzitate nicht im Original geprüft.",
+   "verdict": "not_empirical",
+   "decision_impact": "R7-POL-01/03: Interaktivität ohne Aufgabe wird oft nicht genutzt; Evidenzbasis für interaktive Artikel dünn – keine Wirkungsbehauptung"
+  },
+  {
+   "source_id": "kim2017predictionvis",
+   "study_family_id": "kim2017predictionvis",
+   "citation": "Kim, Y.-S., Reinecke, K., & Hullman, J. (2017). Explaining the gap: Visualizing one's predictions improves recall and comprehension of data. Proceedings of the 2017 CHI Conference on Human Factors in Computing Systems, 1375-1386.",
+   "doi_or_url": "https://doi.org/10.1145/3025453.3025592",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "domain": "visualisation_prediction",
+   "identity_check": {
+    "date": "2026-11-27",
+    "method": "Crossref /works (Kurztitel 'Explaining the Gap'); Abstract über OpenAlex",
+    "result": "primary_metadata_checked"
+   },
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.openalex.org/works/https://doi.org/10.1145/3025453.3025592"
+   },
+   "design": "kontrollierte Experimente (Anzahl/N nicht im Abstract)",
+   "population": "Teilnehmende ohne nähere Angabe im Abstract",
+   "operation": "Erinnern und Verstehen von Daten in Visualisierungen",
+   "intervention": "grafische Vorhersage der Daten und Selbsterklärung vor der Anzeige, Feedback zur Lücke",
+   "comparator": "Kontrollgruppe ohne Vorhersage",
+   "outcome": {
+    "measure": "Erinnern und Verständnis der Daten",
+    "assisted": false,
+    "delay": "unknown",
+    "transfer": "nicht gemessen"
+   },
+   "estimate": {
+    "metric": "direction_only",
+    "value": "Richtung: Vorhersage+Selbsterklärung übertrifft Kontrolle; Effekt bleibt bei moderatem oder geringem Vorwissen",
+    "locator": "Abstract"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Daten-Visualisierung, vermutlich Online-Stichprobe; Übertragung auf mathematische Szenen indirekt; passt zu brod2021 (KB).",
+   "verdict": "supported_within_scope",
+   "decision_impact": "R7-POL-02: Vorhersage vor Aufdecken auch in Szenen und Textfiguren, nicht nur in Labs"
+  }
+ ],
+ "search_log": [
+  {
+   "id": "S01",
+   "date": "2026-11-27",
+   "engine": "GitHub REST API (gh api repos/<owner>/<repo>, /license, /readme, /releases/latest, /contents, /commits)",
+   "query": "3b1b/manim; ManimCommunity/manim; 3b1b/videos; mathigon/textbooks; mathigon/studio; mathigon/core.js; mathigon/fermat.js; distillpub/template; distillpub/post--interactive-articles (404); OpenDSA/OpenDSA; vkaravir/JSAV; exercism/website; exercism/problem-specifications; jupyterlite/jupyterlite; pyodide/pyodide; QuantEcon/QuantEcon.py; QuantEcon/lecture-python-intro; QuantEcon/lecture-python.myst; phetsims/scenery; phetsims/geometric-optics; phetsims/phetsims.github.io (404); geogebra/geogebra; jsxgraph/jsxgraph; seeingtheory/Seeing-Theory; explanaria/explanaria.github.io; ncase/trust; ncase/explorables (404)",
+   "hits_screened": 27,
+   "included": [],
+   "excluded_or_note": "Ressourcenidentität und Lizenzen für r7_resources.json; drei 404 protokolliert"
+  },
+  {
+   "id": "S02",
+   "date": "2026-11-27",
+   "engine": "GitHub search/repositories",
+   "query": "'seeing-theory in:name'; 'explanaria'; 'explorabl.es'; '\"explorable explanations\" user:ncase' (0); 'explorables in:name user:ncase' (0)",
+   "hits_screened": 13,
+   "included": [],
+   "excluded_or_note": "Seeing Theory: seeingtheory/Seeing-Theory (Original, 2206 Sterne) und danielkunin/Seeing-Theory (älter); Hub-Repo von explorabl.es nicht gefunden"
+  },
+  {
+   "id": "S03",
+   "date": "2026-11-27",
+   "engine": "WebFetch (je Seite ein Abruf)",
+   "query": "explorabl.es; worrydream.com/ExplorableExplanations; 3blue1brown.com/faq; mathigon.io/polypad; mathigon.org; distill.pub/about; brilliant.org/about; statquest.org; tbsom.de; quantecon.org; intro.quantecon.org/intro.html; jupyterlite.readthedocs.io/en/stable; exercism.org/docs/building/tracks/practice-exercises; geeksforgeeks.org/about; geogebra.org/license; opendsa.org/home/about (Fehler: Zertifikat nur für opendsa-server.cs.vt.edu); distill.pub/2020/communicating-with-interactivity (404, falscher Pfad); phet.colorado.edu/en/licensing (ohne Inhalt gerendert); youtube.com/@VisuallyExplained/about (302 auf Consent-Seite, nicht verfolgt)",
+   "hits_screened": 19,
+   "included": [],
+   "excluded_or_note": "Ressourcenkarten; vier Fehlschläge protokolliert"
+  },
+  {
+   "id": "S04",
+   "date": "2026-11-27",
+   "engine": "WebSearch (standard)",
+   "query": "\"Visually Explained\" YouTube channel math machine learning",
+   "hits_screened": 19,
+   "included": [],
+   "excluded_or_note": "nur Drittseite developereducators.com; offizielle Kanalseite nicht erreicht"
+  },
+  {
+   "id": "S05",
+   "date": "2026-11-27",
+   "engine": "WebSearch (standard)",
+   "query": "\"Think Logic\" YouTube channel mathematics visual",
+   "hits_screened": 19,
+   "included": [],
+   "excluded_or_note": "kein Kanal 'Think Logic'; 'Think Twice' wird nicht ersatzweise angenommen"
+  },
+  {
+   "id": "S06",
+   "date": "2026-11-27",
+   "engine": "WebSearch (standard)",
+   "query": "PhET interactive simulations licensing CC BY 4.0 source code GPL MIT",
+   "hits_screened": 15,
+   "included": [],
+   "excluded_or_note": "Snippets der offiziellen Lizenzseite (CC BY 4.0 Simulationen, GPLv3/MIT Code, neue Bedingungen für Versionen vor 29.03.2026); Primärseite nicht gelesen"
+  },
+  {
+   "id": "S07",
+   "date": "2026-11-27",
+   "engine": "Crossref REST /works/<doi> und OpenAlex /works/https://doi.org/<doi> (generischer User-Agent)",
+   "query": "known-item: 10.1016/j.learninstruc.2006.09.001 (falsch: Ayres 2006, verworfen); 10.1016/j.learninstruc.2007.09.013; 10.1016/j.compedu.2016.06.005; 10.1006/ijhc.2002.1017; 10.1111/jcal.12476; 10.1016/j.compedu.2011.07.017 (Rutten 2012, ausgeschlossen: kein Abstract zugänglich); 10.3102/0034654314526064; 10.1037/0022-0663.93.2.390; 10.3102/0034654321990713; 10.3758/s13423-013-0442-z; 10.1007/s11409-017-9175-0 (Toftness 2018, ausgeschlossen: kein Abstract zugänglich, ersetzt durch carpenter2016fluency); 10.1111/j.1365-2729.2007.00248.x; 10.1145/3231711; 10.1016/j.chb.2014.09.061; 10.23915/distill.00028; 10.4018/jvple.2013070103 (Moyer-Packenham 2013, ausgeschlossen: kein Abstract zugänglich); 10.1145/3025453.3025592; 10.1037/xap0000077",
+   "hits_screened": 18,
+   "included": [
+    "hoffler2007animation",
+    "berney2016animation",
+    "tversky2002animation",
+    "ploetzner2020animationdemands",
+    "karich2014learnercontrol",
+    "mayer2001learnerpacing",
+    "noetel2021video",
+    "muller2008misconceptions",
+    "keuning2019programmingfeedback",
+    "fouh2014opendsa",
+    "kim2017predictionvis",
+    "carpenter2016fluency"
+   ],
+   "excluded_or_note": "Auswahl nach Vorwissen des Agenten (gezielte Schlüsselarbeiten) plus Zitationen aus hohman2020; keine Retraktion/Korrektur in Crossref-Metadaten ('update-to'/'updated-by') gefunden"
+  },
+  {
+   "id": "S08",
+   "date": "2026-11-27",
+   "engine": "Semantic Scholar Graph API /paper/DOI:<doi>?fields=title,year,abstract,tldr",
+   "query": "8 DOIs ohne Abstract (Höffler, Tversky, Toftness, Fouh, Rutten, Berney, Carpenter 2013, Moyer-Packenham)",
+   "hits_screened": 8,
+   "included": [],
+   "excluded_or_note": "nur maschinelle TLDRs, keine Abstracts; TLDRs nicht als Beleg verwendet"
+  },
+  {
+   "id": "S09",
+   "date": "2026-11-27",
+   "engine": "NCBI E-utilities esearch/efetch (PubMed)",
+   "query": "'Appearances can be deceiving instructor fluency'; 'Instructor fluency leads to higher confidence'",
+   "hits_screened": 2,
+   "included": [
+    "carpenter2013fluency",
+    "carpenter2016fluency"
+   ],
+   "excluded_or_note": "zweite Suche fand nicht Toftness 2018, sondern Carpenter et al. 2016 (JEP:Applied) – aufgenommen"
+  },
+  {
+   "id": "S10",
+   "date": "2026-11-27",
+   "engine": "WebFetch",
+   "query": "archive-ouverte.unige.ch/unige:92234; link.springer.com (2 URLs: Login-Umleitung); doi.org/10.1016/j.learninstruc.2007.09.013 → sciencedirect.com/science/article/abs/pii/S0959475207001077 (HTTP 403)",
+   "hits_screened": 4,
+   "included": [
+    "berney2016animation"
+   ],
+   "excluded_or_note": "Springer und ScienceDirect nicht zugänglich"
+  },
+  {
+   "id": "S11",
+   "date": "2026-11-27",
+   "engine": "WebFetch",
+   "query": "distill.pub/2020/communicating-with-interactive-articles/",
+   "hits_screened": 1,
+   "included": [
+    "hohman2020interactivearticles"
+   ],
+   "excluded_or_note": "zugleich Lizenzprüfung für Distill-Karte (CC BY 4.0)"
+  }
+ ]
+}
