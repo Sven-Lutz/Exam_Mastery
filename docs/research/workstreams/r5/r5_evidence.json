@@ -1,7 +1,7 @@
 {
  "schema": "r1-evidence/1",
  "agent": "R5",
- "updated": "2026-11-27T10:07:34+01:00",
+ "updated": "2026-11-27T16:10:00+01:00",
  "entries": [
   {
    "source_id": "bastani2025",
@@ -1038,6 +1038,341 @@
    "bias_and_applicability": "Pre-GenAI; framework only. Provides definitions for separating offloaded peripheral demand from offloaded target operation (cf. R0-D9).",
    "claim_edges": [],
    "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "fan2025metacognitive",
+   "citation": "Fan, Y., Tang, L., Le, H., Shen, K., Tan, S., Zhao, Y., Shen, Y., Li, X., & Gašević, D. (2025). Beware of metacognitive laziness: Effects of generative artificial intelligence on learning motivation, processes, and performance. British Journal of Educational Technology, 56(2), 489-530.",
+   "doi_or_url": "https://doi.org/10.1111/bjet.13544",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "arXiv 2412.09315 (author version); metadata via Crossref 10.1111/bjet.13544",
+    "sections_read": [
+     "Abstract",
+     "3 Method: participants, groups, procedure, learning task, measures",
+     "4.3 Learning performance: 4.3.1 essay improvement incl. Table 3, 4.3.2 knowledge gain, 4.3.3 transfer",
+     "Discussion and limitations",
+     "NOT read: version of record PDF; SRL process-mining sections in detail; appendix tables beyond descriptives"
+    ]
+   },
+   "design": "randomised lab experiment, 4 parallel arms (no support / ChatGPT-4 / human writing expert / writing-analytics checklist), individual allocation; allocation concealment and preregistration not reported in the sections read",
+   "population": "117 university students (ESL, mixed disciplines; CN 30, AI 35, HE 25, CL 27), one lab, Jul-Sep 2023",
+   "operation": "open_synthesis (English reading and essay writing/revision); knowledge test on the reading topic",
+   "intervention": "support agent available during a 1-hour essay revision after a 2-hour reading/writing phase",
+   "comparator": "no support; human expert; checklist tool (active controls with comparable time)",
+   "outcome": {
+    "measure": "essay score improvement (assisted product); knowledge test pre/post (same test) and 10-item transfer test (AI in healthcare)",
+    "assisted": "essay improvement assisted; knowledge and transfer tests unassisted",
+    "delay": "post-test within one day",
+    "transfer": "near-topic transfer test"
+   },
+   "estimate": {
+    "metric": "mean difference / ANOVA",
+    "value": "essay improvement AI vs CN +1.97 points [-3.858,-0.083 for CN-AI], p_adj=0.037; knowledge post-test F=0.913 p=0.438; transfer F=0.019 p=0.996",
+    "ci": "Tukey 95% CI reported for essay improvement only",
+    "k_or_n": "117",
+    "note": "Assisted product improves, unassisted knowledge and transfer do not differ; 'metacognitive laziness' is the authors' interpretation of fewer evaluation/orientation SRL events, which they say lacks a mature measure."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Small arms (25-35), single task, single lab, no delayed test; null on knowledge/transfer is not equivalence (no margin, low power). Supports the pattern 'assisted product quality is not evidence of learning' (R5-POL-04), not a harm claim.",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "lehmann2025aiclassroom",
+   "citation": "Lehmann, M., Cornelius, P. B., & Sting, F. J. (2025). AI meets the classroom: When do large language models harm learning? arXiv:2409.09047v2 (working paper; v1 2024 titled 'When does ChatGPT harm learning?').",
+   "doi_or_url": "https://arxiv.org/abs/2409.09047v2",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "arXiv PDF 2409.09047v2",
+    "sections_read": [
+     "Abstract, Introduction",
+     "Study 1 field panel (N=6,594 student-question observations) incl. Tables 1-3 (IV via ChatGPT outages)",
+     "Study 2 lab §6 incl. Tables 4-5",
+     "Study 3 lab §8 incl. Tables 6-7, 9-10 (copy-and-paste)",
+     "Heterogeneity by pre-test median (Table 12)",
+     "Perceived learning (Table 13)",
+     "NOT read: preregistration documents themselves; Appendix tables in full"
+    ]
+   },
+   "design": "(1) observational field panel with instrumental variable (ChatGPT outages); (2)+(3) two preregistered, incentivised individually randomised lab experiments (LLM access vs none during a 45-min Python learning phase); Study 3 identical but with copy-and-paste enabled",
+   "population": "university students; Study 2 n=107 (after preregistered exclusion), Study 3 n=69; ~80% no prior Python",
+   "operation": "computational_construction (introductory Python programming)",
+   "intervention": "free chat access to an LLM during the learning phase only",
+   "comparator": "same learning phase without LLM (same time)",
+   "outcome": {
+    "measure": "20-item programming post-test minus pre-test",
+    "assisted": "post-test unassisted",
+    "delay": "immediate, same ~90-min session",
+    "transfer": "near (same topics)"
+   },
+   "estimate": {
+    "metric": "regression coefficient (questions solved)",
+    "value": "overall effect n.s. in Study 2 (0.396, SE 0.713, p=0.580) and Study 3 (0.959, SE 0.912, p=0.298); copy-paste: -1.4 questions post-test holding learning-phase progress constant (p=0.009); treatment x pre-test>median interaction p=0.028; below-median treated understood less than controls p=0.043; perceived learning higher than actual (p=0.044)",
+    "ci": "SEs reported",
+    "k_or_n": "107 + 69 (lab)",
+    "note": "In Study 3, 42% of solution requests were sent without any own attempt."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Lab, short, immediate post-test, small n; the 'understanding' estimate conditions on a post-randomisation variable (learning-phase progress), so it is a mediation-type decomposition, not a randomised contrast; subgroup split post hoc on median. Working paper, not peer reviewed. Consistent with attempt-before-help (R5-POL-03) and with heterogeneity concerns (R5-POL-07); does not show harm overall.",
+   "claim_edges": [],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "darvishi2024agency",
+   "citation": "Darvishi, A., Khosravi, H., Sadiq, S., Gašević, D., & Siemens, G. (2024). Impact of AI assistance on student agency. Computers & Education, 210, 104967.",
+   "doi_or_url": "https://doi.org/10.1016/j.compedu.2023.104967",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract for DOI 10.1016/j.compedu.2023.104967; Crossref metadata",
+    "sections_read": [
+     "abstract"
+    ]
+   },
+   "design": "randomised controlled field experiment (per abstract), 4 weeks with AI prompts for all, then 4 weeks in 4 groups: AI prompts continued / no prompts / self-monitoring checklist / AI + checklist; unit of randomisation not stated in abstract",
+   "population": "1,625 students across 10 university courses (peer-review platform)",
+   "operation": "self_regulation (writing peer feedback)",
+   "intervention": "AI prompts flagging insufficiently detailed peer feedback (rule-based, semantic similarity)",
+   "comparator": "withdrawal of AI prompts with/without self-monitoring checklists",
+   "outcome": {
+    "measure": "quality of peer feedback after AI prompts are removed",
+    "assisted": "mixed (AI arm still assisted)",
+    "delay": "weeks 5-8",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "unknown",
+    "ci": "unknown",
+    "k_or_n": "1625",
+    "note": "Abstract: students tended to rely on rather than learn from AI assistance; checklists partly filled the gap but less than AI; AI+checklist not better than AI alone."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract only: effect sizes, clustering and attrition unknown. Outcome is feedback-writing quality, not domain learning. Direct evidence that assisted performance does not persist after assistance is withdrawn (fading/withdrawal test) - supports measuring after removal, not a general harm claim.",
+   "claim_edges": [],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "pardos2024chatgpthints",
+   "citation": "Pardos, Z. A., & Bhandari, S. (2024). ChatGPT-generated help produces learning gains equivalent to human tutor-authored help on mathematics skills. PLOS ONE, 19(5), e0304013.",
+   "doi_or_url": "https://doi.org/10.1371/journal.pone.0304013",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Europe PMC REST fullTextXML PMC11125466 (CC BY), incl. published peer-review history",
+    "sections_read": [
+     "Abstract",
+     "Methods: hint generation, quality check, study design",
+     "Results RQ1 (hint quality) and RQ2 (Table 2, exclusions, power)",
+     "Limitations",
+     "Peer-review history (reviewer notes study was not preregistered)"
+    ]
+   },
+   "design": "individually randomised 3 (no hints / human-authored hints / ChatGPT hints) x 4 (subject) online experiment; not preregistered",
+   "population": "394 Mechanical Turk adults recruited, 274 analysed (30% excluded for not completing; 36-43 per arm); median age group 36-40",
+   "operation": "symbolic_procedure (algebra, statistics)",
+   "intervention": "worked-solution hints generated by ChatGPT (quality-checked) during 5 practice problems",
+   "comparator": "human tutor-authored hints (OATutor); no hints",
+   "outcome": {
+    "measure": "3-item post-test with the exact same items as the pre-test",
+    "assisted": "unassisted",
+    "delay": "immediate (~6-8 min sessions)",
+    "transfer": "none (identical items)"
+   },
+   "estimate": {
+    "metric": "pre-post difference (% correct), Kruskal-Wallis",
+    "value": "ChatGPT +17.0 pp (pre 43.5%), human +11.6 pp (pre 53.5%), control +1.9 pp n.s.; ChatGPT vs human difference n.s.",
+    "ci": "not reported",
+    "k_or_n": "274",
+    "note": "ChatGPT hints failed quality checks on 32% of problems before self-consistency; ~0% algebra / 13% statistics after."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "'Equivalent' is not an equivalence test (no margin, no TOST); identical pre/post items measure item memory; lower ChatGPT-arm pre-test invites regression to the mean; 30% completer-only analysis; MTurk adults. Evidence that LLM hints need verification before display (32% failure) - supports the verified-reference requirement in R5-POL-03/06; not evidence of tutor non-inferiority.",
+   "claim_edges": [],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "doroudi2019fairkt",
+   "citation": "Doroudi, S., & Brunskill, E. (2019). Fairer but not fair enough: On the equitability of knowledge tracing. In Proceedings of LAK19 (pp. 335-339). ACM.",
+   "doi_or_url": "https://doi.org/10.1145/3303772.3303838",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "author PDF cs.stanford.edu/~ebrun/papers/LAK2019_fairness.pdf",
+    "sections_read": [
+     "Abstract",
+     "1 Introduction",
+     "3 Models (BKT, AFM, N-CCR)",
+     "4 simulations with slow/fast learner populations incl. Tables 1-2 and equity-gap definition",
+     "NOT read: every simulation configuration in detail"
+    ]
+   },
+   "design": "simulation study (no learners); mastery-learning policies evaluated on synthetic slow/fast learner populations under correct and misspecified models",
+   "population": "simulated students (two learner types)",
+   "operation": "symbolic_procedure (mastery learning, single skill)",
+   "intervention": "mastery-learning stopping rules: BKT, N-consecutive-correct (N-CCR), AFM-based knowledge tracing",
+   "comparator": "non-adaptive fixed practice; true (individualised) model",
+   "outcome": {
+    "measure": "equity gap = % slow learners vs % fast learners reaching mastery, plus extra practice",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "simulated equity gap",
+    "value": "adaptive KT far more equitable than fixed practice, but BKT fit to a mixed population and N-CCR still favour fast learners; AFM more conservative under misspecification",
+    "ci": "n/a",
+    "k_or_n": "simulation",
+    "note": "Echoes Corbett & Anderson: aggregate models overestimate below-average learners, who then receive less remedial practice than they need."
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Simulation with stylised two-type populations; no empirical learner outcome. Relevant because Mastery's deterministic 'N unassisted correct' rule (R5-POL-01) is an N-CCR heuristic and is not exempt from this inequity; motivates reporting stop decisions by prior-knowledge group (R5-POL-07).",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "eu2024aiact",
+   "citation": "Regulation (EU) 2024/1689 (Artificial Intelligence Act), OJ L, 12.7.2024; Annex III point 3 (education and vocational training); Article 113 as amended by the 2026 Digital Omnibus on AI.",
+   "doi_or_url": "http://data.europa.eu/eli/reg/2024/1689/oj",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "EUR-Lex returned empty responses (HTTP 202) on the access date; text read on the secondary mirror artificialintelligenceact.eu (Annex III, Article 113); amendment status from secondary legal commentary found via web search",
+    "sections_read": [
+     "Annex III point 3(a)-(d) (mirror)",
+     "Article 113 dates of application incl. amended (c)(i) (mirror)",
+     "NOT read: official consolidated EUR-Lex text; Article 6(3) exemptions; Omnibus OJ text"
+    ]
+   },
+   "design": "legal text (primary norm), read via secondary mirror",
+   "population": "providers/deployers of AI systems in the EU",
+   "operation": "n/a",
+   "intervention": "classification of education AI systems as high-risk",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "legal classification",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "none",
+    "value": "unknown",
+    "ci": "n/a",
+    "k_or_n": "n/a",
+    "note": "Annex III 3(b) lists AI systems intended to evaluate learning outcomes, including when used to steer the learning process, in education and vocational training institutions; mirror shows Annex III obligations applying from 2 Dec 2027 after the Omnibus amendment (unverified against EUR-Lex)."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Not legal advice; no lawyer review. Whether a self-study product outside an institution falls under 3(b), and whether Article 6(3) exemptions apply, is unresolved. Product consequence is precautionary only: an AI-driven learning-outcome evaluation that steers learning is a design choice with potential regulatory weight, which strengthens R5-POL-02 (deterministic default) but is not evidence about learning.",
+   "claim_edges": [],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "eu2016gdpr",
+   "citation": "Regulation (EU) 2016/679 (General Data Protection Regulation), Articles 5 and 25.",
+   "doi_or_url": "http://data.europa.eu/eli/reg/2016/679/oj",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "EUR-Lex returned empty responses (HTTP 202); Articles 5 and 25 read on secondary mirror gdpr-info.eu",
+    "sections_read": [
+     "Article 5(1)(a)-(f) principles",
+     "Article 25(1)-(2) data protection by design and by default",
+     "NOT read: Articles 6, 8, 9, 22, 35; recitals"
+    ]
+   },
+   "design": "legal text (primary norm), read via secondary mirror",
+   "population": "controllers processing personal data in the EU",
+   "operation": "n/a",
+   "intervention": "processing principles",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "legal principles",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "none",
+    "value": "unknown",
+    "ci": "n/a",
+    "k_or_n": "n/a",
+    "note": "Art. 5(1): lawfulness/fairness/transparency, purpose limitation, data minimisation, accuracy, storage limitation, integrity/confidentiality; Art. 25: data protection by design and by default."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Not legal advice; whether Mastery is a controller depends on deployment (local-only vs hosted), which is undecided. Product consequence: attempt logs and subgroup attributes (R5-POL-04/07) are personal data once linked to a person; default to local storage, collect subgroup attributes only opt-in with a stated purpose.",
+   "claim_edges": [],
+   "verdict": "unresolved"
   }
- ]
+ ],
+ "search_log": {
+  "protocol": "docs/research/workstreams/SEARCH_PROTOCOL.md (R0 v1); bounded targeted search, not a systematic review",
+  "tool": "general web search index (Claude Code WebSearch); identity and full text then via arXiv, Europe PMC REST, Crossref, OpenAlex and author PDFs",
+  "batches_1_to_3": "Exact queries of the specialist run (batches 1-3, 23 sources) were NOT logged and cannot be reconstructed; access routes per entry are recorded in access.url. Gate item 'exact queries' remains unmet for these 23 entries.",
+  "batch4": [
+   {
+    "id": "R5-Q01",
+    "date": "2026-11-27",
+    "query": "Fan 2025 \"metacognitive laziness\" generative AI learning motivation processes performance British Journal of Educational Technology",
+    "decision": "arXiv 2412.09315 author version read; Crossref for VoR metadata; commentary (Psychology Today, KQED) excluded as secondary"
+   },
+   {
+    "id": "R5-Q02",
+    "date": "2026-11-27",
+    "query": "Lehmann Cornelius Sting \"AI meets the classroom\" large language models harm learning",
+    "decision": "arXiv v2 (2025) read; v1 noted as earlier version, not cited separately"
+   },
+   {
+    "id": "R5-Q03",
+    "date": "2026-11-27",
+    "query": "Darvishi 2024 \"Impact of AI assistance on student agency\" Computers & Education",
+    "decision": "abstract via OpenAlex; PsyPost summary excluded; full text not read"
+   },
+   {
+    "id": "R5-Q04",
+    "date": "2026-11-27",
+    "query": "Pardos Bhandari 2024 ChatGPT-generated help learning gains equivalent human tutor-authored help PLOS ONE",
+    "decision": "PMC11125466 full text via Europe PMC REST; 2023 arXiv pilot (N=77) not included separately"
+   },
+   {
+    "id": "R5-Q05",
+    "date": "2026-11-27",
+    "query": "Doroudi Brunskill 2019 \"Fairer but not fair enough\" equitability of knowledge tracing LAK",
+    "decision": "author PDF read; later bias audits (arXiv 2205.02333, 2609.20249) seen but not screened - open"
+   },
+   {
+    "id": "R5-Q06",
+    "date": "2026-11-27",
+    "query": "AI Act digital omnibus delay high-risk Annex III obligations 2027 adopted 2026",
+    "decision": "secondary legal commentary used only to locate the amendment; date taken from mirror text and flagged unverified against EUR-Lex"
+   },
+   {
+    "id": "R5-A01",
+    "date": "2026-11-27",
+    "query": "direct fetch EUR-Lex OJ:L_202401689 and CELEX:32016R0679",
+    "decision": "HTTP 202 empty body; fallback to mirrors artificialintelligenceact.eu and gdpr-info.eu (labelled secondary)"
+   }
+  ],
+  "not_searched": [
+   "browser/API-key handling and local LLM deployment (engineering question, no learning evidence sought)",
+   "forward citations of bastani2025 since 2025 for delayed unassisted GenAI endpoints",
+   "FSRS/Anki scheduling (AD-1 retained)"
+  ]
+ }
 }

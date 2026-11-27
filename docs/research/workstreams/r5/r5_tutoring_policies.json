@@ -35,9 +35,11 @@
   "self_regulation": "nur Messvertrag; Hilfesuchverhalten in R5-POL-04 als Beobachtung, nicht als Ziel"
  },
  "open_research": [
-  "RQ3: GenAI-Abhängigkeit/Auslagerung (Fan 2025, Lehmann, Darvishi, Pardos LLM-Hinweise) nicht gelesen",
-  "RQ5: Fairness KT (Doroudi 2019), DSGVO-Grundsätze, Browser/API-Key-Grenzen, lokale LLMs nicht gelesen; keine Datenschutz-Policy aus Evidenz abgeleitet",
-  "Suchprotokoll (exakte Queries/Daten) des Spezialisten nicht protokolliert"
+  "RQ3: Volltexte von darvishi2024agency (nur Abstract) und VoR von fan2025metacognitive nicht gelesen; keine Studie mit verzögertem (>= 1 Woche) unassistiertem Endpunkt zu Leitplanken-Tutoren gefunden; Vorwärtszitationen von bastani2025 nicht gescreent",
+  "RQ5: KT-Fairness nur Simulation (doroudi2019fairkt); spätere empirische Bias-Audits (z. B. arXiv 2205.02333) nicht gescreent",
+  "RQ5: DSGVO/AI Act nur über Sekundär-Mirror gelesen (EUR-Lex nicht erreichbar); keine Rechtsprüfung; Einstufung eines Selbstlernprodukts unter Annex III Nr. 3 ungeklärt",
+  "RQ5: Browser/API-Key-Handhabung und lokale LLMs nicht recherchiert (Engineering-Frage, keine Lernevidenz)",
+  "Suchprotokoll: Batch 4 protokolliert (r5_evidence.json search_log); exakte Queries der Batches 1-3 nicht rekonstruierbar"
  ],
  "policies": [
   {
@@ -119,6 +121,11 @@
      "source_id": "khajah2016deepkt",
      "locator": "Abstract (erweitertes BKT ≈ DKT)",
      "relation": "context_only"
+    },
+    {
+     "source_id": "doroudi2019fairkt",
+     "locator": "Abstract; §4 Simulationen: auch N-CCR-Heuristik begünstigt schnelle Lernende bei Fehlspezifikation",
+     "relation": "qualifies"
     }
    ],
    "certainty": {
@@ -143,7 +150,8 @@
    "failure_modes": [
     "Itemwiederholung erzeugt scheinbare Retention",
     "Lernende lesen den Zustand als Zertifikat",
-    "zu kleine Itempools machen 'neue Items' unmöglich"
+    "zu kleine Itempools machen 'neue Items' unmöglich",
+    "deterministische 'N unassistiert richtig'-Regel ist eine N-CCR-Heuristik und erklärt langsam Lernende zu früh für ausreichend belegt (doroudi2019fairkt)"
    ],
    "falsifier": "In einer Validierungsstudie sagt RETAINED_AFTER_ELAPSED_TIME das Bestehen eines unassistierten verzögerten Tests nicht besser vorher als INDEPENDENT_PASS (vorab festgelegte Mindestdifferenz der Bestehensquote).",
    "kb_rule_links": [
@@ -239,6 +247,11 @@
     {
      "source_id": "ma2014",
      "locator": "Abstract: g = 0.42 vs. Großgruppenunterricht, -0.11 vs. Einzeltutoring",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "eu2024aiact",
+     "locator": "Annex III Nr. 3(b); Art. 113(c)(i) in geänderter Fassung: 2.12.2027 (Mirror, nicht gegen EUR-Lex geprüft)",
      "relation": "context_only"
     }
    ],
@@ -363,13 +376,29 @@
      "source_id": "aleven2016",
      "locator": "Abstract: besseres Hilfesuchverhalten ohne besseren Domänenlernerfolg",
      "relation": "qualifies"
+    },
+    {
+     "source_id": "lehmann2025aiclassroom",
+     "locator": "Study 3 §8, Table 10: Copy-and-Paste erhöht Lösungsanfragen, Post-Test -1,4 Aufgaben bei gleichem Fortschritt (p=0,009); 42 % der Lösungsanfragen ohne eigenen Versuch; Gesamteffekt Studien 2/3 n.s.",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pardos2024chatgpthints",
+     "locator": "Results RQ1: 32 % der ChatGPT-Hinweise fielen durch die Qualitätsprüfung (nach Self-Consistency ~0 % Algebra, 13 % Statistik); RQ2 Table 2: gleiche Items pre/post, kein Äquivalenztest",
+     "relation": "supports"
+    },
+    {
+     "source_id": "fan2025metacognitive",
+     "locator": "4.3: Essay-Verbesserung AI > alle (Table 3), Wissenszuwachs F=0,913 p=0,438, Transfer F=0,019 p=0,996",
+     "relation": "qualifies"
     }
    ],
    "certainty": {
     "level": "low",
     "reasons": [
      "eine starke Studie (bastani2025) zeigt Schaden ohne Leitplanken und keinen nachgewiesenen Schaden mit Leitplanken, aber ohne NI-Marge und ohne verzögerten Test",
-     "bias-adjustierte Meta-Analyse: mittlerer GenAI-Effekt nicht robust"
+     "bias-adjustierte Meta-Analyse: mittlerer GenAI-Effekt nicht robust",
+     "Batch 4: zwei Labor-RCTs (lehmann2025aiclassroom, fan2025metacognitive) finden keinen Gesamtnutzen auf unassistierte Tests; Substitution (Lösung ohne Versuch) geht mit geringerem Verständnis einher (Mediationsanalyse, nicht randomisierter Kontrast)"
     ],
     "sub_claims": [
      {
@@ -383,6 +412,10 @@
      {
       "claim": "Leitplanken-Tutor verbessert verzögertes unassistiertes Lernen",
       "level": "very_low"
+     },
+     {
+      "claim": "ungeprüfte LLM-Hinweise sind häufig fehlerhaft und brauchen eine geprüfte Referenz vor Anzeige",
+      "level": "low"
      }
     ]
    },
@@ -392,7 +425,8 @@
     "Prompt-Injection oder Umgehung ('gib mir einfach die Lösung')",
     "Modell halluziniert trotz Referenz",
     "Lernende nutzen externe KI ohne Leitplanken",
-    "Praxisleistung steigt, unassistierte Leistung nicht (bastani2025-Muster)"
+    "Praxisleistung steigt, unassistierte Leistung nicht (bastani2025-Muster)",
+    "ungeprüfte generierte Hinweise enthalten fachliche Fehler (pardos2024chatgpthints: 32 % vor Self-Consistency)"
    ],
    "falsifier": "In einer vorab registrierten Studie liegt die untere Konfidenzgrenze der Differenz Tutor minus Kontrolle im verzögerten unassistierten Test unterhalb der vorab festgelegten Nicht-Unterlegenheitsmarge.",
    "kb_rule_links": [
@@ -468,6 +502,21 @@
      "source_id": "risko2016offloading",
      "locator": "Abstract",
      "relation": "context_only"
+    },
+    {
+     "source_id": "fan2025metacognitive",
+     "locator": "4.3.1-4.3.3: assistiertes Produkt (Essay) besser, unassistierter Wissens- und Transfertest gleich",
+     "relation": "supports"
+    },
+    {
+     "source_id": "darvishi2024agency",
+     "locator": "Abstract: nach Entzug der KI-Prompts fällt die Feedbackqualität; Lernende verlassen sich auf statt lernen von der KI",
+     "relation": "supports"
+    },
+    {
+     "source_id": "lehmann2025aiclassroom",
+     "locator": "Table 13: wahrgenommenes Lernen mit LLM höher als tatsächliches (p=0,044)",
+     "relation": "supports"
     }
    ],
    "certainty": {
@@ -491,7 +540,8 @@
    "independent_outcome": "Korrelation zwischen unassistiertem In-Produkt-Anteil und externem verzögertem Test höher als zwischen assistiertem Anteil und Test",
    "failure_modes": [
     "Lernende nutzen Hilfe außerhalb des Produkts (unsichtbar)",
-    "Hilfequote wird als Scham erlebt und Hilfe vermieden"
+    "Hilfequote wird als Scham erlebt und Hilfe vermieden",
+    "Selbsteinschätzung nach KI-Nutzung überschätzt das tatsächliche Lernen (lehmann2025aiclassroom Table 13); Selbstauskunft ersetzt keinen unassistierten Test"
    ],
    "falsifier": "Assistierte In-Produkt-Leistung sagt einen externen verzögerten unassistierten Test genauso gut vorher wie unassistierte (Differenz der Korrelationen unter vorab festgelegter Schwelle).",
    "kb_rule_links": [
@@ -705,9 +755,9 @@
     ],
     "conditions": "jede Auswertung von Adaptation oder Tutor"
    },
-   "recommendation": "Auswertungen berichten Effekte getrennt nach Vorwissen und, wo erhoben und erlaubt, Erstakademiker-Status; eine Funktion, die für eine Subgruppe schadet, wird für diese nicht als Standard aktiviert. Fairness der Lernermodelle (Doroudi 2019) ist noch nicht gelesen.",
+   "recommendation": "Auswertungen berichten Effekte getrennt nach Vorwissen und, wo erhoben und erlaubt, Erstakademiker-Status; eine Funktion, die für eine Subgruppe schadet, wird für diese nicht als Standard aktiviert. Auch deterministische Abbruchregeln (N richtig in Folge) werden nach Vorwissensgruppe geprüft, weil sie bei Fehlspezifikation schnelle Lernende begünstigen (doroudi2019fairkt). Subgruppenmerkmale sind personenbezogene Daten: nur opt-in, mit benanntem Zweck, standardmäßig lokal gespeichert (DSGVO Art. 5/25 als Gestaltungsrahmen, keine Rechtsprüfung).",
    "product_affordances": {
-    "interactive": "keine subgruppenspezifische Steuerung ohne Evaluationsgrundlage"
+    "interactive": "keine subgruppenspezifische Steuerung ohne Evaluationsgrundlage; Subgruppenmerkmale nur opt-in, lokal gespeichert"
    },
    "abstain_or_fallback": [
     "Subgruppe zu klein: keine Subgruppenaussage, nur Hinweis auf Unsicherheit"
@@ -733,19 +783,41 @@
      "source_id": "wang2024tutorcopilot",
      "locator": "Abstract v3: +9 p.p. bei schwächer bewerteten Tutoren",
      "relation": "context_only"
+    },
+    {
+     "source_id": "lehmann2025aiclassroom",
+     "locator": "Table 12: Interaktion LLM × Vortest > Median p=0,028; unter Median verstanden Behandelte weniger als Kontrolle (p=0,043); post-hoc Mediansplit",
+     "relation": "supports"
+    },
+    {
+     "source_id": "doroudi2019fairkt",
+     "locator": "Abstract; §4: BKT (aggregiert gefittet) und N-CCR begünstigen schnelle Lernende, AFM konservativer (Simulation)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "eu2016gdpr",
+     "locator": "Art. 5(1)(b),(c) Zweckbindung, Datenminimierung; Art. 25 Datenschutz durch Technikgestaltung und Voreinstellungen (Mirror gdpr-info.eu)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "eu2024aiact",
+     "locator": "Annex III Nr. 3(b) Bewertung von Lernergebnissen inkl. Steuerung des Lernprozesses (Mirror artificialintelligenceact.eu); Anwendbarkeit auf Selbstlernprodukt ungeklärt",
+     "relation": "context_only"
     }
    ],
    "certainty": {
     "level": "low",
     "reasons": [
-     "Subgruppenbefunde in Einzelstudien, Richtung uneinheitlich"
+     "Subgruppenbefunde in Einzelstudien, Richtung uneinheitlich",
+     "Batch 4: Vorwissens-Interaktion in einer Laborstudie (post-hoc) und Simulationsbefund zur Ungleichheit von Mastery-Abbruchregeln; kein empirischer Fairnessbefund für Mastery"
     ]
    },
    "observable": "Subgruppenmerkmale nur mit Einwilligung und Datenschutzprüfung",
    "independent_outcome": "unassistierter verzögerter Test, Interaktion Bedingung × Subgruppe vorab registriert",
    "failure_modes": [
     "Erhebung sensibler Merkmale ohne Rechtsgrundlage",
-    "Mehrfachtests erzeugen Scheinbefunde"
+    "Mehrfachtests erzeugen Scheinbefunde",
+    "Mastery-Abbruchregel erklärt Lernende mit niedrigem Vorwissen zu früh für ausreichend belegt"
    ],
    "falsifier": "Vorab registrierte Interaktionsanalysen zeigen über mehrere Studien keine Heterogenität oberhalb der Messunsicherheit; dann kann die Pflicht zur Subgruppenprüfung reduziert werden.",
    "kb_rule_links": [
