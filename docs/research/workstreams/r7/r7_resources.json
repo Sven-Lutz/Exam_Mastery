@@ -18,7 +18,12 @@
   "DEFER": "Entscheidung vertagt (fehlende Identität, fehlender Bedarf oder anderer Workstream zuständig); Wiederaufnahmebedingung angegeben",
   "REJECT": "weder Nutzung noch Emulation; Grund und Wiederaufnahmebedingung angegeben"
  },
- "products": ["textbook", "workbook", "anki", "interactive"],
+ "products": [
+  "textbook",
+  "workbook",
+  "anki",
+  "interactive"
+ ],
  "binding_constraints": [
   "genau vier Produkte (PRODUCT_CONTRACT.md); keine Ressource begründet eine fünfte Produktfläche",
   "Anki/FSRS ist der einzige Scheduler (AD-1); keine Ressource bringt eigene Wiederholungsplanung ein",
@@ -44,61 +49,155 @@
   {
    "id": "R7-RES-3B1B",
    "name": "3Blue1Brown",
-   "aliases": ["3B1B", "Grant Sanderson"],
+   "aliases": [
+    "3B1B",
+    "Grant Sanderson"
+   ],
    "category": "math_visualisation",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "§D Mathematical insight"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "§D Mathematical insight"
+   ],
    "official_url": "https://www.3blue1brown.com/",
-   "other_urls": ["https://www.3blue1brown.com/faq"],
-   "identity": {"verified": true, "method": "offizielle FAQ einmal abgerufen", "owner": "Grant Sanderson / 3Blue1Brown", "version_or_activity": "aktiv (Videos, Website)", "access_date": "2026-11-27"},
-   "licence": {"content": "keine Lizenz für Videos genannt; FAQ erlaubt Standbilder/Clips unter 60 s mit eigenem Kontext und Attribution, alles Weitere nur auf Anfrage", "code": "Szenen-Code 3b1b/videos: CC BY-NC-SA 4.0 (LICENSE.txt via gh api) – nicht kommerziell nutzbar", "reuse_note": "Keine Übernahme von Szenen, Grafiken oder Erzählung; Produktvertrag verlangt eigene Originale"},
+   "other_urls": [
+    "https://www.3blue1brown.com/faq"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "offizielle FAQ einmal abgerufen",
+    "owner": "Grant Sanderson / 3Blue1Brown",
+    "version_or_activity": "aktiv (Videos, Website)",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "keine Lizenz für Videos genannt; FAQ erlaubt Standbilder/Clips unter 60 s mit eigenem Kontext und Attribution, alles Weitere nur auf Anfrage",
+    "code": "Szenen-Code 3b1b/videos: CC BY-NC-SA 4.0 (LICENSE.txt via gh api) – nicht kommerziell nutzbar",
+    "reuse_note": "Keine Übernahme von Szenen, Grafiken oder Erzählung; Produktvertrag verlangt eigene Originale"
+   },
    "pedagogical_behaviour": "Erzählte Animation: konkretes Beispiel und Frage zuerst, dann schrittweise Szenenfolge, in der sich pro Schritt eine Sache ändert; Formelsymbole farblich an Bildobjekte gekoppelt; Formalismus nach Intuition. Lernende sehen zu; Pausieren möglich, keine verlangte Eingabe.",
-   "learning_operations": ["symbolic_procedure", "formal_proof"],
+   "learning_operations": [
+    "symbolic_procedure",
+    "formal_proof"
+   ],
    "claims": [
-    {"text": "Fast alle Animationen werden mit Manim erstellt; Einstieg mit Manim Community Edition empfohlen", "class": "documented_function", "locator": "3blue1brown.com/faq (Manim)", "supports_learning_effect": false},
-    {"text": "Clipnutzung < 60 s mit Attribution erlaubt; Hochladen ganzer Lektionen nur mit Lizenzanfrage", "class": "documented_function", "locator": "3blue1brown.com/faq (Nutzung)", "supports_learning_effect": false}
+    {
+     "text": "Fast alle Animationen werden mit Manim erstellt; Einstieg mit Manim Community Edition empfohlen",
+     "class": "documented_function",
+     "locator": "3blue1brown.com/faq (Manim)",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Clipnutzung < 60 s mit Attribution erlaubt; Hochladen ganzer Lektionen nur mit Lizenzanfrage",
+     "class": "documented_function",
+     "locator": "3blue1brown.com/faq (Nutzung)",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function; keine produktspezifische Lernstudie gefunden oder gesucht",
-   "scientific_grounding": ["noetel2021video (Video ergänzend zu Lehre)", "carpenter2013fluency, carpenter2016fluency (Flüssigkeit erhöht Lernurteil, nicht Lernen)", "muller2008misconceptions (Erklärung mit widerlegten Fehlvorstellungen schlägt reine Exposition)"],
+   "scientific_grounding": [
+    "noetel2021video (Video ergänzend zu Lehre)",
+    "carpenter2013fluency, carpenter2016fluency (Flüssigkeit erhöht Lernurteil, nicht Lernen)",
+    "muller2008misconceptions (Erklärung mit widerlegten Fehlvorstellungen schlägt reine Exposition)"
+   ],
    "importability_api": "keine API; nur Verlinkung von YouTube/Website",
    "offline": "nein (Streaming); keine Einbettung geplant",
    "accessibility": "YouTube-Untertitel teils vorhanden; nicht geprüft",
    "cost_maintenance": "kostenlos ansehbar; keine Wartung auf unserer Seite",
-   "product_fit": {"textbook": "Prinzip: Szenenfolge eine Änderung pro Schritt, Formel↔Objekt-Farbkopplung (MM-R2), Frage vor Formel", "interactive": "Prinzip für em_scene.js; zusätzlich verlangte Vorhersage an Schlüsselschritten (R7-POL-02), Einzelschritt statt Autoplay (R7-POL-05)"},
+   "product_fit": {
+    "textbook": "Prinzip: Szenenfolge eine Änderung pro Schritt, Formel↔Objekt-Farbkopplung (MM-R2), Frage vor Formel",
+    "interactive": "Prinzip für em_scene.js; zusätzlich verlangte Vorhersage an Schlüsselschritten (R7-POL-02), Einzelschritt statt Autoplay (R7-POL-05)"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende sehen ein externes Video passiv; im Produkt entsteht stattdessen eine eigene Szene, in der sie vor jedem Aufdecken eine Vorhersage abgeben und danach eine neue Aufgabe lösen.",
    "decision": "EMULATE_PRINCIPLE",
    "reason": "Szenenprogression, Formel↔Bild-Kopplung und 'Frage vor Formalismus' sind übertragbar und im Produktvertrag bereits gewollt; das passive Zuschauformat und die polierte Erzählung bergen nach carpenter2013/2016 eine Verständnisillusion und werden nicht übernommen.",
-   "not_emulated": ["Zuschauen als Fortschritt (MC-R2)", "durchlaufende Autoplay-Erzählung ohne Eingabe", "Assets, Stimme, Stil-Kopie"],
+   "not_emulated": [
+    "Zuschauen als Fortschritt (MC-R2)",
+    "durchlaufende Autoplay-Erzählung ohne Eingabe",
+    "Assets, Stimme, Stil-Kopie"
+   ],
    "opportunity_cost": "Eigene Szenen kosten Autorenzeit je Kompetenz; ein Link wäre billiger, liefert aber keine verlangte Lernoperation und kein Messsignal.",
    "evaluations": [
-    {"id": "R7-EV-3B1B-1", "task": "Gleiche Kompetenz (z. B. Binomialkoeffizient als Pfadzählung): (a) eigene Szene im 3B1B-Stil ohne Eingabe, (b) dieselbe Szene mit verlangter Vorhersage an 3 Schlüsselschritten, (c) statischer illustrierter Beweis; danach neue Transferaufgabe nach 1 Woche, unassistiert.", "falsifier": "(a) oder (c) erreicht im verzögerten Transfer mindestens das Niveau von (b) bei gleicher Zeit – dann ist die Vorhersage-Erweiterung nicht gerechtfertigt.", "status": "NOT_RUN"},
-    {"id": "R7-EV-3B1B-2", "task": "Nach Ansehen Lernurteil (0-100) und anschließender unassistierter Test erfassen.", "falsifier": "Lernurteil und Testleistung weichen nach Szene (a) nicht stärker ab als nach (b) – dann ist die Fluency-Warnung für dieses Format unbegründet.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-3B1B-1",
+     "task": "Gleiche Kompetenz (z. B. Binomialkoeffizient als Pfadzählung): (a) eigene Szene im 3B1B-Stil ohne Eingabe, (b) dieselbe Szene mit verlangter Vorhersage an 3 Schlüsselschritten, (c) statischer illustrierter Beweis; danach neue Transferaufgabe nach 1 Woche, unassistiert.",
+     "falsifier": "(a) oder (c) erreicht im verzögerten Transfer mindestens das Niveau von (b) bei gleicher Zeit – dann ist die Vorhersage-Erweiterung nicht gerechtfertigt.",
+     "status": "NOT_RUN"
+    },
+    {
+     "id": "R7-EV-3B1B-2",
+     "task": "Nach Ansehen Lernurteil (0-100) und anschließender unassistierter Test erfassen.",
+     "falsifier": "Lernurteil und Testleistung weichen nach Szene (a) nicht stärker ab als nach (b) – dann ist die Fluency-Warnung für dieses Format unbegründet.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-02", "R7-POL-04", "R7-POL-05", "R7-POL-06"]
+   "policy_links": [
+    "R7-POL-02",
+    "R7-POL-04",
+    "R7-POL-05",
+    "R7-POL-06"
+   ]
   },
   {
    "id": "R7-RES-MANIM",
    "name": "manim (3b1b/manim und Manim Community Edition)",
-   "aliases": ["manim", "ManimCE", "ManimCommunity/manim", "3b1b/manim"],
+   "aliases": [
+    "manim",
+    "ManimCE",
+    "ManimCommunity/manim",
+    "3b1b/manim"
+   ],
    "category": "math_visualisation",
-   "preserved_from": ["Issue #29 (3Blue1Brown incl. manim)", "RESOURCE_IDEA_REGISTRY_20261126.md §A 3Blue1Brown"],
+   "preserved_from": [
+    "Issue #29 (3Blue1Brown incl. manim)",
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A 3Blue1Brown"
+   ],
    "official_url": "https://github.com/ManimCommunity/manim",
-   "other_urls": ["https://github.com/3b1b/manim"],
-   "identity": {"verified": true, "method": "gh api repos/ManimCommunity/manim und repos/3b1b/manim (fork=false), /releases/latest", "owner": "ManimCommunity (Community-Fork); 3b1b (Grant Sanderson)", "version_or_activity": "ManimCommunity v0.22.1 (2026-10-27), Push 2026-11-27; 3b1b/manim v1.7.2 (2024-12-13), Push 2026-09-09", "access_date": "2026-11-27"},
-   "licence": {"code": "MIT (beide Repos, GitHub license API)", "content": "nicht anwendbar", "reuse_note": "Bibliothek frei nutzbar; Ausgabe sind Videos/Bilder"},
+   "other_urls": [
+    "https://github.com/3b1b/manim"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "gh api repos/ManimCommunity/manim und repos/3b1b/manim (fork=false), /releases/latest",
+    "owner": "ManimCommunity (Community-Fork); 3b1b (Grant Sanderson)",
+    "version_or_activity": "ManimCommunity v0.22.1 (2026-10-27), Push 2026-11-27; 3b1b/manim v1.7.2 (2024-12-13), Push 2026-09-09",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "MIT (beide Repos, GitHub license API)",
+    "content": "nicht anwendbar",
+    "reuse_note": "Bibliothek frei nutzbar; Ausgabe sind Videos/Bilder"
+   },
    "pedagogical_behaviour": "Python-Bibliothek zum Rendern erklärender Mathe-Animationen als Video/Bildfolge; selbst keine Lernhandlung.",
-   "learning_operations": ["symbolic_procedure", "formal_proof", "spatial_design"],
+   "learning_operations": [
+    "symbolic_procedure",
+    "formal_proof",
+    "spatial_design"
+   ],
    "claims": [
-    {"text": "Animation engine for explanatory math videos", "class": "documented_function", "locator": "gh api repos/3b1b/manim description", "supports_learning_effect": false},
-    {"text": "Community-Fork soll stabiler, dokumentierter und getesteter sein", "class": "documented_function", "locator": "3blue1brown.com/faq (Manim)", "supports_learning_effect": false}
+    {
+     "text": "Animation engine for explanatory math videos",
+     "class": "documented_function",
+     "locator": "gh api repos/3b1b/manim description",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Community-Fork soll stabiler, dokumentierter und getesteter sein",
+     "class": "documented_function",
+     "locator": "3blue1brown.com/faq (Manim)",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function",
    "importability_api": "Python-API; Rendern benötigt externe Abhängigkeiten (u. a. LaTeX, ffmpeg) – nicht gemessen",
    "offline": "Rendern lokal möglich; Ergebnis ist Video, nicht interaktiv im Browser",
    "accessibility": "Video ohne Text-Alternative; Barrierefreiheit hängt an Untertiteln/Beschreibungen, die separat zu erstellen wären",
    "cost_maintenance": "zusätzliche schwere Render-Toolchain neben MathJax-SVG und em_scene.js; Versionswechsel im Community-Fork häufig",
-   "product_fit": {"textbook": "allenfalls statische Keyframes; vorhandene SVG-Pipeline (figures_svg.py) deckt das ab", "interactive": "kein Beitrag zu Interaktion; Video wäre passives Format"},
+   "product_fit": {
+    "textbook": "allenfalls statische Keyframes; vorhandene SVG-Pipeline (figures_svg.py) deckt das ab",
+    "interactive": "kein Beitrag zu Interaktion; Video wäre passives Format"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Autor rendert Video offline; Lernende sehen es. Kein Lernerschritt.",
@@ -106,67 +205,161 @@
    "reason": "Bibliothek ist lizenzrechtlich unproblematisch, liefert aber das passive Videoformat, das R7-POL-05/06 einschränken; die vorhandene SVG-/em_scene-Pipeline erzeugt Keyframes und Schrittsteuerung bereits. Wiederaufnahme nur, wenn ein Kompetenztyp nachweislich kontinuierliche Bewegung braucht, die em_scene.js nicht darstellen kann.",
    "opportunity_cost": "Eine zweite Render-Toolchain (LaTeX, ffmpeg, Python-Grafik) kostet Wartung und Build-Zeit ohne zusätzliche Lernoperation.",
    "evaluations": [
-    {"id": "R7-EV-MANIM-1", "task": "Für drei Szenen aus dem Synthetik-Fixture prüfen, ob em_scene.js die nötige Bewegung (Morph, Pfad) mit Schrittsteuerung darstellen kann.", "falsifier": "Mindestens eine Szene ist ohne Video nicht darstellbar und die Bewegung selbst ist Lerngegenstand (Ploetzner-Kriterium) – dann Spike REUSE_AS_LIBRARY für Keyframe-Export prüfen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-MANIM-1",
+     "task": "Für drei Szenen aus dem Synthetik-Fixture prüfen, ob em_scene.js die nötige Bewegung (Morph, Pfad) mit Schrittsteuerung darstellen kann.",
+     "falsifier": "Mindestens eine Szene ist ohne Video nicht darstellbar und die Bewegung selbst ist Lerngegenstand (Ploetzner-Kriterium) – dann Spike REUSE_AS_LIBRARY für Keyframe-Export prüfen.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-05"]
+   "policy_links": [
+    "R7-POL-05"
+   ]
   },
   {
    "id": "R7-RES-MATHIGON",
    "name": "Mathigon (interaktive Kurse / 'Textbooks')",
-   "aliases": ["Mathigon", "mathigon.org", "mathigon/textbooks", "Mathigon Studio"],
+   "aliases": [
+    "Mathigon",
+    "mathigon.org",
+    "mathigon/textbooks",
+    "Mathigon Studio"
+   ],
    "category": "math_visualisation",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A Mathigon / Polypad", "§D Mathematical insight"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A Mathigon / Polypad",
+    "§D Mathematical insight"
+   ],
    "official_url": "https://mathigon.org/",
-   "other_urls": ["https://github.com/mathigon/textbooks", "https://github.com/mathigon/studio"],
-   "identity": {"verified": true, "method": "Startseite einmal abgerufen; gh api repos/mathigon/textbooks, repos/mathigon/studio, /license, /readme, contents/content/probability/content.md", "owner": "Amplify Education, Inc. ('Mathigon is part of Amplify')", "version_or_activity": "textbooks letzter Push 2025-02-25; studio letzter Push 2025-02-27", "access_date": "2026-11-27"},
-   "licence": {"code": "mathigon/studio: Quellcode MIT, Bilder/Medien/Doku/UI CC BY-SA 4.0, Schriften OFL, Marken ausgenommen (LICENSE.md)", "content": "mathigon/textbooks: keine Lizenzdatei (GitHub: none) und Contributor License Agreement im README – Kursinhalte daher nicht wiederverwendbar", "reuse_note": "Weder Kurstexte noch Grafiken übernehmen; nur Mechanismus emulieren"},
+   "other_urls": [
+    "https://github.com/mathigon/textbooks",
+    "https://github.com/mathigon/studio"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "Startseite einmal abgerufen; gh api repos/mathigon/textbooks, repos/mathigon/studio, /license, /readme, contents/content/probability/content.md",
+    "owner": "Amplify Education, Inc. ('Mathigon is part of Amplify')",
+    "version_or_activity": "textbooks letzter Push 2025-02-25; studio letzter Push 2025-02-27",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "mathigon/studio: Quellcode MIT, Bilder/Medien/Doku/UI CC BY-SA 4.0, Schriften OFL, Marken ausgenommen (LICENSE.md)",
+    "content": "mathigon/textbooks: keine Lizenzdatei (GitHub: none) und Contributor License Agreement im README – Kursinhalte daher nicht wiederverwendbar",
+    "reuse_note": "Weder Kurstexte noch Grafiken übernehmen; nur Mechanismus emulieren"
+   },
    "pedagogical_behaviour": "Kursabschnitte enthalten Lückenwahl- und Eingabefelder; nachfolgender Text und Bilder werden erst aufgedeckt, wenn die Lücke beantwortet ist (Quelltext-Syntax [[richtig|falsch]] und {.reveal(when=\"blank-0\")}). Dazu manipulierbare Grafiken und Schritt-Fortsetzung.",
-   "learning_operations": ["symbolic_procedure", "spatial_design", "recall_discrimination"],
+   "learning_operations": [
+    "symbolic_procedure",
+    "spatial_design",
+    "recall_discrimination"
+   ],
    "claims": [
-    {"text": "Inhalte nach einer Lücke werden erst nach deren Beantwortung eingeblendet (reveal when blank-n)", "class": "documented_function", "locator": "mathigon/textbooks content/probability/content.md Z. 76, 101-111", "supports_learning_effect": false},
-    {"text": "Free tools, courses and manipulatives", "class": "marketing", "locator": "mathigon.org Startseite", "supports_learning_effect": false}
+    {
+     "text": "Inhalte nach einer Lücke werden erst nach deren Beantwortung eingeblendet (reveal when blank-n)",
+     "class": "documented_function",
+     "locator": "mathigon/textbooks content/probability/content.md Z. 76, 101-111",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Free tools, courses and manipulatives",
+     "class": "marketing",
+     "locator": "mathigon.org Startseite",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function; keine produktspezifische Lernstudie gefunden",
-   "scientific_grounding": ["kim2017predictionvis (Vorhersage vor Datenanzeige verbessert Erinnern/Verständnis)", "brod2021 (KB: Vorhersagen verändert Feedbackverarbeitung)"],
+   "scientific_grounding": [
+    "kim2017predictionvis (Vorhersage vor Datenanzeige verbessert Erinnern/Verständnis)",
+    "brod2021 (KB: Vorhersagen verändert Feedbackverarbeitung)"
+   ],
    "importability_api": "Studio-Server (NodeJS) könnte eigene Kurse hosten; Kursformat Markdown-Dialekt – nicht übernommen",
    "offline": "Online-Dienst; Studio selbst hostbar, aber eigener Server",
    "accessibility": "nicht geprüft",
    "cost_maintenance": "Studio-Abhängigkeit wäre ein zweites Kurs-Framework neben der Engine; Repos seit Anfang 2025 kaum aktiv",
-   "product_fit": {"textbook": "Web-Lehrbuch: Antwort-dann-Aufdecken an Schlüsselstellen; PDF-Export zeigt Frage und Lösung getrennt", "interactive": "gleiche Gating-Logik in Szenen und Labs", "workbook": "nicht betroffen"},
+   "product_fit": {
+    "textbook": "Web-Lehrbuch: Antwort-dann-Aufdecken an Schlüsselstellen; PDF-Export zeigt Frage und Lösung getrennt",
+    "interactive": "gleiche Gating-Logik in Szenen und Labs",
+    "workbook": "nicht betroffen"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende lesen einen Absatz, wählen an einer Lücke eine Antwort, erst dann erscheint die Fortsetzung mit Erklärung.",
    "decision": "EMULATE_PRINCIPLE",
    "reason": "Das Antwort-dann-Aufdecken-Gating ist ein klar abgrenzbarer, im Quelltext belegter Mechanismus, der Vorhersage/Abruf in den Lesefluss bringt und zu PR-R1/R1-POL-A11 passt; Inhalte sind nicht lizenziert und Studio wäre ein zweites Framework.",
-   "not_emulated": ["Kurstexte und Grafiken", "Gating ohne Ausweg (Lernende müssen fortfahren können; Antwort wird geloggt, nicht erzwungen richtig)"],
+   "not_emulated": [
+    "Kurstexte und Grafiken",
+    "Gating ohne Ausweg (Lernende müssen fortfahren können; Antwort wird geloggt, nicht erzwungen richtig)"
+   ],
    "opportunity_cost": "Gering: Gating ist eine Erweiterung vorhandener Web-Exporte; eine Studio-Übernahme würde Wochen Integration kosten.",
    "evaluations": [
-    {"id": "R7-EV-MATHIGON-1", "task": "Web-Lehrbuchkapitel in zwei Varianten: mit Lücken-Gating an 4 Schlüsselstellen vs. gleicher Text mit nachgestellten Fragen; verzögerter unassistierter Test mit umformulierten Items.", "falsifier": "Kein Unterschied über vorab festgelegter Mindestdifferenz oder Gating erhöht Abbruchquote über Schwelle – dann Gating nur optional.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-MATHIGON-1",
+     "task": "Web-Lehrbuchkapitel in zwei Varianten: mit Lücken-Gating an 4 Schlüsselstellen vs. gleicher Text mit nachgestellten Fragen; verzögerter unassistierter Test mit umformulierten Items.",
+     "falsifier": "Kein Unterschied über vorab festgelegter Mindestdifferenz oder Gating erhöht Abbruchquote über Schwelle – dann Gating nur optional.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-02"]
+   "policy_links": [
+    "R7-POL-02"
+   ]
   },
   {
    "id": "R7-RES-POLYPAD",
    "name": "Polypad (Mathigon/Amplify) und Polypad-API",
-   "aliases": ["Polypad", "mathigon.io/polypad", "polypad.amplify.com"],
+   "aliases": [
+    "Polypad",
+    "mathigon.io/polypad",
+    "polypad.amplify.com"
+   ],
    "category": "math_visualisation",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A Mathigon / Polypad", "Source leads verified 2026-11-26"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A Mathigon / Polypad",
+    "Source leads verified 2026-11-26"
+   ],
    "official_url": "https://mathigon.io/polypad/",
-   "other_urls": ["https://polypad.amplify.com/"],
-   "identity": {"verified": true, "method": "API-Seite einmal abgerufen; mathigon.org meldet 'Polypad has moved from Mathigon to Amplify'", "owner": "Amplify (Polypad umgezogen); API-Seite Footer 'Copyright © 2024 Mathigon.org'", "version_or_activity": "API-Skript polypad-en-v5.0.5.js", "access_date": "2026-11-27"},
-   "licence": {"code": "proprietär; API-Seite nennt keine Lizenz, Nutzungsbedingungen oder Preise", "content": "nicht angegeben", "reuse_note": "Einbettung nur über Skript von static.mathigon.org mit optionalem 'Mathigon-issued API key'; Bedingungen ungeklärt"},
+   "other_urls": [
+    "https://polypad.amplify.com/"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "API-Seite einmal abgerufen; mathigon.org meldet 'Polypad has moved from Mathigon to Amplify'",
+    "owner": "Amplify (Polypad umgezogen); API-Seite Footer 'Copyright © 2024 Mathigon.org'",
+    "version_or_activity": "API-Skript polypad-en-v5.0.5.js",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "proprietär; API-Seite nennt keine Lizenz, Nutzungsbedingungen oder Preise",
+    "content": "nicht angegeben",
+    "reuse_note": "Einbettung nur über Skript von static.mathigon.org mit optionalem 'Mathigon-issued API key'; Bedingungen ungeklärt"
+   },
    "pedagogical_behaviour": "Virtuelle Manipulative (Kacheln, Zahlstäbe, Würfel, Geometrie) auf freier Leinwand; Zustand als JSON speicherbar; keine eingebaute Aufgabenlogik.",
-   "learning_operations": ["spatial_design", "symbolic_procedure"],
+   "learning_operations": [
+    "spatial_design",
+    "symbolic_procedure"
+   ],
    "claims": [
-    {"text": "JavaScript-API erzeugt Polypad-Leinwand; Zustand als JSON speicherbar", "class": "documented_function", "locator": "mathigon.io/polypad (API-Übersicht)", "supports_learning_effect": false},
-    {"text": "Tastaturkürzel, highContrast, largeUI, altText für Kacheln", "class": "documented_function", "locator": "mathigon.io/polypad (Optionen)", "supports_learning_effect": false}
+    {
+     "text": "JavaScript-API erzeugt Polypad-Leinwand; Zustand als JSON speicherbar",
+     "class": "documented_function",
+     "locator": "mathigon.io/polypad (API-Übersicht)",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Tastaturkürzel, highContrast, largeUI, altText für Kacheln",
+     "class": "documented_function",
+     "locator": "mathigon.io/polypad (Optionen)",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function",
    "importability_api": "JS-API dokumentiert; Fremdskript von Herstellerserver",
    "offline": "nicht erwähnt; Beispiele laden vom Herstellerserver – verletzt Offline-Vorgabe",
    "accessibility": "Tastaturbedienung und Hochkontrast dokumentiert; keine formale A11y-Erklärung",
    "cost_maintenance": "Lizenz/Preis unbekannt; Anbieterwechsel (Mathigon→Amplify) zeigt Plattformrisiko",
-   "product_fit": {"textbook": "optionaler Link bei Schulmathematik-Voraussetzungen", "interactive": "keine Einbettung (Offline, Lizenz)"},
+   "product_fit": {
+    "textbook": "optionaler Link bei Schulmathematik-Voraussetzungen",
+    "interactive": "keine Einbettung (Offline, Lizenz)"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende öffnen extern Polypad für freies Hantieren; kein Rückfluss ins Produkt.",
@@ -174,31 +367,65 @@
    "reason": "Für Hochschulinhalte selten nötig; Einbettung scheitert an Offline-Vorgabe und ungeklärten Bedingungen; als optionaler Verweis für Voraussetzungslücken (Brüche, Flächen, Wahrscheinlichkeit) vertretbar.",
    "opportunity_cost": "Einbettung würde Netzabhängigkeit und Lizenzklärung erzwingen; Link kostet fast nichts.",
    "evaluations": [
-    {"id": "R7-EV-POLYPAD-1", "task": "Prüfen, ob ein Hochschulkurs im Synthetik-Fixture eine Voraussetzung hat, die nur mit freien Manipulativen sinnvoll geübt wird.", "falsifier": "Kein solcher Fall in drei Fixture-Domänen – dann Link streichen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-POLYPAD-1",
+     "task": "Prüfen, ob ein Hochschulkurs im Synthetik-Fixture eine Voraussetzung hat, die nur mit freien Manipulativen sinnvoll geübt wird.",
+     "falsifier": "Kein solcher Fall in drei Fixture-Domänen – dann Link streichen.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-10"]
+   "policy_links": [
+    "R7-POL-10"
+   ]
   },
   {
    "id": "R7-RES-EXPLANARIA",
    "name": "Explanaria",
-   "aliases": ["explanaria.github.io"],
+   "aliases": [
+    "explanaria.github.io"
+   ],
    "category": "math_visualisation",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "Source leads verified 2026-11-26"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "Source leads verified 2026-11-26"
+   ],
    "official_url": "https://explanaria.github.io/",
-   "other_urls": ["https://github.com/explanaria/explanaria.github.io"],
-   "identity": {"verified": true, "method": "gh api repos/explanaria/explanaria.github.io (fork=false, Owner-Typ User, angelegt 2022-06-12), README", "owner": "GitHub-Nutzerkonto 'explanaria' (Einzelperson; Name nicht angegeben)", "version_or_activity": "README 'Explanaria v0.2', 'most definitely a work in progress'; letzter Push 2025-05-12; 41 Sterne", "access_date": "2026-11-27"},
-   "licence": {"code": "MIT (GitHub license API)", "content": "Demos im selben Repo; separate Inhaltslizenz nicht geprüft", "reuse_note": "rechtlich nutzbar, technisch unreif"},
+   "other_urls": [
+    "https://github.com/explanaria/explanaria.github.io"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "gh api repos/explanaria/explanaria.github.io (fork=false, Owner-Typ User, angelegt 2022-06-12), README",
+    "owner": "GitHub-Nutzerkonto 'explanaria' (Einzelperson; Name nicht angegeben)",
+    "version_or_activity": "README 'Explanaria v0.2', 'most definitely a work in progress'; letzter Push 2025-05-12; 41 Sterne",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "MIT (GitHub license API)",
+    "content": "Demos im selben Repo; separate Inhaltslizenz nicht geprüft",
+    "reuse_note": "rechtlich nutzbar, technisch unreif"
+   },
    "pedagogical_behaviour": "Animierte, interaktive 3D-Mathepräsentationen im Browser; Architektur trennt Definitionsbereich, Transformation und Ausgabe (EXP.Area, EXP.Transformation, EXP.PointOutput); präsentationsartige Schrittfolge.",
-   "learning_operations": ["symbolic_procedure", "spatial_design"],
+   "learning_operations": [
+    "symbolic_procedure",
+    "spatial_design"
+   ],
    "claims": [
-    {"text": "Werkzeug für animierte, interaktive 3D-Mathepräsentationen im Browser; Work in Progress", "class": "documented_function", "locator": "README 'What is it?'", "supports_learning_effect": false}
+    {
+     "text": "Werkzeug für animierte, interaktive 3D-Mathepräsentationen im Browser; Work in Progress",
+     "class": "documented_function",
+     "locator": "README 'What is it?'",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function",
    "importability_api": "JS-Bibliothek ohne Releases; Dokumentation im Repo",
    "offline": "statische Seiten, prinzipiell lokal auslieferbar (nicht getestet)",
    "accessibility": "WebGL-3D ohne dokumentierte Tastatur-/Screenreader-Unterstützung",
    "cost_maintenance": "Einzelpersonen-Projekt, v0.2, keine Tests sichtbar – hohes Wartungsrisiko",
-   "product_fit": {"interactive": "kein zusätzlicher Mechanismus gegenüber R7-RES-3B1B/em_scene.js"},
+   "product_fit": {
+    "interactive": "kein zusätzlicher Mechanismus gegenüber R7-RES-3B1B/em_scene.js"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende klicken durch eine 3D-Präsentation; keine verlangte Eingabe.",
@@ -206,32 +433,73 @@
    "reason": "Kein Lernmechanismus über verknüpfte Repräsentationen hinaus (bereits durch 3B1B-Prinzip und MM-R2 abgedeckt); als Bibliothek unreif und ohne A11y. Wiederaufnahme, falls R4 für spatial_design echte 3D-Transformationen im Browser braucht.",
    "opportunity_cost": "Eine WebGL-3D-Abhängigkeit mit Einzelpflege wäre teurer als eigene 2D-SVG-Szenen; Ablehnung verliert keinen belegten Mechanismus.",
    "evaluations": [
-    {"id": "R7-EV-EXPLANARIA-1", "task": "Bei R4-Spatial-Aufgaben prüfen, ob 2D-Schnitte/Ansichten statt 3D die Aufgabe abdecken.", "falsifier": "Eine R4-Aufgabe ist nur mit frei drehbarem 3D lösbar – dann 3D-Bibliothek neu bewerten (nicht zwingend Explanaria).", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-EXPLANARIA-1",
+     "task": "Bei R4-Spatial-Aufgaben prüfen, ob 2D-Schnitte/Ansichten statt 3D die Aufgabe abdecken.",
+     "falsifier": "Eine R4-Aufgabe ist nur mit frei drehbarem 3D lösbar – dann 3D-Bibliothek neu bewerten (nicht zwingend Explanaria).",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-04"]
+   "policy_links": [
+    "R7-POL-04"
+   ]
   },
   {
    "id": "R7-RES-BRIGHTSIDE",
    "name": "The Bright Side of Mathematics",
-   "aliases": ["Bright Side of Mathematics", "brightsideofmaths", "tbsom.de"],
+   "aliases": [
+    "Bright Side of Mathematics",
+    "brightsideofmaths",
+    "tbsom.de"
+   ],
    "category": "math_visualisation",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A"
+   ],
    "official_url": "https://tbsom.de/",
-   "other_urls": ["https://www.youtube.com/@brightsideofmaths"],
-   "identity": {"verified": true, "method": "tbsom.de einmal abgerufen (verweist auf Dr. Julian Grossmann); YouTube-Handle aus Registry nicht separat abgerufen", "owner": "Julian P. Großmann (laut Website)", "version_or_activity": "aktiv; 'more than 900' bzw. 'More than 800' Videos (widersprüchliche Angaben auf derselben Seite)", "access_date": "2026-11-27"},
-   "licence": {"content": "keine Lizenz- oder Nachnutzungsangabe; Mitgliedschaft über Steady/Patreon/YouTube", "code": "nicht anwendbar", "reuse_note": "keine Übernahme"},
+   "other_urls": [
+    "https://www.youtube.com/@brightsideofmaths"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "tbsom.de einmal abgerufen (verweist auf Dr. Julian Grossmann); YouTube-Handle aus Registry nicht separat abgerufen",
+    "owner": "Julian P. Großmann (laut Website)",
+    "version_or_activity": "aktiv; 'more than 900' bzw. 'More than 800' Videos (widersprüchliche Angaben auf derselben Seite)",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "keine Lizenz- oder Nachnutzungsangabe; Mitgliedschaft über Steady/Patreon/YouTube",
+    "code": "nicht anwendbar",
+    "reuse_note": "keine Übernahme"
+   },
    "pedagogical_behaviour": "Kurze Videos in strenger Reihenfolge Definition → Satz → Beweis → Beispiel für Universitätsmathematik (Maßtheorie, Funktionalanalysis, lineare Algebra u. a.), PDF je Video, Quiz nach Videos.",
-   "learning_operations": ["formal_proof", "symbolic_procedure"],
+   "learning_operations": [
+    "formal_proof",
+    "symbolic_procedure"
+   ],
    "claims": [
-    {"text": "Video-Kurse in 21 Gebieten, PDF-Versionen, Quizze nach Videos", "class": "documented_function", "locator": "tbsom.de Startseite", "supports_learning_effect": false},
-    {"text": "Mitgliedschaft für Early/Ad-free Access", "class": "marketing", "locator": "tbsom.de Startseite", "supports_learning_effect": false}
+    {
+     "text": "Video-Kurse in 21 Gebieten, PDF-Versionen, Quizze nach Videos",
+     "class": "documented_function",
+     "locator": "tbsom.de Startseite",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Mitgliedschaft für Early/Ad-free Access",
+     "class": "marketing",
+     "locator": "tbsom.de Startseite",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function",
    "importability_api": "keine",
    "offline": "nein",
    "accessibility": "nicht geprüft",
    "cost_maintenance": "teilweise Mitgliedschaft; keine Wartung unsererseits",
-   "product_fit": {"textbook": "optionaler Verweis bei fortgeschrittener Universitätsmathematik", "interactive": "kein Beitrag"},
+   "product_fit": {
+    "textbook": "optionaler Verweis bei fortgeschrittener Universitätsmathematik",
+    "interactive": "kein Beitrag"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende schauen bei Bedarf ein externes Video zu einem Satz; danach Aufgabe im Arbeitsbuch.",
@@ -239,22 +507,46 @@
    "reason": "Strenge Definition-Satz-Beweis-Abfolge ist im Produktvertrag schon Pflicht (keine neue Emulation nötig); als optionaler Zweitzugang für Beweisverständnis brauchbar, ohne Wirkungsbehauptung.",
    "opportunity_cost": "Link kostet Pflege toter Verweise; Emulation brächte nichts Neues.",
    "evaluations": [
-    {"id": "R7-EV-BRIGHTSIDE-1", "task": "Stichprobe von 5 verlinkten Videos auf fachliche Übereinstimmung mit Notation/Voraussetzungen des Lehrbuchkapitels prüfen.", "falsifier": "Mehr als 1 von 5 Videos nutzt abweichende Voraussetzungen ohne Hinweis – dann Link nur mit Notationswarnung oder entfernen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-BRIGHTSIDE-1",
+     "task": "Stichprobe von 5 verlinkten Videos auf fachliche Übereinstimmung mit Notation/Voraussetzungen des Lehrbuchkapitels prüfen.",
+     "falsifier": "Mehr als 1 von 5 Videos nutzt abweichende Voraussetzungen ohne Hinweis – dann Link nur mit Notationswarnung oder entfernen.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-10"]
+   "policy_links": [
+    "R7-POL-10"
+   ]
   },
   {
    "id": "R7-RES-THINKLOGIC",
    "name": "Think Logic (Kandidat, Identität ungeklärt)",
-   "aliases": ["Think Logic"],
+   "aliases": [
+    "Think Logic"
+   ],
    "category": "math_visualisation",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A 'Think Logic / Visually Explained'", "Issue #29 'earlier Think Logic/Visually Explained candidates'"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A 'Think Logic / Visually Explained'",
+    "Issue #29 'earlier Think Logic/Visually Explained candidates'"
+   ],
    "official_url": "unresolved",
    "other_urls": [],
-   "identity": {"verified": false, "method": "WebSearch '\"Think Logic\" YouTube channel mathematics visual' (2026-11-27): kein Kanal dieses Namens gefunden; nächster Treffer 'Think Twice' wird NICHT ersatzweise angenommen", "owner": "unbekannt", "version_or_activity": "unbekannt", "access_date": "2026-11-27"},
-   "licence": {"content": "unbekannt", "code": "unbekannt", "reuse_note": "nicht verlinken, solange Identität offen"},
+   "identity": {
+    "verified": false,
+    "method": "WebSearch '\"Think Logic\" YouTube channel mathematics visual' (2026-11-27): kein Kanal dieses Namens gefunden; nächster Treffer 'Think Twice' wird NICHT ersatzweise angenommen",
+    "owner": "unbekannt",
+    "version_or_activity": "unbekannt",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "unbekannt",
+    "code": "unbekannt",
+    "reuse_note": "nicht verlinken, solange Identität offen"
+   },
    "pedagogical_behaviour": "laut Registry 'worked mathematical/visual reasoning'; nicht überprüfbar",
-   "learning_operations": ["formal_proof"],
+   "learning_operations": [
+    "formal_proof"
+   ],
    "claims": [],
    "highest_evidence_present": "keine (Identität offen)",
    "importability_api": "unbekannt",
@@ -269,24 +561,52 @@
    "reason": "Registry verbietet geratene URLs; Suche fand keinen eindeutigen Kandidaten. Wiederaufnahme, sobald der Owner die ursprüngliche Quelle (Link/Kanal) nennt.",
    "opportunity_cost": "keine",
    "evaluations": [
-    {"id": "R7-EV-THINKLOGIC-1", "task": "Owner nennt Original-Link; dann Identitätsprüfung und Karte nach Schema.", "falsifier": "Owner kann keine Quelle nennen – Kandidat wird als nicht auffindbar geschlossen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-THINKLOGIC-1",
+     "task": "Owner nennt Original-Link; dann Identitätsprüfung und Karte nach Schema.",
+     "falsifier": "Owner kann keine Quelle nennen – Kandidat wird als nicht auffindbar geschlossen.",
+     "status": "NOT_RUN"
+    }
    ],
    "policy_links": []
   },
   {
    "id": "R7-RES-VISUALLYEXPLAINED",
    "name": "Visually Explained (YouTube-Kanal, Identität nur teilweise)",
-   "aliases": ["Visually Explained", "@VisuallyExplained"],
+   "aliases": [
+    "Visually Explained",
+    "@VisuallyExplained"
+   ],
    "category": "math_visualisation",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A 'Think Logic / Visually Explained'", "Issue #29"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A 'Think Logic / Visually Explained'",
+    "Issue #29"
+   ],
    "official_url": "unresolved",
    "other_urls": [],
-   "identity": {"verified": false, "method": "WebSearch fand nur eine Drittseite (developereducators.com) mit Beschreibung 'CS fundamentals / ML / Optimierung, visuelle Intuition'; Abruf youtube.com/@VisuallyExplained/about endete in Consent-Weiterleitung (302) und wurde nicht weiterverfolgt", "owner": "unbekannt", "version_or_activity": "Drittseite nennt den Kanal inaktiv; nicht primär bestätigt", "access_date": "2026-11-27"},
-   "licence": {"content": "unbekannt (YouTube-Standard vermutet, nicht geprüft)", "code": "nicht anwendbar", "reuse_note": "nicht verlinken, solange Identität offen"},
+   "identity": {
+    "verified": false,
+    "method": "WebSearch fand nur eine Drittseite (developereducators.com) mit Beschreibung 'CS fundamentals / ML / Optimierung, visuelle Intuition'; Abruf youtube.com/@VisuallyExplained/about endete in Consent-Weiterleitung (302) und wurde nicht weiterverfolgt",
+    "owner": "unbekannt",
+    "version_or_activity": "Drittseite nennt den Kanal inaktiv; nicht primär bestätigt",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "unbekannt (YouTube-Standard vermutet, nicht geprüft)",
+    "code": "nicht anwendbar",
+    "reuse_note": "nicht verlinken, solange Identität offen"
+   },
    "pedagogical_behaviour": "laut Drittseite visuelle Erklärvideos zu ML/Optimierung; nicht primär geprüft",
-   "learning_operations": ["symbolic_procedure"],
+   "learning_operations": [
+    "symbolic_procedure"
+   ],
    "claims": [
-    {"text": "Kanal zu ML und Optimierung mit Fokus auf visueller Intuition", "class": "marketing", "locator": "developereducators.com/channel/visuallyexplained (Drittseite)", "supports_learning_effect": false}
+    {
+     "text": "Kanal zu ML und Optimierung mit Fokus auf visueller Intuition",
+     "class": "marketing",
+     "locator": "developereducators.com/channel/visuallyexplained (Drittseite)",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "Drittseitenbeschreibung",
    "importability_api": "keine",
@@ -301,31 +621,64 @@
    "reason": "Offizielle Kanalseite nicht ohne Consent-Dialog abrufbar; als reines Videoangebot ohnehin höchstens LINK-Kandidat. Wiederaufnahme mit Owner-Bestätigung des gemeinten Kanals.",
    "opportunity_cost": "keine",
    "evaluations": [
-    {"id": "R7-EV-VISEXPL-1", "task": "Owner bestätigt Kanal; dann wie R7-RES-BRIGHTSIDE (Notationsstichprobe) bewerten.", "falsifier": "Kanal ist inaktiv oder inhaltlich fehlerhaft in Stichprobe – Kandidat schließen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-VISEXPL-1",
+     "task": "Owner bestätigt Kanal; dann wie R7-RES-BRIGHTSIDE (Notationsstichprobe) bewerten.",
+     "falsifier": "Kanal ist inaktiv oder inhaltlich fehlerhaft in Stichprobe – Kandidat schließen.",
+     "status": "NOT_RUN"
+    }
    ],
    "policy_links": []
   },
   {
    "id": "R7-RES-GEOGEBRA",
    "name": "GeoGebra (ergänzter Vergleichskandidat)",
-   "aliases": ["GeoGebra"],
+   "aliases": [
+    "GeoGebra"
+   ],
    "category": "math_visualisation",
-   "preserved_from": ["R7-Ergänzung zu RESOURCE_IDEA_REGISTRY_20261126.md §B 'maths editors' / 'meaningful visual interaction frameworks'"],
+   "preserved_from": [
+    "R7-Ergänzung zu RESOURCE_IDEA_REGISTRY_20261126.md §B 'maths editors' / 'meaningful visual interaction frameworks'"
+   ],
    "official_url": "https://www.geogebra.org/",
-   "other_urls": ["https://www.geogebra.org/license", "https://github.com/geogebra/geogebra"],
-   "identity": {"verified": true, "method": "Lizenzseite einmal abgerufen; gh api repos/geogebra/geogebra (Mirror, Push 2026-11-26)", "owner": "GeoGebra", "version_or_activity": "aktiv", "access_date": "2026-11-27"},
-   "licence": {"code": "Quellcode EUPL 1.2", "content": "Apps/Materialien nur nicht-kommerziell frei; kommerzielle Nutzung 'requires a special license'; Sprachdateien/Doku/UI CC BY-NC-SA 4.0; Attribution 'Made with GeoGebra®' Pflicht", "reuse_note": "Einbettung in ein ggf. kommerzielles Produkt nur mit Lizenzvertrag – Owner-Frage"},
+   "other_urls": [
+    "https://www.geogebra.org/license",
+    "https://github.com/geogebra/geogebra"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "Lizenzseite einmal abgerufen; gh api repos/geogebra/geogebra (Mirror, Push 2026-11-26)",
+    "owner": "GeoGebra",
+    "version_or_activity": "aktiv",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "Quellcode EUPL 1.2",
+    "content": "Apps/Materialien nur nicht-kommerziell frei; kommerzielle Nutzung 'requires a special license'; Sprachdateien/Doku/UI CC BY-NC-SA 4.0; Attribution 'Made with GeoGebra®' Pflicht",
+    "reuse_note": "Einbettung in ein ggf. kommerzielles Produkt nur mit Lizenzvertrag – Owner-Frage"
+   },
    "pedagogical_behaviour": "Dynamische Geometrie, Funktionsplots, CAS, verknüpfte Ansichten (Algebra↔Grafik); Lernende manipulieren Objekte frei.",
-   "learning_operations": ["symbolic_procedure", "spatial_design"],
+   "learning_operations": [
+    "symbolic_procedure",
+    "spatial_design"
+   ],
    "claims": [
-    {"text": "Any use of GeoGebra for a commercial purpose is subject to and requires a special license", "class": "documented_function", "locator": "geogebra.org/license", "supports_learning_effect": false}
+    {
+     "text": "Any use of GeoGebra for a commercial purpose is subject to and requires a special license",
+     "class": "documented_function",
+     "locator": "geogebra.org/license",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function",
    "importability_api": "Embed-API existiert (nicht geprüft)",
    "offline": "Installation erlaubt (nicht-kommerziell); Offline-Bundle nicht geprüft",
    "accessibility": "nicht geprüft",
    "cost_maintenance": "Lizenzrisiko für kommerzielle Nutzung",
-   "product_fit": {"textbook": "optionaler Verweis auf eigene, nicht eingebettete Konstruktionen", "interactive": "keine Einbettung ohne Lizenzklärung"},
+   "product_fit": {
+    "textbook": "optionaler Verweis auf eigene, nicht eingebettete Konstruktionen",
+    "interactive": "keine Einbettung ohne Lizenzklärung"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende öffnen extern GeoGebra; kein Rückfluss.",
@@ -333,31 +686,63 @@
    "reason": "Stärkster etablierter Kandidat für freie Geometrie-Manipulation, aber nicht-kommerzielle Lizenz und unklare Offline-Einbettung; eigene Labs mit Missionen leisten die gezielte Manipulation bereits.",
    "opportunity_cost": "Lizenzvertrag und Netzabhängigkeit wären teurer als eigene SVG-Labs für die wenigen Geometrieaufgaben.",
    "evaluations": [
-    {"id": "R7-EV-GEOGEBRA-1", "task": "Owner-Entscheidung: Ist das Produkt kommerziell? Falls nein, Spike: Offline-Bundle-Größe und Tastaturbedienung messen.", "falsifier": "Offline-Bundle nicht verfügbar oder ohne Tastaturbedienung – dann bleibt es bei LINK.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-GEOGEBRA-1",
+     "task": "Owner-Entscheidung: Ist das Produkt kommerziell? Falls nein, Spike: Offline-Bundle-Größe und Tastaturbedienung messen.",
+     "falsifier": "Offline-Bundle nicht verfügbar oder ohne Tastaturbedienung – dann bleibt es bei LINK.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-10"]
+   "policy_links": [
+    "R7-POL-10"
+   ]
   },
   {
    "id": "R7-RES-JSXGRAPH",
    "name": "JSXGraph (ergänzter Bibliothekskandidat)",
-   "aliases": ["JSXGraph", "jsxgraph/jsxgraph"],
+   "aliases": [
+    "JSXGraph",
+    "jsxgraph/jsxgraph"
+   ],
    "category": "math_visualisation",
-   "preserved_from": ["R7-Ergänzung zu RESOURCE_IDEA_REGISTRY_20261126.md §B 'meaningful visual interaction frameworks'"],
+   "preserved_from": [
+    "R7-Ergänzung zu RESOURCE_IDEA_REGISTRY_20261126.md §B 'meaningful visual interaction frameworks'"
+   ],
    "official_url": "https://github.com/jsxgraph/jsxgraph",
    "other_urls": [],
-   "identity": {"verified": true, "method": "gh api repos/jsxgraph/jsxgraph, /releases/latest", "owner": "jsxgraph (GitHub-Organisation; Trägerschaft nicht geprüft)", "version_or_activity": "v1.14.3 (2026-11-06), Push 2026-11-27, 1509 Sterne", "access_date": "2026-11-27"},
-   "licence": {"code": "LGPL-3.0 (GitHub license API)", "content": "nicht anwendbar", "reuse_note": "LGPL: unveränderte Nutzung als separate Datei unproblematisch; Änderungen an der Bibliothek offenlegen"},
+   "identity": {
+    "verified": true,
+    "method": "gh api repos/jsxgraph/jsxgraph, /releases/latest",
+    "owner": "jsxgraph (GitHub-Organisation; Trägerschaft nicht geprüft)",
+    "version_or_activity": "v1.14.3 (2026-11-06), Push 2026-11-27, 1509 Sterne",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "LGPL-3.0 (GitHub license API)",
+    "content": "nicht anwendbar",
+    "reuse_note": "LGPL: unveränderte Nutzung als separate Datei unproblematisch; Änderungen an der Bibliothek offenlegen"
+   },
    "pedagogical_behaviour": "Bibliothek für interaktive Geometrie und Funktionsplots im Browser; selbst keine Lernlogik.",
-   "learning_operations": ["symbolic_procedure", "spatial_design"],
+   "learning_operations": [
+    "symbolic_procedure",
+    "spatial_design"
+   ],
    "claims": [
-    {"text": "cross-browser library for interactive geometry, function plotting, charting, and data visualization", "class": "documented_function", "locator": "gh api repos/jsxgraph/jsxgraph description", "supports_learning_effect": false}
+    {
+     "text": "cross-browser library for interactive geometry, function plotting, charting, and data visualization",
+     "class": "documented_function",
+     "locator": "gh api repos/jsxgraph/jsxgraph description",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function",
    "importability_api": "JS-Bibliothek, statisch einbindbar",
    "offline": "statische Datei, lokal auslieferbar (nicht getestet)",
    "accessibility": "nicht geprüft",
    "cost_maintenance": "aktive Pflege; zusätzliche Abhängigkeit neben em_scene.js",
-   "product_fit": {"interactive": "nur falls em_scene.js Geometrie/Plots nicht abdeckt"},
+   "product_fit": {
+    "interactive": "nur falls em_scene.js Geometrie/Plots nicht abdeckt"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "unsichtbar für Lernende (Darstellungsschicht).",
@@ -365,101 +750,236 @@
    "reason": "Aussichtsreichste offene Alternative zu eigener SVG-Logik, aber kein nachgewiesener Bedarf: em_scene.js und Labs decken die bisherigen Szenen ab. Wiederaufnahme nur bei konkretem Darstellungsdefizit (Spike).",
    "opportunity_cost": "Eine weitere Grafikbibliothek erhöht Bundle und Testfläche; Aufschub kostet nichts, solange kein Defizit belegt ist.",
    "evaluations": [
-    {"id": "R7-EV-JSXGRAPH-1", "task": "Spike nur bei Defizit: dieselbe Lab-Szene in em_scene.js und JSXGraph, Messung Bundlegröße, Tastaturbedienung, Screenreader-Ausgabe.", "falsifier": "JSXGraph ist bei A11y oder Größe nicht besser – dann bleibt eigene Umsetzung.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-JSXGRAPH-1",
+     "task": "Spike nur bei Defizit: dieselbe Lab-Szene in em_scene.js und JSXGraph, Messung Bundlegröße, Tastaturbedienung, Screenreader-Ausgabe.",
+     "falsifier": "JSXGraph ist bei A11y oder Größe nicht besser – dann bleibt eigene Umsetzung.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-09"]
+   "policy_links": [
+    "R7-POL-09"
+   ]
   },
   {
    "id": "R7-RES-SEEINGTHEORY",
    "name": "Seeing Theory",
-   "aliases": ["seeing-theory.brown.edu", "seeingtheory/Seeing-Theory", "Daniel Kunin"],
+   "aliases": [
+    "seeing-theory.brown.edu",
+    "seeingtheory/Seeing-Theory",
+    "Daniel Kunin"
+   ],
    "category": "statistics",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "§D Statistics", "Source leads verified 2026-11-26"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "§D Statistics",
+    "Source leads verified 2026-11-26"
+   ],
    "official_url": "https://seeing-theory.brown.edu/",
-   "other_urls": ["https://github.com/seeingtheory/Seeing-Theory"],
-   "identity": {"verified": true, "method": "gh api repos/seeingtheory/Seeing-Theory (Organisation, angelegt 2017-03-12), README", "owner": "Daniel Kunin (Projektautor), Brown University Royce Fellowship", "version_or_activity": "README '2019 Update: Seeing Theory is no longer being mantained'; letzter Push 2023-09-25", "access_date": "2026-11-27"},
-   "licence": {"code": "Apache-2.0 (GitHub license API)", "content": "Texte/Grafiken liegen im selben Repo; ob die Repo-Lizenz sie abdeckt, nicht separat geprüft", "reuse_note": "Code nutzbar, aber unmaintained (D3, Stand 2019); Prinzip emulieren"},
+   "other_urls": [
+    "https://github.com/seeingtheory/Seeing-Theory"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "gh api repos/seeingtheory/Seeing-Theory (Organisation, angelegt 2017-03-12), README",
+    "owner": "Daniel Kunin (Projektautor), Brown University Royce Fellowship",
+    "version_or_activity": "README '2019 Update: Seeing Theory is no longer being mantained'; letzter Push 2023-09-25",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "Apache-2.0 (GitHub license API)",
+    "content": "Texte/Grafiken liegen im selben Repo; ob die Repo-Lizenz sie abdeckt, nicht separat geprüft",
+    "reuse_note": "Code nutzbar, aber unmaintained (D3, Stand 2019); Prinzip emulieren"
+   },
    "pedagogical_behaviour": "D3-Visualisierungen zu Grundbegriffen der Einführungsstatistik: wiederholtes Ziehen (Münze, Würfel), laufende relative Häufigkeit gegen theoretischen Wert, Regler für Parameter, Konfidenzintervalle über viele Stichproben.",
-   "learning_operations": ["empirical_experimental", "symbolic_procedure"],
+   "learning_operations": [
+    "empirical_experimental",
+    "symbolic_procedure"
+   ],
    "claims": [
-    {"text": "Visualisiert Grundbegriffe eines einführenden Hochschul-/AP-Statistikkurses mit D3", "class": "documented_function", "locator": "README About", "supports_learning_effect": false},
-    {"text": "Webby Award 2018, weitere Design-Preise", "class": "marketing", "locator": "README Awards", "supports_learning_effect": false}
+    {
+     "text": "Visualisiert Grundbegriffe eines einführenden Hochschul-/AP-Statistikkurses mit D3",
+     "class": "documented_function",
+     "locator": "README About",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Webby Award 2018, weitere Design-Preise",
+     "class": "marketing",
+     "locator": "README Awards",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function; Preise sind keine Lernevidenz",
-   "scientific_grounding": ["R2-POL-16 (simulationsbasierte Inferenz; Evidenz in R2)", "kim2017predictionvis"],
+   "scientific_grounding": [
+    "R2-POL-16 (simulationsbasierte Inferenz; Evidenz in R2)",
+    "kim2017predictionvis"
+   ],
    "importability_api": "Quelltext verfügbar; keine API",
    "offline": "statisch, prinzipiell lokal (nicht getestet)",
    "accessibility": "nicht geprüft; animierte D3-Grafiken ohne dokumentierte Text-Alternative",
    "cost_maintenance": "unmaintained seit 2019 – Übernahme hieße Fork-Pflege",
-   "product_fit": {"interactive": "Prinzip: wiederholte Stichprobensimulation mit Orakel und Vorhersage (R7-POL-07)", "textbook": "statische Keyframes (n=10, 100, 1000) mit Aussage", "workbook": "Aufgabe: warum belegt eine Stichprobe keine Populationsaussage"},
+   "product_fit": {
+    "interactive": "Prinzip: wiederholte Stichprobensimulation mit Orakel und Vorhersage (R7-POL-07)",
+    "textbook": "statische Keyframes (n=10, 100, 1000) mit Aussage",
+    "workbook": "Aufgabe: warum belegt eine Stichprobe keine Populationsaussage"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende sagen vorher, wie stark der Anteil bei n=10 streut, ziehen dann wiederholt, vergleichen und erklären.",
    "decision": "EMULATE_PRINCIPLE",
    "reason": "Wiederholte Simulation mit sichtbarer Streuung ist der Kern simulationsbasierter Inferenz (R2-POL-16); der Code ist alt und ungepflegt, die eigene Umsetzung mit numerischem Orakel ist klein.",
-   "not_emulated": ["freies Klicken ohne Vorhersage/Aufgabe", "Inhalte/Grafiken"],
+   "not_emulated": [
+    "freies Klicken ohne Vorhersage/Aufgabe",
+    "Inhalte/Grafiken"
+   ],
    "opportunity_cost": "Fork-Pflege einer D3-Codebasis von 2019 wäre teurer als zwei bis drei eigene Simulationsbausteine.",
    "evaluations": [
-    {"id": "R7-EV-SEEINGTHEORY-1", "task": "§D Statistik: Lernende sagen Streuung des Stichprobenanteils vorher, simulieren, und erklären schriftlich, warum eine einzelne Stichprobe keine Populationsaussage beweist; Orakel prüft simulierte Werte numerisch.", "falsifier": "Im verzögerten Test mit neuen Kontexten erklären Lernende mit Simulation nicht häufiger korrekt als mit statischer Tabelle gleicher Information.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-SEEINGTHEORY-1",
+     "task": "§D Statistik: Lernende sagen Streuung des Stichprobenanteils vorher, simulieren, und erklären schriftlich, warum eine einzelne Stichprobe keine Populationsaussage beweist; Orakel prüft simulierte Werte numerisch.",
+     "falsifier": "Im verzögerten Test mit neuen Kontexten erklären Lernende mit Simulation nicht häufiger korrekt als mit statischer Tabelle gleicher Information.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-07", "R7-POL-02"]
+   "policy_links": [
+    "R7-POL-07",
+    "R7-POL-02"
+   ]
   },
   {
    "id": "R7-RES-STATQUEST",
    "name": "StatQuest",
-   "aliases": ["StatQuest with Josh Starmer", "statquest.org"],
+   "aliases": [
+    "StatQuest with Josh Starmer",
+    "statquest.org"
+   ],
    "category": "statistics",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A"
+   ],
    "official_url": "https://statquest.org/",
    "other_urls": [],
-   "identity": {"verified": true, "method": "statquest.org einmal abgerufen; Seite nennt keinen Namen, Social-Links auf 'joshua-starmer-phd'", "owner": "vermutlich Joshua Starmer (nur über Social-Links, nicht ausdrücklich)", "version_or_activity": "aktiv (neue Videos, z. B. GRPO)", "access_date": "2026-11-27"},
-   "licence": {"content": "'© StatQuest'; keine Nachnutzungsangabe", "code": "nicht anwendbar", "reuse_note": "keine Inhaltsübernahme"},
+   "identity": {
+    "verified": true,
+    "method": "statquest.org einmal abgerufen; Seite nennt keinen Namen, Social-Links auf 'joshua-starmer-phd'",
+    "owner": "vermutlich Joshua Starmer (nur über Social-Links, nicht ausdrücklich)",
+    "version_or_activity": "aktiv (neue Videos, z. B. GRPO)",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "'© StatQuest'; keine Nachnutzungsangabe",
+    "code": "nicht anwendbar",
+    "reuse_note": "keine Inhaltsübernahme"
+   },
    "pedagogical_behaviour": "Videos und Bücher, die ein Statistik-/ML-Verfahren an einem winzigen konkreten Datensatz Schritt für Schritt durchrechnen, bevor die Formel steht; wiederkehrende Sprachmarker und Humor.",
-   "learning_operations": ["symbolic_procedure"],
+   "learning_operations": [
+    "symbolic_procedure"
+   ],
    "claims": [
-    {"text": "An epic journey through data science, statistics, machine learning, neural networks, and AI", "class": "marketing", "locator": "statquest.org Startseite", "supports_learning_effect": false},
-    {"text": "Bücher und Merchandise im Store; Supporter-Stufen", "class": "marketing", "locator": "statquest.org Startseite", "supports_learning_effect": false}
+    {
+     "text": "An epic journey through data science, statistics, machine learning, neural networks, and AI",
+     "class": "marketing",
+     "locator": "statquest.org Startseite",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Bücher und Merchandise im Store; Supporter-Stufen",
+     "class": "marketing",
+     "locator": "statquest.org Startseite",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "marketing/Beschreibung; keine Studie",
    "importability_api": "keine",
    "offline": "nein",
    "accessibility": "nicht geprüft",
    "cost_maintenance": "Videos frei auf YouTube (nicht geprüft), Bücher kostenpflichtig",
-   "product_fit": {"textbook": "Prinzip: ein winziger, durchgehender Beispieldatensatz trägt durch alle Schritte eines Verfahrens, erst danach allgemeine Formel", "workbook": "Rechenaufgabe am selben Mini-Datensatz, dann neuer Datensatz (Transfer)"},
+   "product_fit": {
+    "textbook": "Prinzip: ein winziger, durchgehender Beispieldatensatz trägt durch alle Schritte eines Verfahrens, erst danach allgemeine Formel",
+    "workbook": "Rechenaufgabe am selben Mini-Datensatz, dann neuer Datensatz (Transfer)"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende rechnen ein Verfahren an 3-6 Datenpunkten von Hand nach, bevor die allgemeine Form erscheint.",
    "decision": "EMULATE_PRINCIPLE",
    "reason": "Das 'durchgehende Mini-Beispiel vor Formel' passt zu Worked-Example-Regeln (WE-R1) und ist billig; keine Wirkungsbehauptung für StatQuest selbst.",
-   "not_emulated": ["Sprachmarker/Humor als Markenstil", "Inhalte"],
+   "not_emulated": [
+    "Sprachmarker/Humor als Markenstil",
+    "Inhalte"
+   ],
    "opportunity_cost": "Gering; eine Verlinkung allein brächte keine Aufgabe.",
    "evaluations": [
-    {"id": "R7-EV-STATQUEST-1", "task": "Kapitel zu einem ML-Verfahren in zwei Varianten: Mini-Datensatz zuerst vs. Formel zuerst mit späterem Beispiel; unassistierte Aufgabe an neuem Datensatz nach 1 Woche.", "falsifier": "Kein Vorteil von 'Beispiel zuerst' oberhalb Mindestdifferenz bei Novizen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-STATQUEST-1",
+     "task": "Kapitel zu einem ML-Verfahren in zwei Varianten: Mini-Datensatz zuerst vs. Formel zuerst mit späterem Beispiel; unassistierte Aufgabe an neuem Datensatz nach 1 Woche.",
+     "falsifier": "Kein Vorteil von 'Beispiel zuerst' oberhalb Mindestdifferenz bei Novizen.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-04"]
+   "policy_links": [
+    "R7-POL-04"
+   ]
   },
   {
    "id": "R7-RES-QUANTECON",
    "name": "QuantEcon",
-   "aliases": ["quantecon.org", "QuantEcon.py", "A First Course in Quantitative Economics with Python"],
+   "aliases": [
+    "quantecon.org",
+    "QuantEcon.py",
+    "A First Course in Quantitative Economics with Python"
+   ],
    "category": "statistics",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A"
+   ],
    "official_url": "https://quantecon.org/",
-   "other_urls": ["https://intro.quantecon.org/intro.html", "https://github.com/QuantEcon/QuantEcon.py", "https://github.com/QuantEcon/lecture-python-intro"],
-   "identity": {"verified": true, "method": "quantecon.org und intro.quantecon.org je einmal abgerufen; gh api repos/QuantEcon/QuantEcon.py (/releases/latest), lecture-python-intro (_config.yml)", "owner": "QuantEcon (Sponsor: Chow Institute, Xiamen University; NumFOCUS-Affiliation); Vorlesungen Thomas J. Sargent & John Stachurski", "version_or_activity": "QuantEcon.py v0.13.1 (2026-10-17); Vorlesungsrepos Push 2026-11-26", "access_date": "2026-11-27"},
-   "licence": {"code": "QuantEcon.py MIT", "content": "Vorlesungen CC BY-SA 4.0 (intro.quantecon.org) – Share-Alike: abgeleitete Texte müssten ebenfalls CC BY-SA sein", "reuse_note": "keine Textübernahme; Bibliothek wäre lizenzrechtlich nutzbar"},
+   "other_urls": [
+    "https://intro.quantecon.org/intro.html",
+    "https://github.com/QuantEcon/QuantEcon.py",
+    "https://github.com/QuantEcon/lecture-python-intro"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "quantecon.org und intro.quantecon.org je einmal abgerufen; gh api repos/QuantEcon/QuantEcon.py (/releases/latest), lecture-python-intro (_config.yml)",
+    "owner": "QuantEcon (Sponsor: Chow Institute, Xiamen University; NumFOCUS-Affiliation); Vorlesungen Thomas J. Sargent & John Stachurski",
+    "version_or_activity": "QuantEcon.py v0.13.1 (2026-10-17); Vorlesungsrepos Push 2026-11-26",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "QuantEcon.py MIT",
+    "content": "Vorlesungen CC BY-SA 4.0 (intro.quantecon.org) – Share-Alike: abgeleitete Texte müssten ebenfalls CC BY-SA sein",
+    "reuse_note": "keine Textübernahme; Bibliothek wäre lizenzrechtlich nutzbar"
+   },
    "pedagogical_behaviour": "Vorlesungen als ausführbare Jupyter-Book-Seiten: Modell → Code → Abbildung → Übung mit Lösung; Notebook-Download und Colab-Start.",
-   "learning_operations": ["symbolic_procedure", "computational_construction", "empirical_experimental"],
+   "learning_operations": [
+    "symbolic_procedure",
+    "computational_construction",
+    "empirical_experimental"
+   ],
    "claims": [
-    {"text": "Open source tools for computational economics, developed by economists for economists", "class": "marketing", "locator": "quantecon.org Startseite", "supports_learning_effect": false},
-    {"text": "Notebook-Download und 'Launch Notebook' in Colab", "class": "documented_function", "locator": "intro.quantecon.org/intro.html", "supports_learning_effect": false}
+    {
+     "text": "Open source tools for computational economics, developed by economists for economists",
+     "class": "marketing",
+     "locator": "quantecon.org Startseite",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Notebook-Download und 'Launch Notebook' in Colab",
+     "class": "documented_function",
+     "locator": "intro.quantecon.org/intro.html",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function",
    "importability_api": "Python-Bibliothek; Browser-Ausführung (Pyodide) für numba-abhängige Teile nicht geprüft",
    "offline": "Notebooks lokal ausführbar; Website online",
    "accessibility": "nicht geprüft",
    "cost_maintenance": "aktiv gepflegt; keine Kosten",
-   "product_fit": {"textbook": "optionaler Verweis für Ökonomie-/Finanzdomäne", "interactive": "Prinzip Modell↔Code↔Abbildung ist im Code-Werkbank-Prinzip (R7-POL-08) enthalten"},
+   "product_fit": {
+    "textbook": "optionaler Verweis für Ökonomie-/Finanzdomäne",
+    "interactive": "Prinzip Modell↔Code↔Abbildung ist im Code-Werkbank-Prinzip (R7-POL-08) enthalten"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende lesen extern eine Vorlesung und führen das Notebook in Colab/lokal aus.",
@@ -467,67 +987,154 @@
    "reason": "Fachlich hochwertige, offen lizenzierte Vertiefung für Ökonomie/Finanzen; keine eigene Lernmechanik über 'ausführbares Dokument' hinaus, die nicht schon im Werkbank-Prinzip steckt. Colab-Start wäre ein Datenabfluss – nur lokaler Download empfehlen.",
    "opportunity_cost": "Bibliotheksintegration lohnt erst mit echtem Ökonomie-Kurs; Link ist billig.",
    "evaluations": [
-    {"id": "R7-EV-QUANTECON-1", "task": "Für einen synthetischen Finanz-KC prüfen, ob die verlinkte Vorlesung Notation und Voraussetzungen des Kapitels teilt.", "falsifier": "Notation weicht ab und erzeugt in einer Lesestichprobe Fehlübertragungen – Link mit Warnung oder entfernen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-QUANTECON-1",
+     "task": "Für einen synthetischen Finanz-KC prüfen, ob die verlinkte Vorlesung Notation und Voraussetzungen des Kapitels teilt.",
+     "falsifier": "Notation weicht ab und erzeugt in einer Lesestichprobe Fehlübertragungen – Link mit Warnung oder entfernen.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-10"]
+   "policy_links": [
+    "R7-POL-10"
+   ]
   },
   {
    "id": "R7-RES-OPENDSA",
    "name": "OpenDSA",
-   "aliases": ["opendsa.org", "OpenDSA/OpenDSA"],
+   "aliases": [
+    "opendsa.org",
+    "OpenDSA/OpenDSA"
+   ],
    "category": "cs_coding",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "§D Coding", "Source leads verified 2026-11-26"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "§D Coding",
+    "Source leads verified 2026-11-26"
+   ],
    "official_url": "https://opendsa.org/",
-   "other_urls": ["https://github.com/OpenDSA/OpenDSA", "https://opendsa.readthedocs.io/"],
-   "identity": {"verified": true, "method": "gh api repos/OpenDSA/OpenDSA (Organisation, angelegt 2011-12-21), /license (MIT-license.txt), /readme, /commits (letzter Commit 581426f am 2026-11-25); Abruf opendsa.org/home/about scheiterte (Zertifikat passt nur zu opendsa-server.cs.vt.edu)", "owner": "OpenDSA-Projekt (Copyright Ville Karavirta und Cliff Shaffer, Virginia Tech)", "version_or_activity": "letzter Commit 2026-11-25; Docker-basierter Buildprozess", "access_date": "2026-11-27"},
-   "licence": {"code": "MIT ('OpenDSA Project Distributed under the MIT License', 2011-2025)", "content": "im selben Repo unter MIT (Repo-Lizenzdatei); einzelne eingebundene Drittkomponenten nicht geprüft", "reuse_note": "rechtlich nutzbar; Integration an Server/LTI-Infrastruktur gebunden"},
+   "other_urls": [
+    "https://github.com/OpenDSA/OpenDSA",
+    "https://opendsa.readthedocs.io/"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "gh api repos/OpenDSA/OpenDSA (Organisation, angelegt 2011-12-21), /license (MIT-license.txt), /readme, /commits (letzter Commit 581426f am 2026-11-25); Abruf opendsa.org/home/about scheiterte (Zertifikat passt nur zu opendsa-server.cs.vt.edu)",
+    "owner": "OpenDSA-Projekt (Copyright Ville Karavirta und Cliff Shaffer, Virginia Tech)",
+    "version_or_activity": "letzter Commit 2026-11-25; Docker-basierter Buildprozess",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "MIT ('OpenDSA Project Distributed under the MIT License', 2011-2025)",
+    "content": "im selben Repo unter MIT (Repo-Lizenzdatei); einzelne eingebundene Drittkomponenten nicht geprüft",
+    "reuse_note": "rechtlich nutzbar; Integration an Server/LTI-Infrastruktur gebunden"
+   },
    "pedagogical_behaviour": "eTextbook für Datenstrukturen/Algorithmen: Text mit Algorithmus-Slideshows (Einzelschritt), automatisch bewertete Übungen und 'Proficiency Exercises', in denen Lernende den Algorithmus auf einer visualisierten Struktur selbst ausführen und gegen ein Modell geprüft werden (JSAV).",
-   "learning_operations": ["computational_construction", "diagnostic_reasoning"],
+   "learning_operations": [
+    "computational_construction",
+    "diagnostic_reasoning"
+   ],
    "claims": [
-    {"text": "Courseware, die Lehrbuchtext tief mit Algorithmenvisualisierungen und interaktiven, automatisch bewerteten Übungen integriert", "class": "documented_function", "locator": "README OpenDSA", "supports_learning_effect": false},
-    {"text": "Studie zum Lernverhalten mit OpenDSA (Fouh et al. 2014) existiert; nur Metadaten gelesen", "class": "documented_function", "locator": "fouh2014opendsa (metadata)", "supports_learning_effect": false}
+    {
+     "text": "Courseware, die Lehrbuchtext tief mit Algorithmenvisualisierungen und interaktiven, automatisch bewerteten Übungen integriert",
+     "class": "documented_function",
+     "locator": "README OpenDSA",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Studie zum Lernverhalten mit OpenDSA (Fouh et al. 2014) existiert; nur Metadaten gelesen",
+     "class": "documented_function",
+     "locator": "fouh2014opendsa (metadata)",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function; deskriptive Verhaltensstudie vorhanden, Inhalt nicht gelesen",
-   "scientific_grounding": ["R2-POL-17 (AV nur mit aktiver Lernoperation; Evidenz hundhausen2002/naps2002/grissom2003 in R2)", "keuning2019programmingfeedback"],
+   "scientific_grounding": [
+    "R2-POL-17 (AV nur mit aktiver Lernoperation; Evidenz hundhausen2002/naps2002/grissom2003 in R2)",
+    "keuning2019programmingfeedback"
+   ],
    "importability_api": "Buchbau per Docker/Make; LTI-Anbindung; kein schlanker Embed-Pfad",
    "offline": "selbst hostbar; Offline-Profil nicht geprüft",
    "accessibility": "nicht geprüft",
    "cost_maintenance": "Server-/Docker-Infrastruktur, eigene Buchkonfiguration",
-   "product_fit": {"interactive": "Prinzip: Proficiency-Aufgabe – Lernende führen den nächsten Algorithmusschritt auf der Struktur selbst aus; automatische Prüfung gegen Modell", "workbook": "Papierversion: Zustand nach Schritt k eintragen", "textbook": "Einzelschritt-Slideshow mit Frage je Schritt"},
+   "product_fit": {
+    "interactive": "Prinzip: Proficiency-Aufgabe – Lernende führen den nächsten Algorithmusschritt auf der Struktur selbst aus; automatische Prüfung gegen Modell",
+    "workbook": "Papierversion: Zustand nach Schritt k eintragen",
+    "textbook": "Einzelschritt-Slideshow mit Frage je Schritt"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende klicken in einer Heap-Darstellung die nächste Tauschoperation; falsche Operation erzeugt sofortige Rückmeldung mit Modellzustand.",
    "decision": "EMULATE_PRINCIPLE",
    "reason": "Die Proficiency-Aufgabe ist die konkreteste verfügbare Umsetzung von R2-POL-17 (Visualisierung mit aktiver Operation, lernergesteuertes Tempo). Die Plattform selbst (Docker, LTI, eigenes Buchsystem) wäre eine zweite Lehrbuchinfrastruktur.",
-   "not_emulated": ["Slideshows ohne Frage als Fortschrittspunkt (Credit-Seeking-Risiko)", "eigene Buch-/LMS-Infrastruktur"],
+   "not_emulated": [
+    "Slideshows ohne Frage als Fortschrittspunkt (Credit-Seeking-Risiko)",
+    "eigene Buch-/LMS-Infrastruktur"
+   ],
    "opportunity_cost": "OpenDSA-Hosting würde Wochen kosten und ein Parallel-Lehrbuch erzeugen; Emulation des Aufgabentyps passt in vorhandene Labs.",
    "evaluations": [
-    {"id": "R7-EV-OPENDSA-1", "task": "§D Coding: gleiche Kompetenz (z. B. Binärsuche/Heap-Insert) als (a) Proficiency-Aufgabe, (b) Tracing-Tabelle, (c) Parsons; danach unassistiert neue Eingabe tracen und Komplexitätsfrage beantworten.", "falsifier": "(a) ist im verzögerten unassistierten Tracing nicht besser als (b) bei gleicher Zeit – dann reicht die billigere Tracing-Tabelle.", "status": "NOT_RUN"},
-    {"id": "R7-EV-OPENDSA-2", "task": "Logauswertung: Anteil Schritte, die durch schnelles Durchklicken ohne Fehlversuch-Korrektur erledigt werden.", "falsifier": "Durchklick-Anteil über vorab gesetzter Schwelle – dann Aufgaben ohne Fortschrittspunkte für Ansehen umbauen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-OPENDSA-1",
+     "task": "§D Coding: gleiche Kompetenz (z. B. Binärsuche/Heap-Insert) als (a) Proficiency-Aufgabe, (b) Tracing-Tabelle, (c) Parsons; danach unassistiert neue Eingabe tracen und Komplexitätsfrage beantworten.",
+     "falsifier": "(a) ist im verzögerten unassistierten Tracing nicht besser als (b) bei gleicher Zeit – dann reicht die billigere Tracing-Tabelle.",
+     "status": "NOT_RUN"
+    },
+    {
+     "id": "R7-EV-OPENDSA-2",
+     "task": "Logauswertung: Anteil Schritte, die durch schnelles Durchklicken ohne Fehlversuch-Korrektur erledigt werden.",
+     "falsifier": "Durchklick-Anteil über vorab gesetzter Schwelle – dann Aufgaben ohne Fortschrittspunkte für Ansehen umbauen.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-05", "R7-POL-06"]
+   "policy_links": [
+    "R7-POL-05",
+    "R7-POL-06"
+   ]
   },
   {
    "id": "R7-RES-JSAV",
    "name": "JSAV (JavaScript Algorithm Visualization library)",
-   "aliases": ["JSAV", "vkaravir/JSAV"],
+   "aliases": [
+    "JSAV",
+    "vkaravir/JSAV"
+   ],
    "category": "cs_coding",
-   "preserved_from": ["R7-Ergänzung: Bibliotheksebene von OpenDSA (README verweist auf JSAV)"],
+   "preserved_from": [
+    "R7-Ergänzung: Bibliotheksebene von OpenDSA (README verweist auf JSAV)"
+   ],
    "official_url": "https://github.com/vkaravir/JSAV",
    "other_urls": [],
-   "identity": {"verified": true, "method": "gh api repos/vkaravir/JSAV", "owner": "Ville Karavirta", "version_or_activity": "Push 2026-11-03, 117 Sterne", "access_date": "2026-11-27"},
-   "licence": {"code": "MIT", "content": "nicht anwendbar", "reuse_note": "nutzbar; Abhängigkeiten (u. a. jQuery) nicht geprüft"},
+   "identity": {
+    "verified": true,
+    "method": "gh api repos/vkaravir/JSAV",
+    "owner": "Ville Karavirta",
+    "version_or_activity": "Push 2026-11-03, 117 Sterne",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "MIT",
+    "content": "nicht anwendbar",
+    "reuse_note": "nutzbar; Abhängigkeiten (u. a. jQuery) nicht geprüft"
+   },
    "pedagogical_behaviour": "Bibliothek für Datenstruktur-Visualisierungen und automatisch bewertete Proficiency-Übungen (Modellantwort-Vergleich).",
-   "learning_operations": ["computational_construction"],
+   "learning_operations": [
+    "computational_construction"
+   ],
    "claims": [
-    {"text": "OpenDSA nutzt JSAV als Visualisierungsbibliothek", "class": "documented_function", "locator": "OpenDSA README (Toolchain)", "supports_learning_effect": false}
+    {
+     "text": "OpenDSA nutzt JSAV als Visualisierungsbibliothek",
+     "class": "documented_function",
+     "locator": "OpenDSA README (Toolchain)",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function",
    "importability_api": "JS-Bibliothek; Abhängigkeitsbaum nicht geprüft",
    "offline": "statische Dateien (nicht getestet)",
    "accessibility": "nicht geprüft; klickbasierte SVG-Interaktion lässt Tastaturlücken erwarten (zu prüfen)",
    "cost_maintenance": "Einzelpflege; Fremdabhängigkeiten",
-   "product_fit": {"interactive": "möglicher Baustein für Proficiency-Aufgaben, falls eigene Umsetzung teurer ist"},
+   "product_fit": {
+    "interactive": "möglicher Baustein für Proficiency-Aufgaben, falls eigene Umsetzung teurer ist"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "unsichtbar für Lernende (Darstellungs-/Prüfschicht).",
@@ -535,101 +1142,238 @@
    "reason": "Lizenz passt, aber A11y, Abhängigkeiten und Offline-Größe sind ungeprüft; erst nach einem Spike gegen eine eigene Minimalumsetzung entscheiden.",
    "opportunity_cost": "Spike kostet ca. einen Arbeitstag; ohne ihn droht eine schwer barrierefrei zu machende Abhängigkeit.",
    "evaluations": [
-    {"id": "R7-EV-JSAV-1", "task": "Spike: eine Heap-Insert-Proficiency-Aufgabe mit JSAV und als eigene SVG-Umsetzung; messen: Bundlegröße, Tastaturbedienbarkeit aller Schritte, Screenreader-Ansage des Zustands.", "falsifier": "JSAV erfüllt Tastatur-/Screenreader-Kriterien nicht ohne Fork – dann eigene Umsetzung.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-JSAV-1",
+     "task": "Spike: eine Heap-Insert-Proficiency-Aufgabe mit JSAV und als eigene SVG-Umsetzung; messen: Bundlegröße, Tastaturbedienbarkeit aller Schritte, Screenreader-Ansage des Zustands.",
+     "falsifier": "JSAV erfüllt Tastatur-/Screenreader-Kriterien nicht ohne Fork – dann eigene Umsetzung.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-09"]
+   "policy_links": [
+    "R7-POL-09"
+   ]
   },
   {
    "id": "R7-RES-EXERCISM",
    "name": "Exercism",
-   "aliases": ["exercism.org", "exercism/problem-specifications", "exercism/website"],
+   "aliases": [
+    "exercism.org",
+    "exercism/problem-specifications",
+    "exercism/website"
+   ],
    "category": "cs_coding",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "§D Coding", "Source leads verified 2026-11-26"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "§D Coding",
+    "Source leads verified 2026-11-26"
+   ],
    "official_url": "https://exercism.org/",
-   "other_urls": ["https://exercism.org/docs/building/tracks/practice-exercises", "https://github.com/exercism/problem-specifications"],
-   "identity": {"verified": true, "method": "Doku-Seite einmal abgerufen; gh api repos/exercism/website, repos/exercism/problem-specifications", "owner": "Exercism (UK Not-for-Profit laut Doku)", "version_or_activity": "website Push 2026-11-27; problem-specifications Push 2026-11-26", "access_date": "2026-11-27"},
-   "licence": {"code": "website AGPL-3.0; problem-specifications MIT", "content": "Übungsbeschreibungen/kanonische Testdaten in problem-specifications MIT", "reuse_note": "AGPL-Plattform nicht einbinden; MIT-Testdaten wären für generische Übungen nutzbar (mit Lizenzhinweis)"},
+   "other_urls": [
+    "https://exercism.org/docs/building/tracks/practice-exercises",
+    "https://github.com/exercism/problem-specifications"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "Doku-Seite einmal abgerufen; gh api repos/exercism/website, repos/exercism/problem-specifications",
+    "owner": "Exercism (UK Not-for-Profit laut Doku)",
+    "version_or_activity": "website Push 2026-11-27; problem-specifications Push 2026-11-26",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "website AGPL-3.0; problem-specifications MIT",
+    "content": "Übungsbeschreibungen/kanonische Testdaten in problem-specifications MIT",
+    "reuse_note": "AGPL-Plattform nicht einbinden; MIT-Testdaten wären für generische Übungen nutzbar (mit Lizenzhinweis)"
+   },
    "pedagogical_behaviour": "Übung = Anleitung + Code-Stub + Testsuite (Tests in Reihenfolge, Abbruch beim ersten Fehler oder alle außer dem ersten übersprungen) + verdeckte Beispiellösung, die ausdrücklich nicht Ziel-Code ist; Analyzer schlagen alternative Ansätze vor; menschliches Mentoring.",
-   "learning_operations": ["computational_construction", "diagnostic_reasoning"],
+   "learning_operations": [
+    "computational_construction",
+    "diagnostic_reasoning"
+   ],
    "claims": [
-    {"text": "Tests laufen in Reihenfolge und stoppen beim ersten Fehler oder nur der erste Test ist aktiv", "class": "documented_function", "locator": "docs/building/tracks/practice-exercises (Tests)", "supports_learning_effect": false},
-    {"text": "Beispiellösung wird Lernenden nicht gezeigt und ist 'purposefully not the target code'", "class": "documented_function", "locator": "docs/building/tracks/practice-exercises (Example implementation)", "supports_learning_effect": false},
-    {"text": "100% free, forever", "class": "marketing", "locator": "docs Seite (Organisation)", "supports_learning_effect": false}
+    {
+     "text": "Tests laufen in Reihenfolge und stoppen beim ersten Fehler oder nur der erste Test ist aktiv",
+     "class": "documented_function",
+     "locator": "docs/building/tracks/practice-exercises (Tests)",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Beispiellösung wird Lernenden nicht gezeigt und ist 'purposefully not the target code'",
+     "class": "documented_function",
+     "locator": "docs/building/tracks/practice-exercises (Example implementation)",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "100% free, forever",
+     "class": "marketing",
+     "locator": "docs Seite (Organisation)",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function",
-   "scientific_grounding": ["keuning2019programmingfeedback (automatisches Feedback meist Fehleridentifikation, selten nächster Schritt)", "R2: baniassad2021autograder, messer2024autograding"],
+   "scientific_grounding": [
+    "keuning2019programmingfeedback (automatisches Feedback meist Fehleridentifikation, selten nächster Schritt)",
+    "R2: baniassad2021autograder, messer2024autograding"
+   ],
    "importability_api": "Übungsformat dokumentiert; problem-specifications als JSON-Daten",
    "offline": "CLI lokal; Testausführung lokal möglich",
    "accessibility": "nicht geprüft",
    "cost_maintenance": "Formatemulation billig; Plattformintegration ausgeschlossen (AGPL, Konto)",
-   "product_fit": {"interactive": "Code-Werkbank: Stub + inkrementell freigeschaltete Tests + verdeckte Referenz + Vorhersage vor Lauf (R7-POL-08)", "workbook": "vollständige Musterlösung mit Begründung nach eigenem Versuch", "textbook": "nicht betroffen"},
+   "product_fit": {
+    "interactive": "Code-Werkbank: Stub + inkrementell freigeschaltete Tests + verdeckte Referenz + Vorhersage vor Lauf (R7-POL-08)",
+    "workbook": "vollständige Musterlösung mit Begründung nach eigenem Versuch",
+    "textbook": "nicht betroffen"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende implementieren eine Funktion; der erste Test wird freigeschaltet, nach Bestehen der nächste; vor jedem Lauf sagen sie das Ergebnis vorher.",
    "decision": "EMULATE_PRINCIPLE",
    "reason": "Das inkrementelle Testformat mit verdeckter Referenz ist ein klarer, billig emulierbarer Aufgabentyp für computational_construction; Mentoring (menschlich) und Plattform sind nicht übertragbar.",
-   "not_emulated": ["Testbestehen als Kompetenznachweis (Tests prüfen Verhalten, nicht Verständnis)", "Konto-/Plattformbindung", "menschliches Mentoring als Produktversprechen"],
+   "not_emulated": [
+    "Testbestehen als Kompetenznachweis (Tests prüfen Verhalten, nicht Verständnis)",
+    "Konto-/Plattformbindung",
+    "menschliches Mentoring als Produktversprechen"
+   ],
    "opportunity_cost": "Gering; Alternative Parsons/Tracing (R2) bleibt für Novizen vorgeschaltet.",
    "evaluations": [
-    {"id": "R7-EV-EXERCISM-1", "task": "§D Coding: Implementieren mit inkrementellen Tests vs. mit vollständiger Testsuite auf einmal; danach unassistiert eine Variante mit adversarialem Randfall und Komplexitätsfrage.", "falsifier": "Kein Unterschied im unassistierten Randfall-Test – dann einfachere Vollsuite.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-EXERCISM-1",
+     "task": "§D Coding: Implementieren mit inkrementellen Tests vs. mit vollständiger Testsuite auf einmal; danach unassistiert eine Variante mit adversarialem Randfall und Komplexitätsfrage.",
+     "falsifier": "Kein Unterschied im unassistierten Randfall-Test – dann einfachere Vollsuite.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-08"]
+   "policy_links": [
+    "R7-POL-08"
+   ]
   },
   {
    "id": "R7-RES-PYODIDE",
    "name": "Pyodide",
-   "aliases": ["pyodide.org", "pyodide/pyodide"],
+   "aliases": [
+    "pyodide.org",
+    "pyodide/pyodide"
+   ],
    "category": "cs_coding",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A JupyterLite / Pyodide"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A JupyterLite / Pyodide"
+   ],
    "official_url": "https://pyodide.org/",
-   "other_urls": ["https://github.com/pyodide/pyodide"],
-   "identity": {"verified": true, "method": "gh api repos/pyodide/pyodide, /releases/latest", "owner": "Pyodide-Projekt", "version_or_activity": "Release-Tag '314.0.8' (2026-11-13) laut API; Push 2026-11-27", "access_date": "2026-11-27"},
-   "licence": {"code": "MPL-2.0 (dateibezogenes Copyleft; unveränderte Nutzung unproblematisch)", "content": "nicht anwendbar", "reuse_note": "Mitgelieferte Pakete haben eigene Lizenzen – bei Bündelung prüfen"},
+   "other_urls": [
+    "https://github.com/pyodide/pyodide"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "gh api repos/pyodide/pyodide, /releases/latest",
+    "owner": "Pyodide-Projekt",
+    "version_or_activity": "Release-Tag '314.0.8' (2026-11-13) laut API; Push 2026-11-27",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "MPL-2.0 (dateibezogenes Copyleft; unveränderte Nutzung unproblematisch)",
+    "content": "nicht anwendbar",
+    "reuse_note": "Mitgelieferte Pakete haben eigene Lizenzen – bei Bündelung prüfen"
+   },
    "pedagogical_behaviour": "Python-Distribution für Browser/Node auf WebAssembly; selbst keine Lernlogik.",
-   "learning_operations": ["computational_construction", "empirical_experimental"],
+   "learning_operations": [
+    "computational_construction",
+    "empirical_experimental"
+   ],
    "claims": [
-    {"text": "Python distribution for the browser and Node.js based on WebAssembly", "class": "documented_function", "locator": "gh api repos/pyodide/pyodide description", "supports_learning_effect": false}
+    {
+     "text": "Python distribution for the browser and Node.js based on WebAssembly",
+     "class": "documented_function",
+     "locator": "gh api repos/pyodide/pyodide description",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function",
    "importability_api": "JS-API, Web-Worker-fähig",
    "offline": "statisch selbst hostbar (nicht getestet); Größe und Kaltstart nicht gemessen",
    "accessibility": "Laufzeit ohne UI; A11y hängt am eigenen Editor",
    "cost_maintenance": "aktiv gepflegt; Bundle mehrere MB (Größe nicht gemessen); Versionssprünge",
-   "product_fit": {"interactive": "Ausführungsschicht der Code-Werkbank: Lernenden-Code läuft im eigenen Browser, ohne Server"},
+   "product_fit": {
+    "interactive": "Ausführungsschicht der Code-Werkbank: Lernenden-Code läuft im eigenen Browser, ohne Server"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende drücken 'Ausführen'; Code läuft lokal im Worker mit Zeitlimit; Ergebnis neben Vorhersage.",
    "decision": "REUSE_AS_LIBRARY",
    "reason": "Einzige geprüfte Option, Python-Aufgaben offline ohne Server auszuführen; Browser-Sandbox genügt für eigenen Lernenden-Code. Übernahme nur nach Spike (Offline-Bündel, Größe, Kaltstart, Worker-Abbruch).",
-   "conditions": ["Spike R7-EV-PYODIDE-1 bestanden", "kein Ausführen fremden/untrusted Codes auf Servern (Browser-Sandbox ist kein sicherer Code-Dienst)", "Paketliste mit Lizenzen dokumentiert"],
+   "conditions": [
+    "Spike R7-EV-PYODIDE-1 bestanden",
+    "kein Ausführen fremden/untrusted Codes auf Servern (Browser-Sandbox ist kein sicherer Code-Dienst)",
+    "Paketliste mit Lizenzen dokumentiert"
+   ],
    "opportunity_cost": "Ohne Pyodide bräuchte die Werkbank einen lokalen Python-Prozess oder Server (Sicherheits- und Installationskosten); Spike kostet ca. einen Tag.",
    "evaluations": [
-    {"id": "R7-EV-PYODIDE-1", "task": "Spike: Werkbank-Prototyp offline (Netz getrennt) laden, Kaltstartzeit und übertragene Bytes messen, Endlosschleife per Worker-Terminate abbrechen.", "falsifier": "Offline-Start scheitert, Kaltstart über vorab festgelegter Schwelle oder Abbruch unzuverlässig – dann DEFER und Tracing/Parsons ohne Ausführung.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-PYODIDE-1",
+     "task": "Spike: Werkbank-Prototyp offline (Netz getrennt) laden, Kaltstartzeit und übertragene Bytes messen, Endlosschleife per Worker-Terminate abbrechen.",
+     "falsifier": "Offline-Start scheitert, Kaltstart über vorab festgelegter Schwelle oder Abbruch unzuverlässig – dann DEFER und Tracing/Parsons ohne Ausführung.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-08", "R7-POL-09"]
+   "policy_links": [
+    "R7-POL-08",
+    "R7-POL-09"
+   ]
   },
   {
    "id": "R7-RES-JUPYTERLITE",
    "name": "JupyterLite",
-   "aliases": ["jupyterlite.readthedocs.io", "jupyterlite/jupyterlite"],
+   "aliases": [
+    "jupyterlite.readthedocs.io",
+    "jupyterlite/jupyterlite"
+   ],
    "category": "cs_coding",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A JupyterLite / Pyodide", "§B Statistical simulation and scientific notebooks", "Source leads verified 2026-11-26"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A JupyterLite / Pyodide",
+    "§B Statistical simulation and scientific notebooks",
+    "Source leads verified 2026-11-26"
+   ],
    "official_url": "https://jupyterlite.readthedocs.io/",
-   "other_urls": ["https://github.com/jupyterlite/jupyterlite"],
-   "identity": {"verified": true, "method": "Doku einmal abgerufen; gh api repos/jupyterlite/jupyterlite, /releases/latest", "owner": "Project Jupyter (Frontends-Unterprojekt)", "version_or_activity": "v0.8.7 (2026-10-30); Doku: nur die letzten zwei Releases aktiv unterstützt", "access_date": "2026-11-27"},
-   "licence": {"code": "BSD-3-Clause", "content": "nicht anwendbar", "reuse_note": "nutzbar"},
+   "other_urls": [
+    "https://github.com/jupyterlite/jupyterlite"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "Doku einmal abgerufen; gh api repos/jupyterlite/jupyterlite, /releases/latest",
+    "owner": "Project Jupyter (Frontends-Unterprojekt)",
+    "version_or_activity": "v0.8.7 (2026-10-30); Doku: nur die letzten zwei Releases aktiv unterstützt",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "code": "BSD-3-Clause",
+    "content": "nicht anwendbar",
+    "reuse_note": "nutzbar"
+   },
    "pedagogical_behaviour": "Vollständige JupyterLab-/Notebook-Oberfläche im Browser mit Pyodide- oder Xeus-Kernel im Web Worker; Dateien im Browser-Speicher.",
-   "learning_operations": ["computational_construction", "empirical_experimental"],
+   "learning_operations": [
+    "computational_construction",
+    "empirical_experimental"
+   ],
    "claims": [
-    {"text": "runs entirely in the browser; als statische Dateien auslieferbar", "class": "documented_function", "locator": "jupyterlite.readthedocs.io Startseite", "supports_learning_effect": false},
-    {"text": "Not all the features available in JupyterLab and the Classic Notebook will work with JupyterLite", "class": "documented_function", "locator": "jupyterlite.readthedocs.io Startseite", "supports_learning_effect": false}
+    {
+     "text": "runs entirely in the browser; als statische Dateien auslieferbar",
+     "class": "documented_function",
+     "locator": "jupyterlite.readthedocs.io Startseite",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Not all the features available in JupyterLab and the Classic Notebook will work with JupyterLite",
+     "class": "documented_function",
+     "locator": "jupyterlite.readthedocs.io Startseite",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function",
    "importability_api": "statischer Build; einbettbar",
    "offline": "Doku bestätigt Offline-Betrieb nicht ausdrücklich",
    "accessibility": "JupyterLab-A11y bekannt lückenhaft (nicht geprüft)",
    "cost_maintenance": "großes Bundle; vollständige zweite Arbeitsoberfläche",
-   "product_fit": {"interactive": "nur als optionale 'In Notebook öffnen'-Ansicht für Kurse, die Notebook-Arbeit selbst lehren"},
+   "product_fit": {
+    "interactive": "nur als optionale 'In Notebook öffnen'-Ansicht für Kurse, die Notebook-Arbeit selbst lehren"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende öffnen ein freies Notebook – ohne Aufgabenführung, ohne Vorhersage, ohne Messsignal.",
@@ -637,31 +1381,65 @@
    "reason": "Eine volle Notebook-Oberfläche wäre faktisch eine eigene Arbeitsumgebung neben Interaktiv (Risiko fünfte Produktfläche) und liefert keine geführte Lernoperation; Pyodide deckt die Ausführung ab. Wiederaufnahme, wenn ein Kurs Notebook-Kompetenz selbst als Lernziel hat.",
    "opportunity_cost": "Bundle- und A11y-Kosten ohne zusätzlichen Lernmechanismus gegenüber der Werkbank.",
    "evaluations": [
-    {"id": "R7-EV-JUPYTERLITE-1", "task": "Für einen Scientific-Computing-KC prüfen, ob eine Aufgabe nur mit Notebook-Zellen sinnvoll ist (z. B. iterative Datenexploration).", "falsifier": "Werkbank mit mehreren Codeblöcken deckt die Aufgabe ab – dann bleibt JupyterLite verworfen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-JUPYTERLITE-1",
+     "task": "Für einen Scientific-Computing-KC prüfen, ob eine Aufgabe nur mit Notebook-Zellen sinnvoll ist (z. B. iterative Datenexploration).",
+     "falsifier": "Werkbank mit mehreren Codeblöcken deckt die Aufgabe ab – dann bleibt JupyterLite verworfen.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-08", "R7-POL-10"]
+   "policy_links": [
+    "R7-POL-08",
+    "R7-POL-10"
+   ]
   },
   {
    "id": "R7-RES-GEEKSFORGEEKS",
    "name": "GeeksforGeeks",
-   "aliases": ["geeksforgeeks.org"],
+   "aliases": [
+    "geeksforgeeks.org"
+   ],
    "category": "cs_coding",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "PRODUCT_CONTRACT.md Sources"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "PRODUCT_CONTRACT.md Sources"
+   ],
    "official_url": "https://www.geeksforgeeks.org/",
-   "other_urls": ["https://www.geeksforgeeks.org/about/"],
-   "identity": {"verified": true, "method": "about-Seite einmal abgerufen", "owner": "Sanchhaya Education Private Limited (Noida, Indien), gegründet 2008 von Sandeep Jain", "version_or_activity": "aktiv", "access_date": "2026-11-27"},
-   "licence": {"content": "'All rights reserved'; keine Nachnutzungsangabe", "code": "nicht angegeben", "reuse_note": "keine Übernahme von Text oder Code"},
+   "other_urls": [
+    "https://www.geeksforgeeks.org/about/"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "about-Seite einmal abgerufen",
+    "owner": "Sanchhaya Education Private Limited (Noida, Indien), gegründet 2008 von Sandeep Jain",
+    "version_or_activity": "aktiv",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "'All rights reserved'; keine Nachnutzungsangabe",
+    "code": "nicht angegeben",
+    "reuse_note": "keine Übernahme von Text oder Code"
+   },
    "pedagogical_behaviour": "Tutorials mit Beispielcode in mehreren Sprachen, Übungsaufgaben, Kurse; Beispiele steigen von einfach zu komplex.",
-   "learning_operations": ["computational_construction"],
+   "learning_operations": [
+    "computational_construction"
+   ],
    "claims": [
-    {"text": "content created and curated by top mentors from renowned institutions", "class": "marketing", "locator": "geeksforgeeks.org/about", "supports_learning_effect": false}
+    {
+     "text": "content created and curated by top mentors from renowned institutions",
+     "class": "marketing",
+     "locator": "geeksforgeeks.org/about",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "marketing; kein Redaktionsprozess beschrieben",
    "importability_api": "keine",
    "offline": "nein",
    "accessibility": "nicht geprüft; werbelastige Seiten",
    "cost_maintenance": "teils kostenpflichtige Kurse",
-   "product_fit": {"textbook": "optionaler Zugänglichkeitsverweis, nie Primärquelle (Produktvertrag)"},
+   "product_fit": {
+    "textbook": "optionaler Zugänglichkeitsverweis, nie Primärquelle (Produktvertrag)"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende lesen bei Bedarf ein alternatives Einsteigertutorial.",
@@ -669,129 +1447,314 @@
    "reason": "Produktvertrag legt die Rolle bereits fest (Zugänglichkeitshilfe, nie Autorität); keine Redaktionsangaben, daher nie als Beleg.",
    "opportunity_cost": "keine",
    "evaluations": [
-    {"id": "R7-EV-GFG-1", "task": "Stichprobe von 5 verlinkten Seiten auf fachliche Fehler/abweichende Definitionen gegen Lehrbuchquelle prüfen.", "falsifier": "Mindestens ein sachlicher Fehler in 5 Seiten – Link nur mit Warnhinweis oder entfernen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-GFG-1",
+     "task": "Stichprobe von 5 verlinkten Seiten auf fachliche Fehler/abweichende Definitionen gegen Lehrbuchquelle prüfen.",
+     "falsifier": "Mindestens ein sachlicher Fehler in 5 Seiten – Link nur mit Warnhinweis oder entfernen.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-10"]
+   "policy_links": [
+    "R7-POL-10"
+   ]
   },
   {
    "id": "R7-RES-EXPLORABLES",
    "name": "Explorable Explanations (Bret Victor; Nicky Case und explorabl.es)",
-   "aliases": ["Explorable Explanations", "explorabl.es", "Bret Victor", "Nicky Case", "ncase", "reactive documents"],
+   "aliases": [
+    "Explorable Explanations",
+    "explorabl.es",
+    "Bret Victor",
+    "Nicky Case",
+    "ncase",
+    "reactive documents"
+   ],
    "category": "explorables",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A Explorable Explanations", "Issue #29"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A Explorable Explanations",
+    "Issue #29"
+   ],
    "official_url": "https://explorabl.es/",
-   "other_urls": ["https://worrydream.com/ExplorableExplanations/", "https://github.com/ncase/trust"],
-   "identity": {"verified": true, "method": "explorabl.es und worrydream.com/ExplorableExplanations je einmal abgerufen; gh api repos/ncase/trust; GitHub-Suche nach dem Hub-Repo erfolglos (nur Kopie cj2big/explorabl.es 'Copied from ncase', CC0)", "owner": "Essay: Bret Victor (März 2011, Postskript Februar 2024); Hub: Community ohne genannte Personen; Beispielwerk 'The Evolution of Trust': Nicky Case", "version_or_activity": "Hub ohne Datum; ncase/trust Push 2025-12-29", "access_date": "2026-11-27"},
-   "licence": {"content": "Hub: keine Lizenzangabe ('open sauce'); ncase/trust CC0-1.0", "code": "uneinheitlich je Werk", "reuse_note": "Nur Prinzipien; CC0-Werke wären übernehmbar, aber eigene Inhalte sind Produktvorgabe"},
+   "other_urls": [
+    "https://worrydream.com/ExplorableExplanations/",
+    "https://github.com/ncase/trust"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "explorabl.es und worrydream.com/ExplorableExplanations je einmal abgerufen; gh api repos/ncase/trust; GitHub-Suche nach dem Hub-Repo erfolglos (nur Kopie cj2big/explorabl.es 'Copied from ncase', CC0)",
+    "owner": "Essay: Bret Victor (März 2011, Postskript Februar 2024); Hub: Community ohne genannte Personen; Beispielwerk 'The Evolution of Trust': Nicky Case",
+    "version_or_activity": "Hub ohne Datum; ncase/trust Push 2025-12-29",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "Hub: keine Lizenzangabe ('open sauce'); ncase/trust CC0-1.0",
+    "code": "uneinheitlich je Werk",
+    "reuse_note": "Nur Prinzipien; CC0-Werke wären übernehmbar, aber eigene Inhalte sind Produktvorgabe"
+   },
    "pedagogical_behaviour": "Victor: reaktive Dokumente (Annahme im Text ändern, Folgen aktualisieren sich), explorierbare Beispiele, kontextuelle Information. Case-Werke: spielerische Simulation mit eingebetteten Fragen und schrittweiser Freigabe.",
-   "learning_operations": ["symbolic_procedure", "empirical_experimental", "open_synthesis"],
+   "learning_operations": [
+    "symbolic_procedure",
+    "empirical_experimental",
+    "open_synthesis"
+   ],
    "claims": [
-    {"text": "I want text to be used as an environment to think in", "class": "documented_function", "locator": "worrydream.com/ExplorableExplanations Einleitung (Designabsicht, keine Messung)", "supports_learning_effect": false},
-    {"text": "a hub for learning through play; above all, an experiment", "class": "marketing", "locator": "explorabl.es Startseite", "supports_learning_effect": false}
+    {
+     "text": "I want text to be used as an environment to think in",
+     "class": "documented_function",
+     "locator": "worrydream.com/ExplorableExplanations Einleitung (Designabsicht, keine Messung)",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "a hub for learning through play; above all, an experiment",
+     "class": "marketing",
+     "locator": "explorabl.es Startseite",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "Designessay und Beispielsammlung; keine Lernstudie zu den Werken gefunden",
-   "scientific_grounding": ["hohman2020interactivearticles ('limited empirical evaluation')", "dejong1998 (KB: Entdeckungslernen mit Simulationen braucht Unterstützung)", "karich2014learnercontrol (Lernerkontrolle allein ~0)"],
+   "scientific_grounding": [
+    "hohman2020interactivearticles ('limited empirical evaluation')",
+    "dejong1998 (KB: Entdeckungslernen mit Simulationen braucht Unterstützung)",
+    "karich2014learnercontrol (Lernerkontrolle allein ~0)"
+   ],
    "importability_api": "keine (Werke einzeln)",
    "offline": "werkabhängig",
    "accessibility": "werkabhängig; oft mausorientiert",
    "cost_maintenance": "keine",
-   "product_fit": {"textbook": "reaktive Zahl im Web-Text: Annahme ändern, Folgerung aktualisiert sich; PDF zeigt zwei feste Fälle", "interactive": "explorierbares Beispiel nur mit Mission (R7-POL-03)"},
+   "product_fit": {
+    "textbook": "reaktive Zahl im Web-Text: Annahme ändern, Folgerung aktualisiert sich; PDF zeigt zwei feste Fälle",
+    "interactive": "explorierbares Beispiel nur mit Mission (R7-POL-03)"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende ändern im Text eine Annahme (z. B. Zinssatz) und sagen vorher, in welche Richtung sich die Folgerung bewegt.",
    "decision": "EMULATE_PRINCIPLE",
    "reason": "Reaktive Dokumente und explorierbare Beispiele sind die Leitidee des Interaktiv-Produkts; Evidenz für Lernwirkung freier Exploration ist schwach (karich2014, dejong1998), daher nur mit Ziel, Vorhersage und Variablenkontrolle.",
-   "not_emulated": ["freies Spielen ohne Ziel als Fortschritt", "Spielmetaphern ohne fachliche Aussage (MM-R1)"],
+   "not_emulated": [
+    "freies Spielen ohne Ziel als Fortschritt",
+    "Spielmetaphern ohne fachliche Aussage (MM-R1)"
+   ],
    "opportunity_cost": "Reaktive Zahlen erfordern ein deterministisches Modell je Abschnitt; Kosten nur dort tragen, wo eine Annahme-Folgerung-Beziehung Lerngegenstand ist.",
    "evaluations": [
-    {"id": "R7-EV-EXPLORABLES-1", "task": "Reaktiver Absatz (Annahme änderbar) mit vs. ohne verlangte Richtungsvorhersage; verzögerter Test: neue Annahmeänderung, Richtung und Begründung angeben.", "falsifier": "Kein Vorteil der Vorhersage-Variante oder kein Vorteil gegenüber zwei statischen Fällen im PDF.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-EXPLORABLES-1",
+     "task": "Reaktiver Absatz (Annahme änderbar) mit vs. ohne verlangte Richtungsvorhersage; verzögerter Test: neue Annahmeänderung, Richtung und Begründung angeben.",
+     "falsifier": "Kein Vorteil der Vorhersage-Variante oder kein Vorteil gegenüber zwei statischen Fällen im PDF.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-02", "R7-POL-03"]
+   "policy_links": [
+    "R7-POL-02",
+    "R7-POL-03"
+   ]
   },
   {
    "id": "R7-RES-DISTILL",
    "name": "Distill",
-   "aliases": ["distill.pub", "distillpub/template"],
+   "aliases": [
+    "distill.pub",
+    "distillpub/template"
+   ],
    "category": "explorables",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "Source leads verified 2026-11-26"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "Source leads verified 2026-11-26"
+   ],
    "official_url": "https://distill.pub/",
-   "other_urls": ["https://distill.pub/about/", "https://github.com/distillpub/template", "https://doi.org/10.23915/distill.00028"],
-   "identity": {"verified": true, "method": "distill.pub/about und ein Artikel (10.23915/distill.00028) je einmal abgerufen; gh api repos/distillpub/template", "owner": "Distill (Editoren Shan Carter, Chris Olah)", "version_or_activity": "Journal 2016-2021, seitdem 'indefinite hiatus'; Template letzter Push 2022-12-05", "access_date": "2026-11-27"},
-   "licence": {"content": "Artikel: Text und Diagramme CC BY 4.0, sofern nicht anders vermerkt; übernommene Fremdfiguren ausgenommen (Footer von distill.00028)", "code": "Template Apache-2.0", "reuse_note": "CC BY erlaubt Nachnutzung mit Attribution auch kommerziell; Produktvertrag verlangt dennoch eigene Visuals"},
+   "other_urls": [
+    "https://distill.pub/about/",
+    "https://github.com/distillpub/template",
+    "https://doi.org/10.23915/distill.00028"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "distill.pub/about und ein Artikel (10.23915/distill.00028) je einmal abgerufen; gh api repos/distillpub/template",
+    "owner": "Distill (Editoren Shan Carter, Chris Olah)",
+    "version_or_activity": "Journal 2016-2021, seitdem 'indefinite hiatus'; Template letzter Push 2022-12-05",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "Artikel: Text und Diagramme CC BY 4.0, sofern nicht anders vermerkt; übernommene Fremdfiguren ausgenommen (Footer von distill.00028)",
+    "code": "Template Apache-2.0",
+    "reuse_note": "CC BY erlaubt Nachnutzung mit Attribution auch kommerziell; Produktvertrag verlangt dennoch eigene Visuals"
+   },
    "pedagogical_behaviour": "Web-native Forschungsartikel: Diagramme direkt neben dem Text, Hover-Verknüpfung von Notation und Grafik, manipulierbare Figuren, Fußnoten am Rand.",
-   "learning_operations": ["symbolic_procedure", "open_synthesis"],
+   "learning_operations": [
+    "symbolic_procedure",
+    "open_synthesis"
+   ],
    "claims": [
-    {"text": "devoted to clear explanations, native to the Web", "class": "marketing", "locator": "distill.pub/about", "supports_learning_effect": false},
-    {"text": "interaktive Artikel sind empirisch nur begrenzt evaluiert", "class": "documented_function", "locator": "hohman2020interactivearticles, Critical Reflections", "supports_learning_effect": false}
+    {
+     "text": "devoted to clear explanations, native to the Web",
+     "class": "marketing",
+     "locator": "distill.pub/about",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "interaktive Artikel sind empirisch nur begrenzt evaluiert",
+     "class": "documented_function",
+     "locator": "hohman2020interactivearticles, Critical Reflections",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "Designreview (hohman2020) mit gemischten Einzelbefunden; keine Lernstudie zu Distill-Artikeln",
-   "scientific_grounding": ["hohman2020interactivearticles", "kim2017predictionvis", "tversky2002animation"],
+   "scientific_grounding": [
+    "hohman2020interactivearticles",
+    "kim2017predictionvis",
+    "tversky2002animation"
+   ],
    "importability_api": "Template als Bibliothek (veraltet)",
    "offline": "statische Seiten",
    "accessibility": "nicht geprüft",
    "cost_maintenance": "Template seit 2022 ungepflegt",
-   "product_fit": {"textbook": "Figur neben Text, Notation↔Grafik per Hover/Fokus gekoppelt (MM-R2, CL-R1); Randnotizen statt Fußnotenapparat", "interactive": "manipulierbare Figur nur mit Aussage und Aufgabe"},
+   "product_fit": {
+    "textbook": "Figur neben Text, Notation↔Grafik per Hover/Fokus gekoppelt (MM-R2, CL-R1); Randnotizen statt Fußnotenapparat",
+    "interactive": "manipulierbare Figur nur mit Aussage und Aufgabe"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende fahren über ein Symbol, das zugehörige Bildobjekt wird hervorgehoben (in em_scene.js bereits vorhanden).",
    "decision": "EMULATE_PRINCIPLE",
    "reason": "Text-Figur-Integration und Notationskopplung sind über MM-R2/CL-R1 schon gewollt und teilweise implementiert; Distill liefert den Qualitätsmaßstab, aber keine Lernwirkungsbelege. Template wird nicht genutzt (ungepflegt).",
-   "not_emulated": ["Interaktivität ohne Aufgabe", "lange Scroll-Animationen"],
+   "not_emulated": [
+    "Interaktivität ohne Aufgabe",
+    "lange Scroll-Animationen"
+   ],
    "opportunity_cost": "gering; keine neue Abhängigkeit",
    "evaluations": [
-    {"id": "R7-EV-DISTILL-1", "task": "Layout-Review: Anteil der Lehrbuchfiguren, deren Symbole mit der Formel gleich benannt und gekoppelt sind und die neben dem erklärenden Text stehen.", "falsifier": "Kopplung ändert in einer Stichprobe die Fehlerquote bei Symbol-Zuordnungsfragen nicht – dann nur Konsistenzregel behalten, Hover-Kopplung nicht ausbauen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-DISTILL-1",
+     "task": "Layout-Review: Anteil der Lehrbuchfiguren, deren Symbole mit der Formel gleich benannt und gekoppelt sind und die neben dem erklärenden Text stehen.",
+     "falsifier": "Kopplung ändert in einer Stichprobe die Fehlerquote bei Symbol-Zuordnungsfragen nicht – dann nur Konsistenzregel behalten, Hover-Kopplung nicht ausbauen.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-04"]
+   "policy_links": [
+    "R7-POL-04"
+   ]
   },
   {
    "id": "R7-RES-PHET",
    "name": "PhET Interactive Simulations (ergänzter Vergleichskandidat)",
-   "aliases": ["PhET", "phet.colorado.edu", "phetsims"],
+   "aliases": [
+    "PhET",
+    "phet.colorado.edu",
+    "phetsims"
+   ],
    "category": "explorables",
-   "preserved_from": ["R7-Ergänzung; im Auftrag als Evidenzbeispiel genannt; R4 führt finkelstein2005cck"],
+   "preserved_from": [
+    "R7-Ergänzung; im Auftrag als Evidenzbeispiel genannt; R4 führt finkelstein2005cck"
+   ],
    "official_url": "https://phet.colorado.edu/",
-   "other_urls": ["https://phet.colorado.edu/en/licensing/html", "https://github.com/phetsims/scenery"],
-   "identity": {"verified": true, "method": "gh api repos/phetsims/scenery (MIT); phet.colorado.edu/en/licensing einmal abgerufen (ohne Inhalt gerendert); Lizenzangaben nur aus WebSearch-Snippets der offiziellen Lizenzseite", "owner": "University of Colorado Boulder", "version_or_activity": "aktiv", "access_date": "2026-11-27"},
-   "licence": {"content": "laut Suchsnippet der offiziellen Lizenzseite: reguläre HTML-Simulationen CC BY 4.0; Snippet deutet auf neue Bedingungen für vor dem 29.03.2026 veröffentlichte Versionen – Primärseite nicht gelesen", "code": "laut Snippet simulationsspezifisch GPLv3, gemeinsamer Code MIT (scenery: MIT per API bestätigt); PhET-iO nicht offen", "reuse_note": "vor jeder Bündelung Primärlizenz lesen"},
+   "other_urls": [
+    "https://phet.colorado.edu/en/licensing/html",
+    "https://github.com/phetsims/scenery"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "gh api repos/phetsims/scenery (MIT); phet.colorado.edu/en/licensing einmal abgerufen (ohne Inhalt gerendert); Lizenzangaben nur aus WebSearch-Snippets der offiziellen Lizenzseite",
+    "owner": "University of Colorado Boulder",
+    "version_or_activity": "aktiv",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "laut Suchsnippet der offiziellen Lizenzseite: reguläre HTML-Simulationen CC BY 4.0; Snippet deutet auf neue Bedingungen für vor dem 29.03.2026 veröffentlichte Versionen – Primärseite nicht gelesen",
+    "code": "laut Snippet simulationsspezifisch GPLv3, gemeinsamer Code MIT (scenery: MIT per API bestätigt); PhET-iO nicht offen",
+    "reuse_note": "vor jeder Bündelung Primärlizenz lesen"
+   },
    "pedagogical_behaviour": "Physik-/Chemie-/Mathe-Simulationen mit impliziter Führung (begrenzte, sinnvoll gewählte Regler, sichtbare Größen), entwickelt mit Lernendeninterviews.",
-   "learning_operations": ["empirical_experimental", "symbolic_procedure"],
+   "learning_operations": [
+    "empirical_experimental",
+    "symbolic_procedure"
+   ],
    "claims": [
-    {"text": "Simulationen unter CC BY 4.0 mit Attribution 'PhET Interactive Simulations, University of Colorado Boulder'", "class": "documented_function", "locator": "WebSearch-Snippet phet.colorado.edu/en/licensing/html (nicht primär gelesen)", "supports_learning_effect": false}
+    {
+     "text": "Simulationen unter CC BY 4.0 mit Attribution 'PhET Interactive Simulations, University of Colorado Boulder'",
+     "class": "documented_function",
+     "locator": "WebSearch-Snippet phet.colorado.edu/en/licensing/html (nicht primär gelesen)",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "learning_outcome-Studien existieren (z. B. finkelstein2005cck in R4), hier nicht erneut geprüft",
-   "scientific_grounding": ["R4-POL-07 (Simulation mit Nicht-Transfer-Etikett; finkelstein2005cck)", "dejong1998 (KB)"],
+   "scientific_grounding": [
+    "R4-POL-07 (Simulation mit Nicht-Transfer-Etikett; finkelstein2005cck)",
+    "dejong1998 (KB)"
+   ],
    "importability_api": "HTML5-Dateien herunterladbar (nicht geprüft)",
    "offline": "HTML-Dateien offline nutzbar (nicht geprüft)",
    "accessibility": "PhET betreibt Inklusions-Features (nicht geprüft)",
    "cost_maintenance": "kostenlos; Lizenzwechsel 2026 zu prüfen",
-   "product_fit": {"interactive": "Prinzip implizite Führung: wenige, zielrelevante Regler, Guided vor Explore (CL-R2)", "textbook": "optionaler Link bei Naturwissenschafts-Grundlagen"},
+   "product_fit": {
+    "interactive": "Prinzip implizite Führung: wenige, zielrelevante Regler, Guided vor Explore (CL-R2)",
+    "textbook": "optionaler Link bei Naturwissenschafts-Grundlagen"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende bedienen 2-3 Regler mit klarer Mission statt eines vollen Parameterraums.",
    "decision": "EMULATE_PRINCIPLE",
    "reason": "Implizite Führung durch Reglerauswahl ist ein designbasierter, in Studien untersuchter Ansatz (R4) und passt zu CL-R2; Bündelung der Simulationen selbst erst nach Primärlizenzprüfung (Link ist jederzeit möglich).",
-   "not_emulated": ["Branding/Assets", "Bündelung ohne Lizenzprüfung"],
+   "not_emulated": [
+    "Branding/Assets",
+    "Bündelung ohne Lizenzprüfung"
+   ],
    "opportunity_cost": "gering; Prinzip ändert nur die Reglerauswahl eigener Labs",
    "evaluations": [
-    {"id": "R7-EV-PHET-1", "task": "Lab mit 2 zielrelevanten Reglern (Guided) vs. allen 6 Reglern (Explore) für dieselbe Mission; verzögerter Transfer: neue Situation, Vorhersage mit Begründung.", "falsifier": "Explore-Variante ist im Transfer nicht schlechter bei Novizen – dann Guided nur optional.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-PHET-1",
+     "task": "Lab mit 2 zielrelevanten Reglern (Guided) vs. allen 6 Reglern (Explore) für dieselbe Mission; verzögerter Transfer: neue Situation, Vorhersage mit Begründung.",
+     "falsifier": "Explore-Variante ist im Transfer nicht schlechter bei Novizen – dann Guided nur optional.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-03"]
+   "policy_links": [
+    "R7-POL-03"
+   ]
   },
   {
    "id": "R7-RES-BRILLIANT",
    "name": "Brilliant",
-   "aliases": ["brilliant.org", "Koji"],
+   "aliases": [
+    "brilliant.org",
+    "Koji"
+   ],
    "category": "commercial_platform",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A"
+   ],
    "official_url": "https://brilliant.org/",
-   "other_urls": ["https://brilliant.org/about/"],
-   "identity": {"verified": true, "method": "about-Seite einmal abgerufen", "owner": "Brilliant Worldwide, Inc.", "version_or_activity": "aktiv; KI-Tutor 'Koji'", "access_date": "2026-11-27"},
-   "licence": {"content": "proprietär", "code": "proprietär", "reuse_note": "nichts übernehmbar"},
+   "other_urls": [
+    "https://brilliant.org/about/"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "about-Seite einmal abgerufen",
+    "owner": "Brilliant Worldwide, Inc.",
+    "version_or_activity": "aktiv; KI-Tutor 'Koji'",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "proprietär",
+    "code": "proprietär",
+    "reuse_note": "nichts übernehmbar"
+   },
    "pedagogical_behaviour": "Kurze interaktive Lektionen: visuelle Erklärung, Manipulation, Rechnen; Pretest vor Verfahren; Übungssätze mit Spacing, gemischten Typen und Hinweisentzug; Gamification (Streaks, Ligen, XP).",
-   "learning_operations": ["symbolic_procedure", "recall_discrimination"],
+   "learning_operations": [
+    "symbolic_procedure",
+    "recall_discrimination"
+   ],
    "claims": [
-    {"text": "Lernende werden vor dem Verfahren getestet; Übungen mit Spacing, gemischten Typen, Hinweisentzug", "class": "documented_function", "locator": "brilliant.org/about", "supports_learning_effect": false},
-    {"text": "millions of problem tries every day; 'our testing to date' ohne Daten", "class": "marketing", "locator": "brilliant.org/about", "supports_learning_effect": false}
+    {
+     "text": "Lernende werden vor dem Verfahren getestet; Übungen mit Spacing, gemischten Typen, Hinweisentzug",
+     "class": "documented_function",
+     "locator": "brilliant.org/about",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "millions of problem tries every day; 'our testing to date' ohne Daten",
+     "class": "marketing",
+     "locator": "brilliant.org/about",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "marketing/documented_function; keine benannte Studie",
    "importability_api": "keine",
@@ -806,25 +1769,62 @@
    "reason": "Die beschriebenen Mechanismen (Pretesting, Spacing, Interleaving, Fading) sind bereits als R1-Policies (A11, A05, A04, A03) mit eigener Evidenz erfasst; Brilliant fügt keinen belegten Mechanismus hinzu. Eigene Spacing-Logik widerspräche AD-1, Streaks/XP widersprechen R1-POL-B05 und MC-R2. Wiederaufnahme nur bei veröffentlichter, kontrollierter Lernstudie.",
    "opportunity_cost": "keine; ein Abo-Link widerspräche Offline/Kostenfreiheit",
    "evaluations": [
-    {"id": "R7-EV-BRILLIANT-1", "task": "Jährliche Prüfung: hat Brilliant eine kontrollierte Lernstudie veröffentlicht?", "falsifier": "Studie mit Vergleichsgruppe und verzögertem Test liegt vor – Karte neu bewerten.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-BRILLIANT-1",
+     "task": "Jährliche Prüfung: hat Brilliant eine kontrollierte Lernstudie veröffentlicht?",
+     "falsifier": "Studie mit Vergleichsgruppe und verzögertem Test liegt vor – Karte neu bewerten.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-06"]
+   "policy_links": [
+    "R7-POL-06"
+   ]
   },
   {
    "id": "R7-RES-MATHACADEMY",
    "name": "Math Academy (Sequenz-/Übungsdesign)",
-   "aliases": ["Math Academy", "mathacademy.com", "FIRe"],
+   "aliases": [
+    "Math Academy",
+    "mathacademy.com",
+    "FIRe"
+   ],
    "category": "commercial_platform",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "§F (R9)"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "§F (R9)"
+   ],
    "official_url": "https://www.mathacademy.com/how-our-ai-works",
    "other_urls": [],
-   "identity": {"verified": true, "method": "aus R9-Karte RES-MATHACADEMY übernommen, nicht erneut abgerufen", "owner": "Math Academy (laut R9)", "version_or_activity": "siehe R9", "access_date": "2026-11-27"},
-   "licence": {"content": "proprietär", "code": "proprietär", "reuse_note": "nichts übernehmbar"},
+   "identity": {
+    "verified": true,
+    "method": "aus R9-Karte RES-MATHACADEMY übernommen, nicht erneut abgerufen",
+    "owner": "Math Academy (laut R9)",
+    "version_or_activity": "siehe R9",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "proprietär",
+    "code": "proprietär",
+    "reuse_note": "nichts übernehmbar"
+   },
    "pedagogical_behaviour": "Nicht-Tutor-Aspekte: Voraussetzungsgraph (ca. 300 Themen je Kurs), diagnostische Einstufung, Aufgabenauswahl, eigene Wiederholungstheorie FIRe (laut R9-Karte).",
-   "learning_operations": ["symbolic_procedure", "self_regulation"],
+   "learning_operations": [
+    "symbolic_procedure",
+    "self_regulation"
+   ],
    "claims": [
-    {"text": "Wissensgraph, Diagnostik und Aufgabenwahl; FIRe-Wiederholungen 'trickle down'", "class": "documented_function", "locator": "R9 RES-MATHACADEMY claims 1-2", "supports_learning_effect": false},
-    {"text": "Diagnostik reduziert Fragenzahl 'by an order of magnitude'", "class": "marketing", "locator": "R9 RES-MATHACADEMY claim 3", "supports_learning_effect": false}
+    {
+     "text": "Wissensgraph, Diagnostik und Aufgabenwahl; FIRe-Wiederholungen 'trickle down'",
+     "class": "documented_function",
+     "locator": "R9 RES-MATHACADEMY claims 1-2",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Diagnostik reduziert Fragenzahl 'by an order of magnitude'",
+     "class": "marketing",
+     "locator": "R9 RES-MATHACADEMY claim 3",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function (laut R9)",
    "r9_card": "RES-MATHACADEMY",
@@ -832,7 +1832,9 @@
    "offline": "nein",
    "accessibility": "nicht geprüft",
    "cost_maintenance": "Abo",
-   "product_fit": {"workbook": "Voraussetzungsreihenfolge der Aufgaben ist Engine-Thema (Kompetenzgraph), nicht R7"},
+   "product_fit": {
+    "workbook": "Voraussetzungsreihenfolge der Aufgaben ist Engine-Thema (Kompetenzgraph), nicht R7"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "geschlossene App",
@@ -841,25 +1843,57 @@
    "deferred_to": "R6",
    "opportunity_cost": "keine für R7",
    "evaluations": [
-    {"id": "R7-EV-MATHACADEMY-1", "task": "R6 prüft, ob diagnostische Einstufung über den Kompetenzgraphen die Zahl nötiger Einstiegsitems gegenüber linearem Einstieg senkt, ohne Fehleinstufung über Schwelle.", "falsifier": "Fehleinstufungsrate über Schwelle – Diagnose nicht übernehmen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-MATHACADEMY-1",
+     "task": "R6 prüft, ob diagnostische Einstufung über den Kompetenzgraphen die Zahl nötiger Einstiegsitems gegenüber linearem Einstieg senkt, ohne Fehleinstufung über Schwelle.",
+     "falsifier": "Fehleinstufungsrate über Schwelle – Diagnose nicht übernehmen.",
+     "status": "NOT_RUN"
+    }
    ],
    "policy_links": []
   },
   {
    "id": "R7-RES-REMNOTE",
    "name": "RemNote (Nicht-Tutor-, Nicht-SRS-Aspekte)",
-   "aliases": ["RemNote", "remnote.com"],
+   "aliases": [
+    "RemNote",
+    "remnote.com"
+   ],
    "category": "commercial_platform",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A"
+   ],
    "official_url": "https://www.remnote.com/",
    "other_urls": [],
-   "identity": {"verified": true, "method": "aus R9-Karte RES-REMNOTE übernommen (Firma bestätigt; 'Guided Learn Mode' unbestätigt)", "owner": "RemNote (laut R9)", "version_or_activity": "siehe R9", "access_date": "2026-11-27"},
-   "licence": {"content": "proprietär", "code": "proprietär", "reuse_note": "nichts übernehmbar"},
+   "identity": {
+    "verified": true,
+    "method": "aus R9-Karte RES-REMNOTE übernommen (Firma bestätigt; 'Guided Learn Mode' unbestätigt)",
+    "owner": "RemNote (laut R9)",
+    "version_or_activity": "siehe R9",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "proprietär",
+    "code": "proprietär",
+    "reuse_note": "nichts übernehmbar"
+   },
    "pedagogical_behaviour": "Notizen mit Inline-Karten und 'Explanations on Your Cards' (laut R9-Startseitenauszug); kein eigenständiger Visualisierungsmechanismus.",
-   "learning_operations": ["recall_discrimination"],
+   "learning_operations": [
+    "recall_discrimination"
+   ],
    "claims": [
-    {"text": "Eingebauter Spaced-Repetition-Algorithmus; offline mit Sync", "class": "documented_function", "locator": "R9 RES-REMNOTE claim 2", "supports_learning_effect": false},
-    {"text": "dramatically increase long-term retention", "class": "marketing", "locator": "R9 RES-REMNOTE claim 3", "supports_learning_effect": false}
+    {
+     "text": "Eingebauter Spaced-Repetition-Algorithmus; offline mit Sync",
+     "class": "documented_function",
+     "locator": "R9 RES-REMNOTE claim 2",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "dramatically increase long-term retention",
+     "class": "marketing",
+     "locator": "R9 RES-REMNOTE claim 3",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "marketing (laut R9)",
    "r9_card": "RES-REMNOTE",
@@ -876,61 +1910,140 @@
    "deferred_to": "R8",
    "opportunity_cost": "keine für R7",
    "evaluations": [
-    {"id": "R7-EV-REMNOTE-1", "task": "Übergabe an R8: Export/Import-Pfad ohne zweiten Scheduler prüfen.", "falsifier": "nicht R7", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-REMNOTE-1",
+     "task": "Übergabe an R8: Export/Import-Pfad ohne zweiten Scheduler prüfen.",
+     "falsifier": "nicht R7",
+     "status": "NOT_RUN"
+    }
    ],
    "policy_links": []
   },
   {
    "id": "R7-RES-MARGINSTUDY",
    "name": "Margin Study (lokaler PDF-Annotator)",
-   "aliases": ["marginstudy", "Margin Study", "marginstudy.app"],
+   "aliases": [
+    "marginstudy",
+    "Margin Study",
+    "marginstudy.app"
+   ],
    "category": "commercial_platform",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A marginstudy", "§F (R9)"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A marginstudy",
+    "§F (R9)"
+   ],
    "official_url": "https://marginstudy.app/",
    "other_urls": [],
-   "identity": {"verified": true, "method": "aus R9-Karte RES-MARGINSTUDY übernommen; R9-Korrektur: kein Tutor, sondern lokaler PDF-Leser mit Randnotizen", "owner": "nicht angegeben (laut R9)", "version_or_activity": "v1.4.0, macOS Apple Silicon (laut R9)", "access_date": "2026-11-27"},
-   "licence": {"content": "proprietär, Einmalkauf", "code": "proprietär", "reuse_note": "nichts übernehmbar"},
+   "identity": {
+    "verified": true,
+    "method": "aus R9-Karte RES-MARGINSTUDY übernommen; R9-Korrektur: kein Tutor, sondern lokaler PDF-Leser mit Randnotizen",
+    "owner": "nicht angegeben (laut R9)",
+    "version_or_activity": "v1.4.0, macOS Apple Silicon (laut R9)",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "proprietär, Einmalkauf",
+    "code": "proprietär",
+    "reuse_note": "nichts übernehmbar"
+   },
    "pedagogical_behaviour": "Notiz unter einer Textzeile in eigenen Worten (Tastenkürzel), Notizkarte, Export; lokal, ohne Konto.",
-   "learning_operations": ["recall_discrimination", "symbolic_procedure"],
+   "learning_operations": [
+    "recall_discrimination",
+    "symbolic_procedure"
+   ],
    "claims": [
-    {"text": "Notiz unter der Zeile in eigenen Worten; lokal, offline, ohne Konto", "class": "documented_function", "locator": "R9 RES-MARGINSTUDY claims 1-2", "supports_learning_effect": false},
-    {"text": "Verweis auf Rey et al. 2019 (Segmentierung) als Begründung", "class": "marketing", "locator": "R9 RES-MARGINSTUDY claim 3 (Studie betrifft nicht das Produkt)", "supports_learning_effect": false}
+    {
+     "text": "Notiz unter der Zeile in eigenen Worten; lokal, offline, ohne Konto",
+     "class": "documented_function",
+     "locator": "R9 RES-MARGINSTUDY claims 1-2",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Verweis auf Rey et al. 2019 (Segmentierung) als Begründung",
+     "class": "marketing",
+     "locator": "R9 RES-MARGINSTUDY claim 3 (Studie betrifft nicht das Produkt)",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "documented_function (laut R9)",
    "r9_card": "RES-MARGINSTUDY",
-   "scientific_grounding": ["fiorella2016 (KB: generative Lernstrategien, u. a. Zusammenfassen)", "chi2014 (KB: ICAP)"],
+   "scientific_grounding": [
+    "fiorella2016 (KB: generative Lernstrategien, u. a. Zusammenfassen)",
+    "chi2014 (KB: ICAP)"
+   ],
    "importability_api": "keine",
    "offline": "ja (laut R9)",
    "accessibility": "nicht geprüft",
    "cost_maintenance": "39 USD einmalig (laut R9)",
-   "product_fit": {"textbook": "Web-Lehrbuch: optionales Feld 'in eigenen Worten' an Absatzende, lokal gespeichert, nie bewertet (SE-R2)", "interactive": "dieselben Notizen im Sichern-Schritt der Labs sichtbar"},
+   "product_fit": {
+    "textbook": "Web-Lehrbuch: optionales Feld 'in eigenen Worten' an Absatzende, lokal gespeichert, nie bewertet (SE-R2)",
+    "interactive": "dieselben Notizen im Sichern-Schritt der Labs sichtbar"
+   },
    "fifth_product": false,
    "second_scheduler": false,
    "user_workflow": "Lernende schreiben nach einem Abschnitt einen Satz in eigenen Worten; später sehen sie ihn neben der Expertenzusammenfassung.",
    "decision": "EMULATE_PRINCIPLE",
    "reason": "Generatives Paraphrasieren am Ort des Lesens ist ein billiger, lokal umsetzbarer Mechanismus (ICAP 'constructive'); Wirkung ist von der Qualität der Paraphrase abhängig und wird nicht automatisch bewertet. Das Produkt selbst wird nicht empfohlen (macOS-only, proprietär); Notizwerkzeug-Fragen bleiben bei R8.",
-   "not_emulated": ["automatische Bewertung der Paraphrase", "Notizen als Fortschrittsmaß"],
+   "not_emulated": [
+    "automatische Bewertung der Paraphrase",
+    "Notizen als Fortschrittsmaß"
+   ],
    "opportunity_cost": "gering; Risiko: Pflichtnotizen verlängern Lesezeit ohne Nutzen – daher optional",
    "evaluations": [
-    {"id": "R7-EV-MARGIN-1", "task": "Kapitel mit optionalem Paraphrasefeld vs. ohne; Nutzungsquote und verzögerter Test zu Abschnitten mit/ohne eigene Paraphrase (within-learner).", "falsifier": "Abschnitte mit Paraphrase zeigen keinen Vorteil oder Nutzungsquote unter Schwelle – Feld entfernen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-MARGIN-1",
+     "task": "Kapitel mit optionalem Paraphrasefeld vs. ohne; Nutzungsquote und verzögerter Test zu Abschnitten mit/ohne eigene Paraphrase (within-learner).",
+     "falsifier": "Abschnitte mit Paraphrase zeigen keinen Vorteil oder Nutzungsquote unter Schwelle – Feld entfernen.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-06"]
+   "policy_links": [
+    "R7-POL-06"
+   ]
   },
   {
    "id": "R7-RES-YOULEARN",
    "name": "YouLearn (Nicht-Tutor-Aspekte)",
-   "aliases": ["YouLearn", "youlearn.ai"],
+   "aliases": [
+    "YouLearn",
+    "youlearn.ai"
+   ],
    "category": "commercial_platform",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "§F (R9)"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "§F (R9)"
+   ],
    "official_url": "https://www.youlearn.ai/",
    "other_urls": [],
-   "identity": {"verified": true, "method": "aus R9-Karte RES-YOULEARN übernommen", "owner": "YouLearn Inc. (laut R9)", "version_or_activity": "siehe R9", "access_date": "2026-11-27"},
-   "licence": {"content": "proprietär", "code": "proprietär", "reuse_note": "nichts übernehmbar"},
+   "identity": {
+    "verified": true,
+    "method": "aus R9-Karte RES-YOULEARN übernommen",
+    "owner": "YouLearn Inc. (laut R9)",
+    "version_or_activity": "siehe R9",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "proprietär",
+    "code": "proprietär",
+    "reuse_note": "nichts übernehmbar"
+   },
    "pedagogical_behaviour": "Erzeugt aus Uploads Zusammenfassungen, Quiz und Podcast (laut R9).",
-   "learning_operations": ["recall_discrimination"],
+   "learning_operations": [
+    "recall_discrimination"
+   ],
    "claims": [
-    {"text": "Zusammenfassungen, Quiz, Podcast aus PDFs/YouTube/Folien", "class": "documented_function", "locator": "R9 RES-YOULEARN claim 1", "supports_learning_effect": false},
-    {"text": "Loved by 2,000,000+ learners", "class": "marketing", "locator": "R9 RES-YOULEARN claim 2", "supports_learning_effect": false}
+    {
+     "text": "Zusammenfassungen, Quiz, Podcast aus PDFs/YouTube/Folien",
+     "class": "documented_function",
+     "locator": "R9 RES-YOULEARN claim 1",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "Loved by 2,000,000+ learners",
+     "class": "marketing",
+     "locator": "R9 RES-YOULEARN claim 2",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "marketing (laut R9)",
    "r9_card": "RES-YOULEARN",
@@ -946,25 +2059,60 @@
    "reason": "Nicht-Tutor-Funktionen sind generierte Zusammenfassungen und Podcasts, also passive Formate, die nach carpenter2013/2016 Lernurteile stärker heben können als Lernen; kein eigener Erklär-/Visualisierungsmechanismus; Cloud-only.",
    "opportunity_cost": "keine",
    "evaluations": [
-    {"id": "R7-EV-YOULEARN-1", "task": "Nur falls ein Owner es fordert: generierte Zusammenfassung vs. eigener Abruf gleicher Zeit, verzögerter Test.", "falsifier": "Zusammenfassung ist nicht schlechter als Abruf – Ablehnungsgrund 'passiv' neu prüfen.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-YOULEARN-1",
+     "task": "Nur falls ein Owner es fordert: generierte Zusammenfassung vs. eigener Abruf gleicher Zeit, verzögerter Test.",
+     "falsifier": "Zusammenfassung ist nicht schlechter als Abruf – Ablehnungsgrund 'passiv' neu prüfen.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-06"]
+   "policy_links": [
+    "R7-POL-06"
+   ]
   },
   {
    "id": "R7-RES-STUDYFETCH",
    "name": "StudyFetch (Nicht-Tutor-Aspekte: generierte Mini-Apps und Lernhilfen)",
-   "aliases": ["StudyFetch", "studyfetch.com"],
+   "aliases": [
+    "StudyFetch",
+    "studyfetch.com"
+   ],
    "category": "commercial_platform",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "§F (R9)"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "§F (R9)"
+   ],
    "official_url": "https://www.studyfetch.com/",
    "other_urls": [],
-   "identity": {"verified": true, "method": "aus R9-Karte RES-STUDYFETCH übernommen", "owner": "StudyFetch, Inc. (laut R9)", "version_or_activity": "siehe R9", "access_date": "2026-11-27"},
-   "licence": {"content": "proprietär", "code": "proprietär", "reuse_note": "nichts übernehmbar"},
+   "identity": {
+    "verified": true,
+    "method": "aus R9-Karte RES-STUDYFETCH übernommen",
+    "owner": "StudyFetch, Inc. (laut R9)",
+    "version_or_activity": "siehe R9",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "proprietär",
+    "code": "proprietär",
+    "reuse_note": "nichts übernehmbar"
+   },
    "pedagogical_behaviour": "Generierte Karten, Quiz, Lernhilfen mit Zitat an Unterlagen; Registry erwähnt 'diverse mini-apps' (nicht primär bestätigt).",
-   "learning_operations": ["recall_discrimination"],
+   "learning_operations": [
+    "recall_discrimination"
+   ],
    "claims": [
-    {"text": "Karten/Quizfragen mit Zitaten zu Originalunterlagen", "class": "documented_function", "locator": "R9 RES-STUDYFETCH claim 2", "supports_learning_effect": false},
-    {"text": "92 %/85 % berichten bessere Noten, 30 % weniger Lernzeit (Eigenbefragung ohne Kontrollgruppe)", "class": "marketing", "locator": "R9 RES-STUDYFETCH claim 3", "supports_learning_effect": false}
+    {
+     "text": "Karten/Quizfragen mit Zitaten zu Originalunterlagen",
+     "class": "documented_function",
+     "locator": "R9 RES-STUDYFETCH claim 2",
+     "supports_learning_effect": false
+    },
+    {
+     "text": "92 %/85 % berichten bessere Noten, 30 % weniger Lernzeit (Eigenbefragung ohne Kontrollgruppe)",
+     "class": "marketing",
+     "locator": "R9 RES-STUDYFETCH claim 3",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "marketing (laut R9)",
    "r9_card": "RES-STUDYFETCH",
@@ -980,24 +2128,57 @@
    "reason": "Generierte Mini-Apps ohne festgelegte Lernoperation sind genau das, was R7-POL-01 ausschließt; eigene Karten widersprechen AD-1; Wirkbehauptungen sind Selbstauskunft.",
    "opportunity_cost": "keine",
    "evaluations": [
-    {"id": "R7-EV-STUDYFETCH-1", "task": "Keine eigene Evaluation; nur Wiederaufnahme bei unabhängiger Studie.", "falsifier": "Unabhängige kontrollierte Studie mit verzögertem Test zeigt Vorteil generierter Mini-Apps gegenüber gezielter Übung.", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-STUDYFETCH-1",
+     "task": "Keine eigene Evaluation; nur Wiederaufnahme bei unabhängiger Studie.",
+     "falsifier": "Unabhängige kontrollierte Studie mit verzögertem Test zeigt Vorteil generierter Mini-Apps gegenüber gezielter Übung.",
+     "status": "NOT_RUN"
+    }
    ],
-   "policy_links": ["R7-POL-01"]
+   "policy_links": [
+    "R7-POL-01"
+   ]
   },
   {
    "id": "R7-RES-KHANMIGO",
    "name": "Khanmigo / Khan Labs",
-   "aliases": ["Khanmigo", "khanacademy.org/khan-labs", "Khan Academy"],
+   "aliases": [
+    "Khanmigo",
+    "khanacademy.org/khan-labs",
+    "Khan Academy"
+   ],
    "category": "commercial_platform",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "§F (R9)"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "§F (R9)"
+   ],
    "official_url": "https://www.khanmigo.ai/",
-   "other_urls": ["https://www.khanacademy.org/khan-labs"],
-   "identity": {"verified": true, "method": "aus R9-Karte RES-KHANMIGO übernommen", "owner": "Khan Academy (laut R9)", "version_or_activity": "siehe R9", "access_date": "2026-11-27"},
-   "licence": {"content": "proprietär (Dienst)", "code": "proprietär", "reuse_note": "nichts übernehmbar"},
+   "other_urls": [
+    "https://www.khanacademy.org/khan-labs"
+   ],
+   "identity": {
+    "verified": true,
+    "method": "aus R9-Karte RES-KHANMIGO übernommen",
+    "owner": "Khan Academy (laut R9)",
+    "version_or_activity": "siehe R9",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "proprietär (Dienst)",
+    "code": "proprietär",
+    "reuse_note": "nichts übernehmbar"
+   },
    "pedagogical_behaviour": "Tutor im Übungsfluss; Nicht-Tutor-Aspekte (Lehrkräfte-Werkzeuge) für Selbstlernende irrelevant.",
-   "learning_operations": ["symbolic_procedure"],
+   "learning_operations": [
+    "symbolic_procedure"
+   ],
    "claims": [
-    {"text": "Tutor 'without giving you direct answers'", "class": "documented_function", "locator": "R9 RES-KHANMIGO claim 1", "supports_learning_effect": false}
+    {
+     "text": "Tutor 'without giving you direct answers'",
+     "class": "documented_function",
+     "locator": "R9 RES-KHANMIGO claim 1",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "learning_outcome (laut R9: NBER WP 35620) – Tutor-Frage, hier nicht wiederholt",
    "r9_card": "RES-KHANMIGO",
@@ -1014,24 +2195,52 @@
    "deferred_to": "R9",
    "opportunity_cost": "keine",
    "evaluations": [
-    {"id": "R7-EV-KHANMIGO-1", "task": "Siehe R9 TUTOR_EVALUATION_PROTOCOL.md.", "falsifier": "nicht R7", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-KHANMIGO-1",
+     "task": "Siehe R9 TUTOR_EVALUATION_PROTOCOL.md.",
+     "falsifier": "nicht R7",
+     "status": "NOT_RUN"
+    }
    ],
    "policy_links": []
   },
   {
    "id": "R7-RES-UTTERSEEN",
    "name": "Utterseen / Screen-Context-Begleiter",
-   "aliases": ["Utterseen", "screen-context companions"],
+   "aliases": [
+    "Utterseen",
+    "screen-context companions"
+   ],
    "category": "commercial_platform",
-   "preserved_from": ["RESOURCE_IDEA_REGISTRY_20261126.md §A", "§F (R9)"],
+   "preserved_from": [
+    "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+    "§F (R9)"
+   ],
    "official_url": "https://utterseen.com/",
    "other_urls": [],
-   "identity": {"verified": true, "method": "aus R9-Karte RES-UTTERSEEN übernommen", "owner": "FAINETZ CORP (laut R9)", "version_or_activity": "siehe R9", "access_date": "2026-11-27"},
-   "licence": {"content": "proprietär", "code": "proprietär", "reuse_note": "nichts übernehmbar"},
+   "identity": {
+    "verified": true,
+    "method": "aus R9-Karte RES-UTTERSEEN übernommen",
+    "owner": "FAINETZ CORP (laut R9)",
+    "version_or_activity": "siehe R9",
+    "access_date": "2026-11-27"
+   },
+   "licence": {
+    "content": "proprietär",
+    "code": "proprietär",
+    "reuse_note": "nichts übernehmbar"
+   },
    "pedagogical_behaviour": "Sprachassistent mit Screenshot je Frage (laut R9); kein Erklär-/Visualisierungsmechanismus.",
-   "learning_operations": ["self_regulation"],
+   "learning_operations": [
+    "self_regulation"
+   ],
    "claims": [
-    {"text": "Screenshots und Sprache werden an KI-Anbieter gesendet", "class": "documented_function", "locator": "R9 RES-UTTERSEEN claim 2", "supports_learning_effect": false}
+    {
+     "text": "Screenshots und Sprache werden an KI-Anbieter gesendet",
+     "class": "documented_function",
+     "locator": "R9 RES-UTTERSEEN claim 2",
+     "supports_learning_effect": false
+    }
    ],
    "highest_evidence_present": "marketing/documented_function (laut R9)",
    "r9_card": "RES-UTTERSEEN",
@@ -1048,39 +2257,409 @@
    "deferred_to": "R9",
    "opportunity_cost": "keine",
    "evaluations": [
-    {"id": "R7-EV-UTTERSEEN-1", "task": "keine R7-Evaluation", "falsifier": "nicht R7", "status": "NOT_RUN"}
+    {
+     "id": "R7-EV-UTTERSEEN-1",
+     "task": "keine R7-Evaluation",
+     "falsifier": "nicht R7",
+     "status": "NOT_RUN"
+    }
    ],
    "policy_links": []
   }
  ],
  "preserved_pointers": [
-  {"name": "Anki", "url": "https://apps.ankiweb.net/", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §A", "owner_workstream": "R8", "decision": "DEFER", "reason": "Kernprodukt und einziger Scheduler (AD-1); Bewertung als Werkzeug in R8. R7-Bezug: Karten tragen nur Abbildungen mit fachlicher Aussage (MM-R1)."},
-  {"name": "Obsidian", "url": "https://obsidian.md/", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §A", "owner_workstream": "R8", "decision": "DEFER", "reason": "optionale Markdown-Ansicht, kein Produkt; Bewertung in R8."},
-  {"name": "DeepTutor", "url": "https://github.com/HKUDS/DeepTutor", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F", "owner_workstream": "R9", "r9_card": "RES-DEEPTUTOR", "decision": "DEFER", "reason": "Tutor-System; R9-Urteil emulate. Nicht-Tutor-Aspekt: Modus 'Visualize' ohne dokumentierte Lernoperation – kein R7-Mechanismus."},
-  {"name": "OATutor", "url": "https://github.com/CAHLR/OATutor", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F", "owner_workstream": "R9", "r9_card": "RES-OATUTOR", "decision": "DEFER", "reason": "R9-Urteil emulate (Schritt-/Hinweisformat)."},
-  {"name": "LMU SMART-RAG Tutor", "url": "https://github.com/digillab-lmu/smart-rag", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F", "owner_workstream": "R9", "r9_card": "RES-SMARTRAG", "decision": "DEFER", "reason": "R9-Urteil emulate; Konzeptkarten-Aspekt nicht visualisierungsrelevant."},
-  {"name": "TutorBench", "url": "https://labs.scale.com/leaderboard/tutorbench", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F", "owner_workstream": "R9", "r9_card": "RES-TUTORBENCH", "decision": "DEFER", "reason": "Benchmark, kein Lernoutcome; R9-Urteil emulate (Rubrikdesign)."},
-  {"name": "OpenTutor", "url": "https://github.com/zijinz456/OpenTutor", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F", "owner_workstream": "R9", "r9_card": "RES-OPENTUTOR", "decision": "DEFER", "reason": "R9-Urteil reject (eigener FSRS-Scheduler, AD-1)."},
-  {"name": "PAIDEIA", "url": "https://github.com/OPTIMETA/PAIDEIA", "other_urls": ["https://github.com/TaewoooPark/PAIDEIA"], "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F", "owner_workstream": "R9", "r9_card": "RES-PAIDEIA", "decision": "DEFER", "reason": "R9: beide URLs dieselbe Repo-ID (Weiterleitung); Urteil emulate."},
-  {"name": "Education Agent Skills", "url": "https://github.com/GarethManning/education-agent-skills", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F", "owner_workstream": "R9", "r9_card": "RES-EAS", "decision": "DEFER", "reason": "R9-Urteil emulate (Hilfepolitik)."},
-  {"name": "ChatGPT Study Mode", "url": "not_applicable", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F", "owner_workstream": "R9", "r9_card": "RES-CHATGPT-STUDY", "decision": "DEFER", "reason": "R9: Vergleichsarm."},
-  {"name": "portable tutor context packs (ChatGPT/Claude Project)", "url": "not_applicable", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F", "owner_workstream": "R9", "r9_card": "RES-CHATGPT-PROJECT", "decision": "DEFER", "reason": "R9-Urteil adapt (portabler Vertrag)."},
-  {"name": "NotebookLM", "url": "not_applicable", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F", "owner_workstream": "R9", "r9_card": "RES-NOTEBOOKLM", "decision": "DEFER", "reason": "R9-Urteil defer."},
-  {"name": "RemNote Guided Learn Mode", "url": "https://www.remnote.com/", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F", "owner_workstream": "R9", "r9_card": "RES-REMNOTE", "decision": "DEFER", "reason": "R9: Funktion nicht bestätigt; Urteil reject."},
-  {"name": "Adaptive curricula, intelligent tutoring and validated educational authoring tools", "url": "not_applicable", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B", "owner_workstream": "R5/R9", "decision": "DEFER", "reason": "Kategorie; ITS/Tutoring in R5/R9."},
-  {"name": "Proof assistants (Lean, Coq, Isabelle, proof-game interfaces)", "url": "not_applicable", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B", "owner_workstream": "R2", "decision": "DEFER", "reason": "R2 führt thoma2022lean, iannone2023lean, mahinpei2025itp."},
-  {"name": "Statistical simulation and scientific notebooks", "url": "not_applicable", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B", "owner_workstream": "R7", "decision": "DEFER", "reason": "In R7 durch R7-RES-SEEINGTHEORY, R7-RES-PYODIDE, R7-RES-JUPYTERLITE, R7-RES-QUANTECON abgedeckt; Kategorie selbst keine Ressource."},
-  {"name": "Argument maps, jurisprudential case practice, medical simulation", "url": "not_applicable", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B", "owner_workstream": "R3", "decision": "DEFER", "reason": "R3 (rule_based_contextual, diagnostic_reasoning)."},
-  {"name": "CAD/3D constraints, physical design verification, psychomotor skills", "url": "not_applicable", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B", "owner_workstream": "R4", "decision": "DEFER", "reason": "R4 (R4-POL-07 Nicht-Transfer-Etikett)."},
-  {"name": "Knowledge graphs, source annotations, semantic Markdown and offline search", "url": "not_applicable", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B", "owner_workstream": "R8/R6", "decision": "DEFER", "reason": "Notiz-/Wissenswerkzeuge R8, Kompetenzgraph R6."},
-  {"name": "Accessibility, mathematical typography and meaningful visual interaction frameworks", "url": "not_applicable", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B", "owner_workstream": "R7", "decision": "EMULATE_PRINCIPLE", "reason": "In R7-POL-09 (A11y/Offline-Basislinie für Visualisierungen) und Karten R7-RES-JSXGRAPH/R7-RES-GEOGEBRA aufgenommen; vorhandene MathJax-SVG-Pipeline bleibt."}
+  {
+   "name": "Anki",
+   "url": "https://apps.ankiweb.net/",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+   "owner_workstream": "R8",
+   "decision": "DEFER",
+   "reason": "Kernprodukt und einziger Scheduler (AD-1); Bewertung als Werkzeug in R8. R7-Bezug: Karten tragen nur Abbildungen mit fachlicher Aussage (MM-R1)."
+  },
+  {
+   "name": "Obsidian",
+   "url": "https://obsidian.md/",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §A",
+   "owner_workstream": "R8",
+   "decision": "DEFER",
+   "reason": "optionale Markdown-Ansicht, kein Produkt; Bewertung in R8."
+  },
+  {
+   "name": "DeepTutor",
+   "url": "https://github.com/HKUDS/DeepTutor",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F",
+   "owner_workstream": "R9",
+   "r9_card": "RES-DEEPTUTOR",
+   "decision": "DEFER",
+   "reason": "Tutor-System; R9-Urteil emulate. Nicht-Tutor-Aspekt: Modus 'Visualize' ohne dokumentierte Lernoperation – kein R7-Mechanismus."
+  },
+  {
+   "name": "OATutor",
+   "url": "https://github.com/CAHLR/OATutor",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F",
+   "owner_workstream": "R9",
+   "r9_card": "RES-OATUTOR",
+   "decision": "DEFER",
+   "reason": "R9-Urteil emulate (Schritt-/Hinweis-/Scaffold-Format); kein Visualisierungsbeitrag."
+  },
+  {
+   "name": "LMU SMART-RAG Tutor",
+   "url": "https://github.com/digillab-lmu/smart-rag",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F",
+   "owner_workstream": "R9",
+   "r9_card": "RES-SMARTRAG",
+   "decision": "DEFER",
+   "reason": "R9-Urteil emulate; Konzeptkarten-Aspekt nicht visualisierungsrelevant."
+  },
+  {
+   "name": "TutorBench",
+   "url": "https://labs.scale.com/leaderboard/tutorbench",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F",
+   "owner_workstream": "R9",
+   "r9_card": "RES-TUTORBENCH",
+   "decision": "DEFER",
+   "reason": "Benchmark, kein Lernoutcome; R9-Urteil emulate (Rubrikdesign)."
+  },
+  {
+   "name": "OpenTutor",
+   "url": "https://github.com/zijinz456/OpenTutor",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F",
+   "owner_workstream": "R9",
+   "r9_card": "RES-OPENTUTOR",
+   "decision": "DEFER",
+   "reason": "R9-Urteil reject (eigener FSRS-Scheduler, AD-1)."
+  },
+  {
+   "name": "PAIDEIA",
+   "url": "https://github.com/OPTIMETA/PAIDEIA",
+   "other_urls": [
+    "https://github.com/TaewoooPark/PAIDEIA"
+   ],
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F",
+   "owner_workstream": "R9",
+   "r9_card": "RES-PAIDEIA",
+   "decision": "DEFER",
+   "reason": "R9: beide URLs dieselbe Repo-ID (Weiterleitung); Urteil emulate."
+  },
+  {
+   "name": "Education Agent Skills",
+   "url": "https://github.com/GarethManning/education-agent-skills",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F",
+   "owner_workstream": "R9",
+   "r9_card": "RES-EAS",
+   "decision": "DEFER",
+   "reason": "R9-Urteil emulate (Hilfepolitik)."
+  },
+  {
+   "name": "ChatGPT Study Mode",
+   "url": "not_applicable",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F",
+   "owner_workstream": "R9",
+   "r9_card": "RES-CHATGPT-STUDY",
+   "decision": "DEFER",
+   "reason": "R9: unveränderter Vergleichsarm in der Tutor-Evaluation (Urteil reuse als Arm, keine Integration)."
+  },
+  {
+   "name": "portable tutor context packs (ChatGPT/Claude Project)",
+   "url": "not_applicable",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F",
+   "owner_workstream": "R9",
+   "r9_card": "RES-CHATGPT-PROJECT",
+   "decision": "DEFER",
+   "reason": "R9-Urteil adapt (portabler Vertrag)."
+  },
+  {
+   "name": "NotebookLM",
+   "url": "not_applicable",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F",
+   "owner_workstream": "R9",
+   "r9_card": "RES-NOTEBOOKLM",
+   "decision": "DEFER",
+   "reason": "R9-Urteil defer (optionaler Vergleichsarm, kein eigener Mechanismus)."
+  },
+  {
+   "name": "RemNote Guided Learn Mode",
+   "url": "https://www.remnote.com/",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §F",
+   "owner_workstream": "R9",
+   "r9_card": "RES-REMNOTE",
+   "decision": "DEFER",
+   "reason": "R9: Funktion nicht bestätigt; Urteil reject."
+  },
+  {
+   "name": "Adaptive curricula, intelligent tutoring and validated educational authoring tools",
+   "url": "not_applicable",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B",
+   "owner_workstream": "R5/R9",
+   "decision": "DEFER",
+   "reason": "Kategorie; ITS/Tutoring in R5/R9."
+  },
+  {
+   "name": "Proof assistants (Lean, Coq, Isabelle, proof-game interfaces)",
+   "url": "not_applicable",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B",
+   "owner_workstream": "R2",
+   "decision": "DEFER",
+   "reason": "R2 führt thoma2022lean, iannone2023lean, mahinpei2025itp."
+  },
+  {
+   "name": "Statistical simulation and scientific notebooks",
+   "url": "not_applicable",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B",
+   "owner_workstream": "R7",
+   "decision": "DEFER",
+   "reason": "In R7 durch R7-RES-SEEINGTHEORY, R7-RES-PYODIDE, R7-RES-JUPYTERLITE, R7-RES-QUANTECON abgedeckt; Kategorie selbst keine Ressource."
+  },
+  {
+   "name": "Argument maps, jurisprudential case practice, medical simulation",
+   "url": "not_applicable",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B",
+   "owner_workstream": "R3",
+   "decision": "DEFER",
+   "reason": "R3 (rule_based_contextual, diagnostic_reasoning)."
+  },
+  {
+   "name": "CAD/3D constraints, physical design verification, psychomotor skills",
+   "url": "not_applicable",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B",
+   "owner_workstream": "R4",
+   "decision": "DEFER",
+   "reason": "R4 (R4-POL-07 Nicht-Transfer-Etikett)."
+  },
+  {
+   "name": "Knowledge graphs, source annotations, semantic Markdown and offline search",
+   "url": "not_applicable",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B",
+   "owner_workstream": "R8/R6",
+   "decision": "DEFER",
+   "reason": "Notiz-/Wissenswerkzeuge R8, Kompetenzgraph R6."
+  },
+  {
+   "name": "Accessibility, mathematical typography and meaningful visual interaction frameworks",
+   "url": "not_applicable",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §B",
+   "owner_workstream": "R7",
+   "decision": "EMULATE_PRINCIPLE",
+   "reason": "In R7-POL-09 (A11y/Offline-Basislinie für Visualisierungen) und Karten R7-RES-JSXGRAPH/R7-RES-GEOGEBRA aufgenommen; vorhandene MathJax-SVG-Pipeline bleibt."
+  }
  ],
  "preserved_ideas": [
-  {"id": "IDEA-D-MATH", "name": "Mathematical insight: 3B1B-artige Erzählung vs. Mathigon-artiges manipulierbares Modell vs. statischer illustrierter Beweis", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §D", "disposition": "als Validierungsaufgabe V1 übernommen (R7-EV-3B1B-1, R7-EV-MATHIGON-1)"},
-  {"id": "IDEA-D-STATS", "name": "Statistics: Seeing-Theory-artige wiederholte Simulation mit numerischem Orakel; Erklärung, warum eine Stichprobe keine Populationsaussage beweist", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §D", "disposition": "als Validierungsaufgabe V5 übernommen (R7-EV-SEEINGTHEORY-1, R7-POL-07)"},
-  {"id": "IDEA-D-CODING", "name": "Coding: Parsons/Tracing vs. Exercism-artiges Schreiben/Testen vs. OpenDSA-artige Strukturmanipulation; adversariale Korrektheits- und Komplexitätsfragen", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §D", "disposition": "als Validierungsaufgaben V6/V7 übernommen (R7-EV-OPENDSA-1, R7-EV-EXERCISM-1)"},
-  {"id": "IDEA-D-TUTOR", "name": "Source-grounded tutor mit mehrdeutigen Referenzen, falschen Versuchen, widersprüchlichen Quellen", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §D", "disposition": "an R9 (TUTOR_EVALUATION_PROTOCOL.md)"},
-  {"id": "IDEA-D-CRAFT", "name": "Cross-domain craft: CAD vs. physische Holzarbeit, Simulation/Checkliste getrennt von realer Genauigkeit", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §D", "disposition": "an R4 (R4-POL-07)"},
-  {"id": "IDEA-E-NO-NEW-TOOL", "name": "Kein neues Werkzeug ohne nachgewiesene Verbesserung gegenüber Lehrbuch/Arbeitsbuch/Anki/Interaktiv", "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §E", "disposition": "Entscheidungsregel aller R7-Karten (nur eine REUSE_AS_LIBRARY-Empfehlung, an Spike gebunden)"}
+  {
+   "id": "IDEA-D-MATH",
+   "name": "Mathematical insight: 3B1B-artige Erzählung vs. Mathigon-artiges manipulierbares Modell vs. statischer illustrierter Beweis",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §D",
+   "disposition": "als Validierungsaufgabe V1 übernommen (R7-EV-3B1B-1, R7-EV-MATHIGON-1)"
+  },
+  {
+   "id": "IDEA-D-STATS",
+   "name": "Statistics: Seeing-Theory-artige wiederholte Simulation mit numerischem Orakel; Erklärung, warum eine Stichprobe keine Populationsaussage beweist",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §D",
+   "disposition": "als Validierungsaufgabe V5 übernommen (R7-EV-SEEINGTHEORY-1, R7-POL-07)"
+  },
+  {
+   "id": "IDEA-D-CODING",
+   "name": "Coding: Parsons/Tracing vs. Exercism-artiges Schreiben/Testen vs. OpenDSA-artige Strukturmanipulation; adversariale Korrektheits- und Komplexitätsfragen",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §D",
+   "disposition": "als Validierungsaufgaben V6/V7 übernommen (R7-EV-OPENDSA-1, R7-EV-EXERCISM-1)"
+  },
+  {
+   "id": "IDEA-D-TUTOR",
+   "name": "Source-grounded tutor mit mehrdeutigen Referenzen, falschen Versuchen, widersprüchlichen Quellen",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §D",
+   "disposition": "an R9 (TUTOR_EVALUATION_PROTOCOL.md)"
+  },
+  {
+   "id": "IDEA-D-CRAFT",
+   "name": "Cross-domain craft: CAD vs. physische Holzarbeit, Simulation/Checkliste getrennt von realer Genauigkeit",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §D",
+   "disposition": "an R4 (R4-POL-07)"
+  },
+  {
+   "id": "IDEA-E-NO-NEW-TOOL",
+   "name": "Kein neues Werkzeug ohne nachgewiesene Verbesserung gegenüber Lehrbuch/Arbeitsbuch/Anki/Interaktiv",
+   "preserved_from": "RESOURCE_IDEA_REGISTRY_20261126.md §E",
+   "disposition": "Entscheidungsregel aller R7-Karten (nur eine REUSE_AS_LIBRARY-Empfehlung, an Spike gebunden)"
+  }
+ ],
+ "shortlist": [
+  {
+   "priority": 1,
+   "id": "SL-1",
+   "title": "Vorhersage vor Aufdecken in Szenen und Web-Lehrbuchfiguren",
+   "products": [
+    "interactive",
+    "textbook"
+   ],
+   "cards": [
+    "R7-RES-MATHIGON",
+    "R7-RES-EXPLORABLES",
+    "R7-RES-3B1B"
+   ],
+   "policies": [
+    "R7-POL-02"
+   ],
+   "evaluations": [
+    "R7-EV-3B1B-1",
+    "R7-EV-MATHIGON-1"
+   ],
+   "validation_task": "Binomialkoeffizient als Pfadzählung: Szene ohne Eingabe vs. Szene mit 3 Vorhersage-Gates vs. statischer illustrierter Beweis; unassistierter Transfer nach 1 Woche, Abbruchquote als Schadensmaß."
+  },
+  {
+   "priority": 2,
+   "id": "SL-2",
+   "title": "Erklärung widerlegt Fehlvorstellung, eigene Aufgabe folgt, Ansehen zählt nie als Fortschritt",
+   "products": [
+    "interactive",
+    "textbook",
+    "workbook",
+    "anki"
+   ],
+   "cards": [
+    "R7-RES-3B1B",
+    "R7-RES-STATQUEST",
+    "R7-RES-MARGINSTUDY"
+   ],
+   "policies": [
+    "R7-POL-06"
+   ],
+   "evaluations": [
+    "R7-EV-3B1B-2"
+   ],
+   "validation_task": "Refutationsszene mit Folgeaufgabe vs. gleich lange Expositionsszene; Lernurteil direkt nach Szene und verzögerter Konzepttest mit Fehlvorstellungs-Items; Kriterium: geringere Urteil-Leistungs-Diskrepanz und bessere Konzeptleistung.",
+   "counter_examples": [
+    "R7-RES-YOULEARN",
+    "R7-RES-BRILLIANT"
+   ]
+  },
+  {
+   "priority": 3,
+   "id": "SL-3",
+   "title": "Animation nur bei Veränderung als Lerngegenstand; 'Weiter' statt 'Abspielen' als Primärknopf; Keyframes im PDF",
+   "products": [
+    "interactive",
+    "textbook"
+   ],
+   "cards": [
+    "R7-RES-3B1B",
+    "R7-RES-MANIM",
+    "R7-RES-OPENDSA"
+   ],
+   "policies": [
+    "R7-POL-05"
+   ],
+   "evaluations": [
+    "R7-EV-MANIM-1"
+   ],
+   "validation_task": "Within-learner: Szenen mit Standard 'Weiter' vs. Standard 'Abspielen' (gleicher Inhalt); verzögert Zustand nach Schritt k für neue Eingabe vorhersagen; Gegenbefund berney2016 (systemgesteuert) ausdrücklich als Alternativhypothese."
+  },
+  {
+   "priority": 4,
+   "id": "SL-4",
+   "title": "Regler nur mit Mission, Guided mit 2-3 zielrelevanten Reglern, Explore danach",
+   "products": [
+    "interactive",
+    "textbook"
+   ],
+   "cards": [
+    "R7-RES-PHET",
+    "R7-RES-EXPLORABLES"
+   ],
+   "policies": [
+    "R7-POL-03"
+   ],
+   "evaluations": [
+    "R7-EV-PHET-1",
+    "R7-EV-EXPLORABLES-1"
+   ],
+   "validation_task": "Gleiche Mission mit 2 vs. 6 Reglern bei Novizen; verzögerte Vorhersage mit Begründung für neue Parameterkonstellation ohne Simulation."
+  },
+  {
+   "priority": 5,
+   "id": "SL-5",
+   "title": "Stichprobensimulation mit Vorhersage, Seed und numerischem Orakel",
+   "products": [
+    "interactive",
+    "textbook",
+    "workbook"
+   ],
+   "cards": [
+    "R7-RES-SEEINGTHEORY"
+   ],
+   "policies": [
+    "R7-POL-07"
+   ],
+   "evaluations": [
+    "R7-EV-SEEINGTHEORY-1"
+   ],
+   "validation_task": "Streuung des Stichprobenanteils vorhersagen, simulieren, erklären, warum eine Stichprobe keine Populationsaussage beweist; Vergleich mit statischer Tabelle gleicher Information; Orakel prüft jede angezeigte Zahl."
+  },
+  {
+   "priority": 6,
+   "id": "SL-6",
+   "title": "Code-Werkbank im Exercism-Format, lokal mit Pyodide (nach Spike)",
+   "products": [
+    "interactive",
+    "workbook"
+   ],
+   "cards": [
+    "R7-RES-EXERCISM",
+    "R7-RES-PYODIDE"
+   ],
+   "policies": [
+    "R7-POL-08"
+   ],
+   "evaluations": [
+    "R7-EV-PYODIDE-1",
+    "R7-EV-EXERCISM-1"
+   ],
+   "validation_task": "Spike: offline laden, Kaltstart/Bytes messen, Endlosschleife abbrechen; danach inkrementelle Tests+Vorhersage vs. Vollsuite; verzögerter Randfall- und Komplexitätstest."
+  },
+  {
+   "priority": 7,
+   "id": "SL-7",
+   "title": "Algorithmus-Proficiency-Aufgabe (Lernende führen den nächsten Schritt selbst aus)",
+   "products": [
+    "interactive",
+    "workbook"
+   ],
+   "cards": [
+    "R7-RES-OPENDSA",
+    "R7-RES-JSAV"
+   ],
+   "policies": [],
+   "sibling_policies": [
+    "R2-POL-17"
+   ],
+   "evaluations": [
+    "R7-EV-OPENDSA-1",
+    "R7-EV-JSAV-1"
+   ],
+   "validation_task": "Heap-Insert/Binärsuche als Proficiency-Aufgabe vs. Tracing-Tabelle vs. Parsons; verzögertes unassistiertes Tracing einer neuen Eingabe plus Komplexitätsfrage; JSAV-Spike gegen eigene SVG-Umsetzung (Tastatur, Screenreader, Größe)."
+  },
+  {
+   "priority": 8,
+   "id": "SL-8",
+   "title": "Verknüpfte Darstellungen mit eigener Übersetzungsaufgabe und Nicht-Farb-Kopplung",
+   "products": [
+    "textbook",
+    "interactive",
+    "workbook",
+    "anki"
+   ],
+   "cards": [
+    "R7-RES-DISTILL",
+    "R7-RES-STATQUEST",
+    "R7-RES-3B1B"
+   ],
+   "policies": [
+    "R7-POL-04",
+    "R7-POL-09"
+   ],
+   "evaluations": [
+    "R7-EV-DISTILL-1",
+    "R7-EV-STATQUEST-1"
+   ],
+   "validation_task": "Layout-Review der Symbolkopplung; dann gekoppelte Darstellung+Übersetzungsaufgabe vs. ungekoppelt; verzögerter Übersetzungstest ohne Hilfsfarben; Screenreader-Durchlauf."
+  }
  ]
 }
