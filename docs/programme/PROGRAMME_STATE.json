@@ -1,7 +1,7 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T21:25:31+01:00",
- "updated_by": "LEAD (interactive, issue #49 execution)",
+ "updated": "2026-11-27T22:24:22+01:00",
+ "updated_by": "LEAD (interactive, issue #51)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
   "Never merge to main; draft PRs only.",
@@ -163,7 +163,8 @@
    "RL Kap. 3 v6 (local pilot)",
    "Golden Attention reference candidate (PR #28): technically executable, not scientifically or didactically accepted"
   ],
-  "learning_evaluation": "NOT_RUN for every product"
+  "learning_evaluation": "NOT_RUN for every product",
+  "mastery_v1": "TECHNICAL_CANDIDATE; PRODUCT_ACCEPTANCE_FAILED (owner hands-on, issue #51, 2026-11-27): no real lecture import, textbook/workbook quality, tutor copy-paste, Anki without visuals/context/feedback, analytics provenance"
  },
  "critical_defects": [
   {
@@ -359,12 +360,67 @@
  ],
  "work_packages": [
   {
+   "id": "WP-C2M-SECOND",
+   "title": "Second contrasting owner course end-to-end (candidates: Lineare Algebra 1 with proofs; Patentrecht/Entrepreneurship)",
+   "status": "PLANNED",
+   "priority": 0.7,
+   "autostart": false,
+   "depends_on": [
+    "WP-C2M-IMPORT",
+    "WP-C2M-AUTHOR-RL"
+   ]
+  },
+  {
+   "id": "WP-C2M-ANALYTICS",
+   "title": "P4 transparent learning analytics: activity timeline, provenance per number, unified stores explained, coverage, delayed unassisted transfer",
+   "status": "PLANNED",
+   "priority": 0.6,
+   "autostart": false
+  },
+  {
+   "id": "WP-C2M-ANKIQA",
+   "title": "P3 Anki card quality: visuals/context/maths in cards, per-card feedback (unclear, too hard, duplicate, missing context, wrong, suggest visual), controlled updates with stable GUIDs",
+   "status": "PLANNED",
+   "priority": 0.5,
+   "autostart": false
+  },
+  {
+   "id": "WP-C2M-TUTOR",
+   "title": "P2 guided tutor inside the UI (prerequisite teaching, hint ladder, manual-LLM bridge without copy-paste friction where possible)",
+   "status": "PLANNED",
+   "priority": 0.4,
+   "autostart": false
+  },
+  {
+   "id": "WP-C2M-QUALITY",
+   "title": "P1 textbook/workbook/explorable quality: typesetting, integrated original figures, graduated workbook (guided -> unassisted -> transfer), 3b1b/Mathigon-style explorable with equations bound to controls",
+   "status": "PLANNED",
+   "priority": 0.3,
+   "autostart": false
+  },
+  {
+   "id": "WP-C2M-AUTHOR-RL",
+   "title": "P0/P1 real chapter from the owner's RL course (Policy Gradient) authored at university-excellence level through the packet contract; four connected products; page-level PDF inspection",
+   "status": "PLANNED",
+   "priority": 0.2,
+   "autostart": false,
+   "next_step": "Specialist: private sources (iCloud, materialise with brctl download), output only to ~/Mastery; AI authorship by the Claude Code subscription session, labelled; every derivation/number verified by computation."
+  },
+  {
+   "id": "WP-C2M-IMPORT",
+   "title": "P0 course import: bin/mastery import + local wizard (inventory, iCloud materialisation, completeness, chapter/competency proposal, authoring packets, status)",
+   "status": "PLANNED",
+   "priority": 0.1,
+   "autostart": false,
+   "next_step": "Specialist: build on exam_mastery.fidelity.inventory/impact (PDF/PPTX/DOCX/LaTeX/MD/notebook parsers exist); courses live in ~/Mastery/courses/<slug> (private); authoring packet contract shared with WP-C2M-AUTHOR."
+  },
+  {
    "id": "WP-V1-NEXT",
    "title": "Next V1 product improvements (after owner feedback or autonomously)",
-   "status": "PLANNED",
+   "status": "SUPERSEDED",
    "priority": 1.0,
-   "autostart": true,
-   "next_step": "Bounded engineering step (headless allowed): Arbeitsbuch difficulty stages for the attention unit (guided -> independent -> exam-style transfer) and one explorable interaction for the backward pass, on branch feat/mastery-v1-next-20261129 from integration/mastery-v1-20261127. Python: ../Exam_Mastery-integration/.venv/bin/python run from the worktree. Keep unit_id/card keys stable (Anki identity). Verify: CI-equivalent suite on a frozen git-archive copy (pytest module list from .github/workflows/tests.yml + python -m unittest discover -s tests), plus tests/test_mastery_v1_app.py. Push the branch and open/update a draft PR against integration/mastery-v1-20261127; never merge, never touch main or the RL pilot. If owner hands-on feedback exists (issue #49 comments), fix that first.",
+   "autostart": false,
+   "next_step": "superseded by issue #51 P0 (course-to-mastery); difficulty stages/backprop animation only inside WP-C2M packages",
    "branch": "feat/mastery-v1-next-20261129",
    "base": "integration/mastery-v1-20261127",
    "worktree": "Exam_Mastery-v1next",
@@ -373,16 +429,14 @@
   {
    "id": "WP-V1-ACCEPT",
    "title": "Owner hands-on acceptance of the local V1 release candidate",
-   "status": "HUMAN_DECISION_REQUIRED",
+   "status": "FAILED_HUMAN_ACCEPTANCE",
    "priority": 0.9,
    "autostart": false,
    "depends_on": [],
    "headless_ok": false,
-   "next_step": "Owner: start Mastery V1 (integration worktree: bin/mastery; library already built in ~/Mastery) and run the 10-step checklist in docs/MASTERY_V1.md; report what blocks daily use.",
+   "next_step": "see issue #51; re-run acceptance after WP-C2M slice",
    "updated": "2026-11-27T21:25:31+01:00",
-   "blockers": [
-    "owner hands-on acceptance"
-   ]
+   "blockers": []
   },
   {
    "id": "WP-V1-CONTENT",
@@ -1061,7 +1115,7 @@
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents.",
   "lead_pacing": "Issue #49: continue within account limits. Lead stops spawning new specialists at seven_day >= 0.92 and leaves remaining packages to the supervisor after the 2026-11-29 07:00 reset (supervisor ceiling 0.85 leaves room for the owner)."
  },
- "next_milestone": "Owner hands-on acceptance of the Mastery V1 release candidate (WP-V1-ACCEPT); then WP-V1-NEXT.",
+ "next_milestone": "Issue #51 thin vertical slice: real lecture import wizard + one real RL chapter with four connected products and inspectable PDFs; then quality, tutor, Anki QA, analytics; second contrasting course.",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
