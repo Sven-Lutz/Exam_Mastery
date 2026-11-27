@@ -129,20 +129,23 @@ const GENERIC = {
   unclassified: { kind: 'unknown', label: 'Ursache nicht erkannt', feedback: 'Ihre Antwort weicht ab, aber die Ursache passt zu keinem bekannten Fehlermuster. Prüfen Sie Ihren Rechenweg Schritt für Schritt.' },
 };
 const category = (tr, c) => tr.categories[c] || GENERIC[c] || GENERIC.unclassified;
-const day = t => String(t).slice(0, 10);
+// Retention evidence uses elapsed time, not calendar dates (mirrors policy.py, RETENTION_MIN_GAP_HOURS).
+const RETENTION_MIN_GAP_HOURS = 20;
+const instant = t => { const s = String(t); return Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(s) ? s + 'T00:00:00Z' : /([zZ]|[+-]\d{2}:?\d{2})$/.test(s) ? s : s + 'Z'); };
 const helped = (ev, tid, upto) => (upto === undefined ? ev : ev.slice(0, upto + 1)).some(e => (e.type === 'hint' || e.type === 'solution') && e.task === tid);
 const solved = (ev, tid) => ev.some(e => e.type === 'attempt' && e.task === tid && e.diagnosis.result === 'correct');
 const role = (tr, r, kc, ev) => { const t = tr.tasks.find(t => t.role === r && (kc == null || t.kc_id === kc) && !(ev && solved(ev, t.id))); return t ? t.id : null; };
 const dec = (rule, action, next, obs, why, unc, o = {}) => ({ schema: 'em-decision-v1', rule, action, next_task: next, hints_allowed: o.hints_allowed !== false, support: o.support || null, focus: o.focus || null, tutor_offer: !!o.tutor, observation: obs, rationale: why, uncertainty: unc, retention: o.retention || null });
 function nextInFlow(tr, ev, cur) { const f = tr.flow; const after = f.includes(cur) ? f.slice(f.indexOf(cur) + 1) : f; for (const t of after) if (!solved(ev, t)) return t; return null; }
 function kcStatus(tr, ev, today) {
-  today = today || new Date().toISOString().slice(0, 10); const T = Object.fromEntries(tr.tasks.map(t => [t.id, t])); const res = {};
+  const now = today ? instant(today) : Date.now(), gap = RETENTION_MIN_GAP_HOURS * 3600e3; const T = Object.fromEntries(tr.tasks.map(t => [t.id, t])); const res = {};
   for (const kc of tr.kcs) {
     const es = ev.map((e, i) => [i, e]).filter(([, e]) => e.type === 'attempt' && T[e.task] && T[e.task].kc_id === kc.id);
     if (!es.length) { res[kc.id] = 'NOT_ASSESSED'; continue; }
-    const ind = [...new Set(es.filter(([i, e]) => e.diagnosis.result === 'correct' && !helped(ev, e.task, i)).map(([, e]) => day(e.t)))].sort();
+    const ind = es.filter(([i, e]) => e.diagnosis.result === 'correct' && !helped(ev, e.task, i)).map(([, e]) => [instant(e.t), e.task]).sort((a, b) => a[0] - b[0]);
     const aided = es.some(([, e]) => e.diagnosis.result === 'correct');
-    res[kc.id] = ind.length >= 2 ? 'RETAINED_ON_LATER_DAY' : ind.length && ind[0] < today ? 'RETEST_DUE' : ind.length ? 'INDEPENDENT_PASS' : aided ? 'ASSISTED' : 'INDEPENDENT_PARTIAL';
+    const retained = ind.some(([t1, k1]) => ind.some(([t2, k2]) => t2 - t1 >= gap && k2 !== k1));
+    res[kc.id] = retained ? 'RETAINED_ON_LATER_DAY' : ind.length && now - ind[0][0] >= gap ? 'RETEST_DUE' : ind.length ? 'INDEPENDENT_PASS' : aided ? 'ASSISTED' : 'INDEPENDENT_PARTIAL';
   }
   return res;
 }

@@ -17,8 +17,12 @@ Rules (ids are stable and appear in the UI, the event log and the tests):
                                   successes incl. transfer -> harder, structurally changed task
   RE   retention unknown          everything solved today -> NOT 'mastered': later retrieval (Anki tags, retest task
                                   on a later day); a retest solved independently on a later day is reported as such
+
+Retention evidence (kc_status) uses elapsed time, not calendar dates: RETAINED_ON_LATER_DAY needs an independent
+success on a *different* task at least RETENTION_MIN_GAP_HOURS after an earlier independent success. Two
+successes at 23:59 and 00:01, or the same task repeated, are not evidence of retention (R0 audit, R1 policies A01/A05).
 """
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 
 SCHEMA = 'em-decision-v1'
 GENERIC = {
@@ -30,8 +34,19 @@ GENERIC = {
 }
 
 
-def _day(t):
-    return datetime.fromisoformat(t.replace('Z', '+00:00')).date() if isinstance(t, str) else t
+# Provisional product parameter, not an empirical constant: roughly one night between the two successes.
+RETENTION_MIN_GAP_HOURS = 20
+
+
+def _instant(t):
+    """Aware UTC instant; a bare date means 00:00 UTC of that day (same rule as em_tutor.js)."""
+    if isinstance(t, datetime):
+        d = t
+    elif isinstance(t, date):
+        d = datetime(t.year, t.month, t.day)
+    else:
+        d = datetime.fromisoformat(str(t).replace('Z', '+00:00'))
+    return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
 
 
 def category(track, cid):
@@ -61,21 +76,26 @@ def _dec(rule, action, nxt, obs, why, unc, support=None, hints_allowed=True, foc
 
 
 def kc_status(track, events, today=None):
-    """Observed state per competency (vocabulary of the tutor protocol). Never a percentage."""
-    today = _day(today) if today else date.today()
+    """Observed state per competency (vocabulary of the tutor protocol). Never a percentage.
+
+    `today` is the reference instant (ISO date or timestamp); default: now (UTC)."""
+    now = _instant(today) if today else datetime.now(timezone.utc)
+    gap = timedelta(hours=RETENTION_MIN_GAP_HOURS)
     T = {t['id']: t for t in track['tasks']}
     out = {}
     for kc in track['kcs']:
         evs = [(i, e) for i, e in enumerate(events) if e['type'] == 'attempt' and T.get(e['task'], {}).get('kc_id') == kc['id']]
         if not evs:
             out[kc['id']] = 'NOT_ASSESSED'; continue
-        indep_days = sorted({_day(e['t']) for i, e in evs if e['diagnosis']['result'] == 'correct' and not helped(events, e['task'], i)})
+        indep = sorted((_instant(e['t']), e['task']) for i, e in evs
+                       if e['diagnosis']['result'] == 'correct' and not helped(events, e['task'], i))
         aided = any(e['diagnosis']['result'] == 'correct' for i, e in evs)
-        if len(indep_days) >= 2:
+        retained = any(t2 - t1 >= gap and k2 != k1 for t1, k1 in indep for t2, k2 in indep)
+        if retained:
             out[kc['id']] = 'RETAINED_ON_LATER_DAY'
-        elif indep_days and indep_days[0] < today:
+        elif indep and now - indep[0][0] >= gap:
             out[kc['id']] = 'RETEST_DUE'
-        elif indep_days:
+        elif indep:
             out[kc['id']] = 'INDEPENDENT_PASS'
         elif aided:
             out[kc['id']] = 'ASSISTED'
