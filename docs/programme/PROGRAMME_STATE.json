@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T18:54:54+01:00",
+ "updated": "2026-11-27T19:03:26+01:00",
  "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -197,9 +197,10 @@
   {
    "id": "CD-8",
    "severity": "P1",
-   "status": "OPEN",
+   "status": "FIX_IN_DRAFT_PR",
    "text": "Anki export identity (anki_v2.build_deck, used by chapter_publish, anki_bridge, experience_anki): (a) every export sets mod=stamp on ALL notes and both note types, so an 'update if newer' import overwrites learner edits to note fields and templates even when content is unchanged; (b) note-type IDs are hashed from the display name ('Exam Mastery · Basis (v2)'), so any rename (Mastery brand) creates new note types; (c) GUID includes the chapter slug, moving a card creates a new note; (d) deck names follow unit titles; (e) '_'-prefixed font media are never updated by Anki. Review history itself is preserved (cards are not changed). Source: R8 EF-1..EF-8 (PR #44), confirmed in code by lead.",
-   "fix": "P4 candidate: stamp only notes/note types whose content hash changed (per-key state), freeze note-type IDs independent of display names before any brand presentation change, versioned media names; verify with disposable-collection import tests (anki library, never the learner's collection)."
+   "fix": "PR #46 (stacked on #43): conditional restamping of notes/note types by content hash (per-key state, legacy fallback), frozen note-type ID seeds; real anki 26.9.3 imports into throwaway collections show learner edit + ivl + revlog survive; previous commit loses the edit; suite 215 pytest + 650 unittest OK",
+   "open": "GUID includes chapter slug (owner decision R8 §13); deck names from titles; '_' font media never updated; mobile import unchecked"
   }
  ],
  "agents": [
@@ -695,6 +696,31 @@
    "next_step": "none"
   },
   {
+   "id": "WP-CD8",
+   "title": "Integrity fix CD-8: Anki re-import keeps learner edits; frozen note-type identity",
+   "status": "COMPLETED",
+   "priority": 7.8,
+   "pr": 46,
+   "branch": "fix/anki-export-identity-20261127",
+   "base": "fix/tutor-evidence-integrity-20261127",
+   "worktree": "Exam_Mastery-cd8",
+   "updated": "2026-11-27T19:03:26+01:00",
+   "done": [
+    "anki_v2.build_deck: per-key mods/notetypes state, restamp only changed content, legacy fallback, 'restamped' in report",
+    "NOTETYPE_ID_SEED/NOTETYPE_NAME",
+    "tests/test_anki_export_identity.py (4, real anki imports into throwaway collections)",
+    "behaviour check: previous commit loses learner edit, fix keeps it",
+    "suite 215 pytest + 650 unittest OK",
+    "draft PR #46"
+   ],
+   "open": [
+    "CI on PR #46",
+    "review",
+    "remaining R8 EF items need owner decisions"
+   ],
+   "next_step": "none"
+  },
+  {
    "id": "WP-R6",
    "title": "R6 synthesis and architecture decision record",
    "status": "RUNNING",
@@ -799,7 +825,7 @@
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents.",
   "lead_pacing": "Lead keeps seven_day <= 0.85 like the supervisor: one specialist while five_hour > 0.6; stop spawning at seven_day >= 0.83 and hand remaining packages to the supervisor after the 2026-11-29 07:00 reset."
  },
- "next_milestone": "R6: red team + ADR, lead reconciliation, draft PR; then owner acceptance gate. Architecture-independent P4 work (CD-8 Anki export identity) can proceed meanwhile.",
+ "next_milestone": "R6 red team + ADR running; lead reconciles and opens one R6 draft PR; owner acceptance gate. Architecture-independent fixes CD-2/7/8 in draft PRs #37/#43/#46.",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
