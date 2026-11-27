@@ -1,0 +1,29 @@
+{
+ "agent_id": "R7",
+ "wp": "WP-R7",
+ "status": "COMPLETED",
+ "updated": "2026-11-27T20:15:00+01:00",
+ "done": [
+  "read: issue #29, RESOURCE_IDEA_REGISTRY_20261126.md, charter, EVIDENCE_REGISTER_SCHEMA, R1 policy test, R3 test pattern",
+  "read sibling results: R9 resource cards (6 overlaps), R2-POL-11/15/16/17, R4-POL-07, R1 kb_rules_out_of_r1_scope (PR-R1..3, MM-R1/2, CL-R1/2 owned by R7)",
+  "code_inspected: labs/pedagogy.py 7-phase lab sequence, math_runtime MathJax SVG",
+  "identity checks: 19 gh api repos + 17 vendor/doc fetches (failures logged); r7_resources.json 30 cards + 20 pointers + 6 ideas; commit 050715d (not pushed)",
+  "r7_evidence.json 14 sources (10 abstract, 3 metadata, 1 fulltext_partial) + search_log S01-S11; commit 874d7ea",
+  "r7_resource_policies.json R7-POL-01..10 + shortlist (8) + tests/test_r7_resources.py (52 tests OK, 1 skipped incl. R1); commit 34ec3ce",
+  "R7_RESOURCES_VISUALISATION.md report; commit 308394a",
+  "pushed research/r7-resources-20261127; draft PR #45 (base research/r1-learning-science-20261127)"
+ ],
+ "open": [
+  "independent/human review of PR #45",
+  "owner decisions: commercial status (NC licences), Think Logic/Visually Explained source, Pyodide spike approval",
+  "gaps: Hoeffler 2007/Tversky 2002/Fouh 2014 metadata only; no database search; PhET licence from snippets; no spike executed; no product-specific learning studies found"
+ ],
+ "artifacts": [
+  "docs/research/workstreams/R7_RESOURCES_VISUALISATION.md",
+  "docs/research/workstreams/r7/r7_resources.json",
+  "docs/research/workstreams/r7/r7_evidence.json",
+  "docs/research/workstreams/r7/r7_resource_policies.json",
+  "tests/test_r7_resources.py"
+ ],
+ "next_step": "none autonomous; await review of PR #45"
+}

@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T18:52:49+01:00",
+ "updated": "2026-11-27T18:54:54+01:00",
  "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -83,14 +83,16 @@
    "note": "batch5 added (hints, error diagnosis, learning analytics); independent review pending"
   },
   "R6": {
-   "status": "PLANNED",
+   "status": "RUNNING",
    "wp": "WP-R6",
    "issue": 27
   },
   "R7": {
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "wp": "WP-R7",
-   "issue": 29
+   "issue": 29,
+   "pr": 45,
+   "note": "independent review pending; owner decisions (licence/commercial, Think Logic identity, Pyodide spike)"
   },
   "R8": {
    "status": "COMPLETED",
@@ -271,7 +273,7 @@
    "id": "R7",
    "kind": "background subagent of LEAD",
    "scope": "R7 learning resources, visualisation, interactive references",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R7.json",
    "worktree": "Exam_Mastery-r7"
   },
@@ -282,6 +284,22 @@
    "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R8.json",
    "worktree": "Exam_Mastery-r8"
+  },
+  {
+   "id": "R6RT",
+   "kind": "background subagent of LEAD",
+   "scope": "R6 independent red-team review",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/R6RT.json",
+   "worktree": "Exam_Mastery-r6rt"
+  },
+  {
+   "id": "R6ADR",
+   "kind": "background subagent of LEAD",
+   "scope": "R6 synthesis, ADR, ontology, contracts, minimum credible system",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/R6ADR.json",
+   "worktree": "Exam_Mastery-r6"
   }
  ],
  "work_packages": [
@@ -536,16 +554,38 @@
   {
    "id": "WP-R7",
    "title": "R7 learning resources, visualisation and interactive excellence",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 7,
    "autostart": true,
    "issue": 29,
    "branch": "research/r7-resources-20261127",
    "base": "research/r1-learning-science-20261127",
-   "next_step": "Specialist R7 (background subagent of LEAD): resource/tool cards with claim classes and decisions, evidence + search log, policies, report, contract test, draft PR.",
+   "next_step": "None autonomous; PR #45 awaits review and owner decisions.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
-   "updated": "2026-11-27T18:25:29+01:00",
-   "worktree": "Exam_Mastery-r7"
+   "updated": "2026-11-27T18:54:54+01:00",
+   "worktree": "Exam_Mastery-r7",
+   "pr": 45,
+   "blockers": [],
+   "done": [
+    "R7 specialist: r7_resources.json 30 cards + 20 pointers + 6 ideas preserving every registry name (reuse-as-library 1 Pyodide after spike; emulate 10; link 5; defer 10; reject 4) (050715d)",
+    "r7_evidence.json 14 sources (1 fulltext_partial, 10 abstract, 3 metadata) + search log (874d7ea)",
+    "R7-POL-01..10, shortlist of 8 with validation tasks V1-V8, tests (34ec3ce); R7_RESOURCES_VISUALISATION.md (308394a); draft PR #45",
+    "lead spot-check 2026-11-27: tests 52 OK (1 skip); 14 DOIs resolve with matching first authors; no local paths"
+   ],
+   "open": [
+    "independent review of PR #45",
+    "owner: commercial or not (licence gate for GeoGebra/3b1b code); original source for Think Logic and Visually Explained; approve a one-day Pyodide spike",
+    "no database search; 3 metadata-only sources; PhET licence from snippets",
+    "em_scene.js makes 'Play' the primary button (engine finding for P4)"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/R7_RESOURCES_VISUALISATION.md",
+    "docs/research/workstreams/r7/r7_resources.json",
+    "docs/research/workstreams/r7/r7_evidence.json",
+    "docs/research/workstreams/r7/r7_resource_policies.json",
+    "tests/test_r7_resources.py"
+   ],
+   "tests": "cd tests && python3 -m unittest test_r7_resources test_r1_learning_policies: 52 OK (skipped=1)"
   },
   {
    "id": "WP-R8",
@@ -657,7 +697,7 @@
   {
    "id": "WP-R6",
    "title": "R6 synthesis and architecture decision record",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 9,
    "autostart": true,
    "issue": 27,
@@ -669,8 +709,11 @@
     "WP-R5"
    ],
    "branch": "research/r6-architecture-20261127",
-   "next_step": "Compare architectures A/B/C on the charter criteria; simplest sufficient architecture; ADR + minimum buildable slice. Taxonomy must be scope-neutral (exam preparation as optional mode; R1 phase 'final_exam_week' becomes an assessment-preparation mode).",
-   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+   "next_step": "Two specialists: R6-RT independent red team (branch research/r6-red-team-20261127, merged by lead) and R6-ADR synthesis/ADR on research/r6-architecture-20261127; lead reconciles, opens one draft PR; owner acceptance required before architecture-dependent coding.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T18:54:54+01:00",
+   "worktree": "Exam_Mastery-r6",
+   "base": "research/r1-learning-science-20261127"
   },
   {
    "id": "WP-P4",
@@ -756,7 +799,7 @@
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents.",
   "lead_pacing": "Lead keeps seven_day <= 0.85 like the supervisor: one specialist while five_hour > 0.6; stop spawning at seven_day >= 0.83 and hand remaining packages to the supervisor after the 2026-11-29 07:00 reset."
  },
- "next_milestone": "R7 + R8 running; then R6 (synthesis/ADR + independent red team); owner acceptance required before architecture-dependent coding.",
+ "next_milestone": "R6: red team + ADR, lead reconciliation, draft PR; then owner acceptance gate. Architecture-independent P4 work (CD-8 Anki export identity) can proceed meanwhile.",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
