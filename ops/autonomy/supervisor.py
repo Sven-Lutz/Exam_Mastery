@@ -186,6 +186,9 @@ def lead_activity(cfg: Dict[str, Any], now: float) -> Optional[str]:
     hb = read_json(state_dir() / "heartbeat.json", {})
     if hb.get("ts") and now - float(hb["ts"]) < cfg["lead_stale_after_min"] * 60:
         return "lead heartbeat fresh (%s, wp=%s)" % (iso(hb["ts"]), hb.get("wp"))
+    if hb.get("hold_until") and now < float(hb["hold_until"]):
+        # The lead declared it is waiting (e.g. on its background agents) until then.
+        return "lead hold until %s (wp=%s)" % (iso(hb["hold_until"]), hb.get("wp"))
     sessions = active_sessions(cfg)
     if sessions is None:
         return None
@@ -617,6 +620,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     hb = sub.add_parser("heartbeat")
     hb.add_argument("--session", default=None)
     hb.add_argument("--wp", default=None)
+    hb.add_argument("--hold-min", type=float, default=0.0,
+                    help="lead stays authoritative this long even without new heartbeats (max 360)")
     a = ap.parse_args(argv)
     cfg = load_config()
     sd = state_dir()
@@ -625,8 +630,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     elif a.cmd == "status":
         cmd_status(cfg)
     elif a.cmd == "heartbeat":
-        write_json(sd / "heartbeat.json", {"ts": now_ts(), "session_id": a.session, "wp": a.wp})
-        print("heartbeat %s wp=%s" % (iso(now_ts()), a.wp))
+        hold = min(max(a.hold_min, 0.0), 360.0)
+        write_json(sd / "heartbeat.json", {"ts": now_ts(), "session_id": a.session, "wp": a.wp,
+                                           "hold_until": now_ts() + hold * 60 if hold else None})
+        print("heartbeat %s wp=%s hold_until=%s" % (iso(now_ts()), a.wp, iso(now_ts() + hold * 60) if hold else None))
     elif a.cmd == "disable":
         (sd / "DISABLED").write_text(iso(now_ts()) + "\n")
         print("disabled")

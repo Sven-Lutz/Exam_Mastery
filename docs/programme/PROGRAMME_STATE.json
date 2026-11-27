@@ -23,7 +23,7 @@
    "the same smoke started by launchd: subscription auth, resume, git over SSH and gh auth work in the agent context",
    "real crash test: tick killed with SIGKILL mid-run; next tick resumed the same session, finished the task without duplicating the completed step; third tick idempotent",
    "rate_limit_event in stream-json reports five_hour/seven_day utilisation and resetsAt; the supervisor records and respects it",
-   "21 unit tests with a fake CLI: limit pause until reported reset, resume of the same session, failure backoff -> BLOCKED, timeout kill, crash recovery, lock, kill switch, daily cap, window ceilings, dependency order, env without API keys"
+   "22 unit tests with a fake CLI: limit pause until reported reset, resume of the same session, failure backoff -> BLOCKED, timeout kill, crash recovery, lock, kill switch, daily cap, window ceilings, dependency order, env without API keys"
   ],
   "not_proven": [
    "a real usage-limit refusal (never hit during testing); the parser follows the CLI's documented rate_limit_info shape",

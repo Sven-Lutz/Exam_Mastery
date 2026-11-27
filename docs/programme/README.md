@@ -16,7 +16,7 @@ Stand 27.11.2026. Diese Steuerebene hält das autonome Exam-Mastery-Programm üb
 3. Läuft der vorige Headless-Prozess noch → nichts tun. Ist er tot (Absturz, Neustart, `kill -9`), wird das als `interrupted` verbucht und **dieselbe Session** mit `--resume` fortgesetzt.
 4. `BLOCKED` (nach drei Fehlschlägen in Folge) → warten auf `supervisor.py reset`.
 5. Pause bis zum gemeldeten Reset, wenn das letzte gemeldete 5-Stunden- oder 7-Tage-Fenster abgelehnt hat oder die Obergrenze erreicht ist (Standard 90 % bzw. 85 %; Rest bleibt für die eigene Arbeit des Owners).
-6. Aktive Lead-Session → nichts tun. Kriterien: Heartbeat jünger als 60 Minuten, Lead-Session laut `claude agents --json` beschäftigt (auch während sie selbst auf einen Limit-Reset wartet) oder eine beschäftigte interaktive Session in einem Exam-Mastery-Worktree.
+6. Aktive Lead-Session → nichts tun. Kriterien: Heartbeat jünger als 60 Minuten oder ausdrücklicher Hold (`--hold-min`), Lead-Session laut `claude agents --json` beschäftigt (auch während sie selbst auf einen Limit-Reset wartet) oder eine beschäftigte interaktive Session in einem Exam-Mastery-Worktree.
 7. Paketwahl: niedrigste `priority` unter `RESUMABLE`, `CHECKPOINTED`, `PAUSED_LIMIT`, `FAILED_RECOVERABLE`, `RUNNING` oder `PLANNED` mit `autostart`, deren `depends_on` abgeschlossen sind.
 8. Höchstens vier Läufe in 24 Stunden; Laufzeitgrenze 150 Minuten.
 9. Start: `claude -p … --output-format stream-json --permission-mode auto --permission-prompts none` mit einer Umgebung ohne API-Schlüssel oder Tokens (nur das angemeldete Abo, nie ein bezahlter Schlüssel). Alles, was eine Rückfrage bräuchte, wird abgelehnt.
@@ -39,7 +39,7 @@ S=ops/autonomy/supervisor.py
 /usr/bin/python3 -m unittest tests.test_programme_supervisor
 ```
 
-Eine interaktive Lead-Session meldet sich bei jedem Checkpoint mit `supervisor.py heartbeat --session <id> --wp <paket>`. Wer eine Lead-Session fortsetzt, prüft zuerst `status`: Läuft gerade ein Headless-Lauf, dessen Ende abwarten oder `disable` setzen, damit sich keine zwei Agenten in die Quere kommen.
+Eine interaktive Lead-Session meldet sich bei jedem Checkpoint mit `supervisor.py heartbeat --session <id> --wp <paket>`. Wartet sie auf eigene Hintergrund-Agenten, setzt sie zusätzlich `--hold-min <Minuten>` (höchstens 360): Bis dahin startet der Supervisor nichts, danach übernimmt er, falls die Lead-Session verschwunden ist. Wer eine Lead-Session fortsetzt, prüft zuerst `status`: Läuft gerade ein Headless-Lauf, dessen Ende abwarten oder `disable` setzen, damit sich keine zwei Agenten in die Quere kommen.
 
 ## Nachgewiesen am 27.11.2026
 

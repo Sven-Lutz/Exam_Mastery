@@ -1,1 +1,21 @@
-{"agent_id":"R1A","wp":"WP-R1","status":"RUNNING","updated":"2026-11-27T09:10:00+01:00","done":[],"open":["read charter/audit/schema","search+read sources Q1-Q9","write r1a_evidence.json","write R1A_COGNITIVE_INSTRUCTIONAL.md"],"artifacts":[],"next_step":"read charter docs then begin Q1 retrieval searches"}
+{
+ "agent_id": "R1A",
+ "wp": "WP-R1",
+ "status": "RUNNING",
+ "updated": "2026-11-27T09:11:44+01:00",
+ "done": [
+  "evidence:murray2025mathspacing",
+  "evidence:ruitenburg2026classroom",
+  "evidence:yang2021classroom"
+ ],
+ "open": [
+  "read charter/audit/schema",
+  "search+read sources Q1-Q9",
+  "write r1a_evidence.json",
+  "write R1A_COGNITIVE_INSTRUCTIONAL.md"
+ ],
+ "artifacts": [
+  "docs/research/workstreams/r1/r1a_evidence.json"
+ ],
+ "next_step": "Q1 continue: van Gog/Sweller vs Karpicke/Aue, successive relearning, pretesting"
+}

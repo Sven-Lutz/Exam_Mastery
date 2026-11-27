@@ -143,6 +143,16 @@ class SupervisorTest(unittest.TestCase):
         self.assertIn("heartbeat fresh", self.tick())
         self.assertEqual(self.argv_calls(), [])
 
+    def test_lead_hold_blocks_until_expiry_and_is_capped(self):
+        sup.write_json(sup.state_dir() / "heartbeat.json", {"ts": time.time() - 7200, "wp": "WP-R1",
+                                                            "hold_until": time.time() + 600})
+        self.assertIn("lead hold until", self.tick())
+        sup.write_json(sup.state_dir() / "heartbeat.json", {"ts": time.time() - 7200, "hold_until": time.time() - 1})
+        self.assertIn("outcome=success", self.tick())
+        sup.main(["heartbeat", "--wp", "X", "--hold-min", "10000"])
+        hb = json.loads((sup.state_dir() / "heartbeat.json").read_text())
+        self.assertLessEqual(hb["hold_until"] - hb["ts"], 360 * 60 + 1)
+
     def test_busy_interactive_session_in_project_prevents_run(self):
         os.environ["FAKE_AGENTS"] = json.dumps([{"pid": os.getpid(), "cwd": str(self.control / "sub"),
                                                  "status": "busy", "sessionId": "x", "name": "lead"}])
