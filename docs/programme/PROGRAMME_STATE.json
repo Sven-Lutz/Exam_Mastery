@@ -413,12 +413,14 @@
     "linear ancestry #11..#47 verified; fast-forward preserves original commits (88 ahead of main)",
     "no-ff merges of R1, R2, R3, R4, R5, R7, R8, R9, R6, #36 without conflicts",
     "frozen-copy suite on f620021: pytest 215 passed, unittest discover 879 OK (skipped=13)",
-    "#33 (control plane) intentionally not merged: programme state changes continuously; supervisor runs from the control worktree"
+    "#33 (control plane) intentionally not merged: programme state changes continuously; supervisor runs from the control worktree",
+    "post-fix suite on fab6c95: pytest 215 passed, unittest discover 889 OK (skipped=13); draft PR #50 -> main"
    ],
    "open": [
-    "draft PR integration -> main (never merged by agents)"
+    "owner review/merge decision (OD-02); agents never merge"
    ],
-   "next_step": "open draft PR after the post-fix suite is green"
+   "next_step": "none",
+   "pr": 50
   },
   {
    "id": "WP-P0",
