@@ -9,8 +9,8 @@ al. 2017 gebunden, synthetische Zahlen) mit zwei regelbasiert geprüften Übungs
 Skalierung, Maskierung, Gradient; Hauptübung) und *Backpropagation* (Voraussetzung). Alles läuft offline auf dem
 eigenen Rechner.
 
-**Start auf diesem Rechner:** `cd ~/Projects/Exam_Mastery-v1 && bin/mastery` (Integrations-Worktree; `.venv` verweist
-lokal auf die vorhandene Engine-Umgebung).
+**Start:** im Checkout des Branches `integration/mastery-v1-20261127` `bin/mastery` ausführen; eine lokale `.venv`
+(oder `$MASTERY_PYTHON`) muss die Engine-Abhängigkeiten enthalten.
 
 ## 1. Start mit einem Befehl
 
