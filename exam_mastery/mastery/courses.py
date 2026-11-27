@@ -34,6 +34,7 @@ INVENTORY_SCHEMA = "mastery-inventory-v1"
 PACKET_SCHEMA = "mastery-authoring-packet-v1"
 AUTHORING_SCHEMA = "mastery-authoring-record-v1"
 GENERATOR = "mastery-import-2"
+ANALYSIS_VERSION = 2              # page-analysis cache: 2 = cleaned PDF text (TeX accents, ligatures) + PDF outline
 SF_DATALESS = 0x40000000          # macOS st_flags: iCloud placeholder whose content is not on this disk
 MAX_FILES = 5000
 MAX_PDF_BYTES = 300 * 1024 * 1024
@@ -60,14 +61,28 @@ KIND_PATTERNS = [
 AUTHORITY_KIND = {"OFFICIAL_SOLUTION": "solution", "OFFICIAL_EXAM": "exam", "OFFICIAL_EXERCISE": "exercise",
                   "OFFICIAL_LECTURE": "lecture_slides", "SUPPLEMENTARY": "literature"}
 NUMBERED = re.compile(r"^\s*(\d{1,3})(?:\s*[-_.:)]\s*|\s+)(.*)$")
+TRAILING_NO = re.compile(r"^(.*?[^\W\d_])[\s_.-]*0*(\d{1,3})$")       # 'Folien 12', 'Loesungsvorschlag 3'
+COPY_SUFFIX = re.compile(r"(?:\s*\(\d{1,2}\)|\s+(?:copy|kopie)(?:\s+\d{1,2})?)+$", re.I)  # 'Blatt 1 (1)'
+SERIES_WORD = re.compile(r"^(folien?|slides?|vorlesung(sfolien)?|vl|lecture( slides| notes)?|handout|kapitel|chapter|"
+                         r"teil|part|einheit|unit|woche|week|sitzung|session|skript|script|lektion|lesson)$", re.I)
+DECK_PREFIX = re.compile(r"^\s*(?:vorlesung|vl|lecture|kapitel|chapter|einheit|unit|woche|week|sitzung|session|"
+                         r"lektion|lesson)\s*(\d{1,3})\s*[:.\-\u2013\u2014]?\s*", re.I)
+STATEMENT = re.compile(r"^\s*(Satz|Theorem|Lemma|Proposition|Korollar|Folgerung|Corollary|Definition)\s*"
+                       r"(\d+(?:\.\d+)*)?\s*(?:\(([^()]{3,60})\)|[:,]\s*([^\d\W][^.;]{2,60}))?\s*(.*)$")
 SHEET_NO = re.compile(r"(?:blatt|sheet|exercise|(?<![a-z])ex|(?:ü|ue)bung|tutorium|tutorial|assignment|homework|hw)"
                       r"[\s_-]*0*(\d{1,2})(?!\d)")
+BACK_MATTER = re.compile(r"^\W*(literatur(verzeichnis)?|bibliogra(ph|f)\w*|references|index|register|symbol(e|verzeichnis)?|"
+                         r"stichwortverzeichnis|notation|anhang|appendix|danksagung|acknowledg\w*)\W*$", re.I)
+SECTION_MIN_SCORE = 0.3   # script section -> lecture chapter: cosine floor (true matches in real courses scored 0.32-0.63)
 GOAL_TITLE = re.compile(r"lernziel|learning (goal|objective|outcome)|objectives|ziele (der|dieser)|goals? (of|for) "
                         r"(this|today)|what you will learn|was sie lernen", re.I)
 GENERIC_TITLE = re.compile(r"^(outline|agenda|overview|übersicht|inhalt|contents?|recap|summary|zusammenfassung|"
                            r"questions\??|fragen\??|thank you|danke|references|literatur(e)?|organi[sz]ation|"
                            r"announcements?|today|heute|motivation|example|beispiel|comparison|vergleich|"
-                           r"wrap[- ]?up|take[- ]?home.*|what (we|have) .*so far.*|agenda .*|recap.*|\d+|[ivx]+)\W*$", re.I)
+                           r"wrap[- ]?up|take[- ]?home.*|what (we|have) .*so far.*|agenda .*|recap.*|\d+|[ivx]+|"
+                           r"beispiele|examples|bemerkung(en)?|remarks?|notation|bezeichnung(en)?|title|titel|"
+                           r"wiederholung.*|erinnerung.*|einnerung.*|letztes mal|last time|vokabeln|fortsetzung|"
+                           r"nachtrag|inhaltsverzeichnis|vorwort|preface|index)\W*$", re.I)
 STOP = set("""the and for with from into of to in on an are is be by as at or this that these what how why when we
 you our der die das und mit von zu im den dem des ein eine einer eines für fur auf als bei aus ist sind wie was oder
 nicht part teil lecture vorlesung exercise exercises übung uebung blatt sheet tutorium tutorial solution solutions
@@ -116,10 +131,51 @@ def display_title(stem):
 
 
 def split_number(title):
+    """'05 - Actor Critic' -> (5, 'Actor Critic'); 'Folien 12' / 'Uebungsblatt 1 (1)' -> (12, 'Folien') / (1, ...).
+    A trailing number only counts after a document-series word (Folien, Blatt, Lösung, Tutorium, Lecture, ...), so a
+    topic title such as 'Diffusion 2' keeps no number; a download copy suffix '(1)' is ignored."""
+    title = COPY_SUFFIX.sub("", title).strip() or title
     m = NUMBERED.match(title)
     if m and m.group(2).strip():
         return int(m.group(1)), m.group(2).strip(" -_.")
+    m = TRAILING_NO.match(title)
+    if m:
+        prefix = m.group(1).strip(" -_.")
+        low = prefix.casefold()
+        if len(prefix.split()) <= 3 and (SERIES_WORD.match(low) or any(re.search(pat, low) for _, pat in KIND_PATTERNS)):
+            return int(m.group(2)), prefix
     return None, title
+
+
+_DIAERESIS = {"a": "ä", "o": "ö", "u": "ü", "A": "Ä", "O": "Ö", "U": "Ü", "e": "ë", "i": "ï"}
+_LIGATURES = {"\ufb00": "ff", "\ufb01": "fi", "\ufb02": "fl", "\ufb03": "ffi", "\ufb04": "ffl"}
+
+
+def clean_pdf_text(text):
+    """Repair what TeX-made PDFs commonly yield on text extraction: separate accent glyphs ('Vektorr¨aume',
+    '¨ Aquivalenz'), ligatures ('Begriﬀe'), the negation overlay ('1 ̸ = −1') and \\mapsto ('x 7→ y')."""
+    text = re.sub(r"\u00a8 ?([aouAOUei])", lambda m: _DIAERESIS[m.group(1)], str(text))
+    for lig, rep in _LIGATURES.items():
+        text = text.replace(lig, rep)
+    text = re.sub(r"\s?\u0338\s*=", " ≠", text)
+    text = re.sub(r"\s?\u0338\s*∈", " ∉", text)
+    text = re.sub(r"(?<![\d.,])7→", "↦", text)
+    return unicodedata.normalize("NFC", text)
+
+
+def title_page(pages):
+    """Title of a lecture deck from its first page: ('Vorlesung 19: Lineare Abbildungen', ...) -> (19, 'Lineare
+    Abbildungen'). Returns (declared number or None, title or '')."""
+    if not pages:
+        return None, ""
+    raw = re.sub(r"\s+", " ", pages[0].get("title") or "").strip()
+    m = DECK_PREFIX.match(raw)
+    number = int(m.group(1)) if m else None
+    rest = raw[m.end():] if m else raw
+    rest = rest.strip(" ,;:-")
+    if len(rest) < 3 or GENERIC_TITLE.match(rest):
+        rest = ""
+    return number, rest[:120]
 
 
 def tokens(text):
@@ -238,14 +294,14 @@ def _pdf_pages(path):
     with pymupdf.open(path) as doc:
         landscape = doc.page_count > 0 and doc[0].rect.width > doc[0].rect.height
         for pno, page in enumerate(doc, 1):
-            text = page.get_text("text").strip()
+            text = clean_pdf_text(page.get_text("text").strip())
             title = ""
             try:
                 spans = [(s["size"], s["text"]) for b in page.get_text("dict")["blocks"] if b.get("type") == 0
                          for line in b["lines"] for s in line["spans"] if s["text"].strip()]
                 if spans:
                     top = max(x[0] for x in spans)
-                    title = " ".join(x[1].strip() for x in spans if x[0] >= top - 0.5)[:160]
+                    title = clean_pdf_text(" ".join(x[1].strip() for x in spans if x[0] >= top - 0.5))[:160]
             except Exception:
                 pass
             imgs = {x[0] for x in page.get_images(full=True) if x[2] * x[3] >= 4096 and min(x[2], x[3]) >= 24}
@@ -254,6 +310,11 @@ def _pdf_pages(path):
             except Exception:
                 drs = set()
             raw.append((pno, text, title, imgs, drs))
+        try:
+            outline = [[int(lvl), clean_pdf_text(str(t)).strip()[:160], int(pg)] for lvl, t, pg in doc.get_toc(simple=True)
+                       if str(t).strip() and isinstance(pg, int) and pg >= 1][:400]
+        except Exception:
+            outline = []
     n = max(len(raw), 1)
     limit = max(3, 0.4 * n)
     img_count = Counter(x for r in raw for x in r[3])
@@ -267,7 +328,27 @@ def _pdf_pages(path):
                       "drawings": drawings, "formula_lines": formula, "text": text,
                       "image_only": chars < 40 and bool(images or drawings),
                       "needs_vision": bool(images) or drawings >= 6 or formula >= 2 or (chars < 40 and bool(drawings))})
-    return pages, {"landscape": landscape}
+    return pages, {"landscape": landscape, "outline": outline}
+
+
+def outline_sections(outline, n_pages):
+    """Sections of a long script from its PDF outline: the level below the top level when it has several entries
+    (chapters inside parts), else the top level. Each: title, part (enclosing top-level entry), start, end page."""
+    entries = [(lvl, t, p) for lvl, t, p in outline or [] if 1 <= p <= n_pages]
+    if not entries:
+        return []
+    top = min(e[0] for e in entries)
+    level = top + 1 if sum(1 for e in entries if e[0] == top + 1) >= 2 else top
+    out, part = [], ""
+    for i, (lvl, t, p) in enumerate(entries):
+        if lvl < level:
+            part = t
+            continue
+        if lvl != level:
+            continue
+        nxt = next((q for lv, _, q in entries[i + 1:] if lv <= level), n_pages + 1)
+        out.append({"title": t, "part": part if level > top else "", "start": p, "end": min(max(p, nxt - 1), n_pages)})
+    return out
 
 
 def _fidelity_pages(path, ext, root, assets):
@@ -423,12 +504,14 @@ def build_inventory(root, cdir, previous=None, log=print):
             f["sha256"] = _sha_file(Path(root) / rel)
             cache = files_dir / f"{fid}.json"
             cached = _read_json(cache)
-            if cached and cached.get("sha256") == f["sha256"] and cached.get("generator") == GENERATOR:
+            if (cached and cached.get("sha256") == f["sha256"] and cached.get("generator") == GENERATOR
+                    and cached.get("analysis_version") == ANALYSIS_VERSION):
                 res = cached["analysis"]
             else:
                 log(f"  lese {rel}")
                 res = analyse(root, rec, assets)
-                _write_json(cache, {"generator": GENERATOR, "sha256": f["sha256"], "rel_path": rel, "analysis": res})
+                _write_json(cache, {"generator": GENERATOR, "analysis_version": ANALYSIS_VERSION, "sha256": f["sha256"],
+                                    "rel_path": rel, "analysis": res})
         except Exception as exc:  # unreadable file: explicit, never silent
             f["status"], f["error"] = "unreadable", f"{type(exc).__name__}: {str(exc)[:160]}"
             f["kind"], f["kind_basis"] = classify_kind(rel, ext, None, {}, "UNKNOWN")
@@ -442,6 +525,14 @@ def build_inventory(root, cdir, previous=None, log=print):
         f["vision_pages"] = [p["n"] for p in pages if p["needs_vision"]]
         f["image_only_pages"] = [p["n"] for p in pages if p["image_only"]]
         f["formula_pages"] = [p["n"] for p in pages if p["formula_lines"] >= 2]
+        if f["kind"] in ("lecture_slides", "script"):
+            declared, deck_title = title_page(pages)
+            if deck_title and (not f["title"] or SERIES_WORD.match(f["title"])):
+                f["file_title"], f["title"], f["title_basis"] = f["title"], deck_title, "Titelseite"
+            if declared is not None and f["number"] is not None and declared != f["number"]:
+                f["title_number"] = declared
+            if f["kind"] == "script":
+                f["sections"] = outline_sections(res["meta"].get("outline"), len(pages))
         if res["meta"].get("render") == "unavailable":
             f["render"] = "unavailable"
         if f["sha256"] in seen:
@@ -552,13 +643,27 @@ def completeness(files, chapters):
             warns.append(_warn("VERSION_CONFLICT", "warning", f"Vorlesung {n:02d} liegt in {len(group)} verschiedenen "
                                f"Fassungen vor: {desc}. Beide gehen ins Kapitel; bitte prüfen, welche gilt.",
                                *[_prov(g) for g in group]))
+    for f in lectures:
+        if f.get("title_number") is not None:
+            warns.append(_warn("LECTURE_NUMBER_MISMATCH", "info", f"{f['rel_path']}: Titelseite nennt Vorlesung "
+                               f"{f['title_number']}, der Dateiname {f['number']} – Reihenfolge nach Dateiname; bitte "
+                               "prüfen (Tippfehler oder fehlende Vorlesungen?).", _prov(f, 1)))
+    split = {fid for ch in chapters for fid in (ch.get("source_pages") or {})}
     for f in live:
-        if f["kind"] in ("lecture_slides", "script") and f["number"] is None:
+        if f["kind"] in ("lecture_slides", "script") and f["number"] is None and f["file_id"] in split:
+            used = sorted({(a, b) for ch in chapters for a, b in (ch.get("source_pages") or {}).get(f["file_id"], [])})
+            free = [s for s in f.get("sections", []) if (s["start"], s["end"]) not in used]
+            warns.append(_warn("SCRIPT_SPLIT", "info", f"Skript {f['rel_path']} nach seinem Inhaltsverzeichnis in "
+                               f"{len(f.get('sections', []))} Abschnitte geteilt und den Kapiteln zugeordnet"
+                               + (f"; ohne Kapitel: {', '.join(s['title'] for s in free[:8])}" if free else "") + ".",
+                               _prov(f)))
+        elif f["kind"] in ("lecture_slides", "script") and f["number"] is None:
             warns.append(_warn("UNNUMBERED_LECTURE", "info", f"Vorlesungsdatei ohne Nummer: {f['rel_path']} – als "
                                "eigenes Kapitel am Ende eingeordnet; ggf. zusammenführen.", _prov(f)))
     sol = [f for f in live if f["kind"] == "solution"]
-    for ex in (f for f in live if f["kind"] == "exercise"):
-        if not _solution_for(ex, sol):
+    exs = [f for f in live if f["kind"] == "exercise"]
+    for ex in exs:
+        if not _solution_for(ex, sol, exs):
             warns.append(_warn("EXERCISE_WITHOUT_SOLUTION", "warning", f"Übung ohne Lösung: {ex['rel_path']}", _prov(ex)))
     for ch in chapters:
         if ch.get("skip"):
@@ -574,11 +679,26 @@ def _sheet_no(f):
     return int(m.group(1)) if m else f["number"]
 
 
-def _solution_for(ex, solutions):
+def _series_word(f):
+    m = SHEET_NO.search(display_title(Path(f["rel_path"]).stem).casefold())
+    return re.sub(r"[\s_\d-]+$", "", m.group(0)) if m else None
+
+
+def _solution_for(ex, solutions, exercises=None):
+    """Same sheet number within the same series: the solution sits in the exercise's folder, or names the exercise's
+    series word ('Lösung Blatt 01' for 'Blatt 01 - …'), or sits in a folder without exercises while only one exercise
+    has that number. So 'Loesungsvorschlag 3' answers 'Uebungsblatt 3', not 'Tutorium 3'. Without the exercise list
+    the number alone decides (older callers)."""
     no, tok = _sheet_no(ex), set(tokens(ex["title"]))
+    folder, word = str(Path(ex["rel_path"]).parent), _series_word(ex)
+    ex_folders = {str(Path(e["rel_path"]).parent) for e in exercises or []}
+    same_no = [e for e in exercises or [] if _sheet_no(e) == no]
     for s in solutions:
         if no is not None and _sheet_no(s) == no:
-            return s
+            sf = str(Path(s["rel_path"]).parent)
+            if (exercises is None or sf == folder or (word and word in display_title(Path(s["rel_path"]).stem).casefold())
+                    or (sf not in ex_folders and len(same_no) == 1)):
+                return s
         if tok and _jaccard(tok, tokens(s["title"])) >= 0.5:
             return s
     return None
@@ -595,11 +715,71 @@ def _chapter_id(number, title, used):
     return cid
 
 
+def _in_ranges(n, ranges):
+    return any(a <= n <= b for a, b in ranges)
+
+
+def chapter_pages(cdir, f, ch):
+    """Pages of source f that belong to chapter ch (a split script contributes only its sections' pages)."""
+    pages = _pages(cdir, f)
+    ranges = (ch.get("source_pages") or {}).get(f["file_id"])
+    return [p for p in pages if _in_ranges(p["n"], ranges)] if ranges else pages
+
+
+SERIES_FLOOR = 0.15   # an exercise of a numbered series attaches only above this content similarity
+
+
+def _doc_counter(cdir, f):
+    body = Counter(tokens(f["title"]) * 5)
+    body.update(tokens(" ".join(p["text"] for p in _pages(cdir, f))[:60000]))
+    return body
+
+
+def _align_series(items, chapters, vec_of, vecs, title_tok):
+    """Assign a numbered exercise series (sorted by number) to chapters in plan order without going back: dynamic
+    programme maximising the summed content similarity (a title match counts 1 extra). Items below SERIES_FLOOR stay
+    unattached but still respect the order. Returns {file_id: (chapter, basis)} for attached items."""
+    m = len(chapters)
+    gain = []
+    for f in items:
+        v, tt = vec_of(f), set(tokens(f["title"]))
+        row = []
+        for ch in chapters:
+            sc = _cos(v, vecs[ch["id"]])
+            bonus = 1.0 if tt and _jaccard(tt, title_tok[ch["id"]]) >= 0.34 else 0.0
+            row.append((sc, sc + bonus - SERIES_FLOOR))
+        gain.append(row)
+    best, back = [[0.0] * m for _ in items], [[0] * m for _ in items]
+    for i, row in enumerate(gain):
+        run, arg = float("-inf"), 0
+        for j in range(m):
+            prev = best[i - 1][j] if i else 0.0
+            if prev > run:
+                run, arg = prev, j
+            best[i][j] = run + max(0.0, row[j][1])
+            back[i][j] = arg
+    j = max(range(m), key=lambda k: (best[-1][k], -k))
+    out = {}
+    for i in range(len(items) - 1, -1, -1):
+        sc, g = gain[i][j]
+        if g > 0:
+            out[items[i]["file_id"]] = (chapters[j], f"Inhalt und Reihenfolge der Serie (Ähnlichkeit {sc:.2f})")
+        j = back[i][j]
+    return out
+
+
 def propose_chapters(cdir, files):
-    """One chapter per numbered lecture deck/script (same number = same chapter), unnumbered decks after them;
-    exercises attached by title, then content similarity, then number; solutions follow their exercise."""
+    """One chapter per numbered lecture deck/script (same number = same chapter), unnumbered decks after them.
+    A long unnumbered script with a PDF outline next to numbered decks is not one giant chapter: its sections go to
+    the deck chapters they resemble (page ranges in 'source_pages'); sections without a deck become chapters of their
+    own. Exercises attached by title, then content similarity, then number; solutions follow their exercise."""
     live = [f for f in files if not f["duplicate_of"] and f["status"] in ("ok", "no_text", "not_local")]
+    by = {f["file_id"]: f for f in files}
     lectures = [f for f in live if f["kind"] in ("lecture_slides", "script")]
+    numbered = {f["number"] for f in lectures if f["number"] is not None and f["number"] < 90}
+    split = [f for f in lectures if f["kind"] == "script" and (f["number"] is None or f["number"] >= 90)
+             and len(f.get("sections") or []) >= 2 and len(numbered) >= 2]
+    lectures = [f for f in lectures if f not in split]
     groups = {}
     for f in sorted(lectures, key=lambda f: (f["number"] is None or f["number"] >= 90, f["number"] or 0, f["rel_path"])):
         key = f["number"] if f["number"] is not None and f["number"] < 90 else "x:" + f["file_id"]
@@ -611,29 +791,76 @@ def propose_chapters(cdir, files):
         chapters.append({"id": _chapter_id(number, title, used), "number": number, "title": title,
                          "sources": [m["file_id"] for m in members], "exercises": [], "solutions": [], "exams": [],
                          "attach_basis": {}})
-    if not chapters:
-        return chapters
-    text_vec = {}
-    for ch in chapters:
+
+    def chapter_counter(ch):
         c = Counter()
         for fid in ch["sources"]:
-            f = next(x for x in files if x["file_id"] == fid)
-            c.update(tokens(f["title"]) * 5)
-            c.update(tokens(" ".join(p["text"] for p in _pages(cdir, f))[:60000]))
-        text_vec[ch["id"]] = c
-    df = Counter(t for c in text_vec.values() for t in c)
-    idf = {t: math.log((1 + len(chapters)) / (1 + n)) + 1 for t, n in df.items()}
-    weigh = lambda c: {t: v * idf.get(t, 1.0) for t, v in c.items()}  # noqa: E731
+            f = by[fid]
+            if not ch.get("source_pages", {}).get(fid):
+                c.update(tokens(f["title"]) * 5)
+            c.update(tokens(" ".join(p["text"] for p in chapter_pages(cdir, f, ch))[:60000]))
+        return c
+
+    def weights(counters):
+        df = Counter(t for c in counters for t in c)
+        idf = {t: math.log((1 + len(counters)) / (1 + n)) + 1 for t, n in df.items()}
+        return lambda c: {t: v * idf.get(t, 1.0) for t, v in c.items()}
+
+    if split and chapters:
+        deck = list(chapters)
+        counters = {ch["id"]: chapter_counter(ch) for ch in deck}
+        weigh = weights(list(counters.values()))
+        vecs = {k: weigh(v) for k, v in counters.items()}
+        pos = {ch["id"]: i for i, ch in enumerate(deck)}
+        for f in split:
+            pages = _pages(cdir, f)
+            frontier = 0   # script and lectures run in the same order: no section goes back more than one chapter
+            for sec in f["sections"]:
+                if BACK_MATTER.match(sec["title"]):
+                    continue
+                rng = [sec["start"], sec["end"]]
+                body = Counter(tokens(sec["title"]) * 5)
+                body.update(tokens(" ".join(p["text"] for p in pages if sec["start"] <= p["n"] <= sec["end"])[:60000]))
+                scored = sorted(((_cos(weigh(body), vecs[ch["id"]]), ch) for ch in deck
+                                 if pos[ch["id"]] >= frontier - 1), key=lambda x: -x[0])
+                label = f"Skriptabschnitt „{sec['title']}“ (S. {sec['start']}–{sec['end']})"
+                hits = [(sc, ch) for sc, ch in scored[:2] if sc >= SECTION_MIN_SCORE and sc >= 0.85 * scored[0][0]]
+                if hits:
+                    frontier = max(frontier, max(pos[ch["id"]] for _, ch in hits))
+                for sc, ch in hits:
+                    if f["file_id"] not in ch["sources"]:
+                        ch["sources"].append(f["file_id"])
+                    ch.setdefault("source_pages", {}).setdefault(f["file_id"], []).append(rng)
+                    ch["attach_basis"].setdefault(f["file_id"], [])
+                    ch["attach_basis"][f["file_id"]].append(f"{label}, Inhalt {sc:.2f}")
+                if not hits and sec["end"] - sec["start"] + 1 >= 3:
+                    chapters.append({"id": _chapter_id(None, sec["title"], used), "number": None, "title": sec["title"],
+                                     "sources": [f["file_id"]], "source_pages": {f["file_id"]: [rng]}, "exercises": [],
+                                     "solutions": [], "exams": [], "attach_basis": {f["file_id"]: [label]}})
+        for ch in chapters:
+            for fid, basis in list(ch["attach_basis"].items()):
+                if isinstance(basis, list):
+                    ch["attach_basis"][fid] = "; ".join(basis)
+    if not chapters:
+        return chapters
+    text_vec = {ch["id"]: chapter_counter(ch) for ch in chapters}
+    weigh = weights(list(text_vec.values()))
     vecs = {k: weigh(v) for k, v in text_vec.items()}
     title_tok = {ch["id"]: set(tokens(ch["title"])) for ch in chapters}
+
+    exs = [f for f in live if f["kind"] == "exercise"]
+    exdf = Counter(t for f in exs for t in set(_doc_counter(cdir, f)))
+    template = {t for t, n in exdf.items() if n >= max(3, 0.5 * len(exs))}   # sheet template words (Aufgabe, Punkte …)
+
+    def body_of(f):
+        return Counter({t: v for t, v in _doc_counter(cdir, f).items() if t not in template})
 
     def best_chapter(f):
         tt = set(tokens(f["title"]))
         scored = sorted(((_jaccard(tt, title_tok[ch["id"]]), ch) for ch in chapters), key=lambda x: -x[0])
         if tt and scored[0][0] >= 0.34 and (len(scored) == 1 or scored[0][0] > scored[1][0]):
             return scored[0][1], "Titel"
-        body = Counter(tokens(f["title"]) * 5)
-        body.update(tokens(" ".join(p["text"] for p in _pages(cdir, f))[:60000]))
+        body = body_of(f) if f["kind"] in ("exercise", "solution") else _doc_counter(cdir, f)
         if sum(body.values()) > 30:
             scored = sorted(((_cos(weigh(body), vecs[ch["id"]]), ch) for ch in chapters), key=lambda x: -x[0])
             if scored[0][0] >= 0.2 and (len(scored) == 1 or scored[0][0] - scored[1][0] >= 0.03):
@@ -645,16 +872,26 @@ def propose_chapters(cdir, files):
         return None, None
 
     exercise_chapter = {}
-    for f in live:
-        if f["kind"] == "exercise":
-            ch, basis = best_chapter(f)
-            if ch:
-                ch["exercises"].append(f["file_id"])
-                ch["attach_basis"][f["file_id"]] = basis
-                exercise_chapter[f["file_id"]] = ch
+    placed, aligned = {}, set()
+    series = {}
+    for f in exs:
+        rest = split_number(display_title(Path(f["rel_path"]).stem))[1]
+        if _sheet_no(f) is not None:
+            series.setdefault((str(Path(f["rel_path"]).parent), rest.casefold()), []).append(f)
+    for items in series.values():
+        if len(items) >= 3:   # weekly sheets run in course order: monotone alignment instead of one-by-one guesses
+            items.sort(key=_sheet_no)
+            placed.update(_align_series(items, chapters, lambda f: weigh(body_of(f)), vecs, title_tok))
+            aligned.update(f["file_id"] for f in items)
+    for f in exs:
+        ch, basis = placed.get(f["file_id"]) or ((None, None) if f["file_id"] in aligned else best_chapter(f))
+        if ch:
+            ch["exercises"].append(f["file_id"])
+            ch["attach_basis"][f["file_id"]] = basis
+            exercise_chapter[f["file_id"]] = ch
     sols = [f for f in live if f["kind"] == "solution"]
     for f in sols:
-        ex = next((e for e in live if e["kind"] == "exercise" and _solution_for(e, [f])), None)
+        ex = next((e for e in exs if _solution_for(e, [f], exs)), None)
         ch = exercise_chapter.get(ex["file_id"]) if ex else None
         basis = "zur Übung " + ex["rel_path"] if ch else None
         if not ch:
@@ -669,14 +906,17 @@ def propose_chapters(cdir, files):
 
 
 def propose_competencies(cdir, files, ch, limit=12):
-    """Deterministic 'Vorschlag': bullets of learning-goal slides first, else distinct slide/section titles."""
+    """Deterministic 'Vorschlag': bullets of learning-goal slides first; else named statements (Satz/Theorem/Lemma/
+    Definition … with a name, e.g. 'Satz 4.5 (Homomorphiesatz)'), then distinct slide/section titles, then unnamed
+    statements with their opening words. Title pages ('Vorlesung 19: …') and generic headings are skipped."""
     by = {f["file_id"]: f for f in files}
-    goals, heads, seen = [], [], set()
+    goals, named, heads, unnamed, seen = [], [], [], [], set()
+    chapter_terms = set(tokens(ch["title"]))
     for fid in ch["sources"]:
         f = by.get(fid)
         if not f:
             continue
-        for p in _pages(cdir, f):
+        for p in chapter_pages(cdir, f, ch):
             title = re.sub(r"\s+", " ", p.get("title") or "").strip()
             if title and GOAL_TITLE.search(title):
                 for line in p["text"].splitlines():
@@ -684,12 +924,32 @@ def propose_competencies(cdir, files, ch, limit=12):
                     if 12 <= len(line) <= 160 and line.casefold() != title.casefold() and line.casefold() not in seen:
                         seen.add(line.casefold())
                         goals.append({"text": line, "basis": "Lernziel-Folie", "provenance": [_prov(f, p["n"])]})
-            elif title and 4 <= len(title) <= 120 and not GENERIC_TITLE.match(title):
+                continue
+            for line in p["text"].splitlines():
+                m = STATEMENT.match(line)
+                if not m:
+                    continue
+                kind, num, name = m.group(1), m.group(2) or "", (m.group(3) or m.group(4) or "").strip()
+                if STATEMENT.match(name) or not re.search(r"[^\W\d_]{3}", name):
+                    name = ""     # '(Satz 7.4)' is a reference, not a name
+                label = " ".join(x for x in (kind, num) if x)
+                if name:
+                    text, bucket = f"{label} ({name})", named
+                elif num and len(m.group(5).strip()) >= 15:
+                    text, bucket = f"{label}: {m.group(5).strip()[:90]}", unnamed
+                else:
+                    continue
+                key = re.sub(r"\W+", " ", (name or text).casefold()).strip()
+                if key and key not in seen:
+                    seen.add(key)
+                    bucket.append({"text": text, "basis": "Satz/Definition im Text", "provenance": [_prov(f, p["n"])]})
+            if (title and 4 <= len(title) <= 120 and not GENERIC_TITLE.match(title) and not DECK_PREFIX.match(title)
+                    and not STATEMENT.match(title)):
                 key = re.sub(r"\W+", " ", title.casefold()).strip()
-                if key and key not in seen and set(tokens(title)) != set(tokens(ch["title"])):
+                if key and key not in seen and set(tokens(title)) != chapter_terms:
                     seen.add(key)
                     heads.append({"text": title, "basis": "Folien-/Abschnittstitel", "provenance": [_prov(f, p["n"])]})
-    out = (goals or heads)[:limit]
+    out = (goals or (named + heads + unnamed))[:limit]
     return [dict(c, id=f"k{i:02d}", label="Vorschlag") for i, c in enumerate(out, 1)]
 
 
@@ -701,8 +961,20 @@ def apply_overrides(chapters, overrides):
         target = by.get(o.get("merge_into") or "")
         if cid in by and target and target is not by[cid]:
             src = by.pop(cid)
+            had = set(target["sources"])
             for key in ("sources", "exercises", "solutions"):
                 target[key] += [x for x in src[key] if x not in target[key]]
+            for fid in src["sources"]:  # page ranges of a split script: union; a whole file stays whole
+                ranges = (src.get("source_pages") or {}).get(fid)
+                if fid in had and fid not in (target.get("source_pages") or {}):
+                    continue
+                if ranges:
+                    mine = target.setdefault("source_pages", {}).setdefault(fid, [])
+                    mine += [r for r in ranges if r not in mine]
+                else:
+                    (target.get("source_pages") or {}).pop(fid, None)
+            for fid, basis in (src.get("attach_basis") or {}).items():
+                target.setdefault("attach_basis", {}).setdefault(fid, basis)
             target.setdefault("merged", []).append(cid)
     out = list(by.values())
     for c in out:
@@ -757,7 +1029,7 @@ def _save(cdir, course):
 
 
 PLAN_KEYS = {"id", "order", "number", "title", "sources", "exercises", "solutions", "exams", "attach_basis", "skip",
-             "merged", "competencies_proposed", "unit_id"}
+             "merged", "competencies_proposed", "unit_id", "source_pages"}
 
 
 def replan(cdir, course):
@@ -965,7 +1237,11 @@ def make_packet(slug, cid, home=None, log=print, force=False):
             warnings.append(f"{f['rel_path']}: nicht lokal verfügbar (iCloud) – Inhalt fehlt im Paket.")
             sources.append(entry)
             continue
-        pages = _pages(cdir, f)
+        pages = chapter_pages(cdir, f, ch) if role is None else _pages(cdir, f)
+        ranges = (ch.get("source_pages") or {}).get(fid) if role is None else None
+        if ranges:
+            entry["selection"] = "Skriptabschnitte: " + ", ".join(f"S. {a}–{b}" for a, b in ranges)
+            entry["attach_basis"] = ch.get("attach_basis", {}).get(fid, "")
         if role == "exam" and len(pages) > 6:
             pages = [p for p in pages if len(title_terms & set(tokens(p["text"]))) >= 2]
             entry["selection"] = "nur Seiten mit Begriffen dieses Kapitels"

@@ -8,6 +8,9 @@ All text uses the design system's sans font; colours are a calm, print-safe pale
 """
 from html import escape as E
 
+import hashlib
+import json
+import math
 INK = '#1d2a3a'
 MUTED = '#5b6878'
 LINE = '#c9d1db'
@@ -480,6 +483,84 @@ def policy_gradient_bandit(spec):
     return _svg(680, h, ''.join(body), spec.get('alt', spec['title']))
 
 
+# Plane transformation scene (shared visual language with templates/plane_map_lab.js; own palette).
+PLANE = {'e1': '#c26a05', 'e2': '#6d3fc0', 'v': '#0e7490', 'pos': '#2563eb', 'neg': '#be123c', 'zero': '#6b7280',
+         'grid': '#9aa9bc', 'ghost': '#e3e8ef', 'kernel': '#111827', 'image': '#0f766e'}
+
+
+def plane_extent(m):
+    """One scale for the whole morph (all keyframes of a scene share it): columns of A, A·v, v and the image square."""
+    A = m['A']; c1, c2 = [A[0][0], A[1][0]], [A[0][1], A[1][1]]
+    pts = [c1, c2, m['v'], m['Av'], [c1[0] + c2[0], c1[1] + c2[1]], [1, 1]]
+    return min(6.0, max(2.5, math.ceil(max(abs(c) for p in pts for c in p) + 0.6)))
+
+
+def plane_linear_map(spec):
+    """Grid, basis images (= columns), unit square -> parallelogram (signed area = det), test vector, kernel/image.
+    Print-first layout: 300 px plane + short, large legend lines (the full equations live in the explorable)."""
+    from .labs.plane_map import compute
+    m = compute(spec['parameters'])
+    R = plane_extent(m); S = 300; o = S / 2 + 10; k = (S / 2) / R
+    X = lambda p: o + k * p[0]
+    Y = lambda p: o - k * p[1]
+    M = m['M']; T = lambda p: [M[0][0] * p[0] + M[0][1] * p[1], M[1][0] * p[0] + M[1][1] * p[1]]
+    uid = 'pm' + hashlib.sha256(json.dumps(spec['parameters'], sort_keys=True).encode()).hexdigest()[:10]  # stable ids
+    body = [f'<defs><clipPath id="{uid}"><rect x="10" y="10" width="{S}" height="{S}"/></clipPath>'
+            + ''.join(f'<marker id="{uid}-{n}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" '
+                      f'orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="{c}"/></marker>'
+                      for n, c in PLANE.items()) + '</defs>',
+            f'<rect x="10" y="10" width="{S}" height="{S}" fill="white" stroke="{LINE}"/>', f'<g clip-path="url(#{uid})">']
+    n = int(R) + 1; far = 4 * R
+    for i in range(-n, n + 1):
+        body.append(f'<line x1="{X([i, -far]):.1f}" y1="{Y([i, -far]):.1f}" x2="{X([i, far]):.1f}" y2="{Y([i, far]):.1f}" stroke="{PLANE["ghost"]}"/>')
+        body.append(f'<line x1="{X([-far, i]):.1f}" y1="{Y([-far, i]):.1f}" x2="{X([far, i]):.1f}" y2="{Y([far, i]):.1f}" stroke="{PLANE["ghost"]}"/>')
+    for i in range(-3 * n, 3 * n + 1):
+        for a, b in (([i, -far], [i, far]), ([-far, i], [far, i])):
+            p, q = T(a), T(b)
+            body.append(f'<line x1="{X(p):.1f}" y1="{Y(p):.1f}" x2="{X(q):.1f}" y2="{Y(q):.1f}" stroke="{PLANE["grid"]}" stroke-width="{1.6 if i == 0 else 0.8}"/>')
+    d = m['det']; col = PLANE['pos'] if d > 1e-12 else (PLANE['neg'] if d < -1e-12 else PLANE['zero'])
+    sq = [T(c) for c in ([0, 0], [1, 0], [1, 1], [0, 1])]
+    body.append(f'<polygon points="{" ".join(f"{X(c):.1f},{Y(c):.1f}" for c in sq)}" fill="{col}" fill-opacity="0.22" '
+                f'stroke="{col}" stroke-width="1.5"/>')
+    for key, vecs, dash in (('kernel', m['kernel'], '7 5'), ('image', m['image'], '')):
+        if m['rank'] == 1 and vecs:
+            u = vecs[0]; L = far / max(1e-9, math.hypot(*u))
+            body.append(f'<line x1="{X([-L * u[0], -L * u[1]]):.1f}" y1="{Y([-L * u[0], -L * u[1]]):.1f}" '
+                        f'x2="{X([L * u[0], L * u[1]]):.1f}" y2="{Y([L * u[0], L * u[1]]):.1f}" stroke="{PLANE[key]}" '
+                        f'stroke-width="{2.4 if key == "image" else 1.8}"' + (f' stroke-dasharray="{dash}"' if dash else '') + '/>')
+    same = math.hypot(m['e1'][0] - m['e2'][0], m['e1'][1] - m['e2'][1]) < 1e-9   # coincident columns: both stay visible
+    for key, tip in (('e2', m['e2']), ('e1', m['e1']), ('v', m['Mv'])):
+        if math.hypot(*tip) > 1e-9:
+            body.append(f'<line x1="{X([0, 0]):.1f}" y1="{Y([0, 0]):.1f}" x2="{X(tip):.1f}" y2="{Y(tip):.1f}" '
+                        f'stroke="{PLANE[key]}" stroke-width="{7 if same and key == "e2" else 3}" marker-end="url(#{uid}-{key})"/>')
+        else:
+            body.append(f'<circle cx="{X([0, 0]):.1f}" cy="{Y([0, 0]):.1f}" r="5" fill="none" stroke="{PLANE[key]}" stroke-width="2"/>')
+    body.append(f'<circle cx="{X(m["v"]):.1f}" cy="{Y(m["v"]):.1f}" r="4" fill="white" stroke="{PLANE["v"]}" stroke-width="2"/>')
+    body.append(_t(X(m['v']) + 8, Y(m['v']) + 16, 'v', 14, 'start', 600, PLANE['v'], True))
+    body.append('</g>')
+    for key, tip, txt in (('e1', m['e1'], 'Me₁'), ('e2', m['e2'], 'Me₂'), ('v', m['Mv'], 'Mv')):
+        if abs(X(tip) - o) < S / 2 - 10 and abs(Y(tip) - o) < S / 2 - 10 and math.hypot(*tip) > 1e-9:
+            body.append(_t(X(tip) + (9 if tip[0] >= 0 else -9), Y(tip) - 8, txt, 15, 'start' if tip[0] >= 0 else 'end', 700, PLANE[key]))
+    g = lambda x: (f'{x:.3g}' if abs(x) > 1e-12 else '0').replace('-', '−')  # noqa: E731
+    pt = lambda p: f'({g(p[0])}; {g(p[1])})'  # noqa: E731
+    lines = [(f't = {g(m["t"])}', INK, 700), (f'Me₁ = {pt(m["e1"])}', PLANE['e1'], 700), (f'Me₂ = {pt(m["e2"])}', PLANE['e2'], 700),
+             (f'Mv = {pt(m["Mv"])}', PLANE['v'], 700), (f'det M = {g(d)}', col, 700),
+             ('Orientierung ' + ('erhalten' if d > 1e-12 else 'umgekehrt' if d < -1e-12 else 'kollabiert'), col, 400),
+             (f'Rang M = {m["rank"]}', INK, 700)]
+    if m['rank'] == 1:
+        u, w = m['kernel'][0], m['image'][0]
+        lines += [(f'Kern = span{pt(u)}', PLANE['kernel'], 600), (f'Bild = span{pt(w)}', PLANE['image'], 600)]
+    elif m['rank'] == 0:
+        lines += [('Kern = ganze Ebene', PLANE['kernel'], 600), ('Bild = {0}', INK, 400)]
+    else:
+        lines += [('Kern = {0}', INK, 400), ('Bild = ganze Ebene', INK, 400)]
+    y = 34
+    for text, c, wgt in lines:
+        body.append(_t(328, y, text, 16, 'start', wgt, c)); y += 27
+    body.append(_t(328, S + 4, 'M(t) = (1 − t)·I + t·A', 12.5, 'start', 400, MUTED))
+    return _svg(540, S + 20, ''.join(body), spec.get('alt', spec.get('title', 'Lineare Abbildung der Ebene')))
+
 RENDER.update({'binomial_area_partition':binomial_partition,
+               'plane_linear_map':plane_linear_map,
                'softmax_policy_gradient':policy_gradient_bandit,
                'scaled_dot_product_attention':attention_pipeline})

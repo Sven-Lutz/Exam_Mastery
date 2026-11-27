@@ -74,7 +74,8 @@ Punkte) daneben legen und bauen. Ergebnisse bleiben `HUMAN_REVIEW_PENDING`; Lern
 | iCloud-Platzhalter erkennen, nur mit Zustimmung laden | funktioniert (Test simuliert das Flag; am echten RL-Kurs geprüft) |
 | Vollständigkeit: Nummerierungslücken, Fassungskonflikte, Übung ohne Lösung, Kapitel ohne Übung, Duplikate, Formate | funktioniert; Heuristik nach Dateinamen, Titeln und Inhalt |
 | Kapitelvorschlag, Zuordnung von Übungen | Heuristik; die Grundlage (Titel/Inhalt/Nummer) wird angezeigt, Plan ist editierbar |
-| Kompetenzvorschläge | einfache Heuristik aus Folientiteln/Lernzielen; nur Vorschlag |
+| Mathematik-Kurse (zweiter Kurs, Lineare Algebra) | Dateinamen wie „Folien 12“, „Loesungsvorschlag 3“, „Blatt 1 (1)“ werden nummeriert; Kapiteltitel von der Titelfolie („Vorlesung 19: …“, abweichende Nummer wird gemeldet); ein langes Skript mit PDF-Inhaltsverzeichnis wird in Abschnitte geteilt und den Vorlesungen in Kursreihenfolge zugeordnet (Abschnitte ohne Vorlesung werden eigene Kapitel); Lösungen nur innerhalb ihrer Serie (Übungsblatt ≠ Tutorium); nummerierte Übungsserien werden monoton in Kursreihenfolge zugeordnet, Vorlagenwörter der Blätter zählen nicht; TeX-Textartefakte („Vektorr¨aume“, „̸ =“, „7→“, Ligaturen) werden repariert; Kompetenzvorschläge aus benannten Sätzen/Definitionen |
+| Kompetenzvorschläge | einfache Heuristik aus Lernzielen, benannten Sätzen/Definitionen und Folientiteln; nur Vorschlag |
 | Paket, Validierung, Bau, Eintrag in die Bibliothek, stabile Anki-Identität, Neuimport mit „veraltet“ | funktioniert, getestet |
 | Folienbilder für PPTX | nicht verfügbar (kein Renderer); Folientext wird übernommen |
 | OCR für Scans | nicht verfügbar; Seiten ohne Textebene werden gemeldet und als Bild ins Paket gelegt (PDF) |
