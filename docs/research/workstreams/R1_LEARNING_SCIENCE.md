@@ -2,6 +2,8 @@
 
 Stand 27.11.2026. **Forschungsergebnis zur Begutachtung, keine Freigabe.** Alle 23 Policies sind `design_hypothesis` mit `learning_evaluation: NOT_RUN`. Keine Policy ist implementiert; kein Exam-Mastery-Produkt hat dadurch eine nachgewiesene Lernwirkung. Historische `HUMAN_REJECTED`-Bewertungen bleiben unverändert.
 
+**Produktidentität:** Seit Issue #34 heißt das Produkt **Mastery** (vormals Exam Mastery), eine allgemeine Plattform für Wissens- und Fertigkeitserwerb. R1 wurde mit Blick auf intensive Prüfungsvorbereitung recherchiert. Policies mit Prüfungsbezug (B02, B08, die Prüfungswochenfälle in A05 und CR-4) gelten im optionalen Modus Prüfungsvorbereitung, alle übrigen unabhängig davon. Pfade, Schema-Namen und Bezeichner bleiben unverändert.
+
 | Artefakt | Inhalt |
 |---|---|
 | [r1/R1A_COGNITIVE_INSTRUCTIONAL.md](r1/R1A_COGNITIVE_INSTRUCTIONAL.md) + [r1/r1a_evidence.json](r1/r1a_evidence.json) | Abruf, Verteilung, Interleaving, kognitive Belastung, Worked Examples, Expertise Reversal, Productive Failure, Selbsterklärung, Feedback, Kalibrierung, Transfer. 31 Quellen, 12 auf Volltextebene. Policies A01–A11. |
