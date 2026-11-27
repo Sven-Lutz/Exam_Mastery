@@ -1,4 +1,6 @@
-"""Mastery V1 command line: start | build | status | export. German user messages; no network beyond 127.0.0.1."""
+"""Mastery V1 command line: start | build | status | export, and the course import: import | courses | course | plan |
+packet | build-chapter | reimport. German user messages; no network beyond 127.0.0.1 (exception: `--materialize` asks
+iCloud to download the user's own placeholder files, with that explicit consent)."""
 from __future__ import annotations
 
 import argparse
@@ -75,6 +77,101 @@ def cmd_export(args):
     return 0
 
 
+def _print_course(s, full=False):
+    n = s["counts"]
+    print(f"Kurs {s['slug']}: {s['title']}")
+    print(f"  Dateien {n['files']} (lokal {n['local']}, nicht lokal {n['not_local']}, nicht unterstützt "
+          f"{n['unsupported']}, unlesbar {n['unreadable']}, Duplikate {n['duplicates']}, ignoriert {n['ignored']})")
+    print(f"  Seiten/Folien {n['pages']} (mit Text {n['text_pages']}, brauchen Bildverständnis {n['vision_pages']})")
+    print("  Arten: " + ", ".join(f"{k} {v}" for k, v in n["kinds"].items()))
+    warns = s["warnings"]
+    print(f"  Warnungen: {len(warns)}")
+    for w in warns if full else [w for w in warns if w["severity"] != "info"][:25]:
+        print(f"    [{w['code']}] {w['message']}")
+    print(f"  Kapitel: {len(s['chapters'])}")
+    for ch in s["chapters"]:
+        flags = (" ÜBERSPRUNGEN" if ch["skip"] else "") + (" VERALTET" if ch["stale"] else "")
+        author = f" ({ch['author_label']})" if ch["author"] else ""
+        print(f"    {ch['order']:>2}. {ch['id']:<40} {ch['status']}{author}{flags}  Übungen {len(ch['exercises'])}, "
+              f"Kompetenz-Vorschläge {len(ch['competencies_proposed'])}")
+
+
+def cmd_import(args):
+    from .courses import import_course
+    s = import_course(args.folder, slug=args.slug, title=args.title, home=args.home,
+                      materialize_files=args.materialize)
+    _print_course(s)
+    if s["counts"]["not_local"]:
+        print(f"Hinweis: {s['counts']['not_local']} Datei(en) liegen nur in iCloud und wurden NICHT gelesen. "
+              f"Mit Ihrer Zustimmung herunterladen: mastery reimport {s['slug']} --materialize")
+    print(f"Weiter: mastery packet {s['slug']} <kapitel>   (Kapitel-IDs oben)")
+    return 0
+
+
+def cmd_courses(args):
+    from .courses import list_courses
+    for s in list_courses(args.home):
+        built = sum(c["status"] in ("GEBAUT", "PRÜFUNG_AUSSTEHEND") for c in s["chapters"])
+        print(f"{s['slug']:<20} {s['title']:<40} {len(s['chapters'])} Kapitel, {built} gebaut, "
+              f"{len(s['warnings'])} Warnungen")
+    return 0
+
+
+def cmd_course(args):
+    from .courses import course_status
+    s = course_status(args.slug, args.home)
+    if args.json:
+        print(json.dumps(s, ensure_ascii=False, indent=1))
+    else:
+        _print_course(s, full=True)
+    return 0
+
+
+def cmd_plan(args):
+    from .courses import plan
+    _print_course(plan(args.slug, args.home))
+    return 0
+
+
+def cmd_packet(args):
+    from .courses import course_status, make_packet
+    result = make_packet(args.slug, args.chapter, args.home)
+    for w in result["warnings"]:
+        print("  Hinweis: " + w)
+    ch = next(c for c in course_status(args.slug, args.home)["chapters"] if c["id"] == args.chapter)
+    ins = ch["instruction"]
+    if ins:
+        print(ins["statement"])
+        print("Auftrag für die Sitzung: " + ins["prompt"])
+        print("Danach: " + ins["then"])
+    return 0
+
+
+def cmd_build_chapter(args):
+    from .courses import build_chapter
+    r = build_chapter(args.slug, args.chapter, args.home)
+    for note in r["notes"]:
+        print("  Hinweis: " + note)
+    if r["built"]:
+        print(f"Gebaut und eingetragen als '{r['library_slug']}': Anki {r['anki']['notes']} Notizen "
+              f"({r['anki']['package_status']}, {r['anki']['restamped']} neu gestempelt). Fachliche Prüfung: ausstehend.")
+    else:
+        print(f"Unverändert – '{r['library_slug']}' ist aktuell, nichts neu gebaut. Fachliche Prüfung: ausstehend.")
+    for k, v in r["products"].items():
+        print(f"  {k}: {v}")
+    return 0
+
+
+def cmd_reimport(args):
+    from .courses import reimport
+    s = reimport(args.slug, args.home, materialize_files=args.materialize)
+    imp = s["impact"]
+    print(f"Geändert {len(imp['changed_files'])}, neu {len(imp['added_files'])}, entfernt {len(imp['removed_files'])}; "
+          f"veraltete Kapitel: {', '.join(imp['stale_chapters']) or 'keine'}")
+    _print_course(s)
+    return 0
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="mastery", description="Mastery – lokale Lernumgebung (offline)")
     parser.add_argument("--home", help="Bibliotheksordner (Standard: $MASTERY_HOME oder ~/Mastery)")
@@ -92,11 +189,34 @@ def main(argv=None):
     sub.add_parser("status", help="Zustand der Bibliothek und letzte Sicherung")
     e = sub.add_parser("export", help="vom Server empfangenen Lernstand als Sicherungsdatei schreiben")
     e.add_argument("--out", help="Zieldatei (Standard: $MASTERY_HOME/exports/…)")
+    i = sub.add_parser("import", help="lokalen Kursordner importieren (nur lesend): Inventar, Warnungen, Kapitelplan")
+    i.add_argument("folder", help="Kursordner (Folien, Skripte, Übungen, Lösungen, Literatur, Altklausuren)")
+    i.add_argument("--slug", help="Kurzname des Kurses (Standard: aus dem Ordnernamen)")
+    i.add_argument("--title", help="Titel des Kurses")
+    i.add_argument("--materialize", action="store_true",
+                   help="Zustimmung: iCloud-Platzhalter dieses Ordners herunterladen (brctl download)")
+    sub.add_parser("courses", help="importierte Kurse auflisten")
+    c = sub.add_parser("course", help="Zustand eines Kurses: Inventar, Warnungen, Kapitel und Status")
+    c.add_argument("slug")
+    c.add_argument("--json", action="store_true", help="vollständige Ausgabe als JSON")
+    pl = sub.add_parser("plan", help="Kapitelplan neu berechnen (nach Änderungen in course.json: plan_overrides)")
+    pl.add_argument("slug")
+    pk = sub.add_parser("packet", help="Authoring-Paket eines Kapitels schreiben/erneuern (packet.json + Seitenbilder)")
+    pk.add_argument("slug")
+    pk.add_argument("chapter")
+    bc = sub.add_parser("build-chapter", help="erarbeitete unit.json prüfen, vier Produkte bauen, in Bibliothek eintragen")
+    bc.add_argument("slug")
+    bc.add_argument("chapter")
+    r = sub.add_parser("reimport", help="Kursordner neu inventarisieren; betroffene Kapitel als veraltet markieren")
+    r.add_argument("slug")
+    r.add_argument("--materialize", action="store_true", help="Zustimmung: iCloud-Platzhalter herunterladen")
     args = parser.parse_args(argv)
     if not args.cmd:
         args = parser.parse_args([*(["--home", args.home] if args.home else []), "start"])
     try:
-        return {"start": cmd_start, "build": cmd_build, "status": cmd_status, "export": cmd_export}[args.cmd](args)
+        return {"start": cmd_start, "build": cmd_build, "status": cmd_status, "export": cmd_export,
+                "import": cmd_import, "courses": cmd_courses, "course": cmd_course, "plan": cmd_plan,
+                "packet": cmd_packet, "build-chapter": cmd_build_chapter, "reimport": cmd_reimport}[args.cmd](args)
     except MasteryError as exc:
         print(f"Mastery: {exc}", file=sys.stderr)
         return 1
