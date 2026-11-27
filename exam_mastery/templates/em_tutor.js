@@ -137,16 +137,21 @@ const ASSIST_EVENTS = ['hint', 'solution', 'tutor'];
 const helped = (ev, tid, upto) => (upto === undefined ? ev : ev.slice(0, upto + 1)).some(e => ASSIST_EVENTS.includes(e.type) && e.task === tid);
 // Tasks whose purpose is evidence of independent solving: the tutor brief carries no answer key for them (mirrors tutor.KEY_WITHHELD_ROLES).
 const EVIDENCE_ROLES = ['similar', 'transfer', 'retest'];
+// Mirrors policy.KC_HELP_WINDOW_HOURS / _kc_helped: help on any task of the same competency within the window makes a
+// later attempt assisted for the competency's evidence state (CD-9).
+const KC_HELP_WINDOW_HOURS = RETENTION_MIN_GAP_HOURS;
+const FUTURE_SKEW_MINUTES = 5;  // mirrors policy.FUTURE_SKEW_MINUTES
+const kcHelped = (ev, T, kc, i, t) => ev.slice(0, i).some(e => ASSIST_EVENTS.includes(e.type) && T[e.task] && T[e.task].kc_id === kc && t - instant(e.t) <= KC_HELP_WINDOW_HOURS * 3600e3);
 const solved = (ev, tid) => ev.some(e => e.type === 'attempt' && e.task === tid && e.diagnosis.result === 'correct');
 const role = (tr, r, kc, ev) => { const t = tr.tasks.find(t => t.role === r && (kc == null || t.kc_id === kc) && !(ev && solved(ev, t.id))); return t ? t.id : null; };
 const dec = (rule, action, next, obs, why, unc, o = {}) => ({ schema: 'em-decision-v1', rule, action, next_task: next, hints_allowed: o.hints_allowed !== false, support: o.support || null, focus: o.focus || null, tutor_offer: !!o.tutor, observation: obs, rationale: why, uncertainty: unc, retention: o.retention || null });
 function nextInFlow(tr, ev, cur) { const f = tr.flow; const after = f.includes(cur) ? f.slice(f.indexOf(cur) + 1) : f; for (const t of after) if (!solved(ev, t)) return t; return null; }
 function kcStatus(tr, ev, today) {
-  const now = today ? instant(today) : Date.now(), gap = RETENTION_MIN_GAP_HOURS * 3600e3; const T = Object.fromEntries(tr.tasks.map(t => [t.id, t])); const res = {};
+  const now = today ? instant(today) : Date.now(), gap = RETENTION_MIN_GAP_HOURS * 3600e3, latest = Date.now() + FUTURE_SKEW_MINUTES * 60e3; const T = Object.fromEntries(tr.tasks.map(t => [t.id, t])); const res = {};
   for (const kc of tr.kcs) {
-    const es = ev.map((e, i) => [i, e]).filter(([, e]) => e.type === 'attempt' && T[e.task] && T[e.task].kc_id === kc.id);
+    const es = ev.map((e, i) => [i, e]).filter(([, e]) => e.type === 'attempt' && T[e.task] && T[e.task].kc_id === kc.id && instant(e.t) <= latest);
     if (!es.length) { res[kc.id] = 'NOT_ASSESSED'; continue; }
-    const ind = es.filter(([i, e]) => e.diagnosis.result === 'correct' && !helped(ev, e.task, i)).map(([, e]) => [instant(e.t), e.task]).sort((a, b) => a[0] - b[0]);
+    const ind = es.filter(([i, e]) => e.diagnosis.result === 'correct' && !helped(ev, e.task, i) && !kcHelped(ev, T, kc.id, i, instant(e.t))).map(([, e]) => [instant(e.t), e.task]).sort((a, b) => a[0] - b[0]);
     const aided = es.some(([, e]) => e.diagnosis.result === 'correct');
     const retained = ind.some(([t1, k1]) => ind.some(([t2, k2]) => t2 - t1 >= gap && k2 !== k1));
     res[kc.id] = retained ? 'RETAINED_ON_LATER_DAY' : ind.length && now - ind[0][0] >= gap ? 'RETEST_DUE' : ind.length ? 'INDEPENDENT_PASS' : aided ? 'ASSISTED' : 'INDEPENDENT_PARTIAL';
@@ -207,7 +212,8 @@ const Store = EMT.store = {
   importObj(o, tid) {
     if (!o || o.schema !== 'em-tutor-export-v1' || o.track !== tid || !Array.isArray(o.events)) throw new Error('Keine Lernhistorie dieser Lernstrecke (Schema em-tutor-export-v1).');
     const d = this.read(); const cur = (d.tracks[tid] = d.tracks[tid] || { events: [] }).events; const key = e => [e.t, e.type, e.task || ''].join('|'); const have = new Set(cur.map(key)); let n = 0;
-    for (const e of o.events) if (e && typeof e.t === 'string' && typeof e.type === 'string' && !have.has(key(e))) { cur.push(e); have.add(key(e)); n++; }
+    const latest = Date.now() + FUTURE_SKEW_MINUTES * 60e3;  // events dated in the future are refused: they would become evidence later (CD-9)
+    for (const e of o.events) if (e && typeof e.t === 'string' && typeof e.type === 'string' && !(instant(e.t) > latest) && !have.has(key(e))) { cur.push(e); have.add(key(e)); n++; }
     cur.sort((a, b) => a.t < b.t ? -1 : 1); this.write(d); return n;
   },
 };
