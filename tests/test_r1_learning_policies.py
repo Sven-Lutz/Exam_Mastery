@@ -27,20 +27,28 @@ REQUIRED = ("id", "title", "applies_to_operations", "context", "recommendation",
             "failure_modes", "falsifier", "kb_rule_links", "status", "implementation_status", "learning_evaluation")
 
 
-def load(name):
-    return json.loads((R1 / name).read_text(encoding="utf-8"))
+def load(path):
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+R1_REGISTERS = (R1 / "r1a_evidence.json", R1 / "r1b_evidence.json")
 
 
 class R1PolicyContract(unittest.TestCase):
+    """Reusable: later workstreams subclass with their own POLICY_FILE/REGISTERS."""
+    POLICY_FILE = R1 / "r1_learning_policies.json"
+    REGISTERS = R1_REGISTERS
+    REQUIRE_ALL_RULES_REVIEWED = True
+
     @classmethod
     def setUpClass(cls):
-        cls.doc = load("r1_learning_policies.json")
+        cls.doc = load(cls.POLICY_FILE)
         cls.policies = cls.doc["policies"]
         kb_sources = json.loads((KB / "sources.json").read_text(encoding="utf-8"))
         kb_sources = kb_sources["sources"] if isinstance(kb_sources, dict) else kb_sources
         cls.kb_ids = {s["id"] for s in kb_sources}
         cls.r1_entries = {}
-        for reg in ("r1a_evidence.json", "r1b_evidence.json"):
+        for reg in cls.REGISTERS:
             for e in load(reg)["entries"]:
                 cls.r1_entries.setdefault(e["source_id"], e)
         principles = json.loads((KB / "principles.json").read_text(encoding="utf-8"))["principles"]
@@ -122,6 +130,8 @@ class R1PolicyContract(unittest.TestCase):
                     self.assertIn(link["rule_id"], self.rule_ids, "%s links unknown rule %s" % (p["id"], link["rule_id"]))
 
     def test_every_existing_engine_rule_is_reviewed(self):
+        if not self.REQUIRE_ALL_RULES_REVIEWED:
+            self.skipTest("only R1 must decide every engine rule")
         reviewed = {l["rule_id"] for p in self.policies for l in p["kb_rule_links"]}
         reviewed |= {r["rule_id"] for r in self.doc.get("kb_rules_out_of_r1_scope", [])}
         missing = sorted(self.rule_ids - reviewed)
@@ -129,8 +139,10 @@ class R1PolicyContract(unittest.TestCase):
 
 
 class R1EvidenceRegisters(unittest.TestCase):
+    REGISTERS = R1_REGISTERS
+
     def test_entries_are_complete_and_honest_about_access(self):
-        for reg in ("r1a_evidence.json", "r1b_evidence.json"):
+        for reg in self.REGISTERS:
             doc = load(reg)
             self.assertEqual(doc["schema"], "r1-evidence/1")
             ids = [e["source_id"] for e in doc["entries"]]
