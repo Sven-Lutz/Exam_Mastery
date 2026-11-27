@@ -455,3 +455,149 @@ def test_mastery_app_demo_scene_end_to_end(tmp_path):
         server.server_close()
     assert not errors, errors
     assert not external, external
+
+
+# ------------------------------------------------------------------ MOTION-2: teaching point, declutter, layout, themes
+
+def test_last_rl_step_states_the_honest_baseline_point_from_the_model():
+    sc = scene()
+    st = M.states(sc)[-1]
+    assert st["b"] == st["J"] and st["var_b"] > st["var_none"] and st["b_vs_none"] == "größer"  # b = J loses here
+    assert math.isclose(sum(st["b_weights"]), 1.0, rel_tol=1e-12) and min(st["b_weights"]) > 0
+    p = M.params_at(sc, len(sc["steps"]) - 1)
+    assert math.isclose(st["b_opt"], sum(w * r for w, r in zip(st["b_weights"], p["rewards"])), rel_tol=1e-12)  # weighted mean
+    assert st["var_opt"] < min(st["var_b"], st["var_none"])
+    text = M.text_of(sc["steps"][-1]["caption"], st)
+    for value in (st["sd_b"], st["sd_none"], st["b_opt"], st["sd_opt"], *st["b_weights"]):
+        assert M.fmt(value, 2) in text
+    assert "größer als ohne" in text and "gewichteter" in text
+
+
+def test_score_lines_show_only_where_samples_lie():
+    sc = scene()
+    ids = [s["id"] for s in sc["steps"]]
+    for sid in ("first-episodes", "cloud-grows", "baseline-on"):
+        st = M.states(sc)[ids.index(sid)]
+        rays = {r["action"]: r["points"] for r in st["score_rays"]}
+        assert set(rays) == set(st["actions"])
+        for a, ret, s in zip(st["actions"], st["returns"], st["samples"]):  # every sample lies on its drawn segment
+            lo, hi = np.array(rays[a][0]), np.array(rays[a][1])
+            t = np.dot(np.array(s) - lo, hi - lo) / np.dot(hi - lo, hi - lo)
+            assert -1e-12 <= t <= 1 + 1e-12 and np.allclose(lo + t * (hi - lo), s, atol=1e-12)
+    assert M.states(sc)[ids.index("many-steps")]["score_rays"] == []      # no samples, no score lines
+
+
+@pytest.mark.parametrize("sid", [RL, PLANE])
+def test_object_labels_never_collide_with_other_text(sid):
+    sc = M.load(sid)
+    labelled = {o["id"] for o in sc["objects"] if o["type"] in ("point", "vector") and o.get("label")}
+    for pr in [None] + [p["id"] for p in sc.get("presets", [])]:
+        for i, step in enumerate(sc["steps"]):
+            hidden = set(step.get("hidden", []))
+            prims = [p for p in M.display(sc, M.evaluate(sc, M.params_at(sc, i, pr)), M.panels_for(sc, pr))
+                     if p["k"] == "text" and p["o"] not in hidden]
+            for p in prims:
+                if p["o"] not in labelled:
+                    continue
+                box = M._box(p["x"], p["y"], p["s"], p["a"])
+                others = [M._box(q["x"], q["y"], q["s"], q["a"]) for q in prims if q is not p]
+                assert M._free(box, others), (sid, pr, step["id"], p["s"])
+
+
+def test_keyframes_exist_in_light_and_dark_with_the_same_geometry():
+    for sid, step, preset in ((RL, "baseline-on", None), (PLANE, "half", "spiegelung")):
+        sc = M.load(sid)
+        light, dark = M.keyframe_svg(sc, step, preset=preset), M.keyframe_svg(sc, step, preset=preset, theme="dark")
+        assert M.STAGE["dark"]["bg"] in dark and M.STAGE["dark"]["bg"] not in light
+        used = {p["t"] for p in M.display(sc, M.evaluate(sc, M.params_at(sc, [s["id"] for s in sc["steps"]].index(step), preset)),
+                                          M.panels_for(sc, preset))}
+        for tok in used - {"muted"}:
+            assert M.PALETTE[tok]["dark"] in dark and M.PALETTE[tok]["color"] in light, tok
+        strip = lambda s: __import__("re").sub(r'(fill|stroke)="#[0-9a-f]{6}"|-dark|id="[^"]*"|url\(#[^)]*\)', "", s)  # noqa: E731
+        assert strip(light) == strip(dark)                                    # identical geometry and text
+
+
+def test_plane_demo_scene_is_the_builder_output():
+    from exam_mastery.motion.plane import DEMO_PRESETS, demo_scene
+    stored = M.load(PLANE)
+    assert stored == json.loads(json.dumps(demo_scene())) and stored["public"] is True
+    assert [p["id"] for p in stored["presets"]] == [p["id"] for p in DEMO_PRESETS]
+    kinds = {p["id"]: M.evaluate(stored, M.params_at(stored, 4, p["id"])) for p in stored["presets"]}
+    assert kinds["rang-1"]["rank"] == 1 and kinds["null"]["rank"] == 0 and kinds["spiegelung"]["det"] == -1
+    assert kinds["drehung"]["det"] == 1 and kinds["scherung"]["det"] == 1 and kinds["rang-1"]["Av"] == [0.0, 0.0]
+    assert kinds["spiegelung"]["singular_times"] == [0.5]                   # the reflection must collapse on the way
+
+
+@pytest.mark.skipif(not HAVE_BROWSER, reason="playwright not installed")
+def test_both_flagship_scenes_in_a_real_browser_dark_and_reduced_motion(tmp_path):
+    """Plane scene: own matrix -> new round -> snapping onto an off-keyframe collapse -> drag a column after the reveal.
+    Both scenes in dark mode (colours from the dark palette) and with reduced motion (no animation frames)."""
+    embed.write_demo_pages(tmp_path)
+    for name in ("em_tokens.css", "mastery_home.css"):                      # the app's shell styles (served by the app)
+        (tmp_path / "assets" / name).write_bytes((TEMPLATES / name).read_bytes())
+    errors, external = [], []
+
+    def watch(pg):
+        pg.on("pageerror", lambda e: errors.append(str(e)))
+        pg.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
+        pg.on("request", lambda r: external.append(r.url) if not r.url.startswith(("file:", "data:", "about:")) else None)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        ctx = browser.new_context(viewport={"width": 1280, "height": 1300}, color_scheme="dark")
+        pg = ctx.new_page()
+        watch(pg)
+        pg.goto((tmp_path / f"motion/{PLANE}.html").as_uri())
+        pg.wait_for_selector(SCENE)
+        assert pg.get_attribute(SCENE, "data-theme") == "dark" and pg.get_attribute(SCENE, "data-error") is None
+        geo = pg.inner_html(".mm-geo")
+        assert M.PALETTE["basis1"]["dark"] in geo and M.PALETTE["basis1"]["color"] not in geo
+        assert pg.locator(".mm-presets button").count() == 6
+        for k, value in enumerate(("-2", "0", "0", "1")):                   # own matrix A = [[-2, 0], [0, 1]]
+            pg.fill(f'.mm-edit-input[data-param="A"][data-index="{k}"]', value)
+            pg.dispatch_event(f'.mm-edit-input[data-param="A"][data-index="{k}"]', "change")
+        assert pg.get_attribute(SCENE, "data-preset") == "custom" and pg.is_disabled("[data-action=next]")
+        pg.click("[data-action=skip]")
+        _wait_step(pg, "quarter")
+        assert pg.locator(".mm-snap").count() == 1
+        pg.eval_on_selector(".mm-scrub", "e => { e.value = '1.3'; e.dispatchEvent(new Event('input')); }")  # t = 0.325
+        st = json.loads(pg.get_attribute(SCENE, "data-state"))
+        assert math.isclose(st["t"], 1 / 3, rel_tol=1e-9) and st["rank"] == 1 and st["det"] == 0   # snapped: det = 0
+        text = pg.text_content("svg.mm-stage")
+        assert "Kern = span(1; 0)" in text and "Bild = span(0; 1)" in text and "t = 0,33" in text
+        pg.click('[data-step="image"] button')
+        _wait_step(pg, "image")
+        handle = pg.locator('.mm-handle[data-drag="0"]')
+        box = handle.bounding_box()
+        pg.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+        pg.mouse.down()
+        pg.mouse.move(box["x"] + box["width"] / 2 + 120, box["y"] + box["height"] / 2 - 90, steps=6)
+        pg.mouse.up()
+        a = [float(pg.input_value(f'.mm-edit-input[data-param="A"][data-index="{k}"]')) for k in range(4)]
+        assert (a[0], a[2]) != (-2, 0) and a[1] == 0 and a[3] == 1             # column 1 moved, column 2 untouched
+        assert a[0] % 0.25 == 0 and a[2] % 0.25 == 0                           # snapped to the drag grid
+        st = json.loads(pg.get_attribute(SCENE, "data-state"))
+        assert math.isclose(st["det"], a[0] * a[3] - a[1] * a[2], abs_tol=1e-12)
+        assert pg.is_enabled("[data-action=back]") and pg.locator("[data-action=commit]").count() == 0  # exploring
+        pg.goto((tmp_path / f"motion/{RL}.html").as_uri())
+        pg.wait_for_selector(SCENE)
+        assert pg.get_attribute(SCENE, "data-theme") == "dark" and M.PALETTE["policy"]["dark"] in pg.inner_html(".mm-geo")
+        pg.evaluate("() => document.documentElement.setAttribute('data-theme', 'light')")       # page theme wins
+        pg.wait_for_function(f"() => document.querySelector('{SCENE}').dataset.theme === 'light'")
+        assert M.PALETTE["policy"]["color"] in pg.inner_html(".mm-geo")
+        for sid in (RL, PLANE):
+            rctx = browser.new_context(reduced_motion="reduce")
+            rp = rctx.new_page()
+            watch(rp)
+            rp.goto((tmp_path / f"motion/{sid}.html").as_uri())
+            rp.wait_for_selector(SCENE)
+            assert rp.get_attribute(SCENE, "data-reduced-motion") == "1" and rp.is_hidden("[data-action=play]")
+            rp.evaluate("() => { window.requestAnimationFrame = () => { throw new Error('animation in reduced motion'); }; }")
+            if sid == PLANE:
+                rp.click("[data-action=skip]")
+            else:
+                rp.click("[data-action=next]")
+            assert rp.get_attribute(SCENE, "data-pos") == "1.000"
+            rctx.close()
+        browser.close()
+    assert not errors, errors
+    assert not external, external
