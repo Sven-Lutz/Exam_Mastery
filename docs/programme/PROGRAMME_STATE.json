@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T18:03:41+01:00",
+ "updated": "2026-11-27T18:25:29+01:00",
  "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -88,12 +88,12 @@
    "issue": 27
   },
   "R7": {
-   "status": "PLANNED",
+   "status": "RUNNING",
    "wp": "WP-R7",
    "issue": 29
   },
   "R8": {
-   "status": "PLANNED",
+   "status": "RUNNING",
    "wp": "WP-R8",
    "issue": 30
   },
@@ -256,6 +256,22 @@
    "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R9.json",
    "worktree": "Exam_Mastery-r9"
+  },
+  {
+   "id": "R7",
+   "kind": "background subagent of LEAD",
+   "scope": "R7 learning resources, visualisation, interactive references",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/R7.json",
+   "worktree": "Exam_Mastery-r7"
+  },
+  {
+   "id": "R8",
+   "kind": "background subagent of LEAD",
+   "scope": "R8 Anki FSRS, Obsidian, alternatives, integration workflow",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/R8.json",
+   "worktree": "Exam_Mastery-r8"
   }
  ],
  "work_packages": [
@@ -510,26 +526,30 @@
   {
    "id": "WP-R7",
    "title": "R7 learning resources, visualisation and interactive excellence",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 7,
    "autostart": true,
    "issue": 29,
    "branch": "research/r7-resources-20261127",
    "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #29 and RESOURCE_IDEA_REGISTRY_20261126.md; reuse/link/emulate/defer/reject per resource.",
-   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+   "next_step": "Specialist R7 (background subagent of LEAD): resource/tool cards with claim classes and decisions, evidence + search log, policies, report, contract test, draft PR.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T18:25:29+01:00",
+   "worktree": "Exam_Mastery-r7"
   },
   {
    "id": "WP-R8",
    "title": "R8 Anki, FSRS, Obsidian and knowledge workflows",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 8,
    "autostart": true,
    "issue": 30,
    "branch": "research/r8-anki-workflows-20261127",
    "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #30 and ANKI_OBSIDIAN_TOOLING_RESEARCH_20261126.md; no second scheduler.",
-   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+   "next_step": "Specialist R8 (background subagent of LEAD): resource/tool cards with claim classes and decisions, evidence + search log, policies, report, contract test, draft PR.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T18:25:29+01:00",
+   "worktree": "Exam_Mastery-r8"
   },
   {
    "id": "WP-BRAND-B",
@@ -658,6 +678,18 @@
      "resets": "2026-11-29T07:00+01:00"
     },
     "note": "after R2S+R5S+R3+R4 (4 specialists, ~1.24M subagent tokens) + lead; measured via supervisor smoke"
+   },
+   {
+    "at": "2026-11-27T18:24+01:00",
+    "five_hour": {
+     "utilization": 0.02,
+     "resets": "2026-11-27T23:20+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.78,
+     "resets": "2026-11-29T07:00+01:00"
+    },
+    "note": "after R9 (~0.33M subagent tokens = ~1 point of the 7-day window)"
    }
   ],
   "supervisor_ceilings": {
@@ -668,7 +700,7 @@
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents.",
   "lead_pacing": "Lead keeps seven_day <= 0.85 like the supervisor: one specialist while five_hour > 0.6; stop spawning at seven_day >= 0.83 and hand remaining packages to the supervisor after the 2026-11-29 07:00 reset."
  },
- "next_milestone": "R9 running; R7 after the 18:20 five-hour reset; R8; then R6 architecture decision (owner acceptance required before architecture-dependent coding).",
+ "next_milestone": "R7 + R8 running; then R6 (synthesis/ADR + independent red team); owner acceptance required before architecture-dependent coding.",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
