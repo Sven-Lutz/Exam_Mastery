@@ -1,0 +1,1447 @@
+{
+ "schema": "r1-evidence/1",
+ "agent": "R1A",
+ "updated": "2026-11-27T09:27:46+01:00",
+ "entries": [
+  {
+   "source_id": "ruitenburg2026classroom",
+   "citation": "Ruitenburg, S. K., Goos, M., Lambert, G., Kirschner, P. A., Jarodzka, H., & Camp, G. (2026). A meta-analysis of the effectiveness and boundary conditions of retrieval practice, distributed practice, and interleaved practice in authentic school classrooms. Educational Psychology Review, 38, Article 137.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-026-10225-5",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "https://link.springer.com/article/10.1007/s10648-026-10225-5 (CC BY 4.0; read via fetch tool, first ~100k of 220k characters, tool-summarised)",
+    "sections_read": [
+     "Method: inclusion criteria, search",
+     "Results 3.2.1-3.2.3 overall effects and moderator text",
+     "Publication bias analysis",
+     "Table 1 NOT reproduced; subject-area (mathematics) moderator not seen"
+    ]
+   },
+   "design": "three-level meta-analysis; 53 studies / 71 experiments (2006-2024), 233 effect sizes, N=7,303; inclusion required active comparison, random assignment or matched classes, curricular materials, supervised school setting, retrieval without consulting materials",
+   "population": "typically developing pupils aged 6-18 in regular primary/secondary education (NOT university)",
+   "operation": "factual, conceptual, procedural, mixed knowledge; retention, recognition, comprehension, transfer, fluency outcomes",
+   "intervention": "retrieval practice (120 ES, 31 studies); distributed practice (56 ES, 15 studies); interleaved practice (57 ES, 10 studies)",
+   "comparator": "restudy/active control; massed or less-distributed practice; blocked practice",
+   "outcome": {
+    "measure": "objective curricular posttests",
+    "assisted": false,
+    "delay": "varies; retention interval coded (<1 h to >1 week)",
+    "transfer": "coded as outcome type; transfer k=9 for retrieval"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "testing 0.37 [0.18, 0.56]; spacing 0.20 [0.03, 0.36]; interleaving 0.40 [0.10, 0.71]",
+    "ci": "as listed",
+    "k_or_n": "53 studies / 233 ES / N=7,303",
+    "note": "Testing: factual g=0.53 significant; conceptual (k=10) p=.10, procedural p=.63, transfer outcome (k=9) p=.92, comprehension p=.23 not significant; in joint model only posttest format remained significant (multicollinearity VIF 7-10.6). Spacing: vs massed g=0.39, vs less-distributed n.s.; ISI/RI 0.10-<1 g=0.31. Interleaving: no feedback g=0.25, delayed feedback g=0.82 (k=5), immediate feedback n.s. I2 total 85%/73%/74%. Three-level Egger tests n.s.; no bias-adjusted estimate reported."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Tool-summarised partial read: numbers should be re-verified against Table 1 before reuse. School population indirect for university exam preparation. Non-significant subgroups (conceptual, procedural, transfer) have small k and are not evidence of absence; moderator levels are not randomized; heavy multicollinearity in joint model.",
+   "claim_edges": [
+    {
+     "claim_id": "rp.3",
+     "relation": "qualifies",
+     "locator": "Results 3.2.1.2 (transfer outcome p=.92, k=9)"
+    },
+    {
+     "claim_id": "rp.4",
+     "relation": "qualifies",
+     "locator": "Results 3.2.1.1-3.2.1.2"
+    },
+    {
+     "claim_id": "sp.1",
+     "relation": "qualifies",
+     "locator": "Results 3.2.2.2 ISI/RI ratio"
+    },
+    {
+     "claim_id": "il.1",
+     "relation": "qualifies",
+     "locator": "Results 3.2.3.2 feedback timing"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "murray2025mathspacing",
+   "citation": "Murray, E., Horner, A. J., & Göbel, S. M. (2025). A meta-analytic review of the effectiveness of spacing and retrieval practice for mathematics learning. Educational Psychology Review, 37(3), Article 75.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-025-10035-1",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://osf.io/wdahf (submitted preprint v1) + https://eric.ed.gov/?id=EJ1478558 (VoR abstract)",
+    "sections_read": [
+     "preprint: abstract, Method (publication bias), Results subsets 1-3 incl. difference-in-fit and risk-of-bias paragraphs, Discussion",
+     "VoR: ERIC abstract only"
+    ]
+   },
+   "design": "preregistered meta-analysis, RVE with correlated hierarchical effects; Egger test, trim-and-fill, difference-in-fit",
+   "population": "mathematics learners; course-embedded subset ~65% of effects from university settings; testing subset all university except one secondary study",
+   "operation": "symbolic procedure / quantitative problem solving (combinatorics, arithmetic, statistics, calculus, fractions)",
+   "intervention": "spaced practice; retrieval practice",
+   "comparator": "massed practice; restudy",
+   "outcome": {
+    "measure": "posttest / final exam performance",
+    "assisted": "unknown",
+    "delay": "isolated subset: 1 day to 6 weeks; course subset: 2 days to 5 weeks after last practice",
+    "transfer": "mostly near (same problem types)"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "VoR abstract: spacing overall 0.28 (27 studies, 53 ES); isolated 0.43 (10 studies, 27 ES); course-embedded 0.24 (17 studies, 26 ES); testing vs restudy 0.18 (7 studies, 32 ES), 95% CI crosses zero",
+    "ci": "preprint values differ: isolated g=0.384 [0.085, 0.683]; course g=0.24 [0.155, 0.324]; testing g=0.221 [-0.091, 0.532]",
+    "k_or_n": "see value",
+    "note": "VoR CIs not read; preprint and VoR numbers differ, VoR numbers take precedence for citation, preprint for structure"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Small k for testing; funnel asymmetry hints in isolated subset; course subset Egger significant (preprint). 53% of course effects could not ensure retrieval (students could look back at work). Spacing confounded with interleaving in course subset. Authors could not code whether spacing required retrieval.",
+   "claim_edges": [
+    {
+     "claim_id": "sp.1",
+     "relation": "supports",
+     "locator": "preprint Results subset 1/2; VoR abstract"
+    },
+    {
+     "claim_id": "rp.3",
+     "relation": "qualifies",
+     "locator": "preprint Results subset 3; VoR abstract: testing effect in maths not robust"
+    },
+    {
+     "claim_id": "rp.4",
+     "relation": "qualifies",
+     "locator": "VoR abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "yang2021classroom",
+   "citation": "Yang, C., Luo, L., Vadillo, M. A., Yu, R., & Shanks, D. R. (2021). Testing (quizzing) boosts classroom learning: A systematic and meta-analytic review. Psychological Bulletin, 147(4), 399-435.",
+   "doi_or_url": "https://doi.org/10.1037/bul0000309",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://gwern.net/docs/spacedrepetition/2021-yang.pdf (third-party mirror of APA advance-online version; read only, not redistributed)",
+    "sections_read": [
+     "Results overall effect (pdf p.12)",
+     "publication bias PET/PEESE, trim-and-fill, 3PSM (pdf p.13-14)",
+     "Table 2 moderators (pdf p.15)",
+     "material matching, corrective feedback (pdf p.18)",
+     "exam content type (pdf p.19)",
+     "Implications"
+    ]
+   },
+   "design": "multilevel random-effects meta-analysis of classroom studies, 222 independent studies, 573 effects, 48,478 students",
+   "population": "elementary to university/college classrooms (university/college 335 effects)",
+   "operation": "fact, concept, problem-solving (application) exam content",
+   "intervention": "class quizzing (retrieval practice)",
+   "comparator": "restudy, no activity, or other strategies",
+   "outcome": {
+    "measure": "classroom exams/criterion assessments",
+    "assisted": false,
+    "delay": "varies",
+    "transfer": "identical, rephrased and untested material coded"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "overall 0.499 [0.442, 0.557]; PEESE-corrected 0.475 [0.329, 0.620]; vs restudy 0.330 [0.256, 0.404] (162 ES); university/college 0.486 [0.420, 0.552]; mathematics/statistics 0.433 [0.193, 0.674] (27 ES); medical 0.481 [0.309, 0.653]; problem-solving exam content 0.453 [0.309, 0.596]; concept 0.644 [0.507, 0.781]; fact 0.524 [0.453, 0.595]; rephrased 0.558 [0.464, 0.651]; untested material 0.321 [0.210, 0.432]; corrective feedback 0.537 vs none 0.374",
+    "ci": "as listed",
+    "k_or_n": "222 studies / 573 ES / N=48,478",
+    "note": "exam content type did not significantly moderate (Q(4)=8.125, p=.087); heterogeneity Q(572)=4,816"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Many classroom studies quasi-experimental; 'problem-solving' category is broad and coded from exam content, not element interactivity; quiz vs no-quiz comparisons confound additional exposure. Five bias tools found little bias. Directly relevant to university courses but not to unassisted far transfer or proof construction.",
+   "claim_edges": [
+    {
+     "claim_id": "rp.4",
+     "relation": "supports",
+     "locator": "pdf p.12, Table 2 p.15"
+    },
+    {
+     "claim_id": "rp.3",
+     "relation": "qualifies",
+     "locator": "pdf p.18-19 (untested material 0.321; problem-solving 0.453)"
+    },
+    {
+     "claim_id": "rp.2",
+     "relation": "qualifies",
+     "locator": "pdf p.18 corrective feedback"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "vangog2015testingwe",
+   "citation": "van Gog, T., Kester, L., Dirkx, K., Hoogerheide, V., Boerboom, J., & Verkoeijen, P. P. J. L. (2015). Testing after worked example study does not enhance delayed problem-solving performance compared to restudy. Educational Psychology Review, 27(2), 265-289.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-015-9297-3",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://dspace.library.uu.nl/bitstream/handle/1874/327549/Testing.pdf (publisher version, open access)",
+    "sections_read": [
+     "Abstract",
+     "Exp.1 Method p.269",
+     "p.279 effort interpretation caveats",
+     "General Discussion p.283-284"
+    ]
+   },
+   "design": "4 randomized experiments (Exp1 3x2 between-subjects n=120; Exp2 n=124; Exp3 n=129; Exp4 n=75)",
+   "population": "Dutch university students (Exp1-3); vocational education students (Exp4)",
+   "operation": "symbolic procedure / diagnostic troubleshooting (electrical circuit fault diagnosis; probability calculation)",
+   "intervention": "after worked example(s): solve isomorphic or identical practice problem, or recall the example (testing)",
+   "comparator": "restudy isomorphic/identical worked example",
+   "outcome": {
+    "measure": "final isomorphic problem-solving test",
+    "assisted": false,
+    "delay": "5 min and 1 week",
+    "transfer": "near (isomorphic problems)"
+   },
+   "estimate": {
+    "metric": "group means / ANOVA",
+    "value": "no testing advantage in any experiment or overall analysis",
+    "ci": "not extracted",
+    "k_or_n": "N=448 across 4 experiments",
+    "note": "Exp2 immediate+delayed test > delayed only, attributed to longer engagement once restudy control added (Exp3/4). Restudy cost less self-reported mental effort for equal outcome."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Null results; per-experiment power modest (n~20-43 per cell); short acquisition (1-4 examples); single sessions. Supports 'retrieval does not substitute for schema acquisition early on'; does not show retrieval is useless after schemas exist.",
+   "claim_edges": [
+    {
+     "claim_id": "rp.3",
+     "relation": "contradicts",
+     "locator": "Abstract; General Discussion p.283 (no testing effect for problem-solving from worked examples)"
+    },
+    {
+     "claim_id": "we.1",
+     "relation": "supports",
+     "locator": "General Discussion p.283-284"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "vangog2015complexity",
+   "citation": "van Gog, T., & Sweller, J. (2015). Not new, but nearly forgotten: The testing effect decreases or even disappears as the complexity of learning materials increases. Educational Psychology Review, 27(2), 247-264.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-015-9310-x",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://dspace.library.uu.nl/handle/1874/321823 (open access)",
+    "sections_read": [
+     "Abstract",
+     "Table 1 study list with element-interactivity coding p.250-253",
+     "special-issue summary p.253-254",
+     "motivation/effort discussion p.260"
+    ]
+   },
+   "design": "editorial narrative review of a special issue; Table 1 codes studies by element interactivity (L/M/H) post hoc",
+   "population": "mixed; university, vocational, elementary",
+   "operation": "recall vs high element-interactivity problem solving",
+   "intervention": "testing",
+   "comparator": "restudy",
+   "outcome": {
+    "measure": "various",
+    "assisted": false,
+    "delay": "various",
+    "transfer": "various"
+   },
+   "estimate": "unknown",
+   "inference": "theoretical",
+   "bias_and_applicability": "Element-interactivity codes are the authors' post hoc judgements (some marked '?'); no meta-analytic weighting; selection of studies contested by Karpicke & Aue (2015). Useful as boundary-condition hypothesis, not as established moderator.",
+   "claim_edges": [
+    {
+     "claim_id": "rp.3",
+     "relation": "qualifies",
+     "locator": "Abstract; p.253-254"
+    },
+    {
+     "claim_id": "cl.1",
+     "relation": "context_only",
+     "locator": "p.247-249"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "karpicke2015complex",
+   "citation": "Karpicke, J. D., & Aue, W. R. (2015). The testing effect is alive and well with complex materials. Educational Psychology Review, 27(2), 317-326.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-015-9309-3",
+   "source_type": "commentary",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "https://api.crossref.org/works/10.1007/s10648-015-9309-3",
+    "sections_read": [
+     "bibliographic metadata; no abstract in Crossref; publisher full text closed; content known only from search-engine snippet"
+    ]
+   },
+   "design": "commentary",
+   "population": "n/a",
+   "operation": "complex texts/meaningful learning",
+   "intervention": "retrieval practice",
+   "comparator": "restudy/elaborative study",
+   "outcome": {
+    "measure": "n/a",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": "unknown",
+   "inference": "theoretical",
+   "bias_and_applicability": "Not read. Recorded only as the competing position in the 2015 debate; its arguments must not be paraphrased in detail from this access level.",
+   "claim_edges": [
+    {
+     "claim_id": "rp.3",
+     "relation": "context_only",
+     "locator": "title/metadata only"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "redifer2025advanced",
+   "citation": "Redifer, J. L., Myers, S. J., Lee Bae, C. L., Naas, A., & Scott, A. (2025). Testing the testing effect with advanced materials while accounting for individual differences. Instructional Science, 54(1), Article 8 (online 2025-12-04).",
+   "doi_or_url": "https://doi.org/10.1007/s11251-025-09758-z",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.openalex.org/works/doi:10.1007/s11251-025-09758-z",
+    "sections_read": [
+     "abstract (Crossref/OpenAlex)"
+    ]
+   },
+   "design": "experiment with assigned strategies, undergraduate sample n=213",
+   "population": "undergraduates",
+   "operation": "comprehension/retention of a published research article (advanced expository text)",
+   "intervention": "combined retrieval strategies: free recall, practice quizzing, test-question generation",
+   "comparator": "rereading",
+   "outcome": {
+    "measure": "final test performance",
+    "assisted": false,
+    "delay": "unknown from abstract",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "retrieval did not improve final test performance over rereading; retrieval raised cognitive load, which mediated lower final scores",
+    "ci": "unknown",
+    "k_or_n": "n=213",
+    "note": "abstract-level only"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract only; delay, power, item type unknown; single study; a null is not equivalence.",
+   "claim_edges": [
+    {
+     "claim_id": "rp.4",
+     "relation": "qualifies",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "higham2023reactivity",
+   "citation": "Higham, P. A., Fastrich, G. M., Potts, R., Murayama, K., Pickering, J. S., & Hadwin, J. A. (2023). Spaced retrieval practice: Can restudying trump retrieval? Educational Psychology Review, 35, Article 98 (online 2023-09-26).",
+   "doi_or_url": "https://doi.org/10.1007/s10648-023-09809-2",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.1007/s10648-023-09809-2",
+    "sections_read": [
+     "abstract (Crossref); article number not verified"
+    ]
+   },
+   "design": "3 preregistered online experiments",
+   "population": "online adult participants",
+   "operation": "recall (Swahili-English word pairs)",
+   "intervention": "spaced retrieval with or without trial-by-trial memory rating",
+   "comparator": "spaced restudy with memory rating ('would you have remembered?')",
+   "outcome": {
+    "measure": "final cued recall",
+    "assisted": false,
+    "delay": "sessions separated by 2 days",
+    "transfer": "none"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "Exp1-2: when memory ratings were required, restudy > retrieval (reversed testing effect); without ratings pattern reversed descriptively (Exp2) and retrieval > restudy (Exp3)",
+    "ci": "unknown",
+    "k_or_n": "3 experiments",
+    "note": "abstract-level"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Word pairs only; demonstrates that metacognitive judgements are not inert measurement — they can change what is learned (reactivity).",
+   "claim_edges": [
+    {
+     "claim_id": "rp.1",
+     "relation": "qualifies",
+     "locator": "abstract"
+    },
+    {
+     "claim_id": "mc.1",
+     "relation": "context_only",
+     "locator": "abstract (reactivity)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "pan2023pretesting",
+   "citation": "Pan, S. C., & Carpenter, S. K. (2023). Prequestioning and pretesting effects: A review of empirical research, theoretical perspectives, and implications for educational practice. Educational Psychology Review, 35(4), Article 97.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-023-09814-5",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "https://link.springer.com/article/10.1007/s10648-023-09814-5 (CC BY; first ~100k of 285k characters, tool-summarised)",
+    "sections_read": [
+     "Untested and previously unpresented materials",
+     "Interval between practice testing and subsequent learning",
+     "Effects involving different test formats",
+     "Effects in authentic educational settings"
+    ]
+   },
+   "design": "narrative review (no new meta-analysis)",
+   "population": "lab and classroom; children to university and MOOC learners",
+   "operation": "mostly recall of text/video/lecture content; a few classification/procedural cases",
+   "intervention": "prequestions/pretests before study",
+   "comparator": "no pretest / extra study time",
+   "outcome": {
+    "measure": "posttests on pretested, related and untested content",
+    "assisted": false,
+    "delay": "minutes to weeks",
+    "transfer": "inference questions mixed; classification of new exemplars positive in Sana et al. 2020"
+   },
+   "estimate": {
+    "metric": "narrative",
+    "value": "often beneficial for pretested content; mixed for untested content; inference transfer often absent (Hausman & Rhodes 2018); for paired associates delayed feedback eliminated the effect; MOOC study (Janelli & Lipnevich 2021): no overall benefit and higher dropout with pretests",
+    "ci": "n/a",
+    "k_or_n": "n/a",
+    "note": "no pooled estimate in the read portion; maths/problem-solving coverage not seen"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Partial, tool-summarised read; classroom studies partly non-randomized; mostly declarative content.",
+   "claim_edges": [
+    {
+     "claim_id": "pr.1",
+     "relation": "qualifies",
+     "locator": "sections listed"
+    },
+    {
+     "claim_id": "pf.1",
+     "relation": "context_only",
+     "locator": "Effects in authentic educational settings"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "rohrer2020interleaved",
+   "citation": "Rohrer, D., Dedrick, R. F., Hartwig, M. K., & Cheung, C.-N. (2020). A randomized controlled trial of interleaved mathematics practice. Journal of Educational Psychology, 112(1), 40-52 (online first 2019).",
+   "doi_or_url": "https://doi.org/10.1037/edu0000367",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://www.gwern.net/doc/psychology/spaced-repetition/2019-rohrer.pdf (third-party mirror of APA online-first version; read only)",
+    "sections_read": [
+     "Abstract p.1",
+     "prior studies p.5",
+     "Table 5 compliance, Results p.8",
+     "teacher survey, Caveats p.9",
+     "Feasibility p.10"
+    ]
+   },
+   "design": "preregistered cluster RCT; 54 seventh-grade classes, 15 teachers, multiple schools; WWC: meets standards without reservations (per IES listing, not re-audited)",
+   "population": "grade 7 mathematics students, USA (787 students per WWC listing)",
+   "operation": "recall/discrimination of strategy choice within symbolic procedure (choosing which procedure applies: expressions, graphs, inequalities, circles)",
+   "intervention": "practice assignments mostly interleaved over ~4 months (9 worksheets incl. review)",
+   "comparator": "mostly blocked practice of same problems (both groups received some blocked practice during initial instruction)",
+   "outcome": {
+    "measure": "unannounced test of critical problem kinds",
+    "assisted": false,
+    "delay": "1 month after last worksheet",
+    "transfer": "near (same problem kinds, new items)"
+   },
+   "estimate": {
+    "metric": "Cohen d (student-level SD)",
+    "value": "0.83",
+    "ci": "[0.68, 0.97]",
+    "k_or_n": "54 classes / 15 teachers",
+    "note": "test 61% vs 38%; positive for each teacher (d 0.23-1.48); per problem kind d 0.86/0.63/0.40/0.34 ordered by when blocked group practised them (scheduling confound acknowledged by authors); interleaving inherently adds spacing"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Strong design for school maths; interleaving confounded with spacing/retention-interval by construction; outcome is near transfer of strategy choice, not proof or open modelling. University transfer is an extrapolation.",
+   "claim_edges": [
+    {
+     "claim_id": "il.2",
+     "relation": "supports",
+     "locator": "Abstract; Results p.8"
+    },
+    {
+     "claim_id": "il.1",
+     "relation": "qualifies",
+     "locator": "p.8 scheduling confound"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "dejong2010clt",
+   "citation": "de Jong, T. (2010). Cognitive load theory, educational research, and instructional design: Some food for thought. Instructional Science, 38(2), 105-134.",
+   "doi_or_url": "https://doi.org/10.1007/s11251-009-9110-0",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://ris.utwente.nl/ws/files/6597420/Jong10cognitive.pdf (author repository)",
+    "sections_read": [
+     "Abstract",
+     "conceptual definitions p.113-114",
+     "The measurement of cognitive load p.114-117",
+     "ecological validity/modality p.125"
+    ]
+   },
+   "design": "critical conceptual and methodological review",
+   "population": "n/a",
+   "operation": "n/a",
+   "intervention": "n/a",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "n/a",
+    "assisted": "unknown",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": "unknown",
+   "inference": "theoretical",
+   "bias_and_applicability": "Critique: load types (intrinsic/extraneous/germane) and mental load vs effort defined inconsistently (p.113-114); load often inferred post hoc from posttest results, making explanations circular (p.114); single-item effort scale's reliability evidence derives from two small studies and high alpha implies a person trait rather than task-person interaction (p.117); some effects (e.g., modality) may depend on short, system-paced learning times (p.125).",
+   "claim_edges": [
+    {
+     "claim_id": "cl.1",
+     "relation": "qualifies",
+     "locator": "p.113-117"
+    },
+    {
+     "claim_id": "cl.2",
+     "relation": "qualifies",
+     "locator": "p.114 (post hoc inference of load)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "kalyuga2004measuring",
+   "citation": "Kalyuga, S., & Sweller, J. (2004). Measuring knowledge to optimize cognitive load factors during instruction. Journal of Educational Psychology, 96(3), 558-568.",
+   "doi_or_url": "https://doi.org/10.1037/0022-0663.96.3.558",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.openalex.org/works/doi:10.1037/0022-0663.96.3.558",
+    "sections_read": [
+     "abstract via OpenAlex; UNSW repository record has no file; no full text found"
+    ]
+   },
+   "design": "4 experiments: Exp1-2 develop/validate rapid first-step test; Exp3-4 use it to adapt instruction",
+   "population": "grade 9-10 students",
+   "operation": "symbolic procedure (algebra, geometry)",
+   "intervention": "rapid 'first-step' schema-based knowledge test; adaptive selection of worked examples vs problems",
+   "comparator": "traditional full-solution knowledge tests; non-adapted instruction",
+   "outcome": {
+    "measure": "correlation with traditional tests; test time",
+    "assisted": false,
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "Pearson r",
+    "value": "up to .92 with traditional measures; test time reduced by factors 4.9 and 2.5",
+    "ci": "unknown",
+    "k_or_n": "unknown",
+    "note": "'up to' = best case; per-experiment N, adaptive-instruction effect sizes and reliability not read"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract only. Correlation with a longer test on the same narrow item families is concurrent validity, not predictive validity for misclassification-costly adaptive decisions; school algebra/geometry only.",
+   "claim_edges": [
+    {
+     "claim_id": "we.4",
+     "relation": "qualifies",
+     "locator": "abstract (R0-D6 primary chain now abstract-level)"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "kapur2023prior",
+   "citation": "Kapur, M., Saba, J., & Roll, I. (2023). Prior math achievement and inventive production predict learning from productive failure. npj Science of Learning, 8, Article 15.",
+   "doi_or_url": "https://doi.org/10.1038/s41539-023-00165-y",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10185511/ (tool-summarised read)",
+    "sections_read": [
+     "Methods: participants, data collection",
+     "Results (ANCOVA)",
+     "Limitations"
+    ]
+   },
+   "design": "two quasi-experimental pre-post studies within PF only (no direct-instruction comparison), 2 schools",
+   "population": "Singapore grade 7 (n=112, ratios) and grade 8 (n=105, variance)",
+   "operation": "concept + procedure in school statistics/ratios (symbolic procedure with conceptual component)",
+   "intervention": "PF: 2 periods unscaffolded group generation, then teacher consolidation",
+   "comparator": "none (between-school comparison of differing prior achievement)",
+   "outcome": {
+    "measure": "composite posttest (procedural, conceptual, near transfer) scaled 0-10",
+    "assisted": false,
+    "delay": "1 week after unit",
+    "transfer": "near"
+   },
+   "estimate": {
+    "metric": "ANCOVA F",
+    "value": "inventive production (no. of representations/solution methods) predicted posttest: F(1,107)=62.589 ratios; F(1,100)=105.518 variance, p<.001; PSLE math significant only in ratios",
+    "ci": "not reported",
+    "k_or_n": "N=217",
+    "note": "no PF x prior-knowledge interaction tested; RSMs are group-level"
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Within-PF correlational evidence; cannot show PF beats instruction-first; group-level predictor with individual outcomes; two schools.",
+   "claim_edges": [
+    {
+     "claim_id": "pf.1",
+     "relation": "context_only",
+     "locator": "Results; Limitations"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "sinha2021",
+   "citation": "Sinha, T., & Kapur, M. (2021). When problem solving followed by instruction works: Evidence for productive failure. Review of Educational Research, 91(5), 761-798.",
+   "doi_or_url": "https://doi.org/10.3102/00346543211019105",
+   "source_type": "meta_analysis",
+   "kb_status": "existing",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.3102/00346543211019105",
+    "sections_read": [
+     "abstract (CC BY 4.0) — full text NOT reached: Sage HTML/PDF HTTP 403, ETH Research Collection API 'Access Restricted'"
+    ]
+   },
+   "design": "meta-analysis, 53 studies, 166 comparisons PS-I vs I-PS",
+   "population": "grade 2 to university (age distribution not read)",
+   "operation": "concept learning in maths/science mainly",
+   "intervention": "problem solving before instruction (PS-I; PF as high-fidelity subset)",
+   "comparator": "instruction before problem solving (I-PS)",
+   "outcome": {
+    "measure": "conceptual knowledge, procedural knowledge, transfer (per KB claim; not re-read)",
+    "assisted": false,
+    "delay": "unknown",
+    "transfer": "coded; not read"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "0.36 [0.20, 0.51]; high-fidelity PF 0.37-0.58; bias-adjusted 'true effect' estimate g=0.87",
+    "ci": "[0.20, 0.51] overall",
+    "k_or_n": "53 studies / 166 comparisons",
+    "note": "I-PS favoured for grades 2-5 and domain-general skills. A bias-adjusted estimate LARGER than the raw estimate is unusual and needs full-text method check."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Fidelity is coded by the PF developers' own design principles (allegiance risk); comparison conditions vary in quality of I-PS; quasi-experimental share moderates. Full text still unread after R0 and R1A.",
+   "claim_edges": [
+    {
+     "claim_id": "pf.1",
+     "relation": "qualifies",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "agarwal2021classroom",
+   "citation": "Agarwal, P. K., Nunes, L. D., & Blunt, J. R. (2021). Retrieval practice consistently benefits student learning: A systematic review of applied research in schools and classrooms. Educational Psychology Review, 33(4), 1409-1453.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-021-09595-9",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.openalex.org/works/doi:10.1007/s10648-021-09595-9",
+    "sections_read": [
+     "abstract (OpenAlex)"
+    ]
+   },
+   "design": "systematic review with narrow 'classroom research' definition; ~2000 abstracts screened; 50 experiments coded; no pooled meta-analytic estimate in abstract",
+   "population": "school and classroom learners, various levels; only 6% of experiments in non-WEIRD countries",
+   "operation": "mixed course content",
+   "intervention": "retrieval practice",
+   "comparator": "various",
+   "outcome": {
+    "measure": "classroom tests",
+    "assisted": false,
+    "delay": "various",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "vote count of effect-size bands",
+    "value": "49 effect sizes, n=5,374; 57% medium or large benefits",
+    "ci": "n/a",
+    "k_or_n": "50 experiments",
+    "note": "categorisation, not a pooled estimate; implies 43% small/null/negative"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract only; vote-counting style summary; title ('consistently') stronger than the 57% figure.",
+   "claim_edges": [
+    {
+     "claim_id": "rp.4",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "higham2022relearning",
+   "citation": "Higham, P. A., Zengel, B., Bartlett, L. K., & Hadwin, J. A. (2022). The benefits of successive relearning on multiple learning outcomes. Journal of Educational Psychology, 114(5), 928-944.",
+   "doi_or_url": "https://doi.org/10.1037/edu0000693",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.openalex.org/works/doi:10.1037/edu0000693",
+    "sections_read": [
+     "abstract (OpenAlex); Southampton repository PDF returned HTTP 403"
+    ]
+   },
+   "design": "within-course alternation design: students alternated weekly between relearning and restudy tasks over 10 weeks; exposure duration controlled",
+   "population": "introductory psychology university students",
+   "operation": "recall of course concepts (fill-in-the-blank)",
+   "intervention": "successive relearning: 3 sessions per week 2 days apart, 20 cloze items with corrective feedback, wrong items re-presented up to 2 more times",
+   "comparator": "restudy of same sentences twice per session",
+   "outcome": {
+    "measure": "end-of-semester recall; metacognition, mastery, attentional control, anxiety (self-report)",
+    "assisted": false,
+    "delay": "end of semester",
+    "transfer": "none reported in abstract"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "recall better for relearned than restudied material; individual differences did not moderate relearning benefit",
+    "ci": "unknown",
+    "k_or_n": "unknown",
+    "note": "secondary outcomes are associations, not randomized contrasts"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract only; outcome is recall of the practised sentences, not application/transfer; psychology content.",
+   "claim_edges": [
+    {
+     "claim_id": "sp.4",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "yeo2019retrievalwe",
+   "citation": "Yeo, D. J., & Fazio, L. K. (2019). The optimal learning strategy depends on learning goals and processes: Retrieval practice versus worked examples. Journal of Educational Psychology, 111(1), 73-90.",
+   "doi_or_url": "https://doi.org/10.1037/edu0000268",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.1037/edu0000268",
+    "sections_read": [
+     "abstract (Semantic Scholar)"
+    ]
+   },
+   "design": "3 experiments",
+   "population": "not stated in abstract (likely university students)",
+   "operation": "recall of worked-example text vs learning a novel math procedure",
+   "intervention": "repeated testing (solving)",
+   "comparator": "repeated studying of worked examples",
+   "outcome": {
+    "measure": "final procedure/recall tests",
+    "assisted": false,
+    "delay": "immediate and 1 week",
+    "transfer": "identical vs non-identical learning problems manipulated"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "immediate test: repeated studying better for procedures; 1-week: testing = studying with non-identical problems, testing > studying with identical problems; testing > studying for remembering example text after 1 week",
+    "ci": "unknown",
+    "k_or_n": "3 experiments",
+    "note": "abstract-level"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract only; a single lab; procedure learning is near transfer.",
+   "claim_edges": [
+    {
+     "claim_id": "rp.3",
+     "relation": "qualifies",
+     "locator": "abstract"
+    },
+    {
+     "claim_id": "we.1",
+     "relation": "qualifies",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "bisra2018",
+   "citation": "Bisra, K., Liu, Q., Nesbit, J. C., Salimi, F., & Winne, P. H. (2018). Inducing self-explanation: A meta-analysis. Educational Psychology Review, 30(3), 703-725.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-018-9434-x",
+   "source_type": "meta_analysis",
+   "kb_status": "existing",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://www.gwern.net/doc/psychology/spaced-repetition/2018-bisra.pdf (third-party mirror of published version; read only)",
+    "sections_read": [
+     "Table 1 comparison treatments (pdf p.9)",
+     "Table 2 inducement types incl. metacognitive prompts",
+     "Table 6 learning outcome (pdf p.14)",
+     "Table 7 education level (pdf p.15)",
+     "Publication bias (pdf p.15)",
+     "Discussion (pdf p.16-17)"
+    ]
+   },
+   "design": "random-effects meta-analysis; 69 effect sizes, N=5,917 (BPS digest: 64 studies)",
+   "population": "elementary to professional programmes; undergraduate k=42, N=3,349",
+   "operation": "problem solving, comprehension, transfer across domains (incl. medical diagnosis, geometry)",
+   "intervention": "prompts/inducements to self-explain",
+   "comparator": "no additional explanation; instructional explanation; other strategy; mixed",
+   "outcome": {
+    "measure": "various learning outcomes",
+    "assisted": false,
+    "delay": "not extracted",
+    "transfer": "transfer coded separately (k=17)"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "overall .552 [.454, .650]; vs no additional explanation .673 [.519, .826] (k=41); vs instructional explanation .354 [.175, .533] (k=6); vs other strategy .304 [.126, .483] (k=7); transfer .534 [.350, .718] (k=17); problem solving .445 [.227, .664] (k=14); comprehension .282 [-.014, .579] (k=3, n.s.); metacognitive prompts .192 [-.073, .456] (k=3, n.s.); multiple-choice prompts g=.24 n.s. (k=2); undergraduate .611 [.472, .751]",
+    "ci": "as listed",
+    "k_or_n": "69 ES / N=5,917",
+    "note": "heterogeneity Q(68)=196.63"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Publication bias assessed only with classic and Orwin fail-safe N (weak methods, no selection model/PET-PEESE). Much of the effect is vs 'no additional explanation' (adds time/content). Explanation quality is not coded as a moderator; self-explanations were rarely verified.",
+   "claim_edges": [
+    {
+     "claim_id": "se.1",
+     "relation": "supports",
+     "locator": "Table 1 p.9"
+    },
+    {
+     "claim_id": "se.1",
+     "relation": "qualifies",
+     "locator": "Discussion p.16 (vs instructional explanation g=.35, k=6)"
+    },
+    {
+     "claim_id": "tr.1",
+     "relation": "context_only",
+     "locator": "Table 6 p.14"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "barbieri2023",
+   "citation": "Barbieri, C. A., Miller-Cotto, D., Clerjuste, S. N., & Chawla, K. (2023). A meta-analysis of the worked examples effect on mathematics performance. Educational Psychology Review, 35(1), Article 11.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-023-09745-1",
+   "source_type": "meta_analysis",
+   "kb_status": "existing",
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "https://api.crossref.org/works/10.1007/s10648-023-09745-1",
+    "sections_read": [
+     "bibliographic metadata; abstract content only via search-engine snippet (not directly read); closed access, no repository copy found"
+    ]
+   },
+   "design": "meta-analysis with robust variance estimation (per snippet)",
+   "population": "mathematics learners",
+   "operation": "symbolic procedure",
+   "intervention": "worked examples (correct, incorrect, mixed; with/without self-explanation prompts)",
+   "comparator": "problem solving / conventional practice",
+   "outcome": {
+    "measure": "mathematics performance",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "Hedges g (per snippet)",
+    "value": "snippet reports g=0.48; correct-only examples larger than incorrect/mixed; pairing with self-explanation prompts listed as moderator (direction per secondary summary: lower)",
+    "ci": "unknown",
+    "k_or_n": "unknown (secondary sources give 43 or 55 studies)",
+    "note": "NOT verified from the article; do not cite numerically"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Unread; R0 and R1A both failed to access full text.",
+   "claim_edges": [
+    {
+     "claim_id": "we.5",
+     "relation": "context_only",
+     "locator": "search snippet only"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "ashman2020sequence",
+   "citation": "Ashman, G., Kalyuga, S., & Sweller, J. (2020). Problem-solving or explicit instruction: Which should go first when element interactivity is high? Educational Psychology Review, 32(1), 229-247 (online 2019).",
+   "doi_or_url": "https://doi.org/10.1007/s10648-019-09500-5",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://link.springer.com/doi/10.1007/s10648-019-09500-5 (abstract content via search-engine snippet; not directly read)",
+    "sections_read": [
+     "abstract-level summary only"
+    ]
+   },
+   "design": "2 fully randomised controlled experiments (Exp1 N=64; Exp2 N=71)",
+   "population": "Year 5 primary pupils",
+   "operation": "science concept/procedure (light energy efficiency calculations)",
+   "intervention": "explicit instruction first then problem solving",
+   "comparator": "problem solving first then explicit instruction (PF-style)",
+   "outcome": {
+    "measure": "similar and transfer problems",
+    "assisted": false,
+    "delay": "unknown",
+    "transfer": "similar vs transfer problems"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "Exp1: instruction-first better on similar problems, no difference on transfer; Exp2 (higher element interactivity): instruction-first better on similar and transfer problems",
+    "ci": "unknown",
+    "k_or_n": "N=135",
+    "note": "abstract-level via snippet"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Young learners (consistent with Sinha & Kapur's own finding that I-PS is favoured for grades 2-5), so not a direct test for university learners; PF fidelity of the PS-first arm is disputed terrain.",
+   "claim_edges": [
+    {
+     "claim_id": "pf.1",
+     "relation": "qualifies",
+     "locator": "abstract"
+    },
+    {
+     "claim_id": "pf.2",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "rhodes2011delayedjol",
+   "citation": "Rhodes, M. G., & Tauber, S. K. (2011). The influence of delaying judgments of learning on metacognitive accuracy: A meta-analytic review. Psychological Bulletin, 137(1), 131-148.",
+   "doi_or_url": "https://doi.org/10.1037/a0021705",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.openalex.org/works/doi:10.1037/a0021705",
+    "sections_read": [
+     "abstract (OpenAlex)"
+    ]
+   },
+   "design": "two meta-analyses",
+   "population": "mostly lab participants",
+   "operation": "recall (mostly paired associates)",
+   "intervention": "delayed JOLs",
+   "comparator": "immediate JOLs",
+   "outcome": {
+    "measure": "relative accuracy (gamma); memory performance",
+    "assisted": false,
+    "delay": "short lab delays",
+    "transfer": "none"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "relative accuracy g=0.93 (112 ES, N=4,554); memory performance g=0.08 (98 ES, N=3,807)",
+    "ci": "not in abstract",
+    "k_or_n": "as listed",
+    "note": "relative accuracy (ordering items) is not absolute calibration"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Lab word materials; relative accuracy of item ordering, not prediction of exam score on complex problems.",
+   "claim_edges": [
+    {
+     "claim_id": "mc.1",
+     "relation": "context_only",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "double2018reactivity",
+   "citation": "Double, K. S., Birney, D. P., & Walker, S. A. (2018). A meta-analysis and systematic review of reactivity to judgements of learning. Memory, 26(6), 741-750.",
+   "doi_or_url": "https://doi.org/10.1080/09658211.2017.1404111",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.1080/09658211.2017.1404111",
+    "sections_read": [
+     "metadata + machine-generated TLDR only (not an author abstract)"
+    ]
+   },
+   "design": "meta-analysis",
+   "population": "lab",
+   "operation": "recall of word pairs/lists",
+   "intervention": "eliciting JOLs",
+   "comparator": "no JOLs",
+   "outcome": {
+    "measure": "recall",
+    "assisted": false,
+    "delay": "unknown",
+    "transfer": "none"
+   },
+   "estimate": "unknown",
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Not read; only the existence of a reactivity literature (JOLs can change encoding, especially for related pairs) is recorded.",
+   "claim_edges": [
+    {
+     "claim_id": "mc.1",
+     "relation": "context_only",
+     "locator": "metadata"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "janssen2024monitoring",
+   "citation": "Janssen, N., & Lazonder, A. W. (2024). Meta-analysis of interventions for monitoring accuracy in problem solving. Educational Psychology Review, 36(3), Article 96.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-024-09936-4",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "https://link.springer.com/article/10.1007/s10648-024-09936-4 (CC BY; first ~100k of 202k characters, tool-summarised; Table 3 values not seen)",
+    "sections_read": [
+     "Method: study selection",
+     "Results: overall effect, intervention type, exploratory moderators, publication bias",
+     "Discussion: limitations"
+    ]
+   },
+   "design": "random-effects meta-analysis, 35 studies (28 records), searched 2002-2022",
+   "population": "elementary, secondary, adults",
+   "operation": "problem solving (maths, science, reasoning, map reading)",
+   "intervention": "monitoring interventions: whole task, metacognitive knowledge, external standards, timing of judgement, procedural knowledge, monitoring training, mixed",
+   "comparator": "untreated or non-monitoring intervention",
+   "outcome": {
+    "measure": "absolute monitoring accuracy (NOT problem-solving performance)",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "overall 0.25 [0.12, 0.37]; I2=63.6%; timing-of-judgement interventions significantly negative (k=2); lab > classroom; retrospective confidence judgements > JOLs",
+    "ci": "[0.12, 0.37]",
+    "k_or_n": "35 studies",
+    "note": "Egger and Begg tests n.s.; no analysis of effects on performance"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Monitoring accuracy outcome only; does not show calibration training improves later exam performance. Classroom effects smaller.",
+   "claim_edges": [
+    {
+     "claim_id": "mc.1",
+     "relation": "qualifies",
+     "locator": "Results: Overall Effect; Exploratory Moderator Analyses"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "gutierrez2022calibrating",
+   "citation": "Gutierrez de Blume, A. P. (2022). Calibrating calibration: A meta-analysis of learning strategy instruction interventions to improve metacognitive monitoring accuracy. Journal of Educational Psychology, 114(4), 681-700.",
+   "doi_or_url": "https://doi.org/10.1037/edu0000674",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "https://api.crossref.org/works/10.1037/edu0000674",
+    "sections_read": [
+     "bibliographic metadata only; no abstract retrievable"
+    ]
+   },
+   "design": "meta-analysis",
+   "population": "unknown",
+   "operation": "unknown",
+   "intervention": "learning strategy instruction",
+   "comparator": "unknown",
+   "outcome": {
+    "measure": "monitoring accuracy",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": "unknown",
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Unread; listed as a priority gap for the calibration question.",
+   "claim_edges": [
+    {
+     "claim_id": "mc.1",
+     "relation": "context_only",
+     "locator": "metadata"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "fyfe2021manyclasses",
+   "citation": "Fyfe, E. R., de Leeuw, J. R., Carvalho, P. F., Goldstone, R. L., Sherman, J., et al., & Motz, B. A. (2021). ManyClasses 1: Assessing the generalizable effect of immediate feedback versus delayed feedback across many college classes. Advances in Methods and Practices in Psychological Science, 4(3).",
+   "doi_or_url": "https://doi.org/10.1177/25152459211027575",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.1177/25152459211027575",
+    "sections_read": [
+     "abstract (Crossref; CC BY-NC 4.0)"
+    ]
+   },
+   "design": "preregistered within-class randomized experiment replicated across 38 college classes (ManyClasses paradigm), Bayesian estimation",
+   "population": "college students across topics and institutions",
+   "operation": "mixed course content (class assignments)",
+   "intervention": "immediate feedback on assignments",
+   "comparator": "feedback delayed by a few days",
+   "outcome": {
+    "measure": "subsequent class assessments",
+    "assisted": false,
+    "delay": "course-dependent",
+    "transfer": "course assessments"
+   },
+   "estimate": {
+    "metric": "standardized effect (Bayesian posterior)",
+    "value": "0.002",
+    "ci": "95% HDI [-0.05, 0.05]",
+    "k_or_n": "38 classes",
+    "note": "no credible nonzero effects for 40 preregistered moderators; hints of delayed-feedback advantages in undersampled class types"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Strong external validity for 'immediate vs few-days-delayed feedback on whole assignments'; not a test of step-level feedback inside a problem; abstract-level read.",
+   "claim_edges": [
+    {
+     "claim_id": "fb.3",
+     "relation": "qualifies",
+     "locator": "abstract (timeliness of assignment-level feedback shows no generalizable effect)"
+    },
+    {
+     "claim_id": "its.4",
+     "relation": "context_only",
+     "locator": "abstract (different grain size)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "mullet2014delayedfb",
+   "citation": "Mullet, H. G., Butler, A. C., Verdin, B., von Borries, R., & Marsh, E. J. (2014). Delaying feedback promotes transfer of knowledge despite student preferences to receive feedback immediately. Journal of Applied Research in Memory and Cognition, 3(3), 222-229.",
+   "doi_or_url": "https://doi.org/10.1016/j.jarmac.2014.05.001",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "https://api.crossref.org/works/10.1016/j.jarmac.2014.05.001",
+    "sections_read": [
+     "metadata; design/result known only from search-engine snippet of abstract and secondary summary"
+    ]
+   },
+   "design": "2 within-course experiments",
+   "population": "upper-level college engineering students",
+   "operation": "symbolic procedure / quantitative problem solving (homework)",
+   "intervention": "homework feedback released ~1 week after due date",
+   "comparator": "feedback available immediately after due date",
+   "outcome": {
+    "measure": "exam transfer problems",
+    "assisted": false,
+    "delay": "exam",
+    "transfer": "new problems"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "delayed feedback -> better exam performance; students preferred immediate feedback; immediate group viewed feedback ~4 days after completion vs ~12 days delayed (per snippet)",
+    "ci": "unknown",
+    "k_or_n": "unknown",
+    "note": "not directly read"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Single course; feedback viewing time confounded with spacing; superseded in generality by ManyClasses 1 null.",
+   "claim_edges": [
+    {
+     "claim_id": "fb.3",
+     "relation": "qualifies",
+     "locator": "snippet only"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "alfieri2013comparison",
+   "citation": "Alfieri, L., Nokes-Malach, T. J., & Schunn, C. D. (2013). Learning through case comparisons: A meta-analytic review. Educational Psychologist, 48(2), 87-113.",
+   "doi_or_url": "https://doi.org/10.1080/00461520.2013.775712",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.openalex.org/works/doi:10.1080/00461520.2013.775712",
+    "sections_read": [
+     "abstract (OpenAlex)"
+    ]
+   },
+   "design": "random-effects meta-analysis, 57 experiments, 336 tests",
+   "population": "lab and classroom",
+   "operation": "discrimination/abstraction of principles across cases",
+   "intervention": "case comparison activities",
+   "comparator": "sequential, single-case, non-analogous cases; traditional instruction; control",
+   "outcome": {
+    "measure": "learning outcomes",
+    "assisted": false,
+    "delay": "immediate testing associated with larger effects",
+    "transfer": "not separable from abstract"
+   },
+   "estimate": {
+    "metric": "Cohen d",
+    "value": "0.50",
+    "ci": "[0.44, 0.56]",
+    "k_or_n": "57 experiments / 336 tests",
+    "note": "moderators: comparison objective (finding similarities), principle provided AFTER comparison, perceptual content, immediate testing -> larger effects"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract only; 336 dependent tests from 57 experiments (dependency handling unknown); larger effects for immediate tests means delayed unassisted transfer is less secure.",
+   "claim_edges": [
+    {
+     "claim_id": "tr.1",
+     "relation": "context_only",
+     "locator": "abstract"
+    },
+    {
+     "claim_id": "il.1",
+     "relation": "context_only",
+     "locator": "abstract (discriminative contrast)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "sala2017fartransfer",
+   "citation": "Sala, G., & Gobet, F. (2017). Does far transfer exist? Negative evidence from chess, music, and working memory training. Current Directions in Psychological Science, 26(6), 515-520.",
+   "doi_or_url": "https://doi.org/10.1177/0963721417712760",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.1177/0963721417712760",
+    "sections_read": [
+     "abstract (Crossref)"
+    ]
+   },
+   "design": "summary of three meta-analyses",
+   "population": "children (chess, music) and WM-training samples",
+   "operation": "far transfer to cognitive/academic skills",
+   "intervention": "chess, music, working-memory training",
+   "comparator": "passive and active controls",
+   "outcome": {
+    "measure": "cognitive and academic skills",
+    "assisted": false,
+    "delay": "various",
+    "transfer": "far"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "small to moderate raw effects inversely related to design quality (active controls); authors conclude far transfer rarely occurs",
+    "ci": "unknown",
+    "k_or_n": "3 meta-analyses",
+    "note": "abstract-level"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Domain of 'general training' differs from subject-matter instruction; supports scepticism toward far-transfer claims, does not show subject-specific near transfer fails.",
+   "claim_edges": [
+    {
+     "claim_id": "tr.1",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "nesbit2006conceptmaps",
+   "citation": "Nesbit, J. C., & Adesope, O. O. (2006). Learning with concept and knowledge maps: A meta-analysis. Review of Educational Research, 76(3), 413-448.",
+   "doi_or_url": "https://doi.org/10.3102/00346543076003413",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.3102/00346543076003413",
+    "sections_read": [
+     "abstract (Crossref)"
+    ]
+   },
+   "design": "meta-analysis of experimental and quasi-experimental studies, 55 studies, 67 effect sizes, N=5,818",
+   "population": "grade 4 to postsecondary; science, psychology, statistics, nursing",
+   "operation": "conceptual organisation; recall and transfer posttests",
+   "intervention": "constructing, modifying or viewing concept maps",
+   "comparator": "various (text, lists, lectures, other)",
+   "outcome": {
+    "measure": "recall and transfer",
+    "assisted": false,
+    "delay": "unknown",
+    "transfer": "included"
+   },
+   "estimate": {
+    "metric": "standardized mean difference",
+    "value": "small to large depending on use and comparison; pooled value not in abstract",
+    "ci": "unknown",
+    "k_or_n": "55 studies / 67 ES",
+    "note": "significant heterogeneity in most subsets"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract only; Schroeder et al. 2018 update (10.1007/s10648-017-9403-9) identified but not read.",
+   "claim_edges": [
+    {
+     "claim_id": "se.2",
+     "relation": "context_only",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "ebersbach2020mathspacing",
+   "citation": "Ebersbach, M., & Barzagar Nazari, K. (2020). No robust effect of distributed practice on the short- and long-term retention of mathematical procedures. Frontiers in Psychology, 11, Article 811.",
+   "doi_or_url": "https://doi.org/10.3389/fpsyg.2020.00811",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2020.00811/full (CC BY; tool-summarised read of first ~100k of 112k characters)",
+    "sections_read": [
+     "Abstract",
+     "Materials and Methods (sample, design, material, schedule, test)",
+     "Results (practice, robust regression)",
+     "Discussion and limitations"
+    ]
+   },
+   "design": "randomized 3 (ISI 0/1/11 days) x 2 (RI 1/5 weeks) between-subjects; n=38-40 per cell; power analysis N=138 for f=0.15",
+   "population": "German university students, N=235 analysed (273 recruited), mean age ~24",
+   "operation": "symbolic procedure (permutation counting formula, adapted from Rohrer & Taylor 2007)",
+   "intervention": "8 practice tasks split over two sessions 1 or 11 days apart, partial solution feedback",
+   "comparator": "massed practice (all 8 tasks in one session; tutorial timing differed)",
+   "outcome": {
+    "measure": "unannounced 5-item permutation test (procedure execution)",
+    "assisted": false,
+    "delay": "1 or 5 weeks",
+    "transfer": "none (same task type)"
+   },
+   "estimate": {
+    "metric": "robust regression B / standardized beta",
+    "value": "ISI (spaced vs massed) B=-0.02, p=.909; ISI 11 vs 1 day B=0.26, p=.103; RI beta=-0.24, p=.001",
+    "ci": "not reported",
+    "k_or_n": "N=235",
+    "note": "no spacing main effect, no lag effect; floor-ish test scores (M 1.63-2.53 of 5)"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Single procedure, low test scores (possible floor), tutorial timing confound in massed arm; null with stated power for f=0.15 is not equivalence for smaller effects. Contrasts with Rohrer & Taylor positive results on similar material.",
+   "claim_edges": [
+    {
+     "claim_id": "sp.1",
+     "relation": "qualifies",
+     "locator": "Results: robust regression; Discussion"
+    },
+    {
+     "claim_id": "sp.2",
+     "relation": "qualifies",
+     "locator": "no lag effect (ISI/RI)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "leahy2015testingwe",
+   "citation": "Leahy, W., Hanham, J., & Sweller, J. (2015). High element interactivity information during problem solving may lead to failure to obtain the testing effect. Educational Psychology Review, 27(2), 291-304.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-015-9296-4",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "https://api.crossref.org/works/10.1007/s10648-015-9296-4 (identity verified); content only via secondary summary in van Gog & Sweller 2015, p.254",
+    "sections_read": [
+     "secondary description only"
+    ]
+   },
+   "design": "3 experiments (per secondary summary)",
+   "population": "elementary school children",
+   "operation": "reading bus timetables (worked examples)",
+   "intervention": "example-problem pairs (testing)",
+   "comparator": "worked examples only",
+   "outcome": {
+    "measure": "problem-solving test",
+    "assisted": false,
+    "delay": "immediate (Exp1-2), 1 week (Exp3)",
+    "transfer": "near"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "Exp1-2: examples-only better on immediate test; Exp3 (1 week): no testing effect, reversal disappeared",
+    "ci": "unknown",
+    "k_or_n": "unknown",
+    "note": "secondary, from special-issue editorial"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Only secondary report by proponents of the boundary hypothesis; children.",
+   "claim_edges": [
+    {
+     "claim_id": "rp.3",
+     "relation": "qualifies",
+     "locator": "van Gog & Sweller 2015 p.254"
+    }
+   ],
+   "verdict": "unresolved"
+  }
+ ]
+}
