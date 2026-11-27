@@ -290,7 +290,7 @@ function viewCourses() {
     el('div', { class: 'm-card m-accent', id: 'import' }, el('h2', { class: 'm-h2' }, 'Kurs importieren'),
       el('label', { class: 'm-field', for: 'import-path' }, 'Ordnerpfad (Finder: Ordner wählen, ⌥⌘C kopiert den Pfad)'), path,
       el('label', { class: 'm-field', for: 'import-title' }, 'Titel des Kurses'), title,
-      el('label', { class: 'm-check' }, consent, ' iCloud-Platzhalter in diesem Ordner herunterladen (Ihre Zustimmung; sonst werden sie nur aufgelistet)'),
+      el('div', {}, el('label', { class: 'm-check' }, consent, ' iCloud-Platzhalter in diesem Ordner herunterladen (Ihre Zustimmung; sonst werden sie nur aufgelistet)')),
       el('div', { class: 'm-row' }, run), msg,
       el('p', { class: 'm-note', id: 'import-help' }, 'Nur Ordner in Ihrem Benutzerordner. Mastery liest nur und schreibt nichts in den Kursordner; Inventar, Pakete und Produkte liegen in Ihrer Bibliothek unter courses/. Erneuter Import desselben Ordners erkennt Änderungen.')));
   if (COURSE_ERR) s.append(el('p', { class: 'm-card' }, 'Kursdaten nicht verfügbar (' + COURSE_ERR + '). Bitte Mastery mit `mastery start` öffnen.'));

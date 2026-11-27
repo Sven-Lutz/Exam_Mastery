@@ -898,10 +898,9 @@ def authoring_instruction(cdir, course, ch, packet_name=None):
         "statement": ("Die Erarbeitung (unit.json) braucht eine Claude-Code-Sitzung mit Ihrem Abo – nicht offline, "
                       "kein API-Schlüssel, keine versteckten Modellaufrufe durch Mastery. Alternativ schreibt ein Mensch "
                       "die Einheit."),
-        "prompt": (f"Erarbeite Kapitel {ch['id']} des Kurses {course['slug']} nach docs/COURSE_TO_MASTERY_CONTRACT.md "
-                   f"aus dem Paket {chdir / packet_name} (Seitenbilder in {chdir / 'pages'}). Schreibe "
-                   f"{chdir / 'unit.json'} (em-experience-v1, unit_id {ch['unit_id']}) und {chdir / 'authoring.json'} "
-                   f"(mastery-authoring-record-v1)."),
+        "prompt": (f"Erarbeite Kapitel {ch['id']} des Kurses {course['slug']} nach docs/COURSE_TO_MASTERY_CONTRACT.md. "
+                   f"Kapitelordner: {chdir} – Paket {packet_name}, Seitenbilder pages/. Schreibe dort unit.json "
+                   f"(em-experience-v1, unit_id {ch['unit_id']}) und authoring.json (mastery-authoring-record-v1)."),
         "command": f"cd {REPO} && claude",
         "then": f"bin/mastery build-chapter {course['slug']} {ch['id']}",
     }
