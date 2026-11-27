@@ -163,6 +163,17 @@ function kcStatus(tr, ev, today) {
   }
   return res;
 }
+// Mirrors policy.kc_evidence_basis (CD-11): recognition-only evidence never stands for a constructed argument.
+const RECOGNITION_TYPES = ['choice', 'constraints'];
+function kcEvidenceBasis(tr, ev) {
+  const T = Object.fromEntries(tr.tasks.map(t => [t.id, t])), latest = Date.now() + FUTURE_SKEW_MINUTES * 60e3, res = {};
+  for (const kc of tr.kcs) {
+    const types = new Set(ev.map((e, i) => [i, e]).filter(([i, e]) => e.type === 'attempt' && T[e.task] && T[e.task].kc_id === kc.id && instant(e.t) <= latest
+      && e.diagnosis.result === 'correct' && !helped(ev, e.task, i) && !kcHelped(ev, T, kc.id, i, instant(e.t))).map(([, e]) => T[e.task].type));
+    res[kc.id] = !types.size ? 'none' : [...types].every(t => RECOGNITION_TYPES.includes(t)) ? 'recognition_only' : 'production';
+  }
+  return res;
+}
 function decide(tr, ev) {
   const T = Object.fromEntries(tr.tasks.map(t => [t.id, t])), flow = tr.flow;
   const atts = ev.map((e, i) => [i, e]).filter(([, e]) => e.type === 'attempt' && e.diagnosis.result !== 'invalid');
@@ -193,7 +204,7 @@ function decide(tr, ev) {
   if (n) return dec(indep ? 'RD' : 'RF', 'next_task', n, obs, 'Weiter im Lernpfad.', 'Eine einzelne Lösung ist eine Stichprobe.', { retention });
   return dec('RE', 'schedule_retrieval', role(tr, 'retest'), obs, 'Alle Aufgaben dieser Lernstrecke sind bearbeitet. Ob Sie es behalten, zeigt erst ein späterer Abruf: Anki-Karten mit den angegebenen Schlagwörtern und morgen oder später die Prüfaufgabe mit neuen Zahlen.', 'Behalten ist nicht beobachtet.', { retention });
 }
-EMT.decide = decide; EMT.kcStatus = kcStatus;
+EMT.decide = decide; EMT.kcStatus = kcStatus; EMT.kcEvidenceBasis = kcEvidenceBasis;
 
 /* ------------------------------------------------------------ cash-flow model (same as labs/models.py cashflow) */
 function cashflow(m) {
@@ -362,8 +373,9 @@ function boot() {
   const events = () => Store.events(SK);
 
   function drawPath() {
-    const ev = events(), st = kcStatus(tr, ev);
-    { const d = Store.read(); const r = (d.tracks[SK] = d.tracks[SK] || { events: [] }); r.summary = { title: tr.title, kcs: tr.kcs.map(k => [k.label, STATUS[st[k.id]]]) }; Store.write(d); }   /* read by the chapter's progress view */
+    const ev = events(), st = kcStatus(tr, ev), basis = kcEvidenceBasis(tr, ev);
+    const label = k => STATUS[st[k.id]] + (k.type === 'argument' && basis[k.id] === 'recognition_only' ? ' – nur Wiedererkennen geprüft, Argument nicht selbst formuliert' : '');
+    { const d = Store.read(); const r = (d.tracks[SK] = d.tracks[SK] || { events: [] }); r.summary = { title: tr.title, kcs: tr.kcs.map(k => [k.label, label(k)]) }; Store.write(d); }   /* read by the chapter's progress view */
     const visible = tr.tasks.filter(t => tr.flow.includes(t.id) || ev.some(e => e.task === t.id) || t.id === current);
     pathEl.replaceChildren(...visible.map(t => {
       const done = solved(ev, t.id), tried = ev.some(e => e.type === 'attempt' && e.task === t.id);
@@ -371,7 +383,7 @@ function boot() {
         el('span', { class: 'wb-step-role' }, ROLE[t.role] || t.role), el('span', { class: 'wb-step-t' }, t.title));
     }));
     side.replaceChildren(el('h2', { class: 'wb-h3' }, 'Beobachteter Lernstand'),
-      el('ul', { class: 'wb-status' }, tr.kcs.map(k => el('li', { 'data-kc': k.id, 'data-status': st[k.id] }, el('span', {}, k.label), el('small', {}, STATUS[st[k.id]])))),
+      el('ul', { class: 'wb-status' }, tr.kcs.map(k => el('li', { 'data-kc': k.id, 'data-status': st[k.id], 'data-basis': basis[k.id] }, el('span', {}, k.label), el('small', {}, label(k))))),
       el('p', { class: 'wb-note' }, 'Kein Prozentwert: Angezeigt wird nur, was beobachtet wurde. „Heute ohne Hilfe gelöst“ sagt nichts über Behalten – dafür gibt es die spätere Prüfung und Anki.'));
   }
   function drawFigure(task) { figure.replaceChildren(el('p', { class: 'wb-hud' }, el('span', {}, ROLE[task.role] || ''), el('span', {}, focus ? 'Fokus: Ihre Antwort' : 'Ausgangsbild'))); vizFor(tr)(figure, tr, task, focus); figCap.textContent = focus ? 'Die Darstellung zeigt den Teil, auf den sich die Rückmeldung bezieht.' : 'Ausgangsbild der Aufgabe.'; figure.append(figCap); }

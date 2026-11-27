@@ -127,6 +127,28 @@ def kc_status(track, events, today=None):
     return out
 
 
+# Task types that only ask to recognise or select. For a competency of type 'argument' (proof) such evidence shows
+# that the learner recognises premises or conclusions, not that they can build the argument (CD-11, R6 RT-10,
+# R2-POL-02: comprehension, validation and construction are reported separately).
+RECOGNITION_TYPES = ('choice', 'constraints')
+
+
+def kc_evidence_basis(track, events, today=None):
+    """Per competency: what its independent evidence consists of - 'none', 'recognition_only' or 'production'.
+
+    Same independence rules as kc_status (per-task and competency-level help, no future-dated attempts)."""
+    latest = datetime.now(timezone.utc) + timedelta(minutes=FUTURE_SKEW_MINUTES)
+    T = {t['id']: t for t in track['tasks']}
+    out = {}
+    for kc in track['kcs']:
+        types = {T[e['task']]['type'] for i, e in enumerate(events)
+                 if e['type'] == 'attempt' and T.get(e['task'], {}).get('kc_id') == kc['id'] and _instant(e['t']) <= latest
+                 and e['diagnosis']['result'] == 'correct' and not helped(events, e['task'], i)
+                 and not _kc_helped(events, T, kc['id'], i, _instant(e['t']))}
+        out[kc['id']] = 'none' if not types else 'recognition_only' if types <= set(RECOGNITION_TYPES) else 'production'
+    return out
+
+
 def decide(track, events, now=None):
     T = {t['id']: t for t in track['tasks']}
     flow = track['flow']
