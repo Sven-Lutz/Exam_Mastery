@@ -2,9 +2,20 @@
  "agent_id": "R2",
  "wp": "WP-R2",
  "status": "RUNNING",
- "updated": "2026-11-27T10:00:00+01:00",
- "done": ["read:charter,issue23,R1 synthesis,R1 policy schema,R0 audit s7-8"],
- "open": ["search+screen Q1-Q5", "r2_evidence.json", "r2_learning_policies.json", "R2_FORMAL_QUANTITATIVE.md"],
- "artifacts": [],
- "next_step": "metadata sweep via OpenAlex/Crossref, then full-text reads (proof comprehension first)"
+ "updated": "2026-11-27T09:56:00+01:00",
+ "done": [
+  "read:charter,issue23,R1 synthesis,R1 policy schema,R0 audit s7-8",
+  "metadata sweep: Crossref 27 DOIs, OpenAlex ~30, S2 8 (API)",
+  "evidence batch1: hodds2014selfexplanation, alcock2015notices, roy2017eproofs, neuhaus2025proofskills, inglis2013standards, inglis2012reading, selden2003validation"
+ ],
+ "open": [
+  "search+screen Q1-Q5",
+  "r2_evidence.json",
+  "r2_learning_policies.json",
+  "R2_FORMAL_QUANTITATIVE.md"
+ ],
+ "artifacts": [
+  "docs/research/workstreams/r2/r2_evidence.json"
+ ],
+ "next_step": "batch2: proof construction (Kollar 2014), CJ (Davies 2020, Jones&Inglis 2015), LLM/CAS grading; page fetches used 8/45"
 }

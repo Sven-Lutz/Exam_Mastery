@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T10:30:00+01:00",
+ "updated": "2026-11-27T10:55:00+01:00",
  "updated_by": "lead (interactive Claude Code session)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -148,7 +148,9 @@
   {
    "id": "CD-2",
    "severity": "P0",
-   "text": "policy.kc_status counts distinct calendar dates as spacing/mastery evidence; two dates can be minutes apart (R0 §2)."
+   "text": "policy.kc_status counts distinct calendar dates as spacing/mastery evidence; two dates can be minutes apart (R0 §2).",
+   "status": "FIX_IN_DRAFT_PR",
+   "fix": "PR #37 (stacked on #28): elapsed time >= 20 h (provisional) + different task; Python/JS parity; old code fails 3/5 new checks; 112 related tests OK locally"
   },
   {
    "id": "CD-3",
@@ -395,6 +397,26 @@
     "presentation changes after P4 integration (one display constant)",
     "owner: public name/trademark, phase C, repo rename"
    ]
+  },
+  {
+   "id": "WP-CD2",
+   "title": "Integrity fix CD-2: retention evidence by elapsed time",
+   "status": "COMPLETED",
+   "priority": 7.6,
+   "pr": 37,
+   "branch": "fix/kc-status-elapsed-time-20261127",
+   "base": "feat/golden-attention-20261126",
+   "updated": "2026-11-27T10:55:00+01:00",
+   "done": [
+    "policy.py + em_tutor.js fixed",
+    "tests/test_kc_status_elapsed_time.py",
+    "regressions b18/b19 + 9 policy-related modules OK"
+   ],
+   "open": [
+    "CI on PR #37",
+    "review"
+   ],
+   "next_step": "none"
   },
   {
    "id": "WP-R6",
