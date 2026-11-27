@@ -23,7 +23,7 @@ def cmd_start(args):
     from .server import make_server
     root = resolve_home(args.home)
     if args.rebuild or is_outdated(root):
-        print("Bibliothek fehlt oder ist veraltet – wird erstellt (offline, ohne Modellaufrufe) …")
+        print("Bibliothek fehlt oder ist veraltet – wird erstellt (offline, ohne Modellaufrufe) …", flush=True)
         build(root, force=args.rebuild)
     url = f"http://127.0.0.1:{args.port}/"
     if args.port != DEFAULT_PORT:
@@ -41,7 +41,7 @@ def cmd_start(args):
         print(f"Port {args.port} ist belegt ({exc.strerror}). Anderen Port wählen: mastery start --port 8766 "
               "(dann anderer Browser-Speicher).", file=sys.stderr)
         return 2
-    print(f"Mastery läuft offline unter {url}  (Bibliothek: {root})")
+    print(f"Mastery läuft offline unter {url}  (Bibliothek: {root})", flush=True)
     print("Beenden mit Ctrl+C. Lernstand: im Browser; Sicherung: Startseite > Sicherung oder `mastery export`.")
     if not args.no_open:
         webbrowser.open(url)
