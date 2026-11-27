@@ -1,7 +1,7 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T13:55:00+01:00",
- "updated_by": "headless WP-R2",
+ "updated": "2026-11-27T15:05:00+01:00",
+ "updated_by": "headless WP-R5",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
   "Never merge to main; draft PRs only.",
@@ -72,7 +72,7 @@
    "issue": 25
   },
   "R5": {
-   "status": "RUNNING",
+   "status": "CHECKPOINTED",
    "wp": "WP-R5",
    "issue": 26
   },
@@ -309,23 +309,37 @@
   {
    "id": "WP-R5",
    "title": "R5 AI tutoring, adaptation and learning measurement",
-   "status": "RUNNING",
+   "status": "CHECKPOINTED",
    "priority": 3,
    "autostart": true,
    "issue": 26,
    "branch": "research/r5-tutoring-measurement-20261127",
    "base": "research/r1-learning-science-20261127 (bec1f62)",
-   "next_step": "If the specialist checkpoint is COMPLETED: lead review, spot-check, test, commit, draft PR. Otherwise continue the specialist part from its checkpoint (only its files).",
+   "next_step": "Batch4 evidence (RQ3 offloading + RQ5 privacy/fairness) with logged search queries into r5_evidence.json; reconcile report §2/§9 and R5-POL-03/07; then spot-check, test, draft PR against research/r1-learning-science-20261127.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
    "worktree": "Exam_Mastery-r5",
    "done": [
-    "specialist brief issued; policy file in R1 schema"
+    "specialist brief issued; policy file in R1 schema",
+    "evidence register committed (23 sources; 70f9d59)",
+    "report AI_TUTOR_MEASUREMENT.md + r5_tutoring_policies.json (7 policies, all NOT_RUN) + contract test (3703542), branch pushed"
    ],
    "open": [
-    "specialist report + evidence + policies",
-    "lead review/spot-check",
-    "draft PR"
-   ]
+    "batch4 evidence: RQ3 offloading/dependency (Fan 2025, Lehmann, Darvishi, Pardos LLM hints); RQ5 fairness KT (Doroudi 2019), privacy/GDPR principles, browser/API-key, local LLM",
+    "search log (exact queries/dates) per SEARCH_PROTOCOL.md; gate item not met",
+    "update report/policies after batch4; lead spot-check of 2-3 locators",
+    "draft PR (base research/r1-learning-science-20261127)"
+   ],
+   "updated": "2026-11-27T15:05:00+01:00",
+   "artifacts": [
+    "docs/research/workstreams/r5/r5_evidence.json",
+    "docs/research/workstreams/r5/r5_tutoring_policies.json",
+    "docs/research/workstreams/r5/AI_TUTOR_MEASUREMENT.md",
+    "tests/test_r5_tutoring_policies.py"
+   ],
+   "tests": [
+    "python3 -m unittest tests.test_r5_tutoring_policies tests.test_r1_learning_policies: OK (skipped=1), 2026-11-27"
+   ],
+   "blockers": []
   },
   {
    "id": "WP-R3",

@@ -1,10 +1,31 @@
 {
  "agent_id": "R5",
  "wp": "WP-R5",
- "status": "RUNNING",
- "updated": "2026-11-27T10:00:00+01:00",
- "done": ["read:charter,issue26,KB_GAP_AUDIT§2/§5/§6,R1 report+schema,EVALUATION_PROTOCOL,policy/tutor/evaluation code"],
- "open": ["RQ1 ITS effects","RQ2 knowledge tracing","RQ3 GenAI RCTs incl. Bastani SI, Kestin VoR","RQ4 measurement validity","RQ5 privacy/architecture","report","policies"],
- "artifacts": [],
- "next_step": "search + evidence extraction RQ3 (Bastani/Kestin first), append to r5_evidence.json every ~5 sources"
+ "status": "CHECKPOINTED",
+ "updated": "2026-11-27T15:05:00+01:00",
+ "done": [
+  "read:charter,issue26,KB_GAP_AUDIT§2/§5/§6,R1 report+schema,EVALUATION_PROTOCOL,policy/tutor/evaluation code",
+  "evidence:bastani2025 (VoR+SI+correction)",
+  "evidence:kestin2025 (VoR+supplement vs v1)",
+  "evidence:boolzen2026genaistem",
+  "evidence:liu2026izavsa",
+  "evidence:wang2024tutorcopilot",
+  "evidence:henkel2024rori",
+  "evidence:desimone2025nigeria",
+  "evidence:batch3 ITS/KT/measurement (vanlehn2011,kulik2016,ma2014,steenbergenhu2013its,aleven2016,pane2014ctai,roschelle2016assistments,pelanek2017,pelanek2018mastery,gervet2020kt,khajah2016deepkt,kraft2020effectsizes,cheungslavin2016methods,hedgeshedberg2007icc,piaggio2012consortni,risko2016offloading)",
+  "lead (headless): report + 7 policies + test from batch1-3 evidence (3703542)"
+ ],
+ "open": [
+  "RQ3 dependency/offloading GenAI studies (Fan 2025, Lehmann, Darvishi, Pardos LLM hints)",
+  "RQ5 fairness KT (Doroudi 2019), GDPR principles, browser/API-key constraints, local LLM",
+  "search log",
+  "reconcile report/policies after batch4"
+ ],
+ "artifacts": [
+  "docs/research/workstreams/r5/r5_evidence.json",
+  "docs/research/workstreams/r5/r5_tutoring_policies.json",
+  "docs/research/workstreams/r5/AI_TUTOR_MEASUREMENT.md",
+  "tests/test_r5_tutoring_policies.py"
+ ],
+ "next_step": "batch4 with logged queries, then reconcile report/policies"
 }
