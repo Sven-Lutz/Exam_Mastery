@@ -54,6 +54,7 @@ function observations() {
       const o = get(k);
       if (e.type === 'hint') { st.help = true; o.hints++; }
       if (e.type === 'solution') { st.help = true; o.solution = true; }
+      if (e.type === 'tutor') st.help = true;   // a prepared tutor briefing for this item counts as help (CD-7)
       if (e.type === 'attempt') {
         o.attempts++;
         if (e.result === 'correct') { const day = e.t.slice(0, 10); if (st.correctDays.size && !st.correctDays.has(day)) o.later = true; st.correctDays.add(day); if (st.help) o.aided = true; else o.unaided = true; }
@@ -330,8 +331,9 @@ function viewTutor(id) {
   const s = sec || (item ? null : (last ? S[last.section] : C.sections[0]));
   const text = briefing(s, item ? item.id : null);
   const ta = el('textarea', { class: 'brief', rows: 16, readonly: true, 'aria-label': 'Tutor-Briefing' }); ta.value = text;
-  const copy = el('button', { class: 'btn btn-primary', onclick: () => { const done = () => toast('Briefing kopiert.'); if (navigator.clipboard && window.isSecureContext !== false) navigator.clipboard.writeText(text).then(done, () => { ta.select(); document.execCommand('copy'); done(); }); else { ta.select(); document.execCommand('copy'); done(); } } }, 'Briefing kopieren');
-  const dl = el('button', { class: 'btn', onclick: () => download('tutor-briefing.md', text, 'text/markdown') }, 'Als Datei speichern');
+  const logTutor = () => { if (item) Store.add({ type: 'tutor', item: item.id }); };
+  const copy = el('button', { class: 'btn btn-primary', onclick: () => { logTutor(); const done = () => toast('Briefing kopiert.'); if (navigator.clipboard && window.isSecureContext !== false) navigator.clipboard.writeText(text).then(done, () => { ta.select(); document.execCommand('copy'); done(); }); else { ta.select(); document.execCommand('copy'); done(); } } }, 'Briefing kopieren');
+  const dl = el('button', { class: 'btn', onclick: () => { logTutor(); download('tutor-briefing.md', text, 'text/markdown'); } }, 'Als Datei speichern');
   const pick = el('select', { 'aria-label': 'Abschnitt wählen', onchange: e => { location.hash = '#/tutor/' + e.target.value; } }, C.sections.map(x => el('option', { value: x.id }, x.no + ' ' + x.title))); if (s) pick.value = s.id;
   setContext(s);
   return [el('div', { class: 'eyebrow' }, 'Tutor'), el('h1', {}, 'Tutor-Briefing'),
@@ -339,7 +341,9 @@ function viewTutor(id) {
     el('div', { class: 'tutor-modes' },
       el('div', { class: 'tm tm-local' }, el('h2', {}, 'Funktioniert hier, ohne Verbindung'), el('ul', {}, el('li', {}, 'Briefing zum gewählten Abschnitt zusammenstellen'), el('li', {}, 'Ihre beobachteten Versuche einbeziehen'), el('li', {}, 'Kopieren oder als Datei speichern'))),
       el('div', { class: 'tm tm-agent' }, el('h2', {}, 'Braucht einen Agenten (z. B. Claude Code)'), el('ul', {}, el('li', {}, 'Rückfragen beantworten und erklären'), el('li', {}, 'Ihre eigene Lösung kommentieren'), el('li', {}, 'Neue Übungsvarianten erzeugen')))),
-    el('div', { class: 'filters' }, pick), ta, el('div', { class: 'row' }, copy, dl),
+    el('div', { class: 'filters' }, pick), ta,
+    item ? el('p', { class: 'muted', 'data-tutor-note': '' }, 'Wenn Sie dieses Briefing nutzen, zählt eine spätere richtige Lösung dieser Aufgabe im Lernstand als „mit Hilfe richtig“.') : null,
+    el('div', { class: 'row' }, copy, dl),
     el('section', { class: 'panel' }, el('h2', {}, 'So verwenden Sie das Briefing'), el('ol', {}, el('li', {}, 'Briefing kopieren.'), el('li', {}, 'In Claude Code im Kursordner einfügen, zum Beispiel nach „/exam-mastery lernen“.'), el('li', {}, 'Ohne KI: Hinweise und Musterlösungen der Übungen sowie die Quellenangaben im Text helfen ebenso.')),
       el('p', { class: 'muted' }, 'Nichts wird automatisch übertragen. Das Briefing enthält keine Namen, nur Kursinhalte und Ihre beobachteten Versuche zu diesem Abschnitt.'))];
 }

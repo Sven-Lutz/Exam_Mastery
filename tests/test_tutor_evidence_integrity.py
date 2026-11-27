@@ -127,5 +127,57 @@ class BrowserMirror(unittest.TestCase):
         self.assertEqual(errors, [])
 
 
+class ChapterAppTutorBriefing(unittest.TestCase):
+    """Chapter learning app (em_app.js): an item briefing that the learner copies or saves marks the item as helped."""
+
+    @classmethod
+    def setUpClass(cls):
+        from playwright.sync_api import sync_playwright
+        from exam_mastery import learn_app
+        from tests.test_b15_learn_app import book
+        cls.tmp = tempfile.TemporaryDirectory(); art = Path(cls.tmp.name) / 'artifacts'
+        cls.index = learn_app.build(book(), art / 'Lernumgebung', labs=[], materials=[], anki=None, chapter_id='ch-cd7')
+        cls.pw = sync_playwright().start(); cls.browser = cls.pw.chromium.launch()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.close(); cls.pw.stop(); cls.tmp.cleanup()
+
+    def open(self, route):
+        c = self.browser.new_context(offline=True, accept_downloads=True); pg = c.new_page(); errs = []
+        pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.goto(self.index.as_uri() + '#/' + route); pg.wait_for_selector('#app[data-ready="1"]')
+        return c, pg, errs
+
+    def events(self, pg):
+        return json.loads(pg.evaluate('localStorage.getItem("em-learn-v2") || "{\\"events\\": []}"'))['events']
+
+    def test_saving_an_item_briefing_logs_tutor_help(self):
+        c, pg, errs = self.open('tutor/a-01')
+        self.assertEqual(pg.locator('[data-tutor-note]').count(), 1)
+        pg.locator('button:has-text("Als Datei speichern")').click()
+        self.assertEqual([e.get('item') for e in self.events(pg) if e['type'] == 'tutor'], ['a-01'])
+        self.assertEqual(errs, []); c.close()
+
+    def test_section_briefing_logs_nothing(self):
+        c, pg, errs = self.open('tutor/s2')
+        self.assertEqual(pg.locator('[data-tutor-note]').count(), 0)
+        pg.locator('button:has-text("Als Datei speichern")').click()
+        self.assertEqual([e for e in self.events(pg) if e['type'] == 'tutor'], [])
+        self.assertEqual(errs, []); c.close()
+
+    def test_correct_after_tutor_counts_as_aided(self):
+        c, pg, errs = self.open('stand')
+        pg.evaluate('''() => { const d = JSON.parse(localStorage.getItem("em-learn-v2") || "null") || {schema: 2, created: new Date().toISOString(), events: [], prefs: {}};
+            d.events.push({t: "2026-11-27T09:00:00Z", chapter: "ch-cd7", type: "tutor", item: "a-01"},
+                          {t: "2026-11-27T09:05:00Z", chapter: "ch-cd7", type: "attempt", item: "a-01", result: "correct", mode: "number"});
+            localStorage.setItem("em-learn-v2", JSON.stringify(d)); }''')
+        pg.reload(); pg.wait_for_selector('#app[data-ready="1"]')
+        text = pg.inner_text('main')
+        self.assertIn('mit Hilfe richtig', text)
+        self.assertNotIn('ohne Hilfe richtig', text)
+        self.assertEqual(errs, []); c.close()
+
+
 if __name__ == '__main__':
     unittest.main()
