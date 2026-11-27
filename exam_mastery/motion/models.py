@@ -244,10 +244,10 @@ def plane_texts(st):
         "Av_formula": _par(v[0]) + "·" + _pt(st["A_e1"]) + " + " + _par(v[1]) + "·" + _pt(st["A_e2"]) + " = " + _pt(st["Av"]),
         "det_formula": _par(m[0]) + "·" + _par(m[3]) + " − " + _par(m[1]) + "·" + _par(m[2]) + " = " + g2(d),
         "det_A_text": g2(st["det_A"]),
-        "det_A_note": ("Weil det A < 0 ist, muss jeder stetige Weg von I nach A durch det = 0: Die Ebene wird unterwegs "
+        "det_A_note": ("Negativ: Jeder stetige Weg von I nach A muss durch det = 0: Die Ebene wird unterwegs "
                        "einmal flach gedrückt." if st["det_A"] < 0 else
-                       "det A = 0: Am Ende liegt die ganze Ebene auf einer Geraden oder im Nullpunkt." if st["rank_A"] < 2
-                       else "det A > 0: Die Orientierung bleibt erhalten."),
+                       "Am Ende liegt die ganze Ebene auf einer Geraden oder im Nullpunkt." if st["rank_A"] < 2
+                       else "Positiv: Die Orientierung bleibt erhalten."),
         "orientation_text": ("Orientierung erhalten" if st["orientation"] > 0 else
                              "Orientierung umgekehrt (gespiegelt)" if st["orientation"] < 0 else
                              "Fläche 0: die Ebene ist kollabiert"),

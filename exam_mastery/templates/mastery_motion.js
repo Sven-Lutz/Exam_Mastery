@@ -109,7 +109,7 @@ function planeTexts(st) {
     Av_formula: par(v[0]) + '·' + pt(st.A_e1) + ' + ' + par(v[1]) + '·' + pt(st.A_e2) + ' = ' + pt(st.Av),
     det_formula: par(m[0]) + '·' + par(m[3]) + ' − ' + par(m[1]) + '·' + par(m[2]) + ' = ' + g2(st.det),
     det_A_text: g2(st.det_A),
-    det_A_note: st.det_A < 0 ? 'Weil det A < 0 ist, muss jeder stetige Weg von I nach A durch det = 0: Die Ebene wird unterwegs einmal flach gedrückt.' : st.rank_A < 2 ? 'det A = 0: Am Ende liegt die ganze Ebene auf einer Geraden oder im Nullpunkt.' : 'det A > 0: Die Orientierung bleibt erhalten.',
+    det_A_note: st.det_A < 0 ? 'Negativ: Jeder stetige Weg von I nach A muss durch det = 0: Die Ebene wird unterwegs einmal flach gedrückt.' : st.rank_A < 2 ? 'Am Ende liegt die ganze Ebene auf einer Geraden oder im Nullpunkt.' : 'Positiv: Die Orientierung bleibt erhalten.',
     orientation_text: st.orientation > 0 ? 'Orientierung erhalten' : st.orientation < 0 ? 'Orientierung umgekehrt (gespiegelt)' : 'Fläche 0: die Ebene ist kollabiert',
     rank_text: 'Rang M = ' + rank, kernel_text: ki[0], image_text: ki[1], dim_text: 'dim Kern + Rang: ' + ki[2]
   };
