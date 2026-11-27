@@ -1,0 +1,1499 @@
+{
+ "schema": "em-learning-policies/1",
+ "version": "0.1.0",
+ "status": "DESIGN_HYPOTHESIS_SET",
+ "date": "2026-11-27",
+ "baseline": {
+  "branch": "research/r3-contextual-reasoning-20261127",
+  "builds_on": "R1 policies (research/r1-learning-science-20261127, 3559872); R5 tutor output types read from research/r5-tutoring-measurement-20261127 (not merged)",
+  "kb": "exam_mastery/knowledge/{sources,principles}.json"
+ },
+ "authorship": {
+  "R3": "ein Spezialistenlauf (Register, Policies, Bericht); dasselbe Modell wie andere Workstreams",
+  "independent_review": "pending: keine menschliche oder unabhängige Fachprüfung; Selbstprüfung zählt nicht als Review"
+ },
+ "operations": [
+  "recall_discrimination",
+  "symbolic_procedure",
+  "formal_proof",
+  "rule_based_contextual",
+  "diagnostic_reasoning",
+  "empirical_experimental",
+  "computational_construction",
+  "spatial_design",
+  "embodied_psychomotor",
+  "open_synthesis",
+  "self_regulation"
+ ],
+ "certainty_scale": {
+  "high": "mehrere unabhängige, biasgeprüfte Belege in passender Population; Produktregel nah am Beleg",
+  "moderate": "konsistente Richtung, aber Indirektheit, Heterogenität oder Bias-Risiko",
+  "low": "indirekte oder einzelne Belege; Produktregel deutlich vom Beleg entfernt",
+  "very_low": "keine direkte Evidenz; plausibel begründete Setzung",
+  "normative": "Sicherheits-, Rechts- oder Ethikgrenze; keine empirische Sicherheit beansprucht",
+  "note": "von R1 übernommen; interne, an GRADE angelehnte Einschätzung, kein formales GRADE"
+ },
+ "conflict_resolution": [
+  {
+   "id": "R3-CR-1",
+   "between": [
+    "R3-POL-02",
+    "R3-POL-03"
+   ],
+   "rule": "Novizen beginnen mit R3-POL-03 (Beispiele, reduzierter Normbestand); unannotierte Sachverhalte (R3-POL-02) erst, wenn ein Fall mit vollem Gesetz ohne Hilfe begonnen werden kann (vgl. R1-CR-3)."
+  },
+  {
+   "id": "R3-CR-2",
+   "between": [
+    "R3-POL-11",
+    "R2-POL-05",
+    "R2-POL-14"
+   ],
+   "rule": "Wie R2-CR-2: LLM-Bewertung ist immer agent_judgement und nie Kompetenzbeleg; für offene Aufgaben ohne formalen Prüfer ist der Pflichtprüfer ein Mensch."
+  },
+  {
+   "id": "R3-CR-3",
+   "between": [
+    "R3-POL-08",
+    "R3-POL-09",
+    "R1-POL-A09"
+   ],
+   "rule": "Konfidenz wird nur stichprobenartig erfasst (R1-CR-5) und nie in Fällen, deren Reflexionswirkung verzögert gemessen wird."
+  },
+  {
+   "id": "R3-CR-4",
+   "between": [
+    "R3-POL-10",
+    "alle klinischen und rechtspraktischen Policies"
+   ],
+   "rule": "R3-POL-10 hat Vorrang: bei Zweifel an Simulation vs. realer Situation enthält sich das Produkt."
+  }
+ ],
+ "shared_measurement_contract": {
+  "evidence_of_competence": "wie R1: nur unassistierte, verzögerte (echte verstrichene Zeit) Versuche an neuen Fällen; zusätzlich: neuer Sachverhalt/Text/Fall mit veränderter Oberfläche und deklarierter Transferdimension, bewertet durch deklarierten menschlichen Prüfer oder deterministischen Prüfer",
+  "not_evidence": [
+   "LLM-Bewertung (agent_judgement)",
+   "mit KI-Hilfe erstellte Fall- oder Gutachtenlösungen",
+   "Kartenqualität oder Schema-Vollständigkeit",
+   "Konfidenzangaben",
+   "Zufriedenheit mit Fallarbeit",
+   "Leistung in virtuellen Patienten als Kompetenz am realen Patienten"
+  ],
+  "labels": "Simulationsergebnisse heißen 'Fallleistung in der Simulation' (R3-POL-10); Rechtsaussagen tragen Rechtsstand (R3-POL-01)"
+ },
+ "deferred_operations": [
+  {
+   "operation": "recall_discrimination",
+   "reason": "von R1 abgedeckt (R1-POL-A01, A04); R3 nutzt sie für Normen und Krankheitsskripte",
+   "owner_workstream": "R1"
+  },
+  {
+   "operation": "symbolic_procedure",
+   "reason": "quantitative Teilschritte in Ökonomiefällen gehören zu R2",
+   "owner_workstream": "R2"
+  },
+  {
+   "operation": "formal_proof",
+   "reason": "formale Beweise und Validierung bei R2; R3 nur natürlichsprachliche Argumente",
+   "owner_workstream": "R2"
+  },
+  {
+   "operation": "empirical_experimental",
+   "reason": "nicht untersucht",
+   "owner_workstream": "R4 (mit R2 für Statistik)"
+  },
+  {
+   "operation": "computational_construction",
+   "reason": "nicht untersucht",
+   "owner_workstream": "R2"
+  },
+  {
+   "operation": "spatial_design",
+   "reason": "nicht untersucht",
+   "owner_workstream": "R4"
+  },
+  {
+   "operation": "embodied_psychomotor",
+   "reason": "klinische Fertigkeiten am Patienten (Untersuchung, Prozeduren) nicht untersucht; Simulation ersetzt sie nicht (R3-POL-10)",
+   "owner_workstream": "R4"
+  }
+ ],
+ "coverage_gaps": [
+  "Gutachtenstil: keine empirische Lernstudie gefunden (R3-S07, R3-S08); nur LLM-Bewertungsstudie (zubaer2026gradelegal)",
+  "Formatives Feedback im Jurastudium: einzige kontrollierte Studie (Schwarcz & Farganis, SSRN 2772393) nicht lesbar (HTTP 403); Seed cooper2018lawstudyhabits nur Abstract, korrelativ",
+  "Gesetzesauslegung (Auslegungsmethoden) als Lernoperation: keine Studie gesichtet",
+  "Business-/Ökonomie-Fallmethode: keine kontrollierte Evidenz gefunden; Farashahi & Tajeddin 2018 ohne Abstract; kontrafaktisches Denken nur Theorieliteratur",
+  "Interpretative Fairness/Charity: keine empirische Studie gesucht oder gefunden",
+  "Nesbit & Liu 2025 (Seed) nur Abstract; Ergebnis der Kausalanalyse unbekannt",
+  "Script Concordance Test: Gegenrede der SCT-Entwickler auf lineberry2013sct nicht gelesen",
+  "LLM-Bewertung philosophischer Essays: keine Studie gesichtet",
+  "deutschsprachige Rechts- und Medizindidaktik insgesamt kaum durchsucht; nur zwei deutsche Queries",
+  "Volltextanteil: 13 von 35 Einträgen; 22 nur Abstract"
+ ],
+ "verification_log": [
+  {
+   "by": "R3 (Selbstprüfung, kein unabhängiges Review)",
+   "date": "2026-11-27",
+   "method": "Volltext erneut gelesen (pdftotext)",
+   "checked": "zubaer2026gradelegal QWK 0.911 / 0.599 / Mensch 0.911 ± 0.066; N = 71 + 16",
+   "result": "match (Table 4 Fußnote, §3.1, §5)"
+  },
+  {
+   "by": "R3 (Selbstprüfung)",
+   "date": "2026-11-27",
+   "method": "Volltext erneut gelesen",
+   "checked": "nievelstein2011lawsupport M = 23.37 vs 12.74, F(1,75) = 15.46",
+   "result": "match; berichtetes f = .11 inkonsistent, nicht verwendet"
+  },
+  {
+   "by": "R3 (Selbstprüfung)",
+   "date": "2026-11-27",
+   "method": "Volltext erneut gelesen",
+   "checked": "sellier2019debiasing 48.0 % vs 72.7 %, CI [4.90 %, 41.90 %]",
+   "result": "match (accepted manuscript)"
+  },
+  {
+   "by": "R3 (Selbstprüfung)",
+   "date": "2026-11-27",
+   "method": "OpenAlex-Abstract erneut gelesen",
+   "checked": "mamede2012reflection 0.66/0.48/0.52 (1 Woche), 0.48/0.62/0.61 (sofort)",
+   "result": "match"
+  },
+  {
+   "by": "R3 (Selbstprüfung)",
+   "date": "2026-11-27",
+   "method": "Europe PMC Volltext",
+   "checked": "kononowicz2019virtualpatients SMD 0.11 [-0.17, 0.39], 0.90 [0.49, 1.32]; goh2024llmdiagnosis kappa 0.66",
+   "result": "match"
+  },
+  {
+   "by": "R3 (Selbstprüfung)",
+   "date": "2026-11-27",
+   "method": "Europe PMC Volltext",
+   "checked": "wark2025clinicalreasoning: gepoolte Mittelwertdifferenzen sind unstandardisiert über verschiedene Instrumente",
+   "result": "Interpretationsvorbehalt im Register vermerkt"
+  }
+ ],
+ "policies": [
+  {
+   "id": "R3-POL-01",
+   "title": "Datierte, versionierte Rechtsquellen mit Stichtag; Enthaltung bei unbekannter Fassung",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-01",
+   "applies_to_operations": [
+    "rule_based_contextual"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "jede Aufgabe, Erklärung oder Karte, die eine Norm, Entscheidung oder Rechtsfolge als geltend darstellt"
+   },
+   "recommendation": "Jede Rechtsaussage trägt Quelle (Norm/Entscheidung), Fassung bzw. Änderungsgesetz und Stichtag ('Rechtsstand: TT.MM.JJJJ'). Aufgaben deklarieren den Rechtsstand des Sachverhalts. Ist die maßgebliche Fassung nicht ermittelbar oder nach dem Stichtag geändert, wird die Aussage nicht als geltend ausgegeben, sondern als 'Fassung ungeprüft' markiert oder zurückgehalten. Modellgenerierte Zitate gelten erst nach Abgleich mit der amtlichen bzw. dokumentierten Quelle als Beleg.",
+   "product_affordances": {
+    "textbook": "Normzitate mit Fassung und Stichtag; Kennzeichnung 'nicht amtliche konsolidierte Fassung' wo zutreffend",
+    "workbook": "Sachverhalt mit Rechtsstand-Datum; Lösungen verweisen auf dieselbe Fassung",
+    "anki": "Karten zu Tatbestandsmerkmalen tragen Norm + Stichtag im Feld; bei Rechtsänderung Karte als veraltet markieren statt still ändern",
+    "interactive": "Anzeige 'Rechtsstand' je Fall; Warnhinweis, wenn der Stichtag älter als die letzte bekannte Änderung ist"
+   },
+   "tutor_affordance": "Tutor nennt keine Norm ohne Fundstelle aus dem Kursbestand; fehlt sie: ABSTAIN(no_verified_reference) statt Modellwissen",
+   "abstain_or_fallback": [
+    "Fassung unbekannt: Aussage als 'Fassung ungeprüft' kennzeichnen, nicht als geltendes Recht",
+    "kein Zitat aus Modellgedächtnis als Beleg (dahl2024legalfictions, magesh2025legalrag)",
+    "Rechtslage nach dem Stichtag: Hinweis, dass die Lösung nur für den Stichtag gilt",
+    "reale Rechtsfragen der Lernenden: Verweis auf qualifizierte Beratung"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "gii2026hinweise",
+     "locator": "Hinweise-Seite: nicht amtliche Fassung, BGBl maßgeblich, 'Stand'",
+     "relation": "supports"
+    },
+    {
+     "source_id": "magesh2025legalrag",
+     "locator": "Introduction, Figure 2 (überholte Entscheidung als geltend zitiert); §4 'misgrounded'",
+     "relation": "supports"
+    },
+    {
+     "source_id": "dahl2024legalfictions",
+     "locator": "Introduction S. 6 (58-88 % Halluzinationen); §5 Kalibrierung",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "normative",
+    "reasons": [
+     "Validitäts- und Sicherheitsgrenze; keine Lernwirkung beansprucht",
+     "Benchmarks belegen das Risiko, nicht die Wirksamkeit der Gegenmaßnahme"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Sprachmodelle erzeugen bei Rechtsfragen häufig falsche oder falsch belegte Autoritäten (US-Recht, Modellstand 2023/24)",
+      "level": "moderate"
+     },
+     {
+      "claim": "Stichtag und Fassungsangabe verhindern Fehllernen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Feld 'source', 'version', 'as_of' je Rechtsaussage; Anteil Aussagen mit Status 'Fassung ungeprüft'",
+   "independent_outcome": "Audit: Stichprobe von Rechtsaussagen wird von einer juristisch qualifizierten Person gegen die amtliche Fassung zum Stichtag geprüft (Fehlerquote mit Konfidenzintervall)",
+   "failure_modes": [
+    "Stichtag fehlt oder ist falsch",
+    "konsolidierte Fassung wird als amtlich ausgegeben",
+    "Lernende ignorieren den Hinweis",
+    "Wartungsaufwand bei Rechtsänderungen unterschätzt"
+   ],
+   "falsifier": "Wenn ein Audit zeigt, dass Aussagen mit Fassungs- und Stichtagsangabe nicht seltener veraltet oder falsch sind als ohne, ist die Angabe allein wirkungslos und braucht eine technische Prüfung gegen die Quelle.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AS-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AI-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "R3-POL-01-NEW",
+     "relation": "new"
+    }
+   ],
+   "practice_boundary": {
+    "domain": "legal",
+    "statement": "Übungsfälle und generierte Lösungen sind Lernmaterial zu einem datierten Rechtsstand, keine Rechtsberatung und kein Nachweis berufspraktischer Kompetenz; für reale Sachverhalte wird auf qualifizierte Beratung verwiesen.",
+    "abstain_reason": "safety_or_professional_boundary"
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R3-POL-02",
+   "title": "Issue Spotting an unannotierten Sachverhalten vor jeder Gliederungshilfe",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-02",
+   "applies_to_operations": [
+    "rule_based_contextual"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "intermediate",
+     "advanced"
+    ],
+    "phase": [
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "nachdem Normen und Prüfungsschemata einmal instruiert wurden; Sachverhalt ohne Hervorhebung, Überschrift oder Normhinweis"
+   },
+   "recommendation": "Klausurnahe Aufgaben zeigen einen unkommentierten Sachverhalt. Die lernende Person listet zuerst alle Rechtsprobleme (Anspruchsgrundlagen, Tatbestandsmerkmale mit Problem) mit kurzer Begründung, bevor Gliederung oder Musterlösung sichtbar werden. Abgleich mit einer fachlich geprüften Problemliste, die vertretbare Zusatzprobleme ausdrücklich enthält; Auslassungen und Scheinprobleme werden getrennt zurückgemeldet.",
+   "product_affordances": {
+    "workbook": "Fall ohne Markierungen; Problemliste als eigener Abgabeschritt; Lösungsbogen mit 'zwingend / vertretbar / nicht einschlägig'",
+    "interactive": "Problemliste vor Freischaltung der Gliederung; Rückmeldung zu Auslassungen",
+    "textbook": "Hinweis, dass Beispiele mit hervorgehobenen Problemen kein Issue-Spotting trainieren"
+   },
+   "tutor_affordance": "Tutor gibt keine Problemliste vor dem eigenen Versuch (AI-R1); nennt danach nur Kategorien ('Prüfe Anspruchsgrundlagen aus Vertrag'), nicht die Lösung",
+   "abstain_or_fallback": [
+    "Novizen ohne Normkenntnis: zuerst R3-POL-03 (Beispiele, reduzierter Normbestand)",
+    "keine geprüfte Problemliste vorhanden: Aufgabe nur als Übung ohne Bewertung",
+    "keine Wertung abweichender, aber vertretbarer Probleme als Fehler"
+   ],
+   "parameters": [
+    {
+     "name": "issue_list_min_reviewer",
+     "value": 1,
+     "unit": "fachlich qualifizierte Prüfperson je Problemliste",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; Problemlisten sind nicht deterministisch prüfbar (pinkwart2009largo)"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "cooper2018lawstudyhabits",
+     "locator": "Abstract (Selbsttest mit Anwendung korreliert mit Noten)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "nievelstein2011lawsupport",
+     "locator": "Results/Discussion (Suchlast bei Novizen)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "pinkwart2009largo",
+     "locator": "Abstract (Richtigkeit nicht formal prüfbar)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "keine Studie prüft Issue-Spotting-Training direkt; nur korrelative und indirekte Evidenz",
+     "Ableitung aus Prüfungsformat und R1-Abrufevidenz"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Anwendungsübung statt bloßem Lesen/Briefing hängt mit besseren Jura-Noten zusammen",
+      "level": "low"
+     },
+     {
+      "claim": "unannotierte Sachverhalte verbessern Issue Spotting",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Problemliste je Versuch: gefunden / ausgelassen / Scheinproblem; Zeit bis zur Abgabe",
+   "independent_outcome": "verzögerter, unassistierter neuer Sachverhalt (anderes Lebensverhältnis, gleiche Normen), Problemliste blind durch Fachperson bewertet",
+   "failure_modes": [
+    "Lernende lernen Aufgabenmuster statt Normstruktur",
+    "Problemliste zu eng, vertretbare Lösungen werden bestraft",
+    "Überforderung von Novizen"
+   ],
+   "falsifier": "Wenn in einem randomisierten Vergleich (unannotiert vs. annotiert, gleiche Zeit) der verzögerte unassistierte Issue-Spotting-Test an neuen Fällen keinen Unterschied oberhalb einer vorab festgelegten Mindestdifferenz zeigt, entfällt die Zusatzhürde.",
+   "kb_rule_links": [
+    {
+     "rule_id": "TR-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "RP-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "R3-POL-02-NEW",
+     "relation": "new"
+    }
+   ],
+   "practice_boundary": {
+    "domain": "legal",
+    "statement": "Übungsfälle und generierte Lösungen sind Lernmaterial zu einem datierten Rechtsstand, keine Rechtsberatung und kein Nachweis berufspraktischer Kompetenz; für reale Sachverhalte wird auf qualifizierte Beratung verwiesen.",
+    "abstain_reason": "safety_or_professional_boundary"
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R3-POL-03",
+   "title": "Strukturierte Falllösung (Gutachten/Schema) über Lösungsbeispiele mit Ausblenden und schrittweise vollem Normbestand",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-03",
+   "applies_to_operations": [
+    "rule_based_contextual"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "erste Fälle eines Rechtsgebiets; Gutachtenstil oder vergleichbares Prüfungsschema"
+   },
+   "recommendation": "Neue Fallarten beginnen mit vollständig ausgearbeiteten Musterlösungen, deren Prüfungsschritte (Obersatz, Definition, Subsumtion, Ergebnis) sichtbar benannt sind. Danach werden Schritte ausgeblendet und selbst ergänzt; zuerst mit reduziertem Normbestand (nur einschlägige Normen), dann mit vollem Gesetz. Das Schema ist Gerüst, nicht Bewertungsziel: Bewertet wird die Tragfähigkeit der Subsumtion, nicht die Form.",
+   "product_affordances": {
+    "textbook": "Musterlösungen mit benannten Prüfungsschritten und Begründung je Schritt",
+    "workbook": "Fading-Reihe: vollständig, teilweise ausgeblendet, eigenständig; Normauszug, dann Volltext",
+    "interactive": "Schrittweises Aufdecken; Auswahl der einschlägigen Norm aus wachsendem Normbestand"
+   },
+   "tutor_affordance": "Tutor prüft je Schritt nur, ob ein Element fehlt (Obersatz, Definition, Subsumtion, Ergebnis); inhaltliche Bewertung bleibt FEEDBACK_UNVERIFIED",
+   "abstain_or_fallback": [
+    "Fortgeschrittene: Beispiele bleiben optional verfügbar statt automatisch übersprungen (nievelstein2013lawexamples: kein Expertise-Reversal gefunden)",
+    "kein Kompetenzbeleg aus Formvollständigkeit (Schema eingehalten ≠ Subsumtion tragfähig)",
+    "deutsche Gutachtenstil-Lerneffekte sind empirisch nicht belegt: keine Wirksamkeitsbehauptung"
+   ],
+   "parameters": [
+    {
+     "name": "fading_steps",
+     "value": 3,
+     "unit": "Stufen (vollständig, teilweise, eigenständig)",
+     "status": "provisional_product_parameter",
+     "rationale": "aus WE-R1 übernommen; für Recht nicht geprüft"
+    },
+    {
+     "name": "reduced_norm_set_until",
+     "value": 2,
+     "unit": "eigenständig gelöste Fälle",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; nievelstein2011lawsupport testete nur eine Lernphase"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "nievelstein2013lawexamples",
+     "locator": "Abstract (Lösungsbeispiele > Problemlösen für Novizen und Fortgeschrittene)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "nievelstein2011lawsupport",
+     "locator": "Results: Testfall M = 23.37 vs 12.74, F(1,75) = 15.46",
+     "relation": "supports"
+    },
+    {
+     "source_id": "kalyuga2007",
+     "locator": "KB-Quelle; R0-D6 (Expertise-Reversal in strukturierten Aufgaben)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "zubaer2026gradelegal",
+     "locator": "§1, §3.1 (Gutachtenstil nur als Bewertungsgegenstand untersucht)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "zwei kleine niederländische Experimente einer Gruppe, unmittelbare Tests",
+     "keine Studie zum deutschen Gutachtenstil als Lernmethode gefunden"
+    ],
+    "sub_claims": [
+     {
+      "claim": "reduzierter Normbestand in der Lernphase verbessert die spätere Falllösung mit vollem Gesetz (unmittelbar)",
+      "level": "low"
+     },
+     {
+      "claim": "Lösungsbeispiele bleiben in juristischer Falllösung länger nützlich als in Algebra",
+      "level": "low"
+     },
+     {
+      "claim": "Gutachtenstil-Training verbessert Klausurleistung",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Versuchslog je Fading-Stufe: Hilfe genutzt, Schritt ergänzt, Normauswahl richtig",
+   "independent_outcome": "verzögerter unassistierter Fall mit vollem Gesetz, blind bewertet nach Rubrik mit vertretbaren Alternativen",
+   "failure_modes": [
+    "Schema wird mechanisch ausgefüllt",
+    "Lernende bleiben am reduzierten Normbestand hängen",
+    "Musterlösung legt eine Lösungsroute als einzig richtige fest"
+   ],
+   "falsifier": "Wenn ein randomisierter Vergleich (Beispiel-Fading mit reduziertem Normbestand vs. gleich lange Fallübung mit vollem Gesetz) bei einem verzögerten neuen Fall keinen Vorteil zeigt, wird die Reihenfolge freigegeben.",
+   "kb_rule_links": [
+    {
+     "rule_id": "WE-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "WE-R2",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "SE-R1",
+     "relation": "retains"
+    }
+   ],
+   "practice_boundary": {
+    "domain": "legal",
+    "statement": "Übungsfälle und generierte Lösungen sind Lernmaterial zu einem datierten Rechtsstand, keine Rechtsberatung und kein Nachweis berufspraktischer Kompetenz; für reale Sachverhalte wird auf qualifizierte Beratung verwiesen.",
+    "abstain_reason": "safety_or_professional_boundary"
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R3-POL-04",
+   "title": "Kontrafaktische Sachverhaltsvariation und Fallvergleich",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-04",
+   "applies_to_operations": [
+    "rule_based_contextual",
+    "open_synthesis"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "intermediate",
+     "advanced"
+    ],
+    "phase": [
+     "consolidation"
+    ],
+    "conditions": "nach Lösung eines Grundfalls; Recht (Sachverhaltsänderung), Management/Ökonomie (Annahmenänderung)"
+   },
+   "recommendation": "Nach einem gelösten Fall werden Paare gebildet: derselbe Fall mit genau einer geänderten Tatsache bzw. Annahme. Die lernende Person sagt zuerst vorher, ob und warum sich das Ergebnis ändert, und benennt das entscheidende Merkmal; danach Vergleich zweier strukturgleicher Fälle mit Herausarbeiten des gemeinsamen Prinzips.",
+   "product_affordances": {
+    "workbook": "Variantenpaare mit 'ändert sich das Ergebnis? welches Merkmal?'",
+    "interactive": "Schieberegler/Toggle für eine Tatsache, Vorhersage vor Aufdecken",
+    "anki": "Diskriminationskarten: zwei Sachverhalte, welcher erfüllt das Merkmal",
+    "textbook": "Gegenüberstellungen strukturgleicher Fälle mit explizitem Prinzip"
+   },
+   "tutor_affordance": "Tutor erzeugt Varianten nur aus geprüften Fallbausteinen; generierte Varianten ohne geprüfte Lösung sind FEEDBACK_UNVERIFIED",
+   "abstain_or_fallback": [
+    "Variante ohne fachlich geprüfte Lösung: nicht bewerten",
+    "Novizen ohne Grundfall: erst R3-POL-03",
+    "Management: keine 'richtige' Entscheidung behaupten, wenn die Bewertung nur am später bekannten Ergebnis hängt (Rückschaufehler)"
+   ],
+   "parameters": [
+    {
+     "name": "facts_changed_per_variant",
+     "value": 1,
+     "unit": "Tatsache/Annahme",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung für eindeutige Zuordnung der Ergebnisänderung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "gentner2003analogicalencoding",
+     "locator": "Abstract (Fallvergleich > getrennte Fälle; Transfer in Live-Verhandlung)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "alfieri2013comparison",
+     "locator": "R1A-Register (Fallvergleich, Meta-Analyse)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pinkwart2009largo",
+     "locator": "Abstract (Hypotheticals-Diagramme: Studie 2 null)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Vergleichsevidenz aus Verhandlungs- und Laborstudien, nicht aus juristischer Falllösung",
+     "kontrafaktische Variation selbst nicht direkt geprüft"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Vergleich zweier Fälle fördert Schema-Abstraktion und Transfer",
+      "level": "moderate"
+     },
+     {
+      "claim": "Einzelmerkmal-Variation verbessert juristische Subsumtion",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Vorhersage je Variante (ändert sich / nicht), benanntes Merkmal, Korrektheit",
+   "independent_outcome": "verzögerter unassistierter neuer Fall mit veränderter Oberfläche und einem kritischen Merkmal, blind bewertet",
+   "failure_modes": [
+    "Lernende raten Muster der Variantengenerierung",
+    "Varianten ändern unbeabsichtigt mehrere Merkmale",
+    "Rückschaufehler bei Managementfällen"
+   ],
+   "falsifier": "Wenn Variantenpaare gegenüber gleich langer Übung mit unabhängigen neuen Fällen beim verzögerten Transfertest keinen Vorteil bringen, entfallen sie zugunsten einfacher Fallmenge.",
+   "kb_rule_links": [
+    {
+     "rule_id": "IL-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "TR-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "PR-R1",
+     "relation": "refines"
+    }
+   ],
+   "practice_boundary": {
+    "domain": "legal",
+    "statement": "Übungsfälle und generierte Lösungen sind Lernmaterial zu einem datierten Rechtsstand, keine Rechtsberatung und kein Nachweis berufspraktischer Kompetenz; für reale Sachverhalte wird auf qualifizierte Beratung verwiesen.",
+    "abstain_reason": "safety_or_professional_boundary"
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R3-POL-05",
+   "title": "Argumentrekonstruktion mit Karte, Einwand und Erwiderung; Karte ist Werkzeug, nicht Lernbeleg",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-05",
+   "applies_to_operations": [
+    "open_synthesis"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Philosophie, Argumentationslehre, juristische Argumentation, Essayfächer; echte (gekürzte) Texte statt künstlicher Kurzargumente"
+   },
+   "recommendation": "Lernende rekonstruieren Argumente aus Texten als Karte (Prämissen, implizite Prämissen, Schluss, Einwand, Erwiderung) mit zeitnaher Rückmeldung einer Fachperson oder an einer geprüften Referenzkarte. Jede Rekonstruktion enthält mindestens einen stärksten Einwand und eine Erwiderung sowie eine Prüfung der wohlwollenden Lesart ('würde die Autorin dieser Rekonstruktion zustimmen?'). Gemessen wird an unkartierten neuen Texten und Essays, nicht an Kartenqualität.",
+   "product_affordances": {
+    "workbook": "Rekonstruktionsaufgaben mit Feldern Prämisse/implizit/Schluss/Einwand/Erwiderung",
+    "interactive": "Karteneditor; Vergleich mit Referenzkarte nach eigenem Versuch",
+    "textbook": "Beispielrekonstruktionen mit begründeten impliziten Prämissen",
+    "anki": "nicht anwendbar für Rekonstruktion; nur Begriffe (gültig, schlüssig, Fehlschlusstypen) als Abrufkarten"
+   },
+   "tutor_affordance": "Tutor fragt nach fehlender Prämisse oder schwächstem Einwand (Hinweisstufen), bewertet Rekonstruktionen nur als FEEDBACK_UNVERIFIED",
+   "abstain_or_fallback": [
+    "keine Wirksamkeitsbehauptung für Karten als solche (Effekt nicht von intensiver Rückmeldung trennbar)",
+    "keine automatische Bewertung der Rekonstruktionsqualität als Kompetenz",
+    "interpretative Fairness: keine Evidenz gefunden, nur Designregel"
+   ],
+   "parameters": [
+    {
+     "name": "objections_per_reconstruction",
+     "value": 1,
+     "unit": "stärkster Einwand + Erwiderung",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; nussbaum2007counterargument zeigt Effekte von Kriterieninstruktion"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "cullen2018argumentvisualization",
+     "locator": "Results: LSAT d = 0.71 [0.37, 1.04]; Essays d = 0.87; Discussion: Konfundierung",
+     "relation": "supports"
+    },
+    {
+     "source_id": "dwyer2012argumentmapping",
+     "locator": "Abstract (HCTA-Gewinne vs. keine Instruktion)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "abrami2015ctmeta",
+     "locator": "Abstract (g+ = 0.30; Dialog, authentische Probleme, Mentoring)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "nussbaum2007counterargument",
+     "locator": "Abstract (Organizer: mehr Widerlegungen; Kriterien: bessere Integration)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "nesbit2025argumentmapping",
+     "locator": "Abstract (124 Studien, viele zu Einstellungen/Kartenqualität)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "pinkwart2009largo",
+     "locator": "Abstract (Studie 2: kein Unterschied)",
+     "relation": "contradicts"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Wirkung intensiver Argumentanalyse mit Rückmeldung konsistent, aber nicht randomisiert bzw. gegen keine Instruktion",
+     "kartenspezifischer Anteil nicht identifiziert; juristische Nullstudie"
+    ],
+    "sub_claims": [
+     {
+      "claim": "intensive Argumentanalyse mit Rückmeldung verbessert allgemeines analytisches Schließen",
+      "level": "low"
+     },
+     {
+      "claim": "Kartenformat selbst ist der Wirkfaktor",
+      "level": "very_low"
+     },
+     {
+      "claim": "Kriterieninstruktion verbessert Einwand-Erwiderung-Integration",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Rekonstruktion je Text: Prämissen vollständig, Einwand vorhanden, Erwiderung vorhanden; Abgleich mit Referenzkarte durch Fachperson",
+   "independent_outcome": "verzögerte Analyse eines neuen, nicht kartierten Textes und ein Essay mit Einwand/Erwiderung, blind von zwei Personen bewertet (Übereinstimmung berichtet)",
+   "failure_modes": [
+    "Kartenformalismus statt Verstehen",
+    "Referenzkarte erzwingt eine Lesart",
+    "Strohmann-Einwände"
+   ],
+   "falsifier": "Wenn ein randomisierter Vergleich gleich intensiver Argumentanalyse mit Karte vs. Prosa ohne Unterschied an neuen Texten endet, wird die Karte optional statt verpflichtend.",
+   "kb_rule_links": [
+    {
+     "rule_id": "SE-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "FB-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "R3-POL-05-NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R3-POL-06",
+   "title": "Logikübungen nur mit Anwendung auf natürlichsprachliche Argumente; kein Transferversprechen",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-06",
+   "applies_to_operations": [
+    "open_synthesis"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "formal_proof",
+     "reason": "Beweiskonstruktion und -validierung gehören zu R2 (R2-POL-02/03)"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Logik/Argumentationslehre in Philosophie, Recht, Ökonomie"
+   },
+   "recommendation": "Formale Logikübungen (Gültigkeit, Konditional, Fehlschlüsse) werden stets mit Übertragungsaufgaben auf alltagssprachliche und fachliche Argumente gekoppelt; Lernstand für 'Argumente bewerten' wird nur an solchen Aufgaben geführt, nicht an formalen Drills.",
+   "product_affordances": {
+    "workbook": "Paare: formale Aufgabe + gleiches Muster in Fachtext",
+    "anki": "Definitionen und Schlussformen als Abrufkarten (R1-POL-A01), ausdrücklich ohne Kompetenzaussage",
+    "interactive": "Konditional-Aufgaben mit Kontextwechsel"
+   },
+   "tutor_affordance": "Tutor weist bei formal richtigen, aber kontextfalschen Antworten auf die Lesart des Konditionals hin",
+   "abstain_or_fallback": [
+    "keine Aussage 'Logikkurs verbessert kritisches Denken' im Produkt",
+    "formale Beweiskonstruktion an R2 verweisen"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "attridge2013conditional",
+     "locator": "Introduction (Cheng et al. 1986: 40 h Training, kein Effekt); Results (Wandel zur 'defective'-Lesart)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "abrami2015ctmeta",
+     "locator": "Abstract (inhaltsspezifische und generische Strategien wirksam)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Transferbefunde aus Schulstichprobe und Sekundärbeschreibung",
+     "Richtung konsistent mit Transferliteratur, aber dünn"
+    ],
+    "sub_claims": [
+     {
+      "claim": "formales Logiktraining überträgt sich nur begrenzt auf kontextualisiertes Schließen",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "getrennte Versuchslogs für formale und kontextualisierte Aufgaben",
+   "independent_outcome": "verzögerte unassistierte Bewertung neuer Fachargumente (nicht formal notiert)",
+   "failure_modes": [
+    "Lernende lösen nur formale Muster",
+    "Kontextaufgaben zu leicht"
+   ],
+   "falsifier": "Wenn Lernende mit reinen formalen Drills bei verzögerten kontextualisierten Bewertungsaufgaben gleich gut abschneiden wie mit gekoppelten Aufgaben, ist die Kopplung unnötig.",
+   "kb_rule_links": [
+    {
+     "rule_id": "TR-R1",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R3-POL-07",
+   "title": "Entscheidungsfälle (Management, Ökonomie, Gründung): Alternativen, disconfirmierende Prüfung, Trennung messbar/nicht messbar",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-07",
+   "applies_to_operations": [
+    "open_synthesis"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "intermediate",
+     "advanced"
+    ],
+    "phase": [
+     "consolidation"
+    ],
+    "conditions": "Fallstudien mit Entscheidungsfrage; keine bekannte 'richtige' Antwort oder Antwort nur durch späteres Ergebnis bekannt"
+   },
+   "recommendation": "Fallaufgaben verlangen (1) mindestens drei echte Handlungsalternativen, (2) für die bevorzugte Hypothese einen Test, der sie widerlegen könnte, (3) Kriterien vor der Wahl, (4) eine kontrafaktische Frage 'Was müsste wahr sein, damit Alternative B besser ist?'. Bewertet werden nur prüfbare Prozessmerkmale (Alternativenzahl und -verschiedenheit, Konsistenz mit genannten Kriterien, Qualität der Widerlegungstests, Rechenkorrektheit) – nicht die 'Richtigkeit' der Entscheidung.",
+   "product_affordances": {
+    "workbook": "Entscheidungsvorlage mit Pflichtfeldern Alternativen/Kriterien/Widerlegungstest/Kontrafaktum",
+    "interactive": "unangekündigter Transferfall in späterer Sitzung",
+    "textbook": "Fallbeispiele mit offen gelegten Annahmen und Gegenargumenten"
+   },
+   "tutor_affordance": "Tutor fordert fehlende Alternativen oder Widerlegungstests ein; bewertet die Entscheidung selbst nie",
+   "abstain_or_fallback": [
+    "keine Musterentscheidung als 'richtig' ausgeben, wenn sie nur am Ausgang gemessen wird",
+    "Zufriedenheit und Diskussionsbeteiligung zählen nicht als Lernbeleg (thistlethwaite2012cbl)",
+    "quantitative Teilschritte an R2-Prüfer (R2-POL-14) übergeben"
+   ],
+   "parameters": [
+    {
+     "name": "min_alternatives",
+     "value": 3,
+     "unit": "Alternativen",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "sellier2019debiasing",
+     "locator": "Results: 48.0 % vs 72.7 % (6-Tage-Fenster), Abstract 19 % weniger bestätigende Wahl",
+     "relation": "supports"
+    },
+    {
+     "source_id": "gentner2003analogicalencoding",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "thistlethwaite2012cbl",
+     "locator": "Abstract, Conclusion (Lernwirkung uneinheitlich)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "dochy2003pbl",
+     "locator": "Abstract (Fertigkeiten +, Wissen nicht robust)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "eine Feldstudie (nicht randomisiert) und Laborevidenz; Fallmethode als Ganzes nicht belegt",
+     "keine kontrollierte Evidenz zur Business-Fallmethode gefunden"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Debiasing-Training überträgt sich auf unangekündigte Fallentscheidungen",
+      "level": "low"
+     },
+     {
+      "claim": "Fallmethode ist anderen Methoden überlegen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "ausgefüllte Entscheidungsvorlage; Anteil Fälle mit Widerlegungstest; Wahl der bestätigenden Option in Transferfällen",
+   "independent_outcome": "unangekündigter neuer Fall mit eingebauter Bestätigungsfalle, Wochen später, unassistiert",
+   "failure_modes": [
+    "Pflichtfelder werden formal gefüllt",
+    "Rückschaufehler in Musterlösungen",
+    "Bewertung belohnt Länge"
+   ],
+   "falsifier": "Wenn Lernende mit der Vorlage bei unangekündigten Bestätigungsfallen nicht seltener die bestätigende Option wählen als ohne Vorlage, ist die Vorlage nur Formalie.",
+   "kb_rule_links": [
+    {
+     "rule_id": "PR-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "R3-POL-07-NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R3-POL-08",
+   "title": "Klinische Ausbildungsfälle mit gezielter (deliberate) Reflexion und verzögerter Messung",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-08",
+   "applies_to_operations": [
+    "diagnostic_reasoning"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "intermediate",
+     "advanced"
+    ],
+    "phase": [
+     "consolidation"
+    ],
+    "conditions": "Medizin-/Gesundheitsausbildung mit schriftlichen oder virtuellen Fällen; Krankheitswissen der Fallgruppe vorhanden"
+   },
+   "recommendation": "Nach einer ersten Verdachtsdiagnose füllt die lernende Person eine Reflexionstabelle: für die Verdachtsdiagnose und zwei Alternativen jeweils stützende, widersprechende und erwartete, aber fehlende Befunde; danach Rangfolge. Bei Novizen wird die Reflexion auf relevante Differenzialdiagnosen gelenkt (cued) oder ein Reflexionsbeispiel studiert. Lernerfolg wird frühestens nach einer Woche an neuen Fällen derselben Erkrankungen gemessen; unmittelbare Leistung steuert nichts.",
+   "product_affordances": {
+    "workbook": "Reflexionstabelle je Fall; Musterreflexion als Lösungsbeispiel",
+    "interactive": "virtuelle Fälle mit Reflexionsschritt und verzögertem Testblock",
+    "anki": "Krankheitsskripte (prädisponierende Faktoren, Pathophysiologie, Befunde) als Abrufkarten, nicht als Diagnosekompetenz",
+    "textbook": "Illness-Script-Struktur je Erkrankung als Lernziel"
+   },
+   "tutor_affordance": "Tutor stellt Reflexionsfragen ('welcher Befund passt nicht?'), nennt keine Diagnose vor dem eigenen Versuch; Erklärungen sind FEEDBACK_UNVERIFIED, wenn nicht aus geprüfter Fallquelle",
+   "abstain_or_fallback": [
+    "keine Behauptung von Kompetenz am realen Patienten (R3-POL-10)",
+    "fehlendes Krankheitswissen: zuerst Wissensaufbau (R1-POL-A01), Reflexion ersetzt es nicht (mamede2019guidedreflection: kein Transfer auf Nachbarerkrankungen)",
+    "einfache Routinefälle: Reflexion optional (mamede2022deliberatereflection)",
+    "keine Behandlungsempfehlungen für reale Personen"
+   ],
+   "parameters": [
+    {
+     "name": "delayed_test_after",
+     "value": 7,
+     "unit": "Tage echte verstrichene Zeit",
+     "status": "provisional_product_parameter",
+     "rationale": "mamede2012reflection: Rangfolge kehrt sich zwischen sofort und 1 Woche um"
+    },
+    {
+     "name": "alternatives_in_reflection",
+     "value": 2,
+     "unit": "Alternativdiagnosen",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung nach dem Reflexionsprotokoll der Studien (Anzahl nicht verifiziert)"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "mamede2012reflection",
+     "locator": "Abstract: 1 Woche 0.66 vs 0.48/0.52; sofort 0.48 vs 0.62",
+     "relation": "supports"
+    },
+    {
+     "source_id": "mamede2019guidedreflection",
+     "locator": "Abstract: cued 0.58 vs free 0.41; Nachbarerkrankungen ohne Effekt",
+     "relation": "supports"
+    },
+    {
+     "source_id": "mamede2022deliberatereflection",
+     "locator": "Abschnitte komplexe vs. einfache Fälle; ungelöste Fragen",
+     "relation": "supports"
+    },
+    {
+     "source_id": "norman2014system1",
+     "locator": "Abstract: 44.5 % vs 45.0 % (generische Langsamkeitsinstruktion)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "wark2025clinicalreasoning",
+     "locator": "Meta-analyses of the RCTs; Limitations",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "schmidt2007illnessscripts",
+     "locator": "Abstract (Theorie Illness Scripts)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "mehrere randomisierte Experimente, aber überwiegend eine Forschungsgruppe, kleine Stichproben, schriftliche Fälle, Nahtransfer",
+     "Produktregel (Software-Reflexionstabelle) weicht vom Laborsetting ab"
+    ],
+    "sub_claims": [
+     {
+      "claim": "strukturierte Reflexion verbessert verzögerte Diagnosegenauigkeit an neuen Fällen gelernter Erkrankungen (schriftliche Fälle)",
+      "level": "moderate"
+     },
+     {
+      "claim": "Transfer auf nicht gelernte Erkrankungen",
+      "level": "very_low"
+     },
+     {
+      "claim": "Wirkung in realer Versorgung",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "ausgefüllte Reflexionstabelle; Diagnose und Rang je Fall; verzögerter Testblock",
+   "independent_outcome": "verzögerter (>= 1 Woche) unassistierter Test mit neuen schriftlichen/virtuellen Fällen gelernter und benachbarter Erkrankungen, blind bewertet; ausdrücklich keine Aussage über reale Patienten",
+   "failure_modes": [
+    "Tabelle wird schematisch ausgefüllt",
+    "Fallbank zu ähnlich (Wiedererkennen)",
+    "Lernende verwechseln Simulationserfolg mit Praxisreife"
+   ],
+   "falsifier": "Wenn eine vorab registrierte Randomisierung (Reflexionstabelle vs. gleich lange Fallübung mit sofortiger Diagnose) im verzögerten Test an neuen Fällen keinen Vorteil oberhalb der Mindestdifferenz zeigt, wird die Tabelle optional.",
+   "kb_rule_links": [
+    {
+     "rule_id": "SE-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "SP-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "R3-POL-08-NEW",
+     "relation": "new"
+    }
+   ],
+   "practice_boundary": {
+    "domain": "clinical",
+    "statement": "Virtuelle bzw. schriftliche Fälle und generierte Erklärungen dienen nur der Ausbildung; sie belegen keine Kompetenz am realen Patienten, sind keine Zertifizierung und enthalten keine Behandlungsempfehlung für reale Personen.",
+    "abstain_reason": "safety_or_professional_boundary"
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R3-POL-09",
+   "title": "Differenzialdiagnose mit Konfidenzangabe je Hypothese; Kalibrierungsrückmeldung statt generischer Debiasing-Checklisten",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-09",
+   "applies_to_operations": [
+    "diagnostic_reasoning",
+    "self_regulation"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "intermediate",
+     "advanced"
+    ],
+    "phase": [
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "Ausbildungsfälle mit gesicherter Referenzdiagnose; auch technische/juristische Diagnoseaufgaben mit eindeutiger Referenz"
+   },
+   "recommendation": "Bei ausgewählten Fällen gibt die lernende Person bis zu drei Hypothesen mit Konfidenz (0-100 %) und den nächsten Informationsschritt an. Nach mehreren Fällen zeigt das Produkt Kalibrierung (Konfidenz vs. Trefferquote, getrennt nach leichten und schweren Fällen). Generische Debiasing-Checklisten oder 'langsamer denken'-Instruktionen werden nicht als Lernmethode mit Wirkversprechen angeboten.",
+   "product_affordances": {
+    "interactive": "Konfidenzschieber je Hypothese; Kalibrierungsdiagramm nach N Fällen",
+    "workbook": "Kalibrierungsprotokoll zum Selbstausfüllen",
+    "textbook": "Erklärung Kalibrierung und Überkonfidenz mit Studienbefund"
+   },
+   "tutor_affordance": "Tutor kommentiert Kalibrierung nur aus Daten (Trefferquote), nicht aus Modellurteil; keine eigene Konfidenzangabe des Modells als Maßstab",
+   "abstain_or_fallback": [
+    "Konfidenz zählt nie als Kompetenzbeleg (R1-POL-A09)",
+    "keine Kalibrierungsanzeige bei weniger als der Mindestfallzahl",
+    "kein Wirkversprechen für generische Checklisten oder Forcing-Strategien (sherbino2014forcing, norman2014system1)",
+    "Checklisten nur als Arbeitshilfe gekennzeichnet (assistiert), nicht als Lernerfolg (staal2022reasoningtools)"
+   ],
+   "parameters": [
+    {
+     "name": "min_cases_for_calibration_display",
+     "value": 10,
+     "unit": "Fälle",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; kleinere Zahlen erzeugen zufällige Kalibrierungskurven"
+    },
+    {
+     "name": "confidence_sampling",
+     "value": "stichprobenartig",
+     "unit": "Anteil Fälle",
+     "status": "provisional_product_parameter",
+     "rationale": "R1-CR-5: keine Konfidenzabfrage nach jedem Item"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "meyer2013calibration",
+     "locator": "Abstract: 55.3 % vs 5.8 % richtig bei Konfidenz 7.2 vs 6.4",
+     "relation": "supports"
+    },
+    {
+     "source_id": "sherbino2014forcing",
+     "locator": "Abstract: CFS 54 % vs 48 % (p = .13); 45 % vs 45 %",
+     "relation": "supports"
+    },
+    {
+     "source_id": "staal2022reasoningtools",
+     "locator": "Results: g = 0.20 [0.10, 0.29], GRADE moderat (Werkzeug während Diagnose)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "ely2015checklists",
+     "locator": "Abstract: 11.2 % vs 17.8 % n.s.; mehr Diagnosen erwogen",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "dahl2024legalfictions",
+     "locator": "§5 Kalibrierung (Modellkonfidenz überschätzt)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Überkonfidenz deskriptiv gut belegt; Wirksamkeit von Kalibrierungsrückmeldung in klinischer Ausbildung nicht direkt geprüft",
+     "Nullbefunde für generisches Debiasing bei Novizen"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Konfidenz ist bei schweren Fällen kaum an Genauigkeit gekoppelt",
+      "level": "moderate"
+     },
+     {
+      "claim": "generisches Debiasing-Training senkt Diagnosefehler von Novizen nicht",
+      "level": "low"
+     },
+     {
+      "claim": "Kalibrierungsrückmeldung verbessert Kalibrierung",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Hypothesen, Konfidenzen, Referenzdiagnose, Kalibrierungsmaß (z. B. Brier-Score) je Lernende/r",
+   "independent_outcome": "verzögerte Kalibrierung und Genauigkeit an neuen Fällen ohne Hilfe, Vergleich vor/nach Rückmeldephase mit Kontrollgruppe",
+   "failure_modes": [
+    "Lernende geben strategisch mittlere Konfidenz",
+    "zu wenige Fälle",
+    "Referenzdiagnosen falsch"
+   ],
+   "falsifier": "Wenn Lernende mit Kalibrierungsrückmeldung in einer randomisierten Studie bei verzögerten neuen Fällen nicht besser kalibriert sind als ohne, entfällt die Anzeige als Lernfunktion.",
+   "kb_rule_links": [
+    {
+     "rule_id": "MC-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "ITS-R1",
+     "relation": "retains"
+    }
+   ],
+   "practice_boundary": {
+    "domain": "clinical",
+    "statement": "Virtuelle bzw. schriftliche Fälle und generierte Erklärungen dienen nur der Ausbildung; sie belegen keine Kompetenz am realen Patienten, sind keine Zertifizierung und enthalten keine Behandlungsempfehlung für reale Personen.",
+    "abstain_reason": "safety_or_professional_boundary"
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R3-POL-10",
+   "title": "Simulation ist keine Autorität für die Praxis: Kennzeichnung und harte Grenze für Klinik und Recht",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-10",
+   "applies_to_operations": [
+    "diagnostic_reasoning",
+    "rule_based_contextual"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "alle klinischen und rechtspraktischen Inhalte, virtuellen Patienten, Fallsimulationen und Tutorantworten"
+   },
+   "recommendation": "Ergebnisse aus virtuellen Patienten, schriftlichen Fällen und Rechtsfällen heißen im Produkt 'Fallleistung in der Simulation' und werden nie als Kompetenz am Patienten, Berufsreife, Zertifizierung oder Rechtsberatung bezeichnet. Fragen zu realen Patienten oder realen Rechtsfällen beantwortet der Tutor nicht inhaltlich (ABSTAIN mit Verweis auf Fachpersonen). Keine Behandlungs-, Dosierungs- oder Handlungsempfehlungen für reale Personen.",
+   "product_affordances": {
+    "textbook": "Hinweisbox zu Geltungsgrenzen je klinischem/rechtspraktischem Kapitel",
+    "workbook": "Fallkopf: 'synthetischer Ausbildungsfall, Rechtsstand/Leitlinienstand TT.MM.JJJJ'",
+    "interactive": "Statuslabel 'Simulation'; keine Abzeichen wie 'praxisreif'",
+    "anki": "keine Karten mit Therapieanweisungen ohne Quelle und Stand"
+   },
+   "tutor_affordance": "ABSTAIN(safety_or_professional_boundary) bei realen Patienten-/Mandatsfragen, Notfällen, Dosierungen; Hinweis auf Fachpersonen bzw. Notruf",
+   "abstain_or_fallback": [
+    "reale Fallfragen: Enthaltung und Verweis",
+    "Leitlinien-/Rechtsstand unbekannt: Inhalt zurückhalten (R3-POL-01)",
+    "keine Simulation als Ersatz für supervidierte Praxis"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "kononowicz2019virtualpatients",
+     "locator": "Results (Outcome fast nie an realen Patienten gemessen); Discussion ('ergänzen, nicht ersetzen')",
+     "relation": "supports"
+    },
+    {
+     "source_id": "mamede2022deliberatereflection",
+     "locator": "Ungelöste Fragen: Vignetten enthalten alle Befunde, Praxis nicht",
+     "relation": "supports"
+    },
+    {
+     "source_id": "staal2022reasoningtools",
+     "locator": "Discussion (Bedarf an Evaluation in der Praxis)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "goh2024llmdiagnosis",
+     "locator": "Results: Modellzugang verbesserte ärztliches Schließen nicht",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "normative",
+    "reasons": [
+     "Sicherheits- und Berufsrechtsgrenze; keine empirische Lernwirkung beansprucht"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Lernerfolge in virtuellen Patienten sind kaum an realen Patienten gemessen",
+      "level": "moderate"
+     }
+    ]
+   },
+   "observable": "Label je Ergebnis; Anzahl ABSTAIN(safety_or_professional_boundary); Audit verbotener Formulierungen",
+   "independent_outcome": "Audit durch Fachperson (Medizin/Recht): Stichprobe von Produktausgaben auf Kompetenz- oder Beratungsbehauptungen; Zielwert null",
+   "failure_modes": [
+    "Label wird übersehen",
+    "Tutor beantwortet reale Fälle trotzdem",
+    "Marketingtexte behaupten Praxisreife"
+   ],
+   "falsifier": "Wenn ein Audit Ausgaben findet, die Praxis- oder Beratungskompetenz nahelegen, ist die Kennzeichnung unzureichend und braucht eine technische Sperre statt Text.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AI-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "R3-POL-10-NEW",
+     "relation": "new"
+    }
+   ],
+   "practice_boundary": {
+    "domain": "legal_and_clinical",
+    "statement": "Übungsfälle und generierte Lösungen sind Lernmaterial zu einem datierten Rechtsstand, keine Rechtsberatung und kein Nachweis berufspraktischer Kompetenz; für reale Sachverhalte wird auf qualifizierte Beratung verwiesen. Virtuelle bzw. schriftliche Fälle und generierte Erklärungen dienen nur der Ausbildung; sie belegen keine Kompetenz am realen Patienten, sind keine Zertifizierung und enthalten keine Behandlungsempfehlung für reale Personen.",
+    "abstain_reason": "safety_or_professional_boundary"
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R3-POL-11",
+   "title": "Mehrdeutige, aber vertretbare Antworten: menschliche Prüfung, Rubrik mit Alternativrouten, LLM nur als FEEDBACK_UNVERIFIED",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-11",
+   "applies_to_operations": [
+    "rule_based_contextual",
+    "open_synthesis",
+    "diagnostic_reasoning"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "offene Antworten ohne deterministischen Prüfer: Gutachten, Essays, Argumentrekonstruktionen, Differenzialdiagnose-Begründungen, Entscheidungsfälle"
+   },
+   "recommendation": "Jede offene Aufgabe hat eine Rubrik mit klaren Kriterien, die vertretbare Alternativlösungen ausdrücklich nennt ('a. A. vertretbar, wenn ...'), plus 2-3 bewertete Beispielantworten. Kompetenzbelege entstehen nur durch menschliche Bewertung (Lehrende, geschulte Peers mit Comparative Judgement oder Doppelbewertung einer Stichprobe mit berichteter Übereinstimmung). LLM-Bewertungen erscheinen nur als FEEDBACK_UNVERIFIED (source=agent_judgement) mit Hinweis 'nicht geprüft', ändern nie den Lernstand und dienen höchstens als Abweichungsflag für menschliche Zweitprüfung. Antworten, die von der Rubrik abweichen, aber begründet sind, werden als 'Prüfung nötig' statt 'falsch' markiert. Keine Aggregatbewertung nach Expertenmehrheit ohne Reliabilitätsprüfung.",
+   "product_affordances": {
+    "workbook": "Rubrik mit Alternativrouten und Beispielantworten; Selbstbewertung als Übung, nicht als Beleg",
+    "interactive": "Statusanzeige: 'menschlich bewertet' / 'Modell-Feedback, nicht geprüft' / 'Prüfung nötig'",
+    "textbook": "Bewertungsmaßstäbe offenlegen, inkl. Grenzen der Bewertbarkeit"
+   },
+   "tutor_affordance": "Tutor-Ausgabe nur als FEEDBACK_UNVERIFIED oder ERROR_HYPOTHESIS (R5-POL-06/09); keine Note, keine Punktzahl als Kompetenzaussage",
+   "abstain_or_fallback": [
+    "keine menschliche Prüfung verfügbar: Aufgabe zählt als Übung ohne Kompetenzbeleg",
+    "Rubrik ohne Alternativrouten: Aufgabe nicht für Lernstand verwenden",
+    "Modellbewertung bei hohen Einsätzen (Noten, Zulassung): nie allein",
+    "Modellkonfidenz nicht als Entscheidungssignal (dahl2024legalfictions)"
+   ],
+   "parameters": [
+    {
+     "name": "double_marking_sample",
+     "value": 0.2,
+     "unit": "Anteil menschlich doppelt bewerteter Antworten",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung für Übereinstimmungsschätzung; Kosten prüfen"
+    },
+    {
+     "name": "cj_comparisons_per_script",
+     "value": 12,
+     "unit": "Vergleiche je Antwort für SSR ca. .70",
+     "status": "provisional_product_parameter",
+     "rationale": "verhavert2019cj: 10-14 Vergleiche für .70"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "zubaer2026gradelegal",
+     "locator": "§4.1/Table 4: QWK 0.911 öffentliches Recht vs 0.599 Strafrecht; §6 Grenzen",
+     "relation": "supports"
+    },
+    {
+     "source_id": "cope2026gradingmachines",
+     "locator": "Abstract: r bis 0.93 nur mit detaillierter Rubrik",
+     "relation": "supports"
+    },
+    {
+     "source_id": "goh2024llmdiagnosis",
+     "locator": "Assessment Tool Validation: kappa 0.66, alpha 0.64",
+     "relation": "supports"
+    },
+    {
+     "source_id": "lineberry2013sct",
+     "locator": "Abstract: Aggregatbewertung belohnt Antwortstil",
+     "relation": "supports"
+    },
+    {
+     "source_id": "brookhart2015rubrics",
+     "locator": "Abstract: Qualität bei klaren, fokussierten Kriterien",
+     "relation": "supports"
+    },
+    {
+     "source_id": "verhavert2019cj",
+     "locator": "Abstract: Vergleichszahl und Reliabilität",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pinkwart2009largo",
+     "locator": "Abstract: Richtigkeit nicht formal prüfbar, Expertendissens",
+     "relation": "supports"
+    },
+    {
+     "source_id": "dahl2024legalfictions",
+     "locator": "§5 Kalibrierung",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "normative",
+    "reasons": [
+     "Validitätsgrenze für Kompetenzaussagen; keine Lernwirkung beansprucht",
+     "LLM-Übereinstimmung stark aufgaben-, rubrik- und domänenabhängig"
+    ],
+    "sub_claims": [
+     {
+      "claim": "LLM-Noten korrelieren mit menschlichen Noten bei detaillierter Rubrik hoch, aber domänenabhängig",
+      "level": "low"
+     },
+     {
+      "claim": "menschliche Bewertung offener Schlussfolgerungen erreicht nur mäßige Übereinstimmung",
+      "level": "low"
+     },
+     {
+      "claim": "Aggregatbewertung nach Expertenpanel kann Antwortstile belohnen",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Bewertungsquelle je Versuch (human / agent_judgement / none), Übereinstimmung der Doppelbewertungen, Anteil 'Prüfung nötig'",
+   "independent_outcome": "Reliabilitäts- und Validitätsstudie: Übereinstimmung zweier unabhängiger Fachpersonen und Korrelation mit verzögerter unassistierter Leistung an neuen Fällen",
+   "failure_modes": [
+    "Rubrik erstarrt zu einer Lösungsroute",
+    "Prüfkosten führen zu stiller LLM-Nutzung",
+    "Lernende halten Modellfeedback für Bewertung"
+   ],
+   "falsifier": "Wenn eine Validierungsstudie zeigt, dass ein bestimmtes Modell mit Rubrik für einen bestimmten Aufgabentyp die Übereinstimmung zweier Fachpersonen erreicht UND keine systematische Verzerrung gegen vertretbare Alternativen hat, darf es für diesen Typ als zweiter Bewerter neben einem Menschen dienen; ohne solchen Nachweis bleibt es FEEDBACK_UNVERIFIED.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AI-R2",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "SE-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "AS-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "R3-POL-11-NEW",
+     "relation": "new"
+    }
+   ],
+   "practice_boundary": {
+    "domain": "legal_and_clinical",
+    "statement": "Übungsfälle und generierte Lösungen sind Lernmaterial zu einem datierten Rechtsstand, keine Rechtsberatung und kein Nachweis berufspraktischer Kompetenz; für reale Sachverhalte wird auf qualifizierte Beratung verwiesen. Virtuelle bzw. schriftliche Fälle und generierte Erklärungen dienen nur der Ausbildung; sie belegen keine Kompetenz am realen Patienten, sind keine Zertifizierung und enthalten keine Behandlungsempfehlung für reale Personen.",
+    "abstain_reason": "safety_or_professional_boundary"
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R3-POL-12",
+   "title": "Fall- und problembasierte Module mit Wissens- und Anwendungsprüfung; Zufriedenheit und assistierte Leistung sind kein Beleg",
+   "source_section": "R3_ARGUMENT_CASE_DIAGNOSIS.md §8 R3-POL-12",
+   "applies_to_operations": [
+    "rule_based_contextual",
+    "diagnostic_reasoning",
+    "open_synthesis"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Module, die überwiegend über Fälle unterrichten (Recht, Medizin, Management)"
+   },
+   "recommendation": "Fallbasierte Module werden mit getrennten Abrufprüfungen des Regel-/Krankheits-/Konzeptwissens kombiniert (R1-POL-A01), weil Fallarbeit Anwendung fördern, aber Wissensaufbau verlangsamen kann. Fortschritt wird getrennt für Wissen und Anwendung angezeigt. Mit KI-Hilfe erstellte Falllösungen werden als assistiert geführt und zählen nicht.",
+   "product_affordances": {
+    "anki": "Regel- und Begriffswissen aus den Fällen als Abrufkarten",
+    "workbook": "Fallaufgaben plus kurze Wissensprüfungen je Modul",
+    "interactive": "getrennte Anzeige 'Wissen' / 'Anwendung (unassistiert)'"
+   },
+   "tutor_affordance": "Tutorhilfe setzt den Versuch auf assistiert (R5-POL-04)",
+   "abstain_or_fallback": [
+    "Fallmodul ohne Wissensprüfung: Fortschritt nur als 'Anwendung, Wissen nicht geprüft'",
+    "keine Wirksamkeitsbehauptung der Fallmethode gegenüber anderen Methoden"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "dochy2003pbl",
+     "locator": "Abstract (Fertigkeiten robust +, Wissen nicht robust)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "thistlethwaite2012cbl",
+     "locator": "Abstract (Lernwirkung uneinheitlich; Zufriedenheit hoch)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "choi2024lawyeringai",
+     "locator": "Abstract (GPT-4: kaum bessere Qualität, viel schneller)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "goh2024llmdiagnosis",
+     "locator": "Results primary outcome (2 pp [-4, 8])",
+     "relation": "supports"
+    },
+    {
+     "source_id": "wark2025clinicalreasoning",
+     "locator": "Results (überwiegend positive Sofortbefunde, Publikationsbias-Sorge)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "alte, überwiegend medizinische Meta-Analyse; narrative Reviews; assistierte Leistung statt Lernen gemessen"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Fallarbeit fördert Anwendung, Wissenseffekt unsicher",
+      "level": "low"
+     },
+     {
+      "claim": "assistierte Falllösung belegt keine eigene Kompetenz",
+      "level": "moderate"
+     }
+    ]
+   },
+   "observable": "getrennte Logs für Wissensabruf und Fallanwendung; Hilfestatus",
+   "independent_outcome": "verzögerte unassistierte Wissens- und Fallprüfung an neuen Items, getrennt berichtet",
+   "failure_modes": [
+    "doppelte Prüfung erhöht Zeitlast",
+    "Wissenskarten verlieren Fallbezug"
+   ],
+   "falsifier": "Wenn Lernende in Fallmodulen ohne Wissensprüfung bei verzögerten Wissenstests gleich gut abschneiden, ist die Zusatzprüfung verzichtbar.",
+   "kb_rule_links": [
+    {
+     "rule_id": "RP-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "MC-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "ITS-R1",
+     "relation": "retains"
+    }
+   ],
+   "practice_boundary": {
+    "domain": "legal_and_clinical",
+    "statement": "Übungsfälle und generierte Lösungen sind Lernmaterial zu einem datierten Rechtsstand, keine Rechtsberatung und kein Nachweis berufspraktischer Kompetenz; für reale Sachverhalte wird auf qualifizierte Beratung verwiesen. Virtuelle bzw. schriftliche Fälle und generierte Erklärungen dienen nur der Ausbildung; sie belegen keine Kompetenz am realen Patienten, sind keine Zertifizierung und enthalten keine Behandlungsempfehlung für reale Personen.",
+    "abstain_reason": "safety_or_professional_boundary"
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  }
+ ]
+}
