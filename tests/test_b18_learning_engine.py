@@ -246,7 +246,7 @@ class Security(unittest.TestCase):
             with contextlib.redirect_stdout(buf):
                 self.assertEqual(runtime.main(['lernstrecken', td]), 0)
             self.assertEqual(json.loads(buf.getvalue())['model_calls'], 0)
-            self.assertEqual(len(list((Path(td) / 'lernstrecken').glob('*.html'))), 3)
+            self.assertEqual(len(list((Path(td) / 'lernstrecken').glob('*.html'))), len(TRACKS))
 
 
 class Browser(unittest.TestCase):

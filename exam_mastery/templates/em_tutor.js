@@ -424,7 +424,31 @@ viz.quad = (host, tr, task, focus) => {
     ? 'Gleich lang: U und V liegen auf dem Kreis über PQ. Nach dem Satz des Thales ist der Winkel bei U (und bei jeder Ecke) ein rechter – deshalb Rechteck.'
     : 'Verschieden lang: U und V liegen nicht auf dem Kreis über PQ, der Winkel bei U ist kein rechter. Gleicher Mittelpunkt allein ergibt nur ein Parallelogramm – die gleiche Länge ist die Voraussetzung, die den rechten Winkel erzwingt.')));
 };
-const vizFor = tr => tr.domain === 'machine_learning' ? viz.network : tr.domain === 'business_economics' ? viz.cash : viz.quad;
+viz.attention = (host, tr, task, focus) => {
+  /* only given numbers and, after a diagnosis, the weights that the recognised misconception produces; never the answer */
+  const A = task.attention;
+  if (!A) { host.appendChild(el('p', { class: 'wb-cap-p' }, 'Diese Aufgabe arbeitet mit Symbolen: α_j sind die Gewichte einer Softmax-Zeile, g_j = ∂L/∂α_j die Gradienten von oben.')); return; }
+  const CAP = { unscaled: 'So sähen die Gewichte ohne Division durch √dₖ aus – die Zeile ist spitzer als bei Scaled Dot-Product Attention.',
+    by_dk: 'So sähen die Gewichte bei Division durch dₖ aus – die Zeile ist flacher als bei Division durch √dₖ.',
+    unchanged: 'Diese Gewichte gehören zu den ursprünglichen Logits. Unverändert bleiben sie nur bei einer gemeinsamen Verschiebung.',
+    unmasked: 'So sähen die Gewichte aus, wenn der maskierte Key mitzählt: Er erhält Gewicht und sein Value trägt bei.',
+    after_softmax: 'So sähen die Gewichte aus, wenn man erst normiert und dann den maskierten Eintrag auf null setzt.' };
+  const key = ((focus && focus.show) || []).find(k => A.variants && A.variants[k]), w = key ? A.variants[key] : null;
+  const n = A.given.length, W = 400, rowH = 36, top = 34, H = top + n * rowH + 8, x0 = 150, bw = 190;   /* narrow viewBox: legible at phone width */
+  const s = sv('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', class: 'wb-att', 'aria-label': `${n} Keys mit ${A.label}` + (w ? '; Balken: Gewichte der erkannten Rechnung' : '') });
+  s.appendChild(sv('text', { x: 8, y: 20, class: 'wb-lane' }, 'Key')); s.appendChild(sv('text', { x: 46, y: 20, class: 'wb-lane' }, A.label));
+  if (w) s.appendChild(sv('text', { x: x0, y: 20, class: 'wb-lane' }, 'Gewicht dieser Rechnung'));
+  A.given.forEach((g, j) => {
+    const y = top + j * rowH, m = A.masked[j];
+    s.appendChild(sv('text', { x: 8, y: y + 22, class: 'wb-lane' }, 'k' + (j + 1)));
+    s.appendChild(sv('text', { x: 46, y: y + 22, class: 'wb-lane-n' }, fmt(g, Number.isInteger(g) ? 0 : 2) + (m ? '  maskiert' : '')));
+    s.appendChild(sv('rect', { x: x0, y: y + 6, width: bw, height: 22, class: m ? 'wb-att-mask' : 'wb-att-track' }));
+    if (w) { s.appendChild(sv('rect', { x: x0, y: y + 6, width: Math.max(0, Math.min(1, w[j])) * bw, height: 22, class: 'wb-bar pos' })); s.appendChild(sv('text', { x: x0 + bw + 6, y: y + 22, class: 'wb-tick' }, fmt(w[j], 4))); }
+  });
+  host.appendChild(s);
+  if (w) host.appendChild(el('p', { class: 'wb-cap-p' }, CAP[key] + ' Summe dieser Gewichte: ' + fmt(w.reduce((a, b) => a + b, 0), 4) + '.'));
+};
+const vizFor = tr => tr.viz === 'attention' ? viz.attention : tr.domain === 'machine_learning' ? viz.network : tr.domain === 'business_economics' ? viz.cash : viz.quad;
 
 /* ------------------------------------------------------------ workbench */
 function boot() {

@@ -37,6 +37,21 @@ CARDS = [
      'tags': ['lernstrecke::rechteck', 'fehler::missing_premise_equal_diagonals', 'fehler::diagonal_bisection_overclaimed']},
     {'key': 'rectangle/fourth-corner', 'kind': 'math', 'front': 'Sehne PQ hat den Mittelpunkt M = (0; 2), U = (1; 4). Wo liegt V, damit UV denselben Mittelpunkt hat?',
      'answer': 'V = 2M − U = (−1; 0).', 'tags': ['lernstrecke::rechteck', 'fehler::reflection_error']},
+    {'key': 'attention/scale-sqrt-dk', 'kind': 'condition', 'front': 'Warum teilt Scaled Dot-Product Attention die Scores durch √d_k und nicht durch d_k?',
+     'answer': 'Unter Unabhängigkeit und Einheitsvarianz hat q·k die Varianz d_k, also Standardabweichung √d_k; Division durch √d_k ergibt Varianz eins.',
+     'pitfall': 'Division durch d_k drückt die Varianz auf 1/d_k: Die Gewichte werden zu flach.', 'source': 'Vaswani et al. (2017), §3.2.1, Fußnote 4',
+     'tags': ['lernstrecke::attention', 'fehler::scaled_by_dk', 'fehler::missing_scaling']},
+    {'key': 'attention/shift-vs-scale', 'kind': 'compare', 'front': 'Welche Änderung aller Logits einer Zeile lässt die Softmax-Gewichte unverändert: z + c oder λ·z?',
+     'answer': 'Nur z + c: e^c kürzt sich. λ·z multipliziert alle Abstände und macht die Zeile für λ > 1 spitzer, für λ < 1 flacher.',
+     'tags': ['lernstrecke::attention', 'fehler::scale_treated_as_shift', 'fehler::missing_scaling']},
+    {'key': 'attention/softmax-axis', 'kind': 'condition', 'front': 'Über welche Achse von QKᵀ normiert Softmax in Attention?',
+     'answer': 'Über jede Query-Zeile, also über die Keys; jede Zeile von A summiert sich zu eins.', 'tags': ['lernstrecke::attention', 'fehler::wrong_axis']},
+    {'key': 'attention/mask-before-softmax', 'kind': 'misconception', 'front': 'Warum muss eine Padding-Maske vor Softmax wirken und nicht danach?',
+     'answer': 'Nach Softmax auf null gesetzte Gewichte summieren sich nicht mehr zu eins; vor Softmax (Logit −∞) fällt der Key aus Zähler und Nenner.',
+     'tags': ['lernstrecke::attention', 'fehler::mask_after_softmax', 'fehler::mask_ignored']},
+    {'key': 'attention/softmax-gradient', 'kind': 'math', 'front': 'Wie lautet ∂L/∂z_ℓ für α = softmax(z) bei Gradienten g = ∂L/∂α?',
+     'answer': 'α_ℓ·(g_ℓ − Σ_j α_j g_j), in Matrixform (diag(α) − ααᵀ)g.', 'pitfall': 'Nur α_ℓ g_ℓ: Der gemeinsame Nenner koppelt alle Einträge.',
+     'tags': ['lernstrecke::attention', 'fehler::normaliser_ignored', 'fehler::diagonal_only', 'fehler::offdiag_zero', 'fehler::jacobian_sign']},
 ]
 
 
