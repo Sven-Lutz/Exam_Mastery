@@ -407,7 +407,12 @@ def validate_state(obj):
     if practice is not None:
         if not isinstance(practice, dict) or practice.get("schema") != 1 or not isinstance(practice.get("units"), dict):
             raise MasteryError("em-practice-v1: invalid")
-        for key, rec in list(practice["units"].items()) + list((practice.get("archived") or {}).items()):
+        archived = practice.get("archived", {})
+        if archived is None:
+            archived = {}
+        if not isinstance(archived, dict):
+            raise MasteryError("em-practice-v1: invalid archive")
+        for key, rec in list(practice["units"].items()) + list(archived.items()):
             if not isinstance(rec, dict):
                 raise MasteryError("em-practice-v1: invalid unit record")
             _check_events(rec.get("events", []), "em-practice-v1/" + key)

@@ -12,6 +12,10 @@ folder, outside the repository and the library; source folders are only read. Op
 from __future__ import annotations
 
 import json
+import os
+import shutil
+import stat
+from contextlib import ExitStack, contextmanager
 import mimetypes
 import re
 import threading
@@ -37,6 +41,25 @@ TYPES = {".html": "text/html; charset=utf-8", ".json": "application/json; charse
          ".apkg": "application/octet-stream"}
 
 
+@contextmanager
+def _open_product(root, relative):
+    """Pin each directory while opening its child and refuse links throughout."""
+    components = relative.parts
+    directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    with ExitStack() as stack:
+        directory = os.open(root, directory_flags)
+        stack.callback(os.close, directory)
+        for component in components[:-1]:
+            directory = os.open(component, directory_flags, dir_fd=directory)
+            stack.callback(os.close, directory)
+        fd = os.open(components[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory)
+        stream = stack.enter_context(os.fdopen(fd, "rb"))
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode):
+            raise FileNotFoundError
+        yield stream, info.st_size
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "Mastery/1"
     sys_version = ""
@@ -54,9 +77,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def _send(self, code, body, ctype="application/json; charset=utf-8", extra=None):
         data = body if isinstance(body, bytes) else json.dumps(body, ensure_ascii=False).encode()
+        self._headers(code, len(data), ctype, extra)
+        if self.command != "HEAD":
+            self.wfile.write(data)
+
+    def _headers(self, code, length, ctype, extra):
         self.send_response(code)
         self.send_header("Content-Type", ctype)
-        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Content-Length", str(length))
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
@@ -64,8 +92,6 @@ class Handler(BaseHTTPRequestHandler):
         for k, v in (extra or {}).items():
             self.send_header(k, v)
         self.end_headers()
-        if self.command != "HEAD":
-            self.wfile.write(data)
 
     def do_HEAD(self):
         self.do_GET()
@@ -89,16 +115,21 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(200, {"courses": C.list_courses(self.server.root), "import_enabled": True})
             except MasteryError as exc:
                 return self._send(404, {"error": str(exc)[:300]})
-        if not ALLOWED.match(path) or ".." in path:
+        if not ALLOWED.fullmatch(path) or ".." in path:
             return self._send(404, {"error": "not found"})
-        target = self.server.root / path.lstrip("/")
-        if target.is_symlink() or not target.is_file():
-            return self._send(404, {"error": "not found"})
+        target = Path(path.lstrip("/"))
         extra = {}
         if target.suffix == ".apkg":
             extra["Content-Disposition"] = 'attachment; filename="Anki.apkg"'
         ctype = TYPES.get(target.suffix) or mimetypes.guess_type(target.name)[0] or "application/octet-stream"
-        return self._send(200, target.read_bytes(), ctype, extra)
+        with ExitStack() as stack:
+            try:
+                stream, length = stack.enter_context(_open_product(self.server.root, target))
+            except OSError:
+                return self._send(404, {"error": "not found"})
+            self._headers(200, length, ctype, extra)
+            if self.command != "HEAD":
+                shutil.copyfileobj(stream, self.wfile)
 
     def do_POST(self):
         if not self._host_ok():
