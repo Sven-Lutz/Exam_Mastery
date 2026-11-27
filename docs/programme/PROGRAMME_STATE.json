@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T21:07:51+01:00",
+ "updated": "2026-11-27T21:25:31+01:00",
  "updated_by": "LEAD (interactive, issue #49 execution)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -352,35 +352,59 @@
    "id": "V1CONTENT",
    "kind": "background subagent of LEAD",
    "scope": "V1 attention content + deterministic track",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/V1CONTENT.json",
    "worktree": "Exam_Mastery-v1content"
   }
  ],
  "work_packages": [
   {
+   "id": "WP-V1-NEXT",
+   "title": "Next V1 product improvements (after owner feedback or autonomously)",
+   "status": "PLANNED",
+   "priority": 1.0,
+   "autostart": false,
+   "next_step": "Priority by learning-quality bottleneck: (1) fix issues from owner hands-on; (2) Arbeitsbuch difficulty stages + explorable interactions for backward pass/multi-head; (3) human subject review path for attention content (OD-23); (4) second contrasting university topic (e.g. a proof-heavy maths topic with construction evidence, CD-11); (5) languages track design. Owner-private real course units only via bin/mastery build --unit outside the repo."
+  },
+  {
    "id": "WP-V1-ACCEPT",
    "title": "Owner hands-on acceptance of the local V1 release candidate",
-   "status": "PLANNED",
+   "status": "HUMAN_DECISION_REQUIRED",
    "priority": 0.9,
    "autostart": false,
-   "depends_on": [
-    "WP-V1-CONTENT"
-   ],
+   "depends_on": [],
    "headless_ok": false,
-   "next_step": "Owner runs bin/mastery start and the checklist in docs/MASTERY_V1.md; quality judged against textbook + LLM + Anki baseline."
+   "next_step": "Owner: start Mastery V1 (integration worktree: bin/mastery; library already built in ~/Mastery) and run the 10-step checklist in docs/MASTERY_V1.md; report what blocks daily use.",
+   "updated": "2026-11-27T21:25:31+01:00",
+   "blockers": [
+    "owner hands-on acceptance"
+   ]
   },
   {
    "id": "WP-V1-CONTENT",
    "title": "Deepen the V1 AI unit to university excellence (attention): derivations/proofs, worked + original unassisted problems with full solutions, deterministic attention practice track, Anki retrieval cards",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 0.8,
    "autostart": false,
    "depends_on": [],
-   "next_step": "Specialist V1CONTENT: content audit vs textbook+LLM baseline, deepened attention unit (same unit_id), deterministic ai/attention-track, tests; lead merges into integration.",
+   "next_step": "none (merged into integration)",
    "branch": "feat/mastery-v1-attention-content-20261127",
    "base": "integration/mastery-v1-20261127",
-   "worktree": "Exam_Mastery-v1content"
+   "worktree": "Exam_Mastery-v1content",
+   "updated": "2026-11-27T21:25:31+01:00",
+   "done": [
+    "audit: top gaps were backward pass, multi-head/cost, masking numerics, equivariance proof, find-the-error tasks/misconception checks",
+    "8bd0430..130b3b8: six new sections (variance limits incl. covariance form; full backward pass with finite-difference check; causal+padding masks with IEEE behaviour; equivariance proof + causal counterexample; multi-head bookkeeping 4*d_model^2; cost n^2 d vs n d^2, crossover n=2d); 8 new problems with full solutions incl. 3 find-the-error; 4 misconceptions with computed wrong values; 16 new cards; 11 sympy formula records; same unit_id, original ids/cards unchanged, status stays HUMAN_REVIEW_PENDING",
+    "ai/attention-track: 10 tasks, 14 error categories, all values computed in tracks.py, Python/JS parity; real Anki reimport keeps the 16 original note ids/GUIDs",
+    "lead: re-derived Var(q^T k|q)=sigma^2||q||^2, crossover n=2d, fp16 overflow of -1e9, all-masked row NaN, 4*d_model^2 params; merged --no-ff into integration; track added to library.json; final frozen suite on 88e9cbf: pytest list 238 passed, unittest discover 906 OK (skipped=13)"
+   ],
+   "open": [
+    "human subject review of the new content",
+    "newly cited Vaswani §3.2.2, §3.5, §4 Table 1 not re-read against the PDF",
+    "no multi-head/backprop interaction in the explorable lab",
+    "Arbeitsbuch has a single difficulty stage",
+    "track step labels overlap on desktop (cosmetic)"
+   ]
   },
   {
    "id": "WP-V1-APP",
@@ -1011,6 +1035,18 @@
      "utilization": 0.84,
      "resets": "2026-11-29T07:00+01:00"
     }
+   },
+   {
+    "at": "2026-11-27T21:25",
+    "five_hour": {
+     "utilization": 0.59,
+     "resets": "2026-11-27T23:20:00+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.85,
+     "resets": "2026-11-29T07:00:00+01:00"
+    },
+    "note": "after V1APP + V1CONTENT"
    }
   ],
   "supervisor_ceilings": {
@@ -1021,7 +1057,7 @@
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents.",
   "lead_pacing": "Issue #49: continue within account limits. Lead stops spawning new specialists at seven_day >= 0.92 and leaves remaining packages to the supervisor after the 2026-11-29 07:00 reset (supervisor ceiling 0.85 leaves room for the owner)."
  },
- "next_milestone": "Mastery V1 local release candidate (WP-V1-APP), then content deepening (WP-V1-CONTENT) and owner hands-on acceptance.",
+ "next_milestone": "Owner hands-on acceptance of the Mastery V1 release candidate (WP-V1-ACCEPT); then WP-V1-NEXT.",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
@@ -1045,7 +1081,8 @@
   "naming_risk": "'Mastery' collides with existing education/AI apps (signal only); trademark/category/territory research before any public commercial naming, final name to owner"
  },
  "owner_attention": [
-  "exam_mastery/learning/anki_bridge.py (draft stack) cites a lecture file name and page ('07 Business Planning & Effectuation.pdf S. 21') in a public branch: owner to decide whether to neutralise (R8 side note, confirmed by lead)."
+  "exam_mastery/learning/anki_bridge.py (draft stack) cites a lecture file name and page ('07 Business Planning & Effectuation.pdf S. 21') in a public branch: owner to decide whether to neutralise (R8 side note, confirmed by lead).",
+  "Commit 04fd926 on integration/mastery-v1-20261127 (pushed) contains a home-relative local path in docs/MASTERY_V1.md; removed in 42b75a0. History not rewritten (owner decision required)."
  ],
  "owner_delegated_defaults": {
   "source": "issue #49",
