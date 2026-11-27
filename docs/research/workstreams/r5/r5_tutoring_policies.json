@@ -1,0 +1,762 @@
+{
+ "schema": "em-learning-policies/1",
+ "version": "0.1.0",
+ "status": "DESIGN_HYPOTHESIS_SET",
+ "date": "2026-11-27",
+ "baseline": {
+  "branch": "research/r5-tutoring-measurement-20261127",
+  "builds_on": "R1 (bec1f62/3559872): Policy-Schema und Messvertrag",
+  "kb": "exam_mastery/knowledge/{sources,principles}.json"
+ },
+ "authorship": {
+  "R5": "Spezialist (r5/r5_evidence.json)",
+  "lead": "Report und Policies aus dem Register (headless Fortsetzung, gleiches Modell)",
+  "independent_review": "pending: keine menschliche Fachprüfung"
+ },
+ "operations": [
+  "recall_discrimination",
+  "symbolic_procedure",
+  "formal_proof",
+  "rule_based_contextual",
+  "diagnostic_reasoning",
+  "empirical_experimental",
+  "computational_construction",
+  "spatial_design",
+  "embodied_psychomotor",
+  "open_synthesis",
+  "self_regulation"
+ ],
+ "certainty_scale": "wie r1/r1_learning_policies.json",
+ "shared_measurement_contract": "übernommen aus r1/r1_learning_policies.json; R5-POL-04/05 präzisieren Hilfestatus, Quelle und Studiendesign",
+ "operation_notes": {
+  "embodied_psychomotor": "nur Messvertrag (R5-POL-05/07); Instrumente R4",
+  "spatial_design": "nur Messvertrag; R4",
+  "empirical_experimental": "nur Messvertrag; R4/R2",
+  "self_regulation": "nur Messvertrag; Hilfesuchverhalten in R5-POL-04 als Beobachtung, nicht als Ziel"
+ },
+ "open_research": [
+  "RQ3: GenAI-Abhängigkeit/Auslagerung (Fan 2025, Lehmann, Darvishi, Pardos LLM-Hinweise) nicht gelesen",
+  "RQ5: Fairness KT (Doroudi 2019), DSGVO-Grundsätze, Browser/API-Key-Grenzen, lokale LLMs nicht gelesen; keine Datenschutz-Policy aus Evidenz abgeleitet",
+  "Suchprotokoll (exakte Queries/Daten) des Spezialisten nicht protokolliert"
+ ],
+ "policies": [
+  {
+   "id": "R5-POL-01",
+   "title": "Beobachtbare Kompetenzzustände statt Mastery-Wahrscheinlichkeit",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §5 R5-POL-01",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure",
+    "computational_construction",
+    "formal_proof"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "open_synthesis",
+     "reason": "keine deterministische Korrektheitsprüfung; Freitext bleibt UNVERIFIED oder agent_judgement (R5-POL-04)"
+    },
+    {
+     "operation": "embodied_psychomotor",
+     "reason": "reale Handlung ist im Produkt nicht beobachtbar; R4"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "deterministisch prüfbare Items (numerisch, symbolisch, Auswahl, Code mit Tests, Beweisverständnis mit geschlossenem Format); Mastery hat keine Lernerdaten im Umfang der KT-Benchmarks"
+   },
+   "recommendation": "Pro Kompetenz zwei getrennte Größen ausweisen: Grad (Anteil unassistiert richtiger Versuche an neuen bzw. umformulierten Items) und Evidenzmenge (Zahl solcher Versuche, tatsächlich verstrichene Zeit seit dem ersten). Daraus einen benannten Zustand (NOT_ASSESSED, ASSISTED, INDEPENDENT_PASS, RETEST_DUE, RETAINED_AFTER_ELAPSED_TIME, INSUFFICIENT_EVIDENCE) ableiten. Keine Prozentzahl, keine Wahrscheinlichkeit, kein Mastery-Label.",
+   "product_affordances": {
+    "interactive": "Zustand plus Grad/Evidenzmenge je Kompetenz; Hinweis, welche Messung fehlt",
+    "workbook": "Selbstprotokoll unassistiert/assistiert je Aufgabe",
+    "anki": "Kartenstatistik wird nicht als Kompetenzzustand angezeigt"
+   },
+   "abstain_or_fallback": [
+    "unter Mindest-Evidenzmenge: INSUFFICIENT_EVIDENCE statt Zustand",
+    "Versuche mit Hinweis, sichtbarer Lösung oder Tutorhilfe zählen nur zu ASSISTED",
+    "Items, die der Lernende schon mit Lösung gesehen hat, zählen nicht als neue Items",
+    "keine Aggregation über Kompetenzen zu einem Gesamtwert"
+   ],
+   "parameters": [
+    {
+     "name": "min_unassisted_attempts_for_state",
+     "value": 2,
+     "unit": "Versuche an verschiedenen Items",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; pelanek2018mastery: N-in-Folge-Kriterien liefern bei wenig Rauschen ähnliche Entscheidungen wie Modelle, N ist kontextabhängig"
+    },
+    {
+     "name": "min_elapsed_for_retention",
+     "value": 20,
+     "unit": "Stunden echte verstrichene Zeit zwischen erstem und späterem unassistiertem Erfolg",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; ersetzt 'verschiedene Kalendertage' (CD-2); nicht empirisch kalibriert"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "pelanek2018mastery",
+     "locator": "Simulationsvergleich NCC vs. LogisticHMM; BKT>=0.95 ist keine 95-%-Sicherheit",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pelanek2017",
+     "locator": "3.2 (Vorteil von Lernermodellen für Mastery-Policies 'not yet completely clear'); 6.1; 7.1 (einfache Modelle bevorzugen)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "gervet2020kt",
+     "locator": "Kalibrierungsanalyse: nur in datendichten Intervallen kalibriert; ähnliche Genauigkeit, sehr verschiedene Empfehlungen",
+     "relation": "supports"
+    },
+    {
+     "source_id": "khajah2016deepkt",
+     "locator": "Abstract (erweitertes BKT ≈ DKT)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "drei voneinander unabhängige Arbeiten (Review, Simulation, Benchmark auf neun Datensätzen) stützen Abstention von Wahrscheinlichkeiten bei wenig Daten",
+     "keine Studie testet direkt, ob Zustandsanzeigen Lernen verbessern"
+    ],
+    "sub_claims": [
+     {
+      "claim": "ohne große Daten sind KT-Wahrscheinlichkeiten an den Extremen schlecht kalibriert",
+      "level": "moderate"
+     },
+     {
+      "claim": "benannte Zustände helfen Lernenden bei Entscheidungen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Versuchslog mit Item-ID, Itemvariante, Hilfestatus (none/hint_level/solution/tutor), Prüfverfahren, Zeitstempel",
+   "independent_outcome": "unassistierter, verzögerter Test (>= 1 Woche) mit neuen Items; Vergleich: Anteil Lernender mit RETAINED_AFTER_ELAPSED_TIME, die den Test bestehen, vs. Anteil mit INDEPENDENT_PASS (prädiktive Validität des Zustands)",
+   "failure_modes": [
+    "Itemwiederholung erzeugt scheinbare Retention",
+    "Lernende lesen den Zustand als Zertifikat",
+    "zu kleine Itempools machen 'neue Items' unmöglich"
+   ],
+   "falsifier": "In einer Validierungsstudie sagt RETAINED_AFTER_ELAPSED_TIME das Bestehen eines unassistierten verzögerten Tests nicht besser vorher als INDEPENDENT_PASS (vorab festgelegte Mindestdifferenz der Bestehensquote).",
+   "kb_rule_links": [
+    {
+     "rule_id": "ITS-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AS-R1",
+     "relation": "retains"
+    }
+   ],
+   "implementation_status": "partially_implemented_unverified",
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R5-POL-02",
+   "title": "Deterministische, stufenbasierte Adaptation als Standard; modellbasierte Adaptation nur nach Validierungsgate",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §4, §5 R5-POL-02",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure",
+    "computational_construction"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice",
+     "consolidation"
+    ],
+    "conditions": "Aufgabenfolgen mit Rollen (Diagnose, Kern, ähnlich, Kontrast, Transfer, Retest) und klassifizierbaren Fehlerkategorien"
+   },
+   "recommendation": "Adaptation bleibt regelbasiert und erklärbar (bestehende em-decision-v1-Regeln mit Regel-ID). Ein Lernermodell (BKT/logistisch/DKT) darf Entscheidungen erst steuern, wenn (a) genug eigene Daten vorliegen, (b) Kalibrierung im entscheidungsrelevanten Intervall auf neuen Lernenden gezeigt ist, (c) die Policy selbst gegen die Regelpolicy auf einem unabhängigen Lernergebnis getestet wurde. Bis dahin höchstens Schattenbetrieb ohne Einfluss.",
+   "product_affordances": {
+    "interactive": "Regel-ID und Begründung je Entscheidung sichtbar",
+    "workbook": "feste Stufenfolge mit Verzweigung nach Selbstcheck"
+   },
+   "abstain_or_fallback": [
+    "Gate nicht erfüllt: Modell läuft nur im Schattenmodus und erscheint nicht in der UI",
+    "unbekannte Fehlerursache: Regel RU, kein Raten",
+    "fehlende Aufgabenrolle: nächste Aufgabe im Flow statt erfundener Variante"
+   ],
+   "parameters": [
+    {
+     "name": "model_gate_min_learners",
+     "value": 500,
+     "unit": "Lernende mit Logdaten je Kurs",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung in der Größenordnung kleiner Datensätze in gervet2020kt; muss vor Nutzung begründet neu festgelegt werden"
+    },
+    {
+     "name": "model_gate_requires_policy_trial",
+     "value": true,
+     "unit": "boolesch",
+     "status": "provisional_product_parameter",
+     "rationale": "gervet2020kt: Prädiktorgenauigkeit sagt wenig über Empfehlungen; Policy muss selbst getestet werden"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "gervet2020kt",
+     "locator": "Diskussion: schwächstes Glied meist Policy und KC-Modell, nicht der Prädiktor",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pelanek2017",
+     "locator": "7.1 einfache Modelle bevorzugen; 6.1 AUC ungeeignet bei absoluten Schwellen",
+     "relation": "supports"
+    },
+    {
+     "source_id": "roschelle2016assistments",
+     "locator": "Impact-Abschnitt: g = 0.18 auf unabhängigem Standardtest; einfaches Hausaufgaben-Feedback-System",
+     "relation": "supports"
+    },
+    {
+     "source_id": "steenbergenhu2013its",
+     "locator": "Abstract: g = 0.01–0.09 in K-12-Mathe-Feldeinsätzen",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "pane2014ctai",
+     "locator": "Abstract: Jahr 1 kein Effekt, Jahr 2 positiv nur High School",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "vanlehn2011",
+     "locator": "Abstract: ITS d = 0.76 vs. kein Tutoring",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "ma2014",
+     "locator": "Abstract: g = 0.42 vs. Großgruppenunterricht, -0.11 vs. Einzeltutoring",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Belege betreffen Prädiktion oder ganze Systeme, nicht den Vergleich Regel- vs. Modellpolicy",
+     "ITS-Feldeffekte heterogen bis null"
+    ],
+    "sub_claims": [
+     {
+      "claim": "bessere KT-Vorhersage führt nicht automatisch zu besserem Lernen",
+      "level": "moderate"
+     },
+     {
+      "claim": "Regelpolicy ist für Mastery mindestens so gut wie eine Modellpolicy",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Entscheidungslog (Regel-ID, Eingabeereignisse, nächste Aufgabe), im Schattenbetrieb zusätzlich Modellempfehlung",
+   "independent_outcome": "unassistierter verzögerter Test mit neuen Items; bei Gate-Studie randomisierte Zuteilung Regel- vs. Modellpolicy",
+   "failure_modes": [
+    "Regeln kodieren falsche Fehlerkategorien",
+    "Lernende umgehen Stufen durch Raten",
+    "Modell wird ohne Gate wegen 'besserer AUC' aktiviert"
+   ],
+   "falsifier": "Eine vorab registrierte randomisierte Studie zeigt, dass eine kalibrierte Modellpolicy die Regelpolicy auf einem unabhängigen verzögerten Test um mehr als die vorab festgelegte Mindestdifferenz übertrifft; dann ist der Standard zu ändern.",
+   "kb_rule_links": [
+    {
+     "rule_id": "ITS-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "ITS-R2",
+     "relation": "refines"
+    }
+   ],
+   "implementation_status": "partially_implemented_unverified",
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R5-POL-03",
+   "title": "Generative Tutorhilfe nur mit Leitplanken; Hilfe ersetzt nie die Zieloperation",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §5 R5-POL-03",
+   "applies_to_operations": [
+    "symbolic_procedure",
+    "computational_construction",
+    "formal_proof",
+    "diagnostic_reasoning"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "embodied_psychomotor",
+     "reason": "Textassistenz ersetzt keine beaufsichtigte Praxis; R4"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice"
+    ],
+    "conditions": "geprüfte Musterlösung und bekannte Fehler liegen dem Tutor vor; Lernender hat einen eigenen Versuch abgegeben; diagnostic_reasoning nur an Lernfällen, nie an realen klinischen oder sicherheitskritischen Entscheidungen"
+   },
+   "recommendation": "Tutor gibt gestufte Hinweise (Orientierung, Strategie, konkreter Schritt) auf Grundlage einer geprüften Referenzlösung; vollständige Lösung nur nach eigenem Versuch oder ausdrücklicher Anforderung und dann als ASSISTED markiert. Jede Tutorsitzung endet mit einer unassistierten Parallelaufgabe. Keine Behauptung eines Lernvorteils; nur das Ziel, Schaden durch Auslagerung zu vermeiden.",
+   "product_affordances": {
+    "interactive": "Hinweisstufen, Versuch-vor-Hilfe, Parallelaufgabe ohne Hilfe nach Tutorkontakt",
+    "workbook": "gestufte Hinweise im Anhang, getrennt von der Lösung"
+   },
+   "abstain_or_fallback": [
+    "keine geprüfte Referenzlösung: Tutor gibt nur Orientierung und verweist auf Worked Example",
+    "Anfrage zur Lösung ohne Versuch: Strategiehinweis statt Lösung, Lösung erst auf zweite ausdrückliche Anfrage",
+    "Frage außerhalb der Quelle oder des Kurses: ABSTAIN mit Begründung",
+    "klinische, rechtliche oder sicherheitskritische Realentscheidung: ABSTAIN und Verweis an Fachperson"
+   ],
+   "parameters": [
+    {
+     "name": "hint_levels",
+     "value": 3,
+     "unit": "Stufen",
+     "status": "provisional_product_parameter",
+     "rationale": "AI-R1; Stufenzahl nicht empirisch kalibriert"
+    },
+    {
+     "name": "unassisted_followup_after_tutor",
+     "value": 1,
+     "unit": "Parallelaufgabe",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; misst, ob Hilfe übernommen oder verstanden wurde"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "bastani2025",
+     "locator": "Table 1; SI A.6 Table A.2: Base vs. Control Exam -0.035 [-0.057, -0.012]; Tutor vs. Control -0.006 [-0.030, 0.018]",
+     "relation": "supports"
+    },
+    {
+     "source_id": "liu2026izavsa",
+     "locator": "5.2: Zugang ohne Integration, exact-match Endnote -0.37 SD; Vollstichprobe n.s.",
+     "relation": "supports"
+    },
+    {
+     "source_id": "boolzen2026genaistem",
+     "locator": "Abstract: RoBMA mu = 0.076 ± 0.254; ISAR-Moderator",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "kestin2025",
+     "locator": "VoR Results; Supplement Table S1 (0.63, sofortiger Post-Test, Expertenprompts)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "risko2016offloading",
+     "locator": "Abstract (Definition Auslagerung)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "aleven2016",
+     "locator": "Abstract: besseres Hilfesuchverhalten ohne besseren Domänenlernerfolg",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "eine starke Studie (bastani2025) zeigt Schaden ohne Leitplanken und keinen nachgewiesenen Schaden mit Leitplanken, aber ohne NI-Marge und ohne verzögerten Test",
+     "bias-adjustierte Meta-Analyse: mittlerer GenAI-Effekt nicht robust"
+    ],
+    "sub_claims": [
+     {
+      "claim": "ungeführter Zugang zu Antworten kann unassistierte Leistung senken",
+      "level": "low"
+     },
+     {
+      "claim": "Leitplanken-Tutor ist nicht unterlegen gegenüber Üben ohne KI",
+      "level": "very_low"
+     },
+     {
+      "claim": "Leitplanken-Tutor verbessert verzögertes unassistiertes Lernen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Hilfeereignisse mit Stufe, Zeitpunkt relativ zum eigenen Versuch, Lösungsabruf; Ergebnis der unassistierten Parallelaufgabe",
+   "independent_outcome": "unassistierter Test >= 1 Woche später mit neuen Items, randomisiert Tutor mit Leitplanken vs. gleich lange Übung mit Worked Examples ohne KI; Nicht-Unterlegenheitsmarge vorab festgelegt",
+   "failure_modes": [
+    "Prompt-Injection oder Umgehung ('gib mir einfach die Lösung')",
+    "Modell halluziniert trotz Referenz",
+    "Lernende nutzen externe KI ohne Leitplanken",
+    "Praxisleistung steigt, unassistierte Leistung nicht (bastani2025-Muster)"
+   ],
+   "falsifier": "In einer vorab registrierten Studie liegt die untere Konfidenzgrenze der Differenz Tutor minus Kontrolle im verzögerten unassistierten Test unterhalb der vorab festgelegten Nicht-Unterlegenheitsmarge.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AI-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AI-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  },
+  {
+   "id": "R5-POL-04",
+   "title": "Trennung assistierter und unassistierter Evidenz; Hilfeabhängigkeit sichtbar machen",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §5 R5-POL-04",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure",
+    "formal_proof",
+    "computational_construction",
+    "diagnostic_reasoning",
+    "open_synthesis",
+    "rule_based_contextual"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "jede Lernhandlung im Produkt mit Hilfe- und Prüfquelle"
+   },
+   "recommendation": "Jedes Ereignis trägt assist_level (none, hint_n, solution_seen, tutor) und source (deterministic, agent_judgement, self_report). Kompetenzzustände nutzen nur none + deterministic. Der Fortschritt zeigt getrennt: assistiert gelöst, unassistiert gelöst, Hilfequote; Tutorbewertungen erscheinen nie als Prüfergebnis.",
+   "product_affordances": {
+    "interactive": "zwei getrennte Spalten assistiert/unassistiert; Hilfequote je Kompetenz",
+    "workbook": "Selbstmarkierung 'mit Lösung gelöst'"
+   },
+   "abstain_or_fallback": [
+    "Ereignis ohne Hilfestatus: als assistiert behandeln",
+    "agent_judgement ohne deterministische Bestätigung: UNVERIFIED"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "bastani2025",
+     "locator": "Table 1: Praxis +48 %/+127 % (assistiert) vs. Exam -17 %/n.s. (unassistiert)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "wang2024tutorcopilot",
+     "locator": "Abstract v3; Limitations: Exit-Ticket +4 p.p., MAP n.s.",
+     "relation": "supports"
+    },
+    {
+     "source_id": "kulik2016",
+     "locator": "Abstract: Testausrichtung als entscheidende Determinante",
+     "relation": "supports"
+    },
+    {
+     "source_id": "aleven2016",
+     "locator": "Abstract",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "risko2016offloading",
+     "locator": "Abstract",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "proximale/assistierte Messungen überschätzen distale unassistierte Leistung in mehreren unabhängigen Quellen",
+     "Trennung selbst ist eine Messregel, deren Lernwirkung nicht geprüft ist"
+    ],
+    "sub_claims": [
+     {
+      "claim": "assistierte Leistung ist kein Indikator unassistierter Leistung",
+      "level": "moderate"
+     },
+     {
+      "claim": "sichtbare Hilfequote ändert Hilfeverhalten günstig",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Ereignisschema mit assist_level und source; Anteil Ereignisse ohne Hilfestatus",
+   "independent_outcome": "Korrelation zwischen unassistiertem In-Produkt-Anteil und externem verzögertem Test höher als zwischen assistiertem Anteil und Test",
+   "failure_modes": [
+    "Lernende nutzen Hilfe außerhalb des Produkts (unsichtbar)",
+    "Hilfequote wird als Scham erlebt und Hilfe vermieden"
+   ],
+   "falsifier": "Assistierte In-Produkt-Leistung sagt einen externen verzögerten unassistierten Test genauso gut vorher wie unassistierte (Differenz der Korrelationen unter vorab festgelegter Schwelle).",
+   "kb_rule_links": [
+    {
+     "rule_id": "AI-R2",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "ITS-R2",
+     "relation": "retains"
+    }
+   ],
+   "implementation_status": "partially_implemented_unverified",
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R5-POL-05",
+   "title": "Messvertrag für jede Lernwirkungsbehauptung",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §6",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure",
+    "formal_proof",
+    "rule_based_contextual",
+    "diagnostic_reasoning",
+    "empirical_experimental",
+    "computational_construction",
+    "spatial_design",
+    "embodied_psychomotor",
+    "open_synthesis",
+    "self_regulation"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "any"
+    ],
+    "conditions": "jede Aussage, ein Produkt oder eine Funktion verbessere Lernen oder Kompetenz"
+   },
+   "recommendation": "Eine Lernwirkungsbehauptung braucht: vorab registrierte Hypothese und Mindestdifferenz bzw. NI-Marge; randomisierte Zuteilung mit verdeckter Allokation (Cluster mit ICC-basierter Power); Kontrollbedingung mit gleicher Zeit und vergleichbarer Aktivität; unassistierten, verzögerten (echte verstrichene Zeit) Test mit neuen Items, nicht vom Produktteam aus den Übungsitems abgeleitet; Bericht nach Subgruppen (Vorwissen, Erstakademiker) und Attrition. In-Produkt-Messungen gelten nur als proximale Indikatoren.",
+   "product_affordances": {
+    "textbook": "keine Wirksamkeitsbehauptung im Text",
+    "interactive": "Fortschrittsanzeigen ohne Wirksamkeitsversprechen",
+    "workbook": "keine Wirksamkeitsbehauptung",
+    "anki": "keine Wirksamkeitsbehauptung"
+   },
+   "abstain_or_fallback": [
+    "Vertrag nicht erfüllt: nur 'nicht gemessen' kommunizieren",
+    "verkörperte, räumliche, experimentelle Kompetenz: Instrumente durch R4 festzulegen; bis dahin keine Aussage"
+   ],
+   "parameters": [
+    {
+     "name": "min_delay_for_retention_claim",
+     "value": 7,
+     "unit": "Tage echte verstrichene Zeit",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung in Anlehnung an R1-Messvertrag"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "kraft2020effectsizes",
+     "locator": "Benchmarks; ausgerichtete Tests 2–4-fach größere Effekte",
+     "relation": "supports"
+    },
+    {
+     "source_id": "cheungslavin2016methods",
+     "locator": "Abstract: etwa doppelte Effekte bei kleinen, selbstgebauten Messungen",
+     "relation": "supports"
+    },
+    {
+     "source_id": "kulik2016",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "hedgeshedberg2007icc",
+     "locator": "Abstract (ICC-basierte Power)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "piaggio2012consortni",
+     "locator": "Abstract (NI-Berichtsstandard)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "boolzen2026genaistem",
+     "locator": "Abstract: nicht vergleichbare Kontrollaktivität in 33 Studien",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "normative",
+    "reasons": [
+     "Messvertrag ist eine Setzung zur Ehrlichkeit von Aussagen; methodische Belege stützen ihn"
+    ]
+   },
+   "observable": "Studienprotokoll, Registrierung, Analyseplan",
+   "independent_outcome": "entfällt (Policy definiert das unabhängige Ergebnis)",
+   "failure_modes": [
+    "Studie ohne Kontrollaktivität wird als Wirksamkeit gelesen",
+    "Marge nachträglich gewählt",
+    "Retest mit identischen Items"
+   ],
+   "falsifier": "Nicht empirisch falsifizierbar (normativ); zu revidieren, wenn methodische Standards (z. B. eine neuere CONSORT-Erweiterung) andere Mindestanforderungen setzen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AS-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "AS-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  },
+  {
+   "id": "R5-POL-06",
+   "title": "Ausgabe- und Abstentionssemantik des Tutors",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §7",
+   "applies_to_operations": [
+    "symbolic_procedure",
+    "computational_construction",
+    "formal_proof",
+    "recall_discrimination",
+    "open_synthesis",
+    "rule_based_contextual",
+    "diagnostic_reasoning"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice"
+    ],
+    "conditions": "jede Tutorantwort"
+   },
+   "recommendation": "Tutorantworten sind JSON mit genau einem Typ: HINT(level 1–3), CHECK_STEP(deterministisch bestätigt/nicht bestätigt), FEEDBACK_UNVERIFIED (Modelleinschätzung, source=agent_judgement), SOLUTION_REVEAL (nur nach Versuch oder ausdrücklicher Anforderung, setzt assist_level=solution_seen), ABSTAIN(reason). ABSTAIN-Gründe: no_verified_reference, out_of_scope, untrusted_source_instruction, safety_or_professional_boundary, model_unavailable. Kein Freitext außerhalb dieser Typen.",
+   "product_affordances": {
+    "interactive": "Darstellung je Typ, ABSTAIN mit Begründung und Alternative (Worked Example, Quelle, Fachperson)"
+   },
+   "abstain_or_fallback": [
+    "Schema verletzt: Antwort verwerfen, ABSTAIN(model_unavailable)",
+    "kein Modell/kein Netz: deterministische Hinweise aus dem Track"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "bastani2025",
+     "locator": "Methods: GPT Tutor-Prompt mit Lehrerlösungen, häufigen Fehlern, Hinweis- statt Antwortinstruktion",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "normative",
+    "reasons": [
+     "Schnittstellen- und Sicherheitsfestlegung; Lernwirkung nicht beansprucht"
+    ]
+   },
+   "observable": "Tutor-Ereignislog nach Typ; Anteil ABSTAIN und Schemaverletzungen",
+   "independent_outcome": "entfällt (Schnittstelle); Wirkung über R5-POL-03 zu prüfen",
+   "failure_modes": [
+    "Modell versteckt Lösung im HINT",
+    "ABSTAIN zu häufig, Lernende wandern zu ungeführter KI ab"
+   ],
+   "falsifier": "Audit von Tutor-Logs zeigt mehr als die vorab festgelegte Rate an HINTs, die die Lösung vollständig enthalten; dann sind Typen bzw. Prüfungen zu ändern.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AI-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AI-R2",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  },
+  {
+   "id": "R5-POL-07",
+   "title": "Heterogenität und Gerechtigkeit prüfen statt Durchschnittseffekte zu berichten",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §6",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure",
+    "formal_proof",
+    "rule_based_contextual",
+    "diagnostic_reasoning",
+    "empirical_experimental",
+    "computational_construction",
+    "spatial_design",
+    "embodied_psychomotor",
+    "open_synthesis",
+    "self_regulation"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "any"
+    ],
+    "conditions": "jede Auswertung von Adaptation oder Tutor"
+   },
+   "recommendation": "Auswertungen berichten Effekte getrennt nach Vorwissen und, wo erhoben und erlaubt, Erstakademiker-Status; eine Funktion, die für eine Subgruppe schadet, wird für diese nicht als Standard aktiviert. Fairness der Lernermodelle (Doroudi 2019) ist noch nicht gelesen.",
+   "product_affordances": {
+    "interactive": "keine subgruppenspezifische Steuerung ohne Evaluationsgrundlage"
+   },
+   "abstain_or_fallback": [
+    "Subgruppe zu klein: keine Subgruppenaussage, nur Hinweis auf Unsicherheit"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "liu2026izavsa",
+     "locator": "5.2: Erstakademiker zusätzlich -0.28 SD (Vollstichprobe)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "steenbergenhu2013its",
+     "locator": "Abstract: kleinere Effekte für Leistungsschwache",
+     "relation": "supports"
+    },
+    {
+     "source_id": "roschelle2016assistments",
+     "locator": "Impact: größere Effekte bei niedrigem Vorwissen",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "wang2024tutorcopilot",
+     "locator": "Abstract v3: +9 p.p. bei schwächer bewerteten Tutoren",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Subgruppenbefunde in Einzelstudien, Richtung uneinheitlich"
+    ]
+   },
+   "observable": "Subgruppenmerkmale nur mit Einwilligung und Datenschutzprüfung",
+   "independent_outcome": "unassistierter verzögerter Test, Interaktion Bedingung × Subgruppe vorab registriert",
+   "failure_modes": [
+    "Erhebung sensibler Merkmale ohne Rechtsgrundlage",
+    "Mehrfachtests erzeugen Scheinbefunde"
+   ],
+   "falsifier": "Vorab registrierte Interaktionsanalysen zeigen über mehrere Studien keine Heterogenität oberhalb der Messunsicherheit; dann kann die Pflicht zur Subgruppenprüfung reduziert werden.",
+   "kb_rule_links": [
+    {
+     "rule_id": "ITS-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  }
+ ]
+}
