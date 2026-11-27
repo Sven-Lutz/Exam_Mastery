@@ -24,8 +24,9 @@ FONTS = [('Source Serif 4', 'source-serif-4', ['400-normal', '400-italic', '600-
          ('Source Sans 3', 'source-sans-3', ['400-normal', '400-italic', '600-normal', '700-normal']),
          ('JetBrains Mono', 'jetbrains-mono', ['400-normal'])]
 PROV = {'course': 'Vorlesung', 'supplement': 'Fachliche Ergänzung', 'didactic': 'Didaktisches Beispiel (selbst entworfen)',
-        'interpretation': 'Einordnung (nicht aus der Vorlesung)', 'unconfirmed': 'Nicht bestätigt', 'vision': 'Abbildung der Vorlesung (vom Agenten ausgewertet)'}
-BOX = {'note': 'Hinweis', 'law': 'Rechtslage', 'pitfall': 'Typischer Fehler', 'key': 'Kernaussage', 'remark': 'Anmerkung',
+        'interpretation': 'Einordnung (nicht aus der Vorlesung)', 'unconfirmed': 'Nicht bestätigt',
+        'derivation': 'Eigene Herleitung (rechnerisch geprüft)', 'vision': 'Abbildung der Vorlesung (vom Agenten ausgewertet)'}
+BOX = {'note': 'Hinweis', 'research': 'Forschungskontext', 'law': 'Rechtslage', 'pitfall': 'Typischer Fehler', 'key': 'Kernaussage', 'remark': 'Anmerkung',
        'limit': 'Modellgrenze', 'question': 'Leitfrage'}
 
 
@@ -333,7 +334,7 @@ class Doc:
                             for s in b['steps']]
             tab = self.table(b['table']) if b.get('table') else ''
             fig = self.figure({'id': b['figure']}) if b.get('figure') else ''
-            return (f'<div class="ex"><div class="ex-intro"><span class="lab">Beispiel {self.book["meta"]["chapter_no"]}.{self.ex_no} · {E(b.get("label", "Durchgerechnet"))}</span><h4>{inline(b["title"])}</h4>'
+            return (f'<div class="ex"><div class="ex-intro"><span class="lab">{E(b.get("kind_label", "Beispiel"))} {self.book["meta"]["chapter_no"]}.{self.ex_no} · {E(b.get("label", "Durchgerechnet"))}</span><h4>{inline(b["title"])}</h4>'
                     f'<div class="given">{md(b["given"])}</div>{tab}<ol class="steps">{"".join(step_parts[:1])}</ol></div>'
                     + (f'<ol class="steps continued">{"".join(step_parts[1:])}</ol>' if len(step_parts) > 1 else '')
                     + (f'<div class="res">{md(b["result"])}</div>' if b.get('result') else '') + f'{fig}</div>')

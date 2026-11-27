@@ -42,6 +42,31 @@ def _atomic_bytes(path, body):
             os.unlink(name)
 
 
+STAGE_TITLES = {
+    "worked_example": "Stufe 1 · Durchgerechnete Beispiele",
+    "guided": "Stufe 2 · Geführte Aufgaben",
+    "independent": "Stufe 3 · Selbstständige Aufgaben",
+    "transfer": "Stufe 4 · Transfer",
+    "exam": "Stufe 5 · Klausurniveau",
+}
+SOURCE_PROVENANCE = {"lecture": "course", "lecture_slides": "course", "script": "course", "exercise": "course",
+                     "paper": "supplement", "book": "supplement", "literature": "supplement",
+                     "original_derivation": "derivation"}
+
+
+def _provenance(item, claim_map, source_map):
+    """Side label of a grounded section: unverified claims dominate, then lecture, literature, own derivation."""
+    claims = [claim_map[c] for c in item.get("claim_ids", [])]
+    if not claims or any(c["evidence_status"] != "verified" for c in claims):
+        return "unconfirmed"
+    kinds = {SOURCE_PROVENANCE.get(source_map[s].get("kind"), "unconfirmed")
+             for c in claims for s in c["source_refs"]}
+    for label in ("unconfirmed", "course", "supplement", "derivation"):
+        if label in kinds:
+            return label
+    return "unconfirmed"
+
+
 def book_model(unit):
     """Adapt an evidence-linked unit to the *existing* typeset.em-book-v1 model."""
     checked = validate(unit)
@@ -70,20 +95,23 @@ def book_model(unit):
         for claim_id in item.get("claim_ids", []):
             for source_id in claim_map[claim_id]["source_refs"]:
                 source = source_map[source_id]
-                prefix = ("Synthetisch" if synthetic else
-                          "Ungeprüft" if claim_map[claim_id]["evidence_status"] == "unverified"
-                          else "Verifiziert (Statusangabe)")
-                label = prefix + ": " + source["locator"]
+                status = claim_map[claim_id]["evidence_status"]
+                if source.get("short") and not synthetic:
+                    # Short side note; the full locator stays in the reference list.
+                    label = ("Ungeprüft: " if status == "unverified" else "") + source["short"]
+                else:
+                    prefix = ("Synthetisch" if synthetic else
+                              "Ungeprüft" if status == "unverified" else "Verifiziert (Statusangabe)")
+                    label = prefix + ": " + source["locator"]
                 if label not in provenance:
                     provenance.append(label)
-        section_blocks = [{"type": "lead" if i == 1 else "text", "md": item["content"],
-                           "kc_ids": item["competency_ids"], "block_id": item["id"],
-                           "prov": "didactic" if synthetic else "unconfirmed",
-                           "src": "; ".join(provenance)}]
+        prov = "didactic" if synthetic else _provenance(item, claim_map, source_map)
+        src = "; ".join(provenance)
+        rendered = {}
         if item.get("derivation"):
             derivation = item["derivation"]
-            section_blocks.append({
-                "type": "example", "label": "Herleitung · Schritt für Schritt",
+            rendered["derivation"] = [{
+                "type": "example", "label": "Schritt für Schritt", "kind_label": "Herleitung",
                 "title": derivation["title"], "given": derivation["given"],
                 "steps": [[
                     step["statement"] + (
@@ -93,10 +121,8 @@ def book_model(unit):
                     step["justification"],
                 ] for step in derivation["steps"]],
                 "result": derivation["result"], "kc_ids": item["competency_ids"],
-                "block_id": item["id"] + "/derivation",
-                "prov": "didactic" if synthetic else "unconfirmed",
-                "src": "; ".join(provenance),
-            })
+                "block_id": item["id"] + "/derivation", "prov": prov, "src": src,
+            }]
         for spec in unit.get("misconceptions", []):
             if placement[spec["id"]] != item["id"]:
                 continue
@@ -107,7 +133,7 @@ def book_model(unit):
                              "Quellenangabe (Fachprüfung erforderlich): ") + source_map[source_id]["locator"]
                     if label not in cited:
                         cited.append(label)
-            section_blocks.append({
+            rendered.setdefault("misconceptions", []).append({
                 "type": "misconception",
                 "wrong": spec["wrong_example"],
                 "right": spec["corrected_example"],
@@ -121,23 +147,70 @@ def book_model(unit):
             if graphic['teaching_id'] == item['id']:
                 gid = graphic['id'] + '-state-' + str(frame)
                 figures[gid] = spec
-                section_blocks.append({'type':'figure','id':gid,'caption':graphic['caption'] + ' ' + graphic['alt'],
-                                       'kc_ids':graphic['competency_ids'],'prov':'didactic'})
+                rendered.setdefault("graphic:" + graphic["id"], []).append(
+                    {'type': 'figure', 'id': gid, 'caption': graphic['caption'] + ' ' + graphic['alt'],
+                     'kc_ids': graphic['competency_ids'], 'prov': 'didactic'})
+        section_blocks = [{"type": "lead" if i == 1 else "text", "md": item["content"],
+                           "kc_ids": item["competency_ids"], "block_id": item["id"],
+                           "prov": prov, "src": src}]
+        # Optional authored order: definitions, boxes, the derivation and figures where the text needs them.
+        for index, block in enumerate(item.get("blocks", [])):
+            kind = block["type"]
+            if kind == "derivation":
+                section_blocks.extend(rendered.pop("derivation", []))
+            elif kind == "graphic":
+                section_blocks.extend(rendered.pop("graphic:" + block["id"], []))
+            elif kind == "definition":
+                section_blocks.append({"type": "definition", "term": block["term"], "md": block["md"],
+                                       "block_id": f"{item['id']}/block-{index}", "prov": prov, "src": src})
+            elif kind == "box":
+                section_blocks.append({"type": "box", "kind": block.get("kind", "note"), "md": block["md"],
+                                       **({"title": block["title"]} if block.get("title") else {}),
+                                       "block_id": f"{item['id']}/block-{index}"})
+            elif kind == "summary":
+                section_blocks.append({"type": "summary", "md": block["md"],
+                                       **({"title": block["title"]} if block.get("title") else {})})
+        section_blocks.extend(rendered.pop("derivation", []))
+        section_blocks.extend(rendered.pop("misconceptions", []))
+        for key in sorted(rendered):
+            section_blocks.extend(rendered[key])
         sections.append({
             "title": item.get("section_title") or
                      item["id"].rsplit("/", 1)[-1].replace("-", " ").capitalize(),
             "blocks": section_blocks,
         })
-    items = []
+    from .experience import STAGES
+    task_figure = {}
+    for graphic, frame, _spec in graphic_frames:
+        for task_id in graphic["assessment_ids"]:
+            task_figure.setdefault(task_id, graphic["id"] + "-state-" + str(frame))
+    grouped = {name: [] for name in (*STAGES, None)}
     for index, task in enumerate(unit["assessments"], 1):
         rubric = [[x["criterion"], x["points"]] for x in task["rubric"]]
-        items.append({
+        stage = task.get("stage")
+        solution = {"answer": task["solution"], "rubric": rubric}
+        if task.get("solution_approach"):
+            solution["approach"] = task["solution_approach"]
+        if task.get("solution_steps"):
+            solution["steps"] = task["solution_steps"]
+        if task.get("typical_errors"):
+            solution["errors"] = task["typical_errors"]
+        grouped[stage].append({
             "id": task["id"], "no": str(index), "prompt": task["prompt"],
             "stage_label": "transfer", "operation": task.get("operation") or "",
-            "kc_keys": task["competency_ids"], "space": 26,
+            "kc_keys": task["competency_ids"], "space": 0 if stage == "worked_example" else 26,
             "points": sum(x["points"] for x in task["rubric"]),
-            "solution": {"answer": task["solution"], "rubric": rubric},
+            **({"title": task["title"]} if task.get("title") else {}),
+            **({"scaffold": task["scaffold"]} if task.get("scaffold") else {}),
+            **({"figure": task_figure[task["id"]]} if task["id"] in task_figure else {}),
+            "worked": stage == "worked_example",
+            "solution": solution,
         })
+    stages = [{"title": STAGE_TITLES[name], "level": level, "items": grouped[name], "key": name}
+              for level, name in enumerate(STAGES, 1) if grouped[name]]
+    if grouped[None]:
+        stages.append({"title": "Selbstständige Anwendung und Transfer", "level": 4,
+                       "items": grouped[None], "key": "unstaged"})
     keys = [s["locator"] for s in unit["sources"]]
     return {
         "meta": {
@@ -153,7 +226,7 @@ def book_model(unit):
             ) + "Automatisch gesetzter und strukturell validierter Entwurf.",
         },
         "figures": figures, "sections": sections,
-        "stages": [{"title": "Selbstständige Anwendung und Transfer", "level": 4, "items": items}],
+        "stages": stages,
         "exam": None, "cards": unit["cards"],
         "competencies": [{"key": c["id"], "operation": c["operation"]} for c in unit["competencies"]],
         "objectives": [c["description"] for c in unit["competencies"]
@@ -182,14 +255,25 @@ def _combined_workbook(book):
     sections.append('<section><h2 id="aufgaben">Teil I · Aufgaben</h2>'
                     '<p>Bearbeiten Sie die Aufgaben vor dem Blick auf die Musterlösungen.</p></section>')
     toc.append((1, "aufgaben", "Teil I · Aufgaben"))
+    attached = {task.get("figure") for stage in book["stages"] for task in stage["items"]} - {None}
     for graphic_id, spec in book['figures'].items():
-        sections.append(d.figure({'type':'figure','id':graphic_id,'caption':spec['title']}))
+        # Figures appear inside the tasks that use them. Only a unit without any task figure keeps the
+        # previous reference block before the tasks; other keyframes remain in the textbook.
+        if not attached:
+            sections.append(d.figure({'type':'figure','id':graphic_id,'caption':spec['title']}))
     for idx, stage in enumerate(book["stages"], 1):
         tag = f"aufgaben-{idx}"
         toc.append((2, tag, stage["title"]))
-        parts = [f'<section class="stage{" first" if idx == 1 else ""}"><h2 id="{tag}">{typeset.inline(stage["title"])}</h2>']
-        for task in stage["items"]:
-            parts.append(typeset._item_html(d, task, solution=False))
+        # Stages flow on (no forced page per stage); the heading is kept with its first task.
+        head = f'<h2 id="{tag}">{typeset.inline(stage["title"])}</h2>'
+        parts = ['<section class="stage first">']
+        for number, task in enumerate(stage["items"]):
+            html_ = typeset._item_html(d, task, solution=bool(task.get("worked")), space=not task.get("worked"))
+            if task.get("worked"):  # a worked example is longer than a page fragment: let it break across pages
+                html_ = html_.replace('<div class="item"', '<div class="item worked" style="break-inside:auto"', 1)
+            # Long worked examples would leave a nearly empty page if kept together with the heading.
+            parts.append((f'<div class="keephead">{head}{html_}</div>' if not task.get("worked") else head + html_)
+                         if number == 0 else html_)
         parts.append("</section>")
         sections.extend(parts)
     sections.append('<section style="break-before:page"><h2 id="loesungen">'
@@ -199,12 +283,19 @@ def _combined_workbook(book):
     toc.append((1, "loesungen", "Teil II · Vollständige Musterlösungen"))
     for idx, stage in enumerate(book["stages"], 1):
         tag = f"loesungen-{idx}"
+        if all(task.get("worked") for task in stage["items"]):
+            continue  # worked examples carry their solution in part I
         toc.append((2, tag, stage["title"] + " · Lösungen"))
-        parts = [f'<section class="stage{" first" if idx == 1 else ""}"><h2 id="{tag}">{typeset.inline(stage["title"])}</h2>']
+        head = f'<h2 id="{tag}">{typeset.inline(stage["title"])}</h2>'
+        parts, first = ['<section class="stage first">'], True
         for task in stage["items"]:
+            if task.get("worked"):
+                continue
             # The same semantic task receives a distinct PDF anchor for the solution.
             copy = dict(task, id="loesung-" + task["id"])
-            parts.append(typeset._item_html(d, copy, solution=True, space=False))
+            html_ = typeset._item_html(d, copy, solution=True, space=False)
+            parts.append(f'<div class="keephead">{head}{html_}</div>' if first else html_)
+            first = False
         parts.append("</section>")
         sections.extend(parts)
     body = (

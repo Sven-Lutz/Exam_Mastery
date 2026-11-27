@@ -419,5 +419,67 @@ def attention_pipeline(spec):
     return _svg(680,h,''.join(body),spec.get('alt',spec['title']))
 
 
+def policy_gradient_bandit(spec):
+    """Softmax bandit: policy, exact gradient and single-batch estimator variance as a function of the baseline."""
+    from .labs.policy_gradient import compute, exact
+    m = compute(spec['parameters']); prm = m['parameters']; k = len(m['pi'])
+    ex = exact(prm['theta'], prm['rewards'], prm['noise_sd'])
+    n = prm['batch']; h = 120 + 46 * k + 110
+    body = [_t(20, 26, '1 · Politik und exakter Gradient', 15, 'start', 700),
+            _t(400, 26, '2 · Schätzervarianz über b', 15, 'start', 700),
+            _t(20, 52, 'Aktion', 11.5, 'start', 600, MUTED), _t(70, 52, 'θ', 11.5, 'middle', 600, MUTED, True),
+            _t(130, 52, 'π(a)', 11.5, 'middle', 600, MUTED), _t(196, 52, 'r(a)', 11.5, 'middle', 600, MUTED),
+            _t(300, 52, '∂J/∂θ = π(r − J)', 11.5, 'middle', 600, MUTED)]
+    gmax = max(1e-9, max(abs(g) for g in m['grad']))
+    for j in range(k):
+        y = 82 + j * 46
+        g = m['grad'][j]; w = 34 * abs(g) / gmax
+        body += [_t(20, y + 5, f'a{j + 1}', 14, 'start', 700),
+                 _t(70, y + 5, f'{prm["theta"][j]:.3g}', 13),
+                 f'<rect x="95" y="{y - 11}" width="70" height="20" fill="#eef2f7"/>',
+                 f'<rect x="95" y="{y - 11}" width="{70 * m["pi"][j]:.4g}" height="20" fill="{ACCENT[1]}"/>',
+                 _t(130, y + 5, f'{m["pi"][j]:.3f}', 12.5, 'middle', 700),
+                 _t(196, y + 5, f'{prm["rewards"][j]:.3g}', 13),
+                 f'<line x1="300" y1="{y - 15}" x2="300" y2="{y + 13}" stroke="{LINE}"/>',
+                 f'<rect x="{300 if g >= 0 else 300 - w:.4g}" y="{y - 9}" width="{w:.4g}" height="16" '
+                 f'fill="{ACCENT[4] if g >= 0 else ACCENT[3]}"/>',
+                 _t(300 + (w + 5 if g >= 0 else -w - 5), y + 5, f'{g:+.3f}', 12, 'start' if g >= 0 else 'end', 700,
+                    ACCENT[4] if g >= 0 else ACCENT[3])]
+    yb = 82 + k * 46
+    body += [f'<line x1="20" y1="{yb - 16}" x2="372" y2="{yb - 16}" stroke="{LINE}"/>',
+             _t(20, yb + 6, f'J(θ) = Σ π(a) r(a) = {m["J"]:.4f}', 13, 'start', 600),
+             _t(20, yb + 28, 'Grün: r(a) > J, Logit steigt · Rost: r(a) < J, Logit sinkt.', 11, 'start', 400, MUTED),
+             _t(20, yb + 44, 'Die Komponenten summieren sich zu null.', 11, 'start', 400, MUTED)]
+    # Variance panel: x = baseline, y = trace of covariance of the N-sample estimator.
+    rs = prm['rewards']; lo = min(min(rs), 0.0, m['b_opt']) - 0.5; hi = max(max(rs), 0.0, m['b_opt']) + 0.5
+    xs = [lo + (hi - lo) * i / 60 for i in range(61)]
+    vs = [ex['variance'](b) / n for b in xs]
+    vmax = max(vs) * 1.08 or 1.0
+    X = lambda b: 410 + 250 * (b - lo) / (hi - lo)
+    Y = lambda v: 70 + (h - 180) * (1 - v / vmax)
+    base = Y(0)
+    pts = ' '.join(f'{X(b):.1f},{Y(v):.1f}' for b, v in zip(xs, vs))
+    body += [f'<line x1="410" y1="{base:.1f}" x2="660" y2="{base:.1f}" stroke="{MUTED}"/>',
+             f'<line x1="410" y1="70" x2="410" y2="{base:.1f}" stroke="{MUTED}"/>',
+             f'<polyline points="{pts}" fill="none" stroke="{ACCENT[0]}" stroke-width="2"/>',
+             _t(535, base + 30, 'Baseline b', 12, 'middle', 600, MUTED),
+             _t(404, 66, f'Var/N (N = {n})', 11, 'start', 600, MUTED)]
+    for val in sorted({round(lo, 6), 0.0, round(hi, 6)}):
+        body.append(_t(X(val), base + 15, f'{val:.2g}', 10.5, 'middle', 400, MUTED))
+    marks = [(0.0, 'ohne', ACCENT[3]), (m['J'], 'b = J', ACCENT[4]), (m['b_opt'], 'b*', ACCENT[2])]
+    for i, (b, label, col) in enumerate(marks):
+        v = ex['variance'](b) / n
+        body += [f'<circle cx="{X(b):.1f}" cy="{Y(v):.1f}" r="{5 - i}" fill="{col}"/>',
+                 f'<circle cx="416" cy="{base + 46 + 16 * i:.1f}" r="4.5" fill="{col}"/>',
+                 _t(426, base + 50 + 16 * i, f'{label} (b = {b:.3g}): Var/N = {v:.4g}', 11.5, 'start', 600, col)]
+    if prm['baseline_mode'] == 'constant':
+        v = ex['variance'](prm['baseline']) / n
+        body.append(f'<circle cx="{X(prm["baseline"]):.1f}" cy="{Y(v):.1f}" r="7" fill="none" stroke="{INK}" stroke-width="1.5"/>')
+    body.append(_t(20, h - 12, 'Varianz = Spur der Kovarianz des Schätzers ĝ = (1/N) Σ (R − b)(e_A − π); '
+                   'exakt berechnet, nicht simuliert.', 11, 'start', 400, MUTED))
+    return _svg(680, h, ''.join(body), spec.get('alt', spec['title']))
+
+
 RENDER.update({'binomial_area_partition':binomial_partition,
+               'softmax_policy_gradient':policy_gradient_bandit,
                'scaled_dot_product_attention':attention_pipeline})

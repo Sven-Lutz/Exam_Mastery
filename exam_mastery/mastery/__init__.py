@@ -36,6 +36,7 @@ MAX_STATE_BYTES = 4_000_000
 MAX_EVENTS = 20_000
 SLUG = re.compile(r"^[a-z0-9][a-z0-9-]{0,40}$")
 ASSETS = ("em_tokens.css", "mastery_home.css", "em_tutor.js", "mastery_home.js")
+OUT_DIR = re.compile(r"^courses/[a-z0-9][a-z0-9-]{0,40}/chapters/[a-z0-9][a-z0-9-]{0,60}/build$")
 
 
 class MasteryError(ValueError):
@@ -110,6 +111,11 @@ def _check_entry(entry, private):
     tracks = entry.get("tracks", [])
     if not isinstance(tracks, list) or not all(isinstance(t, dict) and (t.get("id") or t.get("path")) for t in tracks):
         raise MasteryError(f"Invalid tracks for unit {entry['slug']}")
+    if "out" in entry and not (private and isinstance(entry["out"], str) and OUT_DIR.match(entry["out"])):
+        raise MasteryError(f"Invalid build folder for unit {entry['slug']} (courses/<kurs>/chapters/<kapitel>/build)")
+    for key in ("course", "chapter"):
+        if key in entry and not (isinstance(entry[key], dict) and isinstance(entry[key].get("title"), str)):
+            raise MasteryError(f"Invalid {key} for unit {entry['slug']}")
     return dict(entry, private=private)
 
 
@@ -230,8 +236,9 @@ def _build_unit(root, item, log):
     from ..learning.experience_adaptation import track_for_unit
     from ..learning.experience_evidence import assessment_revision
     entry, unit = item["entry"], item["unit"]
-    unit_dir = Path(root) / "units" / entry["slug"]
-    if unit_dir.is_symlink():
+    rel_dir = entry.get("out") or f"units/{entry['slug']}"
+    unit_dir = Path(root) / rel_dir
+    if any((Path(root).joinpath(*Path(rel_dir).parts[:i])).is_symlink() for i in range(1, len(Path(rel_dir).parts) + 1)):
         raise MasteryError("Refusing symlinked unit directory")
     before = _anki_state(unit_dir)
     started = time.monotonic()
@@ -240,16 +247,17 @@ def _build_unit(root, item, log):
     anki = _anki_report(unit_dir, unit, before, after, result["changes"]["anki"])
     tracks = []
     for ref, track in item["tracks"]:
-        page = render.write(track, unit_dir / "tracks", context=STORE_CONTEXT, back="../../../index.html",
-                            back_label="Mastery – Startseite")
-        base = f"units/{entry['slug']}/tracks/{page.name}"
+        page = render.write(track, unit_dir / "tracks", context=STORE_CONTEXT,
+                            back="../" * (len(Path(rel_dir).parts) + 1) + "index.html", back_label="Mastery – Startseite")
+        base = f"{rel_dir}/tracks/{page.name}"
         tracks.append({"id": track["id"], "title": track["title"], "objective": track["objective"],
                        "relation": ref.get("relation", "practice"), "label": ref.get("label") or track["title"],
                        "href": base, "json": base[:-5] + ".json", "store_key": f"{STORE_CONTEXT}|{track['id']}"})
     log(f"  {entry['slug']}: Produkte {result['publication']['status']}, Anki {result['changes']['anki']}, "
         f"{len(anki['restamped'])} Karten neu gestempelt ({time.monotonic() - started:.1f} s)")
-    prefix = f"units/{entry['slug']}/"
+    prefix = rel_dir + "/"
     return {
+        **({"course": entry["course"], "chapter": entry["chapter"]} if entry.get("course") else {}),
         "slug": entry["slug"], "title": unit["title"], "unit_id": unit["unit_id"], "private": entry["private"],
         "source_mode": unit["source_mode"], "academic_status": result["academic_status"],
         "content_hash": item["content_hash"], "built_at": now(),
@@ -281,7 +289,7 @@ def _write_shell(root):
             '<title>Mastery</title><link rel="stylesheet" href="assets/em_tokens.css">'
             '<link rel="stylesheet" href="assets/mastery_home.css"></head><body>'
             '<header class="m-top"><a class="m-brand" href="#start">Mastery</a><nav class="m-nav" aria-label="Bereiche">'
-            '<a href="#start">Start</a><a href="#lernstand">Lernstand</a><a href="#tutor">Tutor</a>'
+            '<a href="#start">Start</a><a href="#kurse">Kurse</a><a href="#lernstand">Lernstand</a><a href="#tutor">Tutor</a>'
             '<a href="#sicherung">Sicherung</a></nav></header>'
             '<main id="app" class="m-shell"><noscript><p>Mastery braucht JavaScript. Die PDFs liegen im Ordner units/.</p>'
             '</noscript><p class="m-loading">Bibliothek wird geladen …</p></main>'
@@ -289,8 +297,9 @@ def _write_shell(root):
     (Path(root) / "index.html").write_text(html, encoding="utf-8")
 
 
-def build(home=None, force=False, log=print):
-    """Build every outdated unit (content hash) and rewrite the home shell. Idempotent; no network, no model calls."""
+def build(home=None, force=False, log=print, only=None):
+    """Build every outdated unit (content hash) and rewrite the home shell. Idempotent; no network, no model calls.
+    With `only` (a slug) just that unit is (re)built; the other units keep their previous build if they have one."""
     root = resolve_home(home)
     root.mkdir(parents=True, exist_ok=True)
     engine = engine_fingerprint()
@@ -303,6 +312,10 @@ def build(home=None, force=False, log=print):
         fresh = (prev and prev.get("content_hash") == item["content_hash"]
                  and all((root / p).is_file() for p in prev["products"].values())
                  and all((root / t["href"]).is_file() for t in prev["tracks"]))
+        if only and slug != only:
+            if prev and all((root / p).is_file() for p in prev["products"].values()):
+                units.append(prev)
+            continue
         if fresh and not force:
             units.append(prev)
             continue

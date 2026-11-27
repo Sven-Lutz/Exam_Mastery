@@ -12,6 +12,7 @@ Identity model (rule C5):
 Card kinds (shown as a small label): Begriff, Zusammenhang, Vergleich, Bedingung, Rechnen, Abbildung, Denkfehler, Lückentext.
 """
 import hashlib
+from html import escape as _esc
 import json
 import re
 import shutil
@@ -194,7 +195,7 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
                             'Source': _html(c.get('source', '')), 'Kind': KIND_LABEL['cloze']}
                 else:
                     ctx = _html(c.get('context', ''))
-                    img = (f'<img src="em-{chapter_slug}-{slug(c["figure"])}.svg" alt="{c.get("figure_alt","Abbildung")}">'
+                    img = (f'<img src="em-{chapter_slug}-{slug(c["figure"])}.svg" alt="{_esc(c.get("figure_alt","Abbildung"), quote=True)}">'
                            if c.get('figure') else '')
                     # rule C1: a figure that shows the answer belongs on the back; only figures that ARE the question go on the front
                     front_fig = c.get('figure_side') == 'front'

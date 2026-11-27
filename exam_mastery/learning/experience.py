@@ -34,6 +34,10 @@ INTERACTIONS = {
     "simulation", "interactive_explanation", "code_parsons",
 }
 SEMANTIC_ID = re.compile(r"^[a-z0-9][a-z0-9/_-]{2,100}$")
+# Optional workbook progression (graduated practice); order is the print order.
+STAGES = ("worked_example", "guided", "independent", "transfer", "exam")
+TEACHING_BLOCKS = {"definition", "box", "summary", "derivation", "graphic"}
+BOX_KINDS = {"note", "pitfall", "key", "remark", "limit", "question", "research"}
 
 
 def _text(value):
@@ -137,6 +141,69 @@ def _derivation(item, known_claims, source_mode, errors):
                 )
 
 
+def _graphic_frames(unit):
+    names = set()
+    for graphic in unit.get("graphics", []) or []:
+        if isinstance(graphic, dict) and isinstance(graphic.get("keyframes"), list):
+            names.update(f"{graphic.get('id')}-state-{frame}" for frame in graphic["keyframes"])
+    return names
+
+
+def _teaching_blocks(unit, item, errors):
+    """Optional typed blocks that place definitions, boxes, the derivation and figures inside a section."""
+    blocks = item.get("blocks")
+    if blocks is None:
+        return
+    key = item.get("id")
+    if not isinstance(blocks, list) or len(blocks) > 16:
+        errors.append(f"teaching.{key}.blocks: list of at most 16 blocks required")
+        return
+    own = {g.get("id") for g in unit.get("graphics", []) or [] if isinstance(g, dict) and g.get("teaching_id") == key}
+    seen = set()
+    for index, block in enumerate(blocks):
+        where = f"teaching.{key}.blocks[{index}]"
+        kind = block.get("type") if isinstance(block, dict) else None
+        if kind not in TEACHING_BLOCKS:
+            errors.append(f"{where}: unsupported block type")
+            continue
+        if kind == "definition" and not (_text(block.get("term")) and _text(block.get("md"))):
+            errors.append(f"{where}: definition requires term and md")
+        elif kind == "box" and (not _text(block.get("md")) or block.get("kind", "note") not in BOX_KINDS
+                                or ("title" in block and not _text(block["title"]))):
+            errors.append(f"{where}: box requires md, a known kind and a nonempty title if given")
+        elif kind == "summary" and not _text(block.get("md")):
+            errors.append(f"{where}: summary requires md")
+        elif kind == "derivation":
+            if not item.get("derivation") or "derivation" in seen:
+                errors.append(f"{where}: derivation placeholder needs exactly one derivation")
+            seen.add("derivation")
+        elif kind == "graphic":
+            if block.get("id") not in own or block.get("id") in seen:
+                errors.append(f"{where}: graphic must be placed once in its own teaching section")
+            seen.add(block.get("id"))
+
+
+def _assessment_presentation(item, key, errors):
+    """Optional print/presentation fields for graduated workbooks; never a grading oracle."""
+    if "stage" in item and item["stage"] not in STAGES:
+        errors.append(f"assessments.{key}: stage must be one of {', '.join(STAGES)}")
+    if "title" in item and (not _text(item["title"]) or len(item["title"]) > 120):
+        errors.append(f"assessments.{key}: title must be a short nonempty string")
+    for field, low, high in (("scaffold", 1, 10), ("typical_errors", 1, 10)):
+        value = item.get(field)
+        if value is not None and (not isinstance(value, list) or not low <= len(value) <= high
+                                  or not all(_text(x) for x in value)):
+            errors.append(f"assessments.{key}: {field} must list {low}..{high} nonempty strings")
+    steps = item.get("solution_steps")
+    if steps is not None and (not isinstance(steps, list) or not 1 <= len(steps) <= 30 or not all(
+            isinstance(x, list) and len(x) == 2 and _text(x[0]) and isinstance(x[1], str) for x in steps)):
+        errors.append(f"assessments.{key}: solution_steps must be 1..30 [statement, justification] pairs")
+    if "solution_approach" in item and not _text(item["solution_approach"]):
+        errors.append(f"assessments.{key}: solution_approach must be nonempty")
+    if item.get("stage") == "worked_example" and not steps:
+        errors.append(f"assessments.{key}: a worked example needs solution_steps")
+
+
 def validate(unit):
     """Structural QA only; not a scientific or learning-effectiveness certificate."""
     if not isinstance(unit, dict):
@@ -184,6 +251,8 @@ def validate(unit):
         key = item.get("id")
         if not _text(item.get("locator")):
             errors.append(f"sources.{key}: locator required")
+        if "short" in item and (not _text(item["short"]) or len(item["short"]) > 80):
+            errors.append(f"sources.{key}: short label must be 1..80 characters")
         if source_mode == "synthetic" and item.get("kind") != "synthetic":
             errors.append(f"sources.{key}: synthetic mode forbids lecture/external sources")
         if source_mode == "grounded" and item.get("kind") == "synthetic":
@@ -226,6 +295,7 @@ def validate(unit):
                     errors.append(f"teaching.{key}: explanation required")
                 _references(item.get("claim_ids", []), claim_ids, f"teaching.{key}.claim_ids", errors)
                 _derivation(item, claim_ids, source_mode, errors)
+                _teaching_blocks(unit, item, errors)
                 if source_mode == "grounded" and not item.get("claim_ids"):
                     errors.append(f"teaching.{key}: grounded explanation requires claim refs")
             elif section == "assessments":
@@ -269,6 +339,7 @@ def validate(unit):
                                         not SEMANTIC_ID.fullmatch(err["category"])
                                         for err in errors_spec)):
                             errors.append(f"assessments.{key}: invalid numerical error categories")
+                _assessment_presentation(item, key, errors)
                 role = item.get("role", "core")
                 if role not in ("diagnostic", "prereq_retry", "core", "transfer", "similar", "contrast", "harder", "retest"):
                     errors.append(f"assessments.{key}: unsupported adaptive role")
@@ -278,6 +349,10 @@ def validate(unit):
                     errors.append(f"assessments.{key}: hints must be 0..6 nonempty bounded strings")
             elif section == "cards":
                 _references(item.get("claim_ids", []), claim_ids, f"cards.{key}.claim_ids", errors)
+                if "figure" in item and item["figure"] not in _graphic_frames(unit):
+                    errors.append(f"cards.{key}: figure must name a graphic keyframe '<graphic-id>-state-<n>'")
+                if item.get("figure_side", "back") not in ("front", "back"):
+                    errors.append(f"cards.{key}: figure_side must be front or back")
                 if source_mode == "grounded" and not item.get("claim_ids"):
                     errors.append(f"cards.{key}: grounded card requires claim refs")
                 from ..anki_v2 import card_lint
