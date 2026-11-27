@@ -406,6 +406,22 @@ textarea { min-height:90px; }
 .parsons-reasons code { font-size:.9rem; }
 .hidden { display:none!important; }
 .tutor-panel { margin:.6rem 0; } .tutor-panel summary { cursor:pointer; color:var(--blue); }
+.guide-panel:empty { display:none; } .guide-panel { margin:.8rem 0; padding:.7rem .9rem; border:1px solid var(--line); border-radius:10px; }
+.guide-panel .guide-chips { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; margin:.4rem 0; }
+.guide-panel .guide-offer { background:#fff6e5; border-left:3px solid #b77900; padding:.5rem .75rem; margin:.5rem 0; }
+.guide-panel .ds-btn:not(.ds-btn-primary), .guide-panel .guide-chip { background:#e8efff; color:#183b78; }
+.wb-lesson { border-left:3px solid var(--blue); background:#f2f7fc; padding:.7rem .9rem; margin:.6rem 0; border-radius:0 8px 8px 0; }
+.wb-lesson h3 { margin:.1rem 0 .4rem; } .wb-lesson ol { padding-left:1.3em; }
+.wb-role, .wb-step-l { font-size:.78rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:.4rem 0 .2rem; }
+.wb-formula { font-family:ui-monospace,Menlo,monospace; font-weight:650; background:white; padding:.35rem .6rem; border-radius:6px; overflow-x:auto; }
+.wb-lesson-check { border-top:1px dashed #94a5ba; margin-top:.6rem; padding-top:.5rem; } .wb-lesson-check input[type=text] { max-width:14rem; }
+.wb-row { display:flex; flex-wrap:wrap; gap:.5rem; margin:.5rem 0; } .wb-choices { border:0; padding:0; margin:.3rem 0; }
+.wb-choice { display:flex; gap:.5rem; align-items:center; } .wb-choice input { width:auto; }
+.wb-res { margin:.3rem 0; padding:.45rem .7rem; border-left:3px solid; border-radius:0 6px 6px 0; } .wb-res.ok { background:#e8f6ee; border-color:#1d7a46; }
+.wb-res.bad { background:#fdecea; border-color:#b3261e; } .wb-res.warn { background:#fff6e5; border-color:#b77900; }
+.wb-evid { font-size:.82rem; color:var(--muted); margin:.2rem 0; } .wb-lesson-src { font-size:.9rem; color:var(--muted); }
+.wb-lesson-src a { color:var(--blue); } .wb-lesson-more summary { cursor:pointer; color:var(--blue); }
+.ds-sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 .tutor-brief { white-space:pre-wrap; max-height:16rem; overflow:auto; font-size:.8rem; background:#f4f6f9; padding:.6rem; border-radius:6px; }
 .file-button { display:inline-block; padding:.45rem .8rem; border-radius:6px; background:#e8efff; color:#183b78; cursor:pointer; }
 .file-button input { position:absolute; width:1px; height:1px; opacity:0; }
@@ -478,7 +494,7 @@ document.getElementById("practice-backup-export").addEventListener("click", () =
     unit_id:model.unit_id, assessment_revision:model.assessment_revision, exported:new Date().toISOString(),
     events:record.events, policy:record.policy}, null, 1) + "\n");
 });
-const PRACTICE_TYPES = ["attempt","hint","solution_reveal","tutor_brief"], POLICY_TYPES = ["attempt","hint","solution","tutor"];
+const PRACTICE_TYPES = ["attempt","hint","solution_reveal","tutor_brief","guided_help"], POLICY_TYPES = ["attempt","hint","solution","tutor","guided"];
 document.getElementById("practice-backup-import").addEventListener("change", ev => {
   const file = ev.target.files[0];
   if (!file || file.size > 4e6) return;
@@ -773,7 +789,16 @@ function explainPolicy(taskId, diagnosis, container) {
     panel.append(el("p", "", category.feedback));
     const details = document.createElement("details");
     const head = document.createElement("summary");
-    head.textContent = "Beispiel einer Fehlstrategie und begründete Korrektur";
+    head.textContent = "Beispiel einer Fehlstrategie und begründete Korrektur (zählt als Hilfe)";
+    // The corrected example can contain the corrected number: opening it is help for this task (R5-POL-04).
+    details.addEventListener("toggle", () => {
+      if (!details.open || details.dataset.logged) return;
+      details.dataset.logged = "1";
+      recordPractice({type:"guided_help",task_id:taskId,lesson_id:"misconception:" + diagnosis.error_category});
+      policyEvents.push({type:"guided",task:taskId,t:new Date().toISOString(),lesson:"misconception:" + diagnosis.error_category,
+        step:"misconception_example",assist_level:"worked_example",source:"deterministic"});
+      save();
+    });
     details.append(head,
       el("p", "", category.wrong_example),
       el("p", "", category.corrected_example),
@@ -828,6 +853,42 @@ document.querySelectorAll(".assessment").forEach(root=>{
   const tutorStatus = root.querySelector(".tutor-status");
   const tutorBrief = root.querySelector(".tutor-brief");
   let submitted = false, hintIndex = 0, solutionSeen = false;
+  // Guided learning (offline, deterministic): prerequisite lessons of this task; after a diagnosed gap the matching lesson
+  // is offered. Only after an own attempt (the evidence log rejects help before an attempt). Logged as guided help.
+  const G = window.EMT.guided, lessonsById = new Map((model.lessons || []).map(l => [l.id, l]));
+  const guideHost = root.querySelector(".guide-panel"), guideIds = G.lessonsForTask(model, definition), slug = taskId.replace(/[^a-z0-9_-]/g,"-");
+  const guideBody = el("div", "guide-body"), guideOffer = el("div", "guide-offer hidden"), guideStatus = el("p", "help");
+  guideStatus.setAttribute("role", "status");
+  let guideGap = null;
+  const shownLessons = () => [...new Set(policyEvents.filter(e => e.type === "guided" && e.task === taskId && e.step === "lesson").map(e => e.lesson))].filter(id => lessonsById.has(id));
+  function openLesson(lid, trigger) {
+    const l = lessonsById.get(lid);
+    if (!l) return;
+    if (!submitted && !policyEvents.some(e => e.type === "attempt" && e.task === taskId)) { guideStatus.textContent = "Erst ein eigener Versuch, dann die Voraussetzung."; return; }
+    recordPractice({type:"guided_help",task_id:taskId,lesson_id:lid});
+    policyEvents.push({type:"guided",task:taskId,t:new Date().toISOString(),lesson:lid,step:"lesson",trigger,assist_level:"prereq_lesson",source:"deterministic"});
+    save();
+    guideOffer.classList.add("hidden");
+    guideBody.replaceChildren(G.lessonView(l, {prefix:"guide-" + slug, anchor: ref => "teaching-" + ref.replace(/[^a-z0-9_-]/g,"-"),
+      onCheck: r => { policyEvents.push({type:"guided",task:taskId,t:new Date().toISOString(),lesson:lid,step:"check",result:r.result,assist_level:"prereq_check",source:"deterministic"}); save(); },
+      onBack: () => { guideBody.replaceChildren(); guideStatus.textContent = "Zurück zur Aufgabe: „Neuer Versuch“, dann erneut abgeben. Eine Lösung danach zählt als mit Hilfe."; (submitted ? retry : input).focus(); }}));
+    guideStatus.textContent = "Voraussetzung geöffnet – zählt als Hilfe für diese Aufgabe.";
+  }
+  function showGap(checked) {
+    guideGap = G.gapFor(model, checked);
+    guideOffer.replaceChildren();
+    if (!guideGap) { guideOffer.classList.add("hidden"); return; }
+    const learn = el("button", "guide-learn", "Voraussetzung jetzt lernen"); learn.type = "button";
+    learn.addEventListener("click", () => openLesson(guideGap, "diagnosis"));
+    guideOffer.append(el("strong", "", "Vermutlich fehlt eine Voraussetzung: " + lessonsById.get(guideGap).title + ". "),
+      el("span", "", "Hypothese aus Ihrer Zahl. Kurz lernen, eine Kontrollfrage, dann zurück zur Aufgabe. "), learn);
+    guideOffer.classList.remove("hidden");
+  }
+  if (guideHost && guideIds.length) {
+    const chips = el("div", "guide-chips"); chips.append(el("span", "", "Diese Aufgabe baut auf:"));
+    for (const lid of guideIds) { const b = el("button", "guide-chip", lessonsById.get(lid).title); b.type = "button"; b.dataset.lesson = lid; b.addEventListener("click", () => openLesson(lid, "chosen")); chips.append(b); }
+    guideHost.append(el("strong", "", "Geführtes Lernen (offline, ohne Sprachmodell)"), guideOffer, chips, guideStatus, guideBody);
+  } else if (guideHost) guideHost.append(guideOffer, guideBody);
   // Restore from this browser: the evidence log's order rules (hint indices, one reveal) stay valid.
   hintIndex = Math.min(definition.hints.length,
     practice.events.filter(e => e.type === "hint" && e.task_id === taskId).length);
@@ -887,6 +948,7 @@ document.querySelectorAll(".assessment").forEach(root=>{
     save();
     if (tutorButton) tutorButton.disabled = false;
     explainPolicy(taskId, diagnosis, guidance);
+    if (guideHost) showGap(diagnosis);
   });
   retry.addEventListener("click",()=>{
     if (!submitted) return;
@@ -933,16 +995,22 @@ document.querySelectorAll(".assessment").forEach(root=>{
     const sibling = model.assessments.find(a => a.id !== taskId
       && a.competency_ids.some(c => definition.competency_ids.includes(c))
       && !policyEvents.some(e => e.type === "attempt" && e.task === a.id));
-    const text = window.EMT.portableBrief({
+    const brief = withLearner => window.EMT.portableBrief({
       title: model.title, objective: "", competency: definition.competency_ids.map(competencyText).join("; "),
       task: {id: taskId, role: definition.role, prompt: definition.prompt},
-      attempts: attempts.map(e => ({t: e.t, observed: e.observed || "", result: e.diagnosis.result,
-        category: e.diagnosis.error_category ? ((cats[e.diagnosis.error_category] || {}).label || e.diagnosis.error_category) : null})),
+      attempts: withLearner ? attempts.map(e => ({t: e.t, observed: e.observed || "", result: e.diagnosis.result,
+        category: e.diagnosis.error_category ? ((cats[e.diagnosis.error_category] || {}).label || e.diagnosis.error_category) : null})) : [],
+      mode: G.briefMode(definition.role, attempts.length),
       hints: definition.hints.slice(0, hintIndex), solution_viewed: solutionSeen,
       solution: definition.solution ? [definition.solution] : null,
       sources: definition.sources || [], source_status: model.source_status,
+      gap: guideGap ? lessonsById.get(guideGap).title : null,
+      lessons: shownLessons().map(id => { const l = lessonsById.get(id); return {title: l.title, formula: l.formula, example: l.example}; }),
       parallel: sibling ? "Aufgabe " + sibling.id + " im Explorable, ohne Tutor." : null,
-      question: tutorQuestion ? tutorQuestion.value : ""});
+      question: withLearner && tutorQuestion ? tutorQuestion.value : ""});
+    // deterministic guard (R9-POL-04): the engine part of the brief must not contain an evidence answer key
+    if (G.leaks(model, brief(false)).length) { tutorStatus.textContent = "Brief zurückgehalten: Er enthielte einen Nachweis-Schlüssel."; return; }
+    const text = brief(true);
     tutorBrief.textContent = text; tutorBrief.classList.remove("hidden");
     recordPractice({type:"tutor_brief",task_id:taskId});
     policyEvents.push({type:"tutor",task:taskId,t:new Date().toISOString()});
@@ -1211,7 +1279,8 @@ def render_html(unit):
              if task.get("hints") else ''),
             '<button class="answer-button secondary" type="button" disabled>Musterlösung anzeigen</button>',
             '</div><p class="attempt-status" role="status" aria-live="polite"></p>',
-            '<details class="tutor-panel"><summary>Tutor fragen (Claude oder ChatGPT)</summary>',
+            '<details class="tutor-panel"><summary>Mit Claude/ChatGPT weiterdenken</summary>',
+            '<p class="help"><strong>Externes Modell · nicht offline · nicht geprüft.</strong> Die Antwort zählt nie als Bewertung.</p>',
             '<p class="help">Erst nach einem eigenen Versuch. Der Brief enthält Tutor-Regeln, Aufgabe, Ihre Versuche, ',
             'genutzte Hinweise und Quellen' + ('; keine Musterlösung, weil diese Aufgabe selbstständiges Lösen prüft'
             if task.get("role", "core") in ("similar", "transfer", "retest") else '') +
@@ -1221,6 +1290,7 @@ def render_html(unit):
             '<button class="tutor-button" type="button" disabled>Tutor-Brief kopieren</button>',
             '<p class="tutor-status" role="status" aria-live="polite"></p><pre class="tutor-brief hidden"></pre></details>',
             '<div class="adaptive-guidance" role="status" aria-live="polite"></div>',
+            '<div class="guide-panel" aria-label="Geführtes Lernen"></div>',
             ('<p class="hint-text hidden" role="status" aria-live="polite"></p>'
              if task.get("hints") else ''),
             '<div class="answer hidden"><strong>Musterlösung</strong><div>' + rich(task["solution"]) + '</div>',
@@ -1253,7 +1323,8 @@ def render_html(unit):
                       "adaptive_track": track_for_unit(unit),
                       "competencies": {c["id"]: c.get("description", c["id"])
                                        for c in unit["competencies"]},
-                      "assessments": [_tutor_view(unit, x) for x in unit["assessments"]]}),
+                      "assessments": [_tutor_view(unit, x) for x in unit["assessments"]],
+                      "lessons": unit.get("lessons", [])}),
         '</script><script>' + tutor_js + '</script><script>' + RUNTIME +
         '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_experience.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/policy_gradient_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/policy_gradient_lab.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/plane_map_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/plane_map_lab.js').read_text() + '</script></main></body></html>',
     ])

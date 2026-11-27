@@ -2872,5 +2872,154 @@
       ],
       "worked_example_id": "teach/mask-numerics"
     }
+  ],
+  "lessons": [
+    {
+      "id": "prereq/softmax-normalisation",
+      "title": "Softmax: aus Scores werden Gewichte",
+      "explain": "Softmax macht aus beliebigen Scores positive Gewichte mit Summe eins: erst jeden Eintrag exponentieren, dann durch die Summe der Exponentialwerte teilen. Direktes Teilen der Scores scheitert, sobald ein Score negativ oder null ist.",
+      "formula": "α_j = e^(z_j) / Σ_ℓ e^(z_ℓ)",
+      "example": [
+        "z = (1; 0).",
+        "e¹ = 2,7183, e⁰ = 1, Summe 3,7183.",
+        "α = (0,7311; 0,2689); beide positiv, Summe eins."
+      ],
+      "check": {
+        "type": "numeric",
+        "prompt": "Eine Zeile hat die Logits z = (0; 1; 1). Wie groß ist α₁? (4 Nachkommastellen)",
+        "expected": 0.155362,
+        "tolerance": 0.0005,
+        "errors": [
+          {
+            "value": 0.0,
+            "category": "linear_normalisation",
+            "feedback": "Sie haben die Scores direkt geteilt (0/2). Softmax teilt Exponentialwerte: e⁰ / (e⁰ + e¹ + e¹)."
+          },
+          {
+            "value": 1.0,
+            "category": "missing_normalisation",
+            "feedback": "1 = e⁰ ist der Zähler allein. Teilen Sie durch die Summe aller Exponentialwerte der Zeile."
+          }
+        ],
+        "explain": "α₁ = 1 / (1 + 2e) = 1 / 6,4366 = 0,1554."
+      },
+      "for": {
+        "competencies": [
+          "attention/softmax"
+        ],
+        "misconceptions": []
+      },
+      "taught_in": [
+        {
+          "kind": "section",
+          "ref": "teach/softmax",
+          "label": "Abschnitt „Aus beliebigen Scores werden relative Gewichte“"
+        }
+      ]
+    },
+    {
+      "id": "prereq/softmax-jacobian",
+      "title": "Ableitung einer Softmax-Zeile",
+      "requires": [
+        "prereq/softmax-normalisation"
+      ],
+      "explain": "Alle Gewichte einer Zeile teilen sich denselben Nenner D = Σ_r e^(z_r). Erhöht man ein z_ℓ, wächst D, und alle anderen Gewichte schrumpfen. Die Quotientenregel liefert deshalb zwei Fälle: auf der Diagonale und daneben.",
+      "formula": "∂α_j/∂z_ℓ = α_j(δ_jℓ − α_ℓ): α_j(1 − α_j) für j = ℓ, −α_j·α_ℓ für j ≠ ℓ",
+      "example": [
+        "Quotientenregel: (u/D)′ = (u′·D − u·D′) / D².",
+        "j = ℓ: u = e^(z_j), u′ = D′ = e^(z_j) ⇒ α_j − α_j² = α_j(1 − α_j).",
+        "j ≠ ℓ: u′ = 0, D′ = e^(z_ℓ) ⇒ −α_j·α_ℓ (nur der Nenner wirkt).",
+        "Zahlen α = (0,5; 0,3; 0,2): ∂α₁/∂z₁ = 0,5 · 0,5 = 0,25; ∂α₁/∂z₂ = −0,5 · 0,3 = −0,15."
+      ],
+      "check": {
+        "type": "numeric",
+        "prompt": "Eine Zeile hat die Gewichte α = (0,6; 0,3; 0,1). Wie groß ist ∂α₂/∂z₁?",
+        "expected": -0.18,
+        "tolerance": 0.0005,
+        "errors": [
+          {
+            "value": 0.0,
+            "category": "offdiag_zero",
+            "feedback": "z₁ steht nicht im Zähler von α₂, aber im gemeinsamen Nenner: Der Eintrag ist −α₂α₁, nicht null."
+          },
+          {
+            "value": 0.18,
+            "category": "jacobian_sign",
+            "feedback": "Der Betrag stimmt, das Vorzeichen nicht: Der Nenner-Term geht mit Minus ein."
+          },
+          {
+            "value": 0.21,
+            "category": "diagonal_formula_offdiag",
+            "feedback": "α₂(1 − α₂) gilt nur für ∂α₂/∂z₂, nicht für einen Eintrag neben der Diagonale."
+          }
+        ],
+        "explain": "∂α₂/∂z₁ = −α₂·α₁ = −0,3 · 0,6 = −0,18."
+      },
+      "for": {
+        "competencies": [
+          "attention/backprop"
+        ],
+        "misconceptions": [
+          "attention/softmax-normaliser-ignored",
+          "attention/softmax-diagonal-only"
+        ]
+      },
+      "taught_in": [
+        {
+          "kind": "section",
+          "ref": "teach/gradient",
+          "label": "Abschnitt „Wie aus großen Score-Abständen schwache Gradienten werden“"
+        },
+        {
+          "kind": "section",
+          "ref": "teach/backprop",
+          "label": "Abschnitt „Gradienten durch den ganzen Attention-Kopf“"
+        }
+      ]
+    },
+    {
+      "id": "prereq/masked-softmax",
+      "title": "Maske vor der Normierung",
+      "requires": [
+        "prereq/softmax-normalisation"
+      ],
+      "explain": "Ein maskierter Key bekommt vor Softmax das Logit −∞: e^(−∞) = 0 fällt aus Zähler und Nenner. Normiert wird also nur über die erlaubten Keys; ihre Gewichte summieren sich wieder zu eins.",
+      "formula": "α_j = e^(z_j) / Σ_(ℓ erlaubt) e^(z_ℓ), α_j = 0 für maskierte j",
+      "example": [
+        "z = (2; 0; 9), Key 3 maskiert.",
+        "Erlaubt sind Keys 1–2: α = softmax(2; 0) = (0,8808; 0,1192; 0).",
+        "Wer erst über alle drei normiert und dann α₃ = 0 setzt, erhält Gewichte mit Summe weit unter eins."
+      ],
+      "check": {
+        "type": "numeric",
+        "prompt": "Logits z = (0; 0; 3), Key 3 ist maskiert. Wie groß ist α₁? (4 Nachkommastellen)",
+        "expected": 0.5,
+        "tolerance": 0.0005,
+        "errors": [
+          {
+            "value": 0.045279,
+            "category": "mask_after_softmax",
+            "feedback": "Sie haben über alle drei Keys normiert. Der maskierte Key fällt vor Softmax heraus: Normiert wird nur über Keys 1 und 2."
+          }
+        ],
+        "explain": "Nur Keys 1 und 2 zählen: α₁ = e⁰ / (e⁰ + e⁰) = 0,5."
+      },
+      "for": {
+        "competencies": [
+          "attention/masking"
+        ],
+        "misconceptions": [
+          "attention/mask-after-softmax",
+          "attention/padding-mask-ignored"
+        ]
+      },
+      "taught_in": [
+        {
+          "kind": "section",
+          "ref": "teach/mask",
+          "label": "Abschnitt „Maskieren heißt aus der Normalisierung ausschließen“"
+        }
+      ]
+    }
   ]
 }

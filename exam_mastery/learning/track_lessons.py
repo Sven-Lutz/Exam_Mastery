@@ -126,7 +126,7 @@ def attention_lessons():
                                'feedback': 'Der Betrag stimmt, das Vorzeichen nicht: Der Nenner-Term geht mit Minus ein.'},
                               {'value': round(al[1] * (1 - al[1]), 6), 'category': 'diagonal_formula_offdiag',
                                'feedback': 'α₂(1 − α₂) gilt nur für ∂α₂/∂z₂, nicht für einen Eintrag neben der Diagonale.'}],
-                   'explain': f'∂α₂/∂z₁ = −α₂·α₁ = −{f(al[1], 1)} · {f(al[0], 1)} = {f(-al[1] * al[0], 2)}.'},
+                   'explain': f'∂α₂/∂z₁ = −α₂·α₁ = −{f(al[1], 1)} · {f(al[0], 1)} = {f(-al[1] * al[0], 2).replace("-", "−")}.'},
          'for': {'kcs': ['attention/softmax-gradient'], 'categories': ['normaliser_ignored', 'diagonal_only', 'jacobian_sign', 'missing_weight_factor', 'offdiag_zero', 'diagonal_formula_offdiag']},
          'taught_in': [{'kind': 'worked_example', 'ref': 'attention/softmax-gradient', 'label': 'Durchgerechnet: Gradient durch Softmax mit zwei Keys'}]},
         {'id': 'prereq/masked-softmax', 'title': 'Maske vor der Normierung', 'requires': ['prereq/softmax-normalisation'],
@@ -151,11 +151,11 @@ def unit_attention_lessons():
     by = {l['id']: l for l in attention_lessons()}
     out = []
     for lid, comps, mis, sections in [
-            ('prereq/softmax-normalisation', ['attention/softmax'], [], [('teach/softmax', 'Abschnitt: Aus beliebigen Scores werden relative Gewichte')]),
+            ('prereq/softmax-normalisation', ['attention/softmax'], [], [('teach/softmax', 'Abschnitt „Aus beliebigen Scores werden relative Gewichte“')]),
             ('prereq/softmax-jacobian', ['attention/backprop'], ['attention/softmax-normaliser-ignored', 'attention/softmax-diagonal-only'],
-             [('teach/gradient', 'Abschnitt: Ableitung der Softmax'), ('teach/backprop', 'Abschnitt: Gradienten durch Attention')]),
+             [('teach/gradient', 'Abschnitt „Wie aus großen Score-Abständen schwache Gradienten werden“'), ('teach/backprop', 'Abschnitt „Gradienten durch den ganzen Attention-Kopf“')]),
             ('prereq/masked-softmax', ['attention/masking'], ['attention/mask-after-softmax', 'attention/padding-mask-ignored'],
-             [('teach/mask', 'Abschnitt: Maskierung')])]:
+             [('teach/mask', 'Abschnitt „Maskieren heißt aus der Normalisierung ausschließen“')])]:
         l = dict(by[lid]); l['for'] = {'competencies': comps, 'misconceptions': mis}
         l['taught_in'] = [{'kind': 'section', 'ref': r, 'label': lbl} for r, lbl in sections]
         out.append(l)
