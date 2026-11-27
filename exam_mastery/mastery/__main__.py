@@ -135,7 +135,7 @@ def cmd_plan(args):
 
 def cmd_packet(args):
     from .courses import course_status, make_packet
-    result = make_packet(args.slug, args.chapter, args.home)
+    result = make_packet(args.slug, args.chapter, args.home, force=args.force)
     for w in result["warnings"]:
         print("  Hinweis: " + w)
     ch = next(c for c in course_status(args.slug, args.home)["chapters"] if c["id"] == args.chapter)
@@ -204,6 +204,7 @@ def main(argv=None):
     pk = sub.add_parser("packet", help="Authoring-Paket eines Kapitels schreiben/erneuern (packet.json + Seitenbilder)")
     pk.add_argument("slug")
     pk.add_argument("chapter")
+    pk.add_argument("--force", action="store_true", help="auch ein nicht vom Import erzeugtes packet.json ersetzen")
     bc = sub.add_parser("build-chapter", help="erarbeitete unit.json prüfen, vier Produkte bauen, in Bibliothek eintragen")
     bc.add_argument("slug")
     bc.add_argument("chapter")

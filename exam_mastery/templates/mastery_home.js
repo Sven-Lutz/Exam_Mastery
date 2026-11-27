@@ -102,13 +102,16 @@ function viewStart(lib) {
       el('h2', { class: 'm-h2' }, rec.task), el('p', {}, rec.title), el('p', { class: 'm-note' }, rec.why),
       el('p', { class: 'm-rule' }, 'Regel ', el('code', {}, rec.rule), ' · Engine-Regel ', el('code', {}, rec.engine_rule), rec.rationale ? ' – ' + rec.rationale : ''),
       el('a', { class: 'ds-btn ds-btn-primary', href: rec.href, id: 'next-link' }, 'Öffnen'))));
-  for (const u of lib.units) {
-    const card = el('article', { class: 'm-card m-unit', 'data-unit': u.slug },
-      el('p', { class: 'ds-eyebrow' }, u.private ? 'Private Einheit (nur auf diesem Rechner)' : 'Einheit'), el('h2', { class: 'm-h2' }, u.title),
+  let lastCourse = null;
+  const ordered = lib.units.slice().sort((a, b) => (a.course ? 1 : 0) - (b.course ? 1 : 0) || String((a.course || {}).title || '').localeCompare(String((b.course || {}).title || '')) || ((a.chapter || {}).order || 0) - ((b.chapter || {}).order || 0));
+  for (const u of ordered) {
+    if (u.course && u.course.slug !== lastCourse) { lastCourse = u.course.slug; s.append(el('h2', { class: 'm-h2 m-course-head', 'data-course-head': u.course.slug }, 'Kurs: ' + u.course.title, ' ', el('a', { class: 'm-note', href: '#kurse' }, 'Kursübersicht'))); }
+    const card = el('article', { class: 'm-card m-unit', 'data-unit': u.slug, 'data-course': u.course ? u.course.slug : null },
+      el('p', { class: 'ds-eyebrow' }, u.course ? 'Kapitel ' + u.chapter.order + ' · ' + u.course.title + ' (privat, nur auf diesem Rechner)' : u.private ? 'Private Einheit (nur auf diesem Rechner)' : 'Einheit'), el('h2', { class: 'm-h2' }, u.title),
       el('p', { class: 'm-badge' }, u.source_mode === 'synthetic' ? 'Synthetische Referenzeinheit' : 'Quellengebundene Einheit', ' · fachliche Prüfung durch Menschen ausstehend'));
     card.append(el('ul', { class: 'm-products' }, PRODUCTS.map(([k, label, note]) => el('li', {},
       el('a', { href: u.products[k], 'data-product': k, download: k === 'anki' ? 'Anki.apkg' : null }, label), el('small', {}, note)))));
-    card.append(el('h3', { class: 'm-h3' }, 'Üben mit Rückmeldung'), el('ul', { class: 'm-products' }, u.tracks.map(tr => el('li', {},
+    if (u.tracks.length) card.append(el('h3', { class: 'm-h3' }, 'Üben mit Rückmeldung'), el('ul', { class: 'm-products' }, u.tracks.map(tr => el('li', {},
       el('a', { href: tr.href, 'data-product': 'workbench' }, tr.label), el('small', {}, 'Regelbasierte Prüfung von Zahlen, Ausdrücken und Rechenschritten; Hinweise; Tutor-Brief.')))));
     s.append(card);
   }
@@ -150,7 +153,8 @@ function limitsCard() {
     el('li', {}, 'Freitext wird nicht bewertet. Regelbasiert geprüft werden nur Zahlen, Ausdrücke und Rechenschritte der Übungsstrecke.'),
     el('li', {}, 'Ein Lernender, ein Browser: Der Lernstand liegt im Browser dieser Adresse (Port 8765). Anderer Browser oder Port = anderer Lernstand. Regelmäßig sichern.'),
     el('li', {}, 'Nicht getestet: Handy/Tablet, Screenreader im Detail, Import in die Anki-Desktop-App.'),
-    el('li', {}, 'Der Tutor ist kein Live-Tutor: Mastery kopiert nur einen Brief. Was Claude oder ChatGPT antworten, prüft Mastery nicht.')));
+    el('li', {}, 'Der Tutor ist kein Live-Tutor: Mastery kopiert nur einen Brief. Was Claude oder ChatGPT antworten, prüft Mastery nicht.'),
+    el('li', {}, 'Kurse: Import, Inventar, Vollständigkeit, Kapitelplan, Pakete und Bau laufen offline und ohne Modell. Das Erarbeiten eines Kapitels braucht eine Claude-Code-Sitzung (Ihr Abo) oder einen Menschen – Mastery ruft selbst kein Modell auf.')));
 }
 
 function viewProgress(lib) {
@@ -176,6 +180,128 @@ function viewTutor(lib) {
         el('li', {}, 'Ein Tutor-Brief zählt als Hilfe: Die Aufgabe gilt danach als „mit Hilfe“ bearbeitet. Die Lösung zu sehen bleibt Ihre Entscheidung und wird ebenso vermerkt.'),
         el('li', {}, 'Urteile des Tutors über Freitext sind Modelleinschätzungen, keine Korrektur.')),
       el('ul', { class: 'm-products' }, lib.units.flatMap(u => [el('li', {}, el('a', { href: u.products.interactive }, 'Explorable: ' + u.title)), ...u.tracks.map(tr => el('li', {}, el('a', { href: tr.href }, 'Übungsstrecke: ' + tr.label)))]))));
+}
+
+/* ------------------------------------------------------------ courses: import wizard (local server API, no model calls) */
+const PIPE = { NICHT_ERARBEITET: 'Nicht erarbeitet', PAKET_BEREIT: 'Paket bereit', ERARBEITET: 'Erarbeitet', GEBAUT: 'Gebaut', 'PRÜFUNG_AUSSTEHEND': 'Prüfung ausstehend' };
+const KIND = { lecture_slides: 'Vorlesungsfolien', script: 'Skript', exercise: 'Übung', solution: 'Lösung', exam: 'Klausur', literature: 'Literatur', notebook: 'Notebook', other: 'Sonstiges' };
+const FSTAT = { ok: 'gelesen', no_text: 'ohne Textebene', not_local: 'nicht lokal verfügbar', unsupported: 'nicht unterstützt', unreadable: 'nicht lesbar', ignored: 'ignoriert', symlink_skipped: 'Verknüpfung übersprungen' };
+let COURSES = null, COURSE_ERR = null;
+function api(path, body) {
+  return fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}), cache: 'no-store' })
+    .then(r => r.json().catch(() => ({})).then(j => r.ok ? j : Promise.reject(new Error(j.error || ('HTTP ' + r.status)))));
+}
+function busy(btn, msg, text, job) {
+  btn.disabled = true; msg.textContent = text; msg.dataset.state = 'busy';
+  return job().then(() => reload('#kurse')).then(() => { const m = document.getElementById(msg.id); if (m) { m.textContent = 'Fertig.'; m.dataset.state = 'done'; } })
+    .catch(e => { btn.disabled = false; msg.textContent = 'Nicht möglich: ' + e.message; msg.dataset.state = 'error'; });
+}
+function pipeline(ch) {
+  const order = Object.keys(PIPE), at = order.indexOf(ch.status);
+  return el('ol', { class: 'm-pipe', 'aria-label': 'Status' }, order.map((k, i) => el('li', { class: i < at ? 'done' : i === at ? 'now' : '', 'aria-current': i === at ? 'step' : null },
+    PIPE[k] + (k === 'ERARBEITET' && ch.author_label && i <= at ? ' (' + ch.author_label + ')' : ''))));
+}
+function chapterAction(c, ch) {
+  const msg = el('p', { class: 'm-note', role: 'status', id: 'msg-' + c.slug + '-' + ch.id });
+  const base = 'api/courses/' + c.slug + '/chapters/' + ch.id + '/';
+  const packetBtn = label => { const b = el('button', { type: 'button', class: 'ds-btn', 'data-action': 'packet', onclick: () => busy(b, msg, 'Paket wird geschrieben …', () => api(base + 'packet')) }, label); return b; };
+  const box = el('div', { class: 'm-action' });
+  if (ch.stale) box.append(el('p', { class: 'm-badge m-stale', 'data-stale': '1' }, 'Quellen geändert seit dem Paket: ' + ch.stale.sources.slice(0, 4).join(', ') + ' – Paket erneuern und Kapitel überarbeiten.'));
+  if (ch.status === 'NICHT_ERARBEITET') box.append(packetBtn('Paket erstellen'));
+  if (ch.status === 'PAKET_BEREIT' && ch.instruction) {
+    const copy = el('button', { type: 'button', class: 'ds-btn', onclick: () => { try { navigator.clipboard.writeText(ch.instruction.prompt); copy.textContent = 'Kopiert'; } catch (e) { copy.textContent = 'Bitte markieren und kopieren'; } } }, 'Auftrag kopieren');
+    box.append(el('div', { class: 'm-instr', 'data-instruction': ch.id },
+      el('p', {}, el('strong', {}, 'Erarbeiten: '), ch.instruction.statement),
+      el('ol', { class: 'm-steps' }, el('li', {}, 'Terminal öffnen: ', el('code', {}, ch.instruction.command)),
+        el('li', {}, 'Diesen Auftrag in die Claude-Code-Sitzung geben: ', el('code', { class: 'm-prompt' }, ch.instruction.prompt), ' ', copy),
+        el('li', {}, 'Danach bauen (hier mit „Bauen“ oder im Terminal): ', el('code', {}, ch.instruction.then))),
+      el('p', { class: 'm-note' }, 'Ein Mensch kann unit.json und authoring.json ebenso schreiben. Ohne diesen Schritt entsteht kein Kapitel – Mastery erfindet keine Inhalte.')), packetBtn('Paket erneuern'));
+  }
+  if (ch.status === 'ERARBEITET' || ch.rebuild_needed) { const b = el('button', { type: 'button', class: 'ds-btn ds-btn-primary', 'data-action': 'build', onclick: () => busy(b, msg, 'Vier Produkte werden gebaut (offline) …', () => api(base + 'build')) }, 'Bauen (vier Produkte)'); box.append(b); }
+  if (ch.products) box.append(el('ul', { class: 'm-links' }, PRODUCTS.map(([k, label]) => el('li', {}, el('a', { href: ch.products[k], 'data-product': k, download: k === 'anki' ? 'Anki.apkg' : null }, label)))),
+    el('p', { class: 'm-note' }, 'Fachliche Prüfung durch Menschen ausstehend; Lernwirkung nicht gemessen.'));
+  box.append(msg);
+  return box;
+}
+function coursePanel(c) {
+  const n = c.counts, card = el('article', { class: 'm-card m-course', 'data-course': c.slug });
+  card.append(el('p', { class: 'ds-eyebrow' }, 'Kurs · importiert ' + when(c.imported_at)), el('h2', { class: 'm-h2' }, c.title),
+    el('p', { class: 'm-note' }, 'Quelle (nur gelesen): ', el('code', {}, c.source_root)),
+    el('p', { class: 'm-counts', 'data-files': String(n.files), 'data-pages': String(n.pages) }, n.files + ' Dateien · ' + n.pages + ' Seiten/Folien (' + n.text_pages + ' mit Text, ' + n.vision_pages + ' brauchen Bildverständnis) · ' +
+      Object.entries(n.kinds).map(([k, v]) => v + ' ' + (KIND[k] || k)).join(', ')));
+  const msg = el('p', { class: 'm-note', role: 'status', id: 'msg-course-' + c.slug });
+  const row = el('div', { class: 'm-row' });
+  if (n.not_local) {
+    const b = el('button', { type: 'button', class: 'ds-btn ds-btn-primary', id: 'materialize-' + c.slug, onclick: () => busy(b, msg, 'Dateien werden aus iCloud geladen …', () => api('api/courses/' + c.slug + '/materialize', { consent: true })) }, n.not_local + ' Datei(en) aus iCloud herunterladen');
+    card.append(el('div', { class: 'm-icloud', 'data-not-local': String(n.not_local) }, el('p', {}, el('strong', {}, n.not_local + ' Datei(en) nicht lokal verfügbar. '), 'Sie liegen nur als iCloud-Platzhalter vor; Mastery hat sie nicht geöffnet. Auf Ihren Klick lädt macOS sie herunter (brctl download); nichts wird gelöscht oder verändert.'), b));
+  }
+  const re = el('button', { type: 'button', class: 'ds-btn', 'data-action': 'reimport', onclick: () => busy(re, msg, 'Kursordner wird neu eingelesen …', () => api('api/courses/' + c.slug + '/reimport')) }, 'Neu einlesen (Änderungen erkennen)');
+  row.append(re); card.append(row, msg);
+  const main = c.warnings.filter(w => w.severity !== 'info'), info = c.warnings.filter(w => w.severity === 'info');
+  card.append(el('h3', { class: 'm-h3' }, 'Vollständigkeit (' + main.length + ' Warnungen, ' + info.length + ' Hinweise)'),
+    main.length ? el('ul', { class: 'm-warn' }, main.map(w => el('li', { 'data-code': w.code, class: 'sev-' + w.severity }, w.message))) : el('p', {}, 'Keine Warnungen.'),
+    info.length ? el('details', {}, el('summary', {}, info.length + ' Hinweise'), el('ul', { class: 'm-warn' }, info.map(w => el('li', { 'data-code': w.code }, w.message)))) : null);
+  card.append(el('details', { class: 'm-inv' }, el('summary', {}, 'Inventar: ' + c.files.length + ' Dateien'), el('div', { class: 'm-scroll' }, el('table', { class: 'm-table' },
+    el('thead', {}, el('tr', {}, ['Datei', 'Art', 'Seiten', 'mit Text', 'Bildverständnis', 'Status'].map(h => el('th', { scope: 'col' }, h)))),
+    el('tbody', {}, c.files.map(f => el('tr', { 'data-file': f.rel_path, 'data-status': f.status, 'data-kind': f.kind },
+      el('th', { scope: 'row' }, f.rel_path), el('td', { title: f.kind_basis || '' }, KIND[f.kind] || f.kind), el('td', {}, f.pages == null ? '–' : String(f.pages)),
+      el('td', {}, f.text_pages == null ? '–' : String(f.text_pages)), el('td', {}, f.pages == null ? '–' : String(f.vision_pages)),
+      el('td', {}, (FSTAT[f.status] || f.status) + (f.duplicate_of ? ' · Duplikat' : '')))))))));
+  const ids = c.chapters.map(ch => ch.id), planMsg = el('p', { class: 'm-note', role: 'status', id: 'msg-plan-' + c.slug });
+  const rows = c.chapters.map(ch => {
+    const title = el('input', { type: 'text', class: 'm-input', value: ch.title, 'aria-label': 'Titel von ' + ch.id, 'data-field': 'title', maxlength: '120' });
+    const skip = el('input', { type: 'checkbox', 'data-field': 'skip', 'aria-label': 'Kapitel überspringen', checked: ch.skip });
+    const order = el('input', { type: 'number', class: 'm-input m-num', value: String(ch.order), 'aria-label': 'Reihenfolge', 'data-field': 'order', min: '1' });
+    const merge = el('select', { class: 'm-input', 'data-field': 'merge_into', 'aria-label': 'Zusammenführen mit' }, el('option', { value: '' }, '—'), ids.filter(x => x !== ch.id).map(x => el('option', { value: x }, x)));
+    return el('tr', { 'data-chapter': ch.id, 'data-status': ch.status, class: ch.skip ? 'm-skip' : '' },
+      el('td', {}, order), el('td', {}, title, el('div', { class: 'm-note' }, ch.sources.length + ' Quelle(n) · ' + ch.exercises.length + ' Übung(en) · ' + ch.solutions.length + ' Lösung(en)' + (ch.merged.length ? ' · zusammengeführt: ' + ch.merged.join(', ') : '')),
+        ch.competencies_proposed.length ? el('details', {}, el('summary', {}, ch.competencies_proposed.length + ' Kompetenzen (Vorschlag)'), el('ul', {}, ch.competencies_proposed.map(k => el('li', { 'data-competency': k.id }, k.text, el('small', { class: 'm-note' }, ' – ' + k.basis + ', ' + k.provenance.map(p => p.rel_path.split('/').pop() + (p.page ? ' S. ' + p.page : '')).join('; ')))))) : null),
+      el('td', {}, el('label', { class: 'm-check' }, skip, ' überspringen'), el('div', {}, merge)),
+      el('td', {}, pipeline(ch), ch.skip ? el('p', { class: 'm-note' }, 'Übersprungen') : chapterAction(c, ch)));
+  });
+  const save = el('button', { type: 'button', class: 'ds-btn', id: 'plan-save-' + c.slug, onclick: () => {
+    const ov = {};
+    for (const tr of rows) { const id = tr.dataset.chapter, ch = c.chapters.find(x => x.id === id), o = {};
+      const v = f => tr.querySelector('[data-field="' + f + '"]');
+      if (v('title').value.trim() && v('title').value.trim() !== ch.title) o.title = v('title').value.trim();
+      if (v('skip').checked !== !!ch.skip) o.skip = v('skip').checked;
+      if (Number(v('order').value) !== ch.order) o.order = Number(v('order').value);
+      if (v('merge_into').value) o.merge_into = v('merge_into').value;
+      if (Object.keys(o).length) ov[id] = o; }
+    busy(save, planMsg, 'Plan wird gespeichert …', () => api('api/courses/' + c.slug + '/plan', { overrides: { chapters: ov } }));
+  } }, 'Planänderungen speichern');
+  card.append(el('h3', { class: 'm-h3' }, 'Kapitelplan (Vorschlag – bearbeitbar)'),
+    el('p', { class: 'm-note' }, 'Ein Kapitel pro Vorlesung; Übungen nach Titel, Inhalt oder Nummer zugeordnet; Klausuren gehören zu allen Kapiteln. Kompetenzen sind Vorschläge aus Folientiteln und Lernziel-Folien – deterministisch, ohne Modell.'),
+    el('div', { class: 'm-scroll' }, el('table', { class: 'm-table m-plan' }, el('thead', {}, el('tr', {}, ['Nr.', 'Kapitel', 'Bearbeiten', 'Status und nächster Schritt'].map(h => el('th', { scope: 'col' }, h)))), el('tbody', {}, rows))),
+    el('div', { class: 'm-row' }, save), planMsg);
+  return card;
+}
+function viewCourses() {
+  const msg = el('p', { class: 'm-note', role: 'status', id: 'import-status' });
+  const path = el('input', { type: 'text', class: 'm-input m-wide', id: 'import-path', placeholder: '/Users/…/Studium/Kursordner', 'aria-describedby': 'import-help', autocomplete: 'off', spellcheck: 'false' });
+  const title = el('input', { type: 'text', class: 'm-input', id: 'import-title', placeholder: 'optional', maxlength: '120' });
+  const consent = el('input', { type: 'checkbox', id: 'import-materialize' });
+  const run = el('button', { type: 'button', class: 'ds-btn ds-btn-primary', id: 'import-run', onclick: () => {
+    if (!path.value.trim()) { msg.textContent = 'Bitte einen Ordnerpfad eingeben.'; return; }
+    busy(run, msg, 'Kursordner wird gelesen (das kann bei großen Kursen eine Minute dauern) …', () => api('api/import', { path: path.value.trim(), title: title.value.trim() || null, materialize: consent.checked }));
+  } }, 'Importieren');
+  const s = el('section', { id: 'kurse', class: 'm-view', 'aria-labelledby': 'h-ku' }, el('h1', { id: 'h-ku', class: 'm-h1' }, 'Kurse'),
+    el('p', { class: 'm-lead' }, 'Lehrveranstaltung importieren: Mastery liest Ihren Kursordner (Folien, Skripte, Übungen, Lösungen, Literatur, Altklausuren), zeigt, was erkannt wurde, prüft die Vollständigkeit, schlägt Kapitel und Kompetenzen vor und bereitet für jedes Kapitel ein Authoring-Paket vor.'),
+    el('div', { class: 'm-card m-accent', id: 'import' }, el('h2', { class: 'm-h2' }, 'Kurs importieren'),
+      el('label', { class: 'm-field', for: 'import-path' }, 'Ordnerpfad (Finder: Ordner wählen, ⌥⌘C kopiert den Pfad)'), path,
+      el('label', { class: 'm-field', for: 'import-title' }, 'Titel des Kurses'), title,
+      el('label', { class: 'm-check' }, consent, ' iCloud-Platzhalter in diesem Ordner herunterladen (Ihre Zustimmung; sonst werden sie nur aufgelistet)'),
+      el('div', { class: 'm-row' }, run), msg,
+      el('p', { class: 'm-note', id: 'import-help' }, 'Nur Ordner in Ihrem Benutzerordner. Mastery liest nur und schreibt nichts in den Kursordner; Inventar, Pakete und Produkte liegen in Ihrer Bibliothek unter courses/. Erneuter Import desselben Ordners erkennt Änderungen.')));
+  if (COURSE_ERR) s.append(el('p', { class: 'm-card' }, 'Kursdaten nicht verfügbar (' + COURSE_ERR + '). Bitte Mastery mit `mastery start` öffnen.'));
+  for (const c of COURSES || []) s.append(coursePanel(c));
+  if (COURSES && !COURSES.length) s.append(el('p', { class: 'm-note', id: 'no-courses' }, 'Noch kein Kurs importiert.'));
+  return s;
+}
+function loadCourses() { return fetch('api/courses', { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status))).then(j => { COURSES = j.courses; COURSE_ERR = null; }).catch(e => { COURSES = []; COURSE_ERR = e.message; }); }
+function reload(hash) {
+  return Promise.all([fetch('library.json', { cache: 'no-store' }).then(r => r.json()).then(async lib => { for (const u of lib.units) for (const tr of u.tracks) tr.data = await fetch(tr.json, { cache: 'no-store' }).then(r => r.json()); LIB = lib; }), loadCourses()])
+    .then(() => { const y = window.scrollY; render(); if (hash && location.hash !== hash) location.hash = hash; window.scrollTo(0, y); });
 }
 
 /* ------------------------------------------------------------ backup: file export/import and local server copy */
@@ -214,13 +340,10 @@ function viewBackup() {
 
 /* ------------------------------------------------------------ boot */
 let LIB = null;
-function route() { const id = (location.hash || '#start').slice(1); for (const v of app.querySelectorAll('.m-view')) v.hidden = v.id !== (['start', 'lernstand', 'tutor', 'sicherung'].includes(id) ? id : 'start');
+function route() { const id = (location.hash || '#start').slice(1); for (const v of app.querySelectorAll('.m-view')) v.hidden = v.id !== (['start', 'kurse', 'lernstand', 'tutor', 'sicherung'].includes(id) ? id : 'start');
   for (const a of document.querySelectorAll('.m-nav a')) a.setAttribute('aria-current', a.getAttribute('href') === '#' + id ? 'page' : 'false'); }
-function render() { app.replaceChildren(viewStart(LIB), viewProgress(LIB), viewTutor(LIB), viewBackup()); route(); app.dataset.ready = '1'; }
+function render() { app.replaceChildren(viewStart(LIB), viewCourses(), viewProgress(LIB), viewTutor(LIB), viewBackup()); route(); app.dataset.ready = '1'; }
 window.addEventListener('hashchange', route);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && LIB) { render(); postState(document.getElementById('backup-status')); } });
-fetch('library.json', { cache: 'no-store' }).then(r => r.json()).then(async lib => {
-  for (const u of lib.units) for (const tr of u.tracks) tr.data = await fetch(tr.json, { cache: 'no-store' }).then(r => r.json());
-  LIB = lib; render(); postState(document.getElementById('backup-status'));
-}).catch(e => { app.replaceChildren(el('p', { class: 'm-card' }, 'Bibliothek nicht lesbar (' + e.message + '). Bitte mit `mastery start` öffnen – nicht als Datei.')); });
+reload().then(() => postState(document.getElementById('backup-status'))).catch(e => { app.replaceChildren(el('p', { class: 'm-card' }, 'Bibliothek nicht lesbar (' + e.message + '). Bitte mit `mastery start` öffnen – nicht als Datei.')); });
 })();

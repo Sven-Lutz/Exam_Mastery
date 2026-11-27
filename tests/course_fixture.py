@@ -14,8 +14,8 @@ def _pdf(path, pages, landscape=True):
             page.insert_text((50, y), line, fontsize=13)
             y += 22
         if figure:
-            for i in range(4):
-                page.draw_rect(pymupdf.Rect(420 + 30 * i, 300, 445 + 30 * i, 300 + 40 * (i + 1)), color=(0, 0, 1), fill=(0.6, 0.7, 1))
+            for i in range(8):  # a small bar chart: 8 distinct vector shapes = a figure that needs vision
+                page.draw_rect(pymupdf.Rect(420 + 30 * i, 300, 445 + 30 * i, 300 + 20 * (i + 1)), color=(0, 0, 1), fill=(0.6, 0.7, 1))
     path.parent.mkdir(parents=True, exist_ok=True)
     doc.save(path)
     doc.close()

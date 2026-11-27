@@ -281,7 +281,7 @@ def _write_shell(root):
             '<title>Mastery</title><link rel="stylesheet" href="assets/em_tokens.css">'
             '<link rel="stylesheet" href="assets/mastery_home.css"></head><body>'
             '<header class="m-top"><a class="m-brand" href="#start">Mastery</a><nav class="m-nav" aria-label="Bereiche">'
-            '<a href="#start">Start</a><a href="#lernstand">Lernstand</a><a href="#tutor">Tutor</a>'
+            '<a href="#start">Start</a><a href="#kurse">Kurse</a><a href="#lernstand">Lernstand</a><a href="#tutor">Tutor</a>'
             '<a href="#sicherung">Sicherung</a></nav></header>'
             '<main id="app" class="m-shell"><noscript><p>Mastery braucht JavaScript. Die PDFs liegen im Ordner units/.</p>'
             '</noscript><p class="m-loading">Bibliothek wird geladen …</p></main>'
