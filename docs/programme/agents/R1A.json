@@ -1,21 +1,75 @@
 {
  "agent_id": "R1A",
  "wp": "WP-R1",
- "status": "RUNNING",
- "updated": "2026-11-27T09:11:44+01:00",
+ "status": "COMPLETED",
+ "updated": "2026-11-27T09:35:51+01:00",
  "done": [
+  "evidence:agarwal2021classroom",
+  "evidence:alfieri2013comparison",
+  "evidence:ashman2020sequence",
+  "evidence:barbieri2023",
+  "evidence:bisra2018",
+  "evidence:dejong2010clt",
+  "evidence:double2018reactivity",
+  "evidence:ebersbach2020mathspacing",
+  "evidence:fyfe2021manyclasses",
+  "evidence:gutierrez2022calibrating",
+  "evidence:higham2022relearning",
+  "evidence:higham2023reactivity",
+  "evidence:janssen2024monitoring",
+  "evidence:kalyuga2004measuring",
+  "evidence:kapur2023prior",
+  "evidence:karpicke2015complex",
+  "evidence:leahy2015testingwe",
+  "evidence:mullet2014delayedfb",
   "evidence:murray2025mathspacing",
+  "evidence:nesbit2006conceptmaps",
+  "evidence:pan2023pretesting",
+  "evidence:redifer2025advanced",
+  "evidence:rhodes2011delayedjol",
+  "evidence:rohrer2020interleaved",
   "evidence:ruitenburg2026classroom",
-  "evidence:yang2021classroom"
+  "evidence:sala2017fartransfer",
+  "evidence:sinha2021",
+  "evidence:vangog2015complexity",
+  "evidence:vangog2015testingwe",
+  "evidence:yang2021classroom",
+  "evidence:yeo2019retrievalwe",
+  "report:sections0-2",
+  "report:sections0-8",
+  "search:S01-S27",
+  "validation:json+ids+tables"
  ],
  "open": [
-  "read charter/audit/schema",
-  "search+read sources Q1-Q9",
-  "write r1a_evidence.json",
-  "write R1A_COGNITIVE_INSTRUCTIONAL.md"
+  "independent critic review (not done by R1A)",
+  "gaps G1-G13 in report section 8.1 (Sinha 2021 and Barbieri 2023 full texts, Ruitenburg Table 1 verification, Kalyuga 2004 full text)"
  ],
  "artifacts": [
+  "docs/research/workstreams/r1/R1A_COGNITIVE_INSTRUCTIONAL.md",
   "docs/research/workstreams/r1/r1a_evidence.json"
  ],
- "next_step": "Q1 continue: van Gog/Sweller vs Karpicke/Aue, successive relearning, pretesting"
+ "next_step": "lead: route to independent critic; R2/R3/R5 pick up hand-offs (proof, law/medicine interleaving, help-seeking, evaluation design)",
+ "summary": {
+  "sources": 31,
+  "kb_existing": 3,
+  "new": 28,
+  "fulltext_claim_review": 9,
+  "fulltext_partial": 3,
+  "abstract": 13,
+  "metadata": 6,
+  "page_fetches": 46,
+  "policies": [
+   "R1-POL-A01",
+   "R1-POL-A02",
+   "R1-POL-A03",
+   "R1-POL-A04",
+   "R1-POL-A05",
+   "R1-POL-A06",
+   "R1-POL-A07",
+   "R1-POL-A08",
+   "R1-POL-A09",
+   "R1-POL-A10",
+   "R1-POL-A11"
+  ]
+ }
 }

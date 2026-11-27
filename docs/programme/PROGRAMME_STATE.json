@@ -1,8 +1,8 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T09:10:00+01:00",
+ "updated": "2026-11-27T10:12:00+01:00",
  "updated_by": "lead (interactive Claude Code session)",
- "ambition": "1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
+ "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
   "Never merge to main; draft PRs only.",
   "Never modify the local RL pilot (main checkout on feat/rl-engine-pilot, 10 unpushed commits).",
@@ -33,7 +33,7 @@
   ]
  },
  "science_state": {
-  "summary": "R0 (PR #32) audited the 55-source/52-claim KB: bibliographic checks are not claim checks; retrieval/feedback moderator rankings, transfer to proof construction, tutor non-inferiority and calendar-based mastery are overstated. No Exam Mastery learning effect has been measured. R1 is now deepening cognitive science and sustainable-intensity evidence into context-dependent policies.",
+  "summary": "R0 (PR #32) audited the 55-source/52-claim KB: bibliographic checks are not claim checks; retrieval/feedback moderator rankings, transfer to proof construction, tutor non-inferiority and calendar-based mastery are overstated. No Exam Mastery learning effect has been measured. R1 is now deepening cognitive science and sustainable-intensity evidence into context-dependent policies. R1 (PR #35): 23 context-dependent design-hypothesis policies; retrieval is operation-specific, examples first for novices, feedback timing no lever, judgements reactive, sleep protection over weeks, no universal hour caps; no policy has an evaluated learning effect.",
   "key_documents": [
    "docs/research/RESEARCH_FIRST_PROGRAM_20261126.md (PR #20)",
    "docs/research/workstreams/KB_GAP_AUDIT.md, SEARCH_PROTOCOL.md, EVIDENCE_REGISTER_SCHEMA.md (PR #32)",
@@ -41,21 +41,84 @@
   ]
  },
  "workstreams": {
-  "R0": {"status": "COMPLETED", "pr": 32, "issue": 21, "note": "single-agent audit; independent second extraction pending; do not re-audit"},
-  "R1": {"status": "RUNNING", "wp": "WP-R1", "issue": 22},
-  "R2": {"status": "PLANNED", "wp": "WP-R2", "issue": 23},
-  "R3": {"status": "PLANNED", "wp": "WP-R3", "issue": 24},
-  "R4": {"status": "PLANNED", "wp": "WP-R4", "issue": 25},
-  "R5": {"status": "PLANNED", "wp": "WP-R5", "issue": 26},
-  "R6": {"status": "PLANNED", "wp": "WP-R6", "issue": 27},
-  "R7": {"status": "PLANNED", "wp": "WP-R7", "issue": 29},
-  "R8": {"status": "PLANNED", "wp": "WP-R8", "issue": 30},
-  "R9": {"status": "PLANNED", "wp": "WP-R9", "issue": 31}
+  "R0": {
+   "status": "COMPLETED",
+   "pr": 32,
+   "issue": 21,
+   "note": "single-agent audit; independent second extraction pending; do not re-audit"
+  },
+  "R1": {
+   "status": "COMPLETED",
+   "wp": "WP-R1",
+   "issue": 22,
+   "pr": 35,
+   "note": "independent review pending"
+  },
+  "R2": {
+   "status": "RUNNING",
+   "wp": "WP-R2",
+   "issue": 23
+  },
+  "R3": {
+   "status": "PLANNED",
+   "wp": "WP-R3",
+   "issue": 24
+  },
+  "R4": {
+   "status": "PLANNED",
+   "wp": "WP-R4",
+   "issue": 25
+  },
+  "R5": {
+   "status": "RUNNING",
+   "wp": "WP-R5",
+   "issue": 26
+  },
+  "R6": {
+   "status": "PLANNED",
+   "wp": "WP-R6",
+   "issue": 27
+  },
+  "R7": {
+   "status": "PLANNED",
+   "wp": "WP-R7",
+   "issue": 29
+  },
+  "R8": {
+   "status": "PLANNED",
+   "wp": "WP-R8",
+   "issue": 30
+  },
+  "R9": {
+   "status": "PLANNED",
+   "wp": "WP-R9",
+   "issue": 31
+  }
  },
  "architecture_decisions": [
-  {"id": "AD-0", "status": "WORKING_BASIS", "decision": "Four product containers (textbook, workbook, Anki, interactive) stay; components may be NOT_APPLICABLE with a justified fallback.", "source": "PR #20 charter"},
-  {"id": "AD-1", "status": "WORKING_BASIS", "decision": "Native Anki is the only scheduler; no second spaced-repetition engine without proven added value.", "source": "product contract, R8 brief"},
-  {"id": "AD-2", "status": "OPEN", "decision": "Architecture A/B/C (templates + expert modules / competence graph + policy engine / agent-generated experiences) decided in R6 after R1-R5."}
+  {
+   "id": "AD-0",
+   "status": "WORKING_BASIS",
+   "decision": "Four product containers (textbook, workbook, Anki, interactive) stay; components may be NOT_APPLICABLE with a justified fallback.",
+   "source": "PR #20 charter"
+  },
+  {
+   "id": "AD-1",
+   "status": "WORKING_BASIS",
+   "decision": "Native Anki is the only scheduler; no second spaced-repetition engine without proven added value.",
+   "source": "product contract, R8 brief"
+  },
+  {
+   "id": "AD-2",
+   "status": "OPEN",
+   "decision": "Architecture A/B/C (templates + expert modules / competence graph + policy engine / agent-generated experiences) decided in R6 after R1-R5."
+  },
+  {
+   "id": "AD-3",
+   "status": "OWNER_DECISION",
+   "decision": "Product identity Mastery: general knowledge-and-skill platform; exam preparation is an optional mode. Scope-neutral competency taxonomy; historical exam objectives preserved; no technical renames without a tested migration and separate approval.",
+   "source": "issue #34"
+  }
  ],
  "engine_capabilities": {
   "main": "v0.21.0-rc1 curated snapshot (PR #2)",
@@ -64,72 +127,363 @@
   "not_demonstrated": "automatic high-quality authorship; learning effect; proof-level correctness beyond polynomial identities"
  },
  "product_quality": {
-  "human_rejected": ["engine RC v0.21.0-rc1 products incl. NLP baseline", "NLP reference unit v1, v3, v4, v5, v6.1", "RL Kap. 3 v1, v3, v4"],
-  "human_review_pending": ["NLP v7.1 Self-Attention slice (PR #3)", "RL Kap. 3 v6 (local pilot)", "Golden Attention reference candidate (PR #28): technically executable, not scientifically or didactically accepted"],
+  "human_rejected": [
+   "engine RC v0.21.0-rc1 products incl. NLP baseline",
+   "NLP reference unit v1, v3, v4, v5, v6.1",
+   "RL Kap. 3 v1, v3, v4"
+  ],
+  "human_review_pending": [
+   "NLP v7.1 Self-Attention slice (PR #3)",
+   "RL Kap. 3 v6 (local pilot)",
+   "Golden Attention reference candidate (PR #28): technically executable, not scientifically or didactically accepted"
+  ],
   "learning_evaluation": "NOT_RUN for every product"
  },
  "critical_defects": [
-  {"id": "CD-1", "severity": "P0", "text": "No product has a measured learning effect; protocols lack sample size, allocation concealment and delayed unassisted endpoints (R0 §6)."},
-  {"id": "CD-2", "severity": "P0", "text": "policy.kc_status counts distinct calendar dates as spacing/mastery evidence; two dates can be minutes apart (R0 §2)."},
-  {"id": "CD-3", "severity": "P0", "text": "AI-R1 states tutor harm avoidance as if established; non-significance is not equivalence (R0 §2, D10)."},
-  {"id": "CD-4", "severity": "P1", "text": "Spec numbers (4 fading stages, 3 hints, <=5 min exploration, +-10% blueprint, <=60-word cards) are design hypotheses used as rules (R0 §6)."},
-  {"id": "CD-5", "severity": "P1", "text": "Golden references are session-curated; generalisable authoring quality is unproven (PR #28 limits)."},
-  {"id": "CD-6", "severity": "P1", "text": "Unmerged draft stack #11-#19/#28 and the local RL pilot drift apart from main; integration plan needed before engineering (P4)."}
+  {
+   "id": "CD-1",
+   "severity": "P0",
+   "text": "No product has a measured learning effect; protocols lack sample size, allocation concealment and delayed unassisted endpoints (R0 §6)."
+  },
+  {
+   "id": "CD-2",
+   "severity": "P0",
+   "text": "policy.kc_status counts distinct calendar dates as spacing/mastery evidence; two dates can be minutes apart (R0 §2)."
+  },
+  {
+   "id": "CD-3",
+   "severity": "P0",
+   "text": "AI-R1 states tutor harm avoidance as if established; non-significance is not equivalence (R0 §2, D10)."
+  },
+  {
+   "id": "CD-4",
+   "severity": "P1",
+   "text": "Spec numbers (4 fading stages, 3 hints, <=5 min exploration, +-10% blueprint, <=60-word cards) are design hypotheses used as rules (R0 §6)."
+  },
+  {
+   "id": "CD-5",
+   "severity": "P1",
+   "text": "Golden references are session-curated; generalisable authoring quality is unproven (PR #28 limits)."
+  },
+  {
+   "id": "CD-6",
+   "severity": "P1",
+   "text": "Unmerged draft stack #11-#19/#28 and the local RL pilot drift apart from main; integration plan needed before engineering (P4)."
+  }
  ],
  "agents": [
-  {"id": "LEAD", "kind": "interactive Claude Code session", "scope": "planning, integration, synthesis, PRs, state", "status": "RUNNING"},
-  {"id": "R1A", "kind": "background subagent of LEAD", "scope": "R1 cognitive & instructional science", "status": "RUNNING", "checkpoint": "docs/programme/agents/R1A.json"},
-  {"id": "R1B", "kind": "background subagent of LEAD", "scope": "R1 neuroscience, physiology, motivation, sustainable intensity", "status": "RUNNING", "checkpoint": "docs/programme/agents/R1B.json"},
-  {"id": "SUPERVISOR", "kind": "launchd agent", "scope": "headless continuation after limits/crashes/reboots", "status": "IDLE"}
+  {
+   "id": "LEAD",
+   "kind": "interactive Claude Code session",
+   "scope": "planning, integration, synthesis, PRs, state",
+   "status": "RUNNING"
+  },
+  {
+   "id": "R1A",
+   "kind": "background subagent of LEAD",
+   "scope": "R1 cognitive & instructional science",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R1A.json"
+  },
+  {
+   "id": "R1B",
+   "kind": "background subagent of LEAD",
+   "scope": "R1 neuro, physiology, motivation, intensity",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R1B.json"
+  },
+  {
+   "id": "R2",
+   "kind": "background subagent of LEAD",
+   "scope": "R2 formal, quantitative, computational mastery + measurement contract",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/R2.json",
+   "worktree": "Exam_Mastery-r2"
+  },
+  {
+   "id": "R5",
+   "kind": "background subagent of LEAD",
+   "scope": "R5 AI tutoring, knowledge tracing, measurement, evaluation protocol",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/R5.json",
+   "worktree": "Exam_Mastery-r5"
+  },
+  {
+   "id": "SUPERVISOR",
+   "kind": "launchd agent",
+   "scope": "headless continuation after limits/crashes/reboots",
+   "status": "IDLE (installed, interval 1800 s)"
+  }
  ],
  "work_packages": [
-  {"id": "WP-P0", "title": "Autonomous execution foundation (supervisor, durable state)", "status": "COMPLETED", "priority": 0,
-   "branch": "ops/programme-control-20261127", "base": "origin/main", "worktree": "Exam_Mastery-control",
-   "done": ["supervisor + 22 tests", "real smoke + resume", "launchd smoke", "real crash/resume test", "programme state + resume protocol"],
-   "next_step": "none; maintain"},
-  {"id": "WP-R1", "title": "R1 cognitive science, neuroscience and sustainable intensive study -> context-dependent learning policies", "status": "RUNNING", "priority": 1,
-   "branch": "research/r1-learning-science-20261127", "base": "origin/research/r0-evidence-audit-20261126 (2fbd203)", "worktree": "Exam_Mastery-r1", "issue": 22,
-   "done": ["R1A and R1B specialist briefs issued"],
-   "open": ["R1A report + evidence json", "R1B report + evidence json", "lead synthesis R1_LEARNING_SCIENCE.md", "machine-readable r1_learning_policies.json + consistency test", "independent critique pass by a non-author", "draft PR"],
-   "artifacts": ["docs/research/workstreams/r1/"],
-   "next_step": "If R1A/R1B checkpoints are COMPLETED: write the synthesis and policy JSON; otherwise continue the unfinished specialist part from its checkpoint (only that agent's files)."},
-  {"id": "WP-R2", "title": "R2 formal, quantitative and computational mastery", "status": "PLANNED", "priority": 2, "autostart": true, "issue": 23,
-   "branch": "research/r2-formal-quantitative-20261127", "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #23 and the charter's required outputs; produce docs/research/workstreams/R2_*.md + evidence json; reuse R1 policy format."},
-  {"id": "WP-R5", "title": "R5 AI tutoring, adaptation and learning measurement", "status": "PLANNED", "priority": 3, "autostart": true, "issue": 26,
-   "branch": "research/r5-tutoring-measurement-20261127", "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #26; include R0 open items (Kestin version of record, Bastani SI/analysis plan); measurement contract for unassisted competence."},
-  {"id": "WP-R3", "title": "R3 legal, clinical, economic and philosophical reasoning", "status": "PLANNED", "priority": 4, "autostart": true, "issue": 24,
-   "branch": "research/r3-contextual-reasoning-20261127", "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #24; no clinical competence certification."},
-  {"id": "WP-R4", "title": "R4 engineering, CAD, experimental and embodied learning (incl. cooking, baking, woodworking)", "status": "PLANNED", "priority": 5, "autostart": true, "issue": 25,
-   "branch": "research/r4-embodied-20261127", "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #25; separate simulated understanding from measured physical skill and safety."},
-  {"id": "WP-R9", "title": "R9 tutoring resource excellence", "status": "PLANNED", "priority": 6, "autostart": true, "issue": 31,
-   "branch": "research/r9-tutoring-resources-20261127", "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #31 and TUTORING_RESOURCE_REGISTRY_20261126.md; marketing vs function vs benchmark vs learning outcome."},
-  {"id": "WP-R7", "title": "R7 learning resources, visualisation and interactive excellence", "status": "PLANNED", "priority": 7, "autostart": true, "issue": 29,
-   "branch": "research/r7-resources-20261127", "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #29 and RESOURCE_IDEA_REGISTRY_20261126.md; reuse/link/emulate/defer/reject per resource."},
-  {"id": "WP-R8", "title": "R8 Anki, FSRS, Obsidian and knowledge workflows", "status": "PLANNED", "priority": 8, "autostart": true, "issue": 30,
-   "branch": "research/r8-anki-workflows-20261127", "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #30 and ANKI_OBSIDIAN_TOOLING_RESEARCH_20261126.md; no second scheduler."},
-  {"id": "WP-R6", "title": "R6 synthesis and architecture decision record", "status": "PLANNED", "priority": 9, "autostart": true, "issue": 27,
-   "depends_on": ["WP-R1", "WP-R2", "WP-R3", "WP-R4", "WP-R5"],
+  {
+   "id": "WP-P0",
+   "title": "Autonomous execution foundation (supervisor, durable state)",
+   "status": "COMPLETED",
+   "priority": 0,
+   "branch": "ops/programme-control-20261127",
+   "base": "origin/main",
+   "worktree": "Exam_Mastery-control",
+   "done": [
+    "supervisor + 22 tests",
+    "real smoke + resume",
+    "launchd smoke",
+    "real crash/resume test",
+    "programme state + resume protocol"
+   ],
+   "next_step": "none; maintain"
+  },
+  {
+   "id": "WP-R1",
+   "title": "R1 cognitive science, neuroscience and sustainable intensive study -> context-dependent learning policies",
+   "status": "COMPLETED",
+   "priority": 1,
+   "branch": "research/r1-learning-science-20261127",
+   "base": "origin/research/r0-evidence-audit-20261126 (2fbd203)",
+   "worktree": "Exam_Mastery-r1",
+   "issue": 22,
+   "done": [
+    "R1A report + evidence (31 sources, 12 full-text level)",
+    "R1B report + evidence (42 sources, 13 full-text level)",
+    "lead synthesis R1_LEARNING_SCIENCE.md",
+    "r1_learning_policies.json (23 policies, 8 conflict rules, measurement contract)",
+    "tests/test_r1_learning_policies.py 12 OK, mutation-checked",
+    "lead spot-check 7 key numbers vs abstracts: all match",
+    "draft PR #35"
+   ],
+   "open": [
+    "independent (human or separate) review",
+    "KB claim corrections from R1A §5.12 not applied",
+    "full texts Sinha 2021, Barbieri 2023"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/R1_LEARNING_SCIENCE.md",
+    "docs/research/workstreams/r1/"
+   ],
+   "next_step": "none; review pending",
+   "pr": 35,
+   "updated": "2026-11-27T10:05:00+01:00",
+   "tests": [
+    "python -m unittest tests.test_r1_learning_policies (12 OK)"
+   ]
+  },
+  {
+   "id": "WP-R2",
+   "title": "R2 formal, quantitative and computational mastery",
+   "status": "RUNNING",
+   "priority": 2,
+   "autostart": true,
+   "issue": 23,
+   "branch": "research/r2-formal-quantitative-20261127",
+   "base": "research/r1-learning-science-20261127 (bec1f62)",
+   "next_step": "If the specialist checkpoint is COMPLETED: lead review, spot-check, test, commit, draft PR. Otherwise continue the specialist part from its checkpoint (only its files).",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "worktree": "Exam_Mastery-r2",
+   "done": [
+    "specialist brief issued; policy file in R1 schema"
+   ],
+   "open": [
+    "specialist report + evidence + policies",
+    "lead review/spot-check",
+    "draft PR"
+   ]
+  },
+  {
+   "id": "WP-R5",
+   "title": "R5 AI tutoring, adaptation and learning measurement",
+   "status": "RUNNING",
+   "priority": 3,
+   "autostart": true,
+   "issue": 26,
+   "branch": "research/r5-tutoring-measurement-20261127",
+   "base": "research/r1-learning-science-20261127 (bec1f62)",
+   "next_step": "If the specialist checkpoint is COMPLETED: lead review, spot-check, test, commit, draft PR. Otherwise continue the specialist part from its checkpoint (only its files).",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "worktree": "Exam_Mastery-r5",
+   "done": [
+    "specialist brief issued; policy file in R1 schema"
+   ],
+   "open": [
+    "specialist report + evidence + policies",
+    "lead review/spot-check",
+    "draft PR"
+   ]
+  },
+  {
+   "id": "WP-R3",
+   "title": "R3 legal, clinical, economic and philosophical reasoning",
+   "status": "PLANNED",
+   "priority": 4,
+   "autostart": true,
+   "issue": 24,
+   "branch": "research/r3-contextual-reasoning-20261127",
+   "base": "research/r1-learning-science-20261127",
+   "next_step": "Read issue #24; no clinical competence certification.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+  },
+  {
+   "id": "WP-R4",
+   "title": "R4 engineering, CAD, experimental and embodied learning (incl. cooking, baking, woodworking)",
+   "status": "PLANNED",
+   "priority": 5,
+   "autostart": true,
+   "issue": 25,
+   "branch": "research/r4-embodied-20261127",
+   "base": "research/r1-learning-science-20261127",
+   "next_step": "Read issue #25; separate simulated understanding from measured physical skill and safety.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+  },
+  {
+   "id": "WP-R9",
+   "title": "R9 tutoring resource excellence",
+   "status": "PLANNED",
+   "priority": 6,
+   "autostart": true,
+   "issue": 31,
+   "branch": "research/r9-tutoring-resources-20261127",
+   "base": "research/r1-learning-science-20261127",
+   "next_step": "Read issue #31 and TUTORING_RESOURCE_REGISTRY_20261126.md; marketing vs function vs benchmark vs learning outcome.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+  },
+  {
+   "id": "WP-R7",
+   "title": "R7 learning resources, visualisation and interactive excellence",
+   "status": "PLANNED",
+   "priority": 7,
+   "autostart": true,
+   "issue": 29,
+   "branch": "research/r7-resources-20261127",
+   "base": "research/r1-learning-science-20261127",
+   "next_step": "Read issue #29 and RESOURCE_IDEA_REGISTRY_20261126.md; reuse/link/emulate/defer/reject per resource.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+  },
+  {
+   "id": "WP-R8",
+   "title": "R8 Anki, FSRS, Obsidian and knowledge workflows",
+   "status": "PLANNED",
+   "priority": 8,
+   "autostart": true,
+   "issue": 30,
+   "branch": "research/r8-anki-workflows-20261127",
+   "base": "research/r1-learning-science-20261127",
+   "next_step": "Read issue #30 and ANKI_OBSIDIAN_TOOLING_RESEARCH_20261126.md; no second scheduler.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+  },
+  {
+   "id": "WP-BRAND-B",
+   "title": "Mastery brand phase B: inventory and compatibility/risk matrix, presentation-only changes",
+   "status": "PLANNED",
+   "priority": 7.5,
+   "autostart": false,
+   "issue": 34,
+   "branch": "feat/mastery-brand-phase-b",
+   "base": "origin/main",
+   "next_step": "Inventory UI headings, export metadata, README/docs/CLI strings, package/CLI/data dirs/semantic ids/Anki/automation/CI/repo/external refs; propose exact changes with compatibility/risk matrix; change presentation only where safe; never rename identifiers listed in product_identity.unchanged_identifiers.",
+   "acceptance": [
+    "no forced technical renames",
+    "no data loss or review-history reset",
+    "active autonomous continuation unbroken",
+    "owner follow-up marked only where irreversible/public/legal"
+   ]
+  },
+  {
+   "id": "WP-R6",
+   "title": "R6 synthesis and architecture decision record",
+   "status": "PLANNED",
+   "priority": 9,
+   "autostart": true,
+   "issue": 27,
+   "depends_on": [
+    "WP-R1",
+    "WP-R2",
+    "WP-R3",
+    "WP-R4",
+    "WP-R5"
+   ],
    "branch": "research/r6-architecture-20261127",
-   "next_step": "Compare architectures A/B/C on the charter criteria; simplest sufficient architecture; ADR + minimum buildable slice."},
-  {"id": "WP-P4", "title": "Engineering and golden references on the R6 architecture", "status": "PLANNED", "priority": 10, "autostart": false,
-   "depends_on": ["WP-R6"],
-   "next_step": "Lead plans the integration of the draft stack #11-#19/#28 with main and the R6 slice before any headless engineering."}
+   "next_step": "Compare architectures A/B/C on the charter criteria; simplest sufficient architecture; ADR + minimum buildable slice. Taxonomy must be scope-neutral (exam preparation as optional mode; R1 phase 'final_exam_week' becomes an assessment-preparation mode).",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+  },
+  {
+   "id": "WP-P4",
+   "title": "Engineering and golden references on the R6 architecture",
+   "status": "PLANNED",
+   "priority": 10,
+   "autostart": false,
+   "depends_on": [
+    "WP-R6"
+   ],
+   "next_step": "Lead plans the integration of the draft stack #11-#19/#28 with main and the R6 slice before any headless engineering."
+  },
+  {
+   "id": "WP-BRAND-C",
+   "title": "Mastery technical/repository migration",
+   "status": "HUMAN_DECISION_REQUIRED",
+   "priority": 99,
+   "issue": 34,
+   "headless_ok": false,
+   "blockers": [
+    "requires separate owner approval (issue #34 phase C)"
+   ],
+   "next_step": "wait for owner approval"
+  }
  ],
  "costs_and_limits": {
   "paid_calls_authorised": 0,
   "overage": "disabled at organisation level (reported by rate_limit_event, 2026-11-27)",
   "observed_windows": [
-   {"at": "2026-11-27T09:00+01:00", "five_hour": {"utilization": 0.04, "resets": "2026-11-27T13:20+01:00"}, "seven_day": {"utilization": 0.55, "resets": "2026-11-29T07:00+01:00"}}
+   {
+    "at": "2026-11-27T09:00+01:00",
+    "five_hour": {
+     "utilization": 0.04,
+     "resets": "2026-11-27T13:20+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.55,
+     "resets": "2026-11-29T07:00+01:00"
+    }
+   },
+   {
+    "at": "2026-11-27T10:00+01:00",
+    "five_hour": {
+     "utilization": 0.4,
+     "resets": "2026-11-27T13:20+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.6,
+     "resets": "2026-11-29T07:00+01:00"
+    },
+    "note": "R1 (2 specialists ~0.64M tokens + lead) cost about 5 points of the 7-day window"
+   }
   ],
-  "supervisor_ceilings": {"five_hour": 0.9, "seven_day": 0.85, "max_runs_per_24h": 4},
+  "supervisor_ceilings": {
+   "five_hour": 0.9,
+   "seven_day": 0.85,
+   "max_runs_per_24h": 4
+  },
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents."
  },
- "next_milestone": "WP-R1 draft PR: R1 report, two evidence registers and machine-readable context-dependent learning policies with a consistency test."
+ "next_milestone": "WP-R2 and WP-R5 draft PRs (parallel specialists), then R3/R4/R9/R7/R8, then R6 architecture decision.",
+ "product_identity": {
+  "product_name": "Mastery",
+  "legacy_name": "Exam Mastery",
+  "scope": "general knowledge and skill mastery (academic, technical, analytical, experimental, creative, embodied/practical); exam preparation is an optional learning mode/track",
+  "decision": "owner, issue #34 (2026-11-27)",
+  "not_implied": "no certification of physical or clinical skills from simulation; no trademark clearance",
+  "phase_A": "DONE 2026-11-27: identity recorded here; forward-looking prose updated; historical titles, paths, artifacts and provenance preserved",
+  "phase_B": "WP-BRAND-B: isolated PR with inventory and compatibility/risk matrix; presentation-only changes where safe",
+  "phase_C": "HUMAN_DECISION_REQUIRED: technical/repository migration (module, CLI, Anki deck names/GUIDs, schemas, state dirs, launchd labels, worktree paths, GitHub repo name) only after separate owner approval",
+  "unchanged_identifiers": [
+   "exam_mastery Python module",
+   "exam-mastery CLI",
+   "APKG deck names and note GUIDs",
+   "competency/content ids",
+   "em-* schemas",
+   "state directories",
+   "launchd label dev.exam-mastery.programme-supervisor",
+   "worktree paths",
+   "GitHub repo Sven-Lutz/Exam_Mastery"
+  ],
+  "naming_risk": "'Mastery' collides with existing education/AI apps (signal only); trademark/category/territory research before any public commercial naming, final name to owner"
+ }
 }
