@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T19:10:40+01:00",
+ "updated": "2026-11-27T19:18:53+01:00",
  "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -207,10 +207,11 @@
   {
    "id": "CD-9",
    "severity": "P0",
-   "status": "OPEN",
+   "status": "FIX_IN_DRAFT_PR",
    "source": "R6 red team RT-26 (091ead4), reproduced by lead on the PR #46 head",
    "text": "kc_status still reports RETAINED_ON_LATER_DAY (a) when the learner viewed the solution of a sibling task of the same competency one minute before the later success (help is counted per task, not per competency) and (b) when an attempt carries a future timestamp (client/imported clock). CD-2's fix (PR #37) narrows but does not close the hole. Blocks any use of kc_status as an evaluation endpoint; in-product states stay proximal indicators (R5-POL-05).",
-   "fix": "P4 candidate stacked on #46: help on any task of the same competency taints later attempts within a declared window (provisional parameter); ignore/clamp events after the reference instant and reject future timestamps on import; Python/JS parity tests."
+   "fix": "PR #47 (stacked on #46): KC_HELP_WINDOW_HOURS (provisional, = retention gap) makes help on any same-competency task assisted for kc_status; attempts dated after real clock + 5 min ignored; browser import refuses future events; Python/JS parity; 4/4 new test methods fail on previous commit; suite 215 pytest + 654 unittest OK",
+   "open": "help outside the product stays invisible; in-product states remain proximal indicators (R5-POL-05)"
   },
   {
    "id": "CD-10",
@@ -743,6 +744,28 @@
     "CI on PR #46",
     "review",
     "remaining R8 EF items need owner decisions"
+   ],
+   "next_step": "none"
+  },
+  {
+   "id": "WP-CD9",
+   "title": "Integrity fix CD-9: competency-level help and future timestamps in kc_status",
+   "status": "COMPLETED",
+   "priority": 7.9,
+   "pr": 47,
+   "branch": "fix/kc-evidence-scope-20261127",
+   "base": "fix/anki-export-identity-20261127",
+   "worktree": "Exam_Mastery-cd9",
+   "updated": "2026-11-27T19:18:53+01:00",
+   "done": [
+    "policy.py + em_tutor.js: KC_HELP_WINDOW_HOURS, FUTURE_SKEW_MINUTES, import guard",
+    "tests/test_kc_evidence_scope.py (all methods fail on previous commit)",
+    "suite 215 + 654 OK",
+    "draft PR #47"
+   ],
+   "open": [
+    "CI on PR #47",
+    "review"
    ],
    "next_step": "none"
   },
