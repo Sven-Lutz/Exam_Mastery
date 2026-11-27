@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T19:18:53+01:00",
+ "updated": "2026-11-27T19:21:05+01:00",
  "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -33,7 +33,7 @@
   ]
  },
  "science_state": {
-  "summary": "R0 (PR #32) audited the 55-source/52-claim KB: bibliographic checks are not claim checks; retrieval/feedback moderator rankings, transfer to proof construction, tutor non-inferiority and calendar-based mastery are overstated. No Exam Mastery learning effect has been measured. R1 is now deepening cognitive science and sustainable-intensity evidence into context-dependent policies. R1 (PR #35): 23 context-dependent design-hypothesis policies; retrieval is operation-specific, examples first for novices, feedback timing no lever, judgements reactive, sleep protection over weeks, no universal hour caps; no policy has an evaluated learning effect.",
+  "summary": "R0 (PR #32) audited the 55-source/52-claim KB: bibliographic checks are not claim checks; retrieval/feedback moderator rankings, transfer to proof construction, tutor non-inferiority and calendar-based mastery are overstated. No Exam Mastery learning effect has been measured. R1 is now deepening cognitive science and sustainable-intensity evidence into context-dependent policies. R1 (PR #35): 23 context-dependent design-hypothesis policies; retrieval is operation-specific, examples first for novices, feedback timing no lever, judgements reactive, sleep protection over weeks, no universal hour caps; no policy has an evaluated learning effect. R2-R9 completed 27.11.2026 (PRs #38-#45); R6 (PR #48): 116 design-hypothesis policies, none with evaluated learning effect; independent red team (same model family) 43 findings; architecture H-AB PROPOSED; minimum credible system = one operation family (symbolic_procedure), within-person randomised, delayed unassisted endpoint on independently authored items.",
   "key_documents": [
    "docs/research/RESEARCH_FIRST_PROGRAM_20261126.md (PR #20)",
    "docs/research/workstreams/KB_GAP_AUDIT.md, SEARCH_PROTOCOL.md, EVIDENCE_REGISTER_SCHEMA.md (PR #32)",
@@ -83,9 +83,11 @@
    "note": "batch5 added (hints, error diagnosis, learning analytics); independent review pending"
   },
   "R6": {
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "wp": "WP-R6",
-   "issue": 27
+   "issue": 27,
+   "pr": 48,
+   "note": "H-AB PROPOSED; owner gate G0"
   },
   "R7": {
    "status": "COMPLETED",
@@ -124,8 +126,9 @@
   },
   {
    "id": "AD-2",
-   "status": "OPEN",
-   "decision": "Architecture A/B/C (templates + expert modules / competence graph + policy engine / agent-generated experiences) decided in R6 after R1-R5."
+   "status": "PROPOSED",
+   "decision": "Hybrid H-AB 'Evidenzkern mit Vorlagen': typed semantic contract + observation contract + verifier adapters + deterministic state/decision functions; templates per operation family and domain packs as data; agents only at build time behind gates; no rule language, no runtime agent, no knowledge tracing, no own scheduler. Rationale: verification, safety, measurement integrity, cost, offline, migration - not learning effect (none measured).",
+   "source": "R6 PR #48 (ARCHITECTURE_SYNTHESIS_ADR.md §3.5); awaiting owner OD-01"
   },
   {
    "id": "AD-3",
@@ -325,7 +328,7 @@
    "id": "R6ADR",
    "kind": "background subagent of LEAD",
    "scope": "R6 synthesis, ADR, ontology, contracts, minimum credible system",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R6ADR.json",
    "worktree": "Exam_Mastery-r6"
   }
@@ -772,7 +775,7 @@
   {
    "id": "WP-R6",
    "title": "R6 synthesis and architecture decision record",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 9,
    "autostart": true,
    "issue": 27,
@@ -784,25 +787,48 @@
     "WP-R5"
    ],
    "branch": "research/r6-architecture-20261127",
-   "next_step": "Two specialists: R6-RT independent red team (branch research/r6-red-team-20261127, merged by lead) and R6-ADR synthesis/ADR on research/r6-architecture-20261127; lead reconciles, opens one draft PR; owner acceptance required before architecture-dependent coding.",
+   "next_step": "None autonomous: owner gate G0 (OD-01).",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
-   "updated": "2026-11-27T19:10:40+01:00",
+   "updated": "2026-11-27T19:21:05+01:00",
    "worktree": "Exam_Mastery-r6",
    "base": "research/r1-learning-science-20261127",
    "done": [
-    "R6-RT red team (091ead4 on research/r6-red-team-20261127): RED_TEAM_REVIEW.md, red_team_findings.json 43 findings (1 blocker RT-26, 39 major, 3 minor; 18 certainty spot-checks, 6 over-claims), tests 10 OK; lead reproduced RT-26 and RT-11 -> CD-9, CD-10"
-   ]
+    "R6-RT red team (091ead4 on research/r6-red-team-20261127): RED_TEAM_REVIEW.md, red_team_findings.json 43 findings (1 blocker RT-26, 39 major, 3 minor; 18 certainty spot-checks, 6 over-claims), tests 10 OK; lead reproduced RT-26 and RT-11 -> CD-9, CD-10",
+    "R6-ADR (3a95551 draft before reading red team, d3ea60a JSON+tests, 07c5dfe reconciliation): ARCHITECTURE_SYNTHESIS_ADR.md, adr.json (H-AB PROPOSED), skill_ontology_v1.json, observation_contract_v1.json, 33 owner decisions with blocks/default, gates G0-G7 + brand gate, MCS, P4 integration plan",
+    "lead: merged red-team branch (93866ad), integration plan updated for #46/#47 (d765252), tests R6 architecture 12 + red team 10 + R1 OK; draft PR #48"
+   ],
+   "pr": 48,
+   "blockers": [],
+   "open": [
+    "OWNER: OD-01 accept/change/reject H-AB (G0)",
+    "OWNER: OD-02 merge order; OD-13b independent item author; OD-31/OD-03/OD-04 Anki edit/identity policy; OD-20 anki_bridge file name; remaining ODs in ADR §8",
+    "independent (non-model) review of R0-R9 and R6 (OD-26)"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/ARCHITECTURE_SYNTHESIS_ADR.md",
+    "docs/research/workstreams/RED_TEAM_REVIEW.md",
+    "docs/research/workstreams/r6/"
+   ],
+   "tests": "python3 -m unittest tests.test_r6_architecture tests.test_r6_red_team (+ tests/test_r1_learning_policies): OK"
   },
   {
    "id": "WP-P4",
    "title": "Engineering and golden references on the R6 architecture",
-   "status": "PLANNED",
+   "status": "HUMAN_DECISION_REQUIRED",
    "priority": 10,
    "autostart": false,
    "depends_on": [
     "WP-R6"
    ],
-   "next_step": "Lead plans the integration of the draft stack #11-#19/#28 with main and the R6 slice before any headless engineering. Include Mastery presentation changes (PR #36 §4 step 2) and CD-2 kc_status fix (R1 measurement contract)."
+   "next_step": "After G0: G1 integration per ADR §9, then G2 contract kernel. Before G0 only architecture-independent work: CD-10 expression-domain fix, CD-11 operation tagging (needs care: RT-10 touches K2), test maintenance, document corrections.",
+   "updated": "2026-11-27T19:21:05+01:00",
+   "blockers": [
+    "G0: owner accepts/changes/rejects ADR H-AB (OD-01, PR #48)",
+    "G1: owner merges draft stack in chosen order (OD-02); agents never merge"
+   ],
+   "done": [
+    "architecture-independent integrity fixes as stacked draft PRs: #37 CD-2, #43 CD-7, #46 CD-8, #47 CD-9 (each with failing-before tests and CI-equivalent suite)"
+   ]
   },
   {
    "id": "WP-BRAND-C",
@@ -877,7 +903,7 @@
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents.",
   "lead_pacing": "Lead keeps seven_day <= 0.85 like the supervisor: one specialist while five_hour > 0.6; stop spawning at seven_day >= 0.83 and hand remaining packages to the supervisor after the 2026-11-29 07:00 reset."
  },
- "next_milestone": "R6 red team + ADR running; lead reconciles and opens one R6 draft PR; owner acceptance gate. Architecture-independent fixes CD-2/7/8 in draft PRs #37/#43/#46.",
+ "next_milestone": "OWNER GATE G0 (OD-01 in PR #48) and OD-02 merge order. Meanwhile only architecture-independent work (CD-10, CD-11 scoped, hygiene per OD-20 decision).",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
