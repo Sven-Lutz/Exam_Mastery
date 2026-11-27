@@ -90,7 +90,7 @@ def test_figure_and_trace_use_the_same_model():
     p = {"matrix": [[1, 2], [2, 4]], "vector": [2, -1]}
     svg = figures_svg.render({"type": "plane_linear_map", "parameters": p, "title": "t", "alt": "a"})
     assert svg.startswith("<svg") and "<script" not in svg
-    assert "Kern = span(2; −1)" in svg and "Bild = span(1; 2)" in svg and "Rang M = 1" in svg
+    assert "Kern = span(2; −1)" in svg and "Bild = span(1; 2)" in svg and "Rang M = 1" in svg and "det M = 0" in svg
     neg = figures_svg.render({"type": "plane_linear_map", "parameters": {"matrix": [[0, 1], [1, 0]], "vector": [1, 2]},
                               "title": "t", "alt": "a"})
     assert "Orientierung umgekehrt" in neg and "#be123c" in neg

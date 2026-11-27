@@ -30,10 +30,10 @@ for(const root of document.querySelectorAll('.plane-lab')){
   drawMarks();render();}
  function drawMarks(){marks.replaceChildren();for(const s of model(1).singular_times){const m=el('span','pl-mark');m.style.left=(100*s)+'%';m.title='singulär bei t = '+fmt(s);marks.append(m);}}
  function line(p,q,stroke,w,extra){return node('line',Object.assign({x1:X(p),y1:Y(p),x2:X(q),y2:Y(q),stroke,'stroke-width':w},extra||{}));}
- function arrow(tip,col,key){const g=node('g',{class:'pl-obj pl-obj-'+key});
+ function arrow(tip,col,key,w){const g=node('g',{class:'pl-obj pl-obj-'+key});
   if(Math.hypot(tip[0],tip[1])<1e-9){g.append(node('circle',{cx:X([0,0]),cy:Y([0,0]),r:6,fill:'none',stroke:col,'stroke-width':2.5}));return g;}
   const ang=Math.atan2(-(tip[1]),tip[0]),hx=X(tip),hy=Y(tip),L=11;
-  g.append(line([0,0],tip,col,3.2));
+  g.append(line([0,0],tip,col,w||3.2));
   g.append(node('path',{d:`M${hx},${hy} L${hx-L*Math.cos(ang-0.4)},${hy-L*Math.sin(ang-0.4)} L${hx-L*Math.cos(ang+0.4)},${hy-L*Math.sin(ang+0.4)} Z`,fill:col}));
   return g;}
  function label(tip,text,col){const t=node('text',{x:X(tip)+(tip[0]>=0?9:-9),y:Y(tip)-8,'text-anchor':tip[0]>=0?'start':'end',fill:col,'font-weight':700,'font-size':14});t.textContent=text;return t;}
@@ -49,7 +49,7 @@ for(const root of document.querySelectorAll('.plane-lab')){
   if(m.rank===1){const u=m.kernel[0],w=m.image[0],lu=far/Math.hypot(...u),lw=far/Math.hypot(...w);
    const kl=line([-lu*u[0],-lu*u[1]],[lu*u[0],lu*u[1]],C.kernel,2);kl.setAttribute('stroke-dasharray','7 5');kl.setAttribute('class','pl-obj pl-obj-kernel');g.append(kl);
    const il=line([-lw*w[0],-lw*w[1]],[lw*w[0],lw*w[1]],C.image,2.6);il.setAttribute('class','pl-obj pl-obj-image');g.append(il);}
-  g.append(arrow(m.e1,C.e1,'e1'));g.append(arrow(m.e2,C.e2,'e2'));g.append(arrow(m.Mv,C.v,'v'));
+  const same=Math.hypot(m.e1[0]-m.e2[0],m.e1[1]-m.e2[1])<1e-9;g.append(arrow(m.e2,C.e2,'e2',same?7:3.2));g.append(arrow(m.e1,C.e1,'e1'));g.append(arrow(m.Mv,C.v,'v'));
   g.append(node('circle',{cx:X(v),cy:Y(v),r:4.5,fill:'white',stroke:C.v,'stroke-width':2}));
   if(guess){const gx=X(guess),gy=Y(guess);g.append(node('path',{d:`M${gx},${gy-8} L${gx+8},${gy} L${gx},${gy+8} L${gx-8},${gy} Z`,fill:'none',stroke:C.guess,'stroke-width':2.2,class:'pl-guess'}));}
   svg.append(g);
@@ -102,7 +102,7 @@ for(const root of document.querySelectorAll('.plane-lab')){
   const sign=root.querySelector('.pl-sign input:checked');
   if(!(Number.isFinite(x)&&Number.isFinite(y))||!sign){status.textContent='Bitte beide Koordinaten und ein Vorzeichen angeben (oder „Ohne Vorhersage ansehen“).';return;}
   guess=[x,y];phase='morph';root.querySelector('.pl-predict').hidden=true;status.textContent='Festgelegt. Jetzt Schritt für Schritt verformen oder abspielen.';render();});
- skip.addEventListener('click',()=>{guess=null;root.querySelectorAll('.pl-sign input').forEach(r=>{r.checked=false;});phase='morph';root.querySelector('.pl-predict').hidden=true;render();});
+ skip.addEventListener('click',()=>{guess=null;root.querySelectorAll('.pl-sign input').forEach(r=>{r.checked=false;});phase='morph';root.querySelector('.pl-predict').hidden=true;status.textContent='Ohne Vorhersage: verformen Sie schrittweise und beobachten Sie Spalten, Fläche und Kern.';render();});
  stepBtn.addEventListener('click',()=>{stop();setT(Math.min(1,Math.floor(t*4+1e-9)/4+0.25));});
  playBtn.addEventListener('click',play);
  tIn.addEventListener('input',()=>{stop();setT(Number(tIn.value));});
