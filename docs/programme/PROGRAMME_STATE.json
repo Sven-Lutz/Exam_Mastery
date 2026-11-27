@@ -441,9 +441,10 @@
   {
    "id": "WP-C2M-ANKIQA",
    "title": "P3 Anki card quality: visuals/context/maths in cards, per-card feedback (unclear, too hard, duplicate, missing context, wrong, suggest visual), controlled updates with stable GUIDs",
-   "status": "PLANNED",
+   "status": "DELEGATED_TO_CODEX",
    "priority": 0.5,
-   "autostart": false
+   "autostart": false,
+   "next_step": "Codex (owner-run) builds the card browser, per-card feedback, quality report and controlled update path; lead reviews and integrates its draft PR."
   },
   {
    "id": "WP-C2M-TUTOR",
@@ -1275,7 +1276,7 @@
   ]
  },
  "external_reviewers": {
-  "codex": "owner-run Codex session reviewed code (PR #52, issue #51 comment 7228973004); findings integrated",
+  "codex": "owner-run Codex: PR #52 (46d17d8, 32759c1, d98b64c) merged into integration; issue #53; next Codex task (owner-relayed): per-course render budget + review of 9f202b0; Anki card QA feedback loop (standard 5.4)",
   "gemini": "briefing prepared locally (private), not yet run"
  },
  "owner_directives_20261128": [
