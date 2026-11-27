@@ -489,7 +489,16 @@ def plane_linear_map(spec):
     from .motion.plane import figure_svg
     return figure_svg(spec['parameters'], spec.get('title'), spec.get('alt'))
 
-RENDER.update({'binomial_area_partition':binomial_partition,
+def mastery_motion(spec):
+    """A keyframe of a Mastery Motion scene (book figure / card image; V8). The scene is validated on export."""
+    from .motion import keyframe_svg, validate
+    scene = spec['scene']
+    validate(scene)
+    first = (scene.get('presets') or [{}])[0].get('id')
+    return keyframe_svg(scene, spec['step'], caption=False, preset=first)
+
+
+RENDER.update({'binomial_area_partition':binomial_partition, 'mastery_motion':mastery_motion,
                'plane_linear_map':plane_linear_map,
                'softmax_policy_gradient':policy_gradient_bandit,
                'scaled_dot_product_attention':attention_pipeline})

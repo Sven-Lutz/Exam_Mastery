@@ -38,6 +38,17 @@ def specifications(unit):
         if not isinstance(frames,list) or not 1 <= len(frames) <= 6 or len(set(map(str,frames))) != len(frames):
             raise ValueError('graphic: 1..6 unique keyframes required')
         for index in frames:
+            if isinstance(index, str):
+                # A keyframe step of the Mastery Motion scene of this interaction (V8): the book figure and the card
+                # image are that scene's keyframe (same palette, object ids and scale as the interactive scene).
+                from ..motion.embed import scene_for_interaction
+                scene = scene_for_interaction(interaction)
+                if scene is None or index not in [s['id'] for s in scene['steps']]:
+                    raise ValueError('graphic: unknown Mastery Motion keyframe ' + index)
+                spec = {'type': 'mastery_motion', 'scene': scene, 'step': index, 'title': item['caption'], 'alt': item['alt']}
+                figures_svg.render(spec)
+                result.append((item, index, spec))
+                continue
             if type(index) is not int or not 0 <= index < len(interaction['variants']):
                 raise ValueError('graphic: unknown interactive state')
             variant = interaction['variants'][index]
@@ -56,5 +67,7 @@ def html_frames(unit, teaching_id):
         if item['teaching_id'] == teaching_id:
             result.append('<figure class="semantic-figure" data-graphic-id="'+escape(item['id'])+'">'+
                 figures_svg.render(spec)+'<figcaption>'+escape(item['caption'])+
-                ' · Zustand '+str(index+1)+'. '+escape(item['alt'])+'</figcaption></figure>')
+                ' · '+('Zustand '+str(index+1) if isinstance(index, int) else 'Mastery Motion, Schritt „'
+                       + escape(next(s['title'] for s in spec['scene']['steps'] if s['id'] == index)) + '“')
+                +'. '+escape(item['alt'])+'</figcaption></figure>')
     return ''.join(result)

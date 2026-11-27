@@ -95,8 +95,10 @@ def publish(unit, output_dir, state_dir=None):
     from . import experience_anki
     from ..typeset import NODE
     from . import experience_graphics
+    from .. import motion
+    from ..motion import models as motion_models, plane as motion_plane, embed as motion_embed
     runtime = runtime_fingerprint(
-        [experience_anki, anki_v2, experience_graphics, figures_svg],
+        [experience_anki, anki_v2, experience_graphics, figures_svg, motion, motion_models, motion_plane, motion_embed],
         assets=fonts(NODE, [("source-sans-3", ["400-normal", "600-normal", "700-normal"])]),
         packages=["anki"], settings=[("css", anki_v2.CSS),
             ("basic_q", anki_v2.BASIC_Q), ("basic_a", anki_v2.BASIC_A),

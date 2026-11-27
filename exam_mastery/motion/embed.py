@@ -35,6 +35,19 @@ def section(scene, equation_svg=True):
             '</section>')
 
 
+def scene_for_interaction(interaction):
+    """The Mastery Motion scene an experience interaction belongs to (None if none): the plane scene built from the
+    interaction's own variants, or the public scene registered for its model. Book figures and card images of graphics
+    that name a keyframe step of this scene are rendered from it (V8: same palette, object ids and scale)."""
+    ref = interaction.get("model_ref")
+    if ref == "plane_linear_map":
+        from .plane import unit_scene
+        return unit_scene({"id": interaction["id"], "variants": interaction["variants"],
+                           "prediction_prompt": interaction.get("prediction_prompt")})
+    ids = MODEL_SCENES.get(ref)
+    return load(ids[0]) if ids else None
+
+
 def scenes_for_unit(unit):
     ids = []
     for interaction in unit.get("interactions", []) or []:
