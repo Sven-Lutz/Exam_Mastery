@@ -23,7 +23,7 @@ def specifications(unit):
             raise ValueError('graphic: unique semantic ID required')
         seen.add(item['id'])
         interaction = interactions.get(item['interaction_id'])
-        if not interaction or item['model_ref'] != interaction['model_ref'] or item['model_ref'] not in {'binomial_area_partition','scaled_dot_product_attention'}:
+        if not interaction or item['model_ref'] != interaction['model_ref'] or item['model_ref'] not in {'binomial_area_partition','scaled_dot_product_attention','softmax_policy_gradient'}:
             raise ValueError('graphic: model/interaction mismatch')
         for field, known in [('claim_ids',claims),('competency_ids',skills),('assessment_ids',tasks)]:
             if not isinstance(item[field],list) or not item[field] or not set(item[field]) <= known:

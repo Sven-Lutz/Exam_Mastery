@@ -68,6 +68,18 @@ def publish(unit, output_dir, state_dir=None):
         cards.append(card)
     if not cards:
         raise ValueError("No retrieval cards: refusing to publish an empty Anki package")
+    # Cards may show a keyframe of a semantic graphic (same SVG as in the books).
+    from .experience_graphics import specifications
+    from .. import figures_svg
+    wanted = {card["figure"] for card in cards if card.get("figure")}
+    figures = {}
+    for graphic, frame, spec in specifications(unit):
+        name = graphic["id"] + "-state-" + str(frame)
+        if name in wanted:
+            figures[name] = figures_svg.render(spec)
+            for card in cards:
+                if card.get("figure") == name and not card.get("figure_alt"):
+                    card["figure_alt"] = graphic["alt"]
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
     state = Path(state_dir) if state_dir is not None else output / ".em-state"
@@ -82,14 +94,16 @@ def publish(unit, output_dir, state_dir=None):
     from .experience_runtime import fingerprint as runtime_fingerprint, fonts
     from . import experience_anki
     from ..typeset import NODE
+    from . import experience_graphics
     runtime = runtime_fingerprint(
-        [experience_anki, anki_v2],
+        [experience_anki, anki_v2, experience_graphics, figures_svg],
         assets=fonts(NODE, [("source-sans-3", ["400-normal", "600-normal", "700-normal"])]),
         packages=["anki"], settings=[("css", anki_v2.CSS),
             ("basic_q", anki_v2.BASIC_Q), ("basic_a", anki_v2.BASIC_A),
             ("cloze_q", anki_v2.CLOZE_Q), ("cloze_a", anki_v2.CLOZE_A)])
     fingerprint = hashlib.sha256(json.dumps(
-        {"cards": cards, "course": course, "chapter": chapter, "deck": deck, "notetype": "v2", "runtime": runtime},
+        {"cards": cards, "course": course, "chapter": chapter, "deck": deck, "notetype": "v2", "runtime": runtime,
+         "figures": {k: hashlib.sha256(v.encode()).hexdigest() for k, v in sorted(figures.items())}},
         sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
     package = output / "Anki.apkg"
     manifest = state / ("anki-" + digest_id + ".json")
@@ -105,7 +119,7 @@ def publish(unit, output_dir, state_dir=None):
                 "user_collection_touched": False}
     with tempfile.TemporaryDirectory(dir=output, prefix=".em-anki-build-") as work:
         report = anki_v2.build_deck(
-            cards, deck, course, chapter, Path(work), state_dir=state)
+            cards, deck, course, chapter, Path(work), figures=figures, state_dir=state)
         source = Path(report["package"])
         pkg_hash = _hash_file(source)
         os.replace(source, package)  # temp folder is on the same filesystem
