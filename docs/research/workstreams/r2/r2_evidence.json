@@ -1,7 +1,7 @@
 {
  "schema": "r1-evidence/1",
  "agent": "R2",
- "updated": "2026-11-27T10:09:44+01:00",
+ "updated": "2026-11-27T17:30:00+01:00",
  "entries": [
   {
    "source_id": "hodds2014selfexplanation",
@@ -1780,6 +1780,988 @@
     }
    ],
    "verdict": "unresolved"
+  },
+  {
+   "source_id": "hundhausen2002avmeta",
+   "citation": "Hundhausen, C. D., Douglas, S. A., & Stasko, J. T. (2002). A meta-study of algorithm visualization effectiveness. Journal of Visual Languages & Computing, 13(3), 259-290.",
+   "doi_or_url": "https://doi.org/10.1006/jvlc.2002.0237",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "Crossref/OpenAlex metadata only; no abstract in Crossref, OpenAlex or Semantic Scholar (publisher-elided); ScienceDirect and academia.edu returned 403, author server refused connection. Content known only through secondary reports: saraiya2002avfeatures pp. 3, 15-16 and naps2002engagement abstract",
+    "sections_read": []
+   },
+   "design": "meta-study (vote counting, no pooled effect size) of experimental AV evaluations, grouped by the learning theory each study espoused",
+   "population": "participants of the included experiments (mostly undergraduate CS students; not verified)",
+   "operation": "computational_construction: understanding how an algorithm works (procedural and conceptual knowledge)",
+   "intervention": "algorithm visualisation/animation in different forms of learner involvement",
+   "comparator": "other AV variants or text/no AV (per included study)",
+   "outcome": {
+    "measure": "post-test performance in the included studies",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "vote count of significant vs non-significant experiments (secondary report)",
+    "value": "secondary (saraiya2002avfeatures pp. 3, 15-16): 24 experiments; 11 significant, 10 non-significant; studies framed by 'cognitive constructivism' (active involvement) 10 of 14 significant; 'epistemic fidelity' (representation features) 3 of 10 significant",
+    "ci": "not applicable",
+    "k_or_n": "24 experiments (secondary report)",
+    "note": "Numbers are NOT read in the primary text; a study can appear in several theory groups, so group counts do not sum to 24. Shaffer et al. (2010, TOCE 10(3), §2.2) report the same headline: how students use an AV matters more than what they see."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Primary text not read; vote counting ignores effect sizes and power; included studies are small, mostly immediate post-tests, often run by tool developers. Applicability to delayed, unassisted algorithm competence unknown.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:av_engagement_over_representation",
+     "relation": "supports",
+     "locator": "secondary: saraiya2002avfeatures pp. 3, 15-16"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "naps2002engagement",
+   "citation": "Naps, T. L., Rößling, G., Almstrum, V., Dann, W., Fleischer, R., Hundhausen, C., Korhonen, A., Malmi, L., McNally, M., Rodger, S., & Velázquez-Iturbide, J. Á. (2002). Exploring the role of visualization and engagement in computer science education. ACM SIGCSE Bulletin, 35(2), 131-152 (ITiCSE 2002 working group reports).",
+   "doi_or_url": "https://doi.org/10.1145/782941.782998",
+   "source_type": "expert_consensus",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract (ACM DL full text not fetched; scispace mirror empty)",
+    "sections_read": []
+   },
+   "design": "working-group report: review of experimental AV studies, position statement, engagement taxonomy, proposed evaluation framework",
+   "population": "not applicable (review/position)",
+   "operation": "computational_construction: learning algorithms with visualisation",
+   "intervention": "engagement taxonomy (from abstract: a taxonomy of learner engagement grounded in Bloom; level names not verified in this batch)",
+   "comparator": "not applicable",
+   "outcome": {
+    "measure": "not applicable",
+    "assisted": "not applicable",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "not applicable",
+    "note": "Abstract: visualisation 'is of little educational value unless it engages learners in an active learning activity'; proposes metrics and an experimental framework."
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Position derived from a review including the Hundhausen meta-study (co-author); authors include AV-system developers. It is a hypothesis generator, not a test.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:av_engagement_over_representation",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "not_empirical"
+  },
+  {
+   "source_id": "grissom2003avengagement",
+   "citation": "Grissom, S., McNally, M. F., & Naps, T. (2003). Algorithm visualization in CS education: Comparing levels of student engagement. In Proceedings of the 2003 ACM Symposium on Software Visualization (SoftVis '03), 87-94.",
+   "doi_or_url": "https://doi.org/10.1145/774833.774846",
+   "source_type": "primary_quasi_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; ACM DL full text not fetched (403 for ACM PDFs in this batch)",
+    "sections_read": []
+   },
+   "design": "multi-university comparison of three engagement levels; allocation method not read",
+   "population": "CS students at several universities learning simple sorting algorithms (N not in abstract)",
+   "operation": "computational_construction: understanding simple sorting algorithms",
+   "intervention": "(3) interacting with AVs outside class for an extended period, incl. questions integrated in the AV tool",
+   "comparator": "(1) no visualisation; (2) viewing visualisations briefly in class",
+   "outcome": {
+    "measure": "pre-test/post-test gain on sorting-algorithm questions",
+    "assisted": "unknown",
+    "delay": "none reported in abstract",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not reported in abstract",
+    "k_or_n": "unknown",
+    "note": "Abstract: learning increased with engagement level; students answering questions integrated into the AV showed the largest pre-post improvement."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Engagement level confounded with time on task (brief in-class viewing vs extended out-of-class interaction); authors developed the AV tool (JHAVÉ); only pre-post gain, no delayed or transfer test reported in abstract.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:av_engagement_over_representation",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "urquizafuentes2009avsurvey",
+   "citation": "Urquiza-Fuentes, J., & Velázquez-Iturbide, J. Á. (2009). A survey of successful evaluations of program visualization and algorithm animation systems. ACM Transactions on Computing Education, 9(2), Article 9, 1-21.",
+   "doi_or_url": "https://doi.org/10.1145/1538234.1538236",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref/Semantic Scholar abstract; open copy (URJC repository handle 10115/5593) blocked by bot protection",
+    "sections_read": []
+   },
+   "design": "survey of evaluations of program and algorithm visualisation (PAV) systems, mapped to engagement levels",
+   "population": "evaluations of 18 PAV systems",
+   "operation": "computational_construction: program and algorithm understanding",
+   "intervention": "PAV systems at different engagement levels (viewing, responding, changing, constructing, presenting)",
+   "comparator": "per included evaluation",
+   "outcome": {
+    "measure": "usability or educational effectiveness, per evaluation",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "count of systems/evaluations",
+    "value": "18 systems, 33 evaluations; half of the systems only tested for usability (shallow inspections)",
+    "ci": "not applicable",
+    "k_or_n": "18 systems / 33 evaluations",
+    "note": "Abstract: script-based systems suit viewing/responding/changing, compiler-based systems constructing/presenting; further features of successful evaluations are hypothesised, not tested."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Selection on 'successful' evaluations (survivorship); authors develop PAV systems; no effect-size synthesis. Shows that most AV tools have no learning evaluation.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:av_engagement_over_representation",
+     "relation": "qualifies",
+     "locator": "Abstract (half of systems only usability-tested)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "saraiya2002avfeatures",
+   "citation": "Saraiya, P. (2002). Effective features of algorithm visualizations (Master's thesis). Virginia Polytechnic Institute and State University, Blacksburg, VA. Published in condensed form as Saraiya, Shaffer, McCrickard & North (2004), SIGCSE '04.",
+   "doi_or_url": "http://hdl.handle.net/10919/34654",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "VTechWorks open PDF (thesis); the 2004 SIGCSE paper was not read and not compared",
+    "sections_read": [
+     "Abstract",
+     "Ch. 1 pp. 3 (summary of Hundhausen et al. 2002)",
+     "Ch. 2 pp. 15-16 (theory groups of the meta-study)",
+     "Ch. 4 intro, 4.1 procedure, 4.4 conclusions (Experiment 1)",
+     "Ch. 5.1 procedure, 5.3 sample size (Experiment 2)"
+    ]
+   },
+   "design": "two between-subjects experiments comparing heapsort AV variants with different feature sets",
+   "population": "undergraduate CS students without prior heapsort knowledge; Exp. 1: 66 participated (2 excluded), five variants; Exp. 2: 44 (11 per variant), four variants",
+   "operation": "computational_construction: procedural and conceptual understanding of heapsort",
+   "intervention": "AV variants differing in pace control, data set, pseudocode display, activity guide",
+   "comparator": "minimal AV variant (logical steps only)",
+   "outcome": {
+    "measure": "post-test with procedural and conceptual questions",
+    "assisted": false,
+    "delay": "immediate post-test",
+    "transfer": "near"
+   },
+   "estimate": {
+    "metric": "group comparisons (significance tests); effect sizes not extracted",
+    "value": "Exp. 1: minimal variant 'somewhat better (not significantly)' overall, significantly better on procedural questions than most richer variants (4.4)",
+    "ci": "not reported",
+    "k_or_n": "Exp. 1 N = 66; Exp. 2 N = 44",
+    "note": "Thesis abstract: ability to control the pace was the single most important feature; a good data set covering special cases helped; pseudocode display and activity guide did not improve and may overload (Exp. 1 pseudocode group performed significantly worse on procedural questions, 5.2)."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Small groups, one algorithm, lab setting, immediate test only, developer-group thesis; secondary summary of Hundhausen numbers written before independent checks.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:av_engagement_over_representation",
+     "relation": "supports",
+     "locator": "Abstract; 4.4 (learner-controlled pace, minimal features for procedural understanding)"
+    },
+    {
+     "claim_id": "R2:av_feature_overload",
+     "relation": "qualifies",
+     "locator": "4.4; 5.2 (more features, e.g. pseudocode, not better)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "brieven2026gli",
+   "citation": "Brieven, G., & Donnet, B. (2026). Assessing graphical loop invariant based programming performance in a CS1 course. Informatics in Education, 1-38 (online first).",
+   "doi_or_url": "https://doi.org/10.15388/infedu.2507.010",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "ORBi (Université de Liège) open PDF",
+    "sections_read": [
+     "Abstract",
+     "4.2.2 Groups of students (assignment)",
+     "6.2 RQ2",
+     "6.3 RQ3",
+     "7 Threats to validity"
+    ]
+   },
+   "design": "four-condition A/B/C/D classroom experiment over two problems; students ranked by a prior exam question and assigned round-robin; groups rotated between sessions",
+   "population": "CS1 students at a Belgian university (100 enrolled; voluntary participation; about 9-10 per group in session 2)",
+   "operation": "computational_construction: writing a loop from an invariant (correctness reasoning)",
+   "intervention": "B: fill-in-the-blank graphical loop invariant (GLI); C: construct GLI from scratch; D: complete GLI provided",
+   "comparator": "A: no scaffolding (all groups had been taught GLIBP; no control without GLIBP instruction)",
+   "outcome": {
+    "measure": "paper-based code: correctness, functional rate, semantic error types; GLI quality",
+    "assisted": false,
+    "delay": "none (session tasks)",
+    "transfer": "near (new loop problems)"
+   },
+   "estimate": {
+    "metric": "descriptive error rates; correlations",
+    "value": "Group D consistently fewer semantic errors (loop guard, variable roles); variable-update errors persisted in all groups; Problem 2: variable count vs update errors r = 0.58, p = 9.17e-04 (6.3)",
+    "ci": "not reported",
+    "k_or_n": "max. 25 per group; session 2 about 9-10 per group",
+    "note": "Abstract: many students struggled to understand or represent a GLI; the fill-in-the-blank version often added cognitive load. 6.2: GLIBP 'neither necessary nor sufficient for code correctness'."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Very small groups, single coder, two problems, no non-GLIBP control (7), course developers evaluate their own approach; immediate outcome only.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:invariant_first_reduces_loop_errors",
+     "relation": "supports",
+     "locator": "6.3 (Group D fewer guard/role errors)"
+    },
+    {
+     "claim_id": "R2:invariant_first_reduces_loop_errors",
+     "relation": "qualifies",
+     "locator": "Abstract; 6.2; 7 (fill-in-the-blank adds load; not sufficient; no external control)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "mccauley2015recursion",
+   "citation": "McCauley, R., Grissom, S., Fitzgerald, S., & Murphy, L. (2015). Teaching and learning recursive programming: A review of the research literature. Computer Science Education, 25(1), 37-66.",
+   "doi_or_url": "https://doi.org/10.1080/08993408.2015.1033205",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; publisher full text not accessed",
+    "sections_read": []
+   },
+   "design": "literature review of recursion learning research",
+   "population": "studies of (mostly) introductory programming students",
+   "operation": "computational_construction: understanding and writing recursive programs",
+   "intervention": "introductions via recurrence relations, programming examples, fractals, call-stack explanation; iteration-before-recursion vs reverse",
+   "comparator": "per included study",
+   "outcome": {
+    "measure": "per included study",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "fewer than 50 of hundreds of articles report research results (abstract)",
+    "note": "Abstract lists 'effective strategies' (different contexts, call-stack processing description) and notes that several studies compared iteration-first vs recursion-first; the direction of that comparison is not given in the abstract."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Narrative review; quality of included studies not assessable from abstract; 'effective' is the authors' label, not a pooled estimate.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:recursion_mental_models",
+     "relation": "context_only",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "galezer2004efficiency",
+   "citation": "Gal-Ezer, J., & Zur, E. (2004). The efficiency of algorithms - misconceptions. Computers & Education, 42(3), 215-226.",
+   "doi_or_url": "https://doi.org/10.1016/j.compedu.2003.07.004",
+   "source_type": "primary_descriptive",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Author copy (accepted manuscript 'article in press', Open University of Israel personal site); version of record not compared",
+    "sections_read": [
+     "Abstract",
+     "3.1 Research hypotheses",
+     "3.2 Research population",
+     "3.3 Research instruments",
+     "4 Results (questions 1-3)",
+     "5 Discussion"
+    ]
+   },
+   "design": "questionnaire (14 MC items with written explanations; 3 analysed), pre/post for grade 10, single post for grade 11; item analysis (point-biserial), McNemar test",
+   "population": "Israeli high-school CS students: 174 grade-10 students (pre), 141 of them at end of grade 10, 145 grade-11 students",
+   "operation": "computational_construction: judging time efficiency of algorithms (pre-asymptotic)",
+   "intervention": "regular CS Fundamentals curriculum including an efficiency chapter",
+   "comparator": "pre-test (grade 10) and cross-sectional grade 11",
+   "outcome": {
+    "measure": "correct choice of the more efficient program plus explanation",
+    "assisted": false,
+    "delay": "end of school year",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "percent correct / percent giving a given explanation",
+    "value": "Q1: correct 19.44 % (grade 10 pre), 27.5 % (grade 10 post), 55.9 % (grade 11); 'shorter program is more efficient' explanation 55 % pre, 56.7 % post, 34.3 % grade 11 (section 4)",
+    "ci": "not reported",
+    "k_or_n": "174 / 141 / 145",
+    "note": "Misconceptions (3.1, 5): shorter program = more efficient; fewer variables = more efficient; same statements in different order = equally efficient; same task = equally efficient. Few correct answers came with a correct explanation."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "High-school population (labelled; tertiary evidence in this batch is farghally2017aaci, abstract only); efficiency taught via execution time rather than big-O; no intervention comparison; teacher differences noted (5).",
+   "claim_edges": [
+    {
+     "claim_id": "R2:complexity_surface_heuristics",
+     "relation": "supports",
+     "locator": "3.1; 4 (Q1 percentages); 5"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "farghally2017aaci",
+   "citation": "Farghally, M. F., Koh, K. H., Ernst, J. V., & Shaffer, C. A. (2017). Towards a concept inventory for algorithm analysis topics. In Proceedings of the 2017 ACM SIGCSE Technical Symposium on Computer Science Education (SIGCSE '17), 207-212.",
+   "doi_or_url": "https://doi.org/10.1145/3017680.3017756",
+   "source_type": "primary_measurement",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; ACM DL PDF returned 403",
+    "sections_read": []
+   },
+   "design": "Delphi survey of instructors (important/hard topics, misconceptions), pilot concept-inventory items, four administrations",
+   "population": "post-CS2 (data structures/algorithm analysis) students at two US universities, Fall 2015 and Spring 2016 (N not in abstract)",
+   "operation": "computational_construction / symbolic_procedure: algorithm analysis (asymptotic reasoning)",
+   "intervention": "none (instrument development)",
+   "comparator": "none",
+   "outcome": {
+    "measure": "pilot AACI items targeting listed misconceptions",
+    "assisted": "unknown",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "four administrations, two universities",
+    "note": "Abstract: 'a sufficient number of students held most of the misconceptions identified in the list'. The misconception list itself was not read."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Instrument not validated beyond pilot (as reported in abstract); misconception content unknown to this register; developer group also builds AVs for algorithm analysis.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:complexity_surface_heuristics",
+     "relation": "supports",
+     "locator": "Abstract (misconceptions persist at post-CS2 level)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "chi1981categorization",
+   "citation": "Chi, M. T. H., Feltovich, P. J., & Glaser, R. (1981). Categorization and representation of physics problems by experts and novices. Cognitive Science, 5(2), 121-152.",
+   "doi_or_url": "https://doi.org/10.1207/s15516709cog0502_2",
+   "source_type": "primary_comparative",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; publisher full text not accessed (DTIC technical-report version not fetched)",
+    "sections_read": []
+   },
+   "design": "four experiments: problem sorting tasks and think-aloud protocols, expert-novice comparison",
+   "population": "physics experts and novices (sample sizes not in abstract; per mason2011categorization 1: eight volunteer introductory students in the sorting study)",
+   "operation": "symbolic_procedure: representing and categorising quantitative physics problems",
+   "intervention": "none (expert-novice comparison)",
+   "comparator": "experts vs novices",
+   "outcome": {
+    "measure": "problem categories in sorting; protocol content",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "unknown",
+    "note": "Abstract: experts initially abstract physics principles; novices base representations on literal problem features."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Very small, volunteer samples; dichotomous expert/novice framing later contested (mason2011categorization; docktor2014physicsder: 'continuum not a dichotomy').",
+   "claim_edges": [
+    {
+     "claim_id": "R2:representation_before_calculation",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "mason2011categorization",
+   "citation": "Mason, A., & Singh, C. (2011). Assessing expertise in introductory physics using categorization task. Physical Review Special Topics - Physics Education Research, 7(2), 020110.",
+   "doi_or_url": "https://doi.org/10.1103/PhysRevSTPER.7.020110",
+   "source_type": "primary_comparative",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "APS open access PDF (CC BY 3.0)",
+    "sections_read": [
+     "Abstract",
+     "III.A Procedure",
+     "III.D Participants",
+     "IV.A Evaluation of categories",
+     "V Discussion (incl. V.A)",
+     "VI Conclusion"
+    ]
+   },
+   "design": "categorisation task (25 mechanics problems, two versions, one with 7 Chi problems); categories rated good/moderate/poor with faculty-validated scheme; interviews",
+   "population": "two algebra-based classes (109, 114 students), one calculus-based class (180), 21 physics graduate students, 7 faculty (US)",
+   "operation": "symbolic_procedure: problem categorisation by underlying principle",
+   "intervention": "none (cross-sectional comparison)",
+   "comparator": "introductory vs graduate vs faculty",
+   "outcome": {
+    "measure": "proportion of 'good' (principle-based) categories",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "distribution of good categorisations (figures)",
+    "value": "large overlap between calculus-based introductory and graduate students; faculty significantly better than graduate students; calculus-based better than algebra-based (Abstract, V, VI)",
+    "ci": "not reported in sections read",
+    "k_or_n": "403 introductory, 21 graduate, 7 faculty",
+    "note": "Faculty inter-rater agreement on category ratings better than 95 % (IV.A). Even faculty categorised some multi-principle problems under one principle (V.A). Authors: results 'contrast with those of Chi et al.'"
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Categorisation is a proxy for expertise, not problem-solving performance; single institution; bonus points independent of quality.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:representation_before_calculation",
+     "relation": "qualifies",
+     "locator": "Abstract; VI (expertise is a continuum; categorisation only a proxy)"
+    },
+    {
+     "claim_id": "R2:expert_novice_dichotomy",
+     "relation": "contradicts",
+     "locator": "V; VI (overlap introductory/graduate contrasts with Chi et al.)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "dufresne1992constraining",
+   "citation": "Dufresne, R. J., Gerace, W. J., Hardiman, P. T., & Mestre, J. P. (1992). Constraining novices to perform expertlike problem analyses: Effects on schema acquisition. Journal of the Learning Sciences, 2(3), 307-331.",
+   "doi_or_url": "https://doi.org/10.1207/s15327809jls0203_3",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; publisher full text not accessed",
+    "sections_read": []
+   },
+   "design": "three experiments with novice physics students",
+   "population": "novice physics students (N, institution and allocation not in abstract)",
+   "operation": "symbolic_procedure: qualitative, principle-first analysis before quantitative solution",
+   "intervention": "constrained qualitative, hierarchically structured problem analyses (principles, concepts, procedures) mimicking experts",
+   "comparator": "not stated in abstract",
+   "outcome": {
+    "measure": "similarity judgements (Exp. 1), reasoning about similarity (Exp. 2), problem solving (Exp. 3)",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not reported in abstract",
+    "k_or_n": "unknown",
+    "note": "Abstract: more expertlike similarity judgements (Exp. 1) via focus on deep structure (Exp. 2); hierarchical analyses 'can improve' problem solving (Exp. 3)."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract only: comparator, sample size, delay and effect sizes unknown; computer-based tool from the developers; mechanics only.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:representation_before_calculation",
+     "relation": "supports",
+     "locator": "Abstract (Exp. 1-3)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "schoenfeld1979heuristics",
+   "citation": "Schoenfeld, A. H. (1979). Explicit heuristic training as a variable in problem-solving performance. Journal for Research in Mathematics Education, 10(3), 173-187.",
+   "doi_or_url": "https://doi.org/10.2307/748805",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; JSTOR/NCTM full text not accessed",
+    "sections_read": []
+   },
+   "design": "two-group experiment with equal practice time, problems and solutions; only the heuristics group got an explicit list of five strategies and modelling of their use",
+   "population": "students (educational level and N not stated in abstract)",
+   "operation": "symbolic_procedure: mathematical problem solving",
+   "intervention": "explicit instruction in five heuristic strategies",
+   "comparator": "same problems and solutions without explicit heuristic instruction",
+   "outcome": {
+    "measure": "posttest problems similar but not isomorphic to practice problems; think-aloud transcripts",
+    "assisted": false,
+    "delay": "unknown",
+    "transfer": "near (non-isomorphic problems)"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not reported in abstract",
+    "k_or_n": "unknown (small study; size not verified)",
+    "note": "Abstract: heuristics group 'significantly outperformed' the other students on non-isomorphic posttest problems."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Small, single-instructor study (instructor = researcher); no delayed test reported in abstract; old.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:explicit_heuristics",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "docktor2014physicsder",
+   "citation": "Docktor, J. L., & Mestre, J. P. (2014). Synthesis of discipline-based education research in physics. Physical Review Special Topics - Physics Education Research, 10(2), 020119.",
+   "doi_or_url": "https://doi.org/10.1103/PhysRevSTPER.10.020119",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "APS open access PDF",
+    "sections_read": [
+     "III.D Findings: 1 expert-novice, 2 worked examples, 3 representations, 4 mathematics in physics, 5 instructional strategies (pp. 020119-9 to -12)",
+     "III.E Strengths and limitations of problem-solving research",
+     "III.F Areas for future study (beginning)"
+    ]
+   },
+   "design": "narrative synthesis of physics education research (commissioned for the US National Research Council)",
+   "population": "mainly introductory university physics students",
+   "operation": "symbolic_procedure: quantitative physics problem solving",
+   "intervention": "problem-solving frameworks, qualitative analysis before equations, worked examples, self-diagnosis, representations, cooperative group problem solving, computer tutors",
+   "comparator": "per cited study",
+   "outcome": {
+    "measure": "per cited study; authors note inconsistent problem-solving measures",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "not applicable",
+    "note": "III.D.3: students with incorrect free-body diagrams performed worse than students drawing none; several representation interventions showed favourable reactions but no performance difference. III.D.2: self-diagnosis is hard; only one-third to one-half recognised an inappropriate principle; rubric plus correct solution helped. III.E: low N, limited problem types, no consistent problem-solving measure; worked-example research in physics 'sparse'."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Narrative, no effect sizes or quality appraisal; authors (Mestre) co-authored cited studies (e.g. dufresne1992constraining); secondary reading of primary studies.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:representation_before_calculation",
+     "relation": "supports",
+     "locator": "III.D.1 (expert-novice, qualitative analysis first), III.D.5 (frameworks, qualitative approaches)"
+    },
+    {
+     "claim_id": "R2:representation_before_calculation",
+     "relation": "qualifies",
+     "locator": "III.D.3 (mixed results; incorrect diagrams worse than none), III.E (limitations)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "vogelsanger2025solutionplan",
+   "citation": "Vogelsanger-Holenstein, M., Schukajlow, S., & Bruckmaier, G. (2025). Mathematical modelling and self-efficacy: Immediate and long-lasting effects of teaching mathematical modelling with a solution plan. ZDM - Mathematics Education, 57, 489-502.",
+   "doi_or_url": "https://doi.org/10.1007/s11858-025-01674-3",
+   "source_type": "primary_quasi_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref/Semantic Scholar abstract; Springer open-access PDF blocked for automated download",
+    "sections_read": []
+   },
+   "design": "intervention vs control with pre-, post- and follow-up tests; allocation unit and method not verified (nine classes)",
+   "population": "157 Swiss secondary-school students from nine classes",
+   "operation": "symbolic_procedure / empirical_experimental: mathematical modelling of real-world problems",
+   "intervention": "four mathematics lessons solving modelling problems with a solution plan",
+   "comparator": "regular curriculum (no active control)",
+   "outcome": {
+    "measure": "modelling competence test; self-efficacy",
+    "assisted": false,
+    "delay": "follow-up test (interval not in abstract)",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not reported in abstract",
+    "k_or_n": "N = 157, 9 classes",
+    "note": "Abstract: positive effect on modelling competence that persisted at follow-up; no direct effect on self-efficacy; authors call the study exploratory."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "School level; business-as-usual control (time and task exposure confounded); class-level clustering not checked; solution plan developed by co-author's group.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:modelling_solution_plan",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "lindl2025costamm",
+   "citation": "Lindl, A., Durandt, R., & Blum, W. (2025). Fostering mathematical modelling competency in different learning environments and educational contexts - an exploratory comparative analysis of four intervention studies. ZDM - Mathematics Education, 57, 351-364.",
+   "doi_or_url": "https://doi.org/10.1007/s11858-025-01680-5",
+   "source_type": "primary_quasi_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref abstract; Springer open-access PDF blocked for automated download",
+    "sections_read": []
+   },
+   "design": "four pre-post intervention studies with identical five-lesson modelling unit and instruments, pooled in a linear mixed model; teaching style varied",
+   "population": "453 participants: three studies at tertiary level in South Africa, one secondary-school study in Germany",
+   "operation": "symbolic_procedure / empirical_experimental: mathematical modelling",
+   "intervention": "five-lesson modelling unit, 'method-integrative' teaching style",
+   "comparator": "same unit with 'teacher-directive' style (no no-unit control stated in abstract)",
+   "outcome": {
+    "measure": "modelling competency test (same instruments across studies)",
+    "assisted": false,
+    "delay": "not stated in abstract",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not reported in abstract",
+    "k_or_n": "N = 453, 4 studies",
+    "note": "Abstract: unit effective independent of context; more effective in method-integrative groups. Pre-post gains without untreated control cannot separate unit effect from test-retest and maturation."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Developer-led (Blum); 'exploratory'; whether teaching-style groups were randomised is not stated in the abstract; tertiary participants are pre-service/first-year students in South Africa (not verified in detail).",
+   "claim_edges": [
+    {
+     "claim_id": "R2:modelling_solution_plan",
+     "relation": "supports",
+     "locator": "Abstract (unit effective across contexts incl. tertiary)"
+    },
+    {
+     "claim_id": "R2:modelling_solution_plan",
+     "relation": "qualifies",
+     "locator": "Abstract (pre-post design, teaching style moderates)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "ellison2021dagtemporal",
+   "citation": "Ellison, G. T. H. (2021). Might temporal logic improve the specification of directed acyclic graphs (DAGs)? Journal of Statistics and Data Science Education, 29(2), 202-213.",
+   "doi_or_url": "https://doi.org/10.1080/26939169.2021.1936311",
+   "source_type": "primary_descriptive",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "UCLan CLoK repository, published version (open licence); the earlier medRxiv preprint was not used",
+    "sections_read": [
+     "Abstract",
+     "2.1 Background to the directed learning exercise (setting)"
+    ]
+   },
+   "design": "single-group analysis of a directed learning exercise (temporality-driven covariate classification, then DAG specification); no comparison group",
+   "population": "85 third-year medical undergraduates in the UK (novice analysts)",
+   "operation": "empirical_experimental: causal reasoning with observational data (covariate roles, DAG specification)",
+   "intervention": "classifying covariates by temporal order, then specifying a DAG",
+   "comparator": "none (task 1 vs task 2 within the same students)",
+   "outcome": {
+    "measure": "covariate misclassification (confounder, mediator, competing exposure); completion; implied model bias",
+    "assisted": "unknown",
+    "delay": "none",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "percent of students / covariates",
+    "value": "most students completing task 1 misclassified at least one covariate (84.5 %), 92.4 % among those who specified a DAG; misclassified confounders 4.4 % and 3.1 %, mediators 56.9 % and 48.7 %, competing exposures 67.9 % and 62.3 %; models implied by the DAGs biased in 50/66 (76.8 %) (Abstract)",
+    "ci": "not reported in abstract",
+    "k_or_n": "N = 85 students; 512 and 517 covariates",
+    "note": "Author's conclusion (Abstract): temporality-driven classification had limited impact on DAG specification and bias risk."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Single cohort, single author-instructor, no control, no delayed test; medical rather than statistics students. Shows the deficit, not an effective intervention.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:causal_covariate_roles",
+     "relation": "supports",
+     "locator": "Abstract (misclassification of mediators/competing exposures)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  }
+ ],
+ "search_log": [
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "Crossref REST /works/{doi}",
+   "query": "known-item DOI check of 12 candidate studies named in the batch-5 assignment or known to the specialist (Hundhausen 2002, Naps 2002, Grissom 2003, Gal-Ezer 2004, McCauley 2015, Danielsiek 2012, Chi 1981, Docktor 2014, Schukajlow 2015, Dufresne 1992, Mason 2011, Schoenfeld 1979)",
+   "hits_screened": 12,
+   "included": [
+    "hundhausen2002avmeta",
+    "naps2002engagement",
+    "galezer2004efficiency",
+    "mccauley2015recursion",
+    "chi1981categorization",
+    "docktor2014physicsder",
+    "dufresne1992constraining",
+    "mason2011categorization",
+    "schoenfeld1979heuristics"
+   ],
+   "excluded_or_note": "Two guessed DOIs resolved to other papers (10.1145/774833.774847, 10.1145/2157136.2157140) and were discarded; Schukajlow 2015 (10.1007/s11858-015-0707-2) resolved but no abstract was retrievable (Crossref/S2 elided, Springer blocked), so its design could not be verified and it was not registered."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "Grissom McNally Naps algorithm visualization comparing levels of student engagement",
+   "hits_screened": 5,
+   "included": [
+    "grissom2003avengagement"
+   ],
+   "excluded_or_note": "4 hits: later XML/tool papers by the same group and unrelated items."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "Danielsiek Paul Vahrenhold misconceptions algorithms data structures",
+   "hits_screened": 0,
+   "included": [],
+   "excluded_or_note": "Request failed (non-JSON/rate-limited response); not retried; source not registered."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "Farghally concept inventory algorithm analysis",
+   "hits_screened": 5,
+   "included": [
+    "farghally2017aaci"
+   ],
+   "excluded_or_note": "Farghally et al. 2017 'Evaluating the effectiveness of algorithm analysis visualizations' (10.1145/3017680.3017698) screened on abstract: semester quasi-experiment with more time on AAVs in the intervention group; not registered in this batch (time box; time-on-task confound); candidate for a later batch. Other hits off-topic."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "Ward Sweller structuring effective worked examples",
+   "hits_screened": 0,
+   "included": [],
+   "excluded_or_note": "Request failed (rate-limited); Ward & Sweller (1990) is reported only secondarily via docktor2014physicsder III.D.2 and not registered."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "OpenAlex /works/doi:{doi}",
+   "query": "abstract retrieval for 10 DOIs (AV, physics, modelling, algorithm analysis)",
+   "hits_screened": 10,
+   "included": [
+    "naps2002engagement",
+    "grissom2003avengagement",
+    "chi1981categorization",
+    "dufresne1992constraining",
+    "schoenfeld1979heuristics",
+    "mccauley2015recursion",
+    "farghally2017aaci"
+   ],
+   "excluded_or_note": "No abstract available for hundhausen2002avmeta and galezer2004efficiency."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "OpenAlex /works?search=",
+   "query": "algorithm visualization engagement taxonomy evaluation | survey successful evaluations program visualization algorithm animation | big-O asymptotic complexity student misconceptions | loop invariant teaching students correctness reasoning",
+   "hits_screened": 0,
+   "included": [],
+   "excluded_or_note": "Not executed: HTTP 429, keyless daily budget exhausted. The same topics were searched with WebSearch and Semantic Scholar instead (entries below)."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "Semantic Scholar /paper/DOI",
+   "query": "abstract and open-access lookup for 5 DOIs (Hundhausen 2002, Chi 1981, Dufresne 1992, Schoenfeld 1979, Gal-Ezer 2004)",
+   "hits_screened": 5,
+   "included": [],
+   "excluded_or_note": "Abstracts elided by publishers; no open PDFs listed."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "WebSearch",
+   "query": "Hundhausen Douglas Stasko \"meta-study of algorithm visualization effectiveness\" pdf",
+   "hits_screened": 10,
+   "included": [],
+   "excluded_or_note": "No reachable full text: academia.edu 403, ScienceDirect 403, Georgia Tech author server connection refused; catalogue/summary pages are not sources."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "WebSearch",
+   "query": "Hundhausen Douglas Stasko 2002 meta-study 24 studies \"cognitive constructivism\" \"epistemic fidelity\" significant results procedural conceptual",
+   "hits_screened": 10,
+   "included": [
+    "saraiya2002avfeatures"
+   ],
+   "excluded_or_note": "Shaffer et al. 2010 'Algorithm visualization: the state of the field' (TOCE 10(3), author PDF) read in §2.2 as a cross-check of the Hundhausen headline; not registered (narrative state-of-field, secondary). Machine-generated summary sites (typeset/scispace, bohrium) not used as sources."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "WebSearch",
+   "query": "Urquiza-Fuentes Velázquez-Iturbide survey of successful evaluations of program visualization and algorithm animation systems engagement",
+   "hits_screened": 10,
+   "included": [
+    "urquizafuentes2009avsurvey"
+   ],
+   "excluded_or_note": "2008 workshop paper by the same authors not registered (overlapping content). Repository PDF blocked by bot protection; abstract from Crossref."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "WebSearch",
+   "query": "students misconceptions algorithm complexity big-O asymptotic analysis study undergraduates",
+   "hits_screened": 10,
+   "included": [
+    "galezer2004efficiency"
+   ],
+   "excluded_or_note": "Brown University paper on performance preconceptions (cs.brown.edu) could not be fetched (TLS certificate error) and was not registered; OpenDSA/textbook pages and Q&A pages excluded (not studies)."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "WebSearch",
+   "query": "Farghally Koh Ernst Shaffer \"concept inventory for algorithm analysis\" misconceptions pdf vtechworks OR opendsa",
+   "hits_screened": 10,
+   "included": [],
+   "excluded_or_note": "No open full text of the AACI paper; dynamic-programming concept inventory (arXiv 2411.14655) and recursion concept inventory not assessed (time box)."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "WebSearch",
+   "query": "students learning loop invariants empirical study undergraduate algorithm correctness proofs difficulties",
+   "hits_screened": 10,
+   "included": [
+    "brieven2026gli"
+   ],
+   "excluded_or_note": "SIGCSE poster on loop invariants (RESOLVE) excluded (poster, no full study); Frama-C experience report (arXiv 2111.08208) excluded (no comparison); invariant-based programming error study (Mannila) not assessed (time box)."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "Semantic Scholar /paper/search",
+   "query": "mathematical modelling intervention meta-analysis students modelling competence",
+   "hits_screened": 10,
+   "included": [
+    "lindl2025costamm"
+   ],
+   "excluded_or_note": "Problem-posing meta-analysis (2024) excluded (problem posing, not modelling performance); Wiehe et al. 2025 excluded (motivational outcomes only, grade 9); off-topic hits (health, sport, nursing) excluded."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "Semantic Scholar /paper/search",
+   "query": "solution plan mathematical modelling scaffolding experiment",
+   "hits_screened": 8,
+   "included": [
+    "vogelsanger2025solutionplan"
+   ],
+   "excluded_or_note": "Schukajlow et al. 2015 and the 2020 book chapter: no abstract retrievable, not registered; 2023 expert-novice scaffolding study excluded (teacher practices, not learner outcomes); conference/regional school studies excluded."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "WebSearch",
+   "query": "Schukajlow Kolter Blum 2015 \"Scaffolding mathematical modelling with a solution plan\" abstract ZDM students' modelling competency self-efficacy",
+   "hits_screened": 10,
+   "included": [],
+   "excluded_or_note": "Only search snippets and an unofficial proxy mirror; design claims (class randomisation) not verifiable from a primary page; not registered."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "Semantic Scholar /paper/search",
+   "query": "Fermi problems estimation students intervention",
+   "hits_screened": 0,
+   "included": [],
+   "excluded_or_note": "Not executed: HTTP 429."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "WebSearch",
+   "query": "Fermi problems estimation instruction study students effect \"Fermi problems\" mathematics education empirical",
+   "hits_screened": 10,
+   "included": [],
+   "excluded_or_note": "All screened studies are school-level or teacher-education, small, mostly qualitative or action research; a ZDM 2019 literature review is conceptual. No tertiary learning-outcome evidence; Fermi/estimation stays a declared gap."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "Semantic Scholar /paper/search",
+   "query": "teaching causal inference students learning outcomes",
+   "hits_screened": 8,
+   "included": [],
+   "excluded_or_note": "No relevant hit among the first 8 (AI-teaching, EFL, policy evaluation papers)."
+  },
+  {
+   "batch": 5,
+   "date": "2026-11-27",
+   "engine": "WebSearch",
+   "query": "evaluation of teaching causal inference directed acyclic graphs undergraduate students learning outcomes study",
+   "hits_screened": 10,
+   "included": [
+    "ellison2021dagtemporal"
+   ],
+   "excluded_or_note": "medRxiv preprint of the same study not used (published version preferred); JSE 2020 article on causal diagrams in intro statistics excluded (no outcome data); Druzdzel 1995 and causal-AI primer excluded (anecdotal)."
   }
  ]
 }
