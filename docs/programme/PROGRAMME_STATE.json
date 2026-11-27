@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T18:25:29+01:00",
+ "updated": "2026-11-27T18:36:53+01:00",
  "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -134,7 +134,8 @@
   "main": "v0.21.0-rc1 curated snapshot (PR #2)",
   "draft_stack_unmerged": "PRs #11-#19 four-product experience engine (textbook/workbook PDF, APKG with stable ids and review-history-preserving re-import, offline HTML), adaptive diagnosis (#14), misconception scaffolds (#15), staged publishing (#16), exact symbolic polynomial gates (#17), evidence audit fail-closed (#18), publish recovery + cache invalidation (#19); PR #28 adds exclusive publisher lock, offline MathJax SVG, semantic graphics contract and the Attention lab",
   "verification_entrypoint": "python scripts/verify_experience_references.py --out <dir> (PR #19/#28 branches)",
-  "not_demonstrated": "automatic high-quality authorship; learning effect; proof-level correctness beyond polynomial identities"
+  "not_demonstrated": "automatic high-quality authorship; learning effect; proof-level correctness beyond polynomial identities",
+  "test_environment": "Repo-independent venv with playwright/reportlab/pytest: Projects/Exam_Mastery-integration/.venv (the old ~/.local/share/exam-mastery venv was retired 2026-11-23); run engine suites from a frozen git-archive copy"
  },
  "product_quality": {
   "human_rejected": [
@@ -186,8 +187,9 @@
    "id": "CD-7",
    "severity": "P1",
    "text": "PR #19 tutor brief embeds the full reference solution; only a prompt instruction keeps it from the learner and the chat provider receives it (R9 TUTOR_ADOPTION_DECISION.md). Conflicts with R5-POL-03/R9-POL-04 (answer key only for practice items; never for mock/retest items).",
-   "status": "OPEN",
-   "fix": "P4: brief carries only practice-item keys; mock/retest items never leave the engine"
+   "status": "FIX_IN_DRAFT_PR",
+   "fix": "PR #43 (stacked on #37): no answer key in the tutor brief for similar/transfer/retest (role from engine track); 'tutor' event counts as assistance in policy.py + em_tutor.js; 7 new checks (5 fail on 5bdfb6f); CI-equivalent suite 215 pytest + 643 unittest OK locally",
+   "open": "chapter app em_app.js does not log the tutor handoff yet"
   }
  ],
  "agents": [
@@ -596,6 +598,30 @@
     "CI on PR #37",
     "review"
    ],
+   "next_step": "none"
+  },
+  {
+   "id": "WP-CD7",
+   "title": "Integrity fix CD-7: tutor brief answer keys and tutor-handoff evidence",
+   "status": "COMPLETED",
+   "priority": 7.7,
+   "pr": 43,
+   "branch": "fix/tutor-evidence-integrity-20261127",
+   "base": "fix/kc-status-elapsed-time-20261127",
+   "worktree": "Exam_Mastery-cd7",
+   "updated": "2026-11-27T18:36:53+01:00",
+   "done": [
+    "tutor.KEY_WITHHELD_ROLES; policy.ASSIST_EVENTS incl. 'tutor'; em_tutor.js mirror + UI event + evidence note",
+    "tests/test_tutor_evidence_integrity.py (7; 5 fail on previous commit)",
+    "frozen-copy CI-equivalent run: pytest 215 passed, unittest discover 643 OK (skipped=6)",
+    "draft PR #43"
+   ],
+   "open": [
+    "CI on PR #43",
+    "review",
+    "em_app.js chapter-app tutor handoff not logged"
+   ],
+   "tests": "venv of Exam_Mastery-integration: python -m pytest <CI module list>; python -m unittest discover -s tests",
    "next_step": "none"
   },
   {
