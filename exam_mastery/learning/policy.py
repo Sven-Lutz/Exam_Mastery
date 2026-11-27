@@ -63,6 +63,19 @@ def helped(events, task_id, upto=None):
     return any(e['type'] in ASSIST_EVENTS and e.get('task') == task_id for e in evs)
 
 
+# Help on ANY task of the same competency shortly before an attempt also makes that attempt assisted for the
+# competency's evidence state: a worked solution of a sibling task shows the method (CD-9, R6 red team RT-26).
+# Provisional design parameter (same order as the retention gap), not an evidence-based constant.
+KC_HELP_WINDOW_HOURS = RETENTION_MIN_GAP_HOURS
+FUTURE_SKEW_MINUTES = 5  # tolerated clock skew for event timestamps (CD-9)
+
+
+def _kc_helped(events, tasks, kc_id, i, t_attempt):
+    window = timedelta(hours=KC_HELP_WINDOW_HOURS)
+    return any(e['type'] in ASSIST_EVENTS and tasks.get(e.get('task'), {}).get('kc_id') == kc_id
+               and t_attempt - _instant(e['t']) <= window for e in events[:i])
+
+
 def _solved(events, task_id):
     return any(e['type'] == 'attempt' and e['task'] == task_id and e['diagnosis']['result'] == 'correct' for e in events)
 
@@ -86,14 +99,19 @@ def kc_status(track, events, today=None):
     `today` is the reference instant (ISO date or timestamp); default: now (UTC)."""
     now = _instant(today) if today else datetime.now(timezone.utc)
     gap = timedelta(hours=RETENTION_MIN_GAP_HOURS)
+    latest = datetime.now(timezone.utc) + timedelta(minutes=FUTURE_SKEW_MINUTES)
     T = {t['id']: t for t in track['tasks']}
     out = {}
     for kc in track['kcs']:
-        evs = [(i, e) for i, e in enumerate(events) if e['type'] == 'attempt' and T.get(e['task'], {}).get('kc_id') == kc['id']]
+        # Attempts dated after the real clock (plus a small skew) are not evidence: client or imported clocks may run
+        # ahead and would turn into 'retention' later (CD-9). The reference instant keeps its CD-2 meaning.
+        evs = [(i, e) for i, e in enumerate(events) if e['type'] == 'attempt' and T.get(e['task'], {}).get('kc_id') == kc['id']
+               and _instant(e['t']) <= latest]
         if not evs:
             out[kc['id']] = 'NOT_ASSESSED'; continue
         indep = sorted((_instant(e['t']), e['task']) for i, e in evs
-                       if e['diagnosis']['result'] == 'correct' and not helped(events, e['task'], i))
+                       if e['diagnosis']['result'] == 'correct' and not helped(events, e['task'], i)
+                       and not _kc_helped(events, T, kc['id'], i, _instant(e['t'])))
         aided = any(e['diagnosis']['result'] == 'correct' for i, e in evs)
         retained = any(t2 - t1 >= gap and k2 != k1 for t1, k1 in indep for t2, k2 in indep)
         if retained:
