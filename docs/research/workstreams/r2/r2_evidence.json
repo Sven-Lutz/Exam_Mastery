@@ -1,0 +1,1785 @@
+{
+ "schema": "r1-evidence/1",
+ "agent": "R2",
+ "updated": "2026-11-27T10:09:44+01:00",
+ "entries": [
+  {
+   "source_id": "hodds2014selfexplanation",
+   "citation": "Hodds, M., Alcock, L., & Inglis, M. (2014). Self-explanation training improves proof comprehension. Journal for Research in Mathematics Education, 45(1), 62-101.",
+   "doi_or_url": "https://doi.org/10.5951/jresematheduc.45.1.0062",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "Article file embargoed (figshare 9367232). Read instead: author's PhD thesis 'Improving proof comprehension in undergraduate mathematics' (Hodds, Loughborough 2014, figshare 9375659), same three studies; article version of record not compared",
+    "sections_read": [
+     "Thesis Study 1 results (pp. 87-90: ANCOVA, item-overlap re-analysis, year analysis, explanation coding)",
+     "Thesis Study 2 design note on 10-item MC test",
+     "Thesis Study 3 results (d = 0.410 / 0.350)",
+     "Thesis literature section 2.3 (comprehension vs construction) skimmed"
+    ]
+   },
+   "design": "three experiments: (1) lab RCT, individual sessions; (2) eye-tracking RCT with counterbalanced proof order; (3) classroom RCT in a lecture theatre (details via alcock2015notices)",
+   "population": "UK undergraduate mathematics students (years 1-3 in Exp. 1; first-year calculus students in Exp. 3)",
+   "operation": "formal_proof: proof comprehension (reading a given short number-theory proof); NOT proof construction",
+   "intervention": "self-explanation training booklet (approx. 15-20 min) focusing attention on logical relationships within a proof",
+   "comparator": "time-matched reading on history of mathematics (Exp. 1) or time management (Exp. 3)",
+   "outcome": {
+    "measure": "proof comprehension tests built on the Mejia-Ramos et al. (2012) assessment model; free response (Exp. 1), multiple choice (Exp. 3)",
+    "assisted": false,
+    "delay": "Exp. 3: delayed post-test 20 days later on a second, different proof",
+    "transfer": "near: comprehension of a new proof of similar length/domain; no proof construction outcome"
+   },
+   "estimate": {
+    "metric": "ANCOVA F with partial eta squared; Cohen d",
+    "value": "Study 1 (lab, N approx. 78 by df): F(1,76) = 13.315, p < .001, partial eta2 = .154; means 18.2/28 (SD 4.2) vs 14.2/28 (SD 4.0), d = 0.950; unchanged after removing an item answered in the training (F(1,76) = 12.753, p = .001). Study 3 (classroom, N = 107): d = 0.410 immediate, d = 0.350 delayed (20 days), F(1,105) = 6.024, p = .016",
+    "ci": "not reported",
+    "k_or_n": "Study 1 df 76; Study 3 N = 107",
+    "note": "Study 1 comprehension test alpha = .672. The F(1,69) = 181.459 printed for the condition effect in the Notices accepted manuscript is not supported by the thesis text and is treated as an error there."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Developer-led; short number-theory proofs; Study 1 training examples overlapped with one test item (re-analysis robust); effect shrinks from lab (d approx. 0.95) to classroom (d approx. 0.35-0.41), consistent with typical lab-to-field attenuation; outcome is comprehension, not construction; only Study 3 has a delay (20 days) and a new proof at delayed test.",
+   "claim_edges": [
+    {
+     "claim_id": "se.1",
+     "relation": "supports",
+     "locator": "alcock2015notices pp. 22-23, Fig. 11"
+    },
+    {
+     "claim_id": "R2:proof_comprehension_training",
+     "relation": "supports",
+     "locator": "Abstract; alcock2015notices pp. 16-23"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "alcock2015notices",
+   "citation": "Alcock, L., Hodds, M., Roy, S., & Inglis, M. (2015). Investigating and improving undergraduate proof comprehension. Notices of the American Mathematical Society, 62(7), starting p. 742 (end page not verified).",
+   "doi_or_url": "https://doi.org/10.1090/noti1263",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Accepted manuscript via Loughborough repository (figshare article 9369368, file AlcockHoddsRoyInglis(2015)AMSNotices_ACCEPTED.pdf); AMS page blocked automated access",
+    "sections_read": [
+     "e-Proof study pp. 5-6 incl. Fig. 2",
+     "eye-movement expert/novice section pp. 10-14",
+     "self-explanation studies pp. 16-23 incl. Figs. 7, 8, 11 and endnotes ii-iv",
+     "Discussion pp. 23-25"
+    ]
+   },
+   "design": "authors' narrative summary of their own programme (e-Proofs RCT, eye-tracking expert-novice comparison, three self-explanation RCTs)",
+   "population": "UK undergraduate mathematics students; research mathematicians in eye-tracking comparisons",
+   "operation": "formal_proof: proof comprehension and proof validation (reading)",
+   "intervention": "e-Proofs (audio + animated highlighting) vs. paper proof; self-explanation training vs. unrelated reading",
+   "comparator": "same proof on paper for fixed time (e-Proof study); time-matched unrelated reading (self-explanation)",
+   "outcome": {
+    "measure": "proof comprehension tests per Mejia-Ramos et al. (2012) model",
+    "assisted": false,
+    "delay": "e-Proof study: identical unannounced delayed post-test 2 weeks later; self-explanation classroom study: 20 days, different proof",
+    "transfer": "near only"
+   },
+   "estimate": {
+    "metric": "ANOVA F; Cohen d",
+    "value": "e-Proof: no group difference at immediate or delayed test; time x group interaction F(1,47) = 5.659, p = .021 (e-Proof group dropped more). Self-explanation classroom: d = 0.410 / 0.350",
+    "ci": "not reported",
+    "k_or_n": "e-Proof study df imply about 49 analysed; classroom study 107",
+    "note": "Accepted manuscript, not version of record. Its Fig. 8 caption reports F(1,69) = 181.459 for condition, which the Hodds thesis does not support (thesis: F(1,76) = 13.315); do not reuse that value."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Self-summary by the developers; no independent replication cited. Authors warn that self-report satisfaction misled them about e-Proofs ('some things should be difficult') and that results are limited to short number-theory proofs.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:support_can_harm_retention",
+     "relation": "supports",
+     "locator": "pp. 5-6, Fig. 2 caption"
+    },
+    {
+     "claim_id": "R2:proof_comprehension_training",
+     "relation": "supports",
+     "locator": "pp. 22-23, Fig. 11"
+    },
+    {
+     "claim_id": "R2:experts_disagree_on_validity",
+     "relation": "supports",
+     "locator": "eye-movement section pp. 10-14"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "roy2017eproofs",
+   "citation": "Roy, S., Inglis, M., & Alcock, L. (2017). Multimedia resources designed to support learning from written proofs: An eye-movement study. Educational Studies in Mathematics, 96(2), 249-266.",
+   "doi_or_url": "https://doi.org/10.1007/s10649-017-9754-7",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Accepted manuscript via Loughborough repository (figshare 9369275); Springer blocked",
+    "sections_read": [
+     "Abstract",
+     "4.1 Study 1 method",
+     "4.2 Study 1 results incl. Fig. 3",
+     "Study 2 method and dwell-time results (partial)"
+    ]
+   },
+   "design": "Study 1 RCT (e-Proof vs. written proof, fixed time, immediate + delayed test); Study 2 eye-movement study",
+   "population": "second/third-year UK mathematics undergraduates in a real analysis course; Study 1 randomised e-Proof N = 21 vs textbook N = 28 (a third live-lecture group not analysed here)",
+   "operation": "formal_proof: proof comprehension",
+   "intervention": "e-Proof: proof with audio commentary and visual animations focusing attention on logical relationships",
+   "comparator": "standard written proof, same time",
+   "outcome": {
+    "measure": "8 free-response items scored /18, built on Lin & Yang's (2007) comprehension facets",
+    "assisted": false,
+    "delay": "2 weeks; identical test, 20 instead of 30 minutes; short proof version and definitions sheet provided",
+    "transfer": "none (same proof, same items)"
+   },
+   "estimate": {
+    "metric": "ANOVA F; raw points",
+    "value": "group main effect F(1,47) = 0.006, p = .938; time x group F(1,47) = 5.659, p = .021; drop 2.8 (e-Proof) vs 1.3 (textbook) points of 18",
+    "ci": "not reported",
+    "k_or_n": "N = 49",
+    "note": "Study 2 (eye movements): e-Proof readers showed less processing effort when not listening to audio."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Small randomised sample, one theorem, delayed test identical to immediate test (no item novelty) and shorter; different rooms for the two conditions. Negative observation: extra explanatory support did not help immediately and was associated with steeper forgetting.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:support_can_harm_retention",
+     "relation": "supports",
+     "locator": "Abstract (Study 1, Study 2)"
+    },
+    {
+     "claim_id": "cl.2",
+     "relation": "qualifies",
+     "locator": "Abstract: extra support 'disrupts the processes by which students organise information'"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "neuhaus2025proofskills",
+   "citation": "Neuhaus-Eckhardt, S., Sommerhoff, D., Rach, S., & Ufer, S. (2025). Proof comprehension, proof validation, & proof construction: All the same or different skills? An answer based on structural equation models. International Journal of Science and Mathematics Education, 23, 4153-4178.",
+   "doi_or_url": "https://doi.org/10.1007/s10763-025-10621-3",
+   "source_type": "primary_correlational",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Publisher version via University of Wuerzburg OPUS (docId 43402); Springer direct blocked",
+    "sections_read": [
+     "Method: Sample and Context, Instruments (pp. 4165-4166)",
+     "Results: model fit text and Table 4 correlations (pp. 4168-4170)",
+     "Discussion incl. limitations (pp. 4170-4172)"
+    ]
+   },
+   "design": "cross-sectional measurement study; confirmatory factor analysis comparing five structural models (1-, three 2-, 3-dimensional)",
+   "population": "N = 153 beginning undergraduates in a transition course (mathematics 54.6%, financial mathematics 32.0%, teacher education 13.4%), Germany",
+   "operation": "formal_proof: proof construction (4 items, double-coded 0-3, kappa = .87), proof validation (4 purported proofs incl. circular, inductive, insufficient-warrant errors; judgement + justification), proof comprehension (11 MC items per Mejia-Ramos et al. 2012); elementary number theory",
+   "intervention": "none (no instruction, no delayed test)",
+   "comparator": "competing factor models",
+   "outcome": {
+    "measure": "latent skill structure",
+    "assisted": false,
+    "delay": "not applicable (two consecutive days of testing)",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "latent correlation (standardised)",
+    "value": "best model 2a: construction vs. reading (comprehension+validation) r = .85; all multi-factor models show latent correlations > .80",
+    "ci": "not extracted",
+    "k_or_n": "N = 153",
+    "note": "No model reached acceptable TLI; authors call Model 2a optimal among examined models, not 'strictly confirming'; Model 2b (construction+validation vs. comprehension) also plausible by SRMR."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Small SEM sample (authors' limitation); unequal item numbers and formats across scales; one content domain; cross-sectional, so says nothing about whether training one activity transfers to another. Relevant to measurement: construction must be measured separately from reading.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:construction_separable_from_reading",
+     "relation": "supports",
+     "locator": "Discussion p. 4171 (r = .85, Model 2a)"
+    },
+    {
+     "claim_id": "R2:construction_separable_from_reading",
+     "relation": "qualifies",
+     "locator": "Results p. 4169 (TLI not acceptable) and limitations p. 4172 (Model 2b plausible)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "inglis2013standards",
+   "citation": "Inglis, M., Mejia-Ramos, J. P., Weber, K., & Alcock, L. (2013). On mathematicians' different standards when evaluating elementary proofs. Topics in Cognitive Science, 5(2), 270-282.",
+   "doi_or_url": "https://doi.org/10.1111/tops.12019",
+   "source_type": "primary_survey_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref abstract",
+    "sections_read": []
+   },
+   "design": "survey of mathematicians judging one purported proof",
+   "population": "109 research-active mathematicians",
+   "operation": "formal_proof: proof validation by experts",
+   "intervention": "not applicable",
+   "comparator": "pure vs. applied mathematicians",
+   "outcome": {
+    "measure": "validity judgement, confidence, response to counter-argument",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "proportions (not extracted)",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "N = 109",
+    "note": "Abstract: substantial disagreement on validity; applied more likely than pure to accept; those rejecting more confident; acceptors rarely changed judgement when shown the objection."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "One calculus argument, self-selected online sample. Decisive for measurement design: there is no single shared validity standard even among experts for some proofs, so a binary 'valid proof' label is not a deterministic oracle.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:experts_disagree_on_validity",
+     "relation": "supports",
+     "locator": "Abstract (a)-(d)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "inglis2012reading",
+   "citation": "Inglis, M., & Alcock, L. (2012). Expert and novice approaches to reading mathematical proofs. Journal for Research in Mathematics Education, 43(4), 358-390.",
+   "doi_or_url": "https://doi.org/10.5951/jresematheduc.43.4.0358",
+   "source_type": "primary_comparative",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref abstract; plus authors' summary in alcock2015notices pp. 10-14 (accepted manuscript)",
+    "sections_read": []
+   },
+   "design": "expert-novice eye-tracking comparison during proof validation",
+   "population": "beginning undergraduates vs. research-active mathematicians",
+   "operation": "formal_proof: proof validation",
+   "intervention": "not applicable",
+   "comparator": "experts vs. novices",
+   "outcome": {
+    "measure": "eye movements (dwell on surface features vs. between-line saccades), validity judgements",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "not extracted",
+    "note": "Abstract: mathematicians sometimes disagree on validity of short purported proofs; students spend proportionally more time on surface features; experts shift attention back and forth between lines more (inferring implicit warrants)."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Expert-novice differences are not causal evidence that training eye-movement patterns helps. Interpretation of skimming contested: weber2013skimming (reply) vs. Inglis & Alcock (2013, rejoinder, DOI 10.5951/jresematheduc.44.2.0472, abstract only).",
+   "claim_edges": [
+    {
+     "claim_id": "R2:experts_disagree_on_validity",
+     "relation": "supports",
+     "locator": "Abstract finding (a)"
+    },
+    {
+     "claim_id": "R2:novices_attend_surface_features",
+     "relation": "supports",
+     "locator": "Abstract findings (b), (c)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "selden2003validation",
+   "citation": "Selden, A., & Selden, J. (2003). Validations of proofs considered as texts: Can undergraduates tell whether an argument proves a theorem? Journal for Research in Mathematics Education, 34(1), 4-36.",
+   "doi_or_url": "https://doi.org/10.2307/30034698",
+   "source_type": "primary_qualitative",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "exploratory interview study",
+   "population": "8 mid-level undergraduate mathematics majors",
+   "operation": "formal_proof: proof validation of four student-generated arguments for one theorem",
+   "intervention": "not applicable",
+   "comparator": "none",
+   "outcome": {
+    "measure": "validation judgements and reflections",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "N = 8",
+    "note": "Abstract: students focus on surface features; ability to tell whether arguments are proofs 'very limited', possibly more than they or instructors recognise."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Very small exploratory sample; foundational for treating validation as its own operation, not for prevalence estimates.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:novices_attend_surface_features",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "weber2013skimming",
+   "citation": "Weber, K., & Mejia-Ramos, J. P. (2013). On mathematicians' proof skimming: A reply to Inglis and Alcock. Journal for Research in Mathematics Education, 44(2), 464-471. Rejoinder: Inglis, M., & Alcock, L. (2013), same issue, 472-474, https://doi.org/10.5951/jresematheduc.44.2.0472.",
+   "doi_or_url": "https://doi.org/10.5951/jresematheduc.44.2.0464",
+   "source_type": "commentary",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstracts of reply and rejoinder",
+    "sections_read": []
+   },
+   "design": "re-analysis/commentary on inglis2012reading eye-movement data, with rejoinder",
+   "population": "research mathematicians (re-analysed data)",
+   "operation": "formal_proof: expert proof validation strategy",
+   "intervention": "not applicable",
+   "comparator": "competing analyses of the same data",
+   "outcome": {
+    "measure": "initial reading time / skimming pattern",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "not applicable",
+    "note": "Reply argues mathematicians frequently skim first; rejoinder argues the reply rests on an invalid assumption."
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Unresolved interpretive dispute among the field's main groups: an 'expert reading strategy' to teach (skim first vs. line-by-line warrant inference) is not settled. Product must not hard-code one reading script as 'the expert way'.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:expert_reading_strategy",
+     "relation": "qualifies",
+     "locator": "Abstracts of reply and rejoinder"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "kollar2014argumentation",
+   "citation": "Kollar, I., Ufer, S., Reichersdorfer, E., Vogel, F., Fischer, F., & Reiss, K. (2014). Effects of collaboration scripts and heuristic worked examples on the acquisition of mathematical argumentation skills of teacher students with different levels of prior achievement. Learning and Instruction, 32, 22-36.",
+   "doi_or_url": "https://doi.org/10.1016/j.learninstruc.2014.01.003",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Semantic Scholar abstract; Nottingham repository archive version blocked by Cloudflare challenge (curl and fetch tool)",
+    "sections_read": []
+   },
+   "design": "2 x 2 factorial experiment (collaboration script yes/no x heuristic worked examples vs. problem solving), dyads",
+   "population": "N = 101 beginning mathematics teacher students in a two-week preparatory course (Germany)",
+   "operation": "formal_proof: mathematical argumentation/proof construction (individual-mathematical component) and social-discursive component",
+   "intervention": "heuristic worked examples (modelling the proving process incl. exploration, conjecturing, justification) and/or collaboration scripts",
+   "comparator": "problem solving without examples; no script",
+   "outcome": {
+    "measure": "argumentation skills, two components (instrument details not read)",
+    "assisted": "unknown (not read)",
+    "delay": "unknown (not read)",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "N = 101",
+    "note": "Abstract: positive effects of both scaffolds on the social-discursive component; effects of both scaffolds on both components depended on prior achievement (high-school GPA); heuristic worked examples particularly effective for learners with higher prerequisites. The abstract reports no unconditional main effect on the individual-mathematical component."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Only randomised study found on supporting proof construction in university entrants; full text not read, so outcome timing, assistance and effect sizes unknown. The aptitude interaction contradicts a naive 'worked examples help weaker novices most' transfer from procedural CLT findings.",
+   "claim_edges": [
+    {
+     "claim_id": "we.1",
+     "relation": "qualifies",
+     "locator": "Abstract (effects conditional on prior achievement)"
+    },
+    {
+     "claim_id": "R2:heuristic_examples_for_proof_construction",
+     "relation": "qualifies",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "davies2020cjproof",
+   "citation": "Davies, B., Alcock, L., & Jones, I. (2020). Comparative judgement, proof summaries and proof comprehension. Educational Studies in Mathematics, 105(2), 181-197.",
+   "doi_or_url": "https://doi.org/10.1007/s10649-020-09984-x",
+   "source_type": "primary_measurement",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Publisher PDF (CC BY) via Loughborough repository (figshare 12936137)",
+    "sections_read": [
+     "3.2 Participants",
+     "3.3 Procedure",
+     "4.1 Reliability",
+     "4.2 Criterion validity",
+     "Discussion (partial)"
+    ]
+   },
+   "design": "measurement validation study; comparative judgement (CJ) of free-text proof summaries",
+   "population": "143 consenting first/second-year students in an introductory real analysis course (UK); judges: mathematically competent experts, 143 comparisons each, 1573 judgements total",
+   "operation": "formal_proof: proof comprehension (summarising a given proof: uncountability of the open unit interval)",
+   "intervention": "not applicable",
+   "comparator": "12-item MC proof comprehension test (Mejia-Ramos et al. 2017) and final course scores",
+   "outcome": {
+    "measure": "CJ scores of summaries",
+    "assisted": false,
+    "delay": "not applicable (single sitting, 30 min)",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "Scale Separation Reliability; median split-half inter-rater Pearson r; Pearson r for criterion validity; Cronbach alpha",
+    "value": "SSR = .86; split-half r_median = .73; CJ vs. 7-item MC subset r = .28; CJ vs. course score r = .23; MC test alpha = .53 (12 items), .61 (7-item subset); MC vs. course r = .55",
+    "ci": "not reported",
+    "k_or_n": "N = 143 (134 with course scores)",
+    "note": "Median judgement time 21.6 s. Authors interpret modest correlations as overlapping but different skills."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Reliable ranking does not imply validity: CJ was internally consistent, but correlations with other proof measures were modest, and the published MC comprehension test had low internal consistency in this UK sample. Evidence that proof-comprehension measurement is immature; any product score needs its own validation.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:cj_reliable_for_open_proof_tasks",
+     "relation": "supports",
+     "locator": "4.1 Reliability (SSR .86, r .73)"
+    },
+    {
+     "claim_id": "R2:proof_measures_immature",
+     "relation": "supports",
+     "locator": "4.2 Criterion validity (r .28/.23; alpha .53)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "jones2015cj",
+   "citation": "Jones, I., & Inglis, M. (2015). The problem of assessing problem solving: Can comparative judgement help? Educational Studies in Mathematics, 89(3), 337-355.",
+   "doi_or_url": "https://doi.org/10.1007/s10649-015-9607-1",
+   "source_type": "primary_measurement",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Accepted manuscript via Loughborough repository (figshare 9368165)",
+    "sections_read": [
+     "Reliability literature review",
+     "Method: examination paper, marking procedure, CJ procedure",
+     "Results: marking reliability/validity, CJ reliability/validity"
+    ]
+   },
+   "design": "assessment study: one problem-solving paper marked by a resource-intensive expert marking procedure and by comparative judgement",
+   "population": "750 school students aged 14-15 (England); 20 judges (mathematics education professionals of varied experience), 3,607 judgements; 3 experienced teachers as markers",
+   "operation": "symbolic_procedure / open problem solving (school mathematics examination paper)",
+   "intervention": "not applicable",
+   "comparator": "rubric-based marking",
+   "outcome": {
+    "measure": "CJ scores vs. marks",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "Pearson r (inter-rater, criterion); Cronbach alpha",
+    "value": "marking: alpha = .729, inter-rater r = .91 (249 re-marked scripts), marks vs predicted GCSE r = .72; CJ: inter-rater r = .86 between independent judge groups (250 scripts), CJ vs marks r = .86",
+    "ci": "not reported",
+    "k_or_n": "N = 750",
+    "note": "Payment assumed about 50 judgements per judge-hour."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "School problem solving, not proof. Shows CJ reliability comparable to (not higher than) a carefully designed expert marking scheme; CJ's advantage is freeing item design from mark-scheme constraints.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:cj_reliable_for_open_proof_tasks",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "zhao2025inductiongrading",
+   "citation": "Zhao, C., Silva, M., & Poulsen, S. (2025). Autograding mathematical induction proofs with natural language processing. International Journal of Artificial Intelligence in Education. (arXiv:2406.10268v2)",
+   "doi_or_url": "https://doi.org/10.1007/s40593-025-00498-2",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "arXiv HTML v2 (https://arxiv.org/html/2406.10268v2), read via fetch tool with targeted extraction; journal version not compared",
+    "sections_read": [
+     "3.1 Data",
+     "4.1-4.2 model and human grader comparison, Tables 2-3",
+     "5-6 user study, Tables 5-8",
+     "7.1-7.3 discussion",
+     "8 limitations"
+    ]
+   },
+   "design": "model development + comparison with 9 graduate TAs + randomised three-arm user study",
+   "population": "Discrete mathematics students, one US university (CS173); user study N = 169 after exclusions (Self-eval 68, First 59, Random 42)",
+   "operation": "formal_proof: proof construction (induction proofs), graded against 7 binary rubric items",
+   "intervention": "LLM-based rubric-item autograder with feedback naming the first (or a random) failed rubric item",
+   "comparator": "self-evaluation against the rubric without autograder",
+   "outcome": {
+    "measure": "best-submission score on the same three problems within one week",
+    "assisted": true,
+    "delay": "none: no delayed or independent proof-writing test (listed as future work)",
+    "transfer": "none"
+   },
+   "estimate": {
+    "metric": "rubric-item accuracy (%); regression coefficient on 0-100 score; Kruskal-Wallis H",
+    "value": "best models approx. 89-90% rubric-item accuracy (text says 90.0/90.2%, Table 2 averages 89.3/89.4% per fetch-tool extraction: discrepancy unresolved); TAs average 86.6% agreement with research-team labels; user study: feedback arms +11.6 (SE 2.10) and +11.3 (SE 2.32) points on best submission",
+    "ci": "SE as listed",
+    "k_or_n": "3,586 proofs across 4 problems (sum of per-problem counts); 9 TAs x 60 proofs; N = 169 in user study",
+    "note": "Labels: research-team consensus, Cronbach alpha .82-.92 in source studies. Students rated autograder accuracy lower than human graders (e.g., 0.41 vs 1.14 on -2..2 scale)."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Improvement is assisted revision on the same task, not learning. Narrow, highly structured proof type (induction) with a fixed rubric; surface-form sensitivity ('Suppose that', symbol choice, paragraphing changed grades); missed calculation errors in base cases; user study used a weaker embedding model than the best grader; single institution.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:llm_rubric_grading_narrow_proofs",
+     "relation": "supports",
+     "locator": "4.1-4.2, Table 2"
+    },
+    {
+     "claim_id": "R2:llm_grading_surface_sensitivity",
+     "relation": "supports",
+     "locator": "7.1"
+    },
+    {
+     "claim_id": "ai.1",
+     "relation": "qualifies",
+     "locator": "6, Table 5-6 (assisted within-task gains only)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "ospanov2026llmgrading",
+   "citation": "Ospanov, A., Feng, Z., Ding, D., Liu, C., Bai, H., et al. (2026). Can LLMs reliably grade Olympiad proofs? A study of mathematical verification with LLMs. arXiv:2610.36767 (preprint).",
+   "doi_or_url": "https://doi.org/10.48550/arxiv.2610.36767",
+   "source_type": "preprint_benchmark",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "arXiv HTML v1 read via fetch tool, first 100,000 of approx. 202,000 characters",
+    "sections_read": [
+     "4.1 dataset",
+     "Tables 1-4",
+     "6.1-6.2 metrics and main results incl. Table 6, partial Tables 11-13",
+     "7 limitations"
+    ]
+   },
+   "design": "benchmark of 20 LLM graders against expert-graded solutions; adversarial generation pipeline",
+   "population": "48 expert-graded candidate solutions to six USAMO 2025 problems (errors injected into golden solutions); 200 synthetic adversarial instances",
+   "operation": "formal_proof: proof validation/grading by LLMs (0-7 scale)",
+   "intervention": "LLM graders with or without reference solution and marking scheme ('Full' vs 'Blind')",
+   "comparator": "two expert human annotators",
+   "outcome": {
+    "measure": "agreement with expert grades (QWK, RMSE, bias, exact match)",
+    "assisted": "not applicable",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "quadratic weighted kappa (QWK); exact match; bias in points",
+    "value": "human inter-annotator QWK 0.76 (exact match 0.58); best LLM graders with reference + marking scheme approx. 0.63-0.66 QWK; without reference ('Blind') maximum 0.53; many models over-grade (positive bias, e.g. ~3 points on a 0-7 scale for some models)",
+    "ci": "per-attempt SD in tables (not extracted fully)",
+    "k_or_n": "48 human-graded items; 20 models",
+    "note": "Proposed MABGrader does not apply without a reference solution; authors state that requiring a marking scheme and reference 'does not hold for most real-world applications'."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Preprint, partial read, very small human-graded set, Olympiad level (not typical coursework), synthetic labels partly from an LLM. Direction consistent with zhao2025inductiongrading limits: LLM grading of free proofs falls below human agreement, worst exactly where no reference exists (novel learner proofs).",
+   "claim_edges": [
+    {
+     "claim_id": "R2:llm_proof_grading_not_oracle",
+     "relation": "supports",
+     "locator": "Table 1, Table 6, 6.2, 7"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "petrov2025proofbluff",
+   "citation": "Petrov, I., Dekoninck, J., Baltadzhiev, L., Drencheva, M., et al. (2025). Proof or bluff? Evaluating LLMs on 2025 USA Math Olympiad. arXiv:2503.21934.",
+   "doi_or_url": "https://arxiv.org/abs/2503.21934",
+   "source_type": "preprint_benchmark",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract (ETH record)",
+    "sections_read": []
+   },
+   "design": "expert human grading of LLM-generated full proofs",
+   "population": "state-of-the-art reasoning models (early 2025), six USAMO 2025 problems",
+   "operation": "formal_proof: proof construction by LLMs",
+   "intervention": "not applicable",
+   "comparator": "not applicable",
+   "outcome": {
+    "measure": "expert-graded proof scores",
+    "assisted": "not applicable",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "percentage of maximum score",
+    "value": "one model approx. 25%, all others below 5% (abstract)",
+    "ci": "not reported",
+    "k_or_n": "6 problems",
+    "note": "Final-answer benchmarks overstated proof capability."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Snapshot of early-2025 models; capabilities change quickly. Relevant as caution: correct final answers are not evidence of valid proofs, for models as for learners; LLM-generated reference proofs need independent checking.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:final_answer_not_proof",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "thoma2022lean",
+   "citation": "Thoma, A., & Iannone, P. (2022). Learning about proof with the theorem prover LEAN: The abundant numbers task. International Journal of Research in Undergraduate Mathematics Education, 8(1), 64-93.",
+   "doi_or_url": "https://doi.org/10.1007/s40753-021-00140-1",
+   "source_type": "primary_qualitative",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref abstract",
+    "sections_read": []
+   },
+   "design": "exploratory qualitative comparison of proofs by students who did vs. did not engage with voluntary Lean workshops",
+   "population": "first-year UK mathematics students in a transition-to-proof module; 36 proofs of an unfamiliar statement",
+   "operation": "formal_proof: proof construction (paper proofs) after optional proof-assistant use",
+   "intervention": "voluntary Lean workshops alongside the module",
+   "comparator": "non-engaging students (self-selected)",
+   "outcome": {
+    "measure": "qualitative proof characteristics",
+    "assisted": false,
+    "delay": "unknown",
+    "transfer": "unfamiliar statement"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "36 proofs",
+    "note": "Lean-engaged students' proofs showed more accurate notation/language and explicit goal/sub-goal structure; authors 'hypothesise' a link."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Self-selection confound (more motivated/able students attend voluntary workshops); no causal inference possible.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:proof_assistant_learning_effect",
+     "relation": "context_only",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "iannone2023lean",
+   "citation": "Iannone, P., & Thoma, A. (2023). Interactive theorem provers for university mathematics: An exploratory study of students' perceptions. International Journal of Mathematical Education in Science and Technology (published online 2023; volume/issue not verified).",
+   "doi_or_url": "https://doi.org/10.1080/0020739x.2023.2178981",
+   "source_type": "primary_qualitative",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "questionnaire + semi-structured interviews",
+   "population": "first-year UK mathematics students, questionnaire n = 99, 37 interviews, same cohort",
+   "operation": "formal_proof with a proof assistant (Lean) in a transition-to-proof module",
+   "intervention": "Lean introduced in the module",
+   "comparator": "none",
+   "outcome": {
+    "measure": "perceptions and reported difficulties",
+    "assisted": "not applicable",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "n = 99 / 37",
+    "note": "Many students failed to engage due to difficult syntax and perceived disconnection from proving; some reported an epistemological shift."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Perceptions, not learning outcomes. Negative observation for adoption: syntax overhead can displace the target operation.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:proof_assistant_learning_effect",
+     "relation": "qualifies",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "mahinpei2025itp",
+   "citation": "Mahinpei, R., Horta Ribeiro, M., & Milano, M. (2025). Interactive theorem provers for proof education. ACM (DOI 10.1145/3758317.3759679).",
+   "doi_or_url": "https://doi.org/10.1145/3758317.3759679",
+   "source_type": "primary_mixed_methods",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; venue name not verified",
+    "sections_read": []
+   },
+   "design": "user study with Coq, case study comparing Coq/Lean/pen-and-paper proofs, heuristic usability evaluation",
+   "population": "computer science students (N not in abstract)",
+   "operation": "formal_proof in CS curricula",
+   "intervention": "interactive theorem provers",
+   "comparator": "pen-and-paper proofs (case study)",
+   "outcome": {
+    "measure": "user experience, usability",
+    "assisted": "not applicable",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "unknown",
+    "note": "Abstract: ITPs 'can support' proof skill development but complex syntax and unclear error messages can hinder learning; formal proofs more explicit and verbose."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "No learning outcome reported in abstract. Consistent with iannone2023lean on usability barriers.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:proof_assistant_learning_effect",
+     "relation": "qualifies",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "margulieux2020subgoals",
+   "citation": "Margulieux, L. E., Morrison, B. B., & Decker, A. (2020). Reducing withdrawal and failure rates in introductory programming with subgoal labeled worked examples. International Journal of STEM Education, 7, Article 19.",
+   "doi_or_url": "https://doi.org/10.1186/s40594-020-00222-7",
+   "source_type": "primary_quasi_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "SpringerOpen PDF (CC BY)",
+    "sections_read": [
+     "Abstract",
+     "Method: participants, materials, scoring (pp. 5-8)",
+     "Results: quiz/exam comparisons (pp. 9-11)",
+     "Withdrawal/failure analysis (pp. 13-14)",
+     "Limitations, Conclusion (p. 14)"
+    ]
+   },
+   "design": "classroom quasi-experiment over one semester; five sections, two with subgoal-labelled worked examples, three control (one fully online); no random assignment",
+   "population": "265 students in a US university CS1 course (Fall 2018); 47% first-year; 34% without prior programming experience",
+   "operation": "computational_construction: code writing/problem solving (Java), plus 'explain in plain English' items",
+   "intervention": "subgoal-labelled worked examples and practice problems throughout the semester (subgoals derived by task analysis)",
+   "comparator": "typical worked examples",
+   "outcome": {
+    "measure": "weekly formative quizzes (within a week of instruction) and four summative exams incl. non-cumulative final; SOLO-coded explanations",
+    "assisted": false,
+    "delay": "quizzes within 1 week; exams spread over the semester",
+    "transfer": "exam problems similar to or harder than homework"
+   },
+   "estimate": {
+    "metric": "Cohen d; Mann-Whitney U; proportions",
+    "value": "average quiz score 48% vs 41%, d = 0.44; average exam score 75% vs 72%, d = 0.20, U = 7975, p = .24 (not significant); total exam score d = 0.26 (reflects more exams taken); students with average exam <= 70%: 25% subgoal vs 44% control",
+    "ci": "not reported",
+    "k_or_n": "N = 265",
+    "note": "Lower variance in the subgoal group; authors conclude subgoals 'promote better initial performance but not consistently better performance'."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Not randomised (students chose sections); subgoal sections taught by a research-team member (authors' limitation); one institution. Retention/failure differences are descriptive. Shows the gap between near-term formative gains and summative exam performance.",
+   "claim_edges": [
+    {
+     "claim_id": "we.1",
+     "relation": "qualifies",
+     "locator": "Results: quiz d = 0.44 vs exam d = 0.20 n.s.; Conclusion p. 14"
+    },
+    {
+     "claim_id": "R2:subgoal_labels_programming",
+     "relation": "supports",
+     "locator": "Results (quizzes), withdrawal analysis p. 14"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "morrison2015subgoals",
+   "citation": "Morrison, B. B., Margulieux, L. E., & Guzdial, M. (2015). Subgoals, context, and worked examples in learning computing problem solving. Proceedings of the Eleventh Annual International Conference on International Computing Education Research (ICER '15), 21-29.",
+   "doi_or_url": "https://doi.org/10.1145/2787622.2787733",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "experiment comparing given vs. learner-generated subgoal labels, crossed with other material features",
+   "population": "introductory programming learners (details not read)",
+   "operation": "computational_construction",
+   "intervention": "subgoal labels given vs. generated",
+   "comparator": "variants of instructional material",
+   "outcome": {
+    "measure": "problem-solving performance",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "unknown",
+    "note": "Abstract: results 'mixed'; performance gains for learners given subgoal labels 'did not replicate as expected' in the CS task."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Explicit non-replication by the subgoal research group itself; boundary condition for transferring subgoal effects from mathematics/science to programming.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:subgoal_labels_programming",
+     "relation": "contradicts",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "ericson2017parsons",
+   "citation": "Ericson, B. J., Margulieux, L. E., & Rick, J. (2017). Solving Parsons problems versus fixing and writing code. Proceedings of the 17th Koli Calling International Conference on Computing Education Research, 20-29.",
+   "doi_or_url": "https://doi.org/10.1145/3141880.3141895",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "comparison of three practice formats (details of allocation not read)",
+   "population": "programming learners (details not read)",
+   "operation": "computational_construction: code writing; practice via Parsons problems",
+   "intervention": "two-dimensional Parsons problems with distractors",
+   "comparator": "fixing code with the same errors; writing equivalent code",
+   "outcome": {
+    "measure": "learning performance (pre/post), cognitive load, practice time",
+    "assisted": false,
+    "delay": "retention test one week later",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "unknown",
+    "note": "Abstract: Parsons took significantly less practice time; no statistically significant difference in learning performance or one-week retention."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Null on learning gain with an efficiency advantage; non-significance is not equivalence (power unknown).",
+   "claim_edges": [
+    {
+     "claim_id": "R2:parsons_efficiency_not_superiority",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "ericson2022parsonswg",
+   "citation": "Ericson, B. J., Denny, P., Prather, J., Duran, R., Hellas, A., et al. (2022). Parsons problems and beyond: Systematic literature review and empirical study designs. Proceedings of the 2022 Working Group Reports on Innovation and Technology in Computer Science Education (ITiCSE-WGR '22), 191-234.",
+   "doi_or_url": "https://doi.org/10.1145/3571785.3574127",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "systematic literature review plus proposed multi-site study designs",
+   "population": "programming learners across reviewed studies",
+   "operation": "computational_construction",
+   "intervention": "Parsons problems and variants",
+   "comparator": "various",
+   "outcome": {
+    "measure": "various",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "not extracted",
+    "note": "Abstract: literature 'makes numerous claims of benefits'; review aims to document evidence and identify gaps; designs studies ready for large-scale deployment."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract only; strength of evidence per claim not extracted. The need to design new large-scale studies indicates evidence gaps.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:parsons_efficiency_not_superiority",
+     "relation": "context_only",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "lister2004tracing",
+   "citation": "Lister, R., Adams, E. S., Fitzgerald, S., Fone, W., Hamer, J., et al. (2004). A multi-national study of reading and tracing skills in novice programmers. ACM SIGCSE Bulletin, 36(4), 119-150.",
+   "doi_or_url": "https://doi.org/10.1145/1041624.1041673",
+   "source_type": "primary_descriptive",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref abstract",
+    "sections_read": []
+   },
+   "design": "multi-national descriptive assessment (ITiCSE 2004 working group)",
+   "population": "novice programming students from seven countries",
+   "operation": "computational_construction: code tracing (predict output) and code completion (select correct completion)",
+   "intervention": "not applicable",
+   "comparator": "none",
+   "outcome": {
+    "measure": "MC tracing and completion items",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "not extracted",
+    "note": "Abstract: many students weak at tracing and especially at completion; interpreted as fragile grasp of prerequisites for problem solving."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Convenience samples; MC format. Grounds code tracing as a separately measurable prerequisite operation.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:tracing_prerequisite_writing",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "lopez2008tracing",
+   "citation": "Lopez, M., Whalley, J., Robbins, P., & Lister, R. (2008). Relationships between reading, tracing and writing skills in introductory programming. Proceedings of the Fourth International Workshop on Computing Education Research (ICER '08), 101-112.",
+   "doi_or_url": "https://doi.org/10.1145/1404520.1404531",
+   "source_type": "primary_correlational",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "UTS OPUS repository PDF",
+    "sections_read": [
+     "2 The sample",
+     "5 Results (5.2 tracing, 5.3 explain, 5.4 elaboration incl. Fig. 7)",
+     "6.1 Evidence for a hierarchy",
+     "7 Conclusion"
+    ]
+   },
+   "design": "correlational analysis of one end-of-semester exam; stepwise regression / path diagram",
+   "population": "78 students took the exam; analysed subset 38 (one institution, New Zealand/Australia context)",
+   "operation": "computational_construction: tracing (incl. iteration), explain in plain English, Parsons, code writing",
+   "intervention": "not applicable",
+   "comparator": "not applicable",
+   "outcome": {
+    "measure": "exam item scores",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "Pearson r; adjusted R2",
+    "value": "tracing vs writing r = 0.5621 (adj. R2 30%); iterative tracing vs writing r = 0.6267 (adj. R2 38%); explain vs writing r = 0.5586 (adj. R2 29%); iterative tracing + explain jointly 46% of writing variance",
+    "ci": "CI.99 for explain coefficient (0.2013, 1.0187)",
+    "k_or_n": "N = 38",
+    "note": "Authors state the co-variances are not by themselves evidence of causality."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Small single-exam sample; correlation could reflect generic reasoning ability (authors' own alternative). Supports measuring tracing and explaining as distinct indicators, not that training tracing causes writing ability.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:tracing_prerequisite_writing",
+     "relation": "supports",
+     "locator": "5.2-5.3"
+    },
+    {
+     "claim_id": "R2:tracing_prerequisite_writing",
+     "relation": "qualifies",
+     "locator": "5.4 and 6.1 (non-causal; generic reasoning)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "xie2018tracing",
+   "citation": "Xie, B., Nelson, G. L., & Ko, A. J. (2018). An explicit strategy to scaffold novice program tracing. Proceedings of the 49th ACM Technical Symposium on Computer Science Education (SIGCSE '18), 344-349.",
+   "doi_or_url": "https://doi.org/10.1145/3159450.3159527",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "block-randomised experiment with think-aloud",
+   "population": "24 novices in a university CS1 course (US)",
+   "operation": "computational_construction: code tracing",
+   "intervention": "5-10 min instruction in an explicit line-by-line tracing strategy with external memory table",
+   "comparator": "no strategy instruction",
+   "outcome": {
+    "measure": "accuracy predicting program output; course midterm",
+    "assisted": false,
+    "delay": "immediate (study); midterm later in course",
+    "transfer": "midterm (not designed for the study)"
+   },
+   "estimate": {
+    "metric": "mean percentage difference",
+    "value": "+15% on study tracing problems (p < 0.05); +7% on course midterm (significance not stated in abstract)",
+    "ci": "not reported",
+    "k_or_n": "N = 24",
+    "note": "Very small sample."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Small N, developer-evaluated, outcome = tracing itself. Low-cost candidate for a tracing scaffold; effect on code writing not tested.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:explicit_tracing_strategy",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "yang2024debuggingslr",
+   "citation": "Yang, S., Baird, M., O'Rourke, E., Brennan, K., & Schneider, B. (2024). Decoding debugging instruction: A systematic literature review of debugging interventions. ACM Transactions on Computing Education, 24(4), 1-44.",
+   "doi_or_url": "https://doi.org/10.1145/3690652",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref abstract; ACM full text returned HTTP 403; no author copy found via web search",
+    "sections_read": []
+   },
+   "design": "systematic review of debugging interventions 2010-2022",
+   "population": "mixed (K-12 and higher education; breakdown not read)",
+   "operation": "computational_construction: debugging (cognitive and non-cognitive skills)",
+   "intervention": "diverse: games, unplugged activities, systematic processes, tools",
+   "comparator": "various",
+   "outcome": {
+    "measure": "debugging accuracy, learning, self-efficacy, emotion regulation (categories)",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "not extracted",
+    "note": "Abstract: research 'sporadic'; several interventions improved debugging accuracy and learning; gaps in non-cognitive skills."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract only (charter seed). Study counts, designs and delayed outcomes not extracted: high-priority gap.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:explicit_debugging_instruction",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "sun2024debuggingmeta",
+   "citation": "Sun, C., Yang, S. F., & Becker, B. J. (2024). Debugging in computational thinking: A meta-analysis on the effects of interventions on debugging skills. Journal of Educational Computing Research, 62(4), 867-901.",
+   "doi_or_url": "https://doi.org/10.1177/07356331241227793",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; bibliographic details via Crossref",
+    "sections_read": []
+   },
+   "design": "multi-level meta-analysis",
+   "population": "mixed; computational-thinking framing (population breakdown not read)",
+   "operation": "computational_construction: debugging",
+   "intervention": "debugging interventions (enhanced debuggers, systematic instruction, others)",
+   "comparator": "various control types",
+   "outcome": {
+    "measure": "debugging skill measures (various)",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "Hedges g (mean)",
+    "value": "g = 0.64, CI (0.32, 0.96); prediction range of true effects -0.54 to 1.82",
+    "ci": "(0.32, 0.96)",
+    "k_or_n": "62 effect sizes from 18 articles",
+    "note": "Enhanced debuggers and systematic instruction particularly effective; effects varied by population and possibly publication type."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Small evidence base (18 articles), very wide heterogeneity (true effects may be negative), publication-type moderation hints at bias; CT framing suggests many school studies. Direction supports explicit debugging instruction; magnitude not transferable.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:explicit_debugging_instruction",
+     "relation": "supports",
+     "locator": "Abstract (g = 0.64)"
+    },
+    {
+     "claim_id": "R2:explicit_debugging_instruction",
+     "relation": "qualifies",
+     "locator": "Abstract (prediction range -0.54 to 1.82)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "michaeli2019debugging",
+   "citation": "Michaeli, T., & Romeike, R. (2019). Improving debugging skills in the classroom: The effects of teaching a systematic debugging process. Proceedings of the 14th Workshop in Primary and Secondary Computing Education (WiPSCE '19), 1-7.",
+   "doi_or_url": "https://doi.org/10.1145/3361721.3361724",
+   "source_type": "primary_quasi_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "pre-post control-group design",
+   "population": "K-12 students (Germany; N not in abstract)",
+   "operation": "computational_construction: debugging",
+   "intervention": "explicit instruction in a systematic debugging process",
+   "comparator": "control group continued debugging exercises",
+   "outcome": {
+    "measure": "debugging exercises and self-efficacy questionnaire",
+    "assisted": false,
+    "delay": "immediate post-test",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "unknown",
+    "note": "Abstract: significant increase in self-efficacy and debugging performance vs. control."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "School population; allocation unit unclear; immediate outcome only. Indirect for adult learners.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:explicit_debugging_instruction",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "baniassad2021autograder",
+   "citation": "Baniassad, E., Zamprogno, L., Hall, B., & Holmes, R. (2021). STOP THE (AUTOGRADER) INSANITY: Regression penalties to deter autograder overreliance. Proceedings of the 52nd ACM Technical Symposium on Computer Science Education (SIGCSE '21), 1062-1068.",
+   "doi_or_url": "https://doi.org/10.1145/3408877.3432430",
+   "source_type": "primary_quasi_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "course policy change (penalty when grade decreases between submissions); comparison of submission behaviour",
+   "population": "university programming course (details not read)",
+   "operation": "computational_construction: code writing with autograder",
+   "intervention": "regression penalties on autograder submissions",
+   "comparator": "no penalty (comparison details not read)",
+   "outcome": {
+    "measure": "number of autograder submissions, final grades, student reports",
+    "assisted": "autograder feedback = assisted",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "relative change",
+    "value": "submissions reduced by roughly half; median final grade 'only slightly' lower",
+    "ci": "not reported",
+    "k_or_n": "unknown",
+    "note": "Students reported testing their own code more; also nervousness."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Documents the failure mode that unlimited autograder feedback substitutes for self-testing (students 'hammer the grader'); no learning outcome. Design-relevant for limiting oracle access in practice and excluding it from evidence.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:oracle_overreliance",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "messer2024autograding",
+   "citation": "Messer, M., Brown, N. C. C., Kolling, M., & Shi, M. (2024). Automated grading and feedback tools for programming education: A systematic review. ACM Transactions on Computing Education, 24(1), 1-43. (arXiv:2306.11722)",
+   "doi_or_url": "https://doi.org/10.1145/3636515",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref abstract and arXiv abstract page",
+    "sections_read": []
+   },
+   "design": "systematic literature review",
+   "population": "121 research papers (2017-2021) on autograding tools",
+   "operation": "computational_construction: assessment of code",
+   "intervention": "automated grading/feedback tools",
+   "comparator": "not applicable",
+   "outcome": {
+    "measure": "skills assessed, techniques, evaluation methods",
+    "assisted": "not applicable",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "counts (not extracted)",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "121 papers",
+    "note": "Abstract: mostly correctness via unit tests; feedback often limited to pass/fail and expected vs actual output; few tools assess maintainability/readability/documentation; evaluation mostly via student surveys or comparison with human graders."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Tool evaluation rarely measured learning; agreement with human graders and satisfaction are not evidence of competence validity.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:autograder_validity_limits",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "milovancevic2025formalgrading",
+   "citation": "Milovancevic, D., Bucev, M., Wojnarowski, M., Chassot, S., et al. (2025). Formal autograding in a classroom. In Programming Languages and Systems / LNCS proceedings (Springer), chapter DOI 10.1007/978-3-031-91121-7_7.",
+   "doi_or_url": "https://doi.org/10.1007/978-3-031-91121-7_7",
+   "source_type": "experience_report",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; book series/volume not verified",
+    "sections_read": []
+   },
+   "design": "deployment experience report",
+   "population": "undergraduate programming course",
+   "operation": "computational_construction: code writing (functional/recursive programs)",
+   "intervention": "program-equivalence verifier against reference solutions alongside test-based grading",
+   "comparator": "test-based grading",
+   "outcome": {
+    "measure": "grading coverage, solution classification",
+    "assisted": "not applicable",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "unknown",
+    "note": "Abstract: equivalence checking distinguished recursion patterns even with identical input-output behaviour; revealed solutions beyond those envisioned by instructors."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Technical, not learning evidence. Shows tests alone under-determine program structure; formal equivalence needs reference solutions and does not cover all correct variants.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:autograder_validity_limits",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "sentance2019primm",
+   "citation": "Sentance, S., Waite, J., & Kallia, M. (2019). Teaching computer programming with PRIMM: A sociocultural perspective. Computer Science Education, 29(2-3), 136-176.",
+   "doi_or_url": "https://doi.org/10.1080/08993408.2019.1608781",
+   "source_type": "primary_quasi_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "mixed methods; experimental vs. control group with baseline and post-test (allocation not read)",
+   "population": "493 students aged 11-14 in 13 schools (England)",
+   "operation": "computational_construction: introductory programming",
+   "intervention": "PRIMM (Predict, Run, Investigate, Modify, Make) lessons for 8-12 weeks",
+   "comparator": "control group (usual teaching)",
+   "outcome": {
+    "measure": "programming post-test; teacher interviews",
+    "assisted": false,
+    "delay": "end of intervention",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "N = 493",
+    "note": "Abstract: experimental group performed better on post-test."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "School-age population: indirect for adults/university; clustering and allocation not checked. Predict-before-run maps to an observable action but adult evidence is missing.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:predict_before_run",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "muldner2023workedexamples",
+   "citation": "Muldner, K., Jennings, J., & Chiarelli, V. (2023). A review of worked examples in programming activities. ACM Transactions on Computing Education, 23(1), 1-35.",
+   "doi_or_url": "https://doi.org/10.1145/3560266",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref abstract",
+    "sections_read": []
+   },
+   "design": "thematic literature review",
+   "population": "programming learners",
+   "operation": "computational_construction: code tracing examples and code generation examples",
+   "intervention": "worked examples (dynamic tracing visualisations, subgoal-labelled generation examples, Parsons/incomplete examples)",
+   "comparator": "various",
+   "outcome": {
+    "measure": "various",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "not extracted",
+    "note": "Abstract: established work on program visualisation, subgoals in generation examples, and Parsons puzzles; gaps elsewhere."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Narrative, abstract only. Context for R1-POL-A02 transfer to computational_construction.",
+   "claim_edges": [
+    {
+     "claim_id": "we.1",
+     "relation": "context_only",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "tintle2012retention",
+   "citation": "Tintle, N., Topliff, K., VanderStoep, J., Holmes, V.-L., & Swanson, T. (2012). Retention of statistical concepts in a preliminary randomization-based introductory statistics curriculum. Statistics Education Research Journal, 11(1), 21-40.",
+   "doi_or_url": "https://doi.org/10.52041/serj.v11i1.340",
+   "source_type": "primary_observational",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "SERJ PDF via iase-pub.org",
+    "sections_read": [
+     "2 Methods (cohorts, CAOS, analysis)",
+     "3.1 Analysis cohorts / non-response",
+     "3.2 Aggregate comparisons incl. Table 1 and regression",
+     "3.3 Data collection and design topic",
+     "4 Discussion/limitations (pp. 34-35)"
+    ]
+   },
+   "design": "observational two-cohort comparison (2007 consensus vs. 2009 randomisation-based curriculum), same college; pre, post and 4-month retention",
+   "population": "Hope College (US) introductory statistics students; retention sample consensus n = 78/79, randomisation n = 76 (about 40% response)",
+   "operation": "empirical_experimental / statistical reasoning (conceptual inference, design, significance)",
+   "intervention": "randomisation/simulation-based curriculum",
+   "comparator": "consensus (traditional) curriculum",
+   "outcome": {
+    "measure": "CAOS 40-item concept inventory (alpha .58 pre, .70 post, .72 retention)",
+    "assisted": false,
+    "delay": "4 months after course end",
+    "transfer": "conceptual inventory, not course-specific items"
+   },
+   "estimate": {
+    "metric": "percentage points; regression coefficient; adjusted odds ratios per item",
+    "value": "post-to-4-month change: consensus -5.28 (p < .001), randomisation -0.61 (p = .53); raw retention difference between cohorts p = .66; adjusted for pre/post: cohort effect 4.26 points (95% CI 1.59-6.93, p = .002); data collection/design topic: +10.3 points (95% CI 2.7-17.8)",
+    "ci": "as listed",
+    "k_or_n": "155 in retention analysis",
+    "note": "Consensus retention respondents were more positively selected (posttest +5.1 points vs randomisation respondents, 95% CI 1.1-9.0)."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Observational cohorts, different years and partly different instructors; ~40% self-selected retention sample biased toward stronger students; single college. One of the few delayed (4-month) outcomes found for quantitative curricula; supports measuring retention, not a causal curriculum claim.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:sbi_retention",
+     "relation": "supports",
+     "locator": "3.2 regression (4.26, p = .002)"
+    },
+    {
+     "claim_id": "R2:sbi_retention",
+     "relation": "qualifies",
+     "locator": "3.1 non-response; 3.2 raw difference p = .66; limitations p. 34"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "chance2022sbi",
+   "citation": "Chance, B., Tintle, N., Reynolds, S., Patel, A., Chan, K., & Leader, S. (2022). Student performance in curricula centered on simulation-based inference. Statistics Education Research Journal, 21(3).",
+   "doi_or_url": "https://doi.org/10.52041/serj.v21i3.6",
+   "source_type": "primary_observational",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "SERJ PDF via iase-pub.org",
+    "sections_read": [
+     "3.2-3.3 data and participants",
+     "4 results incl. item-level observations",
+     "sensitivity analyses",
+     "5.1 Discussion",
+     "5.2 Future directions"
+    ]
+   },
+   "design": "observational multi-institution study, multilevel models with student, instructor and institution covariates; propensity-score sensitivity analysis",
+   "population": "10,514 students, 503 sections, 194 instructors, 86 US institutions (2014/15-2016/17), algebra-based introductory statistics",
+   "operation": "empirical_experimental / statistical reasoning",
+   "intervention": "simulation-based inference (SBI) textbooks (ISI, other SBI)",
+   "comparator": "non-SBI textbooks",
+   "outcome": {
+    "measure": "24-question concept inventory pre/post",
+    "assisted": false,
+    "delay": "end of course only",
+    "transfer": "concept inventory"
+   },
+   "estimate": {
+    "metric": "achievable gain (%); inventory points",
+    "value": "SBI curricula achievable gains 14-18% vs 7-11% non-SBI; difference equivalent to an additional 1-2 points on the 24-question inventory",
+    "ci": "not extracted",
+    "k_or_n": "N = 10,514",
+    "note": "Pre-course characteristics (prior knowledge) were the strongest predictors; all textbook groups decreased pre-to-post on the item about a large p-value as evidence for the null; authors call the actual impact 'relatively small'."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Instructors self-selected textbooks; residual confounding despite multilevel adjustment and propensity weighting; no delayed outcome; US algebra-based courses.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:sbi_retention",
+     "relation": "qualifies",
+     "locator": "5.1 (1-2 points of 24); 5.2 ('relatively small')"
+    },
+    {
+     "claim_id": "R2:stat_misconceptions_persist",
+     "relation": "supports",
+     "locator": "5.1 (Q24 decrease in all groups)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "mejia2012proofassessment",
+   "citation": "Mejia-Ramos, J. P., Fuller, E., Weber, K., Rhoads, K., & Samkoff, A. (2012). An assessment model for proof comprehension in undergraduate mathematics. Educational Studies in Mathematics, 79(1), 3-18.",
+   "doi_or_url": "https://doi.org/10.1007/s10649-011-9349-7",
+   "source_type": "theoretical_framework",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "Crossref metadata only (no abstract, Springer blocked). Content known only via citing full texts: neuhaus2025proofskills p. 4166 (11 MC items on local and global aspects), alcock2015notices p. 5 (items on basic knowledge, logical reasoning, application to examples, summarising)",
+    "sections_read": []
+   },
+   "design": "assessment framework for proof comprehension",
+   "population": "undergraduate mathematics",
+   "operation": "formal_proof: proof comprehension (local and holistic aspects)",
+   "intervention": "not applicable",
+   "comparator": "not applicable",
+   "outcome": {
+    "measure": "framework for item construction",
+    "assisted": "not applicable",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "not applicable",
+    "note": "Not read; used as the shared item framework in hodds2014selfexplanation, neuhaus2025proofskills, davies2020cjproof."
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Framework content must be read in the original before it is used to define product item types; its derived MC test showed low internal consistency in a UK sample (davies2020cjproof).",
+   "claim_edges": [
+    {
+     "claim_id": "R2:proof_comprehension_item_types",
+     "relation": "context_only",
+     "locator": "via citing sources (see access)"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "hembree1992problemsolving",
+   "citation": "Hembree, R. (1992). Experiments and relational studies in problem solving: A meta-analysis. Journal for Research in Mathematics Education, 23(3), 242-273.",
+   "doi_or_url": "https://doi.org/10.5951/jresematheduc.23.3.0242",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref/OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "meta-analysis of 487 reports",
+   "population": "mainly school students (K-12) and their teachers",
+   "operation": "symbolic_procedure / mathematical problem solving",
+   "intervention": "problem-solving instruction methods incl. heuristics; representation training",
+   "comparator": "other instructional approaches",
+   "outcome": {
+    "measure": "problem-solving performance",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "487 reports",
+    "note": "Abstract: no superior method in grades K-5; heuristics mildly better in grades 6-8 and 'distinctly superior' in high school; training in representations (diagrams/sketches) gave the largest improvement; teachers trained in heuristics had positive impact."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Old (1992), school-level, pre-modern meta-analytic methods; nothing on university proof. Only quantitative synthesis found for heuristic instruction; gap for adult/university learners.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:heuristics_instruction",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "castrosotos2009misconceptions",
+   "citation": "Castro Sotos, A. E., Vanhoof, S., Van den Noortgate, W., & Onghena, P. (2009). How confident are students in their misconceptions about hypothesis tests? Journal of Statistics Education, 17(2).",
+   "doi_or_url": "https://doi.org/10.1080/10691898.2009.11889514",
+   "source_type": "primary_descriptive",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "questionnaire with confidence ratings (0-10) per item",
+   "population": "144 college students in introductory statistics",
+   "operation": "empirical_experimental / statistical reasoning: definitions of hypothesis test, p-value, significance level",
+   "intervention": "not applicable",
+   "comparator": "not applicable",
+   "outcome": {
+    "measure": "misconception items with confidence",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "N = 144",
+    "note": "Abstract: considerable number held misconceptions even after reformed courses; lower concept-specific self-efficacy related more to misconceptions than to correct answers."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Single-site survey; supports explicit misconception items in statistics and confidence as data (cf. R1-POL-A09), not an intervention.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:stat_misconceptions_persist",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "pelkola2018stack",
+   "citation": "Pelkola, T., Rasila, A., & Sangwin, C. (2018). Investigating Bloom's learning for mastery in mathematics with online assessment. Informatics in Education, 17(2), 363-380.",
+   "doi_or_url": "https://doi.org/10.15388/infedu.2018.19",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "'clinical trial' of a mastery-learning teaching cycle using STACK (allocation details not read)",
+   "population": "university engineering students",
+   "operation": "symbolic_procedure with CAS-based automated assessment",
+   "intervention": "Learning-for-Mastery cycle with STACK automated assessment and feedback",
+   "comparator": "not read",
+   "outcome": {
+    "measure": "formative mastery tests",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "unknown",
+    "note": "Abstract: results 'modest, but positive'; exercise performance predicted mastery 'to a small extent'."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Developer involvement (STACK author co-author); modest predictive link between practice and mastery. Only learning-related CAS evidence located; independent delayed outcomes not seen.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:cas_oracle_learning_evidence",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "kinnear2022eassessment",
+   "citation": "Kinnear, G., Jones, I., Sangwin, C., Alarfaj, M., Davies, B., Fearn, S., et al. (2024). A collaboratively-derived research agenda for e-assessment in undergraduate mathematics. International Journal of Research in Undergraduate Mathematics Education, 10(1), 201-231 (online 2022).",
+   "doi_or_url": "https://doi.org/10.1007/s40753-022-00189-6",
+   "source_type": "expert_consensus",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; Crossref metadata",
+    "sections_read": []
+   },
+   "design": "collaborative research-agenda development",
+   "population": "22 mathematics education researchers, university teachers and learning technologists",
+   "operation": "symbolic_procedure / formal_proof assessment with e-assessment",
+   "intervention": "not applicable",
+   "comparator": "not applicable",
+   "outcome": {
+    "measure": "55 research questions in 5 themes",
+    "assisted": "not applicable",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "count",
+    "value": "55 open research questions; themes: errors and feedback, student interactions, design/implementation choices, tool affordances, mathematical skills",
+    "ci": "not applicable",
+    "k_or_n": "22 contributors",
+    "note": "Signals that core questions on e-assessment in undergraduate mathematics are open."
+   },
+   "inference": "not_empirical",
+   "bias_and_applicability": "Agenda, not evidence; useful for gap list.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:cas_oracle_learning_evidence",
+     "relation": "context_only",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "not_empirical"
+  },
+  {
+   "source_id": "wrenn2021pbt",
+   "citation": "Wrenn, J., Nelson, T., & Krishnamurthi, S. (2021). Using relational problems to teach property-based testing. The Art, Science, and Engineering of Programming, 5(2), Article 9.",
+   "doi_or_url": "https://doi.org/10.22152/programming-journal.org/2021/5/9",
+   "source_type": "experience_report",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract (arXiv:2010.16305)",
+    "sections_read": []
+   },
+   "design": "course experience report with analysis of student PBT submissions",
+   "population": "collegiate CS students (US)",
+   "operation": "computational_construction: specification writing / property-based testing",
+   "intervention": "relational problems (multiple valid outputs) as PBT exercises",
+   "comparator": "none",
+   "outcome": {
+    "measure": "accuracy of student-written specifications; common mistakes",
+    "assisted": "unknown",
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not extracted",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "unknown",
+    "note": "Abstract: students 'can do quite well' at PBT for these problems; introduces a method to evaluate specification accuracy."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "No comparison group, no learning outcome. Relevant as assessment design: student-written properties can themselves be checked against known correct/incorrect implementations.",
+   "claim_edges": [
+    {
+     "claim_id": "R2:testing_as_assessment",
+     "relation": "context_only",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "unresolved"
+  }
+ ]
+}
