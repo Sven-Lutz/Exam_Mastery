@@ -55,7 +55,8 @@ def category(track, cid):
 
 # Events that make a later attempt on the same task assisted. 'tutor' is written when the learner prepares a tutor
 # context for the task (CD-7, R5-POL-04): what happens in that conversation is not observed, so it counts as help.
-ASSIST_EVENTS = ('hint', 'solution', 'tutor')
+# 'guided' is a prerequisite micro-lesson or its check question opened for the task (guided.py, R5-POL-04).
+ASSIST_EVENTS = ('hint', 'solution', 'tutor', 'guided')
 
 
 def helped(events, task_id, upto=None):
@@ -72,7 +73,8 @@ FUTURE_SKEW_MINUTES = 5  # tolerated clock skew for event timestamps (CD-9)
 
 def _kc_helped(events, tasks, kc_id, i, t_attempt):
     window = timedelta(hours=KC_HELP_WINDOW_HOURS)
-    return any(e['type'] in ASSIST_EVENTS and tasks.get(e.get('task'), {}).get('kc_id') == kc_id
+    # a guided event also names the competency its lesson teaches ('kc'): studying the prerequisite helps there too
+    return any(e['type'] in ASSIST_EVENTS and (tasks.get(e.get('task'), {}).get('kc_id') == kc_id or e.get('kc') == kc_id)
                and t_attempt - _instant(e['t']) <= window for e in events[:i])
 
 

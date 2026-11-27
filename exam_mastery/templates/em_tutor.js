@@ -137,8 +137,8 @@ const category = (tr, c) => tr.categories[c] || GENERIC[c] || GENERIC.unclassifi
 // Retention evidence uses elapsed time, not calendar dates (mirrors policy.py, RETENTION_MIN_GAP_HOURS).
 const RETENTION_MIN_GAP_HOURS = 20;
 const instant = t => { const s = String(t); return Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(s) ? s + 'T00:00:00Z' : /([zZ]|[+-]\d{2}:?\d{2})$/.test(s) ? s : s + 'Z'); };
-// Mirrors policy.ASSIST_EVENTS: a prepared tutor context counts as help for that task (CD-7).
-const ASSIST_EVENTS = ['hint', 'solution', 'tutor'];
+// Mirrors policy.ASSIST_EVENTS: a prepared tutor context and a guided prerequisite lesson count as help for that task (CD-7).
+const ASSIST_EVENTS = ['hint', 'solution', 'tutor', 'guided'];
 const helped = (ev, tid, upto) => (upto === undefined ? ev : ev.slice(0, upto + 1)).some(e => ASSIST_EVENTS.includes(e.type) && e.task === tid);
 // Tasks whose purpose is evidence of independent solving: the tutor brief carries no answer key for them (mirrors tutor.KEY_WITHHELD_ROLES).
 const EVIDENCE_ROLES = ['similar', 'transfer', 'retest'];
@@ -146,7 +146,7 @@ const EVIDENCE_ROLES = ['similar', 'transfer', 'retest'];
 // later attempt assisted for the competency's evidence state (CD-9).
 const KC_HELP_WINDOW_HOURS = RETENTION_MIN_GAP_HOURS;
 const FUTURE_SKEW_MINUTES = 5;  // mirrors policy.FUTURE_SKEW_MINUTES
-const kcHelped = (ev, T, kc, i, t) => ev.slice(0, i).some(e => ASSIST_EVENTS.includes(e.type) && T[e.task] && T[e.task].kc_id === kc && t - instant(e.t) <= KC_HELP_WINDOW_HOURS * 3600e3);
+const kcHelped = (ev, T, kc, i, t) => ev.slice(0, i).some(e => ASSIST_EVENTS.includes(e.type) && ((T[e.task] && T[e.task].kc_id === kc) || e.kc === kc) && t - instant(e.t) <= KC_HELP_WINDOW_HOURS * 3600e3);
 const solved = (ev, tid) => ev.some(e => e.type === 'attempt' && e.task === tid && e.diagnosis.result === 'correct');
 const role = (tr, r, kc, ev) => { const t = tr.tasks.find(t => t.role === r && (kc == null || t.kc_id === kc) && !(ev && solved(ev, t.id))); return t ? t.id : null; };
 const dec = (rule, action, next, obs, why, unc, o = {}) => ({ schema: 'em-decision-v1', rule, action, next_task: next, hints_allowed: o.hints_allowed !== false, support: o.support || null, focus: o.focus || null, tutor_offer: !!o.tutor, observation: obs, rationale: why, uncertainty: unc, retention: o.retention || null });
