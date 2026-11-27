@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T20:44:21+01:00",
+ "updated": "2026-11-27T21:07:51+01:00",
  "updated_by": "LEAD (interactive, issue #49 execution)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -344,7 +344,7 @@
    "id": "V1APP",
    "kind": "background subagent of LEAD",
    "scope": "Mastery V1 local app",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/V1APP.json",
    "worktree": "Exam_Mastery-v1app"
   },
@@ -365,7 +365,7 @@
    "priority": 0.9,
    "autostart": false,
    "depends_on": [
-    "WP-V1-APP"
+    "WP-V1-CONTENT"
    ],
    "headless_ok": false,
    "next_step": "Owner runs bin/mastery start and the checklist in docs/MASTERY_V1.md; quality judged against textbook + LLM + Anki baseline."
@@ -385,14 +385,27 @@
   {
    "id": "WP-V1-APP",
    "title": "Mastery V1 local app: one-command start, home START/CONTINUE/STUDY, persistent state, tutor, progress, Anki",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 0.7,
    "autostart": false,
    "branch": "feat/mastery-v1-app-20261127",
    "base": "integration/mastery-v1-20261127",
    "worktree": "Exam_Mastery-v1app",
-   "updated": "2026-11-27T20:44:21+01:00",
-   "next_step": "Specialist V1APP builds bin/mastery + python -m exam_mastery.mastery, attention unit + backprop track, E2E tests, docs/MASTERY_V1.md; lead reviews, merges into integration, hands-on check."
+   "updated": "2026-11-27T21:07:51+01:00",
+   "next_step": "none (merged into integration by fast-forward)",
+   "done": [
+    "6bed7f7 explorable persists attempts/hints/solution views/tutor briefs (em-practice-v1, archived on task revision); EMT.portableBrief with R9 contract header; evidence-role tasks never get the key; tutor brief logged as help",
+    "701d456 bin/mastery + python -m exam_mastery.mastery {start,build,status,export}; data-driven library.json + private ~/Mastery/library-spec.local.json; home START/CONTINUE/STUDY; progress page; stdlib server 127.0.0.1:8765 with allow-list, Host/Origin checks, schema/size limits, backup endpoint",
+    "f94e9e7 tests/test_mastery_v1_app.py (7 E2E incl. throwaway Anki import + unchanged rebuild restamps nothing)",
+    "55cb491 docs/MASTERY_V1.md (start, daily flow, owner checklist, limits, baseline comparison)",
+    "lead check: bin/mastery start into a throwaway MASTERY_HOME builds in 6 s and serves offline; E2E 7/7 OK; suite (specialist, frozen 55cb491) pytest 215 + unittest 896 OK; fast-forwarded into integration (PR #50)"
+   ],
+   "open": [
+    "mobile, Anki desktop/AnkiMobile import untested",
+    "explorable tutor button only after an own attempt",
+    "attention free-text tasks counted, never graded",
+    "track title differs between home and progress page (cosmetic)"
+   ]
   },
   {
    "id": "WP-V1-FIX",
