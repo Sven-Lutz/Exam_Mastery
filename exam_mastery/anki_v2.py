@@ -97,15 +97,23 @@ def _html(s):
     return out[3:-4] if out.startswith('<p>') and out.count('<p>') == 1 and out.endswith('</p>') else out
 
 
-def _notetype(col, name, fields, qfmt, afmt, cloze=False):
+# Note-type, field and template IDs are derived from these frozen seeds, never from the display name, so a later
+# display rename (Mastery brand) keeps the learner's note types and their notes (CD-8, R8 EF-1). The seeds are the
+# historical display names: IDs stay bit-identical to every earlier export.
+NOTETYPE_ID_SEED = {'basic': 'Exam Mastery · Basis (v2)', 'cloze': 'Exam Mastery · Lückentext (v2)'}
+NOTETYPE_NAME = dict(NOTETYPE_ID_SEED)  # display names; may change without changing identity
+
+
+def _notetype(col, name, fields, qfmt, afmt, cloze=False, id_seed=None):
     mm = col.models
+    seed = id_seed or name
     nt = mm.new(name)
-    nt['id'] = _id('em-notetype-v2', name, n=6, signed=False) or 1
+    nt['id'] = _id('em-notetype-v2', seed, n=6, signed=False) or 1
     if cloze:
         nt['type'] = 1
     for f in fields:
-        fld = mm.new_field(f); fld['id'] = _id('em-field-v2', name, f); mm.add_field(nt, fld)
-    t = mm.new_template('Karte'); t['id'] = _id('em-template-v2', name); t['qfmt'] = qfmt; t['afmt'] = afmt
+        fld = mm.new_field(f); fld['id'] = _id('em-field-v2', seed, f); mm.add_field(nt, fld)
+    t = mm.new_template('Karte'); t['id'] = _id('em-template-v2', seed); t['qfmt'] = qfmt; t['afmt'] = afmt
     mm.add_template(nt, t)
     nt['css'] = CSS; nt['sortf'] = 1
     mm.update(nt, preserve_usn=True)
@@ -164,8 +172,8 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
     with tempfile.TemporaryDirectory(prefix='em-anki2-') as td:
         col = Collection(str(Path(td) / 'c.anki2'))
         try:
-            basic = _notetype(col, 'Exam Mastery · Basis (v2)', BASIC_FIELDS, BASIC_Q, BASIC_A)
-            cloze = _notetype(col, 'Exam Mastery · Lückentext (v2)', CLOZE_FIELDS, CLOZE_Q, CLOZE_A, cloze=True)
+            basic = _notetype(col, NOTETYPE_NAME['basic'], BASIC_FIELDS, BASIC_Q, BASIC_A, id_seed=NOTETYPE_ID_SEED['basic'])
+            cloze = _notetype(col, NOTETYPE_NAME['cloze'], CLOZE_FIELDS, CLOZE_Q, CLOZE_A, cloze=True, id_seed=NOTETYPE_ID_SEED['cloze'])
             did = col.decks.id(deck_name)
             media = []
             from .typeset import NODE
@@ -176,7 +184,7 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
             for fid, svg in (figures or {}).items():
                 name = f'em-{chapter_slug}-{slug(fid)}.svg'
                 (Path(col.media.dir()) / name).write_text(svg, encoding='utf-8'); media.append(name)
-            hashes = {}
+            hashes, nids = {}, {}
             for c in cards:
                 nt = cloze if c['kind'] == 'cloze' else basic
                 n = col.new_note(nt)
@@ -198,11 +206,23 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
                 for k, v in vals.items():
                     n[k] = v
                 n.tags = [f'em::{chapter_slug}', f'em::typ::{KIND_LABEL[c["kind"]].lower()}'] + [f'em::{t}' for t in c.get('tags', [])]
-                col.add_note(n, did)
+                col.add_note(n, did); nids[c['key']] = n.id
                 hashes[c['key']] = hashlib.sha256(json.dumps(vals, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
-            col.db.execute('update notes set mod=?', stamp)
-            for nt in (basic, cloze):
-                nt['mod'] = stamp; col.models.update(nt, preserve_usn=True)
+            # Only content that changed gets a new modification time. Anki's default import ('update if newer')
+            # then leaves unchanged notes and note types alone, so the learner's own edits survive a re-import (CD-8).
+            # Earlier states had no per-key times: every note of that export carried 'last_export'.
+            old_h = prev.get('hashes', {})
+            old_m = prev.get('mods') or {k: int(prev['last_export']) for k in old_h if prev.get('last_export')}
+            mods = {k: (old_m[k] if old_h.get(k) == h and old_m.get(k) else stamp) for k, h in hashes.items()}
+            for k, nid in nids.items():
+                col.db.execute('update notes set mod=? where id=?', mods[k], nid)
+            nt_state = {}
+            for role, nt in (('basic', basic), ('cloze', cloze)):
+                h = hashlib.sha256(json.dumps([nt['name'], [f['name'] for f in nt['flds']], [(t['qfmt'], t['afmt']) for t in nt['tmpls']],
+                                               nt['css'], nt.get('type', 0)], ensure_ascii=False).encode()).hexdigest()
+                before = (prev.get('notetypes') or {}).get(role) or {}
+                nt['mod'] = before['mod'] if before.get('hash') == h and before.get('mod') else stamp
+                col.models.update(nt, preserve_usn=True); nt_state[role] = {'hash': h, 'mod': nt['mod']}
             pkg = out_dir / 'Anki_Karten.apkg'
             col.export_anki_package(out_path=str(pkg), options=ExportAnkiPackageOptions(
                 with_scheduling=False, with_deck_configs=False, with_media=True, legacy=True), limit=None)
@@ -213,10 +233,11 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
     delta = {'new': sorted(set(hashes) - set(old)), 'changed': sorted(k for k in hashes if k in old and old[k] != hashes[k]),
              'unchanged': sorted(k for k in hashes if old.get(k) == hashes[k]),
              'retirement_candidates': sorted(set(old) - set(hashes)), 'automatic_deletion': False}
-    write_json(state_p, {'schema': 'em-anki-v2-state', 'last_export': stamp, 'hashes': hashes,
+    write_json(state_p, {'schema': 'em-anki-v2-state', 'last_export': stamp, 'hashes': hashes, 'mods': mods, 'notetypes': nt_state,
                          'seen': sorted(set(prev.get('seen', [])) | set(hashes))})
     rep = {'package': str(pkg), 'notes': notes, 'cards': n_cards, 'media': media, 'deck': deck_name,
-           'note_types': ['Exam Mastery · Basis (v2)', 'Exam Mastery · Lückentext (v2)'],
+           'note_types': [NOTETYPE_NAME['basic'], NOTETYPE_NAME['cloze']],
+           'restamped': sorted(k for k in mods if mods[k] == stamp),
            'kinds': {k: sum(1 for c in cards if c['kind'] == k) for k in sorted({c['kind'] for c in cards})},
            'identity': 'GUID = hash(course slug, chapter slug, semantic key)', 'update_delta': delta}
     write_json(out_dir / 'anki_report.json', rep)
