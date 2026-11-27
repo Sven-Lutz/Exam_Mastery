@@ -1188,11 +1188,11 @@
   "OD-02": "agents prepare/test integration branch and PR; merge to main only by explicit owner action"
  },
  "real_courses_local": {
-  "note": "owner-private, never in Git; outputs only under ~/Mastery",
-  "first": "RL (01_Studium/RL; lectures 00-19 with gaps 03/11/18; exercises notebooks; tutorium) - iCloud dataless, materialised with brctl download",
+  "note": "owner-private, never in Git; outputs only under the private Mastery home",
+  "first": "owner's university course Reinforcement Learning (lecture decks with numbering gaps, exercise notebooks, tutorium); cloud placeholders materialised with consent",
   "second_candidates": [
-   "Lineare Algebra 1 (Selbststudium: slides, 23 exercise sheets, extra tasks, tutorium)",
-   "Patentrecht / Entrepreneurship (01_Studium)"
+   "a proof-heavy mathematics course (linear algebra) with exercise sheets",
+   "a law or business course"
   ]
  }
 }
