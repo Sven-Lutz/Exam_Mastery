@@ -1,0 +1,2069 @@
+{
+ "schema": "em-learning-policies/1",
+ "version": "0.2.0",
+ "status": "DESIGN_HYPOTHESIS_SET",
+ "date": "2026-11-27",
+ "baseline": {
+  "branch": "research/r2-formal-quantitative-20261127",
+  "builds_on": "R1 policies (research/r1-learning-science-20261127, 3559872)",
+  "kb": "exam_mastery/knowledge/{sources,principles}.json"
+ },
+ "authorship": {
+  "R2": "Spezialist formale, quantitative und computationale Kompetenz (r2/r2_evidence.json)",
+  "lead": "Synthese R2_FORMAL_QUANTITATIVE.md, Stichprobenprüfung (verification_log), eine Registerkorrektur (petrov2025proofbluff); Lead ist dasselbe Modell wie der Spezialist",
+  "independent_review": "pending: keine menschliche Fachprüfung",
+  "R2S": "Ergänzungsbatch 5 (Algorithmen, quantitatives Problemlösen, Modellieren): 17 Registereinträge, R2-POL-17 bis 21, R2-CR-5/6; dasselbe Modell wie Spezialist und Lead"
+ },
+ "operations": [
+  "recall_discrimination",
+  "symbolic_procedure",
+  "formal_proof",
+  "rule_based_contextual",
+  "diagnostic_reasoning",
+  "empirical_experimental",
+  "computational_construction",
+  "spatial_design",
+  "embodied_psychomotor",
+  "open_synthesis",
+  "self_regulation"
+ ],
+ "certainty_scale": "wie R1 (r1/r1_learning_policies.json certainty_scale)",
+ "conflict_resolution": [
+  {
+   "id": "R2-CR-1",
+   "between": [
+    "R2-POL-08",
+    "R2-POL-09",
+    "R1-POL-A02"
+   ],
+   "rule": "Für Programmieranfänger: Tracing-Probe zuerst; besteht sie, beginnen Lösungsbeispiele mit Teilzielen (A02); sonst Tracing-Übung."
+  },
+  {
+   "id": "R2-CR-2",
+   "between": [
+    "R2-POL-05",
+    "R2-POL-14"
+   ],
+   "rule": "LLM-Bewertung ist immer Prüfer 'agent_judgement' und zählt nie als Kompetenzbeleg; Pflichtprüfer bleibt Mensch oder formale Verifikation."
+  },
+  {
+   "id": "R2-CR-3",
+   "between": [
+    "R2-POL-13",
+    "R1-POL-A08"
+   ],
+   "rule": "Korrektives Feedback nach jedem Versuch bleibt; das Einreichungslimit begrenzt nur Orakelaufrufe, nicht Erklärungen."
+  },
+  {
+   "id": "R2-CR-4",
+   "between": [
+    "R2-POL-07",
+    "R2-POL-02"
+   ],
+   "rule": "Ein maschinell geprüfter Beweis belegt Konstruktion nur in der formalen Variante; Papierkonstruktion bleibt separat."
+  },
+  {
+   "id": "R2-CR-5",
+   "between": [
+    "R2-POL-18",
+    "R2-POL-08"
+   ],
+   "rule": "Invariantenarbeit beginnt erst nach bestandener Tracing-Probe; vorher Tracing-Übung."
+  },
+  {
+   "id": "R2-CR-6",
+   "between": [
+    "R2-POL-17",
+    "R2-POL-11",
+    "R1-POL-A08"
+   ],
+   "rule": "Im Algorithmus-Stepper ersetzt die Zustandsvorhersage die PRIMM-Vorhersage; korrigierendes Feedback nach jeder Vorhersage bleibt, eine Konfidenzabfrage nicht bei jeder Vorhersage."
+  }
+ ],
+ "shared_measurement_contract": "übernommen aus R1 (nur unassistierte, verzögerte Versuche an neuen Items); zusätzlich: Prüferdeklaration nach R2-POL-14",
+ "deferred_operations": [
+  {
+   "operation": "recall_discrimination",
+   "reason": "von R1 abgedeckt (R1-POL-A01, A04)",
+   "owner_workstream": "R1"
+  },
+  {
+   "operation": "self_regulation",
+   "reason": "von R1 abgedeckt (B-Policies)",
+   "owner_workstream": "R1"
+  },
+  {
+   "operation": "rule_based_contextual",
+   "reason": "nicht formal/quantitativ",
+   "owner_workstream": "R3"
+  },
+  {
+   "operation": "open_synthesis",
+   "reason": "nicht formal/quantitativ",
+   "owner_workstream": "R3"
+  },
+  {
+   "operation": "diagnostic_reasoning",
+   "reason": "klinisches/technisches Diagnostizieren nicht untersucht",
+   "owner_workstream": "R4"
+  },
+  {
+   "operation": "spatial_design",
+   "reason": "nicht untersucht",
+   "owner_workstream": "R4"
+  },
+  {
+   "operation": "embodied_psychomotor",
+   "reason": "nicht untersucht",
+   "owner_workstream": "R4"
+  }
+ ],
+ "coverage_gaps": [
+  "Physik-Problemlösen: Batch 5 (chi1981categorization, mason2011categorization, dufresne1992constraining, docktor2014physicsder), überwiegend Abstracts bzw. narrative Synthese; mathematische Physik im engeren Sinn (Methoden der theoretischen Physik) nicht gesichtet",
+  "Finanz-/Wirtschaftsmodellierung: weiterhin keine Lernevidenz gesichtet; R2-POL-21 macht dazu keine Aussage",
+  "Komplexitätsanalyse: nur deskriptive Defizitbefunde (galezer2004efficiency Schule, farghally2017aaci nur Abstract); keine Interventionsstudie gelesen",
+  "Algorithmenvisualisierung: Meta-Studie hundhausen2002avmeta nur über Sekundärberichte; Primärtext nicht frei zugänglich",
+  "Kausalinferenz über Einführungsstatistik hinaus: eine deskriptive Quelle (ellison2021dagtemporal), keine Interventionsevidenz, keine Policy",
+  "Schätz-/Fermi-Aufgaben: nur Schul- und Lehrkräftestudien gesichtet, nicht aufgenommen",
+  "Lösungsbeispiele in Physik: nur sekundär über docktor2014physicsder III.D.2; Schukajlow et al. 2015 (Lösungsplan) mangels frei abrufbarem Abstract nicht registriert",
+  "Seed-Quellen: 10.1007/s10763-025-10621-3 (neuhaus2025proofskills) und 10.1145/3690652 (yang2024debuggingslr) im Register; 10.1145/3501385.3543977 nicht gesichtet; ERIC EJ1478558 vermutlich murray2025mathspacing (R1A-Register), für R2 nicht ausgewertet",
+  "formale Suche: Batch 5 mit protokollierten Queries (search_log in r2_evidence.json); Batches 1-4 weiterhin ohne Queries, Q1-Q5 nicht als systematische Suche abgeschlossen"
+ ],
+ "policies": [
+  {
+   "id": "R2-POL-01",
+   "title": "Selbsterklärungstraining vor dem Lesen von Beweisen (Beweisverständnis)",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-01",
+   "applies_to_operations": [
+    "formal_proof"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "Lernende lesen vorgegebene kurze Beweise (Übergang zur Beweismathematik); Ziel ist Verständnis, nicht Konstruktion"
+   },
+   "recommendation": "Vor dem ersten Beweislesen ein kurzes, generisches Selbsterklärungstraining (Beispiel: jede Zeile mit Begründung aus vorherigen Zeilen oder Vorwissen verknüpfen; Gegenbeispiel: Paraphrase). Danach Beweise mit Selbsterklärungsprompts lesen; Antworten mit Referenzerklärung abgleichen (R1-POL-A06).",
+   "product_affordances": {
+    "textbook": "einseitige Selbsterklärungsanleitung vor dem ersten Beweiskapitel",
+    "workbook": "Beweise mit Lücken 'Warum folgt diese Zeile?'",
+    "interactive": "Zeilenweises Aufdecken mit Erklärungsfeld vor Referenzerklärung"
+   },
+   "abstain_or_fallback": [
+    "keine Mastery-Aussage über Beweiskonstruktion aus Verständnisitems (R2-POL-02)",
+    "keine automatische Bewertung freier Selbsterklärungen als richtig (SE-R2)",
+    "bei Fortgeschrittenen optional, nicht verpflichtend"
+   ],
+   "parameters": [
+    {
+     "name": "training_minutes",
+     "value": 15,
+     "unit": "Minuten einmalig",
+     "status": "provisional_product_parameter",
+     "rationale": "Größenordnung der Lehrmaterialien in hodds2014 (Kurzbroschüre); nicht dosisgeprüft"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "hodds2014selfexplanation",
+     "locator": "Thesis Study 1 S. 87-90 (d = 0.95), Study 3 (d = 0.41 / 0.35)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "alcock2015notices",
+     "locator": "S. 16-23, Abb. 11",
+     "relation": "supports"
+    },
+    {
+     "source_id": "mejia2012proofassessment",
+     "locator": "über zitierende Quellen (Itemrahmen)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "Labor-RCT und Klassenraumstudie mit gleicher Richtung",
+     "eine Forschungsgruppe, kleine Stichproben, kurzer Messabstand"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Selbsterklärungstraining verbessert unmittelbares Beweisverständnis",
+      "level": "moderate"
+     },
+     {
+      "claim": "Effekt hält über Wochen und überträgt auf Beweiskonstruktion",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Antworten auf Selbsterklärungsprompts (Freitext, unverifiziert), Lesezeit, Verständnisitems",
+   "independent_outcome": "unassistierter Beweisverständnistest (Itemtypen nach Mejia-Ramos et al.) an neuem Beweis >= 1 Woche später",
+   "failure_modes": [
+    "Prompts werden mit Paraphrasen beantwortet",
+    "Training wird übersprungen",
+    "Messung nur mit bereits gesehenem Beweis"
+   ],
+   "falsifier": "In einer vorab registrierten Randomisierung (Training vs. gleichlange Kontrolllektüre) zeigt der verzögerte Verständnistest an neuen Beweisen keinen Unterschied oberhalb einer festgelegten Mindestdifferenz.",
+   "kb_rule_links": [
+    {
+     "rule_id": "SE-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "SE-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "not_applicable_operations": [
+    {
+     "operation": "computational_construction",
+     "reason": "Evidenz nur für mathematische Beweise gelesen"
+    }
+   ]
+  },
+  {
+   "id": "R2-POL-02",
+   "title": "Beweisverständnis, -validierung und -konstruktion getrennt messen und berichten",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-02",
+   "applies_to_operations": [
+    "formal_proof"
+   ],
+   "context": {
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "jede Kompetenz mit Beweisanteil"
+   },
+   "recommendation": "Der Lernstand führt drei getrennte Beobachtungen: Verständnis (Fragen zu gegebenem Beweis), Validierung (Urteil plus Begründung zu einem vorgelegten, ggf. fehlerhaften Beweis) und Konstruktion (eigener Beweis). Fortschritt in einer Komponente wird nicht als Fortschritt der anderen angezeigt.",
+   "product_affordances": {
+    "workbook": "Aufgaben tragen die Komponente als Pflichtfeld",
+    "interactive": "drei getrennte Statusanzeigen je Beweiskompetenz"
+   },
+   "abstain_or_fallback": [
+    "wenn keine Konstruktionsaufgabe mit gültigem Prüfer existiert: Konstruktion als 'nicht beobachtet' ausweisen",
+    "keine Gesamtnote 'Beweisen' aus einer Komponente"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "neuhaus2025proofskills",
+     "locator": "Discussion S. 4171 (r = .85, Modell 2a)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "neuhaus2025proofskills",
+     "locator": "Results S. 4169 (TLI nicht akzeptabel), Limitations S. 4172",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "davies2020cjproof",
+     "locator": "4.2 Kriteriumsvalidität (r .28/.23; alpha .53)",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "eine Querschnittsstudie, Faktorlösung ohne akzeptablen Fit",
+     "hohe latente Korrelation spricht auch für Zusammenlegung; Trennung ist primär eine Validitätsvorsicht"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Komponenten sind korreliert, aber nicht austauschbar",
+      "level": "low"
+     },
+     {
+      "claim": "vorhandene Messinstrumente für Beweisverständnis sind wenig reliabel",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Versuchslog je Komponente",
+   "independent_outcome": "unassistierte, verzögerte Konstruktionsaufgabe, unabhängig von menschlicher Expertin/Experte bewertet",
+   "failure_modes": [
+    "Komponentenetikett falsch vergeben",
+    "Konstruktion wird nur über Lückentext 'beobachtet'"
+   ],
+   "falsifier": "Wenn in einer Lernendenstichprobe die Konstruktionsleistung aus Verständnis- und Validierungswerten mit einem vorab festgelegten Fehler (z. B. r >= .95 auf Personenebene) vorhergesagt wird, ist die getrennte Führung unnötig.",
+   "kb_rule_links": [
+    {
+     "rule_id": "ITS-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AS-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "MC-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-03",
+   "title": "Validierungsübungen mit fehlerhaften Beweisen und konsentierten Fehlern",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-03",
+   "applies_to_operations": [
+    "formal_proof"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "nach ersten Beweisen; Fehlertypen: Zirkelschluss, unzulässige Verallgemeinerung aus Fällen, fehlende Begründung, falsche Induktionsverankerung, Verwechslung von Satz und Umkehrung"
+   },
+   "recommendation": "Vorgelegte Beweise beurteilen lassen (gültig/ungültig, Fehlerzeile, Begründung). Nur Items mit fachlich eindeutigem, dokumentiertem Fehler verwenden; nach dem Urteil Referenzbegründung zeigen.",
+   "product_affordances": {
+    "workbook": "Fehlersuche in Beweisen mit Zeilenangabe",
+    "interactive": "Zeile markieren, Begründung eintragen, danach Referenz"
+   },
+   "abstain_or_fallback": [
+    "keine Items, bei denen Fachleute uneinig sind (inglis2013standards)",
+    "Validierungsurteil allein (ohne Begründung) zählt nicht als Beleg",
+    "keine Behauptung, Validierungsübung verbessere Konstruktion"
+   ],
+   "parameters": [
+    {
+     "name": "planted_error_share",
+     "value": 0.5,
+     "unit": "Anteil fehlerhafter Items",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung, damit 'gültig' nicht die Standardantwort ist"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "selden2003validation",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "inglis2012reading",
+     "locator": "Abstract, Befunde (b), (c)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "inglis2013standards",
+     "locator": "Abstract (a)-(d)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "weber2013skimming",
+     "locator": "Abstracts von Erwiderung und Replik",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Defizitbefund deskriptiv, kleine Stichproben",
+     "Intervention selbst nicht experimentell geprüft"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Novizen achten auf Oberflächenmerkmale",
+      "level": "low"
+     },
+     {
+      "claim": "Validierungstraining verbessert Validierung",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Urteil, Fehlerzeile, Begründung (Begründung unverifiziert, außer Referenzabgleich durch Mensch)",
+   "independent_outcome": "verzögerter unassistierter Validierungstest mit neuen fehlerhaften Beweisen",
+   "failure_modes": [
+    "Lernende lernen Fehlermuster der Itembank statt Prüfens",
+    "uneindeutige Items erzeugen falsches Feedback"
+   ],
+   "falsifier": "Randomisierter Vergleich (Validierungsübung vs. gleichlange Beweislektüre) zeigt bei verzögerter Validierung neuer Beweise keinen Vorteil.",
+   "kb_rule_links": [
+    {
+     "rule_id": "FB-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "R2-POL-03-NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-04",
+   "title": "Beweiskonstruktion: heuristische Lösungsbeispiele abhängig vom Vorwissen",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-04",
+   "applies_to_operations": [
+    "formal_proof",
+    "symbolic_procedure"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "Lernende sollen eigene Beweise oder nicht-routinemäßige Lösungen konstruieren"
+   },
+   "recommendation": "Heuristische Lösungsbeispiele zeigen den Suchprozess (Ziel umformen, Spezialfälle, Darstellung wechseln, Rückwärtsarbeiten) und nicht nur den fertigen Beweis; danach eigene Konstruktion mit gestuften Hinweisen (AI-R1). Für Lernende mit geringem Vorwissen stärker strukturieren; Wirkung je Vorwissen beobachten.",
+   "product_affordances": {
+    "textbook": "durchgearbeitete Beweissuchen mit sichtbaren Sackgassen",
+    "workbook": "Heuristikkarten plus Konstruktionsaufgaben",
+    "interactive": "Hinweisstufen erst nach eigenem Versuch"
+   },
+   "abstain_or_fallback": [
+    "kein Fading-Automatismus ohne Erster-Schritt-Probe (R1-POL-A03)",
+    "keine Wirksamkeitsbehauptung für Hochschulbeweise ohne Evaluation"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "hembree1992problemsolving",
+     "locator": "Abstract (Heuristiken, Darstellungstraining)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "kollar2014argumentation",
+     "locator": "Abstract (Effekte abhängig vom Vorwissen)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "Hauptbeleg aus Schulmathematik und altem Meta-Review",
+     "Hochschulexperiment nur im Abstract gelesen, Effekte konditional"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Heuristikinstruktion hilft ab Sekundarstufe beim Problemlösen",
+      "level": "low"
+     },
+     {
+      "claim": "heuristische Beispiele verbessern Hochschul-Beweiskonstruktion",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Konstruktionsversuche mit Hinweisstufe, verwendete Heuristik (selbstberichtet)",
+   "independent_outcome": "unassistierte Konstruktion eines neuen Beweises nach >= 1 Woche, Bewertung durch Mensch mit Rubrik oder CJ",
+   "failure_modes": [
+    "Beispiele werden memoriert",
+    "Hinweise ersetzen Suche"
+   ],
+   "falsifier": "Randomisierter Vergleich heuristischer vs. nur fertiger Beispiele zeigt in keiner Vorwissensgruppe einen Vorteil bei verzögerter Konstruktion.",
+   "kb_rule_links": [
+    {
+     "rule_id": "WE-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AI-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-05",
+   "title": "Bewertung offener Beweise: kein automatischer Kompetenzbeleg",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-05",
+   "applies_to_operations": [
+    "formal_proof"
+   ],
+   "context": {
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "freie Beweis- oder Begründungsantworten"
+   },
+   "recommendation": "Automatische (LLM-)Bewertung offener Beweise ist Feedback-Hinweis mit Kennzeichnung 'agent_judgement', nie Kompetenzbeleg. Wenn genutzt: nur mit Referenzlösung und Bewertungsschema, enger Aufgabentyp (z. B. Induktion), Überbewertungs-Prüfung. Kompetenzbelege für Konstruktion stammen aus menschlicher Bewertung (Rubrik oder Comparative Judgement) oder formaler Verifikation (R2-POL-07).",
+   "product_affordances": {
+    "interactive": "Feedbacketikett 'automatisch, unverifiziert'",
+    "workbook": "Rubrik zur Selbst-/Peerbewertung mit Referenzbeweis"
+   },
+   "abstain_or_fallback": [
+    "kein Bestehen-Status aus LLM-Bewertung",
+    "keine LLM-Bewertung ohne Referenz ('blind')",
+    "bei Uneinigkeit von Bewertung und Lernenden: als ungeklärt markieren"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "ospanov2026llmgrading",
+     "locator": "Tab. 1, Tab. 6, 6.2, 7 (QWK Mensch 0.76; LLM 0.63-0.66; blind <= 0.53; Überbewertung)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "zhao2025inductiongrading",
+     "locator": "4.1-4.2, Tab. 2 (ca. 89-90 % Rubrikitems, enger Aufgabentyp)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "zhao2025inductiongrading",
+     "locator": "7.1 (Oberflächensensitivität)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "petrov2025proofbluff",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "davies2020cjproof",
+     "locator": "4.1 Reliabilität (SSR .86)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "jones2015cj",
+     "locator": "Abstract (CJ r = .86 mit Bewertung)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "mehrere unabhängige Gruppen zeigen Lücke zwischen LLM- und Expertenbewertung",
+     "Modelle ändern sich schnell; Zahlen veralten"
+    ],
+    "sub_claims": [
+     {
+      "claim": "LLM-Bewerter erreichen die menschliche Übereinstimmung nicht und überbewerten",
+      "level": "moderate"
+     },
+     {
+      "claim": "CJ ist reliabel für offene Mathematikantworten",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Bewertungsquelle je Versuch (deterministisch / agent_judgement / Mensch)",
+   "independent_outcome": "unabhängige menschliche Zweitbewertung einer Stichprobe; Übereinstimmungsmaß vorab festgelegt",
+   "failure_modes": [
+    "Kennzeichnung verschwindet in Aggregaten",
+    "Lernende optimieren auf Bewerter statt Beweis"
+   ],
+   "falsifier": "Wenn ein automatischer Bewerter auf einer neuen, vorab registrierten Stichprobe des Kurses die menschliche Inter-Rater-Übereinstimmung erreicht und keinen systematischen Überbewertungsbias zeigt, ist die Abstufung zu lockern.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AI-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "SE-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-06",
+   "title": "Adversariale Aufgaben: Endergebnis, Wahrheit des Satzes und Erkennen genügen nicht",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-06",
+   "applies_to_operations": [
+    "formal_proof",
+    "symbolic_procedure",
+    "computational_construction",
+    "empirical_experimental"
+   ],
+   "context": {
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "Aufgabenbanken und Prüfungssimulationen in formalen Fächern"
+   },
+   "recommendation": "Jede Kompetenz erhält mindestens eine Aufgabe, die Faktenabruf, generisches MC und reine Zahlenprüfung bricht: Begründung des Schritts, Voraussetzung prüfen, Gegenbeispiel finden, Fehler in fremder Lösung lokalisieren, Wahl der Methode begründen. Ein wahres Ergebnis mit ungültiger Begründung gilt als nicht gelöst; ein korrekter Beweis eines Satzes belegt nicht, dass Lernende ihn verstanden haben.",
+   "product_affordances": {
+    "workbook": "Aufgabentyp 'Begründe/Gegenbeispiel/Fehler finden' je Kapitel",
+    "interactive": "Endergebnis und Begründung getrennt erfasst",
+    "anki": "nur Voraussetzungen und Gegenbeispiele, keine Lösungsketten"
+   },
+   "abstain_or_fallback": [
+    "Begründungsteil ohne gültigen Prüfer: als unverifiziert führen, nicht als bestanden",
+    "keine MC-Items, deren Distraktoren durch Oberflächenmerkmale ausschließbar sind"
+   ],
+   "parameters": [
+    {
+     "name": "adversarial_items_per_kc",
+     "value": 1,
+     "unit": "Aufgabe je Kompetenz mindestens",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "petrov2025proofbluff",
+     "locator": "Abstract (Endergebnis-Benchmarks überschätzen Beweisfähigkeit)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "selden2003validation",
+     "locator": "Abstract (Oberflächenmerkmale)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "castrosotos2009misconceptions",
+     "locator": "Abstract (Fehlvorstellungen nach Kurs)",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Belege zeigen das Messproblem, nicht die Lernwirkung adversarialer Aufgaben"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Endergebnisprüfung überschätzt Beweis- und Begründungskompetenz",
+      "level": "low"
+     },
+     {
+      "claim": "adversariale Aufgaben verbessern Lernen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Getrennte Korrektheit von Ergebnis und Begründung",
+   "independent_outcome": "verzögerte unassistierte Transferaufgabe mit verändertem Kontext (TR-R1)",
+   "failure_modes": [
+    "Aufgaben werden zu Rätseln ohne Lernziel",
+    "Begründungsfelder werden mit Floskeln gefüllt"
+   ],
+   "falsifier": "Wenn in Pilotdaten Ergebnis- und Begründungskorrektheit nahezu vollständig übereinstimmen (vorab festgelegte Schwelle), liefert die Trennung keine Information.",
+   "kb_rule_links": [
+    {
+     "rule_id": "TR-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "ITS-R2",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AS-R1",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-07",
+   "title": "Beweisassistenten nur optional und mit expliziter Syntaxhilfe",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-07",
+   "applies_to_operations": [
+    "formal_proof"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "intermediate",
+     "advanced"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Kurse, in denen ein Beweisassistent (z. B. Lean, Coq) verfügbar ist"
+   },
+   "recommendation": "Beweisassistenten nicht als Standardweg; als optionale Übung mit vorgefertigter Umgebung, Syntaxspickzettel und Verknüpfung zum Papierbeweis anbieten. Ein maschinell geprüfter Beweis belegt die Gültigkeit des formalen Beweises, nicht das Verständnis oder die Papierbeweis-Kompetenz.",
+   "product_affordances": {
+    "interactive": "optionale formale Variante mit Gegenüberstellung zum Papierbeweis"
+   },
+   "abstain_or_fallback": [
+    "keine Pflichtnutzung",
+    "keine Lernwirkungsbehauptung",
+    "Assistent-Erfolg zählt nur als Beleg formaler Gültigkeit"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "iannone2023lean",
+     "locator": "Abstract (Syntax als Hürde, geringe Beteiligung)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "mahinpei2025itp",
+     "locator": "Abstract",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "thoma2022lean",
+     "locator": "Abstract",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "nur deskriptive und Selbstberichtsstudien, Selbstselektion"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Syntax hemmt Beteiligung",
+      "level": "low"
+     },
+     {
+      "claim": "Beweisassistenten verbessern Papierbeweise",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Nutzung, Abbruchpunkte, geprüfte Beweise",
+   "independent_outcome": "Papierbeweis-Konstruktion an neuer Aufgabe, menschlich bewertet",
+   "failure_modes": [
+    "Werkzeugkampf verdrängt Mathematik",
+    "Taktik-Automatisierung ersetzt Beweisidee"
+   ],
+   "falsifier": "Ein randomisierter Vergleich mit Papierbeweis-Endpunkt zeigt einen klaren Vorteil der Assistenznutzung auch bei Novizen; dann wäre 'optional' zu schwach.",
+   "kb_rule_links": [
+    {
+     "rule_id": "R2-POL-07-NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-08",
+   "title": "Programme verfolgen und erklären vor dem Schreiben",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-08",
+   "applies_to_operations": [
+    "computational_construction"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "Einführung in Programmierung oder neue Kontrollstrukturen"
+   },
+   "recommendation": "Vor Schreibaufgaben: Ausgabe vorhersagen (Tracing) mit expliziter Strategie (Variablentabelle), dann Code in Alltagssprache erklären; erst danach schreiben. Tracing-Schwächen diagnostisch nutzen, nicht als Endziel.",
+   "product_affordances": {
+    "workbook": "Trace-Tabellen und 'Erkläre in einem Satz'",
+    "interactive": "Vorhersage vor Ausführung; Abgleich Zeile für Zeile"
+   },
+   "abstain_or_fallback": [
+    "keine Schreibkompetenz aus Tracing-Erfolg ableiten",
+    "Fortgeschrittene mit bestandener Tracing-Probe überspringen"
+   ],
+   "parameters": [
+    {
+     "name": "tracing_probe_items",
+     "value": 3,
+     "unit": "Items",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "xie2018tracing",
+     "locator": "Abstract (+15 %, N = 24)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "lister2004tracing",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "lopez2008tracing",
+     "locator": "5.2-5.3 (r = .56-.63)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "lopez2008tracing",
+     "locator": "5.4, 6.1 (nicht kausal)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Kausalbeleg nur aus kleiner Studie",
+     "Hierarchie korrelativ"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Tracing korreliert mit Schreibleistung",
+      "level": "moderate"
+     },
+     {
+      "claim": "Tracingtraining verbessert Schreiben",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Vorhersage vs. tatsächliche Ausgabe; Erklärung (unverifiziert)",
+   "independent_outcome": "verzögerte unassistierte Schreibaufgabe mit verborgenen Tests",
+   "failure_modes": [
+    "Tracing wird zur Routineübung ohne Bezug",
+    "Erklärungen werden nicht geprüft"
+   ],
+   "falsifier": "Randomisierter Vergleich (Tracing-zuerst vs. direkt schreiben, gleiche Zeit) zeigt keinen Vorteil bei verzögerten Schreibaufgaben.",
+   "kb_rule_links": [
+    {
+     "rule_id": "PR-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "WE-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-09",
+   "title": "Teilziel-beschriftete Lösungsbeispiele für Programmieranfänger",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-09",
+   "applies_to_operations": [
+    "computational_construction"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "neue Programmiermuster (Schleifen, Rekursion, Datenstrukturen)"
+   },
+   "recommendation": "Lösungsbeispiele mit Teilziel-Beschriftungen (z. B. 'Akkumulator initialisieren') anbieten, danach Aufgaben mit gleichen Teilzielen; Fading nach R1-POL-A03.",
+   "product_affordances": {
+    "textbook": "Beispiele mit Teilziel-Überschriften",
+    "workbook": "Aufgaben mit Teilzielgerüst"
+   },
+   "abstain_or_fallback": [
+    "Wirkung auf Prüfungsleistung unsicher: nicht als Hauptmaßnahme verkaufen",
+    "keine starre Vorgabe für Fortgeschrittene"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "margulieux2020subgoals",
+     "locator": "Results (Quiz d = 0.44; Prüfung d = 0.20 n. s.), S. 14",
+     "relation": "supports"
+    },
+    {
+     "source_id": "morrison2015subgoals",
+     "locator": "Abstract (Replikation fehlgeschlagen)",
+     "relation": "contradicts"
+    },
+    {
+     "source_id": "muldner2023workedexamples",
+     "locator": "Abstract",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "gemischte Replikation, quasi-experimentell",
+     "Prüfungseffekt nicht signifikant"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Teilziele verbessern kurzfristige Quizleistung",
+      "level": "low"
+     },
+     {
+      "claim": "Effekt auf Prüfung",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Fehler je Teilziel",
+   "independent_outcome": "verzögerte unassistierte Schreibaufgabe mit verborgenen Tests",
+   "failure_modes": [
+    "Beschriftungen werden ignoriert",
+    "Teilziele zementieren eine Lösungsform"
+   ],
+   "falsifier": "Vorab registrierter Vergleich mit und ohne Beschriftung zeigt bei verzögerten Schreibaufgaben keinen Unterschied.",
+   "kb_rule_links": [
+    {
+     "rule_id": "WE-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "WE-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-10",
+   "title": "Parsons-Aufgaben als effiziente Übung, nicht als Schreibnachweis",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-10",
+   "applies_to_operations": [
+    "computational_construction"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "Übung von Syntax und Reihenfolge bei knapper Zeit"
+   },
+   "recommendation": "Parsons-Aufgaben (Codezeilen ordnen, mit Distraktoren) als zeitsparende Übung anbieten; Kompetenz im Schreiben nur über freie Schreibaufgaben belegen.",
+   "product_affordances": {
+    "interactive": "Drag-and-drop mit Distraktoren",
+    "workbook": "Zeilenstreifen ordnen"
+   },
+   "abstain_or_fallback": [
+    "Parsons-Erfolg zählt nicht als Schreibbeleg",
+    "keine Überlegenheitsbehauptung"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "ericson2017parsons",
+     "locator": "Abstract (weniger Zeit, kein Unterschied in Leistung/Behalten)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "ericson2022parsonswg",
+     "locator": "Abstract",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "eine Vergleichsstudie im Abstract; Review nennt viele unbelegte Nutzenbehauptungen"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Parsons spart Übungszeit bei gleicher Leistung",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Lösezeit, Versuche",
+   "independent_outcome": "verzögerte freie Schreibaufgabe",
+   "failure_modes": [
+    "Ausschlussraten statt Verständnis",
+    "Distraktoren zu offensichtlich"
+   ],
+   "falsifier": "Ein randomisierter Vergleich zeigt bei gleicher Zeit schlechtere verzögerte Schreibleistung nach Parsons als nach Schreibübungen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "R2-POL-10-NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-11",
+   "title": "Vorhersagen vor Ausführen (Predict-Run-Investigate-Modify-Make)",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-11",
+   "applies_to_operations": [
+    "computational_construction",
+    "empirical_experimental"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "neuer Code oder neue Simulation"
+   },
+   "recommendation": "Vor Ausführen von Code oder einer Simulation eine schriftliche Vorhersage verlangen, dann ausführen, untersuchen, verändern, selbst erstellen.",
+   "product_affordances": {
+    "interactive": "Vorhersagefeld vor 'Ausführen'",
+    "workbook": "PRIMM-Arbeitsblätter"
+   },
+   "abstain_or_fallback": [
+    "Vorhersage nicht bewerten, nur protokollieren",
+    "keine Konfidenzabfrage bei jeder Vorhersage (R1 CR-5)"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "sentance2019primm",
+     "locator": "Abstract (N = 493, Experimentalgruppe besser)",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "eine große Schulstudie, Zuteilung nicht gelesen, Hochschulpopulation abweichend"
+    ],
+    "sub_claims": [
+     {
+      "claim": "PRIMM verbessert Post-Test in Schule",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Vorhersage vs. Ergebnis",
+   "independent_outcome": "verzögerte Schreib- und Erklärungsaufgabe",
+   "failure_modes": [
+    "Vorhersagen werden geraten",
+    "Ablauf wird mechanisch"
+   ],
+   "falsifier": "Randomisierter Hochschulvergleich mit/ohne Vorhersageschritt zeigt keinen Unterschied in verzögerten Aufgaben.",
+   "kb_rule_links": [
+    {
+     "rule_id": "PR-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "PR-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-12",
+   "title": "Debugging ausdrücklich unterrichten",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-12",
+   "applies_to_operations": [
+    "computational_construction"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "nach ersten eigenen Programmen"
+   },
+   "recommendation": "Systematisches Debugging als eigenes Lernziel: Hypothese bilden, Fehler eingrenzen, minimalen Testfall bauen, Ursache benennen. Übungen mit eingebauten Fehlern verschiedener Typen; Werkzeug-Ausgaben erklären lassen.",
+   "product_affordances": {
+    "workbook": "Fehlerkatalog mit Übungen",
+    "interactive": "fehlerhafter Code mit Hypothesenfeld"
+   },
+   "abstain_or_fallback": [
+    "keine Lösungsanzeige vor eigenem Lokalisierungsversuch (RP-R2)",
+    "Selbstwirksamkeitsgewinne nicht als Kompetenz zählen"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "sun2024debuggingmeta",
+     "locator": "Abstract (g = 0.64, KI 0.32-0.96)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "sun2024debuggingmeta",
+     "locator": "Abstract (Vorhersagebereich -0.54 bis 1.82)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "yang2024debuggingslr",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "michaeli2019debugging",
+     "locator": "Abstract",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Meta-Analyse nur im Abstract, sehr breiter Vorhersagebereich",
+     "Heterogene Interventionen"
+    ],
+    "sub_claims": [
+     {
+      "claim": "explizite Debugging-Instruktion wirkt im Mittel positiv",
+      "level": "moderate"
+     },
+     {
+      "claim": "Wirkung im konkreten Kurs",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Lokalisierungszeit, Hypothesen, Erfolg ohne Hilfe",
+   "independent_outcome": "verzögerte unassistierte Debugging-Aufgabe mit neuem Fehlertyp",
+   "failure_modes": [
+    "nur Syntaxfehler geübt",
+    "Werkzeug macht die Arbeit"
+   ],
+   "falsifier": "Vorab registrierter Vergleich zeigt keinen Vorteil bei verzögerten Debugging-Aufgaben mit neuen Fehlern.",
+   "kb_rule_links": [
+    {
+     "rule_id": "FB-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "R2-POL-12-NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-13",
+   "title": "Autograder und Orakel: begrenzte Einreichungen, eigene Tests, verborgene Prüfungen",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-13",
+   "applies_to_operations": [
+    "computational_construction",
+    "symbolic_procedure"
+   ],
+   "context": {
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "Aufgaben mit automatischer Rückmeldung (Unit-Tests, CAS)"
+   },
+   "recommendation": "Sichtbare Tests als Feedback, Kompetenzbeleg nur über verborgene oder neu erzeugte Tests; Einreichungen begrenzen oder verteuern; vor dem Einreichen eigene Tests verlangen; Bewertung deckt nur ab, was der Prüfer prüft (Stil, Lesbarkeit, Begründung sonst unverifiziert).",
+   "product_affordances": {
+    "interactive": "Einreichungslimit, Pflicht eigener Testfälle, verborgene Tests",
+    "workbook": "Testfälle selbst entwerfen vor Lösungsabgleich"
+   },
+   "abstain_or_fallback": [
+    "Bestehen sichtbarer Tests zählt nicht als Kompetenz",
+    "kein Belohnen von Trial-and-Error-Einreichungen"
+   ],
+   "parameters": [
+    {
+     "name": "free_submissions",
+     "value": 3,
+     "unit": "Einreichungen ohne Verzögerung",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; baniassad2021 nutzte Strafen statt Limit"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "baniassad2021autograder",
+     "locator": "Abstract (Einreichungen halbiert)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "messer2024autograding",
+     "locator": "Abstract (meist Unit-Tests, pass/fail)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "milovancevic2025formalgrading",
+     "locator": "Abstract (Äquivalenzprüfung)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "wrenn2021pbt",
+     "locator": "Abstract",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Verhaltensänderung belegt, Lerneffekt nicht"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Einreichungsbeschränkung reduziert Orakel-Abhängigkeit",
+      "level": "low"
+     },
+     {
+      "claim": "Unit-Tests erfassen nur Korrektheit",
+      "level": "moderate"
+     }
+    ]
+   },
+   "observable": "Einreichungsanzahl, eigene Tests, Ergebnis verborgener Tests",
+   "independent_outcome": "verzögerte Aufgabe ohne Autograder, mit verborgenen Tests bewertet",
+   "failure_modes": [
+    "Frustration und Abbruch",
+    "Tests zu schwach, falsch-positive Bestanden"
+   ],
+   "falsifier": "Randomisierter Vergleich mit/ohne Limit zeigt keinen Unterschied in verzögerten Leistungen ohne Autograder.",
+   "kb_rule_links": [
+    {
+     "rule_id": "FB-R2",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "RP-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "ITS-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-14",
+   "title": "Pflicht-Prüferdeklaration je Aufgabe (Verifier-Matrix)",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-14",
+   "applies_to_operations": [
+    "formal_proof",
+    "symbolic_procedure",
+    "computational_construction",
+    "empirical_experimental"
+   ],
+   "context": {
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "jede Aufgabe in formalen, quantitativen und computationalen Fächern"
+   },
+   "recommendation": "Jede Aufgabe deklariert ihren Prüfer (algebraisches Orakel/CAS, Beweisassistent, Unit-Tests, Property-Tests, Zustandsorakel einer Referenzimplementierung, Laufzeit-Zusicherung für Invarianten (nur Widerlegung), Operationszähler (nur Instanzen, kein Komplexitätsbeleg), Prinzipschlüssel (nur konsentierte Items), Rubrik mit Mensch, Expertenurteil, keiner) und welchen Teil der Antwort er prüft. Fortschritt zählt nur für geprüfte Teile; der Rest bleibt 'unverifiziert'.",
+   "product_affordances": {
+    "workbook": "Prüferkennzeichnung je Aufgabe",
+    "interactive": "Statusanzeige 'geprüft durch'"
+   },
+   "abstain_or_fallback": [
+    "fehlender Prüfer: kein Kompetenzbeleg, nur Übungsprotokoll",
+    "kein Ersatz eines Prüfers durch einen schwächeren ohne Kennzeichnung"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "messer2024autograding",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "ospanov2026llmgrading",
+     "locator": "6.2, 7",
+     "relation": "supports"
+    },
+    {
+     "source_id": "milovancevic2025formalgrading",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pelkola2018stack",
+     "locator": "Abstract",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "kinnear2022eassessment",
+     "locator": "Abstract",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "normative",
+    "reasons": [
+     "Validitätsgrenze des Lernstands; keine empirische Lernwirkung beansprucht"
+    ],
+    "sub_claims": []
+   },
+   "observable": "Prüferfeld je Aufgabe, Anteil geprüfter Beobachtungen",
+   "independent_outcome": "Audit: Stichprobe von Aufgaben mit menschlicher Prüfung, ob Deklaration zutrifft",
+   "failure_modes": [
+    "Deklaration falsch",
+    "zu viele unverifizierte Aufgaben ohne Hinweis"
+   ],
+   "falsifier": "Wenn ein Audit zeigt, dass deklarierte Prüfer regelmäßig andere Teile prüfen als angegeben, ist die Deklaration ohne Prüfung wertlos und muss technisch erzwungen werden.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AS-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AI-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "ITS-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-15",
+   "title": "CAS-gestützte Schrittprüfung für symbolische Verfahren",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-15",
+   "applies_to_operations": [
+    "symbolic_procedure"
+   ],
+   "context": {
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Umformungen, Ableitungen, Integrale, Lineare Algebra mit eindeutiger Äquivalenzprüfung"
+   },
+   "recommendation": "Eingaben je Teilschritt per CAS auf Äquivalenz prüfen; typische Fehler (Vorzeichen, Kettenregel, Einheiten) deterministisch erkennen und benennen; Endergebnis allein reicht nicht für Kompetenz.",
+   "product_affordances": {
+    "interactive": "Schritt-Eingabe mit Äquivalenzprüfung",
+    "workbook": "Lösungsschritte mit Kontrollwerten"
+   },
+   "abstain_or_fallback": [
+    "Bei nicht entscheidbarer Äquivalenz: unverifiziert",
+    "keine Bewertung der Methodenwahl durch CAS"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "pelkola2018stack",
+     "locator": "Abstract ('modest, but positive')",
+     "relation": "supports"
+    },
+    {
+     "source_id": "kinnear2022eassessment",
+     "locator": "Abstract",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "eine Studie im Abstract; offene Forschungsagenda"
+    ],
+    "sub_claims": [
+     {
+      "claim": "CAS-Mastery-Zyklus bringt bescheidene Vorteile",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Schrittkorrektheit, Fehlertyp",
+   "independent_outcome": "verzögerte unassistierte Aufgabe auf Papier oder ohne Schrittprüfung",
+   "failure_modes": [
+    "Eingabesyntax wird zur Hürde",
+    "Lernende raten Äquivalente"
+   ],
+   "falsifier": "Randomisierter Vergleich (Schrittprüfung vs. nur Endergebnis) zeigt keinen verzögerten Vorteil.",
+   "kb_rule_links": [
+    {
+     "rule_id": "ITS-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "FB-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-16",
+   "title": "Statistisches Schließen: simulationsbasierte Inferenz und gezielte Fehlvorstellungen",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §5 R2-POL-16",
+   "applies_to_operations": [
+    "empirical_experimental"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "einführende Statistik / Inferenz"
+   },
+   "recommendation": "Inferenz über Randomisierung und Simulation einführen (Nullmodell simulieren, p-Wert als Anteil), dann formale Verfahren; bekannte Fehlvorstellungen (p-Wert als Wahrscheinlichkeit der Hypothese, Signifikanz als Effektgröße) mit Diagnose-Items gezielt und wiederholt prüfen.",
+   "product_affordances": {
+    "interactive": "Simulationsumgebung mit Vorhersage",
+    "workbook": "Fehlvorstellungs-Items mit Begründung",
+    "anki": "Definitionen mit Gegenbeispielen"
+   },
+   "abstain_or_fallback": [
+    "keine Behauptung großer Effekte (Unterschied 1-2 Punkte von 24)",
+    "keine Kausalinterpretation der Kohortenstudien"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "tintle2012retention",
+     "locator": "3.2 Regression (4.26 Punkte, p = .002)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "tintle2012retention",
+     "locator": "3.1 Nonresponse; 3.2 Rohdifferenz p = .66",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "chance2022sbi",
+     "locator": "5.1 (1-2 Punkte von 24)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "castrosotos2009misconceptions",
+     "locator": "Abstract",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "nur Beobachtungsstudien, kleine Effekte"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Fehlvorstellungen bleiben nach Kursen bestehen",
+      "level": "moderate"
+     },
+     {
+      "claim": "SBI verbessert Behalten",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Antworten auf Fehlvorstellungs-Items mit Begründung",
+   "independent_outcome": "verzögertes unassistiertes Konzeptinventar mit neuen Items",
+   "failure_modes": [
+    "Simulation wird bloß bedient",
+    "Items werden auswendig gelernt"
+   ],
+   "falsifier": "Randomisierter Vergleich SBI vs. konventionell zeigt keinen verzögerten Vorteil im Konzeptinventar.",
+   "kb_rule_links": [
+    {
+     "rule_id": "PR-R3",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "R2-POL-16-NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-17",
+   "title": "Algorithmenvisualisierung nur mit aktiver Lernoperation und lernergesteuertem Tempo",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §12.2 R2-POL-17",
+   "applies_to_operations": [
+    "computational_construction"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "formal_proof",
+     "reason": "keine Evidenz zu Beweisvisualisierung in Batch 5; roy2017eproofs (interaktive e-Proofs) zeigte keinen Vorteil"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Algorithmen und Datenstrukturen mit darstellbarer Zustandsfolge (Sortieren, Heaps, Suchbäume, Graphensuche); eine getestete Referenzimplementierung liefert die Zustände"
+   },
+   "recommendation": "Visualisierungen von Algorithmen werden nie zum bloßen Ansehen angeboten. Jede Visualisierung verlangt eine Lernoperation: den nächsten Zustand vorhersagen, eine Frage zum Schritt beantworten oder eine Eingabe konstruieren, die einen bestimmten Fall auslöst. Lernende steuern das Tempo selbst (Einzelschritt statt Autoplay). Die Darstellung bleibt minimal und zeigt die logischen Schritte; Zusatzansichten (Pseudocode, Leitfäden) nur, wenn sie für die Aufgabe nötig sind.",
+   "product_affordances": {
+    "textbook": "Statische Zustandsfolgen mit Haltepunkten ('Wie sieht der Zustand nach dem nächsten Schritt aus?') vor der Auflösung; keine eingebetteten Animationen ohne Aufgabe; Beispieldaten decken Sonderfälle ab (Duplikate, bereits sortierte oder umgekehrte Eingabe)",
+    "workbook": "Handsimulation auf vorgegebener Eingabe mit Zustandstabelle; Aufgabe 'konstruiere eine Eingabe, die den schlechtesten Fall auslöst' (z. B. Quicksort mit fester Pivotwahl)",
+    "anki": "Karten mit Zustand vor einer Operation und Frage nach dem Folgezustand (z. B. Min-Heap nach extract-min); Eingaben werden je Wiederholung neu erzeugt, damit das Verfahren und nicht die Karte abgerufen wird; nur Übung, kein Kompetenzbeleg",
+    "interactive": "Lernergesteuerter Stepper ohne Autoplay als Standard; an markierten Schritten Vorhersage vor der Auflösung, deterministisch gegen das Zustandsorakel der Referenzimplementierung geprüft; Lernende können eigene Eingaben eingeben"
+   },
+   "abstain_or_fallback": [
+    "Ansehen einer Animation zählt nie als Lernfortschritt oder Kompetenzbeleg (MC-R2)",
+    "ohne getestete Referenzimplementierung als Zustandsorakel keine interaktive Vorhersageprüfung; Rückfall auf Arbeitsbuch mit Musterlösung",
+    "keine Wirksamkeitsbehauptung für Visualisierung als solche"
+   ],
+   "parameters": [
+    {
+     "name": "min_predictions_per_trace",
+     "value": 2,
+     "unit": "Vorhersagen je Algorithmusdurchlauf",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; grissom2003avengagement nennt im Abstract keine Dosis"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "grissom2003avengagement",
+     "locator": "Abstract (Lernen steigt mit Engagement-Stufe; integrierte Fragen mit größtem Prä-Post-Zuwachs)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "hundhausen2002avmeta",
+     "locator": "sekundär: saraiya2002avfeatures S. 3, 15-16 (aktive Einbindung 10 von 14 signifikant, Darstellungsmerkmale 3 von 10)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "saraiya2002avfeatures",
+     "locator": "Abstract; 4.4 (Tempokontrolle wichtigstes Merkmal; minimale Darstellung reicht für prozedurales Verständnis)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "saraiya2002avfeatures",
+     "locator": "4.4; 5.2 (Pseudocode und Aktivitätsleitfaden nicht besser, teils schlechter)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "naps2002engagement",
+     "locator": "Abstract (Position: ohne aktive Lernaktivität geringer Bildungswert; Engagement-Taxonomie)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "urquizafuentes2009avsurvey",
+     "locator": "Abstract (Hälfte der Systeme nur auf Usability geprüft)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "gleiche Richtung in Meta-Studie (nur sekundär gelesen), Mehrhochschulvergleich und kleinen Experimenten",
+     "Engagement mit Lernzeit konfundiert (grissom2003avengagement)",
+     "nur unmittelbare Nachtests, keine verzögerten oder unassistierten Transfermaße gelesen",
+     "Studien überwiegend von Entwicklern der Werkzeuge"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Passives Ansehen von Algorithmusanimationen verbessert Verständnis kaum",
+      "level": "low"
+     },
+     {
+      "claim": "Vorhersage- und Antwortaufgaben im Stepper verbessern verzögerte, unassistierte Handsimulation",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Vorhersagegenauigkeit je Schritt und Fehlerart (welcher Zustand falsch vorhergesagt), selbst konstruierte Eingaben",
+   "independent_outcome": "verzögerte (mindestens 1 Woche), unassistierte Handsimulation des Algorithmus auf neuer Eingabe ohne Visualisierung plus ein Begründungsitem ('warum dieser Schritt')",
+   "failure_modes": [
+    "Vorhersagen werden geraten oder durchgeklickt",
+    "visuelle Überladung durch Zusatzansichten (saraiya2002avfeatures)",
+    "Wissen bleibt an die Darstellung gebunden und überträgt sich nicht auf Code oder Begründung",
+    "Verweildauer im Werkzeug wird mit Lernen verwechselt"
+   ],
+   "falsifier": "Ein vorab registrierter randomisierter Vergleich bei gleicher Lernzeit (Stepper mit Vorhersage vs. dieselbe Visualisierung als Animation) zeigt keinen Unterschied in der verzögerten, unassistierten Handsimulation neuer Eingaben ohne Visualisierung.",
+   "kb_rule_links": [
+    {
+     "rule_id": "PR-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "MC-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "MM-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-18",
+   "title": "Korrektheitsargumente für Schleifen und Rekursion: Invariante erst interpretieren, dann konstruieren",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §12.2 R2-POL-18",
+   "applies_to_operations": [
+    "computational_construction",
+    "formal_proof"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Schleifen- und Rekursionsalgorithmen nach bestandener Tracing-Probe (R2-POL-08); Korrektheitsbegründung ist Lernziel"
+   },
+   "recommendation": "Schleifen- und Rekursionsalgorithmen werden mit expliziter Korrektheitsbegründung gelehrt: Invariante mit Initialisierung, Erhaltung und Terminierung bzw. Basisfall und Rekursionsschritt mit Aufrufstapel. Die Reihenfolge ist gestuft: zuerst eine gegebene, vollständige Invariante interpretieren und daraus Initialisierung und Abbruchbedingung ableiten, danach Verletzungen der Invariante in fremdem Code finden, zuletzt eigene Invarianten formulieren. Lückentext-Invarianten sind für Anfänger kein Standard. Invariantenbehauptungen werden als ausführbare Zusicherungen auf erzeugten Eingaben geprüft; das kann eine Invariante widerlegen, aber nicht beweisen.",
+   "product_affordances": {
+    "textbook": "Jeder Schleifenalgorithmus mit Invariante, Initialisierung, Erhaltung und Terminierung direkt neben dem Code (CL-R1); Rekursion mit Aufrufstapel-Darstellung und Begründung des Basisfalls",
+    "workbook": "Stufen: (1) gegebene Invariante interpretieren, Initialisierung und Abbruchbedingung ableiten; (2) Stelle finden, an der fremder Code die Invariante verletzt; (3) eigene Invariante und Korrektheitsargument schreiben (Mensch-Rubrik)",
+    "anki": "Ableitungskarten ('Invariante gegeben: welche Abbruchbedingung, welche Initialisierung?') mit wechselnden Algorithmen; keine Karten, die Invarianten bekannter Algorithmen nur abfragen",
+    "interactive": "Invariante als ausführbares Prädikat eingeben; das System prüft es auf erzeugten Eingaben vor und nach jeder Iteration und zeigt ein Gegenbeispiel; Status 'nicht widerlegt', nie 'bewiesen'; formale Verifikation nur als optionale formale Variante (R2-POL-07)"
+   },
+   "abstain_or_fallback": [
+    "bestandene Laufzeitprüfung einer Invariante gilt als 'nicht widerlegt', nicht als Korrektheitsbeweis",
+    "Korrektheitsargument in Prosa: Mensch-Rubrik oder unverifiziert; LLM-Bewertung nur agent_judgement (R2-CR-2)",
+    "ohne bestandene Tracing-Probe zuerst R2-POL-08 (R2-CR-5)",
+    "keine Lückentext-Invarianten als Standard für Anfänger (brieven2026gli)"
+   ],
+   "parameters": [
+    {
+     "name": "generated_inputs_per_invariant_check",
+     "value": 50,
+     "unit": "erzeugte Eingaben je Prüfung",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; deckt Randfälle nur bei guten Generatoren ab, daher nur Widerlegung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "brieven2026gli",
+     "locator": "6.3 (vollständig vorgegebene grafische Invariante: weniger Fehler bei Schleifenbedingung und Variablenrollen)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "brieven2026gli",
+     "locator": "Abstract; 6.2; 7 (Lückentext erhöht Last; weder notwendig noch hinreichend; keine Kontrolle ohne Invariantenunterricht)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "mccauley2015recursion",
+     "locator": "Abstract (Aufrufstapel-Modell und mehrere Kontexte als empfohlene Einführung; Reihenfolge Iteration/Rekursion untersucht)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "eine CS1-Studie mit etwa 10 Lernenden je Gruppe, ein Kodierer, keine externe Kontrollgruppe, nur unmittelbare Aufgaben",
+     "Rekursion nur über das Abstract eines narrativen Reviews",
+     "Stufung interpretieren vor konstruieren ist aus Fehlerbefunden abgeleitet, nicht getestet"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Eine vorgegebene vollständige Invariante verringert Schleifenbedingungsfehler beim Schreiben",
+      "level": "very_low"
+     },
+     {
+      "claim": "Selbst konstruierte Invarianten verbessern die Korrektheit von Anfängercode",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Fehlerarten im Code (Schleifenbedingung, Variablenrolle, Aktualisierung), Gegenbeispiele zu eingegebenen Invarianten, genutzte Unterstützungsstufe",
+   "independent_outcome": "verzögerte unassistierte Schreibaufgabe einer neuen Schleife mit verborgenen Tests plus schriftliches Korrektheitsargument, von einem Menschen mit Rubrik bewertet",
+   "failure_modes": [
+    "Invarianten werden als Formeln auswendig gelernt",
+    "Zusatzlast überfordert Anfänger, Code bleibt unfertig (brieven2026gli 6.2)",
+    "Laufzeitprüfung mit schwachen Eingabegeneratoren lässt falsche Invarianten durch",
+    "Lernende umgehen die Invariante (mehrere Schleifen statt einer)"
+   ],
+   "falsifier": "Ein vorab registrierter Vergleich (Invariante zuerst vs. gleich lange Codeübung) zeigt bei verzögerten, neuen Schleifenaufgaben keine Verringerung von Schleifenbedingungs- und Aktualisierungsfehlern.",
+   "kb_rule_links": [
+    {
+     "rule_id": "WE-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "CL-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "ITS-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-19",
+   "title": "Komplexitätsanalyse: Wachstumsbegründung statt Etikett, Oberflächenheuristiken gezielt brechen",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §12.2 R2-POL-19",
+   "applies_to_operations": [
+    "computational_construction",
+    "symbolic_procedure",
+    "formal_proof"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "Algorithmenanalyse (Laufzeit, Speicher, asymptotische Notation) ab Einführung in Algorithmen und Datenstrukturen"
+   },
+   "recommendation": "Komplexitätsurteile werden nie aus einem Etikett ('O(n log n)') oder einer Zahl allein gewertet. Aufgaben verlangen eine Wachstumsbegründung: dominante Operation benennen, Anzahl als Summe oder Rekurrenz aufstellen, Fall (bester, schlechtester, durchschnittlicher) benennen. Items brechen bekannte Oberflächenheuristiken gezielt: kürzerer Code ist langsamer, weniger Variablen ist langsamer, gleiche Anweisungen in anderer Reihenfolge ändern das Wachstum. Obere bzw. untere Schranke und bester bzw. schlechtester Fall werden getrennt abgefragt. Diagnoseitems zu typischen Fehlvorstellungen kommen vor und nach der Einheit.",
+   "product_affordances": {
+    "textbook": "Paare semantisch gleichwertiger Programme, deren Oberfläche der Effizienz widerspricht; ausdrückliche Trennung von Schranke und Fall mit Gegenbeispiel",
+    "workbook": "Paarvergleich mit Begründung; Operationszahl als Summe herleiten; Eingabe konstruieren, die den schlechtesten Fall auslöst; Gegenbeispiel zu einer falschen O-Behauptung finden",
+    "anki": "Diskriminationskarten (O vs. Θ, Schranke vs. Fall, Wachstumsvergleich zweier Funktionen) als Abrufstütze; sie zählen nicht als Analysekompetenz",
+    "interactive": "Wachstumsklasse erst vorhersagen, dann Operationszähler über steigende n mit doppelt-logarithmischer Darstellung; der Zähler prüft Instanzen, nicht die asymptotische Aussage; Summenherleitung per CAS-Äquivalenz je Schritt (R2-POL-15)"
+   },
+   "abstain_or_fallback": [
+    "Laufzeitmessungen und Operationszähler belegen keine Komplexitätsklasse (nur endlich viele Instanzen; Konstanten, Cache, Eingabewahl)",
+    "Etikett ohne Herleitung: unverifiziert",
+    "Beweis einer Schranke: Mensch-Rubrik oder unverifiziert; LLM-Bewertung nur agent_judgement",
+    "keine Wirksamkeitsbehauptung für Paarvergleiche (nicht experimentell geprüft)"
+   ],
+   "parameters": [
+    {
+     "name": "diagnostic_items_per_misconception",
+     "value": 2,
+     "unit": "Items je Fehlvorstellung und Messzeitpunkt",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; ein Item allein trennt Raten nicht von Fehlvorstellung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "galezer2004efficiency",
+     "locator": "3.1; 4 (Q1: 19.44 % / 27.5 % / 55.9 % richtig; Erklärung 'kürzer' 55 % / 56.7 % / 34.3 %); 5",
+     "relation": "supports"
+    },
+    {
+     "source_id": "galezer2004efficiency",
+     "locator": "3.2; 5 (Schulpopulation; Effizienz über Ausführungszeit statt O-Notation gelehrt)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "farghally2017aaci",
+     "locator": "Abstract (die meisten Fehlvorstellungen der Liste bei Studierenden nach CS2 vorhanden)",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "Defizitbefund deskriptiv, Hochschulbeleg nur als Abstract",
+     "Hauptquelle aus der Schule, Effizienz dort nicht asymptotisch gelehrt",
+     "keine Interventionsstudie zur Komplexitätsanalyse gelesen"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Lernende beurteilen Effizienz nach Oberflächenmerkmalen (Länge, Variablenzahl)",
+      "level": "low"
+     },
+     {
+      "claim": "Paarvergleich mit Wachstumsbegründung verringert diese Fehlvorstellungen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Antworten auf Diagnoseitems je Fehlvorstellung mit Begründung; Herleitungsschritte (CAS-geprüft); Etikett-Herleitungs-Übereinstimmung",
+   "independent_outcome": "verzögertes unassistiertes Diagnoseinventar mit neuen Items plus Laufzeitherleitung für neuen Code, von einem Menschen bewertet",
+   "failure_modes": [
+    "Faustregeln ('zwei Schleifen = n²') ersetzen die Fehlvorstellung und versagen bei abhängigen Grenzen",
+    "Diagnoseitems werden als Muster wiedererkannt",
+    "Messung im Werkzeug verdrängt die Analyse"
+   ],
+   "falsifier": "Ein vorab registrierter Vergleich (Paarvergleich mit Begründung vs. gleich lange Standardübungen) zeigt im verzögerten Diagnoseinventar mit neuen Items keinen Unterschied bei den Zielfehlvorstellungen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "IL-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "FB-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "TR-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-20",
+   "title": "Quantitatives Problemlösen: Problemrepräsentation vor der Rechnung",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §12.2 R2-POL-20",
+   "applies_to_operations": [
+    "symbolic_procedure"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "mehrschrittige quantitative Aufgaben mit fachlichem Prinzip (Physik, Ingenieurwesen, angewandte Mathematik); Evidenz überwiegend aus einführender Mechanik"
+   },
+   "recommendation": "Vor der Rechnung steht eine kurze qualitative Analyse: zugrunde liegendes Prinzip benennen, seine Anwendbarkeit begründen, Größen und Skizze festhalten, Plan formulieren (Strategieschreiben). Sortieraufgaben mit gekreuzten Oberflächen- und Tiefenmerkmalen dienen als Übung und Diagnose. Nach Fehlern folgt Selbstdiagnose mit Musterlösung und Rubrik. Die Prinzipwahl ist gegen einen Schlüssel prüfbar; Begründung und Plan bleiben unverifiziert oder werden menschlich bewertet.",
+   "product_affordances": {
+    "textbook": "Lösungsbeispiele beginnen mit Prinzip, Begründung, Skizze und Plan, erst dann Gleichungen; Aufgabenpaare mit gleicher Oberfläche und verschiedenem Prinzip sowie umgekehrt",
+    "workbook": "Sortieraufgaben (gleiche Oberfläche, anderes Prinzip und umgekehrt); Aufgaben 'Prinzip + Begründung + Plan, ohne Rechnung'; Selbstdiagnose nach Fehlern mit Musterlösung und Rubrik",
+    "anki": "Karten mit Aufgabentext und Frage nach Prinzip und Begründung statt nach dem Zahlenwert; Oberfläche je Wiederholung variiert; Aufgaben mit mehreren Prinzipien haben mehrere richtige Antworten",
+    "interactive": "Gleichungseingabe erst nach Prinzipwahl und Kurzbegründung; Prinzipwahl gegen Schlüssel geprüft, Rechnung je Schritt per CAS mit Einheitenprüfung (R2-POL-15), Begründung unverifiziert"
+   },
+   "abstain_or_fallback": [
+    "Sortier- bzw. Kategorisierungsleistung ist nur ein Proxy und zählt nicht als Problemlösekompetenz (mason2011categorization)",
+    "Prinzipschlüssel nur für Items mit fachlich konsentiertem Prinzip; Aufgaben mit mehreren Prinzipien erhalten einen Mehrfachschlüssel",
+    "wer eine Erste-Schritt-Probe ohne Hilfe löst, darf die Planungsphase überspringen (WE-R2)",
+    "eine fehlerhafte Skizze wird als Fehler zurückgemeldet und nicht als erfüllte Pflicht gezählt (docktor2014physicsder III.D.3)"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "chi1981categorization",
+     "locator": "Abstract (Fortgeschrittene repräsentieren über Prinzipien, Anfänger über wörtliche Merkmale)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "dufresne1992constraining",
+     "locator": "Abstract (Exp. 1-3: erzwungene hierarchische qualitative Analyse, expertennähere Ähnlichkeitsurteile, besseres Problemlösen)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "docktor2014physicsder",
+     "locator": "III.D.1 (qualitative Analyse vor Gleichungen bei Fortgeschrittenen), III.D.5 (Problemlöse-Rahmen, qualitative Ansätze)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "schoenfeld1979heuristics",
+     "locator": "Abstract (explizite Heuristiken bei gleicher Übungszeit besser bei nicht isomorphen Aufgaben)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "docktor2014physicsder",
+     "locator": "III.D.3 (gemischte Befunde zu Repräsentationen; falsches Diagramm schlechter als keines), III.E (kleine N, uneinheitliche Maße)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "mason2011categorization",
+     "locator": "Abstract; V; VI (Expertise ist ein Kontinuum; große Überlappung Einführung/Promotion; Kategorisierung nur Proxy)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Expert-Novizen-Unterschied in der Richtung konsistent, aber Kategorisierung ist nur Proxy",
+     "Interventionsbelege alt, klein und nur als Abstract gelesen",
+     "narrative Synthese ohne Effektgrößen; Autor Mestre an Primärstudien beteiligt",
+     "Befunde zu externen Repräsentationen gemischt"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Fortgeschrittene repräsentieren Aufgaben stärker über Prinzipien als Anfänger",
+      "level": "moderate"
+     },
+     {
+      "claim": "Erzwungene qualitative Analyse vor der Rechnung verbessert verzögertes Problemlösen an neuen Aufgaben",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Prinzipwahl (geprüft), Begründung (unverifiziert), Schrittkorrektheit der Rechnung, Fehlerart",
+   "independent_outcome": "verzögerte unassistierte Lösung neuer, nicht isomorpher Aufgaben mit verändertem Oberflächenkontext, bewertet mit einer Lösungsrubrik (Prinzip, Ansatz, Rechnung, Plausibilität)",
+   "failure_modes": [
+    "Planungsfeld wird mit Floskeln gefüllt",
+    "Prinzipwahl wird über Schlagworte im Aufgabentext erraten",
+    "Zusatzschritt kostet bei Routineaufgaben Zeit ohne Gewinn",
+    "fehlerhafte Skizzen verschlechtern Lösungen"
+   ],
+   "falsifier": "Ein vorab registrierter randomisierter Vergleich bei gleicher Zeit (Repräsentation zuerst vs. direktes Rechnen) zeigt bei verzögerten, neuen, nicht isomorphen Aufgaben keinen Unterschied in der Rubrikbewertung.",
+   "kb_rule_links": [
+    {
+     "rule_id": "TR-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "ITS-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "WE-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R2-POL-21",
+   "title": "Mathematisches Modellieren mit Lösungsplan und getrennt beobachteten Teilkompetenzen",
+   "source_section": "R2_FORMAL_QUANTITATIVE.md §12.2 R2-POL-21",
+   "applies_to_operations": [
+    "symbolic_procedure",
+    "empirical_experimental"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Aufgaben mit realem Kontext und offenen Annahmen; Evidenz überwiegend aus Sekundarstufe, eine Studienreihe auch an Hochschulen in Südafrika"
+   },
+   "recommendation": "Modellierungsaufgaben werden mit einem Lösungsplan bearbeitet: verstehen, vereinfachen und Annahmen treffen, mathematisieren, mathematisch arbeiten, interpretieren, validieren. Teilkompetenzen werden getrennt beobachtet, weil nur der Rechenschritt deterministisch prüfbar ist; Annahmen und Validierung werden menschlich bewertet oder bleiben unverifiziert. Der Plan wird ausgeblendet, sobald Lernende ihn ohne Aufforderung anwenden.",
+   "product_affordances": {
+    "textbook": "Modellierungskreislauf mit einem durchgerechneten Beispiel, das Annahmen ausdrücklich nennt und das Ergebnis gegen Größenordnung oder Realdaten validiert",
+    "workbook": "Aufgaben mit Lösungsplan; zusätzlich Teilkompetenz-Items (fehlende Annahme benennen, Ergebnis validieren, Modell an veränderten Kontext anpassen); mehrere vertretbare Lösungen mit Bewertungsrubrik",
+    "anki": "nur unterstützend: Karten zu Plausibilitätsprüfungen (Größenordnung, Einheiten) und typischen Annahmen; vollständige Modellierung ist nicht kartentauglich",
+    "interactive": "Lösungsplan-Stepper mit Annahmenprotokoll; Rechenteil per CAS und Einheitenprüfung; Plausibilitätsband als Hinweis, nicht als Korrektheitsurteil; Annahmen und Validierung als 'unverifiziert' oder menschlich bewertet"
+   },
+   "abstain_or_fallback": [
+    "keine Einzelzahlprüfung als Modellierungsbeleg, weil mehrere Ergebnisse vertretbar sind (R2-POL-06)",
+    "keine Aussage über Finanz- oder Wirtschaftsmodellierung (keine Lernevidenz gesichtet)",
+    "Lösungsplan nicht als starre Pflicht für Fortgeschrittene"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "vogelsanger2025solutionplan",
+     "locator": "Abstract (Lösungsplan, vier Stunden, Effekt auf Modellierungskompetenz bis Follow-up; Kontrolle regulärer Unterricht)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "lindl2025costamm",
+     "locator": "Abstract (fünfstündige Einheit in vier Studien wirksam, auch tertiär; methodenintegrativ besser als lehrerzentriert)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "lindl2025costamm",
+     "locator": "Abstract (Prä-Post ohne unbehandelte Kontrolle; explorativ)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "docktor2014physicsder",
+     "locator": "III.D.5 (kontextreiche Aufgaben wirkten zusammen mit Problemlösestrategie und Gruppenarbeit; Effekte schwer trennbar)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "nur Abstracts gelesen",
+     "überwiegend Schulstudien; Hochschulbeleg nur aus einer Studienreihe ohne unbehandelte Kontrolle",
+     "Studien aus einem Forschungsnetz, das den Lösungsplan entwickelt hat",
+     "Kontrollgruppe in vogelsanger2025solutionplan ohne gleiche Aufgaben (Zeit- und Aufgabenkonfundierung)"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Lösungsplan verbessert Modellierungsleistung in der Sekundarstufe bis zum Follow-up",
+      "level": "low"
+     },
+     {
+      "claim": "Übertragbarkeit auf Hochschulmodellierung",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Bearbeitung je Planschritt; dokumentierte Annahmen; Validierungsaussage (unverifiziert); geprüfte Rechenschritte",
+   "independent_outcome": "verzögerte unassistierte neue Modellierungsaufgabe mit anderem Kontext, je Teilkompetenz von Menschen mit Rubrik bewertet",
+   "failure_modes": [
+    "Plan wird mechanisch abgehakt",
+    "Annahmen werden aus dem Aufgabentext abgeschrieben statt getroffen",
+    "Plausibilitätsband wird als Lösungsschlüssel missverstanden",
+    "Schulbefunde tragen nicht für Hochschulmodellierung"
+   ],
+   "falsifier": "Ein vorab registrierter Vergleich derselben Modellierungsaufgaben mit und ohne Lösungsplan bei gleicher Zeit zeigt bei verzögerten neuen Aufgaben in keiner Teilkompetenz einen Unterschied.",
+   "kb_rule_links": [
+    {
+     "rule_id": "WE-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "TR-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "R2-POL-21-NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  }
+ ],
+ "verification_log": [
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "OpenAlex abstract",
+   "checked": "xie2018tracing: block-randomisiert, N = 24, +15 % Tracing (p < .05), +7 % Midterm",
+   "result": "match"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "Crossref abstract",
+   "checked": "sun2024debuggingmeta: g = 0.64, CI (0.32, 0.96), 62 Effekte aus 18 Artikeln, Vorhersagebereich -0.54 bis 1.82",
+   "result": "match"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "OpenAlex abstract",
+   "checked": "neuhaus2025proofskills: N = 153, 2-dimensionales Modell (Konstruktion vs. Lesen) am besten",
+   "result": "match; Abstract formuliert Modellfit positiver als die Volltextnotiz (kein akzeptabler TLI); Policy-Stufe low bleibt"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "arXiv API abstract 2503.21934",
+   "checked": "petrov2025proofbluff: Höchstwert der Modelle",
+   "result": "mismatch: Abstract nennt 'kein Modell über 30 %, die meisten unter 5 %'; Registerwert 'ein Modell ca. 25 %' korrigiert"
+  }
+ ]
+}
