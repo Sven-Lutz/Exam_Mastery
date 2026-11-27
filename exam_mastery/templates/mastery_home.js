@@ -161,7 +161,7 @@ function viewProgress(lib) {
       el('tbody', {}, rows.map(r => el('tr', { 'data-kc': r.id, 'data-source': r.source, 'data-status': r.status, 'data-basis': r.basis, 'data-assisted': String(r.assisted), 'data-unassisted': String(r.unassisted), 'data-unverified': String(r.unverified) },
         el('th', { scope: 'row' }, r.label), el('td', {}, STATUS[r.status] || r.status), el('td', {}, BASIS[r.basis] || r.basis), el('td', {}, String(r.unassisted)), el('td', {}, String(r.assisted)), el('td', {}, String(r.unverified)), el('td', {}, String(r.helps))))))));
   for (const u of lib.units) {
-    for (const tr of u.tracks) s.append(table('Übungsstrecke: ' + tr.data.title, kcRows(tr.data, workbenchEvents(tr), {}, 'workbench'), 'Regelbasiert geprüft (Zahl, Ausdruck, Rechenschritte).'));
+    for (const tr of u.tracks) s.append(table('Übungsstrecke: ' + (tr.label || tr.data.title), kcRows(tr.data, workbenchEvents(tr), {}, 'workbench'), 'Regelbasiert geprüft (Zahl, Ausdruck, Rechenschritte).'));
     const labels = Object.fromEntries(u.competencies.map(c => [c.id, c.label]));
     s.append(table('Interaktiv: ' + u.title, kcRows(u.adaptive_track, practiceRecord(u).policy, labels, 'explorable'),
       'Freitext wird nicht bewertet: Versuche zählen als „ohne/mit Hilfe“, ändern aber keinen Zustand. Zuordnung über die erste Kompetenz der Aufgabe.'));

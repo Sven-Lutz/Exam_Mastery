@@ -7,6 +7,11 @@
    "unit": "fixtures/experience_attention_reference.json",
    "tracks": [
     {
+     "id": "ai/attention-track",
+     "relation": "practice",
+     "label": "Übung: Softmax-Gewichte, Skalierung, Maskierung und Gradient (Attention)"
+    },
+    {
      "id": "ml/backprop-track",
      "relation": "prerequisite",
      "label": "Voraussetzung und Übung: Gradienten mit der Kettenregel (Backpropagation)"
