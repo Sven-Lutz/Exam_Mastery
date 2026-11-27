@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T17:08:02+01:00",
+ "updated": "2026-11-27T17:11:36+01:00",
  "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -55,11 +55,11 @@
    "note": "independent review pending"
   },
   "R2": {
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "wp": "WP-R2",
    "issue": 23,
    "pr": 38,
-   "note": "reopened for supplement batch 5 (owner brief 2026-11-27); PR #38 stays the vehicle"
+   "note": "batch5 added (algorithms, complexity, quantitative problem solving/modelling); independent review pending; finance modelling + causal inference remain gaps"
   },
   "R3": {
    "status": "RUNNING",
@@ -67,7 +67,7 @@
    "issue": 24
   },
   "R4": {
-   "status": "PLANNED",
+   "status": "RUNNING",
    "wp": "WP-R4",
    "issue": 25
   },
@@ -201,8 +201,8 @@
   {
    "id": "R2",
    "kind": "background subagent of LEAD",
-   "scope": "R2S supplement batch 5: algorithms, complexity, quantitative problem solving/modelling",
-   "status": "RUNNING",
+   "scope": "R2 + R2S batch5 (algorithms, complexity, quantitative problem solving)",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R2.json",
    "worktree": "Exam_Mastery-r2"
   },
@@ -227,6 +227,14 @@
    "status": "RUNNING",
    "checkpoint": "docs/programme/agents/R3.json",
    "worktree": "Exam_Mastery-r3"
+  },
+  {
+   "id": "R4",
+   "kind": "background subagent of LEAD",
+   "scope": "R4 embodied, laboratory, spatial/CAD and craft learning",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/R4.json",
+   "worktree": "Exam_Mastery-r4"
   }
  ],
  "work_packages": [
@@ -284,13 +292,13 @@
   {
    "id": "WP-R2",
    "title": "R2 formal, quantitative and computational mastery",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 2,
    "autostart": true,
    "issue": 23,
    "branch": "research/r2-formal-quantitative-20261127",
    "base": "research/r1-learning-science-20261127 (bec1f62)",
-   "next_step": "Specialist R2S adds batch 5 (evidence, policies, report §12, tests), pushes to PR #38; lead integrates and re-marks COMPLETED.",
+   "next_step": "None autonomous; PR #38 awaits independent review.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
    "worktree": "Exam_Mastery-r2",
    "done": [
@@ -299,11 +307,15 @@
     "r2_learning_policies.json: 16 design-hypothesis policies + contract test (4c1f02f); unittest R1+R2 27 ok, 1 skip",
     "R2_FORMAL_QUANTITATIVE.md synthesis report (390ec80): findings, search/access log with declared query gap, operation matrix, verifier matrix, mechanism chains, worked + adversarial examples, risk audit, reviewer questions",
     "lead spot-check 4/40 abstracts (verification_log): 3 match, 1 mismatch corrected (petrov2025proofbluff)",
-    "draft PR #38 against research/r1-learning-science-20261127"
+    "draft PR #38 against research/r1-learning-science-20261127",
+    "batch5 (R2S, 00e8f40 + e73c3fe): 17 sources on algorithm visualisation, loop invariants/recursion, efficiency misconceptions, physics problem categorisation, heuristics, modelling, causal diagrams (3 fulltext_claim_review, 3 fulltext_partial, 10 abstract, 1 metadata); search_log with 21 exact queries; new R2-POL-17..21, conflict rules R2-CR-5/6, R2-POL-14 verifiers extended; report §12; tests 30 OK (1 skip); PR #38 comment",
+    "lead spot-check 2026-11-27: all 16 batch5 DOIs resolve to the registered works (Crossref); saraiya2002 via handle; tests re-run 30 OK"
    ],
    "open": [
-    "independent/human review of PR #38",
-    "optional follow-up: formal search Q1-Q5 with logged queries; physics/finance modelling, complexity analysis, causal inference; seed 10.1145/3501385.3543977"
+    "independent review of PR #38",
+    "finance/economic modelling: no learning evidence found; causal inference: one descriptive source, no policy",
+    "no intervention study on teaching complexity analysis; Hundhausen 2002 meta-study only via secondary report",
+    "batches 1-4 search queries not logged (documented gap)"
    ],
    "artifacts": [
     "docs/research/workstreams/R2_FORMAL_QUANTITATIVE.md",
@@ -311,9 +323,9 @@
     "docs/research/workstreams/r2/r2_learning_policies.json",
     "tests/test_r2_learning_policies.py"
    ],
-   "tests": "cd tests && python3 -m unittest test_r2_learning_policies test_r1_learning_policies: 27 ok, 1 skipped",
+   "tests": "cd tests && python3 -m unittest test_r2_learning_policies test_r1_learning_policies: 30 OK, 1 skipped (lead re-run 2026-11-27)",
    "blockers": [],
-   "updated": "2026-11-27T16:55:00+01:00",
+   "updated": "2026-11-27T17:11:36+01:00",
    "pr": 38,
    "reopened": "Owner resume brief 2026-11-27 requires concrete consequences for algorithms and quantitative problem solving; report §11 lists them as gaps. Supplement batch 5 (R2S) on the same branch/PR #38: algorithm visualisation/complexity, quantitative problem representation and modelling."
   },
@@ -377,14 +389,16 @@
   {
    "id": "WP-R4",
    "title": "R4 engineering, CAD, experimental and embodied learning (incl. cooking, baking, woodworking)",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 5,
    "autostart": true,
    "issue": 25,
    "branch": "research/r4-embodied-20261127",
    "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #25; separate simulated understanding from measured physical skill and safety.",
-   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+   "next_step": "Specialist R4 (background subagent of LEAD): evidence register with search log, r4_learning_policies.json, R4_EMBODIED_EXPERIMENTAL_DESIGN.md, contract test with certification-boundary check, draft PR against research/r1-learning-science-20261127.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T17:11:36+01:00",
+   "worktree": "Exam_Mastery-r4"
   },
   {
    "id": "WP-R9",
@@ -546,7 +560,7 @@
   },
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents."
  },
- "next_milestone": "R2/R5 supplement batch 5, then R3+R4 (two specialists), R9+R7, R8, then R6 architecture decision.",
+ "next_milestone": "R3 + R4 running; then R9 + R7, R8; then R6 architecture decision.",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
