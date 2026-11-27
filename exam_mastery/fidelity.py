@@ -238,7 +238,19 @@ def _omml(xml_el, c, loc, method):
     return found
 
 
+MAX_OFFICE_MEMBERS = 20000
+MAX_OFFICE_EXPANDED_BYTES = 200 * 1024 * 1024
+
+
+def _check_office_archive(path):
+    with zipfile.ZipFile(path) as archive:
+        members = archive.infolist()
+        if len(members) > MAX_OFFICE_MEMBERS or sum(item.file_size for item in members) > MAX_OFFICE_EXPANDED_BYTES:
+            raise ValueError('Office archive expansion exceeds safety limits')
+
+
 def _parse_pptx(path, c, sibling_pdfs):
+    _check_office_archive(path)
     from pptx import Presentation
     from pptx.enum.shapes import MSO_SHAPE_TYPE
     import pptx as _pptx
@@ -318,6 +330,7 @@ def _parse_pptx(path, c, sibling_pdfs):
 
 
 def _parse_docx(path, c):
+    _check_office_archive(path)
     from docx import Document
     import docx as _docx
     method = f'python-docx-{getattr(_docx, "__version__", "?")}'
@@ -522,6 +535,7 @@ def _parse_table(path, c):
 
 
 def _parse_spreadsheet(path, c):
+    _check_office_archive(path)
     from openpyxl import load_workbook
     wb = load_workbook(path, read_only=False, data_only=False, keep_links=False)
     for i, ws in enumerate(wb, 1):
@@ -673,10 +687,6 @@ def inventory(root, out, fetcher=None):
                 elif s['bytes'] == 0:
                     s['status'] = 'empty'; c.gap('EMPTY_SOURCE', 'blocking', 'Zero-byte file')
                 else:
-                    if ext in {'.docx', '.pptx', '.xlsx', '.xlsm'}:
-                        with zipfile.ZipFile(path) as z:
-                            if len(z.infolist()) > 20000 or sum(x.file_size for x in z.infolist()) > 200 * 1024 * 1024:
-                                raise ValueError('Office archive expansion exceeds safety limits')
                     t = s['detected_type']
                     if t == 'pdf': _parse_pdf(path, c)
                     elif t == 'pptx': _parse_pptx(path, c, pdf_stems.get(path.stem.casefold(), []))
