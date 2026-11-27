@@ -356,6 +356,22 @@
    "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/V1CONTENT.json",
    "worktree": "Exam_Mastery-v1content"
+  },
+  {
+   "id": "C2M-IMPORT",
+   "kind": "background subagent of LEAD",
+   "scope": "course import pipeline + wizard",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/C2M-IMPORT.json",
+   "worktree": "Exam_Mastery-c2m-import"
+  },
+  {
+   "id": "C2M-AUTHOR",
+   "kind": "background subagent of LEAD",
+   "scope": "real RL chapter 05 Policy Gradient + page-level QA",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/C2M-AUTHOR.json",
+   "worktree": "Exam_Mastery-c2m-author"
   }
  ],
  "work_packages": [
@@ -401,18 +417,26 @@
   {
    "id": "WP-C2M-AUTHOR-RL",
    "title": "P0/P1 real chapter from the owner's RL course (Policy Gradient) authored at university-excellence level through the packet contract; four connected products; page-level PDF inspection",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 0.2,
    "autostart": false,
-   "next_step": "Specialist: private sources (iCloud, materialise with brctl download), output only to ~/Mastery; AI authorship by the Claude Code subscription session, labelled; every derivation/number verified by computation."
+   "next_step": "Specialist: private sources (iCloud, materialise with brctl download), output only to ~/Mastery; AI authorship by the Claude Code subscription session, labelled; every derivation/number verified by computation.",
+   "branch": "feat/c2m-author-rl-20261127",
+   "base": "integration/mastery-v1-20261127",
+   "worktree": "Exam_Mastery-c2m-author",
+   "private_output": "~/Mastery/courses/rl/chapters/05-policy-gradient"
   },
   {
    "id": "WP-C2M-IMPORT",
    "title": "P0 course import: bin/mastery import + local wizard (inventory, iCloud materialisation, completeness, chapter/competency proposal, authoring packets, status)",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 0.1,
    "autostart": false,
-   "next_step": "Specialist: build on exam_mastery.fidelity.inventory/impact (PDF/PPTX/DOCX/LaTeX/MD/notebook parsers exist); courses live in ~/Mastery/courses/<slug> (private); authoring packet contract shared with WP-C2M-AUTHOR."
+   "next_step": "Specialist: build on exam_mastery.fidelity.inventory/impact (PDF/PPTX/DOCX/LaTeX/MD/notebook parsers exist); courses live in ~/Mastery/courses/<slug> (private); authoring packet contract shared with WP-C2M-AUTHOR.",
+   "branch": "feat/c2m-import-20261127",
+   "base": "integration/mastery-v1-20261127",
+   "worktree": "Exam_Mastery-c2m-import",
+   "contract": "docs/COURSE_TO_MASTERY_CONTRACT.md (350dce0)"
   },
   {
    "id": "WP-V1-NEXT",
@@ -1162,5 +1186,13 @@
   "OD-26": "no new blanket research audit",
   "OD-13": "no paid API budget; independent delayed items required before causal claims but not for usability",
   "OD-02": "agents prepare/test integration branch and PR; merge to main only by explicit owner action"
+ },
+ "real_courses_local": {
+  "note": "owner-private, never in Git; outputs only under ~/Mastery",
+  "first": "RL (01_Studium/RL; lectures 00-19 with gaps 03/11/18; exercises notebooks; tutorium) - iCloud dataless, materialised with brctl download",
+  "second_candidates": [
+   "Lineare Algebra 1 (Selbststudium: slides, 23 exercise sheets, extra tasks, tutorium)",
+   "Patentrecht / Entrepreneurship (01_Studium)"
+  ]
  }
 }
