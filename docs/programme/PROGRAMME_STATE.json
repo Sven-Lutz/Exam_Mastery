@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T17:35:45+01:00",
+ "updated": "2026-11-27T17:36:58+01:00",
  "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -98,7 +98,7 @@
    "issue": 30
   },
   "R9": {
-   "status": "PLANNED",
+   "status": "RUNNING",
    "wp": "WP-R9",
    "issue": 31
   }
@@ -239,6 +239,14 @@
    "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R4.json",
    "worktree": "Exam_Mastery-r4"
+  },
+  {
+   "id": "R9",
+   "kind": "background subagent of LEAD",
+   "scope": "R9 tutoring resources, behavioural contract, evaluation protocol",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/R9.json",
+   "worktree": "Exam_Mastery-r9"
   }
  ],
  "work_packages": [
@@ -453,14 +461,16 @@
   {
    "id": "WP-R9",
    "title": "R9 tutoring resource excellence",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 6,
    "autostart": true,
    "issue": 31,
    "branch": "research/r9-tutoring-resources-20261127",
    "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #31 and TUTORING_RESOURCE_REGISTRY_20261126.md; marketing vs function vs benchmark vs learning outcome.",
-   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+   "next_step": "Specialist R9 (background subagent of LEAD): r9_resources.json (preservation of every named resource, claim classes, reuse/adapt/emulate/defer/reject), evidence register + search log, r9_tutor_policies.json, the four issue documents, contract test, draft PR.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T17:36:58+01:00",
+   "worktree": "Exam_Mastery-r9"
   },
   {
    "id": "WP-R7",
@@ -601,6 +611,18 @@
      "resets": "2026-11-29T07:00+01:00"
     },
     "note": "R1 (2 specialists ~0.64M tokens + lead) cost about 5 points of the 7-day window"
+   },
+   {
+    "at": "2026-11-27T17:36+01:00",
+    "five_hour": {
+     "utilization": 0.71,
+     "resets": "2026-11-27T18:20+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.76,
+     "resets": "2026-11-29T07:00+01:00"
+    },
+    "note": "after R2S+R5S+R3+R4 (4 specialists, ~1.24M subagent tokens) + lead; measured via supervisor smoke"
    }
   ],
   "supervisor_ceilings": {
@@ -608,9 +630,10 @@
    "seven_day": 0.85,
    "max_runs_per_24h": 4
   },
-  "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents."
+  "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents.",
+  "lead_pacing": "Lead keeps seven_day <= 0.85 like the supervisor: one specialist while five_hour > 0.6; stop spawning at seven_day >= 0.83 and hand remaining packages to the supervisor after the 2026-11-29 07:00 reset."
  },
- "next_milestone": "R3 + R4 running; then R9 + R7, R8; then R6 architecture decision.",
+ "next_milestone": "R9 running; R7 after the 18:20 five-hour reset; R8; then R6 architecture decision (owner acceptance required before architecture-dependent coding).",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
