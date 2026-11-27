@@ -66,6 +66,7 @@ function softmaxSimplexPg(p) {
     b, b_opt: ex.b_opt, n, samples, actions, returns, sample_mean: mean, sample_spread: spread,
     var_b: varB, var_none: varNone, var_opt: varOpt, sd_b: Math.sqrt(Math.max(varB, 0)), sd_none: Math.sqrt(Math.max(varNone, 0)), sd_opt: Math.sqrt(Math.max(varOpt, 0)),
     var_delta: varB - varNone,
+    b_vs_none: varB > varNone + 1e-12 ? 'größer' : (varB < varNone - 1e-12 ? 'kleiner' : 'gleich'),
     mean_shift: Math.abs(b) * Math.sqrt(fsum([0, 1, 2].map(j => fsum(pi.map((q, a) => q * score(pi, a)[j])) ** 2))),
     dpi, pi_next: pi.map((q, j) => q + dpi[j]), pi_trail: trail, J_levels: levels, b_line: bSeg ? [{ level: b, points: bSeg }] : [],
     score_rays: scoreRays(pi, actions, returns, b), b_weights: pi.map((q, j) => q * ex.weights[j] / mass),
@@ -305,7 +306,7 @@ function primitiveSvg(p, palette, uid, theme, bg) {
     case 'poly': return `<${p.closed ? 'polygon' : 'polyline'} points="${p.pts.map(n2).join(' ')}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"${dash}/>`;
     case 'area': return `<polygon points="${p.pts.map(n2).join(' ')}" fill="${p.neg ? 'url(#' + (uid || 'mm') + '-hatch)' : c}" fill-opacity="0.24" stroke="${c}" stroke-width="2"/>`;
     case 'rect': return `<rect x="${n2(p.x)}" y="${n2(p.y)}" width="${n2(p.w)}" height="${n2(p.h)}" fill="${c}" fill-opacity="0.85"/>`;
-    case 'text': return `<text x="${n2(p.x)}" y="${n2(p.y)}" text-anchor="${p.a}" fill="${c}" font-size="${FONT}" font-weight="600">${esc(p.s)}</text>`;
+    case 'text': return `<text x="${n2(p.x)}" y="${n2(p.y)}" text-anchor="${p.a}" fill="${c}" font-size="${FONT}" font-weight="600" stroke="${bg || '#ffffff'}" stroke-width="4" stroke-linejoin="round" paint-order="stroke">${esc(p.s)}</text>`;
   }
   return '';
 }
@@ -424,7 +425,7 @@ function mount(root, scene) {
   function markPresets() { if (presetBar) for (const b of presetBar.children) b.setAttribute('aria-pressed', String(b.dataset.preset === presetId)); root.dataset.preset = presetId || ''; }
   function loadPreset(id) {
     stop(); playing = false; play.textContent = 'Abspielen'; if (mode === 'mission') leaveMission();
-    presetId = id; over = clone(presetOf(scene, id).set); panels = panelsFor(scene, id); rebase(); syncEdits(); markPresets(); drawSnaps(); setPos(0);
+    presetId = id; over = clone(presetOf(scene, id).set); panels = panelsFor(scene, id); rebase(); syncEdits(); syncMissions(); markPresets(); drawSnaps(); setPos(0);
   }
   function newCustomRound(explore) { // explore: dragging after the reveal keeps the timeline open
     stop(); playing = false; play.textContent = 'Abspielen'; if (mode === 'mission') leaveMission();
@@ -432,7 +433,7 @@ function mount(root, scene) {
     for (const k of [...revealed]) if (k.startsWith('custom/')) revealed.delete(k);
     for (const k of Object.keys(predicted)) if (k.startsWith('custom/')) delete predicted[k];
     if (explore) for (const st of scene.steps) if (st.checkpoint) revealed.add('custom/' + st.id);
-    rebase(); syncEdits(); markPresets(); drawSnaps(); setPos(explore ? pos : 0);
+    rebase(); syncEdits(); syncMissions(); markPresets(); drawSnaps(); setPos(explore ? pos : 0);
   }
 
   // caption, controls, timeline
@@ -451,11 +452,11 @@ function mount(root, scene) {
   const status = h('p', { class: 'mm-store' }, 'Vorhersagen und Aufträge werden nur in diesem Browser gespeichert (em-motion-v1). Sie sind Lernhandlungen, kein Nachweis von Können, und ändern keinen Kompetenzzustand.');
   const missionBox = h('div', { class: 'mm-missions' });
 
-  root.append(
+  root.append(...[
     h('header', { class: 'mm-head' }, h('p', { class: 'mm-eyebrow' }, 'Mastery Motion · Szene'), h('h2', { class: 'mm-title' }, scene.title), h('p', { class: 'mm-claim' }, scene.claim)),
     h('div', { class: 'mm-formula' }, eq, legend), presetBar,
     h('div', { class: 'mm-figure' }, svg, h('div', { class: 'mm-timeline' }, snaps, scrub, ticks), h('div', { class: 'mm-controls' }, back, next, play, counter)),
-    h('div', { class: 'mm-layout' }, h('div', { class: 'mm-side' }, stepTitle, caption, cp, live), h('div', { class: 'mm-aside' }, editBox, missionBox)), status);
+    h('div', { class: 'mm-layout' }, h('div', { class: 'mm-side' }, stepTitle, caption, cp, live), h('div', { class: 'mm-aside' }, editBox, missionBox)), status].filter(Boolean));
 
   // snapping: the scrubber lands exactly where a model quantity says something happens (e.g. det M(t) = 0)
   function positionOf(param, value) {
@@ -615,6 +616,13 @@ function mount(root, scene) {
     cp.append(box);
   }
   // missions (V6): at most three sliders, each tied to a question; checking writes a task_attempt event
+  const missionSliders = [];
+  function syncMissions() { // slider start values follow the active preset / the learner's values
+    for (const { m, s, inp, val } of missionSliders) {
+      const raw = Object.assign(paramsAt(scene, scene.steps.findIndex(x => x.id === m.from_step), over), m.fixed || {})[s.param];
+      const v = s.index === undefined ? raw : raw[s.index]; inp.value = String(v); val.textContent = fmt(v, 2);
+    }
+  }
   for (const m of scene.missions || []) {
     const out = h('p', { class: 'mm-mission-status', role: 'status', 'aria-live': 'polite' });
     const sliders = m.sliders.map(s => { const spec = scene.params[s.param];
@@ -623,6 +631,7 @@ function mount(root, scene) {
       const inp = h('input', { type: 'range', min: String(spec.min), max: String(spec.max), step: String(s.step || 0.01), 'data-param': s.param, 'aria-label': s.label, value: String(start) });
       const val = h('output', { class: 'mm-val' }, fmt(start, 2));
       inp.addEventListener('input', () => { if (mode !== 'mission') enterMission(m); if (s.index === undefined) missionParams[s.param] = Number(inp.value); else missionParams[s.param][s.index] = Number(inp.value); val.textContent = fmt(Number(inp.value), 2); draw(); });
+      missionSliders.push({ m, s, inp, val });
       return { s, inp, val, el: h('label', { class: 'mm-slider' }, s.label + ' ', inp, val) }; });
     const hint = h('p', { class: 'mm-note', hidden: true }, m.hint);
     const box = h('section', { class: 'mm-mission', 'data-mission': m.id }, h('p', { class: 'mm-eyebrow' }, 'Eigener Auftrag'), h('p', {}, m.prompt), sliders.map(x => x.el),
@@ -664,7 +673,7 @@ function mount(root, scene) {
   });
   root.tabIndex = -1; root.dataset.mode = 'timeline';
   paintDefs(); paintTerms(); syncEdits(); markPresets(); drawSnaps(); setPos(0);
-  return { go, setPos, loadPreset, state: () => evaluate(scene, currentParams()), get pos() { return pos; }, get theme() { return theme; } };
+  return { go, setPos: p => { stop(); playing = false; setPos(p); }, loadPreset, state: () => evaluate(scene, currentParams()), get pos() { return pos; }, get theme() { return theme; } };
 }
 function autoMount() {
   for (const root of document.querySelectorAll('.mm-scene:not(.mm-ready)')) {

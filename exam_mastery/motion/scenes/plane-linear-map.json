@@ -375,7 +375,18 @@
     "col1",
     "col2",
     "mv",
-    "v0"
+    "v0",
+    "read-t",
+    "read-e1",
+    "read-e2",
+    "read-mv",
+    "read-mvf",
+    "read-det",
+    "read-or",
+    "read-rank",
+    "read-ker",
+    "read-img",
+    "read-dim"
    ],
    "title": "Vor der Abbildung (t = 0)",
    "caption": "Gitter, Basisvektoren e₁ und e₂, Einheitsquadrat und Testvektor v = {v_text}. Gleich verformt M(t) = (1 − t)·I + t·A die Ebene stetig von der Identität zu A.",
@@ -391,7 +402,18 @@
     "col1",
     "col2",
     "mv",
-    "v0"
+    "v0",
+    "read-t",
+    "read-e1",
+    "read-e2",
+    "read-mv",
+    "read-mvf",
+    "read-det",
+    "read-or",
+    "read-rank",
+    "read-ker",
+    "read-img",
+    "read-dim"
    ],
    "set": {
     "t": 0.25
@@ -446,7 +468,18 @@
     "col1",
     "col2",
     "mv",
-    "v0"
+    "v0",
+    "read-t",
+    "read-e1",
+    "read-e2",
+    "read-mv",
+    "read-mvf",
+    "read-det",
+    "read-or",
+    "read-rank",
+    "read-ker",
+    "read-img",
+    "read-dim"
    ],
    "set": {
     "t": 0.5
@@ -473,7 +506,18 @@
     "col1",
     "col2",
     "mv",
-    "v0"
+    "v0",
+    "read-t",
+    "read-e1",
+    "read-e2",
+    "read-mv",
+    "read-mvf",
+    "read-det",
+    "read-or",
+    "read-rank",
+    "read-ker",
+    "read-img",
+    "read-dim"
    ],
    "set": {
     "t": 0.75
@@ -500,7 +544,18 @@
     "col1",
     "col2",
     "mv",
-    "v0"
+    "v0",
+    "read-t",
+    "read-e1",
+    "read-e2",
+    "read-mv",
+    "read-mvf",
+    "read-det",
+    "read-or",
+    "read-rank",
+    "read-ker",
+    "read-img",
+    "read-dim"
    ],
    "set": {
     "t": 1.0

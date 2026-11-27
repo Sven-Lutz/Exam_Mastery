@@ -28,7 +28,8 @@ DEMO_PRESETS = [
     {"id": "null", "label": "Nullabbildung", "matrix": [[0, 0], [0, 0]], "vector": [1, 1]},
 ]
 STEPS_T = (("identity", 0.0), ("quarter", 0.25), ("half", 0.5), ("three-quarters", 0.75), ("image", 1.0))
-FOCUS = ["grid", "square", "kernel", "image", "col1", "col2", "mv", "v0"]
+FOCUS = ["grid", "square", "kernel", "image", "col1", "col2", "mv", "v0", "read-t", "read-e1", "read-e2", "read-mv",
+         "read-mvf", "read-det", "read-or", "read-rank", "read-ker", "read-img", "read-dim"]  # the original grid is context
 
 
 def _preset(item):

@@ -119,6 +119,7 @@ def softmax_simplex_pg(params):
         "var_b": var_b, "var_none": var_none, "var_opt": var_opt,
         "sd_b": math.sqrt(max(var_b, 0.0)), "sd_none": math.sqrt(max(var_none, 0.0)), "sd_opt": math.sqrt(max(var_opt, 0.0)),
         "var_delta": var_b - var_none,
+        "b_vs_none": "größer" if var_b > var_none + 1e-12 else ("kleiner" if var_b < var_none - 1e-12 else "gleich"),
         # exact mean of the estimator with baseline minus without: -b * E[e_A - pi] = -b * (pi - pi) = 0
         "mean_shift": abs(b) * math.sqrt(_fsum(_fsum(p * score(pi, a)[j] for a, p in enumerate(pi)) ** 2
                                                for j in range(3))),

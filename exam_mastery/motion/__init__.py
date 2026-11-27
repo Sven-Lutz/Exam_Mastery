@@ -632,8 +632,10 @@ def primitive_svg(p, uid="mm", theme="light"):
     if k == "rect":
         return f'<rect x="{_n(p["x"])}" y="{_n(p["y"])}" width="{_n(p["w"])}" height="{_n(p["h"])}" fill="{c}" fill-opacity="0.85"/>'
     if k == "text":
+        # halo in the stage colour keeps labels readable where they cross grid or level lines
         return (f'<text x="{_n(p["x"])}" y="{_n(p["y"])}" text-anchor="{p["a"]}" fill="{c}" font-size="{FONT}" '
-                f'font-weight="600">{escape(p["s"])}</text>')
+                f'font-weight="600" stroke="{STAGE[theme]["bg"]}" stroke-width="4" stroke-linejoin="round" '
+                f'paint-order="stroke">{escape(p["s"])}</text>')
     _fail("unknown primitive " + k)
 
 
