@@ -15,8 +15,11 @@ import re
 import shutil
 import tempfile
 import time
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+
+from ..learning.publication_lock import publication_lock
 
 PKG = Path(__file__).resolve().parent
 ENGINE = PKG.parent
@@ -54,12 +57,16 @@ def _inside_engine_checkout(path):
     return None
 
 
+def _private_output_forbidden(path):
+    return _inside_engine_checkout(path) or any((parent / ".git").exists() for parent in (path, *path.parents))
+
+
 def resolve_home(home=None):
     """MASTERY_HOME (or ~/Mastery). Refuses any location inside an engine checkout or the installed package."""
     raw = home or os.environ.get("MASTERY_HOME") or (Path.home() / "Mastery")
     path = Path(raw).expanduser().resolve()
-    if _inside_engine_checkout(path):
-        raise MasteryError("Refusing to write the Mastery library into the engine repository or package; "
+    if _private_output_forbidden(path):
+        raise MasteryError("Refusing to write the Mastery library into a Git checkout or the engine package; "
                            "set MASTERY_HOME to a folder outside it (default ~/Mastery).")
     if path.exists() and not path.is_dir():
         raise MasteryError("MASTERY_HOME exists and is not a directory")
@@ -68,8 +75,8 @@ def resolve_home(home=None):
 
 def _guard_output(path):
     path = Path(path).expanduser().resolve()
-    if _inside_engine_checkout(path):
-        raise MasteryError("Refusing to write learner data into the engine repository or package.")
+    if _private_output_forbidden(path):
+        raise MasteryError("Refusing to write learner data into a Git checkout or the engine package.")
     return path
 
 
@@ -84,6 +91,7 @@ def _read_json(path):
 
 def _write_json(path, obj):
     path = Path(path)
+    _guard_output(path.parent)
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(prefix=".mastery-", suffix=".tmp", dir=path.parent)
     try:
@@ -329,7 +337,7 @@ def add_private_unit(unit_path, slug=None, tracks=(), home=None):
     """Register a private unit (outside the repository) in MASTERY_HOME/library-spec.local.json."""
     root = resolve_home(home)
     path = Path(unit_path).expanduser().resolve()
-    if _inside_engine_checkout(path):
+    if _private_output_forbidden(path):
         raise MasteryError("Private units must live outside the engine repository")
     if not path.is_file():
         raise MasteryError("Unit file not found")
@@ -398,14 +406,18 @@ def store_state(root, obj, keep=30):
     """Write a validated snapshot to MASTERY_HOME/state (latest + rotating history)."""
     validate_state(obj)
     state = Path(root) / "state"
-    received = now()
-    record = dict(obj, received_at=received)
-    _write_json(state / "latest.json", record)
-    history = state / "history"
-    history.mkdir(parents=True, exist_ok=True)
-    _write_json(history / ("state-" + received.replace(":", "").replace("-", "") + ".json"), record)
-    for old in sorted(history.glob("state-*.json"))[:-keep]:
-        old.unlink()
+    with publication_lock(state):
+        received = now()
+        record = dict(obj, received_at=received)
+        history = state / "history"
+        with publication_lock(history):
+            prefix = "state-" + received.replace(":", "").replace("-", "")
+            same_second = sorted(history.glob(prefix + "_*.json"))
+            sequence = int(same_second[-1].stem.rsplit("_", 1)[1]) + 1 if same_second else 1
+            _write_json(history / f"{prefix}_{sequence:012d}.json", record)
+            _write_json(state / "latest.json", record)
+            for old in sorted(history.glob("state-*.json"))[:-keep]:
+                old.unlink()
     return received
 
 
@@ -432,7 +444,8 @@ def export(home=None, out=None):
               "library": [{"slug": u["slug"], "unit_id": u["unit_id"], "content_hash": u["content_hash"]}
                           for u in lib.get("units", [])],
               "state": {k: latest[k] for k in ("schema", "saved_at", "received_at", "storage") if k in latest}}
-    target = _guard_output(out) if out else root / "exports" / ("mastery-backup-" + now().replace(":", "").replace("-", "") + ".json")
+    target = _guard_output(out) if out else root / "exports" / ("mastery-backup-" + now().replace(":", "").replace("-", "")
+                                                          + "-" + uuid.uuid4().hex + ".json")
     _write_json(target, backup)
     return target
 
