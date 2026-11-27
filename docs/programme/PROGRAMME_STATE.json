@@ -388,18 +388,35 @@
    "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/MOTION.json",
    "worktree": "Exam_Mastery-motion"
+  },
+  {
+   "id": "MOTION2",
+   "kind": "background subagent of LEAD",
+   "scope": "Motion consolidation, keyframes into books/cards, visual polish",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/MOTION2.json",
+   "worktree": "Exam_Mastery-motion2"
+  },
+  {
+   "id": "TUTOR",
+   "kind": "background subagent of LEAD",
+   "scope": "guided tutor inside the UI",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/TUTOR.json",
+   "worktree": "Exam_Mastery-tutor"
   }
  ],
  "work_packages": [
   {
    "id": "WP-MOTION-2",
    "title": "Mastery Motion consolidation and polish: port the plane scene onto Motion, wire keyframes into textbook/Anki builds, RL scene visual polish (3b1b-level clarity), dark mode",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 0.07,
-   "autostart": true,
+   "autostart": false,
    "branch": "feat/mastery-motion-2",
    "base": "integration/mastery-v1-20261127",
-   "next_step": "Bounded step: (1) port the plane-transformation explorable onto mastery-motion-v1 (linear_map_2d + kernel/image for det=0) and remove the duplicate model only after parity tests; (2) wire Motion keyframes into experience textbook figures and Anki card figures; (3) RL scene polish per the lead's notes. Tests + CI-equivalent suite on a frozen copy; push branch, draft PR against integration; no main, no private material."
+   "next_step": "Bounded step: (1) port the plane-transformation explorable onto mastery-motion-v1 (linear_map_2d + kernel/image for det=0) and remove the duplicate model only after parity tests; (2) wire Motion keyframes into experience textbook figures and Anki card figures; (3) RL scene polish per the lead's notes. Tests + CI-equivalent suite on a frozen copy; push branch, draft PR against integration; no main, no private material.",
+   "worktree": "Exam_Mastery-motion2"
   },
   {
    "id": "WP-MOTION",
@@ -482,9 +499,13 @@
   {
    "id": "WP-C2M-TUTOR",
    "title": "P2 guided tutor inside the UI (prerequisite teaching, hint ladder, manual-LLM bridge without copy-paste friction where possible)",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 0.4,
-   "autostart": false
+   "autostart": false,
+   "branch": "feat/mastery-tutor-ui",
+   "base": "integration/mastery-v1-20261127 (125a1c6)",
+   "worktree": "Exam_Mastery-tutor",
+   "next_step": "Specialist TUTOR: prerequisite graph, guided help panel teaching prerequisites in workbench/explorable, hint ladder with guardrails, honest optional LLM bridge; lead integrates."
   },
   {
    "id": "WP-C2M-QUALITY",
@@ -1242,6 +1263,17 @@
      "utilization": 0.88,
      "resets": "2026-11-29T07:00+01:00"
     }
+   },
+   {
+    "at": "2026-11-28T00:24+01:00",
+    "five_hour": {
+     "utilization": 0.36
+    },
+    "seven_day": {
+     "utilization": 0.93,
+     "resets": "2026-11-29T07:00+01:00"
+    },
+    "note": "owner: continue until the provider limit"
    }
   ],
   "supervisor_ceilings": {
