@@ -188,8 +188,7 @@
    "severity": "P1",
    "text": "PR #19 tutor brief embeds the full reference solution; only a prompt instruction keeps it from the learner and the chat provider receives it (R9 TUTOR_ADOPTION_DECISION.md). Conflicts with R5-POL-03/R9-POL-04 (answer key only for practice items; never for mock/retest items).",
    "status": "FIX_IN_DRAFT_PR",
-   "fix": "PR #43 (stacked on #37): no answer key in the tutor brief for similar/transfer/retest (role from engine track); 'tutor' event counts as assistance in policy.py + em_tutor.js; 7 new checks (5 fail on 5bdfb6f); CI-equivalent suite 215 pytest + 643 unittest OK locally",
-   "open": "chapter app em_app.js does not log the tutor handoff yet"
+   "fix": "PR #43 (stacked on #37): no answer key in the tutor brief for similar/transfer/retest (role from engine track); 'tutor' event counts as assistance in policy.py + em_tutor.js; 7 new checks (5 fail on 5bdfb6f); CI-equivalent suite 215 pytest + 643 unittest OK locally; 5ad257d: chapter app em_app.js logs item tutor briefings as help (3 browser checks; suite 215 pytest + 646 unittest OK)"
   }
  ],
  "agents": [
@@ -614,12 +613,12 @@
     "tutor.KEY_WITHHELD_ROLES; policy.ASSIST_EVENTS incl. 'tutor'; em_tutor.js mirror + UI event + evidence note",
     "tests/test_tutor_evidence_integrity.py (7; 5 fail on previous commit)",
     "frozen-copy CI-equivalent run: pytest 215 passed, unittest discover 643 OK (skipped=6)",
-    "draft PR #43"
+    "draft PR #43",
+    "5ad257d: chapter app (em_app.js) logs copied/saved item briefings as 'tutor' help; learner status shows 'mit Hilfe richtig'; 3 browser checks (2 fail on 8aed87e); suite 215 + 646 OK"
    ],
    "open": [
     "CI on PR #43",
-    "review",
-    "em_app.js chapter-app tutor handoff not logged"
+    "review"
    ],
    "tests": "venv of Exam_Mastery-integration: python -m pytest <CI module list>; python -m unittest discover -s tests",
    "next_step": "none"
