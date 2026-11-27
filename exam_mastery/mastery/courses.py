@@ -106,7 +106,7 @@ def _brctl_download(path):
 
 
 def display_title(stem):
-    """'10_20-_20Offline_20RL' -> '10 - Offline RL'; 'KArmedBandits' -> 'K Armed Bandits'."""
+    """'07_20-_20Graph_20Search' -> '07 - Graph Search'; 'MarkovChains' -> 'Markov Chains'."""
     t = re.sub(r"%20|_20(?=[A-Za-z0-9-])", " ", stem).replace("_", " ")
     t = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", t)
     return re.sub(r"\s+", " ", t).strip(" -")
