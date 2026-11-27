@@ -1,0 +1,969 @@
+{
+ "schema": "mastery-r6-skill-ontology/1",
+ "version": "1.0.0-proposed",
+ "status": "PROPOSED",
+ "date": "2026-11-27",
+ "note": "Hypothesenontologie für die Architekturentscheidung; keine Implementierung; Operationen sind die Charter-Taxonomie und bleiben Hypothesen (RESEARCH_FIRST_PROGRAM_20261126.md 'Core taxonomy').",
+ "operations": [
+  "recall_discrimination",
+  "symbolic_procedure",
+  "formal_proof",
+  "rule_based_contextual",
+  "diagnostic_reasoning",
+  "empirical_experimental",
+  "computational_construction",
+  "spatial_design",
+  "embodied_psychomotor",
+  "open_synthesis",
+  "self_regulation"
+ ],
+ "operation_details": [
+  {
+   "id": "recall_discrimination",
+   "label_de": "Abruf, Wiedererkennen, Unterscheiden",
+   "examples": "Anatomie, Normen, chemische Symbole, ökonomische Begriffe",
+   "in_product_competence_evidence": "yes_deterministic",
+   "default_verifier_classes": [
+    "answer_key_closed_item",
+    "numeric_single_value"
+   ],
+   "tracks": [
+    "A"
+   ],
+   "competence_types": [
+    "recall",
+    "recognize_discriminate"
+   ],
+   "key_policies": [
+    "R1-POL-A01",
+    "R1-POL-A04",
+    "R1-POL-A05",
+    "R8-POL-01",
+    "R8-POL-13"
+   ],
+   "boundary_note": "Anki nur für abrufbare Bausteine mit Bedingungen; keine Atomisierung von Ketten (R1-POL-A01)"
+  },
+  {
+   "id": "symbolic_procedure",
+   "label_de": "Symbolisches Verfahren, quantitative Modellierung",
+   "examples": "Algebra, Statistik, Finanzen, Physik",
+   "in_product_competence_evidence": "yes_per_checked_step",
+   "default_verifier_classes": [
+    "algebraic_oracle_cas",
+    "numeric_single_value",
+    "principle_key"
+   ],
+   "tracks": [
+    "A"
+   ],
+   "competence_types": [
+    "comprehend_trace",
+    "construct",
+    "select_justify_method",
+    "check_conditions_counterexample",
+    "validate_debug"
+   ],
+   "key_policies": [
+    "R1-POL-A02",
+    "R1-POL-A03",
+    "R1-POL-A06",
+    "R1-POL-A08",
+    "R2-POL-15",
+    "R2-POL-20",
+    "R2-POL-21",
+    "R5-POL-10"
+   ],
+   "boundary_note": "Numerische Einzelwertprüfung nie allein (R2-POL-06)"
+  },
+  {
+   "id": "formal_proof",
+   "label_de": "Formaler Beweis, Argumentkonstruktion",
+   "examples": "Analysis, theoretische Informatik, Philosophie",
+   "in_product_competence_evidence": "partial_closed_items_only",
+   "default_verifier_classes": [
+    "answer_key_closed_item",
+    "human_rubric",
+    "comparative_judgement",
+    "proof_assistant"
+   ],
+   "tracks": [
+    "A"
+   ],
+   "competence_types": [
+    "comprehend_trace",
+    "validate_debug",
+    "construct",
+    "check_conditions_counterexample"
+   ],
+   "key_policies": [
+    "R2-POL-01",
+    "R2-POL-02",
+    "R2-POL-03",
+    "R2-POL-04",
+    "R2-POL-05",
+    "R2-POL-07",
+    "R2-POL-18"
+   ],
+   "boundary_note": "Verständnis, Validierung, Konstruktion getrennt (R2-POL-02); Konstruktion nur menschlich oder in formaler Variante (R2-CR-4)"
+  },
+  {
+   "id": "rule_based_contextual",
+   "label_de": "Regelbasiertes kontextuelles Schließen",
+   "examples": "Recht, Steuern, Regulierung",
+   "in_product_competence_evidence": "human_only",
+   "default_verifier_classes": [
+    "human_rubric",
+    "source_version_check",
+    "answer_key_closed_item"
+   ],
+   "tracks": [
+    "A"
+   ],
+   "competence_types": [
+    "issue_spot",
+    "construct",
+    "argue_critique",
+    "recall"
+   ],
+   "key_policies": [
+    "R3-POL-01",
+    "R3-POL-02",
+    "R3-POL-03",
+    "R3-POL-04",
+    "R3-POL-11"
+   ],
+   "boundary_note": "Rechtsaussagen nur mit Fassung und Stichtag, sonst Enthaltung (R3-POL-01)"
+  },
+  {
+   "id": "diagnostic_reasoning",
+   "label_de": "Diagnostisches Schließen unter Unsicherheit",
+   "examples": "Medizin, Debugging, Fehlersuche",
+   "in_product_competence_evidence": "partial_closed_items_only",
+   "default_verifier_classes": [
+    "answer_key_closed_item",
+    "human_rubric"
+   ],
+   "tracks": [
+    "A"
+   ],
+   "competence_types": [
+    "diagnose_differential",
+    "monitor_calibrate",
+    "validate_debug"
+   ],
+   "key_policies": [
+    "R3-POL-08",
+    "R3-POL-09",
+    "R3-POL-10",
+    "R4-POL-14"
+   ],
+   "boundary_note": "Simulationsergebnisse heißen 'Fallleistung in der Simulation' (R3-POL-10)"
+  },
+  {
+   "id": "empirical_experimental",
+   "label_de": "Empirisches und experimentelles Schließen",
+   "examples": "Chemie, Biologie, Werkstoffe, Statistik",
+   "in_product_competence_evidence": "partial_closed_items_only",
+   "default_verifier_classes": [
+    "answer_key_closed_item",
+    "numeric_single_value",
+    "state_oracle",
+    "human_rubric",
+    "external_human_assessment"
+   ],
+   "tracks": [
+    "A",
+    "B"
+   ],
+   "competence_types": [
+    "plan_experiment",
+    "interpret_data",
+    "execute_physical"
+   ],
+   "key_policies": [
+    "R2-POL-16",
+    "R4-POL-07",
+    "R4-POL-08",
+    "R4-POL-09",
+    "R4-POL-13",
+    "R7-POL-07"
+   ],
+   "boundary_note": "Durchführung ist Spur B; Sicherheitsenthaltung (R4-POL-13)"
+  },
+  {
+   "id": "computational_construction",
+   "label_de": "Computationale Konstruktion",
+   "examples": "Algorithmen, Softwaretechnik, Numerik",
+   "in_product_competence_evidence": "yes_for_function_behaviour",
+   "default_verifier_classes": [
+    "hidden_or_property_tests",
+    "state_oracle",
+    "visible_unit_tests",
+    "runtime_invariant_assertion",
+    "operation_counter"
+   ],
+   "tracks": [
+    "A"
+   ],
+   "competence_types": [
+    "comprehend_trace",
+    "validate_debug",
+    "construct",
+    "select_justify_method"
+   ],
+   "key_policies": [
+    "R2-POL-08",
+    "R2-POL-09",
+    "R2-POL-10",
+    "R2-POL-11",
+    "R2-POL-12",
+    "R2-POL-13",
+    "R2-POL-17",
+    "R2-POL-19",
+    "R7-POL-08"
+   ],
+   "boundary_note": "Sichtbare Tests nur Feedback; Code-Werkbank erst nach Pyodide-Spike (OD-18)"
+  },
+  {
+   "id": "spatial_design",
+   "label_de": "Räumliche, gestalterische und ingenieurtechnische Synthese",
+   "examples": "CAD, Geometrie, Maschinenbau, Holzbearbeitung",
+   "in_product_competence_evidence": "human_only",
+   "default_verifier_classes": [
+    "cad_change_test",
+    "human_rubric",
+    "external_human_assessment"
+   ],
+   "tracks": [
+    "A",
+    "B"
+   ],
+   "competence_types": [
+    "construct",
+    "check_conditions_counterexample",
+    "execute_physical"
+   ],
+   "key_policies": [
+    "R4-POL-10",
+    "R4-POL-11",
+    "R4-POL-15"
+   ],
+   "boundary_note": "Änderungstests nur konzeptuell begründet (R4 §9)"
+  },
+  {
+   "id": "embodied_psychomotor",
+   "label_de": "Perzeptuelle, verkörperte und psychomotorische Leistung",
+   "examples": "Chirurgie, Kochen, Backen, Holzbearbeitung, Laborarbeit",
+   "in_product_competence_evidence": "never_in_product",
+   "default_verifier_classes": [
+    "external_human_assessment"
+   ],
+   "tracks": [
+    "B"
+   ],
+   "competence_types": [
+    "execute_physical",
+    "recall"
+   ],
+   "key_policies": [
+    "R4-POL-01",
+    "R4-POL-02",
+    "R4-POL-03",
+    "R4-POL-04",
+    "R4-POL-06",
+    "R4-POL-12",
+    "R4-POL-13",
+    "R4-POL-14"
+   ],
+   "boundary_note": "Produkt trainiert Spur A, dokumentiert fremde Spur-B-Bewertungen, zertifiziert nie (R4-POL-01)"
+  },
+  {
+   "id": "open_synthesis",
+   "label_de": "Offene kritische oder kreative Synthese",
+   "examples": "Philosophie, Gründung, Ökonomie, Forschung",
+   "in_product_competence_evidence": "human_only",
+   "default_verifier_classes": [
+    "human_rubric",
+    "comparative_judgement"
+   ],
+   "tracks": [
+    "A"
+   ],
+   "competence_types": [
+    "argue_critique",
+    "construct",
+    "select_justify_method"
+   ],
+   "key_policies": [
+    "R3-POL-05",
+    "R3-POL-06",
+    "R3-POL-07",
+    "R3-POL-11"
+   ],
+   "boundary_note": "Modellurteil nur FEEDBACK_UNVERIFIED (R3-POL-11)"
+  },
+  {
+   "id": "self_regulation",
+   "label_de": "Selbstregulation und Expertisemanagement",
+   "examples": "intensives Lernen über Fächer hinweg",
+   "in_product_competence_evidence": "no_competence_claim",
+   "default_verifier_classes": [
+    "none"
+   ],
+   "tracks": [],
+   "competence_types": [
+    "monitor_calibrate"
+   ],
+   "key_policies": [
+    "R1-POL-A09",
+    "R1-POL-B01",
+    "R1-POL-B05",
+    "R1-POL-B07",
+    "R1-POL-B11",
+    "R5-POL-08",
+    "R5-POL-11"
+   ],
+   "boundary_note": "nur eigenes Verhalten im Open Learner Model; keine Stundenmetriken (R1-POL-B05)"
+  }
+ ],
+ "in_product_competence_evidence_values": {
+  "yes_deterministic": "deterministische Prüfung genügt",
+  "yes_per_checked_step": "nur für geprüfte Teilschritte",
+  "yes_for_function_behaviour": "nur für Funktionsverhalten auf unbekannten Eingaben",
+  "partial_closed_items_only": "nur geschlossene Items; offene Teile menschlich",
+  "human_only": "nur menschliche Bewertung",
+  "never_in_product": "nie im Produkt (Spur B extern)",
+  "no_competence_claim": "keine Kompetenzaussage"
+ },
+ "competence_types": [
+  {
+   "id": "recall",
+   "definition": "freier Abruf",
+   "operations": [
+    "recall_discrimination",
+    "rule_based_contextual",
+    "embodied_psychomotor"
+   ]
+  },
+  {
+   "id": "recognize_discriminate",
+   "definition": "Wiedererkennen und Unterscheiden verwechselbarer Begriffe",
+   "operations": [
+    "recall_discrimination"
+   ]
+  },
+  {
+   "id": "comprehend_trace",
+   "definition": "Verstehen, Verfolgen, Erklären eines gegebenen Beweises, Verfahrens oder Programms",
+   "operations": [
+    "symbolic_procedure",
+    "formal_proof",
+    "computational_construction"
+   ]
+  },
+  {
+   "id": "validate_debug",
+   "definition": "Fehler in fremder Lösung finden, eingrenzen, begründen",
+   "operations": [
+    "symbolic_procedure",
+    "formal_proof",
+    "computational_construction",
+    "diagnostic_reasoning"
+   ]
+  },
+  {
+   "id": "construct",
+   "definition": "eigene Lösung, Herleitung, Beweis, Programm, Konstruktion, Falllösung",
+   "operations": [
+    "symbolic_procedure",
+    "formal_proof",
+    "computational_construction",
+    "rule_based_contextual",
+    "spatial_design",
+    "open_synthesis"
+   ]
+  },
+  {
+   "id": "select_justify_method",
+   "definition": "Methode, Prinzip, Algorithmus oder Modell wählen und begründen",
+   "operations": [
+    "symbolic_procedure",
+    "computational_construction",
+    "open_synthesis"
+   ]
+  },
+  {
+   "id": "check_conditions_counterexample",
+   "definition": "Voraussetzungen prüfen, Gegenbeispiel, Randfall",
+   "operations": [
+    "symbolic_procedure",
+    "formal_proof",
+    "spatial_design"
+   ]
+  },
+  {
+   "id": "issue_spot",
+   "definition": "relevante Fragen in unannotiertem Sachverhalt finden",
+   "operations": [
+    "rule_based_contextual"
+   ]
+  },
+  {
+   "id": "diagnose_differential",
+   "definition": "konkurrierende Hypothesen bilden, gewichten, fehlende Information erkennen",
+   "operations": [
+    "diagnostic_reasoning"
+   ]
+  },
+  {
+   "id": "argue_critique",
+   "definition": "Argument rekonstruieren, Einwand und Erwiderung",
+   "operations": [
+    "rule_based_contextual",
+    "open_synthesis"
+   ]
+  },
+  {
+   "id": "plan_experiment",
+   "definition": "Versuch planen, Variablen kontrollieren, Vorhersage",
+   "operations": [
+    "empirical_experimental"
+   ]
+  },
+  {
+   "id": "interpret_data",
+   "definition": "Daten, Unsicherheit und Modellannahmen interpretieren",
+   "operations": [
+    "empirical_experimental"
+   ]
+  },
+  {
+   "id": "execute_physical",
+   "definition": "Handlung an realem Material oder Gerät (nur Spur B)",
+   "operations": [
+    "embodied_psychomotor",
+    "empirical_experimental",
+    "spatial_design"
+   ]
+  },
+  {
+   "id": "monitor_calibrate",
+   "definition": "Konfidenz, Planung, Überwachung des eigenen Lernens (nie Kompetenzbeleg der Fachoperation)",
+   "operations": [
+    "self_regulation",
+    "diagnostic_reasoning"
+   ]
+  }
+ ],
+ "knowledge_modes": {
+  "values_today": [
+   "formal_reasoning",
+   "computational",
+   "legal_reasoning",
+   "clinical_reasoning",
+   "experimental",
+   "procedural",
+   "spatial",
+   "economic",
+   "conceptual",
+   "interpretative",
+   "practical"
+  ],
+  "role": "Darstellungsattribut aus em-experience-v1; steuert keine Evidenz",
+  "source": "engine@5ad257d9 learning/experience.py MODES"
+ },
+ "engine_operation_mapping": {
+  "source": "engine@5ad257d9 learning/experience.py OPERATIONS",
+  "note": "Abbildung der 18 Engine-Verben auf Charter-Operation und Kompetenztyp; Migration M1 ergänzt, ersetzt nicht (AD-3)",
+  "map": {
+   "recall": {
+    "operation": "recall_discrimination",
+    "competence_type": "recall"
+   },
+   "classify": {
+    "operation": "recall_discrimination",
+    "competence_type": "recognize_discriminate"
+   },
+   "explain": {
+    "operation": "by_context",
+    "competence_type": "comprehend_trace"
+   },
+   "prove": {
+    "operation": "formal_proof",
+    "competence_type": "construct"
+   },
+   "derive": {
+    "operation": "symbolic_procedure",
+    "competence_type": "construct",
+    "alt_operation": "formal_proof"
+   },
+   "calculate": {
+    "operation": "symbolic_procedure",
+    "competence_type": "construct"
+   },
+   "implement": {
+    "operation": "computational_construction",
+    "competence_type": "construct"
+   },
+   "debug": {
+    "operation": "computational_construction",
+    "competence_type": "validate_debug",
+    "alt_operation": "diagnostic_reasoning"
+   },
+   "trace": {
+    "operation": "computational_construction",
+    "competence_type": "comprehend_trace"
+   },
+   "design": {
+    "operation": "spatial_design",
+    "competence_type": "construct",
+    "alt_operation": "open_synthesis"
+   },
+   "diagnose": {
+    "operation": "diagnostic_reasoning",
+    "competence_type": "diagnose_differential"
+   },
+   "subsume": {
+    "operation": "rule_based_contextual",
+    "competence_type": "construct"
+   },
+   "argue": {
+    "operation": "open_synthesis",
+    "competence_type": "argue_critique",
+    "alt_operation": "formal_proof"
+   },
+   "compare": {
+    "operation": "by_context",
+    "competence_type": "recognize_discriminate"
+   },
+   "evaluate": {
+    "operation": "open_synthesis",
+    "competence_type": "argue_critique"
+   },
+   "experiment": {
+    "operation": "empirical_experimental",
+    "competence_type": "plan_experiment"
+   },
+   "interpret": {
+    "operation": "empirical_experimental",
+    "competence_type": "interpret_data",
+    "alt_operation": "rule_based_contextual"
+   },
+   "transfer": {
+    "operation": "by_context",
+    "competence_type": "by_context",
+    "note": "Transfer ist Itemrolle bzw. Transferdimension, keine Operation"
+   }
+  },
+  "open_question": "'by_context' muss je Kompetenz von Autorinnen/Autoren gesetzt werden; der Validator darf es nicht raten"
+ },
+ "evidence_kinds": [
+  {
+   "id": "deterministic_check",
+   "counts_as_competence": "yes_if_contract_met",
+   "source": "deterministic"
+  },
+  {
+   "id": "human_rubric",
+   "counts_as_competence": "yes_labelled_human",
+   "source": "human_rubric",
+   "condition": "Rubrikversion und bewertende Person protokolliert; für Lernbehauptungen Übereinstimmung berichtet",
+   "conflict": "R5-POL-04 (nur deterministic) vs R2-POL-14/R3-POL-11; Auflösungsvorschlag im ADR §4"
+  },
+  {
+   "id": "comparative_judgement",
+   "counts_as_competence": "yes_with_reliability_report",
+   "source": "human_rubric"
+  },
+  {
+   "id": "external_assessment",
+   "counts_as_competence": "track_b_only",
+   "source": "external_assessment"
+  },
+  {
+   "id": "agent_judgement",
+   "counts_as_competence": "never",
+   "source": "agent_judgement"
+  },
+  {
+   "id": "self_report",
+   "counts_as_competence": "never",
+   "source": "self_report"
+  },
+  {
+   "id": "practice_log",
+   "counts_as_competence": "never",
+   "source": "self_report"
+  },
+  {
+   "id": "scheduler_statistic",
+   "counts_as_competence": "never",
+   "source": "none",
+   "policy": "R8-POL-12"
+  },
+  {
+   "id": "benchmark_score",
+   "counts_as_competence": "never",
+   "source": "none",
+   "policy": "R9-POL-05"
+  },
+  {
+   "id": "exposure",
+   "counts_as_competence": "never",
+   "source": "none",
+   "note": "gelesene Seiten, Minuten, Abspielvorgänge, Reglerbewegungen (R1 Messvertrag, R7 Messvertrag)"
+  }
+ ],
+ "assistance_levels": [
+  {
+   "id": "none",
+   "counts_for_state": true
+  },
+  {
+   "id": "hint_n",
+   "counts_for_state": false,
+   "note": "Stufe n < höchste Stufe"
+  },
+  {
+   "id": "hint_bottom_out",
+   "counts_for_state": false,
+   "note": "höchste Stufe; für den Schritt wie solution_seen (R5-POL-06)"
+  },
+  {
+   "id": "solution_seen",
+   "counts_for_state": false,
+   "note": "Item danach für diese Person nicht mehr neu"
+  },
+  {
+   "id": "tutor",
+   "counts_for_state": false,
+   "note": "Tutor-Übergabe zählt als Hilfe (CD-7, R5-POL-04)"
+  },
+  {
+   "id": "unknown",
+   "counts_for_state": false,
+   "note": "fehlender Hilfestatus = assistiert (R5-POL-04)"
+  }
+ ],
+ "assistance_flags": [
+  {
+   "id": "hint_before_attempt",
+   "policy": "R5-POL-08",
+   "effect": "nur Beobachtung im Open Learner Model, nie Sperre oder Personenlabel"
+  }
+ ],
+ "observable_states": [
+  "NOT_ASSESSED",
+  "ASSISTED",
+  "INDEPENDENT_PASS",
+  "RETEST_DUE",
+  "RETAINED_AFTER_ELAPSED_TIME",
+  "INSUFFICIENT_EVIDENCE"
+ ],
+ "observable_state_details": [
+  {
+   "id": "NOT_ASSESSED",
+   "definition": "kein Versuch an einem Item dieser Kompetenz",
+   "engine_today": "NOT_ASSESSED"
+  },
+  {
+   "id": "ASSISTED",
+   "definition": "nur mit Hilfe (Hinweis, Lösung, Tutor) richtig",
+   "engine_today": "ASSISTED"
+  },
+  {
+   "id": "INDEPENDENT_PASS",
+   "definition": "unassistiert richtig an neuem Item, Behalten nicht beobachtet",
+   "engine_today": "INDEPENDENT_PASS"
+  },
+  {
+   "id": "RETEST_DUE",
+   "definition": "unassistierter Erfolg liegt min_elapsed_for_retention zurück, Retest steht aus",
+   "engine_today": "RETEST_DUE"
+  },
+  {
+   "id": "RETAINED_AFTER_ELAPSED_TIME",
+   "definition": "unassistierter Erfolg an anderem neuem Item nach echter verstrichener Zeit",
+   "engine_today": "RETAINED_ON_LATER_DAY"
+  },
+  {
+   "id": "INSUFFICIENT_EVIDENCE",
+   "definition": "unter Mindest-Evidenzmenge (min_unassisted_attempts_for_state)",
+   "engine_today": null
+  }
+ ],
+ "observable_states_source": "R5-POL-01",
+ "engine_state_mapping": {
+  "RETAINED_ON_LATER_DAY": "RETAINED_AFTER_ELAPSED_TIME (Semantik seit CD-2-Fix gleich: >= 20 h, anderes Item)",
+  "INDEPENDENT_PARTIAL": "OPEN: kein R5-Gegenstück (Versuche, keiner richtig); Vorschlag INSUFFICIENT_EVIDENCE, Entscheidung bei M2",
+  "missing": [
+   "INSUFFICIENT_EVIDENCE"
+  ]
+ },
+ "verifier_classes": [
+  "algebraic_oracle_cas",
+  "numeric_single_value",
+  "proof_assistant",
+  "visible_unit_tests",
+  "hidden_or_property_tests",
+  "human_rubric",
+  "comparative_judgement",
+  "llm_judgement",
+  "none",
+  "state_oracle",
+  "runtime_invariant_assertion",
+  "operation_counter",
+  "principle_key",
+  "answer_key_closed_item",
+  "source_version_check",
+  "cad_change_test",
+  "external_human_assessment"
+ ],
+ "verifier_class_details": [
+  {
+   "id": "algebraic_oracle_cas",
+   "checks": "Äquivalenz von Ausdrücken, je Teilschritt",
+   "does_not_check": "Methodenwahl, Begründung; unentscheidbare Äquivalenzen",
+   "competence_evidence": "yes_for_checked_step_if_item_new",
+   "source": "R2-POL-14",
+   "engine_today": "expr.py randomisierte Identität (probabilistisch, 12 Punkte), experience_proof_checks.py exakte Polynomschritte"
+  },
+  {
+   "id": "numeric_single_value",
+   "checks": "ein Zahlenwert innerhalb Toleranz",
+   "does_not_check": "Lösungsmenge, Weg, Einheiten, Vollständigkeit",
+   "competence_evidence": "no_alone",
+   "source": "R2-POL-14; R2-POL-06",
+   "engine_today": "diagnose.py L1, experience.py machine_check (numeric only)"
+  },
+  {
+   "id": "proof_assistant",
+   "checks": "formale Gültigkeit des formalisierten Beweises",
+   "does_not_check": "Papierbeweis, Verständnis, Formalisierungstreue",
+   "competence_evidence": "formal_variant_only",
+   "source": "R2-POL-14; R2-POL-07",
+   "engine_today": "nicht vorhanden"
+  },
+  {
+   "id": "visible_unit_tests",
+   "checks": "Verhalten auf bekannten Fällen",
+   "does_not_check": "Generalisierung, Stil, Begründung",
+   "competence_evidence": "no_feedback_only",
+   "source": "R2-POL-14; R2-POL-13",
+   "engine_today": "nicht vorhanden"
+  },
+  {
+   "id": "hidden_or_property_tests",
+   "checks": "Verhalten auf unbekannten Fällen bzw. Eigenschaften",
+   "does_not_check": "Spezifikationsfehler, Lesbarkeit",
+   "competence_evidence": "yes_for_function_behaviour",
+   "source": "R2-POL-14; R2-POL-13",
+   "engine_today": "nicht vorhanden (Pyodide-Spike offen)"
+  },
+  {
+   "id": "human_rubric",
+   "checks": "Gültigkeit und Vollständigkeit der Begründung",
+   "does_not_check": "Kosten, Rater-Drift",
+   "competence_evidence": "yes_labelled_human",
+   "source": "R2-POL-14; R3-POL-11",
+   "engine_today": "nicht vorhanden"
+  },
+  {
+   "id": "comparative_judgement",
+   "checks": "relative Qualität offener Antworten",
+   "does_not_check": "absolute Schwelle; Reliabilität ist nicht Validität",
+   "competence_evidence": "yes_with_reliability_report",
+   "source": "R2-POL-14; R3-POL-11",
+   "engine_today": "nicht vorhanden"
+  },
+  {
+   "id": "llm_judgement",
+   "checks": "Hinweis auf mögliche Lücken",
+   "does_not_check": "Gültigkeit verlässlich; neigt zu Überbewertung",
+   "competence_evidence": "never",
+   "source": "R2-POL-14; R2-POL-05; R9-POL-05",
+   "engine_today": "diagnose.py L5 -> UNVERIFIED; Tutor-Urteil als Modelleinschätzung"
+  },
+  {
+   "id": "none",
+   "checks": "nichts",
+   "does_not_check": "alles",
+   "competence_evidence": "never_practice_log_only",
+   "source": "R2-POL-14",
+   "engine_today": "diagnose.py L5 open"
+  },
+  {
+   "id": "state_oracle",
+   "checks": "vorhergesagter Zustand nach einem Algorithmusschritt",
+   "does_not_check": "Begründung, Übertragung auf Code, Fehler der Referenz",
+   "competence_evidence": "yes_if_input_new",
+   "source": "R2-POL-14 (§12.3); R2-POL-17",
+   "engine_today": "nicht vorhanden"
+  },
+  {
+   "id": "runtime_invariant_assertion",
+   "checks": "ob eine behauptete Invariante auf erzeugten Eingaben hält",
+   "does_not_check": "Beweis; Güte des Generators",
+   "competence_evidence": "no_refutation_only",
+   "source": "R2-POL-14 (§12.3); R2-POL-18",
+   "engine_today": "nicht vorhanden"
+  },
+  {
+   "id": "operation_counter",
+   "checks": "Operationen bzw. Zeit für endlich viele n",
+   "does_not_check": "asymptotische Aussage, Fallunterscheidung",
+   "competence_evidence": "no",
+   "source": "R2-POL-14 (§12.3); R2-POL-19",
+   "engine_today": "nicht vorhanden"
+  },
+  {
+   "id": "principle_key",
+   "checks": "gewähltes Prinzip bei konsentierten Items",
+   "does_not_check": "Begründung; Mehrprinzip-Aufgaben",
+   "competence_evidence": "no_alone_proxy",
+   "source": "R2-POL-14 (§12.3); R2-POL-20",
+   "engine_today": "nicht vorhanden"
+  },
+  {
+   "id": "answer_key_closed_item",
+   "checks": "Auswahl bzw. Kurzantwort gegen Schlüssel",
+   "does_not_check": "Begründung; Rateanteil",
+   "competence_evidence": "yes_if_item_new",
+   "source": "R2 §3 (geschlossene Items mit Schlüssel)",
+   "engine_today": "diagnose.py L4 choice"
+  },
+  {
+   "id": "source_version_check",
+   "checks": "Existenz des zitierten Spans, Quelle, Fassung, Stichtag",
+   "does_not_check": "inhaltliche Richtigkeit der Subsumtion",
+   "competence_evidence": "no_validity_gate_only",
+   "source": "R3-POL-01; R9-POL-02",
+   "engine_today": "nicht vorhanden (source_status je Strecke)"
+  },
+  {
+   "id": "cad_change_test",
+   "checks": "ob ein Modell Änderungen der Konstruktionsabsicht übersteht",
+   "does_not_check": "Konstruktionsabsicht valide (nur konzeptuell)",
+   "competence_evidence": "partial_unvalidated",
+   "source": "R4-POL-11",
+   "engine_today": "nicht vorhanden"
+  },
+  {
+   "id": "external_human_assessment",
+   "checks": "reale Ausführung am Objekt durch qualifizierte Person mit Instrument",
+   "does_not_check": "Zertifizierung; Reliabilität außerhalb Medizin unbelegt",
+   "competence_evidence": "track_b_only",
+   "source": "R4-POL-01; R4-POL-12",
+   "engine_today": "nicht vorhanden"
+  }
+ ],
+ "verifier_classes_from_R2_POL_14": [
+  "algebraic_oracle_cas",
+  "numeric_single_value",
+  "proof_assistant",
+  "visible_unit_tests",
+  "hidden_or_property_tests",
+  "human_rubric",
+  "comparative_judgement",
+  "llm_judgement",
+  "none",
+  "state_oracle",
+  "runtime_invariant_assertion",
+  "operation_counter",
+  "principle_key"
+ ],
+ "tracks": {
+  "A_knowledge": {
+   "in_product": "trainiert und geprüft nach Messvertrag",
+   "source": "R4-POL-01"
+  },
+  "B_physical_execution": {
+   "in_product": "nur erfasst; Statusänderung ausschließlich durch external_assessment",
+   "source": "R4-POL-01"
+  },
+  "C_certification_and_safety": {
+   "in_product": "nie angezeigt oder abgeleitet",
+   "source": "R4-POL-01"
+  },
+  "rule": "keine Promotion A->B->C durch Produktdaten (Simulator, Video, Foto, Sensor, Selbstauskunft, Sprachmodell)"
+ },
+ "practice_certification_boundary": [
+  {
+   "rule": "Simulations- und Fallergebnisse heißen 'Fallleistung in der Simulation'; keine Kompetenz am realen Patienten, Berufsreife, Zertifizierung oder Rechtsberatung",
+   "policy": "R3-POL-10"
+  },
+  {
+   "rule": "Zwei-Spuren-Modell, keine Promotion durch Produktdaten",
+   "policy": "R4-POL-01"
+  },
+  {
+   "rule": "Simulation und virtuelles Labor nur als Vorbereitung mit Nicht-Transfer-Kennzeichnung",
+   "policy": "R4-POL-07"
+  },
+  {
+   "rule": "Enthaltung bei gefährlichen Verfahren, Verweis auf beaufsichtigte Settings",
+   "policy": "R4-POL-13"
+  },
+  {
+   "rule": "Rechtsaussagen nur mit Quelle, Fassung, Stichtag",
+   "policy": "R3-POL-01"
+  },
+  {
+   "rule": "medizinische Grenze, Weiterverweisung, Datenschutz",
+   "policy": "R1-POL-B12"
+  },
+  {
+   "rule": "Zustände sind keine Zertifikate",
+   "policy": "R5-POL-01"
+  }
+ ],
+ "phases": [
+  "acquisition",
+  "practice",
+  "consolidation"
+ ],
+ "modes": [
+  {
+   "id": "assessment_preparation",
+   "optional": true,
+   "replaces_phase": "final_exam_week",
+   "note": "Prüfungsvorbereitung ist ein optionaler Modus (AD-3); R1-Policies mit Prüfungsbezug (R1-POL-B02, R1-POL-B08, CR-4) gelten nur dort; Policy-Kontexte mit 'final_exam_week' bleiben lesbar"
+  }
+ ],
+ "phase_mapping": {
+  "final_exam_week": "assessment_preparation"
+ },
+ "item_roles": {
+  "practice": [
+   "diagnostic",
+   "prereq_retry",
+   "core",
+   "contrast",
+   "harder"
+  ],
+  "evidence": [
+   "similar",
+   "transfer",
+   "retest",
+   "mock",
+   "evaluation"
+  ],
+  "engine_today": "engine@5ad257d9 learning/experience.py roles (ohne mock/evaluation); tutor.py KEY_WITHHELD_ROLES = similar, transfer, retest",
+  "rule": "Schlüssel von Nachweisrollen nie im Tutor-Brief (CD-7, R9-POL-04); Evaluationsitems nie im Übungspool"
+ },
+ "product_containers": {
+  "values": [
+   "textbook",
+   "workbook",
+   "anki",
+   "interactive"
+  ],
+  "not_applicable": "jeder Container kann NOT_APPLICABLE mit begründetem Fallback sein (AD-0)",
+  "anki_scope": "nur abrufbare Bausteine; einziger Scheduler (R8-POL-01)"
+ },
+ "prerequisites": {
+  "representation": "Kompetenz-ID-Liste je Kompetenz (em-experience-v1, zyklenfrei geprüft)",
+  "status": "kein kursübergreifender Graph (ADR: B verworfen)"
+ },
+ "acceptable_uncertainty": "Jede Aussage im Produkt trägt Evidenzquelle und Prüferklasse; unter Mindest-Evidenzmenge INSUFFICIENT_EVIDENCE; keine Wahrscheinlichkeiten (R5-POL-01, R5-POL-02)"
+}

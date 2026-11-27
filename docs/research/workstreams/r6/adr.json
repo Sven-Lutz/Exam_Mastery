@@ -1,0 +1,1777 @@
+{
+ "schema": "mastery-r6-adr/1",
+ "id": "ADR-R6-001",
+ "title": "Architektur für Mastery nach den Forschungs-Workstreams R0-R9",
+ "date": "2026-11-27",
+ "report": "ARCHITECTURE_SYNTHESIS_ADR.md",
+ "authorship": {
+  "author": "R6-ADR agent (single model, same family as workstream authors)",
+  "independent_review": "pending; red team in parallel (research/r6-red-team-20261127)"
+ },
+ "decision_question": "Welche Architektur trägt die von R1-R9 begründeten Operationen, setzt den gemeinsamen Messvertrag durch und kann bei unzureichender Evidenz abstinieren (AD-2)?",
+ "inputs": [
+  {
+   "id": "R0",
+   "branch": "research/r0-evidence-audit-20261126",
+   "path": "docs/research/workstreams/KB_GAP_AUDIT.md",
+   "commit": "2fbd20314528"
+  },
+  {
+   "id": "R1",
+   "branch": "research/r1-learning-science-20261127",
+   "path": "docs/research/workstreams/R1_LEARNING_SCIENCE.md",
+   "commit": "35598727285f"
+  },
+  {
+   "id": "R2",
+   "branch": "research/r2-formal-quantitative-20261127",
+   "path": "docs/research/workstreams/R2_FORMAL_QUANTITATIVE.md",
+   "commit": "e73c3fe13808"
+  },
+  {
+   "id": "R3",
+   "branch": "research/r3-contextual-reasoning-20261127",
+   "path": "docs/research/workstreams/R3_ARGUMENT_CASE_DIAGNOSIS.md",
+   "commit": "b675dec2efbd"
+  },
+  {
+   "id": "R4",
+   "branch": "research/r4-embodied-20261127",
+   "path": "docs/research/workstreams/R4_EMBODIED_EXPERIMENTAL_DESIGN.md",
+   "commit": "92828609025e"
+  },
+  {
+   "id": "R5",
+   "branch": "research/r5-tutoring-measurement-20261127",
+   "path": "docs/research/workstreams/r5/AI_TUTOR_MEASUREMENT.md",
+   "commit": "4b444c27166d"
+  },
+  {
+   "id": "R7",
+   "branch": "research/r7-resources-20261127",
+   "path": "docs/research/workstreams/R7_RESOURCES_VISUALISATION.md",
+   "commit": "308394aab8f6"
+  },
+  {
+   "id": "R8",
+   "branch": "research/r8-anki-workflows-20261127",
+   "path": "docs/research/workstreams/R8_ANKI_OBSIDIAN_WORKFLOWS.md",
+   "commit": "8d6194b403c2"
+  },
+  {
+   "id": "R9",
+   "branch": "research/r9-tutoring-resources-20261127",
+   "path": "docs/research/workstreams/TUTOR_ADOPTION_DECISION.md",
+   "commit": "c63e00286a73"
+  },
+  {
+   "id": "programme",
+   "branch": "ops/programme-control-20261127",
+   "path": "docs/programme/PROGRAMME_STATE.json",
+   "commit": "bd36f0a331ff"
+  },
+  {
+   "id": "engine",
+   "branch": "fix/tutor-evidence-integrity-20261127",
+   "path": "exam_mastery/learning/",
+   "commit": "5ad257d94d30"
+  }
+ ],
+ "drivers": [
+  {
+   "id": "D1",
+   "text": "einheitlicher Messvertrag über alle Operationen",
+   "locators": [
+    "R1 §5",
+    "R5-POL-04",
+    "R5-POL-05"
+   ]
+  },
+  {
+   "id": "D2",
+   "text": "Prüferdeklaration je Aufgabe und Antwortteil; ohne Prüfer nur Übungsprotokoll",
+   "locators": [
+    "R2-POL-14"
+   ]
+  },
+  {
+   "id": "D3",
+   "text": "Spuren A/B/C, Simulationsgrenze, Sicherheitsenthaltung",
+   "locators": [
+    "R4-POL-01",
+    "R3-POL-10",
+    "R4-POL-13"
+   ]
+  },
+  {
+   "id": "D4",
+   "text": "Anki einziger Scheduler, stabile Identität",
+   "locators": [
+    "R8-POL-01",
+    "R8-POL-02",
+    "AD-1",
+    "CD-8"
+   ]
+  },
+  {
+   "id": "D5",
+   "text": "ein kanonisches Objekt, vier Container, NOT_APPLICABLE mit Fallback",
+   "locators": [
+    "AD-0",
+    "R8-POL-05"
+   ]
+  },
+  {
+   "id": "D6",
+   "text": "deterministische, erklärbare Adaptation mit Regel-ID; keine Wahrscheinlichkeiten",
+   "locators": [
+    "R5-POL-01",
+    "R5-POL-02"
+   ]
+  },
+  {
+   "id": "D7",
+   "text": "Enthaltung als Normalfall",
+   "locators": [
+    "R5-POL-06",
+    "R3-POL-01",
+    "R9-POL-01"
+   ]
+  },
+  {
+   "id": "D8",
+   "text": "offline, 0 bezahlte Aufrufe, reproduzierbar",
+   "locators": [
+    "docs/PRODUCT_CONTRACT.md",
+    "PROGRAMME_STATE.costs_and_limits"
+   ]
+  },
+  {
+   "id": "D9",
+   "text": "Tutor schreibt nie in den Lernstand; kein Schlüssel für Nachweisitems",
+   "locators": [
+    "R9-POL-10",
+    "R9-POL-04",
+    "CD-7"
+   ]
+  },
+  {
+   "id": "D10",
+   "text": "Kontextabhängigkeit parametrisiert und reversibel",
+   "locators": [
+    "R1 §4",
+    "R1-POL-A03"
+   ]
+  },
+  {
+   "id": "D11",
+   "text": "Rückverfolgbarkeit Policy -> Regel -> Version",
+   "locators": [
+    "RESEARCH_FIRST_PROGRAM_20261126.md 'Architectural decision gate'"
+   ]
+  },
+  {
+   "id": "D12",
+   "text": "keine technischen Umbenennungen ohne getestete Migration",
+   "locators": [
+    "AD-3"
+   ]
+  }
+ ],
+ "criteria": [
+  {
+   "id": "learning_relevance",
+   "definition": "Passung zu den domänenübergreifenden Befunden und Treibern (nicht Lernwirkung; keine Option hat Lernevidenz)"
+  },
+  {
+   "id": "verification_coverage",
+   "definition": "Anteil der Operationen/Items, für die ein deklarierter, auditierbarer Prüfer Kompetenzbelege liefern kann, und Durchsetzung von R2-POL-14"
+  },
+  {
+   "id": "technology_complexity",
+   "definition": "Laufzeit- und Codekomplexität (günstig = gering)"
+  },
+  {
+   "id": "operability",
+   "definition": "Betrieb durch einen Owner mit 0 bezahlten Aufrufen, Reproduzierbarkeit, Wiederaufnahme"
+  },
+  {
+   "id": "offline",
+   "definition": "Funktion ohne Netz und ohne Modellzugang"
+  },
+  {
+   "id": "security",
+   "definition": "Prompt-Injection, Werkzeugausführung, Schlüssel-/Lösungsleck, Datenschutz"
+  },
+  {
+   "id": "authoring_cost",
+   "definition": "Aufwand, eine Domäne/Kompetenz in akzeptabler, menschlich geprüfter Qualität hinzuzufügen"
+  },
+  {
+   "id": "maintainability",
+   "definition": "Nachvollziehbarkeit Policy -> Code, Änderungskosten, Drift"
+  },
+  {
+   "id": "migration_cost",
+   "definition": "Aufwand vom Entwurfsstapel (#11-#19, #28, #37, #43) aus (günstig = gering)"
+  }
+ ],
+ "rating_scale": {
+  "values": [
+   "favourable",
+   "mixed",
+   "unfavourable"
+  ],
+  "note": "ordinales Designurteil relativ zu den Treibern; keine Punktzahl, keine Aggregation"
+ },
+ "options": [
+  {
+   "id": "S0",
+   "name": "Status quo des Entwurfsstapels",
+   "summary": "em-experience-v1 + em-track-v1 + em-decision-v1 + em-diagnosis-v1 + Autorenrollen mit Audits zur Build-Zeit; Zustand bei Untätigkeit des Owners."
+  },
+  {
+   "id": "A",
+   "name": "Vorlagen + Domänenpakete",
+   "summary": "Generische Lehrvorlagen plus von Fachleuten erstellte Fachmodule mit Items, Fehlerbibliotheken und Prüfern je Paket."
+  },
+  {
+   "id": "B",
+   "name": "Deklarativer Kompetenzgraph + evidenzkonditionierte Policy-Engine + verifizierte Domänenadapter",
+   "summary": "Vollständiger Graph; generische Regel-Engine wertet Policies deklarativ über Kontext und Evidenz aus; zentrale Prüferadapter."
+  },
+  {
+   "id": "C",
+   "name": "Agentisch komponierte Erfahrungen + unabhängige Auditoren",
+   "summary": "Agenten erzeugen zur Laufzeit je Thema Erklärung, Aufgaben, Visualisierung und Hilfe mit eingeschränkter Werkzeugausführung; Auditor-Agenten prüfen."
+  },
+  {
+   "id": "H-AB",
+   "name": "Evidenzkern mit Vorlagen (Hybrid)",
+   "summary": "Schmaler B-Kern (typisierter Vertrag, Beobachtungsvertrag, Prüferadapter, deterministische Zustandsableitung, Entscheidungsfunktionen mit Regel-IDs ohne Regelsprache) + Vorlagen je Operationsfamilie und Domänenpakete als Daten (A); Agenten nur zur Build-Zeit hinter Gates und menschlicher Prüfung."
+  },
+  {
+   "id": "H-BC",
+   "name": "Kern + Laufzeitkomposition (Hybrid)",
+   "summary": "H-AB-Kern, aber Erfahrungen werden zur Laufzeit agentisch erzeugt und gegen den Kern validiert."
+  }
+ ],
+ "assessments": [
+  {
+   "option": "S0",
+   "criterion": "learning_relevance",
+   "rating": "mixed",
+   "reason": "Regeln teilweise passend (Hilfe zählt, verzögertes Behalten nach CD-2-Fix), aber Engine-Operationen (18 Verben) entsprechen nicht der Charter-Taxonomie und Spec-Zahlen wirken als Regeln.",
+   "locators": [
+    "engine@5ad257d9 learning/experience.py OPERATIONS/MODES",
+    "engine@5ad257d9 learning/policy.py R0-RE",
+    "CD-4",
+    "R1 §2"
+   ],
+   "unknowns": [
+    "ob die heutigen Regeln RA-RE in irgendeiner Domäne Lernen beeinflussen (NOT_RUN)"
+   ]
+  },
+  {
+   "option": "S0",
+   "criterion": "verification_coverage",
+   "rating": "unfavourable",
+   "reason": "Bewertungsprüfer in Einheiten nur numerisch (machine_check) plus exakte Polynomschritte; keine Prüferdeklaration je Item; offene Antworten korrekt UNVERIFIED.",
+   "locators": [
+    "engine@5ad257d9 learning/experience.py machine_check",
+    "engine@5ad257d9 learning/diagnose.py L1-L5",
+    "R2-POL-14"
+   ],
+   "unknowns": [
+    "Fehlerrate der randomisierten Identitätsprüfung in expr.py bei realen Ausdrücken"
+   ]
+  },
+  {
+   "option": "S0",
+   "criterion": "technology_complexity",
+   "rating": "mixed",
+   "reason": "existiert, aber groß und mit Python/JS-Spiegelung derselben Logik.",
+   "locators": [
+    "engine@5ad257d9 learning/interactive_reference.py",
+    "engine@5ad257d9 learning/policy.py 'Mirrors templates/em_tutor.js'"
+   ],
+   "unknowns": [
+    "Umfang der JS-Parität außerhalb von kc_status"
+   ]
+  },
+  {
+   "option": "S0",
+   "criterion": "operability",
+   "rating": "mixed",
+   "reason": "Publizieren offline und atomar; Autorenläufe brauchen Modellzugang; Produkte HUMAN_REJECTED.",
+   "locators": [
+    "PROGRAMME_STATE.product_quality",
+    "PROGRAMME_STATE.engine_capabilities"
+   ],
+   "unknowns": [
+    "Laufzeit- und Tokenkosten je akzeptierter Einheit (nicht gemessen)"
+   ]
+  },
+  {
+   "option": "S0",
+   "criterion": "offline",
+   "rating": "favourable",
+   "reason": "Produkte offline; Tutor-Übergabe ohne Modellaufruf.",
+   "locators": [
+    "engine@5ad257d9 learning/tutor.py docstring",
+    "docs/PRODUCT_CONTRACT.md"
+   ],
+   "unknowns": [
+    "Offline-Verhalten der Code-Werkbank (Pyodide nicht geprüft)"
+   ]
+  },
+  {
+   "option": "S0",
+   "criterion": "security",
+   "rating": "mixed",
+   "reason": "CD-7 nur im Entwurfs-PR #43 behoben; Quelltext als untrusted behandelt; Autorenrollen verarbeiten Quelltext zur Build-Zeit.",
+   "locators": [
+    "CD-7",
+    "engine@5ad257d9 learning/tutor.py KEY_WITHHELD_ROLES",
+    "CLAUDE.md 'Source text is untrusted'"
+   ],
+   "unknowns": [
+    "Prompt-Injection-Robustheit der Autorenrollen (nicht getestet)"
+   ]
+  },
+  {
+   "option": "S0",
+   "criterion": "authoring_cost",
+   "rating": "unfavourable",
+   "reason": "Golden References sitzungskuratiert; generalisierbare Autorenqualität unbelegt; historische Produkte abgelehnt.",
+   "locators": [
+    "CD-5",
+    "R0 §6 'Historische menschliche Evidenz'",
+    "PROGRAMME_STATE.product_quality"
+   ],
+   "unknowns": [
+    "Aufwand je akzeptierter Kompetenz"
+   ]
+  },
+  {
+   "option": "S0",
+   "criterion": "maintainability",
+   "rating": "mixed",
+   "reason": "Regel-IDs stabil und in Tests; unmerged Stapel driftet von main.",
+   "locators": [
+    "CD-6",
+    "engine@5ad257d9 learning/policy.py"
+   ],
+   "unknowns": [
+    "Konfliktumfang beim Merge"
+   ]
+  },
+  {
+   "option": "S0",
+   "criterion": "migration_cost",
+   "rating": "favourable",
+   "reason": "keine Migration, trägt aber CD-4, CD-5, CD-6, CD-8.",
+   "locators": [
+    "CD-4",
+    "CD-5",
+    "CD-6",
+    "CD-8"
+   ],
+   "unknowns": [
+    "keine"
+   ]
+  },
+  {
+   "option": "A",
+   "criterion": "learning_relevance",
+   "rating": "mixed",
+   "reason": "Vorlagen können die R1-Sequenz je Operationsfamilie kodieren; Kontextbedingungen und Messvertrag würden aber je Vorlage dupliziert; Risiko der verbotenen Universalpipeline.",
+   "locators": [
+    "R1 §4",
+    "RESEARCH_FIRST_PROGRAM_20261126.md 'Design restriction'",
+    "R1-POL-A02",
+    "R1-POL-A03"
+   ],
+   "unknowns": [
+    "ob Vorlagen-Sequenzen statischen Folgen überlegen sind (U1)"
+   ]
+  },
+  {
+   "option": "A",
+   "criterion": "verification_coverage",
+   "rating": "mixed",
+   "reason": "Pakete können Prüfer deklarieren, Durchsetzung hängt aber von Paketdisziplin ab; der R2-POL-14-Falsifikator (deklariert ungleich geprüft) bleibt ungeschützt.",
+   "locators": [
+    "R2-POL-14",
+    "R2 §4"
+   ],
+   "unknowns": [
+    "Abweichungsrate deklarierter Prüfer (kein Audit)"
+   ]
+  },
+  {
+   "option": "A",
+   "criterion": "technology_complexity",
+   "rating": "favourable",
+   "reason": "keine Laufzeitagenten, kein Interpreter.",
+   "locators": [
+    "R7 §1 Nr. 3 (vorhandene Labs)"
+   ],
+   "unknowns": [
+    "Wachstum der Vorlagenzahl"
+   ]
+  },
+  {
+   "option": "A",
+   "criterion": "operability",
+   "rating": "favourable",
+   "reason": "deterministisch, offline, ohne Budget.",
+   "locators": [
+    "docs/PRODUCT_CONTRACT.md"
+   ],
+   "unknowns": [
+    "keine"
+   ]
+  },
+  {
+   "option": "A",
+   "criterion": "offline",
+   "rating": "favourable",
+   "reason": "statisch erzeugte Produkte.",
+   "locators": [
+    "docs/PRODUCT_CONTRACT.md"
+   ],
+   "unknowns": [
+    "keine"
+   ]
+  },
+  {
+   "option": "A",
+   "criterion": "security",
+   "rating": "favourable",
+   "reason": "keine Laufzeitausführung fremder Instruktionen.",
+   "locators": [
+    "R5-POL-06"
+   ],
+   "unknowns": [
+    "Build-Zeit-Autorenhilfe, falls genutzt"
+   ]
+  },
+  {
+   "option": "A",
+   "criterion": "authoring_cost",
+   "rating": "unfavourable",
+   "reason": "Fachleute je Domänenpaket nötig, besonders Recht und Klinik; Kosten unbekannt.",
+   "locators": [
+    "R3-POL-11",
+    "R4-POL-12",
+    "CD-5"
+   ],
+   "unknowns": [
+    "Aufwand je Paket (U2)",
+    "Verfügbarkeit von Fachleuten"
+   ]
+  },
+  {
+   "option": "A",
+   "criterion": "maintainability",
+   "rating": "mixed",
+   "reason": "Policy-Änderungen verteilen sich über viele Vorlagen; Rückverfolgbarkeit nur mit eingebetteten Regel-IDs.",
+   "locators": [
+    "RESEARCH_FIRST_PROGRAM_20261126.md 'traceable rule versions'"
+   ],
+   "unknowns": [
+    "Zahl der Vorlagen, ab der Duplikation kippt"
+   ]
+  },
+  {
+   "option": "A",
+   "criterion": "migration_cost",
+   "rating": "mixed",
+   "reason": "Strecken (em-track-v1) und Labs ähneln Paketen und Vorlagen; Messvertrag müsste je Vorlage nachgezogen werden.",
+   "locators": [
+    "engine@5ad257d9 learning/tracks.py",
+    "R7 §1 Nr. 3"
+   ],
+   "unknowns": [
+    "keine Schätzung möglich"
+   ]
+  },
+  {
+   "option": "B",
+   "criterion": "learning_relevance",
+   "rating": "mixed",
+   "reason": "Struktur Operation x Kontext x Evidenz passt zu R1 §4; aber 77 von 116 Policies sind low/very_low, als Engine-Regeln erzeugten sie Scheinpräzision; Voraussetzungsgraphen nicht belegt.",
+   "locators": [
+    "r6/policy_index.json (Zählung)",
+    "R1 §4",
+    "R5 §1 Nr. 7",
+    "R9 §2 Math Academy defer"
+   ],
+   "unknowns": [
+    "wie viele Kontextbedingungen tatsächlich nötig sind (U4)"
+   ]
+  },
+  {
+   "option": "B",
+   "criterion": "verification_coverage",
+   "rating": "favourable",
+   "reason": "zentrale Adapter und einheitliche Zustandsableitung setzen R2-POL-14 und R5-POL-04 durch.",
+   "locators": [
+    "R2-POL-14",
+    "R5-POL-04"
+   ],
+   "unknowns": [
+    "Reliabilität menschlicher Prüfer (U3)"
+   ]
+  },
+  {
+   "option": "B",
+   "criterion": "technology_complexity",
+   "rating": "unfavourable",
+   "reason": "generische Regelsprache, Graphwerkzeuge, versionierte Regelsätze, doppelte Implementierung im Browser.",
+   "locators": [
+    "engine@5ad257d9 learning/policy.py 'Mirrors templates/em_tutor.js'"
+   ],
+   "unknowns": [
+    "Größe eines minimalen Interpreters"
+   ]
+  },
+  {
+   "option": "B",
+   "criterion": "operability",
+   "rating": "mixed",
+   "reason": "deterministisch und offline, aber Fehlersuche in Regelsätzen und Graphpflege lasten auf einer Person.",
+   "locators": [
+    "PROGRAMME_STATE.costs_and_limits"
+   ],
+   "unknowns": [
+    "Pflegeaufwand"
+   ]
+  },
+  {
+   "option": "B",
+   "criterion": "offline",
+   "rating": "favourable",
+   "reason": "deterministisch auswertbar.",
+   "locators": [
+    "R5-POL-02"
+   ],
+   "unknowns": [
+    "keine"
+   ]
+  },
+  {
+   "option": "B",
+   "criterion": "security",
+   "rating": "favourable",
+   "reason": "keine Laufzeitagenten.",
+   "locators": [
+    "R5-POL-02"
+   ],
+   "unknowns": [
+    "keine"
+   ]
+  },
+  {
+   "option": "B",
+   "criterion": "authoring_cost",
+   "rating": "unfavourable",
+   "reason": "vollständiger Graph mit Voraussetzungen und Interaktionen je Kurs; Qualität solcher Graphen unbelegt.",
+   "locators": [
+    "R9 §2 (Math Academy: Voraussetzungsgraph an R6/R8 übergeben)"
+   ],
+   "unknowns": [
+    "Aufwand und Fehlerrate von Voraussetzungsgraphen"
+   ]
+  },
+  {
+   "option": "B",
+   "criterion": "maintainability",
+   "rating": "mixed",
+   "reason": "gute Rückverfolgbarkeit, aber der Interpreter selbst ist Wartungslast.",
+   "locators": [
+    "RESEARCH_FIRST_PROGRAM_20261126.md"
+   ],
+   "unknowns": [
+    "Lebensdauer einer eigenen Regelsprache"
+   ]
+  },
+  {
+   "option": "B",
+   "criterion": "migration_cost",
+   "rating": "unfavourable",
+   "reason": "Regeln R0-RE aus Code in deklarative Form überführen und im JS-Spiegel nachbauen.",
+   "locators": [
+    "engine@5ad257d9 learning/policy.py",
+    "engine@5ad257d9 templates/em_tutor.js"
+   ],
+   "unknowns": [
+    "Paritätsaufwand (U5)"
+   ]
+  },
+  {
+   "option": "C",
+   "criterion": "learning_relevance",
+   "rating": "unfavourable",
+   "reason": "keine Evidenz für agentisch komponierte Erfahrungen; generierte Hinweise fielen zu 32 % durch die QA; Modellbewertungen überbewerten; RAG-Rechtsprodukte halluzinierten; historische Produkte abgelehnt.",
+   "locators": [
+    "R5 §1 Nr. 8",
+    "R2 §1 Nr. 5",
+    "R3 §1 Nr. 4",
+    "PROGRAMME_STATE.product_quality"
+   ],
+   "unknowns": [
+    "Qualität aktueller Modelle für Autorenschaft unter Gates"
+   ]
+  },
+  {
+   "option": "C",
+   "criterion": "verification_coverage",
+   "rating": "unfavourable",
+   "reason": "jedes Laufzeitartefakt bräuchte einen eigenen Prüfer; Auditoren liefern agent_judgement, nie Kompetenzbelege.",
+   "locators": [
+    "R2-POL-05",
+    "R9-POL-05",
+    "R3-POL-11"
+   ],
+   "unknowns": [
+    "Übereinstimmung Auditor-Mensch in diesen Domänen"
+   ]
+  },
+  {
+   "option": "C",
+   "criterion": "technology_complexity",
+   "rating": "unfavourable",
+   "reason": "Agentenorchestrierung, Werkzeug-Sandbox, Validierungsschleifen zur Laufzeit.",
+   "locators": [
+    "R9 §4 Alternative 1/2"
+   ],
+   "unknowns": [
+    "keine Messung"
+   ]
+  },
+  {
+   "option": "C",
+   "criterion": "operability",
+   "rating": "unfavourable",
+   "reason": "Budget für bezahlte Aufrufe ist 0; nicht deterministisch; Modellwechsel ändern Ergebnisse.",
+   "locators": [
+    "PROGRAMME_STATE.costs_and_limits",
+    "R9 §4"
+   ],
+   "unknowns": [
+    "Kosten je Sitzung"
+   ]
+  },
+  {
+   "option": "C",
+   "criterion": "offline",
+   "rating": "unfavourable",
+   "reason": "Komposition braucht Modellzugang.",
+   "locators": [
+    "R5 §4 Option C"
+   ],
+   "unknowns": [
+    "lokale Modelle nicht recherchiert (R5 open_research)"
+   ]
+  },
+  {
+   "option": "C",
+   "criterion": "security",
+   "rating": "unfavourable",
+   "reason": "Prompt-Injection aus untrusted Quelltext, Werkzeugausführung, Leck von Lösungen an Anbieter.",
+   "locators": [
+    "R5 §8 adversarialer Fall",
+    "CD-7",
+    "R9-POL-04"
+   ],
+   "unknowns": [
+    "Robustheit gegen Injection"
+   ]
+  },
+  {
+   "option": "C",
+   "criterion": "authoring_cost",
+   "rating": "mixed",
+   "reason": "geringe Erzeugungskosten, aber hohe menschliche Prüfkosten je Artefakt.",
+   "locators": [
+    "R3-POL-11",
+    "CD-5"
+   ],
+   "unknowns": [
+    "Prüfaufwand je Artefakt (U2)"
+   ]
+  },
+  {
+   "option": "C",
+   "criterion": "maintainability",
+   "rating": "unfavourable",
+   "reason": "Modelldrift, nicht reproduzierbare Ausgaben.",
+   "locators": [
+    "R2 §13 (Modelle 2025/26)"
+   ],
+   "unknowns": [
+    "keine"
+   ]
+  },
+  {
+   "option": "C",
+   "criterion": "migration_cost",
+   "rating": "mixed",
+   "reason": "Autorenrollen existieren; Laufzeitkomposition, Sandbox und Auditkette wären neu.",
+   "locators": [
+    "engine@5ad257d9 prompts/"
+   ],
+   "unknowns": [
+    "keine Schätzung"
+   ]
+  },
+  {
+   "option": "H-AB",
+   "criterion": "learning_relevance",
+   "rating": "favourable",
+   "reason": "relativ günstig: harter Kern genau dort, wo die Workstreams übereinstimmen (Messvertrag, Prüfer, Enthaltung); schwach belegte Sequenzen bleiben parametrisiert und reversibel. Keine Wirkung belegt.",
+   "locators": [
+    "R1 §5",
+    "R2-POL-14",
+    "R5-POL-01",
+    "R5-POL-04",
+    "R1-POL-A03"
+   ],
+   "unknowns": [
+    "ob irgendeine Sequenzierung besser als statisch ist (U1; MCS)"
+   ]
+  },
+  {
+   "option": "H-AB",
+   "criterion": "verification_coverage",
+   "rating": "favourable",
+   "reason": "für deterministische Operationen (Abruf, symbolisch, Code-Verhalten, geschlossene Beweis-Items) günstig; sonst ehrlich 'Mensch' oder 'keiner' statt Scheinbeleg; Abdeckung dadurch klein.",
+   "locators": [
+    "R2 §3",
+    "R2 §4",
+    "R3 §7",
+    "R4 §3"
+   ],
+   "unknowns": [
+    "Ergebnisse des Prüferaudits G3",
+    "Reliabilität menschlicher Bewertung (U3)"
+   ]
+  },
+  {
+   "option": "H-AB",
+   "criterion": "technology_complexity",
+   "rating": "mixed",
+   "reason": "zusätzliche Schemas und eine Prüferregistry, aber keine Regelsprache und keine Laufzeitagenten.",
+   "locators": [
+    "engine@5ad257d9 learning/experience.py",
+    "engine@5ad257d9 learning/diagnose.py"
+   ],
+   "unknowns": [
+    "Paritätsaufwand Python/JS (U5)"
+   ]
+  },
+  {
+   "option": "H-AB",
+   "criterion": "operability",
+   "rating": "favourable",
+   "reason": "deterministisch, offline, 0 bezahlte Aufrufe für Betrieb; Build-Zeit-Autorenhilfe optional.",
+   "locators": [
+    "PROGRAMME_STATE.costs_and_limits"
+   ],
+   "unknowns": [
+    "Autorenläufe brauchen weiterhin Modellzugang oder Menschen"
+   ]
+  },
+  {
+   "option": "H-AB",
+   "criterion": "offline",
+   "rating": "favourable",
+   "reason": "wie heutige Produkte.",
+   "locators": [
+    "docs/PRODUCT_CONTRACT.md"
+   ],
+   "unknowns": [
+    "Pyodide offline ungeprüft (G7)"
+   ]
+  },
+  {
+   "option": "H-AB",
+   "criterion": "security",
+   "rating": "favourable",
+   "reason": "kein Laufzeitagent; Tutor nur über portablen Vertrag mit Leck-Check; Quelltext untrusted.",
+   "locators": [
+    "R9-POL-03",
+    "R9-POL-04",
+    "R5-POL-06"
+   ],
+   "unknowns": [
+    "Robustheit des Leck-Checks gegen umformulierte Lösungen"
+   ]
+  },
+  {
+   "option": "H-AB",
+   "criterion": "authoring_cost",
+   "rating": "mixed",
+   "reason": "Vorlagen senken Strukturkosten; Inhalt bleibt Fach- und Prüfarbeit; ohne Budget für unabhängige Autorschaft keine Belege außerhalb deterministischer Operationen.",
+   "locators": [
+    "CD-5",
+    "R3-POL-11",
+    "OD-13b"
+   ],
+   "unknowns": [
+    "Aufwand je Kompetenz (U2)"
+   ]
+  },
+  {
+   "option": "H-AB",
+   "criterion": "maintainability",
+   "rating": "mixed",
+   "reason": "Regeln tragen Policy-IDs, Parameter in einer Datei; Python/JS-Parität bleibt Fehlerquelle; Etikettierung ist kein Umsetzungsbeleg.",
+   "locators": [
+    "engine@5ad257d9 learning/policy.py",
+    "CD-4"
+   ],
+   "unknowns": [
+    "Pflegekosten der Parität"
+   ]
+  },
+  {
+   "option": "H-AB",
+   "criterion": "migration_cost",
+   "rating": "favourable",
+   "reason": "erweitert vorhandene Verträge (em-experience-v1, em-decision-v1, em-diagnosis-v1, em-practice-evidence-v1) rückwärtskompatibel; keine Umbenennung.",
+   "locators": [
+    "engine@5ad257d9 learning/experience.py",
+    "engine@5ad257d9 learning/experience_evidence.py",
+    "AD-3"
+   ],
+   "unknowns": [
+    "Konflikte beim Merge des Stapels"
+   ]
+  },
+  {
+   "option": "H-BC",
+   "criterion": "learning_relevance",
+   "rating": "mixed",
+   "reason": "Kern passt, Laufzeitinhalt ungeprüft und ohne Evidenz.",
+   "locators": [
+    "R5 §1 Nr. 8",
+    "R2 §1 Nr. 5"
+   ],
+   "unknowns": [
+    "wie C"
+   ]
+  },
+  {
+   "option": "H-BC",
+   "criterion": "verification_coverage",
+   "rating": "mixed",
+   "reason": "Kern setzt Prüfer durch, aber Laufzeitartefakte brauchen je eigene Prüfer.",
+   "locators": [
+    "R2-POL-14"
+   ],
+   "unknowns": [
+    "Abdeckung generierter Items"
+   ]
+  },
+  {
+   "option": "H-BC",
+   "criterion": "technology_complexity",
+   "rating": "unfavourable",
+   "reason": "Kern plus Agentenlaufzeit.",
+   "locators": [
+    "R9 §4"
+   ],
+   "unknowns": [
+    "keine Messung"
+   ]
+  },
+  {
+   "option": "H-BC",
+   "criterion": "operability",
+   "rating": "unfavourable",
+   "reason": "Budget 0; nicht deterministisch.",
+   "locators": [
+    "PROGRAMME_STATE.costs_and_limits"
+   ],
+   "unknowns": [
+    "Kosten je Sitzung"
+   ]
+  },
+  {
+   "option": "H-BC",
+   "criterion": "offline",
+   "rating": "unfavourable",
+   "reason": "Komposition braucht Modellzugang.",
+   "locators": [
+    "R5 §4 Option C"
+   ],
+   "unknowns": [
+    "lokale Modelle"
+   ]
+  },
+  {
+   "option": "H-BC",
+   "criterion": "security",
+   "rating": "unfavourable",
+   "reason": "Injection- und Leckrisiken wie C.",
+   "locators": [
+    "CD-7",
+    "R5-POL-06"
+   ],
+   "unknowns": [
+    "keine"
+   ]
+  },
+  {
+   "option": "H-BC",
+   "criterion": "authoring_cost",
+   "rating": "mixed",
+   "reason": "wie C.",
+   "locators": [
+    "R3-POL-11"
+   ],
+   "unknowns": [
+    "Prüfaufwand"
+   ]
+  },
+  {
+   "option": "H-BC",
+   "criterion": "maintainability",
+   "rating": "unfavourable",
+   "reason": "Modelldrift zusätzlich zur Kernpflege.",
+   "locators": [
+    "R2 §13"
+   ],
+   "unknowns": [
+    "keine"
+   ]
+  },
+  {
+   "option": "H-BC",
+   "criterion": "migration_cost",
+   "rating": "unfavourable",
+   "reason": "Kern plus Laufzeitinfrastruktur neu.",
+   "locators": [
+    "engine@5ad257d9 prompts/"
+   ],
+   "unknowns": [
+    "keine Schätzung"
+   ]
+  }
+ ],
+ "cross_option_unknowns": [
+  {
+   "id": "U1",
+   "text": "ob irgendeine Sequenzierung messbar besser ist als eine statische Folge"
+  },
+  {
+   "id": "U2",
+   "text": "Autorenkosten je Kompetenz bei akzeptabler, menschlich geprüfter Qualität"
+  },
+  {
+   "id": "U3",
+   "text": "Reliabilität menschlicher Bewertung für Recht, Beweis und offene Synthese in diesem Produkt"
+  },
+  {
+   "id": "U4",
+   "text": "wie viele Kontextbedingungen nötig sind (entscheidet, ob eine Regelsprache je gerechtfertigt ist)"
+  },
+  {
+   "id": "U5",
+   "text": "Umfang des Python/JS-Paritätsaufwands"
+  },
+  {
+   "id": "U6",
+   "text": "Verhalten der Anki-Mobilclients beim Import"
+  }
+ ],
+ "proposed_decision": {
+  "option": "H-AB",
+  "status": "PROPOSED",
+  "decided_by": null,
+  "decided_on": null,
+  "note": "Nur der Owner kann annehmen, ändern oder verwerfen (G0). Agenten setzen nie ACCEPTED.",
+  "components": [
+   {
+    "id": "K1",
+    "name": "semantischer Vertrag",
+    "necessity": [
+     "D2",
+     "D3",
+     "D5",
+     "D7"
+    ],
+    "exists_today": "em-experience-v1"
+   },
+   {
+    "id": "K2",
+    "name": "Evidenzkern",
+    "necessity": [
+     "D1",
+     "D6",
+     "D9"
+    ],
+    "exists_today": "policy.kc_status, experience_evidence"
+   },
+   {
+    "id": "K3",
+    "name": "Prüferadapter",
+    "necessity": [
+     "D2"
+    ],
+    "exists_today": "diagnose.py L1-L5, expr.py, experience_proof_checks.py"
+   },
+   {
+    "id": "K4",
+    "name": "Entscheidungsfunktionen mit Regel- und Policy-IDs, ohne Regelsprache",
+    "necessity": [
+     "D6",
+     "D10",
+     "D11"
+    ],
+    "exists_today": "policy.decide R0-RE"
+   },
+   {
+    "id": "K5",
+    "name": "Vorlagen je Operationsfamilie als Daten",
+    "necessity": [
+     "D5",
+     "D10"
+    ],
+    "exists_today": "labs/pedagogy.py, tracks.py"
+   },
+   {
+    "id": "K6",
+    "name": "Domänenpakete als Daten; Agenten nur zur Build-Zeit hinter Gates und menschlicher Prüfung",
+    "necessity": [
+     "D7",
+     "D8"
+    ],
+    "exists_today": "prompts/ (Autorenrollen), em-track-v1"
+   }
+  ],
+  "excluded": [
+   "generische Policy-Engine oder Regelsprache",
+   "vollständiger kursübergreifender Kompetenzgraph",
+   "Knowledge Tracing oder Wahrscheinlichkeiten (R5-POL-02 nur Schattenbetrieb)",
+   "eigener Scheduler (AD-1)",
+   "Laufzeitagent",
+   "eingebettete Fremdsysteme (R9-POL-07)",
+   "AnkiConnect (R8-POL-14)",
+   "Dashboards über das Open Learner Model hinaus (R5-POL-11)"
+  ],
+  "risks": [
+   "R-1: Inhaltsqualität bleibt Autoren- und Prüfproblem (CD-5)",
+   "R-2: Python/JS-Parität als Fehlerquelle",
+   "R-3: faktische Verengung auf deterministisch prüfbare Operationen, wenn nicht als Phasenfolge ausgewiesen (AD-3)",
+   "R-4: Policy-ID-Etiketten an Regeln täuschen Umsetzungsnähe vor",
+   "R-5: Nähe zum Status quo als Bestätigung früherer Arbeit missverstanden"
+  ]
+ },
+ "rejected_options": [
+  {
+   "option": "S0",
+   "reasons": [
+    "trägt CD-4, CD-5, CD-6, CD-8",
+    "keine Prüferdeklaration",
+    "Engine-Operationen ungleich Charter-Taxonomie",
+    "erlaubt keine ehrliche Lernbehauptung"
+   ],
+   "reconsider_if": "nicht anwendbar; Ausgangspunkt der Migration"
+  },
+  {
+   "option": "A",
+   "reasons": [
+    "Messvertrag und Prüferpflicht je Vorlage dupliziert und nicht zentral durchgesetzt",
+    "R2-POL-14-Falsifikator ungeschützt"
+   ],
+   "reconsider_if": "nie allein; Bestandteil von H-AB"
+  },
+  {
+   "option": "B",
+   "reasons": [
+    "Regelsprache und vollständiger Graph ohne konkrete Notwendigkeit: 0 high, 14 moderate von 116, alle NOT_RUN",
+    "Voraussetzungsgraph zurückgestellt (R9 §2)"
+   ],
+   "reconsider_if": "nach G6 verlangen evaluierte Policies Kontextbedingungen, die K4 nur durch Code-Duplizierung ausdrücken kann, oder ein Review zeigt, dass K4 nicht mehr prüfbar ist"
+  },
+  {
+   "option": "C",
+   "reasons": [
+    "Budget 0, nicht offline, nicht reproduzierbar",
+    "Auditoren liefern nur agent_judgement (R2-POL-05, R9-POL-05)",
+    "Prompt-Injection aus untrusted Quelltext",
+    "historische Produkte HUMAN_REJECTED"
+   ],
+   "reconsider_if": "vorab registrierte Evaluation zeigt Nicht-Unterlegenheit agentisch komponierter Strecken bei verzögertem unassistiertem Transfer, menschliche Inhaltsprüfung lehnt nicht ab, Budget freigegeben"
+  },
+  {
+   "option": "H-BC",
+   "reasons": [
+    "erbt Laufzeitnachteile von C",
+    "Validierung gegen den Kern ist zur Build-Zeit möglich (H-AB)"
+   ],
+   "reconsider_if": "wie C"
+  }
+ ],
+ "cannot_claim": [
+  "Lernwirkung eines Produkts, einer Policy oder der Architektur (116/116 NOT_RUN; CD-1)",
+  "Benchmark-, Judge-, Präferenz- oder Rubrikwerte eines Modells als Lernergebnis (R9-POL-05)",
+  "Scheduler-Kennzahlen, FSRS oder Kartenstatistik als Kompetenz oder Lernen (R8-POL-12)",
+  "Simulations-, VR-, Video- oder Fallleistung als Praxiskompetenz (R3-POL-10, R4-POL-01, R4-POL-07)",
+  "jede Zertifizierung; Zustände sind keine Zertifikate (R4-POL-01, R5-POL-01)",
+  "Mastery-Wahrscheinlichkeit, Prozentwert oder 'gemeistert' ohne verzögerten unassistierten Beleg (R5-POL-01)",
+  "Rechtsberatung, Behandlungs- oder Dosierungsempfehlung (R3-POL-01, R3-POL-10, R1-POL-B12)",
+  "Unschädlichkeit des Leitplanken-Tutors (CD-3)",
+  "Fehlkonzeptdiagnose einer Person (R5-POL-09)",
+  "empirisch kalibrierte Parameter (CD-4)",
+  "Neuro-, Kognitions- oder Wohlbefindenseffekte auf Leistung (R1-POL-B09, R1-POL-B11)",
+  "'ohne jede Hilfe' statt 'ohne sichtbare Hilfe'",
+  "die Architekturbewertung als Messung"
+ ],
+ "migration_path": [
+  {
+   "step": "M0",
+   "content": "CD-8-Fix (Anki-Exportidentität) als eigener Entwurfs-PR; Hygiene nach OD-20",
+   "requires_gate": "none (architekturunabhängig)",
+   "verifiable_by": "Importtests in Wegwerfsammlung (R8-POL-08)"
+  },
+  {
+   "step": "M1",
+   "content": "Charter-operation und competence_type neben Engine-Vokabular in em-experience-v1, rückwärtskompatibel",
+   "requires_gate": "G1",
+   "verifiable_by": "Validator-Tests alt/neu"
+  },
+  {
+   "step": "M2",
+   "content": "Ereignisse nach observation_contract_v1; kc_status auf R5-Vokabular abbilden",
+   "requires_gate": "G1",
+   "verifiable_by": "G2-Fixture-Suite, Python/JS-Parität"
+  },
+  {
+   "step": "M3",
+   "content": "Prüferdeklaration je Item; Item ohne Prüfer nur Übung",
+   "requires_gate": "G2",
+   "verifiable_by": "G3-Audit"
+  },
+  {
+   "step": "M4",
+   "content": "Vorlagen für Verfahren und Abruf",
+   "requires_gate": "G2",
+   "verifiable_by": "Vorlagen-Validator"
+  },
+  {
+   "step": "M5",
+   "content": "MCS-Inhalt in einem Thema",
+   "requires_gate": "G3",
+   "verifiable_by": "G4"
+  },
+  {
+   "step": "M6",
+   "content": "Evaluation: innerhalb-Person-Randomisierung je Kompetenz, Präregistrierung, unabhängige Items",
+   "requires_gate": "G4",
+   "verifiable_by": "G5"
+  }
+ ],
+ "minimum_credible_system": {
+  "claim_under_test": "Adaptive Strecke des interaktiven Produkts vs. statische Workbook-Sequenz mit denselben Worked Examples und Aufgaben bei gleicher Zeit: unassistierte Leistung an neuen, unabhängig verfassten isomorphen und Transferitems nach >= 7 Tagen echter verstrichener Zeit, mindestens vorab registrierte Mindestdifferenz",
+  "secondary": "prädiktive Validität von RETAINED_AFTER_ELAPSED_TIME gegenüber INDEPENDENT_PASS (R5-POL-01 Falsifikator)",
+  "design": "innerhalb einer Person, Kompetenzen randomisiert zu Bedingungen, gegenbalanciert, Seed vor Exposition committet; Bedingung nicht verblindbar (offengelegt); Gruppen nach R5-POL-05",
+  "operations": [
+   "symbolic_procedure",
+   "recall_discrimination"
+  ],
+  "manipulated_product": "interactive",
+  "constant_products": [
+   "textbook",
+   "anki",
+   "workbook (gleiche Items, Kontrollbedingung)"
+  ],
+  "verifiers": [
+   "numeric_single_value (nur mit Einheit und als Teilprüfung)",
+   "algebraic_oracle_cas",
+   "answer_key_closed_item"
+  ],
+  "excluded": [
+   "formal_proof construction",
+   "rule_based_contextual",
+   "diagnostic_reasoning",
+   "open_synthesis",
+   "embodied_psychomotor",
+   "spatial_design",
+   "empirical_experimental",
+   "computational_construction (Code-Werkbank)",
+   "LLM-Tutor in den Armen",
+   "Knowledge Tracing",
+   "Obsidian",
+   "AnkiConnect",
+   "Mobilclients",
+   "Marke Phase C",
+   "Kursmaterial-Ingestion",
+   "Dashboards",
+   "Zertifizierung"
+  ],
+  "independence": "Testitems von einer nicht an der Produkterstellung beteiligten Person; Parallelform-Äquivalenz im Pilot; deterministische Bewertung",
+  "without_independent_items": "MCS endet bei G4 mit 'Lernwirkung nicht gemessen'",
+  "allowed_statements": "nur die vorab formulierte, auf Person/Gruppe, Kompetenzen und Verzögerung beschränkte Aussage oder 'nicht gezeigt'",
+  "policies": [
+   "R1-POL-A01",
+   "R1-POL-A02",
+   "R1-POL-A05",
+   "R1-POL-A08",
+   "R5-POL-01",
+   "R5-POL-03",
+   "R5-POL-04",
+   "R5-POL-05",
+   "R2-POL-14",
+   "R2-POL-15",
+   "R8-POL-01"
+  ]
+ },
+ "gates": [
+  {
+   "id": "G0",
+   "name": "Architektur",
+   "pass_criteria": [
+    "Owner trägt Entscheidung (angenommen/geändert/verworfen) mit Datum in den Programmstatus ein",
+    "kein Agent setzt ACCEPTED"
+   ],
+   "fails_if": "Status ändert sich ohne Owner-Eintrag",
+   "blocked_by_owner_decisions": [
+    "OD-01"
+   ]
+  },
+  {
+   "id": "G1",
+   "name": "Integrationsbasis (P4)",
+   "pass_criteria": [
+    "Stapel bis #43 in owner-bestimmter Reihenfolge gemergt",
+    "CI-äquivalente Suite grün aus eingefrorener Kopie",
+    "CD-8: Reexport unveränderter Inhalte ändert 0 Notizen und 0 Notiztypen in einer Wegwerfsammlung; Anzeigenamensänderung ändert keine Notiztyp-ID",
+    "Hygieneprüfung findet keine Kursunterlagen-Bezeichner im öffentlichen Baum"
+   ],
+   "fails_if": "eine Prüfung schlägt fehl",
+   "blocked_by_owner_decisions": [
+    "OD-02",
+    "OD-03",
+    "OD-04",
+    "OD-20"
+   ]
+  },
+  {
+   "id": "G2",
+   "name": "Vertragskern",
+   "pass_criteria": [
+    "adversariale Fixture-Suite (observation_contract_v1.adversarial_fixtures) mit 0 Verstößen in Python und JS"
+   ],
+   "fails_if": "ein einziger Verstoß",
+   "blocked_by_owner_decisions": [
+    "OD-01",
+    "OD-10",
+    "OD-12",
+    "OD-25",
+    "OD-27"
+   ]
+  },
+  {
+   "id": "G3",
+   "name": "Prüferaudit",
+   "pass_criteria": [
+    "Known-Answer-Satz mit adversarialen Antworten je MCS-Prüferklasse besteht",
+    "menschliche Stichprobe (Umfang vorab festgelegt) findet kein Item mit Abweichung zwischen deklarierten und tatsächlich geprüften Teilen"
+   ],
+   "fails_if": "eine Abweichung; dann technische Erzwingung vor G4",
+   "blocked_by_owner_decisions": [
+    "OD-01",
+    "OD-23"
+   ]
+  },
+  {
+   "id": "G4",
+   "name": "Menschliche Inhaltsprüfung",
+   "pass_criteria": [
+    "benannte Person stellt fest: nicht abgelehnt, kein offenes K.-o.-Kriterium, mathematische Stichprobe korrekt"
+   ],
+   "fails_if": "HUMAN_REJECTED oder offenes K.-o.-Kriterium",
+   "blocked_by_owner_decisions": [
+    "OD-01",
+    "OD-22",
+    "OD-23"
+   ]
+  },
+  {
+   "id": "G5",
+   "name": "Präregistrierung",
+   "pass_criteria": [
+    "Protokoll mit Endpunkt, Mindestdifferenz, Verzögerung, Zuteilungsseed, Analyse- und Fehlwerteplan, Abbruchregeln, Einwilligung und Äquivalenzpilot vor erster Exposition committet",
+    "unabhängige Itemautorschaft bestätigt"
+   ],
+   "fails_if": "Änderung nach Exposition; konfirmatorische Aussage entfällt",
+   "blocked_by_owner_decisions": [
+    "OD-01",
+    "OD-13b",
+    "OD-21",
+    "OD-22",
+    "OD-25"
+   ]
+  },
+  {
+   "id": "G6",
+   "name": "Durchführung und Bericht",
+   "pass_criteria": [
+    "Bericht nach Plan inklusive Nullbefund; Formulierung wörtlich aus dem Protokoll",
+    "Entscheidungsregel: ohne Unterschied >= Mindestdifferenz kein Ausbau von K4/K5"
+   ],
+   "fails_if": "Bericht fehlt oder weicht vom Plan ab",
+   "blocked_by_owner_decisions": [
+    "OD-01",
+    "OD-13b",
+    "OD-13c"
+   ]
+  },
+  {
+   "id": "G7",
+   "name": "Zweite Operationsfamilie",
+   "pass_criteria": [
+    "G6-Bericht liegt vor",
+    "G3 für neue Prüferklassen bestanden",
+    "für menschlich bewertete Operationen: Budget und berichtete Übereinstimmung zwischen Bewertenden im Pilot",
+    "für Code: Pyodide-Spike bestanden (Offline-Laden, Abbruch von Endlosschleifen, Größe)"
+   ],
+   "fails_if": "fehlende Voraussetzung",
+   "blocked_by_owner_decisions": [
+    "OD-01",
+    "OD-13a",
+    "OD-13c",
+    "OD-18",
+    "OD-24"
+   ]
+  },
+  {
+   "id": "G-BRAND",
+   "name": "Marke Phase C",
+   "pass_criteria": [
+    "erst nach G1 (CD-8-IDs eingefroren)",
+    "Migration in Wegwerfprofilen getestet",
+    "Owner-Freigabe"
+   ],
+   "fails_if": "Umbenennung vor eingefrorenen IDs",
+   "blocked_by_owner_decisions": [
+    "OD-03",
+    "OD-19"
+   ]
+  }
+ ],
+ "owner_decision_block_values": [
+  "G0",
+  "G1",
+  "G2",
+  "G3",
+  "G4",
+  "G5",
+  "G6",
+  "G7",
+  "G-BRAND",
+  "RELEASE",
+  "TUTOR_EVALUATION",
+  "THIRD_PARTY_EMBEDDING",
+  "POLICY_STATUS_CHANGE",
+  "NONE"
+ ],
+ "owner_decisions": [
+  {
+   "id": "OD-01",
+   "question": "ADR-Vorschlag H-AB annehmen, ändern oder verwerfen",
+   "source": [
+    "R6"
+   ],
+   "blocks": [
+    "G0",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "G7"
+   ],
+   "default": "bleibt PROPOSED; nur architekturunabhängige Arbeit (M0)"
+  },
+  {
+   "id": "OD-02",
+   "question": "Merge-Reihenfolge und Merge des Entwurfsstapels und der Forschungs-PRs",
+   "source": [
+    "CD-6",
+    "ARCHITECTURE_SYNTHESIS_ADR.md §9"
+   ],
+   "blocks": [
+    "G1"
+   ],
+   "default": "nichts wird gemergt; Drift wächst"
+  },
+  {
+   "id": "OD-03",
+   "question": "Notiztyp-IDs als Konstanten einfrieren und vom Anzeigenamen entkoppeln oder neue IDs mit Migration",
+   "source": [
+    "R8 §13 Nr. 2",
+    "CD-8"
+   ],
+   "blocks": [
+    "G1",
+    "G-BRAND"
+   ],
+   "default": "heutige Werte bleiben; keine Umbenennung von Anzeigenamen"
+  },
+  {
+   "id": "OD-04",
+   "question": "GUID ohne Kapitel-Slug mit Identitätszuordnung; einmaliger Bruch vor erster Freigabe",
+   "source": [
+    "R8 §13 Nr. 3",
+    "CD-8"
+   ],
+   "blocks": [
+    "G1"
+   ],
+   "default": "heutiges GUID-Schema bleibt; Verschieben erzeugt neue Notizen (dokumentiert)"
+  },
+  {
+   "id": "OD-05",
+   "question": "Standard Anki + Markdown-Ordner (Obsidian optional) oder Markdown weglassen; kein fünftes Produkt",
+   "source": [
+    "R8 §13 Nr. 1",
+    "R8 §13 Nr. 8"
+   ],
+   "blocks": [
+    "NONE"
+   ],
+   "default": "keine Markdown-Ansicht im MCS; AD-1 bleibt"
+  },
+  {
+   "id": "OD-06",
+   "question": "Generativer Weg (eigene Karten, Formulierungsaufgaben)",
+   "source": [
+    "R8 §13 Nr. 4",
+    "R8-POL-13"
+   ],
+   "blocks": [
+    "NONE"
+   ],
+   "default": "nicht angeboten"
+  },
+  {
+   "id": "OD-07",
+   "question": "AnkiConnect zurückgestellt lassen",
+   "source": [
+    "R8 §13 Nr. 5",
+    "R8-POL-14"
+   ],
+   "blocks": [
+    "NONE"
+   ],
+   "default": "zurückgestellt"
+  },
+  {
+   "id": "OD-08",
+   "question": "Ordnernamen, Frontmatter, .base-Ansichten des generierten Bereichs",
+   "source": [
+    "R8 §13 Nr. 6"
+   ],
+   "blocks": [
+    "NONE"
+   ],
+   "default": "zurückgestellt"
+  },
+  {
+   "id": "OD-09",
+   "question": "Umfang der Mobilprüfung (AnkiDroid, AnkiMobile)",
+   "source": [
+    "R8 §13 Nr. 7"
+   ],
+   "blocks": [
+    "RELEASE"
+   ],
+   "default": "nur Desktop; Mobil als ungeprüft ausgewiesen"
+  },
+  {
+   "id": "OD-10",
+   "question": "Standard-Brief keyless; Musterlösung nur im Modus with_reference für Übungsitems",
+   "source": [
+    "R9 §6 Nr. 1",
+    "CD-7"
+   ],
+   "blocks": [
+    "G2"
+   ],
+   "default": "Verhalten von PR #43; Tutor nicht in MCS-Armen"
+  },
+  {
+   "id": "OD-11",
+   "question": "Lösung auf ausdrückliche Anforderung auch vor erstem Versuch, protokolliert als assistiert",
+   "source": [
+    "R9 §6 Nr. 2",
+    "R5-POL-03"
+   ],
+   "blocks": [
+    "NONE"
+   ],
+   "default": "erlaubt und als assistiert protokolliert (heutiges Verhalten)"
+  },
+  {
+   "id": "OD-12",
+   "question": "Nur engine-gelieferte, deterministisch geprüfte Parallelaufgaben zählen",
+   "source": [
+    "R9 §6 Nr. 3"
+   ],
+   "blocks": [
+    "G2"
+   ],
+   "default": "ja (Messvertrag)"
+  },
+  {
+   "id": "OD-13a",
+   "question": "Budget für bezahlte Modellaufrufe (Tutor-Arme A/A2/B, Judge)",
+   "source": [
+    "R9 §6 Nr. 4"
+   ],
+   "blocks": [
+    "TUTOR_EVALUATION",
+    "G7"
+   ],
+   "default": "0; keine Tutor-Evaluation"
+  },
+  {
+   "id": "OD-13b",
+   "question": "Budget bzw. Person für unabhängige Item- und Fallautorschaft",
+   "source": [
+    "R9 §6 Nr. 4",
+    "R5-POL-05"
+   ],
+   "blocks": [
+    "G5",
+    "G6"
+   ],
+   "default": "keine; MCS endet bei G4 mit 'Lernwirkung nicht gemessen'"
+  },
+  {
+   "id": "OD-13c",
+   "question": "Budget bzw. Personen für menschliche Bewertung und unabhängige Fachprüfung",
+   "source": [
+    "R3-POL-11",
+    "R2-POL-05",
+    "Charter"
+   ],
+   "blocks": [
+    "G6",
+    "G7"
+   ],
+   "default": "keine; menschlich bewertete Operationen ohne Kompetenzbelege"
+  },
+  {
+   "id": "OD-14",
+   "question": "Anbieterliste des portablen Tutorvertrags; Study Mode als Option",
+   "source": [
+    "R9 §6 Nr. 5"
+   ],
+   "blocks": [
+    "NONE"
+   ],
+   "default": "anbieterneutral, keine offizielle Liste"
+  },
+  {
+   "id": "OD-15",
+   "question": "Lizenzpolitik (CC-BY-SA nur emulieren, PolyForm-NC ausgeschlossen; kommerzieller Status für NC-Einbettung)",
+   "source": [
+    "R9 §6 Nr. 6",
+    "R7 §12 Nr. 1"
+   ],
+   "blocks": [
+    "THIRD_PARTY_EMBEDDING"
+   ],
+   "default": "nur Links; keine NC-Einbettung; keine wörtliche Übernahme"
+  },
+  {
+   "id": "OD-16",
+   "question": "TutorBench-Stichprobe (CC BY-NC) als Zusatzarm",
+   "source": [
+    "R9 §6 Nr. 7"
+   ],
+   "blocks": [
+    "NONE"
+   ],
+   "default": "nicht genutzt"
+  },
+  {
+   "id": "OD-17",
+   "question": "Registerkorrekturen und Herkunft 'Think Logic / Visually Explained'",
+   "source": [
+    "R9 §6 Nr. 8",
+    "R7 §12 Nr. 2"
+   ],
+   "blocks": [
+    "NONE"
+   ],
+   "default": "nur Dokumentkorrekturen; Kandidaten ohne Quelle geschlossen"
+  },
+  {
+   "id": "OD-18",
+   "question": "Pyodide-Spike freigeben",
+   "source": [
+    "R7 §12 Nr. 3"
+   ],
+   "blocks": [
+    "G7"
+   ],
+   "default": "kein Spike; Code-Werkbank nicht weiter spezifiziert"
+  },
+  {
+   "id": "OD-19",
+   "question": "Marke Phase C: technische Migration aller Bezeichner",
+   "source": [
+    "PROGRAMME_STATE.product_identity.phase_C",
+    "AD-3"
+   ],
+   "blocks": [
+    "G-BRAND"
+   ],
+   "default": "alle Bezeichner unverändert"
+  },
+  {
+   "id": "OD-20",
+   "question": "Kursunterlagen-Dateiname mit Seitenangabe in exam_mastery/learning/anki_bridge.py (öffentlicher Entwurfsstapel) neutralisieren; Umgang mit Historie",
+   "source": [
+    "PROGRAMME_STATE.owner_attention",
+    "R8 §2"
+   ],
+   "blocks": [
+    "G1"
+   ],
+   "default": "bleibt unverändert; Agenten ändern weder Datei noch Historie"
+  },
+  {
+   "id": "OD-21",
+   "question": "Teilnehmende, Einwilligung, Ethik/Datenschutz der Evaluation",
+   "source": [
+    "R5-POL-05",
+    "R5-POL-07"
+   ],
+   "blocks": [
+    "G5"
+   ],
+   "default": "Owner als einzige Person, innerhalb-Person-Design, keine Verallgemeinerung"
+  },
+  {
+   "id": "OD-22",
+   "question": "MCS-Thema (quellenfrei-synthetisch oder freigegebenes Material)",
+   "source": [
+    "ARCHITECTURE_SYNTHESIS_ADR.md §6",
+    "docs/PRODUCT_CONTRACT.md 'Generic'"
+   ],
+   "blocks": [
+    "G4",
+    "G5"
+   ],
+   "default": "vorhandene synthetische symbolic_procedure-Strecke"
+  },
+  {
+   "id": "OD-23",
+   "question": "Wer prüft die MCS-Strecke inhaltlich und wer auditiert die Prüfer",
+   "source": [
+    "docs/LEARNING_PRODUCT_CONTRACT.md §6",
+    "R2-POL-14"
+   ],
+   "blocks": [
+    "G3",
+    "G4"
+   ],
+   "default": "Owner prüft; bis dahin HUMAN_REVIEW_PENDING"
+  },
+  {
+   "id": "OD-24",
+   "question": "Praxis-/Zertifizierungsgrenze und Liste gefährlicher Verfahren bestätigen",
+   "source": [
+    "R3-POL-10",
+    "R4-POL-01",
+    "R4-POL-13"
+   ],
+   "blocks": [
+    "G7"
+   ],
+   "default": "nur Spur A mit Enthaltung; keine Pakete für Recht, Klinik, Labor, Werkstatt"
+  },
+  {
+   "id": "OD-25",
+   "question": "Vorläufige Produktparameter (20 h, 7 Tage, 2 Versuche, 3 Hinweisstufen) festschreiben oder ändern",
+   "source": [
+    "CD-4",
+    "R5-POL-01",
+    "R5-POL-03",
+    "R5-POL-05"
+   ],
+   "blocks": [
+    "G2",
+    "G5"
+   ],
+   "default": "Werte bleiben als provisional_product_parameter"
+  },
+  {
+   "id": "OD-26",
+   "question": "Unabhängige zweite Prüfung der Berichte R0-R9 und R6",
+   "source": [
+    "Charter",
+    "PROGRAMME_STATE.workstreams"
+   ],
+   "blocks": [
+    "POLICY_STATUS_CHANGE"
+   ],
+   "default": "alle Policies bleiben design_hypothesis"
+  },
+  {
+   "id": "OD-27",
+   "question": "KB-Textkorrekturen anwenden (CD-3 zu AI-R1; R1A §5.12)",
+   "source": [
+    "CD-3",
+    "R1 §2"
+   ],
+   "blocks": [
+    "G2"
+   ],
+   "default": "nicht angewendet; Verbotsliste des ADR gilt trotzdem"
+  }
+ ],
+ "top_owner_decisions": [
+  "OD-01",
+  "OD-02",
+  "OD-13b",
+  "OD-03",
+  "OD-20"
+ ],
+ "p4_integration_plan": {
+  "order": [
+   "OD-20 Hygiene entscheiden (Bezeichner liegt in #11-#19)",
+   "Engine-Stapel linear: #11 -> #12 -> #13 -> #14 -> #15 -> #16 -> #17 -> #18 -> #19 -> #28 -> #37 -> #43",
+   "CD-8-Fix als neuer Entwurfs-PR auf #43 (M0)",
+   "Forschung: #20 -> #32 -> #35 -> {#38, #39, #40, #41, #42, #44, #45} -> R6",
+   "#33 und #36 unabhängig; Präsentationsänderungen aus #36 erst nach G1; #3 erst nach menschlicher Prüfung"
+  ],
+  "merged_by": "owner only",
+  "allowed_before_acceptance": [
+   "CD-8-Fix (M0)",
+   "Hygiene nach OD-20",
+   "Testpflege",
+   "Dokumentkorrekturen ohne KB-Wirkung"
+  ],
+  "not_allowed_before_acceptance": [
+   "Ontologie-, Beobachtungsvertrags- oder Prüferregistry-Implementierung",
+   "Vorlagen",
+   "neue Schemas"
+  ],
+  "local_rl_pilot": "nicht verändert; 66 Commits divergiert, nicht öffentlich, kursbasiert; kein MCS-Kandidat; Übertragung von Fixes entscheidet der Owner nach G1"
+ },
+ "red_team_reconciliation": {
+  "status": "pending",
+  "source": "origin/research/r6-red-team-20261127:docs/research/workstreams/r6/red_team_findings.json",
+  "items": []
+ }
+}
