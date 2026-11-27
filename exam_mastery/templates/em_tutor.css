@@ -19,7 +19,7 @@
 
 /* path: a segmented progress bar, not a sidebar */
 .wb-path{list-style:none;margin:0;padding:0;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
-.wb-step{flex:1 1 0;min-width:84px;padding:8px 0 0;border-top:4px solid var(--rule);font:var(--fs-xs)/1.3 var(--font-ui);color:var(--muted)}
+.wb-step{flex:1 1 0;min-width:84px;padding:8px 6px 0 0;border-top:4px solid var(--rule);font:var(--fs-xs)/1.3 var(--font-ui);color:var(--muted);overflow-wrap:anywhere;hyphens:auto}
 .wb-step-role{display:block;font-weight:600}
 .wb-step-t{display:none}
 .wb-step.cur{border-top-color:var(--ink);color:var(--ink)}
