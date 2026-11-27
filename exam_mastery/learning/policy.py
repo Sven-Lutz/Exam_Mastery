@@ -56,7 +56,9 @@ def category(track, cid):
 # Events that make a later attempt on the same task assisted. 'tutor' is written when the learner prepares a tutor
 # context for the task (CD-7, R5-POL-04): what happens in that conversation is not observed, so it counts as help.
 # 'guided' is a prerequisite micro-lesson or its check question opened for the task (guided.py, R5-POL-04).
-ASSIST_EVENTS = ('hint', 'solution', 'tutor', 'guided')
+# 'support': a worked example, contrast table or step focus shown automatically after a wrong answer (it
+# demonstrates the method; it names the competency it teaches in 'kc').
+ASSIST_EVENTS = ('hint', 'solution', 'tutor', 'guided', 'support')
 
 
 def helped(events, task_id, upto=None):

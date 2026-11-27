@@ -138,7 +138,7 @@ const category = (tr, c) => tr.categories[c] || GENERIC[c] || GENERIC.unclassifi
 const RETENTION_MIN_GAP_HOURS = 20;
 const instant = t => { const s = String(t); return Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(s) ? s + 'T00:00:00Z' : /([zZ]|[+-]\d{2}:?\d{2})$/.test(s) ? s : s + 'Z'); };
 // Mirrors policy.ASSIST_EVENTS: a prepared tutor context and a guided prerequisite lesson count as help for that task (CD-7).
-const ASSIST_EVENTS = ['hint', 'solution', 'tutor', 'guided'];
+const ASSIST_EVENTS = ['hint', 'solution', 'tutor', 'guided', 'support'];
 const helped = (ev, tid, upto) => (upto === undefined ? ev : ev.slice(0, upto + 1)).some(e => ASSIST_EVENTS.includes(e.type) && e.task === tid);
 // Tasks whose purpose is evidence of independent solving: the tutor brief carries no answer key for them (mirrors tutor.KEY_WITHHELD_ROLES).
 const EVIDENCE_ROLES = ['similar', 'transfer', 'retest'];
@@ -637,11 +637,15 @@ function boot() {
       focus = decision.focus ? Object.assign({}, decision.focus, { reveal: decision.rule !== 'RC1' }) : null; drawFigure(task); drawPath();
       if (solBtn && d.result !== 'correct') solBtn.disabled = false;
       const nextBtn = decision.next_task && decision.next_task !== tid ? el('button', { type: 'button', class: 'ds-btn ds-btn-primary wb-next', id: 'next', onclick: () => { focus = decision.focus && decision.rule === 'RB' ? null : null; show(decision.next_task, decision); } }, 'Weiter: ' + T[decision.next_task].title) : null;
+      // A support block shown after a wrong answer demonstrates the method: it is logged as help for the competency it
+      // teaches (worked example: its ref is a competency id), so a following success is not independent evidence.
+      const supEl = supportBlock(decision.support);
+      if (supEl) Store.add(SK, { type: 'support', task: tid, kind: decision.support.type, kc: decision.support.type === 'worked_example' ? decision.support.ref : task.kc_id });
       fb.replaceChildren(...[
         el('p', { class: 'wb-res ' + rc, 'data-result': d.result }, el('strong', {}, rt), cat ? ' ' + cat.feedback : d.result === 'correct' ? ' ' + (task.feedback_correct || '') : d.result === 'unverified' ? ' Ihre Antwort ist gespeichert. Eine Rückmeldung dazu kann der Tutor geben (Modelleinschätzung, keine Korrektur).' : ''),
         (() => { const [k, t] = evidenceLabel(d); return el('p', { class: 'wb-evid', 'data-ev': k }, t); })(),
         d.correct_steps && d.correct_steps.length && d.result !== 'correct' ? el('p', { class: 'wb-ok-steps' }, 'Richtig sind bereits: ' + d.correct_steps.map(id => { const st = (task.steps || []).find(s => s.id === id); if (st) return st.label; const c = (task.constraints || []).find(c => c.id === id); if (!c) return id; const pl = (task.premises.find(p => p.id === c.premise) || {}).label || c.premise; return c.kind === 'requires' ? '„' + pl.replace(/\.$/, '') + '“ verwendet' : '„' + pl.replace(/\.$/, '') + '“ zu Recht weggelassen'; }).join('; ') + '.') : null,
-        supportBlock(decision.support),
+        supEl,
         d.error_category && (tr.review_cards || {})[d.error_category] ? el('div', { class: 'wb-card' }, el('b', {}, 'Wiederholungskarte zu diesem Fehler'), tr.review_cards[d.error_category][0].front,
           el('p', { class: 'wb-note' }, 'Im Anki-Paket der Lernstrecken, Schlagwort ', el('code', {}, (tr.review_tags || {})[d.error_category] || ''), '. Anki plant, wann sie kommt – Exam Mastery plant nichts selbst. Gezielt üben: in Anki „Filtered Deck“ mit dieser Suche anlegen.')) : null,
         el('details', { class: 'wb-why', id: 'why' }, el('summary', {}, 'Warum diese Empfehlung?'),
