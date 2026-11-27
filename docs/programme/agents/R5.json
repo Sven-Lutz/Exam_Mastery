@@ -2,7 +2,7 @@
  "agent_id": "R5",
  "wp": "WP-R5",
  "status": "COMPLETED",
- "updated": "2026-11-27T16:20:00+01:00",
+ "updated": "2026-11-27T18:40:00+01:00",
  "done": [
   "read:charter,issue26,KB_GAP_AUDIT§2/§5/§6,R1 report+schema,EVALUATION_PROTOCOL,policy/tutor/evaluation code",
   "evidence:bastani2025 (VoR+SI+correction)",
@@ -14,12 +14,16 @@
   "evidence:desimone2025nigeria",
   "evidence:batch3 ITS/KT/measurement (vanlehn2011,kulik2016,ma2014,steenbergenhu2013its,aleven2016,pane2014ctai,roschelle2016assistments,pelanek2017,pelanek2018mastery,gervet2020kt,khajah2016deepkt,kraft2020effectsizes,cheungslavin2016methods,hedgeshedberg2007icc,piaggio2012consortni,risko2016offloading)",
   "lead (headless): report + 7 policies + test from batch1-3 evidence (3703542)",
-  "batch4 evidence + search log + reconciliation (0920bbc); draft PR #39"
+  "batch4 evidence + search log + reconciliation (0920bbc); draft PR #39",
+  "R5S: started batch 5 (hints, error diagnosis, learning analytics); read report/policies/register/tests/issue #26",
+  "R5S: batch5 evidence register checkpoint caa2112 (16 sources: 4 claim_review, 4 partial, 8 abstract; search_log.batch5 R5-Q07..Q22, R5-A02..A04)",
+  "R5S: policies R5-POL-03/06 revised, R5-POL-08..11 added, report §12 + §1/2/5/7/9/10 consistency, test for batch-5 affordances (4b444c2); PR #39 comment 7222863461"
  ],
  "open": [
-  "independent review of PR #39 (questions in report §10)",
+  "independent review of PR #39 (questions in report §10 and §12.8)",
   "search queries of batches 1-3 not reconstructible (documented gap)",
-  "Darvishi full text; delayed unassisted GenAI-tutor endpoint; post-2019 KT bias audits; legal review of GDPR/AI Act applicability"
+  "Darvishi full text; delayed unassisted GenAI-tutor endpoint; post-2019 KT bias audits; legal review of GDPR/AI Act applicability",
+  "batch5 gaps: two-tier diagnostic tests and reliability of automated misconception diagnosis; Mitrovic CBM; Durkin & Rittle-Johnson 2012; Bodily & Verbert 2017; Bull & Kay; full texts of 8 abstract-only batch-5 sources; no study on number of hint levels (CD-4 stays a setting)"
  ],
  "artifacts": [
   "docs/research/workstreams/r5/r5_evidence.json",

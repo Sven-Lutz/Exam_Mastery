@@ -1,7 +1,7 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T16:55:00+01:00",
- "updated_by": "LEAD (interactive, resume 2026-11-27 16:43)",
+ "updated": "2026-11-27T17:08:02+01:00",
+ "updated_by": "LEAD (interactive)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
   "Never merge to main; draft PRs only.",
@@ -62,7 +62,7 @@
    "note": "reopened for supplement batch 5 (owner brief 2026-11-27); PR #38 stays the vehicle"
   },
   "R3": {
-   "status": "PLANNED",
+   "status": "RUNNING",
    "wp": "WP-R3",
    "issue": 24
   },
@@ -72,11 +72,11 @@
    "issue": 25
   },
   "R5": {
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "wp": "WP-R5",
    "issue": 26,
    "pr": 39,
-   "note": "reopened for supplement batch 5 (owner brief 2026-11-27); PR #39 stays the vehicle"
+   "note": "batch5 added (hints, error diagnosis, learning analytics); independent review pending"
   },
   "R6": {
    "status": "PLANNED",
@@ -209,8 +209,8 @@
   {
    "id": "R5",
    "kind": "background subagent of LEAD",
-   "scope": "R5S supplement batch 5: hint levels, error diagnosis, learning analytics",
-   "status": "RUNNING",
+   "scope": "R5 + R5S batch5 (hints, error diagnosis, learning analytics)",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R5.json",
    "worktree": "Exam_Mastery-r5"
   },
@@ -219,6 +219,14 @@
    "kind": "launchd agent",
    "scope": "headless continuation after limits/crashes/reboots",
    "status": "IDLE (installed; daily cap 4/4 reached 2026-11-27; lead heartbeat + hold active)"
+  },
+  {
+   "id": "R3",
+   "kind": "background subagent of LEAD",
+   "scope": "R3 legal, philosophical, case and clinical reasoning",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/R3.json",
+   "worktree": "Exam_Mastery-r3"
   }
  ],
  "work_packages": [
@@ -312,13 +320,13 @@
   {
    "id": "WP-R5",
    "title": "R5 AI tutoring, adaptation and learning measurement",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 3,
    "autostart": false,
    "issue": 26,
    "branch": "research/r5-tutoring-measurement-20261127",
    "base": "research/r1-learning-science-20261127 (bec1f62)",
-   "next_step": "Specialist R5S adds batch 5 (evidence, policies, report §12, tests), pushes to PR #39; lead integrates and re-marks COMPLETED.",
+   "next_step": "None autonomous; PR #39 awaits independent review.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
    "worktree": "Exam_Mastery-r5",
    "done": [
@@ -326,14 +334,19 @@
     "evidence register committed (23 sources; 70f9d59)",
     "report AI_TUTOR_MEASUREMENT.md + r5_tutoring_policies.json (7 policies, all NOT_RUN) + contract test (3703542), branch pushed",
     "batch4: 7 sources (fan2025metacognitive, lehmann2025aiclassroom, darvishi2024agency, pardos2024chatgpthints, doroudi2019fairkt, eu2024aiact, eu2016gdpr) + search_log with exact queries; R5-POL-01/02/03/04/07 and report §1/2/3/6/9/10 reconciled; lead spot-check bastani2025 VoR figures (0920bbc)",
-    "draft PR #39 against research/r1-learning-science-20261127"
+    "draft PR #39 against research/r1-learning-science-20261127",
+    "batch5 (R5S, caa2112 + 4b444c2): 16 sources on hints/help-seeking/gaming, error diagnosis/erroneous examples, learning analytics dashboards/OLM/early warning (4 fulltext_claim_review, 4 fulltext_partial, 8 abstract); R5-POL-03/06 revised (on-demand hints, bottom_out flag, ERROR_HYPOTHESIS type), new R5-POL-08..11; report §12; tests 27 OK (1 skip); PR #39 comment",
+    "lead spot-check 2026-11-27: all 16 batch5 DOIs resolve to the registered works (Crossref title/author/year); vanderkleij2015 effect sizes consistent with the published abstract"
    ],
    "open": [
-    "independent review of PR #39 (questions in report §10)",
+    "independent review of PR #39 (questions in report §10, §12)",
+    "8 batch5 sources abstract-only; Course Signals critique only via press article",
+    "two-tier diagnostic tests and reliability of automated misconception diagnosis not covered; Mitrovic constraint-based tutors, Durkin & Rittle-Johnson 2012, Bodily & Verbert 2017, Bull & Kay not read",
+    "number of hint levels (3) remains an untested setting (CD-4)",
     "search queries of batches 1-3 not reconstructible (documented gap)",
     "Darvishi full text; delayed unassisted GenAI-tutor endpoint; post-2019 KT bias audits; legal review of GDPR/AI Act applicability"
    ],
-   "updated": "2026-11-27T16:55:00+01:00",
+   "updated": "2026-11-27T17:08:02+01:00",
    "artifacts": [
     "docs/research/workstreams/r5/r5_evidence.json",
     "docs/research/workstreams/r5/r5_tutoring_policies.json",
@@ -341,7 +354,7 @@
     "tests/test_r5_tutoring_policies.py"
    ],
    "tests": [
-    "python3 -m unittest tests.test_r5_tutoring_policies tests.test_r1_learning_policies: 26 OK (skipped=1), 2026-11-27"
+    "python3 -m unittest tests.test_r5_tutoring_policies tests.test_r1_learning_policies: 27 OK (skipped=1), lead re-run 2026-11-27"
    ],
    "blockers": [],
    "pr": 39,
@@ -350,14 +363,16 @@
   {
    "id": "WP-R3",
    "title": "R3 legal, clinical, economic and philosophical reasoning",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 4,
    "autostart": true,
    "issue": 24,
    "branch": "research/r3-contextual-reasoning-20261127",
    "base": "research/r1-learning-science-20261127",
-   "next_step": "Read issue #24; no clinical competence certification.",
-   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract."
+   "next_step": "Specialist R3 (background subagent of LEAD): evidence register with search log, r3_learning_policies.json, R3_ARGUMENT_CASE_DIAGNOSIS.md, contract test, draft PR against research/r1-learning-science-20261127.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T17:08:02+01:00",
+   "worktree": "Exam_Mastery-r3"
   },
   {
    "id": "WP-R4",
