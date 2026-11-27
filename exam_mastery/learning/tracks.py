@@ -164,7 +164,7 @@ ENT_DATA = {'orders': [0.0, 100.0, 180.0, 190.0, 210.0, 230.0, 250.0, 270.0], 'd
 CONTRAST = {'orders': [0, 0, 100, 100, 100, 100], 'delay': 1, 'cost': [40] * 6, 'invest': [50]}
 
 
-def ent_track(data=None, kc_ids=('kc-d5d3fd65634ab3', 'kc-33639d91c4dfa2'), sources=('07 Business Planning & Effectuation.pdf S. 21',)):
+def ent_track(data=None, kc_ids=('kc-d5d3fd65634ab3', 'kc-33639d91c4dfa2'), sources=('Referenzfall Liquiditätsplanung, Kapitel 7 (private Kursunterlage, nicht im Repository)',)):
     d = data or ENT_DATA
     cf = lambda **k: M.cashflow(**{**dict(orders=d['orders'], delay=d['delay'], cost=d['cost'], invest=d['invest']), **k})
     base, start500, tr, re4 = cf(), cf(start_cash=500), cf(delay=3), cf(delay=4)

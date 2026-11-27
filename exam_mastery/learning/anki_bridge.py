@@ -25,7 +25,7 @@ CARDS = [
      'answer': '0,3 (θ − η·∂L/∂θ).', 'pitfall': 'Plus statt minus: Der Verlust steigt.', 'tags': ['lernstrecke::backprop', 'fehler::update_direction']},
     {'key': 'liquidity/need-vs-end', 'kind': 'misconception', 'front': 'Warum ist der Finanzierungsbedarf nicht der Endsaldo der Liquiditätsplanung?',
      'answer': 'Bedarf ist der Betrag des tiefsten kumulierten Standes; davor wäre das Unternehmen sonst zahlungsunfähig.',
-     'example': 'Kapitel 7: Tiefpunkt −2.144 k€ (P7), Endsaldo −2.136 k€.', 'source': '07 Business Planning & Effectuation.pdf S. 21',
+     'example': 'Kapitel 7: Tiefpunkt −2.144 k€ (P7), Endsaldo −2.136 k€.', 'source': 'Referenzfall Liquiditätsplanung, Kapitel 7 (private Kursunterlage, nicht im Repository)',
      'tags': ['lernstrecke::liquiditaet', 'fehler::end_balance_vs_minimum']},
     {'key': 'liquidity/positive-end', 'kind': 'math', 'front': 'Cashflows −90, −40, −40, +60, +60, +60 k€: Wie hoch ist der Finanzierungsbedarf trotz positivem Endsaldo?',
      'answer': '170 k€ (Tiefpunkt nach Periode 3).', 'tags': ['lernstrecke::liquiditaet', 'fehler::end_balance_vs_minimum', 'fehler::period_vs_cumulative']},
