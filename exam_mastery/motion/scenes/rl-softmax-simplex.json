@@ -167,6 +167,7 @@
     {"id": "best-baseline", "from_step": "baseline-on",
      "prompt": "Auftrag: Finde mit dem Regler eine konstante Baseline b, bei der die Streuung höchstens 3 % über dem kleinstmöglichen Wert liegt.",
      "hint": "Beobachte „Streuung exakt“. Sie hängt quadratisch von b ab. Das Minimum liegt in der Nähe von J(θ), aber nicht genau dort.",
+     "feedback": "Streuung jetzt {sd_b:3}; kleinstmöglich {sd_opt:3} bei b = {b_opt:2}.",
      "sliders": [{"param": "b0", "label": "Baseline b", "step": 0.05}],
      "fixed": {"lam": 0.0, "n": 200},
      "goal": {"of": "var_b", "op": "<=", "ref": "var_opt", "factor": 1.03}}

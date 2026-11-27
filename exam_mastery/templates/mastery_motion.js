@@ -55,7 +55,7 @@ function softmaxSimplexPg(p) {
   return {
     theta, pi, J, grad, grad_shown: grad.map(x => gVis * x), grad_norm: Math.sqrt(fsum(grad.map(x => x * x))), argmax_grad: argmax,
     b, b_opt: ex.b_opt, n, samples, actions, returns, sample_mean: mean, sample_spread: spread,
-    var_b: varB, var_none: varNone, var_opt: varOpt, sd_b: Math.sqrt(Math.max(varB, 0)), sd_none: Math.sqrt(Math.max(varNone, 0)),
+    var_b: varB, var_none: varNone, var_opt: varOpt, sd_b: Math.sqrt(Math.max(varB, 0)), sd_none: Math.sqrt(Math.max(varNone, 0)), sd_opt: Math.sqrt(Math.max(varOpt, 0)),
     var_delta: varB - varNone,
     mean_shift: Math.abs(b) * Math.sqrt(fsum([0, 1, 2].map(j => fsum(pi.map((q, a) => q * score(pi, a)[j])) ** 2))),
     dpi, pi_next: pi.map((q, j) => q + dpi[j]), pi_trail: trail, J_levels: levels, b_line: bSeg ? [{ level: b, points: bSeg }] : [],
@@ -445,19 +445,20 @@ function mount(root, scene) {
   for (const m of scene.missions || []) {
     const out = h('p', { class: 'mm-mission-status', role: 'status', 'aria-live': 'polite' });
     const sliders = m.sliders.map(s => { const spec = scene.params[s.param];
-      const start = Object.assign(paramsAt(scene, scene.steps.findIndex(x => x.id === m.from_step)), m.fixed || {})[s.param];
+      const raw = Object.assign(paramsAt(scene, scene.steps.findIndex(x => x.id === m.from_step)), m.fixed || {})[s.param];
+      const start = s.index === undefined ? raw : raw[s.index];
       const inp = h('input', { type: 'range', min: String(spec.min), max: String(spec.max), step: String(s.step || 0.01), 'data-param': s.param, 'aria-label': s.label, value: String(start) });
       const val = h('output', { class: 'mm-val' }, fmt(start, 2));
-      inp.addEventListener('input', () => { if (mode !== 'mission') enterMission(m); missionParams[s.param] = Number(inp.value); val.textContent = fmt(Number(inp.value), 2); draw(); });
+      inp.addEventListener('input', () => { if (mode !== 'mission') enterMission(m); if (s.index === undefined) missionParams[s.param] = Number(inp.value); else missionParams[s.param][s.index] = Number(inp.value); val.textContent = fmt(Number(inp.value), 2); draw(); });
       return { s, inp, val, el: h('label', { class: 'mm-slider' }, s.label + ' ', inp, val) }; });
     const hint = h('p', { class: 'mm-note', hidden: true }, m.hint);
     const box = h('section', { class: 'mm-mission', 'data-mission': m.id }, h('p', { class: 'mm-eyebrow' }, 'Eigener Auftrag'), h('p', {}, m.prompt), sliders.map(x => x.el),
       h('div', { class: 'mm-row' },
-        h('button', { type: 'button', class: 'mm-btn', 'data-action': 'mission-start', onclick: () => { enterMission(m); sliders.forEach(x => { x.inp.value = String(missionParams[x.s.param]); x.val.textContent = fmt(missionParams[x.s.param], 2); }); draw(); } }, 'Auftrag starten'),
+        h('button', { type: 'button', class: 'mm-btn', 'data-action': 'mission-start', onclick: () => { enterMission(m); sliders.forEach(x => { const v = x.s.index === undefined ? missionParams[x.s.param] : missionParams[x.s.param][x.s.index]; x.inp.value = String(v); x.val.textContent = fmt(v, 2); }); draw(); } }, 'Auftrag starten'),
         h('button', { type: 'button', class: 'mm-btn mm-primary', 'data-action': 'mission-check', onclick: () => {
           if (mode !== 'mission') enterMission(m); const state = evaluate(scene, missionParams), met = goalMet(state, m.goal);
-          record(scene, { type: 'task_attempt', mission: m.id, values: Object.fromEntries(m.sliders.map(s => [s.param, missionParams[s.param]])), met });
-          out.textContent = (met ? '✓ Ziel erreicht. ' : '✗ Noch nicht. ') + 'Streuung jetzt ' + fmt(Math.sqrt(state.var_b), 3) + ' (kleinstmöglich ' + fmt(Math.sqrt(state.var_opt), 3) + ' bei b = ' + fmt(state.b_opt, 2) + ').';
+          record(scene, { type: 'task_attempt', mission: m.id, values: Object.fromEntries(m.sliders.map(s => [s.param + (s.index === undefined ? '' : '.' + s.index), s.index === undefined ? missionParams[s.param] : missionParams[s.param][s.index]])), met });
+          out.textContent = (met ? '✓ Ziel erreicht. ' : '✗ Noch nicht. ') + (m.feedback ? textOf(m.feedback, state) : '');
           out.dataset.met = String(met); } }, 'Prüfen'),
         h('button', { type: 'button', class: 'mm-btn mm-secondary', onclick: () => { hint.hidden = !hint.hidden; } }, 'Experimentierhilfe'),
         h('button', { type: 'button', class: 'mm-btn mm-secondary', 'data-action': 'mission-leave', onclick: () => { leaveMission(); setPos(pos); } }, 'Zur Zeitachse')), hint, out);

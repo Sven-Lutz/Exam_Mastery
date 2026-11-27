@@ -404,18 +404,26 @@ def validate(scene):
         _need(isinstance(m, dict) and ID.fullmatch(str(m.get("id"))), "mission id")
         _text(m.get("prompt"), "mission prompt")
         _text(m.get("hint"), "mission hint")
+        _need(set(m) <= {"id", "prompt", "hint", "feedback", "from_step", "sliders", "fixed", "goal"}, "mission: unknown fields")
         _need(m.get("from_step") in sids, "mission.from_step")
         sl = m.get("sliders")
         _need(isinstance(sl, list) and 1 <= len(sl) <= 3, "missions have 1..3 sliders (V6)")
         for s in sl:
             spec = params.get(s.get("param"))
-            _need(spec is not None and "min" in spec and "max" in spec and isinstance(s.get("label"), str),
-                  "mission slider needs a bounded parameter and a label")
+            _need(spec is not None and "min" in spec and "max" in spec and isinstance(s.get("label"), str)
+                  and set(s) <= {"param", "label", "step", "index"}, "mission slider needs a bounded parameter and a label")
+            if "index" in s:  # one component of a vector parameter, e.g. an entry of a matrix
+                _need(isinstance(spec["value"], list) and type(s["index"]) is int and 0 <= s["index"] < len(spec["value"]),
+                      "mission slider index must name a component of a vector parameter")
+            else:
+                _need(not isinstance(spec["value"], list), "mission slider on a vector parameter needs an index")
         g = m.get("goal")
         _need(isinstance(g, dict) and g.get("op") in ("<=", ">=", "abs<=") and ("ref" in g or "value" in g), "goal")
         idx = [s["id"] for s in steps].index(m["from_step"])
         p = {**params_at(scene, idx), **m.get("fixed", {})}
         goal_met(evaluate(scene, p), g)
+        if m.get("feedback"):
+            text_of(m["feedback"], evaluate(scene, p))
     kf = scene.get("keyframes", {})
     _need(isinstance(kf, dict) and all(isinstance(v, list) and set(v) <= sids for v in kf.values()), "keyframes")
     return computed

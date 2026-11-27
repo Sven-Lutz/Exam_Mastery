@@ -79,7 +79,8 @@ def test_invalid_scenes_are_rejected(mutate, message):
 def test_grammar_expresses_the_plane_transformation_primitives():
     """Not a shipped scene: proves grid, basis vectors, linear-map interpolation and signed area are expressible."""
     sc = {"schema": M.SCHEMA, "id": "plane-probe", "title": "Probe", "claim": "Die Spalten von A sind die Bilder der Basis.",
-          "model": "linear_map_2d", "params": {"A": {"value": [1.0, 2.0, 1.0, 1.0]}, "t": {"value": 0.0, "min": 0, "max": 1},
+          "model": "linear_map_2d", "params": {"A": {"value": [1.0, 2.0, 1.0, 1.0], "min": -3, "max": 3},
+                                               "t": {"value": 0.0, "min": 0, "max": 1},
                                                "v": {"value": [1.0, 1.0]}},
           "view": {"width": 400, "height": 400, "panels": [{"id": "plane", "x": 0, "y": 0, "w": 400, "h": 400,
                                                              "domain": [-4, 4, -4, 4], "clip": True}]},
@@ -95,8 +96,17 @@ def test_grammar_expresses_the_plane_transformation_primitives():
                     {"id": "map", "title": "A", "caption": "det = {det:2}", "aria": "Gitter",
                      "set": {"t": 1.0}, "transition": {"kind": "interpolate", "animate": ["t"], "ms": 1500},
                      "checkpoint": {"predict": [{"id": "sign", "type": "sign", "prompt": "Vorzeichen von det?",
-                                                 "correct": {"rule": "sign", "of": "det"}}], "explain": "det = {det:2}"}}]}
+                                                 "correct": {"rule": "sign", "of": "det"}}], "explain": "det = {det:2}"}}],
+          "missions": [{"id": "flatten", "from_step": "map", "prompt": "Bringe die Determinante auf 0.", "hint": "Spalten parallel.",
+                        "feedback": "det = {det:2}", "sliders": [{"param": "A", "index": 1, "label": "a₁₂"}],
+                        "goal": {"of": "det", "op": "abs<=", "value": 0.05}}]}
     states = M.validate(sc)
+    flat = M.evaluate(sc, {**M.params_at(sc, 1), "A": [1.0, 1.0, 1.0, 1.0]})
+    assert M.goal_met(flat, sc["missions"][0]["goal"]) and not M.goal_met(states[1], sc["missions"][0]["goal"])
+    bad = copy.deepcopy(sc)
+    del bad["missions"][0]["sliders"][0]["index"]
+    with pytest.raises(M.SceneError, match="needs an index"):
+        M.validate(bad)
     assert states[0]["det"] == 1.0 and math.isclose(states[1]["det"], -1.0)
     assert M.correct_answer(sc, states[1], sc["steps"][1]["checkpoint"]["predict"][0]) == "-"
     assert states[1]["e1"] == [1.0, 1.0] and states[1]["e2"] == [2.0, 1.0]  # columns of A
