@@ -68,7 +68,7 @@
    "name": "time_quality",
    "type": "enum",
    "required": true,
-   "semantics": "exact | date_only | unknown",
+   "semantics": "exact | date_only | unverified | unknown; unverified bei t > Erfassungszeit, Uhr-Rücksprung oder importierten Ereignissen (RT-26)",
    "policies": [
     "R5-POL-08"
    ]
@@ -145,6 +145,24 @@
    "semantics": "A | B",
    "policies": [
     "R4-POL-01"
+   ]
+  },
+  {
+   "name": "item.transfer_dimension",
+   "type": "string",
+   "required": false,
+   "semantics": "Pflicht für Nachweisrollen: Unterschied im Lösungsweg oder Ergebnis (RT-29)",
+   "policies": [
+    "R1-POL-A10"
+   ]
+  },
+  {
+   "name": "item.low_entropy_answer",
+   "type": "boolean",
+   "required": true,
+   "semantics": "binär/MC/Einzeldiagnose: zählt nicht allein als Beleg (RT-13)",
+   "policies": [
+    "R3-POL-04"
    ]
   },
   {
@@ -381,7 +399,14 @@
    "source": "R5-POL-05"
   },
   "date_only_or_unknown": "Behaltens- und Leseregeln werden nicht ausgewertet; keine Schätzung (R5-POL-08)",
-  "clock": "Client-Uhr; Rücksprünge (t2 < t1) machen das Paar ungültig statt negativ"
+  "clock": "Client-Uhr; Rücksprünge (t2 < t1) machen das Paar ungültig statt negativ; Zeitstempel nach dem Erfassungszeitpunkt oder aus Importen = time_quality unverified (RT-26)",
+  "kc_assist_window": {
+   "value": null,
+   "unit": "hours",
+   "status": "provisional_product_parameter",
+   "note": "jede Hilfe im selben KC innerhalb des Fensters macht folgende Versuche assistiert (RT-26); Wert in der Präregistrierung festlegen (OD-25)"
+  },
+  "display_wording": "erneut gelöst nach >= 20 h ohne protokollierte Hilfe (RT-26, RT-27)"
  },
  "item_role_rules": [
   "Schlüssel von Nachweisrollen (similar, transfer, retest, mock, evaluation) nie im Tutor-Brief (CD-7, R9-POL-04)",
@@ -391,11 +416,15 @@
  ],
  "state_derivation": {
   "state_changing_event": "attempt",
+  "state_key": "(competency_id, competence_type) (RT-10)",
   "required_for_track_a_state": [
    "assist_level == none",
+   "keine Hilfe im selben KC innerhalb kc_assist_window (RT-26)",
+   "low_entropy_answer == false oder kontrafaktisch variierter Retest mit wechselndem Ergebnis (RT-13)",
+   "Nachweisitem mit deklarierter transfer_dimension (RT-29)",
    "source in {deterministic, human_rubric (gekennzeichnet)}",
    "item.new_for_learner == true",
-   "time_quality == exact",
+   "time_quality == exact (nicht unverified)",
    "verifier.class mit competence_evidence != never",
    "Ergebnis nur für checked_parts"
   ],
@@ -424,7 +453,23 @@
    "Bericht nach Subgruppen und Attrition",
    "In-Produkt-Messungen nur proximale Indikatoren"
   ],
-  "if_not_met": "nur 'nicht gemessen' kommunizieren"
+  "if_not_met": "nur 'nicht gemessen' kommunizieren",
+  "endpoint_rule": "Evaluationsendpunkt nie aus kc_status, sondern aus dem unabhängigen verzögerten Test (RT-26)",
+  "decision_tier": {
+   "source": "RT-32; Owner-Entscheidung OD-29",
+   "allowed_designs_proposed": [
+    "Within-Learner-Itemrandomisierung",
+    "n-of-1 mit vorab festgelegter Analyse"
+   ],
+   "banned_decision_surrogates": [
+    "Anki-Retention",
+    "Nutzungszeit",
+    "Agenten-Audits",
+    "Golden References",
+    "Zufriedenheit"
+   ],
+   "default_until_owner": "nur Behauptungsstufe"
+  }
  },
  "privacy": [
   "lokale Speicherung",
@@ -491,7 +536,7 @@
   {
    "id": "FX-10",
    "case": "Nachweisrolle 'transfer' in Tutor-Kontext angefordert",
-   "expected": "Brief ohne Schlüssel; Abbruch bei Leck",
+   "expected": "kein Export der Nachweisaufgabe (Abbruch mit Meldung) bzw. Verhalten nach OD-30; nie Schlüssel im Brief (RT-27)",
    "policy_or_defect": "R9-POL-04"
   },
   {
@@ -505,12 +550,39 @@
    "case": "Rechtsaussage ohne Stichtag",
    "expected": "nicht als geltend ausgegeben",
    "policy_or_defect": "R3-POL-01"
+  },
+  {
+   "id": "FX-13",
+   "case": "Lösung einer Schwesteraufgabe im selben KC gesehen, 1 min später andere Aufgabe richtig",
+   "expected": "assistiert (KC-Fenster)",
+   "policy_or_defect": "RT-26"
+  },
+  {
+   "id": "FX-14",
+   "case": "Zeitstempel in der Zukunft bzw. importiertes Ereignis mit +24 h",
+   "expected": "time_quality unverified; kein Behalten",
+   "policy_or_defect": "RT-26"
+  },
+  {
+   "id": "FX-15",
+   "case": "binäre Rechtsfolge, umformuliert, nach 2 Tagen richtig",
+   "expected": "kein Beleg allein (low_entropy_answer)",
+   "policy_or_defect": "RT-13"
+  },
+  {
+   "id": "FX-16",
+   "case": "Beweis-KC: Prämissenauswahl (constraints) richtig, Konstruktion nie versucht",
+   "expected": "Zustand nur für comprehend_trace/validate_debug; construct NOT_ASSESSED",
+   "policy_or_defect": "RT-10"
   }
  ],
  "engine_today": {
   "practice_evidence_types": "engine@5ad257d9 learning/experience_evidence.py TYPES = attempt, hint, solution_reveal",
   "assist_events": "engine@5ad257d9 learning/policy.py ASSIST_EVENTS = hint, solution, tutor",
   "gaps": [
+   "helped() wertet Hilfe nur an derselben Aufgabe (RT-26)",
+   "Zeitstempel ungeprüft gegen Erfassungszeit (RT-26)",
+   "Zustand je KC statt je (KC, Kompetenztyp) (RT-10)",
    "kein assist_level-Feld (nur Ereignistypen)",
    "kein source-Feld je Versuch (nur diagnosis.evidence)",
    "kein time_quality",

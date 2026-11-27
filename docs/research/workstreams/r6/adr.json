@@ -730,8 +730,8 @@
   {
    "option": "H-AB",
    "criterion": "learning_relevance",
-   "rating": "favourable",
-   "reason": "relativ günstig: harter Kern genau dort, wo die Workstreams übereinstimmen (Messvertrag, Prüfer, Enthaltung); schwach belegte Sequenzen bleiben parametrisiert und reversibel. Keine Wirkung belegt.",
+   "rating": "mixed",
+   "reason": "gemischt wie alle Optionen: keine Option hat Lernevidenz (RT-36). Vorteil nur bei Messintegrität: harter Kern dort, wo die Workstreams übereinstimmen (Messvertrag, Prüfer, Enthaltung); schwach belegte Sequenzen bleiben parametrisiert und reversibel. Die Auswahl stützt sich nicht auf dieses Kriterium.",
    "locators": [
     "R1 §5",
     "R2-POL-14",
@@ -756,6 +756,7 @@
    ],
    "unknowns": [
     "Ergebnisse des Prüferaudits G3",
+    "bekannte Lücke des Ausdrucksprüfers: Stichprobe nur in (0.15, 0.95), fester Seed (RT-11)",
     "Reliabilität menschlicher Bewertung (U3)"
    ]
   },
@@ -997,42 +998,46 @@
   "components": [
    {
     "id": "K1",
-    "name": "semantischer Vertrag",
+    "name": "semantischer Vertrag (inkl. alternative_routes, evidence_channel, transfer_dimension je Item; RT-04, RT-29)",
     "necessity": [
      "D2",
      "D3",
      "D5",
      "D7"
     ],
-    "exists_today": "em-experience-v1"
+    "exists_today": "em-experience-v1",
+    "catches": "A: Prüferpflicht je Vorlage nicht durchgesetzt (RT-33)"
    },
    {
     "id": "K2",
-    "name": "Evidenzkern",
+    "name": "Evidenzkern (Zustand je Kompetenz und Kompetenztyp; Hilfe auf KC-Ebene mit Zeitfenster; Zeitplausibilität; RT-10, RT-26)",
     "necessity": [
      "D1",
      "D6",
      "D9"
     ],
-    "exists_today": "policy.kc_status, experience_evidence"
+    "exists_today": "policy.kc_status, experience_evidence",
+    "catches": "S0: Schwesterlösung und Zukunftszeitstempel ergeben Behalten (RT-26)"
    },
    {
     "id": "K3",
-    "name": "Prüferadapter",
+    "name": "Prüferadapter (Stichprobe aus deklariertem Definitionsbereich, exakte Prüfung Pflicht wo möglich; RT-11)",
     "necessity": [
      "D2"
     ],
-    "exists_today": "diagnose.py L1-L5, expr.py, experience_proof_checks.py"
+    "exists_today": "diagnose.py L1-L5, expr.py, experience_proof_checks.py",
+    "catches": "C: Auditoren derselben Modellfamilie als Prüfer (RT-35)"
    },
    {
     "id": "K4",
-    "name": "Entscheidungsfunktionen mit Regel- und Policy-IDs, ohne Regelsprache",
+    "name": "Entscheidungsfunktionen mit Regel- und Policy-IDs, ohne Regelsprache; nur beobachtbare Prädikate; kein automatisches Überspringen; kein Novizen-Klassifikator als Standard (RT-02, RT-19, RT-34)",
     "necessity": [
      "D6",
      "D10",
      "D11"
     ],
-    "exists_today": "policy.decide R0-RE"
+    "exists_today": "policy.decide R0-RE",
+    "catches": "B: Scheinpräzision durch unbeobachtbare Kontextprädikate (RT-34)"
    },
    {
     "id": "K5",
@@ -1045,14 +1050,27 @@
    },
    {
     "id": "K6",
-    "name": "Domänenpakete als Daten; Agenten nur zur Build-Zeit hinter Gates und menschlicher Prüfung",
+    "name": "Domänenpakete als Daten; Agenten nur zur Build-Zeit hinter Gates und menschlicher Prüfung; Build-Zeit-Audits ersetzen nie G3/G4 (RT-35)",
     "necessity": [
      "D7",
      "D8"
     ],
-    "exists_today": "prompts/ (Autorenrollen), em-track-v1"
+    "exists_today": "prompts/ (Autorenrollen), em-track-v1",
+    "catches": "C: Laufzeitdrift und Identitätsverlust (RT-35)"
    }
   ],
+  "precedence": {
+   "order": [
+    "Wahrheit, Sicherheit und Datensicherheit",
+    "Messintegrität",
+    "ausdrücklicher Wunsch der lernenden Person",
+    "didaktischer Standard",
+    "Komfort und Automatisierung"
+   ],
+   "source": "docs/PRODUCT_CONTRACT.md Conflict rule; RT-25",
+   "rule": "jeder bekannte Paarkonflikt zwischen Workstream-Konfliktregeln erhält einen Testfall; Rangfolge vom Owner mit OD-01 zu bestätigen"
+  },
+  "selection_basis": "Prüfbarkeit, Sicherheit, Messintegrität, Kosten, Offline, Migration; nicht Lernwirksamkeit (RT-36)",
   "excluded": [
    "generische Policy-Engine oder Regelsprache",
    "vollständiger kursübergreifender Kompetenzgraph",
@@ -1088,7 +1106,7 @@
     "Messvertrag und Prüferpflicht je Vorlage dupliziert und nicht zentral durchgesetzt",
     "R2-POL-14-Falsifikator ungeschützt"
    ],
-   "reconsider_if": "nie allein; Bestandteil von H-AB"
+   "reconsider_if": "nie allein; Bestandteil von H-AB. Vor Ausweitung der Vorlagen über das MCS hinaus: Experiment RT-33 (2 Vorlagen x 3 Domänen, Anteil NOT_APPLICABLE/überschriebener Felder, blinde menschliche Bewertung)"
   },
   {
    "option": "B",
@@ -1096,17 +1114,17 @@
     "Regelsprache und vollständiger Graph ohne konkrete Notwendigkeit: 0 high, 14 moderate von 116, alle NOT_RUN",
     "Voraussetzungsgraph zurückgestellt (R9 §2)"
    ],
-   "reconsider_if": "nach G6 verlangen evaluierte Policies Kontextbedingungen, die K4 nur durch Code-Duplizierung ausdrücken kann, oder ein Review zeigt, dass K4 nicht mehr prüfbar ist"
+   "reconsider_if": "nach G6 verlangen evaluierte Policies Kontextbedingungen, die K4 nur durch Code-Duplizierung ausdrücken kann, oder ein Review zeigt, dass K4 nicht mehr prüfbar ist; und das Experiment RT-34 (20 Policies als Regeln auf 30 synthetischen Spuren) zeigt, dass Entscheidungen nicht überwiegend an unbeobachtbaren Prädikaten hängen"
   },
   {
    "option": "C",
    "reasons": [
     "Budget 0, nicht offline, nicht reproduzierbar",
-    "Auditoren liefern nur agent_judgement (R2-POL-05, R9-POL-05)",
+    "Auditoren liefern nur agent_judgement (R2-POL-05, R9-POL-05) und teilen Blindstellen mit dem Generator (RT-35)",
     "Prompt-Injection aus untrusted Quelltext",
     "historische Produkte HUMAN_REJECTED"
    ],
-   "reconsider_if": "vorab registrierte Evaluation zeigt Nicht-Unterlegenheit agentisch komponierter Strecken bei verzögertem unassistiertem Transfer, menschliche Inhaltsprüfung lehnt nicht ab, Budget freigegeben"
+   "reconsider_if": "vorab registrierte Evaluation zeigt Nicht-Unterlegenheit agentisch komponierter Strecken bei verzögertem unassistiertem Transfer, menschliche Inhaltsprüfung lehnt nicht ab, Budget freigegeben; zusätzlich Experiment RT-35 (gepflanzte Defekte: Auditor-Recall je Defektklasse gegen Mensch, GUID-Churn) mit Auditoren aus anderer Modellfamilie und Subgruppenanalyse für Alternativrouten (RT-30)"
   },
   {
    "option": "H-BC",
@@ -1129,13 +1147,15 @@
   "Fehlkonzeptdiagnose einer Person (R5-POL-09)",
   "empirisch kalibrierte Parameter (CD-4)",
   "Neuro-, Kognitions- oder Wohlbefindenseffekte auf Leistung (R1-POL-B09, R1-POL-B11)",
-  "'ohne jede Hilfe' statt 'ohne sichtbare Hilfe'",
+  "'ohne jede Hilfe' statt 'ohne protokollierte Hilfe' (RT-27)",
+  "Gültigkeit für Erwachsene und Selbststudium, wo nur Schul- oder Laborevidenz vorliegt (RT-08)",
+  "Anki-Selbstbewertung als Korrektheit (RT-28)",
   "die Architekturbewertung als Messung"
  ],
  "migration_path": [
   {
    "step": "M0",
-   "content": "CD-8-Fix (Anki-Exportidentität) als eigener Entwurfs-PR; Hygiene nach OD-20",
+   "content": "CD-8-Fix (Anki-Exportidentität) als eigener Entwurfs-PR, Änderungsklassen im Update-Bericht nach OD-31 (RT-12, RT-21); Hygiene nach OD-20",
    "requires_gate": "none (architekturunabhängig)",
    "verifiable_by": "Importtests in Wegwerfsammlung (R8-POL-08)"
   },
@@ -1159,9 +1179,9 @@
   },
   {
    "step": "M4",
-   "content": "Vorlagen für Verfahren und Abruf",
+   "content": "Vorlagen für Verfahren und Abruf; vorher universelle Engine-Regeln operationsgebunden machen (RP-R1, WE-R1/R2, MC-R1, PR-R1, AS-R1; RT-01..RT-04, RT-19) über OD-27",
    "requires_gate": "G2",
-   "verifiable_by": "Vorlagen-Validator"
+   "verifiable_by": "Vorlagen-Validator; NOT_APPLICABLE-Pfad je Regel getestet"
   },
   {
    "step": "M5",
@@ -1179,7 +1199,11 @@
  "minimum_credible_system": {
   "claim_under_test": "Adaptive Strecke des interaktiven Produkts vs. statische Workbook-Sequenz mit denselben Worked Examples und Aufgaben bei gleicher Zeit: unassistierte Leistung an neuen, unabhängig verfassten isomorphen und Transferitems nach >= 7 Tagen echter verstrichener Zeit, mindestens vorab registrierte Mindestdifferenz",
   "secondary": "prädiktive Validität von RETAINED_AFTER_ELAPSED_TIME gegenüber INDEPENDENT_PASS (R5-POL-01 Falsifikator)",
-  "design": "innerhalb einer Person, Kompetenzen randomisiert zu Bedingungen, gegenbalanciert, Seed vor Exposition committet; Bedingung nicht verblindbar (offengelegt); Gruppen nach R5-POL-05",
+  "design": "innerhalb einer Person, Kompetenzen randomisiert zu Bedingungen, gegenbalanciert, Seed vor Exposition committet; Bedingung nicht verblindbar (offengelegt); Gruppen nach R5-POL-05; im Ein-Personen-Fall Entscheidungsstufe nach OD-29 (RT-32)",
+  "endpoint_source": "unabhängiger verzögerter Test; nie kc_status (RT-26 Blocker)",
+  "population": "Erwachsene/Hochschule; keine Übertragung von Schulevidenz behauptet (RT-08)",
+  "item_requirements": "Nachweis- und Testitems deklarieren Transferdimension und unterscheiden sich im Lösungsweg oder Ergebnis (RT-13, RT-29)",
+  "hint_ladder": "nur für symbolic_procedure; Stufenzahl vorläufig (RT-07, CD-4)",
   "operations": [
    "symbolic_procedure",
    "recall_discrimination"
@@ -1192,7 +1216,7 @@
   ],
   "verifiers": [
    "numeric_single_value (nur mit Einheit und als Teilprüfung)",
-   "algebraic_oracle_cas",
+   "algebraic_oracle_cas (nach RT-11-Korrektur: Definitionsbereich, exakte Prüfung)",
    "answer_key_closed_item"
   ],
   "excluded": [
@@ -1258,14 +1282,16 @@
     "OD-02",
     "OD-03",
     "OD-04",
-    "OD-20"
+    "OD-20",
+    "OD-31"
    ]
   },
   {
    "id": "G2",
    "name": "Vertragskern",
    "pass_criteria": [
-    "adversariale Fixture-Suite (observation_contract_v1.adversarial_fixtures) mit 0 Verstößen in Python und JS"
+    "adversariale Fixture-Suite (observation_contract_v1.adversarial_fixtures, inkl. FX-13..FX-16 aus RT-26/RT-27/RT-29) mit 0 Verstößen in Python und JS",
+    "jeder bekannte Paarkonflikt der Rangfolge hat einen Testfall (RT-25)"
    ],
    "fails_if": "ein einziger Verstoß",
    "blocked_by_owner_decisions": [
@@ -1273,14 +1299,16 @@
     "OD-10",
     "OD-12",
     "OD-25",
-    "OD-27"
+    "OD-27",
+    "OD-28",
+    "OD-30"
    ]
   },
   {
    "id": "G3",
    "name": "Prüferaudit",
    "pass_criteria": [
-    "Known-Answer-Satz mit adversarialen Antworten je MCS-Prüferklasse besteht",
+    "Known-Answer-Satz mit adversarialen Antworten je MCS-Prüferklasse besteht, inkl. definitionsbereichssensitiver Fälle wie sqrt(x^2) gegen x und negativer Werte (RT-11)",
     "menschliche Stichprobe (Umfang vorab festgelegt) findet kein Item mit Abweichung zwischen deklarierten und tatsächlich geprüften Teilen"
    ],
    "fails_if": "eine Abweichung; dann technische Erzwingung vor G4",
@@ -1306,6 +1334,7 @@
    "id": "G5",
    "name": "Präregistrierung",
    "pass_criteria": [
+    "Endpunkt ist der unabhängige verzögerte Test, nicht kc_status (RT-26)",
     "Protokoll mit Endpunkt, Mindestdifferenz, Verzögerung, Zuteilungsseed, Analyse- und Fehlwerteplan, Abbruchregeln, Einwilligung und Äquivalenzpilot vor erster Exposition committet",
     "unabhängige Itemautorschaft bestätigt"
    ],
@@ -1315,7 +1344,8 @@
     "OD-13b",
     "OD-21",
     "OD-22",
-    "OD-25"
+    "OD-25",
+    "OD-29"
    ]
   },
   {
@@ -1329,7 +1359,8 @@
    "blocked_by_owner_decisions": [
     "OD-01",
     "OD-13b",
-    "OD-13c"
+    "OD-13c",
+    "OD-29"
    ]
   },
   {
@@ -1339,7 +1370,11 @@
     "G6-Bericht liegt vor",
     "G3 für neue Prüferklassen bestanden",
     "für menschlich bewertete Operationen: Budget und berichtete Übereinstimmung zwischen Bewertenden im Pilot",
-    "für Code: Pyodide-Spike bestanden (Offline-Laden, Abbruch von Endlosschleifen, Größe)"
+    "für Code: Pyodide-Spike bestanden (Offline-Laden, Abbruch von Endlosschleifen, Größe); Belege nur aus engine-ausgeführten Läufen mit property-/mutationsbasierten verborgenen Tests; eingefügte Ausgaben = self_report (RT-15)",
+    "für Klinik: Prävalenzverteilung der Fallbank deklariert, Referenzdiagnosen fachlich geprüft (RT-14)",
+    "für CAD: verdeckte, randomisierte Änderungstests oder NOT_APPLICABLE (RT-16)",
+    "für Hochrisikodomänen: Messgröße Sitzungsende nach Enthaltung und abgestufte Rückfallebene (RT-24)",
+    "Vorlagen-Experiment RT-33 durchgeführt"
    ],
    "fails_if": "fehlende Voraussetzung",
    "blocked_by_owner_decisions": [
@@ -1496,10 +1531,12 @@
   },
   {
    "id": "OD-10",
-   "question": "Standard-Brief keyless; Musterlösung nur im Modus with_reference für Übungsitems",
+   "question": "Standard-Brief keyless; Musterlösung nur im Modus with_reference für Übungsitems nach protokolliertem Versuch; welche Daten überhaupt an Drittanbieter-Chats gehen (keine, nur Übungsschlüssel nach Versuch, frei mit Hinweis)",
    "source": [
     "R9 §6 Nr. 1",
-    "CD-7"
+    "CD-7",
+    "RT-27",
+    "RT-42"
    ],
    "blocks": [
     "G2"
@@ -1689,11 +1726,12 @@
   },
   {
    "id": "OD-24",
-   "question": "Praxis-/Zertifizierungsgrenze und Liste gefährlicher Verfahren bestätigen",
+   "question": "Praxis-/Zertifizierungsgrenze und Liste gefährlicher Verfahren bestätigen; Umfang je Hochrisikodomäne (Kompetenzbereich oder nur Wissensbegleiter) und ob ein menschlicher Bewertungspfad aufgebaut wird",
    "source": [
     "R3-POL-10",
     "R4-POL-01",
-    "R4-POL-13"
+    "R4-POL-13",
+    "RT-40"
    ],
    "blocks": [
     "G7"
@@ -1717,34 +1755,99 @@
   },
   {
    "id": "OD-26",
-   "question": "Unabhängige zweite Prüfung der Berichte R0-R9 und R6",
+   "question": "Unabhängige zweite Prüfung der Berichte R0-R9 und R6: mindestens eine menschliche Fachprüfung Lernwissenschaft und je Hochrisikodomäne eine Fachperson für Stichproben; Übernahme der Red-Team-Sicherheitskorrekturen (z. B. RT-06, RT-08)",
    "source": [
     "Charter",
-    "PROGRAMME_STATE.workstreams"
+    "PROGRAMME_STATE.workstreams",
+    "RT-43",
+    "RT-06",
+    "RT-08"
    ],
    "blocks": [
     "POLICY_STATUS_CHANGE"
    ],
-   "default": "alle Policies bleiben design_hypothesis"
+   "default": "alle Policies bleiben design_hypothesis; Red-Team-Korrekturen nicht angewendet"
   },
   {
    "id": "OD-27",
-   "question": "KB-Textkorrekturen anwenden (CD-3 zu AI-R1; R1A §5.12)",
+   "question": "KB- und Engine-Regeltexte korrigieren: CD-3 zu AI-R1 (RT-05), R1A §5.12, universelle Regeln RP-R1, WE-R1/R2, MC-R1, PR-R1, AS-R1 operationsgebunden machen (RT-01..RT-04, RT-19)",
    "source": [
     "CD-3",
-    "R1 §2"
+    "R1 §2",
+    "RT-01",
+    "RT-02",
+    "RT-03",
+    "RT-04",
+    "RT-05"
    ],
    "blocks": [
     "G2"
    ],
-   "default": "nicht angewendet; Verbotsliste des ADR gilt trotzdem"
+   "default": "nicht angewendet; Verbotsliste des ADR gilt trotzdem; M4 bleibt gesperrt"
+  },
+  {
+   "id": "OD-28",
+   "question": "Darf die Engine fällige Retest-Aufgaben (nicht Karten) anzeigen, oder Retest nur über Anki-Verweiskarten?",
+   "source": [
+    "RT-37",
+    "RT-22",
+    "AD-1",
+    "R8-POL-01"
+   ],
+   "blocks": [
+    "G2"
+   ],
+   "default": "passive Zustandsanzeige RETEST_DUE beim Öffnen der Strecke wie heute (Regel RE), ohne Warteschlange und ohne Benachrichtigung"
+  },
+  {
+   "id": "OD-29",
+   "question": "Entscheidungsstufe des Messvertrags (zulässige schwächere Designs wie n-of-1, Itemrandomisierung; verbotene Ersatzgrößen) und verbindliche Produktwortliste ('ohne protokollierte Hilfe', 'nicht gemessen')",
+   "source": [
+    "RT-38",
+    "RT-32",
+    "R5-POL-05"
+   ],
+   "blocks": [
+    "G5",
+    "G6"
+   ],
+   "default": "nur Behauptungsstufe; jede Lernaussage 'nicht gemessen'; Ersatzgrößen (Anki-Retention, Nutzungszeit, Agenten-Audits) nicht als Entscheidungsgrundlage"
+  },
+  {
+   "id": "OD-30",
+   "question": "Nachweisitem auf ausdrücklichen Wunsch zeigen und ausmustern (assistiert, frisches Nachweisitem) oder verweigern",
+   "source": [
+    "RT-39",
+    "RT-20",
+    "R9-POL-04",
+    "R5-POL-06"
+   ],
+   "blocks": [
+    "G2"
+   ],
+   "default": "zeigen, als assistiert protokollieren, Item ausmustern; Engine stellt frisches Nachweisitem, sofern vorhanden"
+  },
+  {
+   "id": "OD-31",
+   "question": "Edit- und Änderungsklassen-Politik für generierte Anki-Notizen (überschreiben, schützen, forken; redaktionell vs. substanziell, ggf. neue GUID) vor dem CD-8-Fix",
+   "source": [
+    "RT-41",
+    "RT-12",
+    "RT-21",
+    "R8-POL-05",
+    "CD-8"
+   ],
+   "blocks": [
+    "G1"
+   ],
+   "default": "R8-Standard: unveränderte Notizen nicht neu stempeln; substanzielle Änderungen überschreiben mit Eintrag im Update-Bericht; Historie bleibt; keine Lesezugriffe auf die Sammlung"
   }
  ],
  "top_owner_decisions": [
   "OD-01",
   "OD-02",
   "OD-13b",
-  "OD-03",
+  "OD-31",
   "OD-20"
  ],
  "p4_integration_plan": {
@@ -1770,8 +1873,290 @@
   "local_rl_pilot": "nicht verändert; 66 Commits divergiert, nicht öffentlich, kursbasiert; kein MCS-Kandidat; Übertragung von Fixes entscheidet der Owner nach G1"
  },
  "red_team_reconciliation": {
-  "status": "pending",
-  "source": "origin/research/r6-red-team-20261127:docs/research/workstreams/r6/red_team_findings.json",
-  "items": []
+  "status": "reconciled_by_author_pending_lead_review",
+  "source": "origin/research/r6-red-team-20261127:docs/research/workstreams/r6/red_team_findings.json @ 091ead46",
+  "scope": "alle Befunde der Schwere blocker und major (1 blocker, 39 major); minor RT-09, RT-18, RT-31 nicht einzeln abgebildet",
+  "items": [
+   {
+    "finding": "RT-01",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "universelle Regel RP-R1 vor Vorlagen operationsgebunden; NOT_APPLICABLE-Pfad",
+    "where": "M4, OD-27"
+   },
+   {
+    "finding": "RT-02",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "K4 ohne automatisches Überspringen nach einem Item; Überspringen nur als reversibles Angebot",
+    "where": "K4, M4, OD-27"
+   },
+   {
+    "finding": "RT-03",
+    "severity": "major",
+    "disposition": "partial",
+    "change": "Konfidenz nur stichprobenartig (MC-R1/PR-R1 über OD-27); Nutzung der Stichprobe als Within-Learner-Vergleich außerhalb des MCS",
+    "where": "M4, OD-27"
+   },
+   {
+    "finding": "RT-04",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "K1-Item mit alternative_routes, verifier, evidence_channel; Zeit als Schätzung",
+    "where": "K1, ontology item_fields"
+   },
+   {
+    "finding": "RT-05",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "bereits OD-10/OD-27; AI-R1-Text bleibt bis Owner-Entscheidung unverändert, Verbotsliste gilt",
+    "where": "OD-10, OD-27, cannot_claim"
+   },
+   {
+    "finding": "RT-06",
+    "severity": "major",
+    "disposition": "partial",
+    "change": "R6 ändert keine Workstream-Sicherheitsstufen; Korrektur als Eingabe für OD-26; MCS hängt nicht an R2-POL-11",
+    "where": "OD-26"
+   },
+   {
+    "finding": "RT-07",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Hilfeleiter im MCS nur für symbolic_procedure, Stufenzahl vorläufig; für Beweis/Recht keine Stufenzahl",
+    "where": "MCS hint_ladder"
+   },
+   {
+    "finding": "RT-08",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Verbotsliste: keine Gültigkeit für Erwachsene/Selbststudium aus Schulevidenz; population_match als Empfehlung an OD-26; MCS-Population benannt",
+    "where": "cannot_claim, MCS population, OD-26"
+   },
+   {
+    "finding": "RT-10",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Zustände je (Kompetenz, Kompetenztyp); Prüfer muss Kompetenztyp abdecken; Konstruktion ohne Prüfer nicht beobachtet",
+    "where": "K2, observation_contract state_derivation"
+   },
+   {
+    "finding": "RT-11",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Ausdrucksprüfer: Stichprobe aus deklariertem Definitionsbereich, exakte Prüfung Pflicht wo möglich; G3 mit definitionsbereichssensitiven Fällen",
+    "where": "K3, G3, MCS verifiers"
+   },
+   {
+    "finding": "RT-12",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Änderungsklassen redaktionell/substanziell im Update-Bericht; Entscheidung OD-31",
+    "where": "M0, OD-31"
+   },
+   {
+    "finding": "RT-13",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Items mit geringer Ergebnisvielfalt zählen nicht allein; Retest kontrafaktisch variiert; Begründung getrennt vom Ergebnis",
+    "where": "observation_contract state_derivation, FX-15"
+   },
+   {
+    "finding": "RT-14",
+    "severity": "major",
+    "disposition": "partial",
+    "change": "Klinik nicht im MCS; als G7-Voraussetzung (Prävalenz deklariert, Referenzdiagnosen geprüft)",
+    "where": "G7"
+   },
+   {
+    "finding": "RT-15",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "G7-Voraussetzung für Code: engine-ausgeführte Läufe, property-/mutationsbasierte verborgene Tests, eingefügte Ausgaben = self_report",
+    "where": "G7, ontology hidden_or_property_tests"
+   },
+   {
+    "finding": "RT-16",
+    "severity": "major",
+    "disposition": "partial",
+    "change": "CAD nicht im MCS; G7: verdeckte randomisierte Änderungstests oder NOT_APPLICABLE",
+    "where": "G7"
+   },
+   {
+    "finding": "RT-17",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Anzeige 'Wissen geprüft - Ausführung nicht beobachtet' ohne Fortschrittsbalken bei physischem Anteil; Übungsprotokoll eigener Kanal; Bewertungspfad OD-24",
+    "where": "ontology tracks display_rule, OD-24"
+   },
+   {
+    "finding": "RT-19",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Standard ohne Novizen-Klassifikator: Beispiel zuerst, Vorhersage/Erkundung als Angebot",
+    "where": "K4"
+   },
+   {
+    "finding": "RT-20",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Rangfolge festgelegt (Vorschlag), Wertentscheidung OD-30; Nachweisitems nie im Brief",
+    "where": "precedence, OD-30, FX-10"
+   },
+   {
+    "finding": "RT-21",
+    "severity": "major",
+    "disposition": "partial",
+    "change": "Update-Bericht nennt geänderte Notizen (Überschreibrisiko); Erkennung lokaler Änderungen durch Lesen der Sammlung abgelehnt (R8: keine Lesezugriffe), außer Owner erlaubt es über OD-31",
+    "where": "M0, OD-31"
+   },
+   {
+    "finding": "RT-22",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "ausdrückliche Entscheidung nötig: OD-28 mit Default passive Zustandsanzeige ohne Warteschlange",
+    "where": "OD-28"
+   },
+   {
+    "finding": "RT-23",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Vorhersage-Gates nur in Spur-A-Umgebungen mit engine-eigener Ausführung; keine Ausprobier-Aufforderung zu realer Praxis",
+    "where": "ontology practice_certification_boundary"
+   },
+   {
+    "finding": "RT-24",
+    "severity": "major",
+    "disposition": "partial",
+    "change": "normative Grenzen bleiben; G7 verlangt Messgröße Sitzungsende nach Enthaltung und abgestufte, gekennzeichnete Rückfallebene",
+    "where": "G7"
+   },
+   {
+    "finding": "RT-25",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "globale Rangfolge aus dem Produktvertrag abgeleitet, Paarkonflikte mit Testfall in G2; Bestätigung mit OD-01",
+    "where": "precedence, G2"
+   },
+   {
+    "finding": "RT-26",
+    "severity": "blocker",
+    "disposition": "accept",
+    "change": "Hilfe auf KC-Ebene mit Zeitfenster; Zeitstempel in der Zukunft oder aus Importen = time_quality unverified; Anzeige 'erneut gelöst nach >= 20 h ohne protokollierte Hilfe'; Evaluationsendpunkt nie kc_status",
+    "where": "K2, observation_contract, FX-13/FX-14, G5, MCS endpoint_source"
+   },
+   {
+    "finding": "RT-27",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Nachweisrollen nicht exportieren; Schlüssel nur nach protokolliertem Versuch; Produktwort 'ohne protokollierte Hilfe'",
+    "where": "FX-10, OD-10, cannot_claim"
+   },
+   {
+    "finding": "RT-28",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Anki-Reviews sind self_report; A01-Falsifikator nur an engine-geprüften Items; MCS nutzt keine Anki-Daten",
+    "where": "ontology evidence_kinds anki_review, cannot_claim"
+   },
+   {
+    "finding": "RT-29",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "'umformuliert' operationalisiert: Transferdimension deklariert, Unterschied im Lösungsweg oder Ergebnis",
+    "where": "K1, observation_contract item.transfer_dimension, MCS item_requirements"
+   },
+   {
+    "finding": "RT-30",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "keine Lockerung im ADR; Bedingungen in Wiedervorlage von C aufgenommen",
+    "where": "rejected_options C"
+   },
+   {
+    "finding": "RT-32",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "zweistufiger Vertrag: Behauptungsstufe unverändert, Entscheidungsstufe per OD-29",
+    "where": "observation_contract evaluation_contract.decision_tier, OD-29"
+   },
+   {
+    "finding": "RT-33",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Vorlagen-Experiment vor Ausweitung über MCS (G7, Wiedervorlage A); universelle Regeln vor M4 korrigiert",
+    "where": "G7, M4, rejected_options A"
+   },
+   {
+    "finding": "RT-34",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "K4 nur beobachtbare Prädikate; Experiment als Bedingung der Wiedervorlage von B",
+    "where": "K4, rejected_options B"
+   },
+   {
+    "finding": "RT-35",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Build-Zeit-Audits ersetzen nie G3/G4; Experiment als Bedingung der Wiedervorlage von C",
+    "where": "K6, rejected_options C"
+   },
+   {
+    "finding": "RT-36",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "Lernrelevanz von H-AB auf 'gemischt'; Auswahlbasis ausdrücklich ohne Lernwirksamkeit; je Baustein der abgefangene Fehler",
+    "where": "assessments H-AB, selection_basis, components.catches"
+   },
+   {
+    "finding": "RT-37",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "neue Owner-Entscheidung",
+    "where": "OD-28"
+   },
+   {
+    "finding": "RT-38",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "neue Owner-Entscheidung",
+    "where": "OD-29"
+   },
+   {
+    "finding": "RT-39",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "neue Owner-Entscheidung",
+    "where": "OD-30"
+   },
+   {
+    "finding": "RT-40",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "OD-24 erweitert",
+    "where": "OD-24"
+   },
+   {
+    "finding": "RT-41",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "neue Owner-Entscheidung, blockiert G1 (CD-8-Fix)",
+    "where": "OD-31"
+   },
+   {
+    "finding": "RT-42",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "OD-10 erweitert",
+    "where": "OD-10"
+   },
+   {
+    "finding": "RT-43",
+    "severity": "major",
+    "disposition": "accept",
+    "change": "OD-26 erweitert",
+    "where": "OD-26"
+   }
+  ]
  }
 }

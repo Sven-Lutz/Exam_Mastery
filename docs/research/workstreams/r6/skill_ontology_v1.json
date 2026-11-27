@@ -596,6 +596,12 @@
    "source": "self_report"
   },
   {
+   "id": "anki_review",
+   "counts_as_competence": "never",
+   "source": "self_report",
+   "note": "Again/Good ist Selbstbewertung nach dem Aufdecken (RT-28); R1-POL-A01-Falsifikator nur an engine-geprüften Items"
+  },
+  {
    "id": "scheduler_statistic",
    "counts_as_competence": "never",
    "source": "none",
@@ -722,8 +728,8 @@
  "verifier_class_details": [
   {
    "id": "algebraic_oracle_cas",
-   "checks": "Äquivalenz von Ausdrücken, je Teilschritt",
-   "does_not_check": "Methodenwahl, Begründung; unentscheidbare Äquivalenzen",
+   "checks": "Äquivalenz von Ausdrücken, je Teilschritt (Stichprobe aus deklariertem Definitionsbereich, exakte Prüfung wo möglich; RT-11)",
+   "does_not_check": "Methodenwahl, Begründung; unentscheidbare Äquivalenzen; heute: Stichprobe nur in (0.15, 0.95) mit festem Seed, sqrt(x^2) = x wird akzeptiert (RT-11)",
    "competence_evidence": "yes_for_checked_step_if_item_new",
    "source": "R2-POL-14",
    "engine_today": "expr.py randomisierte Identität (probabilistisch, 12 Punkte), experience_proof_checks.py exakte Polynomschritte"
@@ -754,8 +760,8 @@
   },
   {
    "id": "hidden_or_property_tests",
-   "checks": "Verhalten auf unbekannten Fällen bzw. Eigenschaften",
-   "does_not_check": "Spezifikationsfehler, Lesbarkeit",
+   "checks": "Verhalten auf unbekannten Fällen bzw. Eigenschaften (nur engine-ausgeführt; property-/mutationsbasiert, nicht aus sichtbaren Tests ableitbar; RT-15)",
+   "does_not_check": "Spezifikationsfehler, Lesbarkeit; Sonderfallbehandlung bei Tests aus demselben Generator",
    "competence_evidence": "yes_for_function_behaviour",
    "source": "R2-POL-14; R2-POL-13",
    "engine_today": "nicht vorhanden (Pyodide-Spike offen)"
@@ -842,8 +848,8 @@
   },
   {
    "id": "cad_change_test",
-   "checks": "ob ein Modell Änderungen der Konstruktionsabsicht übersteht",
-   "does_not_check": "Konstruktionsabsicht valide (nur konzeptuell)",
+   "checks": "ob ein Modell verdeckte, randomisierte Änderungen über Parameterbereiche übersteht (RT-16)",
+   "does_not_check": "Konstruktionsabsicht valide (nur konzeptuell); angekündigte Einzelwerte sind ausnutzbar",
    "competence_evidence": "partial_unvalidated",
    "source": "R4-POL-11",
    "engine_today": "nicht vorhanden"
@@ -885,7 +891,8 @@
    "in_product": "nie angezeigt oder abgeleitet",
    "source": "R4-POL-01"
   },
-  "rule": "keine Promotion A->B->C durch Produktdaten (Simulator, Video, Foto, Sensor, Selbstauskunft, Sprachmodell)"
+  "rule": "keine Promotion A->B->C durch Produktdaten (Simulator, Video, Foto, Sensor, Selbstauskunft, Sprachmodell)",
+  "display_rule": "Kompetenzen mit physischem Anteil zeigen 'Wissen geprüft - Ausführung nicht beobachtet' ohne Fortschrittsbalken; Übungsprotokoll ist eigener, nicht-evidenzieller Kanal (RT-17)"
  },
  "practice_certification_boundary": [
   {
@@ -915,6 +922,10 @@
   {
    "rule": "Zustände sind keine Zertifikate",
    "policy": "R5-POL-01"
+  },
+  {
+   "rule": "Vorhersage-Gates nur in Spur-A-Umgebungen mit engine-eigener Ausführung; Texte zu realer Labor- oder Werkstattpraxis fordern nie zum Ausprobieren auf (RT-23)",
+   "policy": "R4-POL-13"
   }
  ],
  "phases": [
@@ -961,6 +972,15 @@
   "not_applicable": "jeder Container kann NOT_APPLICABLE mit begründetem Fallback sein (AD-0)",
   "anki_scope": "nur abrufbare Bausteine; einziger Scheduler (R8-POL-01)"
  },
+ "item_fields": {
+  "alternative_routes": "zulässige Lösungsrouten mit je eigener Musterlösung (RT-04, R3-POL-11)",
+  "evidence_channel": "product | human | none (RT-04)",
+  "verifier": "Klasse, geprüfte und ungeprüfte Teile (R2-POL-14)",
+  "transfer_dimension": "worin sich ein Nachweisitem von gesehenen Items unterscheidet (Lösungsweg oder Ergebnis); Pflicht für Nachweisrollen (RT-29)",
+  "low_entropy_answer": "true bei binärer Rechtsfolge, Einzeldiagnose, MC, Wahr/Falsch: zählt nicht allein als Beleg (RT-13)",
+  "time_estimate": "Schätzung, keine Regel (CD-4)"
+ },
+ "state_key": "(competency_id, competence_type): ein Zustand je Kompetenz und Kompetenztyp; der Prüfer muss den Kompetenztyp abdecken (RT-10)",
  "prerequisites": {
   "representation": "Kompetenz-ID-Liste je Kompetenz (em-experience-v1, zyklenfrei geprüft)",
   "status": "kein kursübergreifender Graph (ADR: B verworfen)"

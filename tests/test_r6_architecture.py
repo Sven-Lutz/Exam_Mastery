@@ -218,6 +218,24 @@ class R6ArchitectureContract(unittest.TestCase):
             self.assertEqual(p["status"], "provisional_product_parameter")
         self.assertGreaterEqual(len(self.observation["adversarial_fixtures"]), 9)
 
+    # --- red-team reconciliation -----------------------------------------------------
+    def test_red_team_findings_are_reconciled(self):
+        rec = self.adr["red_team_reconciliation"]
+        self.assertNotEqual(rec["status"], "pending", "red-team findings exist and must be reconciled")
+        seen = set()
+        for item in rec["items"]:
+            self.assertIn(item["disposition"], {"accept", "partial", "reject"}, item)
+            self.assertIn(item["severity"], {"blocker", "major"}, item)
+            self.assertTrue(item["change"].strip(), item)
+            self.assertTrue(item["where"].strip(), item)
+            self.assertIn(item["finding"], self.md, "reconciled finding missing in the report")
+            seen.add(item["finding"])
+        self.assertEqual(len(seen), len(rec["items"]))
+        findings = R6 / "red_team_findings.json"
+        if findings.exists():  # present once the lead merges the red-team branch
+            required = {f["id"] for f in load(findings)["findings"] if f["severity"] in ("blocker", "major")}
+            self.assertEqual(required - seen, set(), "blocker/major findings without disposition")
+
     # --- report ----------------------------------------------------------------------
     def test_report_sections_and_hygiene(self):
         for heading in ("## 2. Synthese", "### 2.6 Was keine Architektur behaupten darf", "## 3. Architecture Decision Record",
