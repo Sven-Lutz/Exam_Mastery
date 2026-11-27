@@ -372,19 +372,28 @@
    "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/C2M-AUTHOR.json",
    "worktree": "Exam_Mastery-c2m-author"
+  },
+  {
+   "id": "C2M-SECOND",
+   "kind": "background subagent of LEAD",
+   "scope": "second contrasting course (linear algebra) end to end",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/C2M-SECOND.json",
+   "worktree": "Exam_Mastery-c2m-second"
   }
  ],
  "work_packages": [
   {
    "id": "WP-C2M-SECOND",
    "title": "Second contrasting owner course end-to-end (candidates: Lineare Algebra 1 with proofs; Patentrecht/Entrepreneurship)",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 0.7,
    "autostart": false,
-   "depends_on": [
-    "WP-C2M-IMPORT",
-    "WP-C2M-AUTHOR-RL"
-   ]
+   "depends_on": [],
+   "branch": "feat/c2m-second-linalg-20261127",
+   "base": "integration/mastery-v1-20261127 (9f202b0)",
+   "worktree": "Exam_Mastery-c2m-second",
+   "next_step": "Specialist C2M-SECOND: import the owner's linear algebra course through the product path, fix generic pipeline gaps, author one proof-rich chapter, page QA; lead integrates."
   },
   {
    "id": "WP-C2M-ANALYTICS",
