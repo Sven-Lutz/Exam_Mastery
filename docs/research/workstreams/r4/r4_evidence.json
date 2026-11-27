@@ -1,0 +1,1650 @@
+{
+ "schema": "r1-evidence/1",
+ "agent": "R4",
+ "updated": "2026-11-27T20:15:00+01:00",
+ "note": "Abstract and metadata retrieval for the registered DOIs used PubMed efetch, Crossref /works and the Semantic Scholar Graph API batch endpoint (free tiers); full texts only from open-access copies named in access.url. Abstract-level entries are not full-text analyses.",
+ "entries": [
+  {
+   "source_id": "sattelmayer2016motorprinciples",
+   "citation": "Sattelmayer, M., Elsig, S., Hilfiker, R., & Baer, G. (2016). A systematic review and meta-analysis of selected motor learning principles in physiotherapy and medical education. BMC Medical Education, 16, 15.",
+   "doi_or_url": "https://doi.org/10.1186/s12909-016-0538-z",
+   "source_type": "systematic_review_meta_analysis (RCTs)",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "PMC4714441 via NCBI efetch db=pmc (open access, CC BY); issue #25 seed PMID 26768734",
+    "sections_read": [
+     "Results: WP-PP, RP-BP, MP, AF incl. performance tests and movement duration",
+     "Risk of bias assessment",
+     "Discussion: summary of main results, quality of evidence, potential biases, agreements with other studies"
+    ]
+   },
+   "design": "Systematic review and random-effects meta-analysis of 15 RCTs (695 participants); Cochrane risk-of-bias tool",
+   "population": "Medical and physiotherapy students and residents; mostly surgical procedures (orthopaedic bone plating, laparoscopy, gynaecology, colonoscopy, joint mobilisation)",
+   "operation": "embodied_psychomotor: procedural motor skills",
+   "intervention": "whole vs part practice; random vs blocked practice; mental practice (added or substituted); terminal vs concurrent augmented feedback",
+   "comparator": "the respective alternative schedule or no additional practice",
+   "outcome": {
+    "measure": "procedure-specific checklists, global rating scales, error scores, movement duration",
+    "assisted": false,
+    "delay": "mostly immediate post-acquisition (0-10 min); some delayed retention 5 days to 6 weeks; few transfer tests (e.g. cadaver instead of artificial bone)",
+    "transfer": "near; one study each for most transfer tests"
+   },
+   "estimate": {
+    "metric": "SMD (random effects)",
+    "value": "mental practice post-acquisition SMD 0.43 [0.01, 0.85] (241 participants), transfer 0.20 [-0.56, 0.97]; random vs blocked post-acquisition 0.63 [-0.10, 1.36] (n = 31, 2 studies), transfer -0.22 [-1.36, 0.92] favouring blocked (1 study); feedback: delayed retention -0.35 [-0.78, 0.08] favouring concurrent, transfer 0.94 [0.18, 1.70] favouring terminal (1 study, n = 30)",
+    "ci": "95% CI as reported",
+    "k_or_n": "15 RCTs, 695 participants",
+    "note": "Several values extracted by the authors from graphs; most comparisons rest on 1-5 small studies."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "All included studies rated high risk of bias (no blinding of learners/educators; sequence generation poorly reported; detection bias unclear in three). Almost all tests immediately after practice, which the authors state gives only limited evidence of learning. In the random-vs-blocked studies the benefit reversed on a more complex transfer task (cadaver bone), consistent with task-complexity moderation. Simulation and real procedures were pooled for mental practice.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:mental_practice_supplement",
+     "relation": "supports",
+     "locator": "Results 'Performance tests (MP)'; Discussion 'Agreements with other studies' (MP as support, not replacement)"
+    },
+    {
+     "claim_id": "R4:ci_shrinks_with_complexity",
+     "relation": "supports",
+     "locator": "Results 'Performance tests RP-BP'; Discussion 'Summary of main results'"
+    },
+    {
+     "claim_id": "R4:feedback_schedule_uncertain",
+     "relation": "qualifies",
+     "locator": "Results 'Performance tests (AF)'; Discussion (guidance hypothesis cannot explain delayed retention)"
+    },
+    {
+     "claim_id": "R4:immediate_tests_overstate_learning",
+     "relation": "supports",
+     "locator": "Discussion 'Summary of main results'; 'Quality of the evidence'"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "czyz2024ciretention",
+   "citation": "Czyż, S. H., Wójcik, A. M., Solarská, P., & Kiper, P. (2024). High contextual interference improves retention in motor learning: systematic review and meta-analysis. Scientific Reports, 14, 15974.",
+   "doi_or_url": "https://doi.org/10.1038/s41598-024-65753-3",
+   "source_type": "systematic_review_meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "PMC11237090 via NCBI efetch db=pmc (open access)",
+    "sections_read": [
+     "Meta-analysis: results (three-level model, averaged-SMD model)",
+     "Laboratory vs field-based (applied) studies",
+     "Age-group analyses",
+     "Risk of publication bias assessment",
+     "Discussion incl. comparison with Brady 2004 and Ammar et al. 2023",
+     "Low quality and bias problem",
+     "Limitations",
+     "Conclusions"
+    ]
+   },
+   "design": "Systematic review; three-level mixed meta-analysis plus random-effects model with averaged SMDs",
+   "population": "Healthy children, adults and older adults learning motor tasks; 54 studies, 2068 participants, 194 effect sizes",
+   "operation": "embodied_psychomotor: motor skills (laboratory and sport tasks)",
+   "intervention": "high contextual interference (random practice schedule)",
+   "comparator": "low contextual interference (blocked schedule)",
+   "outcome": {
+    "measure": "task-specific motor performance on delayed retention test",
+    "assisted": false,
+    "delay": "delayed retention (study-specific)",
+    "transfer": "retention only (transfer in separate paper)"
+   },
+   "estimate": {
+    "metric": "SMD (three-level model)",
+    "value": "overall 0.63 [0.33, 0.93], without outliers 0.43 [0.19, 0.67]; laboratory 0.92 [0.48, 1.36]; applied 0.23 [-0.16, 0.62], after sensitivity analysis -0.01 [-0.35, 0.32]; young 0.02 [-0.90, 0.94]; older adults 1.45 [0.55, 2.35]",
+    "ci": "95% CI as reported",
+    "k_or_n": "54 studies / 194 ES / 2068 participants; laboratory 30 studies, applied 24 studies",
+    "note": "Total I2 about 90%; no formal publication-bias test performed because of extreme heterogeneity."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Authors' quality appraisal: only 3 of 54 articles moderate or high quality; no preregistered protocols; assessor blinding not reported in 56 of 59 studies. Setting and age are confounded (older adults only in laboratory, young almost only in applied settings). Effect sizes treated as independent within the three-level model. Authors explicitly re-ask whether CI is a laboratory artefact. Relevance: the applied-setting estimate, not the pooled one, is closest to craft/lab practice.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:ci_shrinks_with_complexity",
+     "relation": "supports",
+     "locator": "Results 'Laboratory vs. field-based (applied) studies'; Discussion para. 2 (Lee and White; complex tasks)"
+    },
+    {
+     "claim_id": "R4:ci_lab_benefit",
+     "relation": "supports",
+     "locator": "Results 'Three-level mixed model'"
+    },
+    {
+     "claim_id": "R4:ci_evidence_low_quality",
+     "relation": "supports",
+     "locator": "Discussion 'Low quality and bias problem'"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "czyz2024citransfer",
+   "citation": "Czyż, S. H., Wójcik, A. M., & Solarská, P. (2024). The effect of contextual interference on transfer in motor learning - a systematic review and meta-analysis. Frontiers in Psychology, 15, 1377122.",
+   "doi_or_url": "https://doi.org/10.3389/fpsyg.2024.1377122",
+   "source_type": "systematic_review_meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=39205981&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only (PMC11349744 exists, not read)"
+    ]
+   },
+   "design": "Systematic review and meta-analysis (registered CRD42021228267); 42 studies reviewed, 34 meta-analysed",
+   "population": "Healthy participants of different ages; laboratory and applied motor tasks",
+   "operation": "embodied_psychomotor",
+   "intervention": "random practice (high CI)",
+   "comparator": "blocked practice (low CI)",
+   "outcome": {
+    "measure": "motor performance on transfer tests",
+    "assisted": false,
+    "delay": "study-specific",
+    "transfer": "transfer to task variations"
+   },
+   "estimate": {
+    "metric": "SMD",
+    "value": "overall 0.55; laboratory 0.75 (significant); applied 0.34 (not significant); adults 0.54; older adults 1.28; young 0.12",
+    "ci": "not in abstract",
+    "k_or_n": "34 studies in meta-analysis"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Same author group and quality problems as czyz2024ciretention (not re-read). Same laboratory-vs-applied pattern for transfer.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:ci_shrinks_with_complexity",
+     "relation": "supports",
+     "locator": "abstract (applied SMD 0.34 n.s. vs laboratory 0.75)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "ammar2023cimyth",
+   "citation": "Ammar, A., Trabelsi, K., Boujelbane, M. A., Boukhris, O., Glenn, J. M., Chtourou, H., & Schöllhorn, W. I. (2023). The myth of contextual interference learning benefit in sports practice: A systematic review and meta-analysis. Educational Research Review, 39, 100537.",
+   "doi_or_url": "https://doi.org/10.1016/j.edurev.2023.100537",
+   "source_type": "systematic_review_meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "metadata",
+    "url": "Crossref metadata (no abstract); ScienceDirect author manuscript returned HTTP 403; Semantic Scholar record without abstract; University of Mainz repository blocked by bot protection",
+    "sections_read": []
+   },
+   "design": "unknown from own reading; described by czyz2024ciretention (Discussion) as a meta-analysis of 28 studies and 84 effect sizes in sport settings",
+   "population": "sport practice (per title); details not verified",
+   "operation": "embodied_psychomotor",
+   "intervention": "high CI practice",
+   "comparator": "low CI practice",
+   "outcome": {
+    "measure": "unknown (secondary report: retention and transfer)",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": "unknown",
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Not read. Only secondary characterisation by an author group that disputes it (czyz2024ciretention: small pooled effect; benefit only in 20-32-year-olds; blocked favoured in older adults). A rebuttal exchange exists per web search snippets (not read). Registered only so the contradiction is visible; no number from this record is used in policies.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:ci_shrinks_with_complexity",
+     "relation": "context_only",
+     "locator": "title; secondary description in czyz2024ciretention Discussion"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "wulfshea2002complex",
+   "citation": "Wulf, G., & Shea, C. H. (2002). Principles derived from the study of simple skills do not generalize to complex skill learning. Psychonomic Bulletin & Review, 9(2), 185-211.",
+   "doi_or_url": "https://doi.org/10.3758/BF03196276",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=12120783&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only"
+    ]
+   },
+   "design": "Narrative review of complex motor skill learning research",
+   "population": "mixed experimental literature",
+   "operation": "embodied_psychomotor",
+   "intervention": "practice variables (e.g. CI, feedback frequency, physical guidance, attentional focus)",
+   "comparator": "the same variables in simple laboratory tasks",
+   "outcome": {
+    "measure": "motor learning (retention/transfer) in complex vs simple tasks",
+    "assisted": false,
+    "delay": "mixed",
+    "transfer": "mixed"
+   },
+   "estimate": "unknown",
+   "inference": "theoretical",
+   "bias_and_applicability": "Interpretive frame (load-dependent effect of challenge), not a quantitative synthesis; one author is also an author of attentional-focus primary studies challenged by mckay2024focusbias.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:ci_shrinks_with_complexity",
+     "relation": "supports",
+     "locator": "abstract (opposite effects for simple vs complex skills; reduce load when load is extreme)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "mckay2022feedbackfrequency",
+   "citation": "McKay, B., Hussien, J., Vinh, M.-A., Mir-Orefice, A., Brooks, H., & Ste-Marie, D. M. (2022). Meta-analysis of the reduced relative feedback frequency effect on motor learning and performance. Psychology of Sport and Exercise, 61, 102165.",
+   "doi_or_url": "https://doi.org/10.1016/j.psychsport.2022.102165",
+   "source_type": "systematic_review_meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "Preprint PsyArXiv 10.31234/osf.io/v2cp7 via OSF download (version of record not read; volume/page from Crossref metadata not verified beyond DOI)",
+    "sections_read": [
+     "Abstract and highlights",
+     "Results: study selection, Table 1 excerpt, moderator text, publication-bias models (selection model, RoBMA)",
+     "Discussion opening"
+    ]
+   },
+   "design": "Systematic review, multilevel meta-analysis, selection models, robust Bayesian meta-analysis, z-curve",
+   "population": "Healthy adults/children, mostly novices on simple laboratory tasks; 61 papers, k = 75, N = 2228",
+   "operation": "embodied_psychomotor",
+   "intervention": "reduced relative frequency of augmented terminal feedback (KR/KP)",
+   "comparator": "feedback after every trial (100%)",
+   "outcome": {
+    "measure": "motor performance at acquisition, immediate and delayed no-feedback retention",
+    "assisted": false,
+    "delay": "delayed retention >= 24 h",
+    "transfer": "retention"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "delayed retention: selection model g = .06 [-.30, .42]; RoBMA g = .021, 95% credible interval [-.062, .279], BF01 = 4.22 (evidence for no effect); prediction intervals at each time point span > 1 SD in both directions",
+    "ci": "as reported",
+    "k_or_n": "61 papers, k = 75, N = 2228",
+    "note": "Preprint text; numbers must be checked against the version of record."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Z-curve indicates severely underpowered primary studies; no significant moderators; guidance hypothesis's predicted reversal (acquisition vs retention) not found. Mostly simple tasks and novices; says nothing about complex procedures or experts. Absence of evidence, not evidence that feedback frequency never matters.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:feedback_schedule_uncertain",
+     "relation": "supports",
+     "locator": "Abstract; Results publication-bias paragraph (RoBMA); Discussion para. 1"
+    },
+    {
+     "claim_id": "R4:guidance_hypothesis",
+     "relation": "contradicts",
+     "locator": "Highlights ('guidance hypothesis is not supported'); Discussion para. 1"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "chua2021externalfocus",
+   "citation": "Chua, L.-K., Jimenez-Diaz, J., Lewthwaite, R., Kim, T., & Wulf, G. (2021). Superiority of external attentional focus for motor performance and learning: Systematic reviews and meta-analyses. Psychological Bulletin, 147(6), 618-645.",
+   "doi_or_url": "https://doi.org/10.1037/bul0000335",
+   "source_type": "systematic_review_meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=34843301&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only"
+    ]
+   },
+   "design": "Meta-analyses with metaregression",
+   "population": "73 studies / 1824 participants (performance); 40 studies / 1274 participants (learning)",
+   "operation": "embodied_psychomotor",
+   "intervention": "external focus instructions (movement effect)",
+   "comparator": "internal focus instructions (body movements)",
+   "outcome": {
+    "measure": "behavioural performance, retention, transfer; EMG",
+    "assisted": false,
+    "delay": "retention/transfer tests (study-specific)",
+    "transfer": "near"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "performance 0.264 [0.217, 0.310]; retention 0.583 [0.425, 0.741]; transfer 0.584 [0.325, 0.842]; no moderation by age, health or skill level",
+    "ci": "95% CI",
+    "k_or_n": "73 / 40 studies"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Uncorrected for publication bias; the same data reanalysed by mckay2024focusbias yield negligible corrected effects. Senior author is the originator of the external-focus hypothesis.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:external_focus",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "overstated"
+  },
+  {
+   "source_id": "mckay2024focusbias",
+   "citation": "McKay, B., Corson, A. E., Seedu, J., De Faveri, C. S., Hasan, H., Arnold, K., Adams, F. C., & Carter, M. J. (2024). Reporting bias, not external focus: A robust Bayesian meta-analysis and systematic review of the external focus of attention literature. Psychological Bulletin, 150(11), 1347-1362.",
+   "doi_or_url": "https://doi.org/10.1037/bul0000451",
+   "source_type": "systematic_review_meta_analysis (reanalysis)",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=39480294&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only; preprint SportRxiv 10.51224/srxiv.304 landing page retrieved, text not read"
+    ]
+   },
+   "design": "Robust Bayesian meta-analysis reanalysing the data of the most comprehensive previous meta-analysis with publication-bias models",
+   "population": "as chua2021externalfocus",
+   "operation": "embodied_psychomotor",
+   "intervention": "external focus",
+   "comparator": "internal focus",
+   "outcome": {
+    "measure": "performance, retention, transfer, EMG, distance effect",
+    "assisted": false,
+    "delay": "as primary studies",
+    "transfer": "near"
+   },
+   "estimate": {
+    "metric": "Hedges g (bias-corrected)",
+    "value": "performance 0.01; retention 0.15; transfer 0.09; EMG 0.06; distance -0.01; BF01 from 1.3 (retention) to 5.75 (performance)",
+    "ci": "not in abstract",
+    "k_or_n": "reanalysis of chua2021externalfocus data"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Model-based correction depends on bias-model assumptions; authors find clear heterogeneity (effects may exist in unknown contexts). Strong counterevidence to a universal 'external focus' rule.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:external_focus",
+     "relation": "contradicts",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "ashford2006observational",
+   "citation": "Ashford, D., Bennett, S. J., & Davids, K. (2006). Observational modeling effects for movement dynamics and movement outcome measures across differing task constraints: a meta-analysis. Journal of Motor Behavior, 38(3), 185-205.",
+   "doi_or_url": "https://doi.org/10.3200/JMBR.38.3.185-205",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=16709559&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only"
+    ]
+   },
+   "design": "Meta-analysis of between-participants observational-modelling studies",
+   "population": "motor learning studies (populations not detailed in abstract)",
+   "operation": "embodied_psychomotor",
+   "intervention": "observational modelling (demonstration) plus practice",
+   "comparator": "practice-only control",
+   "outcome": {
+    "measure": "movement dynamics (form, coordination) vs movement outcome (accuracy, result)",
+    "assisted": "unknown",
+    "delay": "unknown from abstract",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "mean treatment effect (delta)",
+    "value": "movement dynamics 0.77, movement outcome 0.17; serial tasks 1.62 / 0.61; continuous 1.01 / 0.51; discrete 0.56 / 0.10",
+    "ci": "not in abstract",
+    "k_or_n": "not in abstract"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "2006 synthesis; no bias correction visible in abstract; retention vs acquisition not separated in abstract. Key qualifier: demonstrations change how a movement looks much more than what it achieves.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:demonstration_form_not_outcome",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "keith2008errormanagement",
+   "citation": "Keith, N., & Frese, M. (2008). Effectiveness of error management training: A meta-analysis. Journal of Applied Psychology, 93(1), 59-69.",
+   "doi_or_url": "https://doi.org/10.1037/0021-9010.93.1.59",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=18211135&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only"
+    ]
+   },
+   "design": "Meta-analysis of 24 studies (N = 2183)",
+   "population": "trainees in skill-based training; task domains not stated in the abstract (not verified)",
+   "operation": "diagnostic_reasoning / tool use in exploratory tasks; not hazardous physical tasks",
+   "intervention": "error management training (active exploration + explicit error encouragement)",
+   "comparator": "proceduralised error-avoidant training or exploration without error encouragement",
+   "outcome": {
+    "measure": "post-training performance; analogical vs adaptive transfer",
+    "assisted": "unknown",
+    "delay": "post-training",
+    "transfer": "adaptive (structurally distinct) vs analogical"
+   },
+   "estimate": {
+    "metric": "Cohen d",
+    "value": "overall 0.44; post-training transfer 0.56; adaptive transfer 0.80; within-training performance and analogical transfer smaller (values not in abstract)",
+    "ci": "not in abstract",
+    "k_or_n": "24 studies, N = 2183"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Task domains not verified (abstract only); not transferable to steps whose errors cause injury or damage. Moderator results are associations.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:error_exploration_adaptive_transfer",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "cook2011simulation",
+   "citation": "Cook, D. A., Hatala, R., Brydges, R., Zendejas, B., Szostek, J. H., Wang, A. T., Erwin, P. J., & Hamstra, S. J. (2011). Technology-enhanced simulation for health professions education: a systematic review and meta-analysis. JAMA, 306(9), 978-988.",
+   "doi_or_url": "https://doi.org/10.1001/jama.2011.1234",
+   "source_type": "systematic_review_meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=21900138&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only"
+    ]
+   },
+   "design": "Systematic review, random-effects meta-analysis; 609 studies (137 randomised, 67 non-randomised two-group, 405 single-group pre-post)",
+   "population": "35,226 health-professions trainees (physicians, nurses, dentists, others)",
+   "operation": "embodied_psychomotor; diagnostic_reasoning",
+   "intervention": "technology-enhanced simulation training",
+   "comparator": "no intervention",
+   "outcome": {
+    "measure": "knowledge; skills in a test setting (time, process, product); behaviours with patients; direct patient effects",
+    "assisted": "unknown",
+    "delay": "mixed",
+    "transfer": "simulation to patient care (subset)"
+   },
+   "estimate": {
+    "metric": "pooled effect size (random effects)",
+    "value": "knowledge 1.20 [1.04, 1.35]; process skills 1.09 [1.03, 1.16]; product skills 1.18 [0.98, 1.37]; other behaviours 0.81 [0.66, 0.96]; patient effects 0.50 [0.34, 0.66]",
+    "ci": "95% CI",
+    "k_or_n": "609 studies; e.g. 426 for process skills, 32 for patient effects"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Comparison against no intervention, so it shows simulation beats nothing, not that it beats other instruction or real practice. Heterogeneity I2 > 50% in all analyses; two-thirds single-group designs. Effects decline from test-setting skills to patient outcomes.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:simulation_prepares_not_certifies",
+     "relation": "supports",
+     "locator": "abstract (DATA SYNTHESIS)"
+    },
+    {
+     "claim_id": "R4:effects_shrink_toward_real_task",
+     "relation": "supports",
+     "locator": "abstract (patient effects 0.50 vs skills > 1)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "dawe2014transfer",
+   "citation": "Dawe, S. R., Pena, G. N., Windsor, J. A., Broeders, J. A. J. L., Cregan, P. C., Hewett, P. J., & Maddern, G. J. (2014). Systematic review of skills transfer after surgical simulation-based training. British Journal of Surgery, 101(9), 1063-1076.",
+   "doi_or_url": "https://doi.org/10.1002/bjs.9482",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.1002/bjs.9482",
+    "sections_read": [
+     "Crossref abstract only"
+    ]
+   },
+   "design": "Systematic review (protocol, two independent reviewers) of 27 RCTs and 7 non-randomised comparative studies",
+   "population": "surgical trainees; laparoscopic (14), endoscopic (13), other (7) procedures",
+   "operation": "embodied_psychomotor",
+   "intervention": "simulation-based training, often to predetermined proficiency",
+   "comparator": "no simulation training; patient-based training",
+   "outcome": {
+    "measure": "performance in the patient-based setting",
+    "assisted": false,
+    "delay": "study-specific",
+    "transfer": "simulation to operating room"
+   },
+   "estimate": "unknown",
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Narrative synthesis; authors state 'strong evidence' that participants who reached proficiency in simulation performed better on patients. Transfer is conditional on a structured programme with proficiency levels and was measured by observers in real procedures, not by the simulator.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:simulation_prepares_not_certifies",
+     "relation": "supports",
+     "locator": "abstract (Results, Conclusion)"
+    },
+    {
+     "claim_id": "R4:real_task_outcome_needed",
+     "relation": "supports",
+     "locator": "abstract (transfer assessed in patient-based setting)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "makransky2019immersivevr",
+   "citation": "Makransky, G., Terkildsen, T. S., & Mayer, R. E. (2019). Adding immersive virtual reality to a science lab simulation causes more presence but less learning. Learning and Instruction, 60, 225-236.",
+   "doi_or_url": "https://doi.org/10.1016/j.learninstruc.2017.12.007",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Semantic Scholar Graph API abstract for DOI",
+    "sections_read": [
+     "abstract only"
+    ]
+   },
+   "design": "2 x 2 cross-panel experiment (desktop vs head-mounted display; text vs text + narration); EEG",
+   "population": "52 university students",
+   "operation": "empirical_experimental (conceptual learning from a virtual science lab)",
+   "intervention": "immersive VR (HMD) version of a lab simulation",
+   "comparator": "desktop version of the same simulation",
+   "outcome": {
+    "measure": "learning outcome test; presence; EEG-based cognitive load",
+    "assisted": false,
+    "delay": "immediate",
+    "transfer": "none"
+   },
+   "estimate": {
+    "metric": "Cohen d",
+    "value": "presence higher in VR d = 1.30; learning lower in VR d = 0.80; EEG cognitive load higher d = 0.59",
+    "ci": "not in abstract",
+    "k_or_n": "N = 52"
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Small sample, single session, immediate test, one simulation. Shows that immersion and presence are not learning.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:immersion_not_learning",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "radhakrishnan2021ivr",
+   "citation": "Radhakrishnan, U., Koumaditis, K., & Chinello, F. (2021). A systematic review of immersive virtual reality for industrial skills training. Behaviour & Information Technology, 40(12), 1310-1339.",
+   "doi_or_url": "https://doi.org/10.1080/0144929X.2021.1954693",
+   "source_type": "systematic_review (descriptive, vote counting)",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "Author preprint via Aarhus University repository (pure.au.dk); version of record not read",
+    "sections_read": [
+     "Abstract",
+     "4.4.9-4.4.10 coding of haptics and effectiveness",
+     "5.x effectiveness results (Effective / Not as effective / Inconclusive)",
+     "retention paragraph"
+    ]
+   },
+   "design": "Systematic review of 78 studies; effectiveness coded from the authors' own conclusions (vote counting)",
+   "population": "industrial, healthcare, manufacturing, construction and other skills training",
+   "operation": "embodied_psychomotor; procedural",
+   "intervention": "immersive VR training",
+   "comparator": "desktop VR, physical training, manuals or none",
+   "outcome": {
+    "measure": "time, scores, errors, knowledge retention (as reported by studies)",
+    "assisted": "unknown",
+    "delay": "mostly immediate; few longitudinal",
+    "transfer": "rarely measured in real task"
+   },
+   "estimate": {
+    "metric": "count of studies",
+    "value": "of 40 studies comparing IVR with another modality: 29 'effective', 6 'not as effective', 5 'inconclusive'; 38 studies had no comparison",
+    "ci": "not applicable",
+    "k_or_n": "78 studies"
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Vote counting of author-declared effectiveness; no effect sizes, no bias assessment visible in sections read. Authors note lack of learning theory and limited metrics beyond time and scores; counterexamples include laparoscopy IVR worse than desktop VR and an assembly task where a manual group was faster with fewer errors.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:immersion_not_learning",
+     "relation": "qualifies",
+     "locator": "results 'Not as effective' paragraph"
+    },
+    {
+     "claim_id": "R4:simulation_metrics_narrow",
+     "relation": "supports",
+     "locator": "abstract; effectiveness coding section"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "finkelstein2005cck",
+   "citation": "Finkelstein, N. D., Adams, W. K., Keller, C. J., Kohl, P. B., Perkins, K. K., Podolefsky, N. S., Reid, S., & LeMaster, R. (2005). When learning about the real world is better done virtually: A study of substituting computer simulations for laboratory equipment. Physical Review Special Topics - Physics Education Research, 1, 010103.",
+   "doi_or_url": "https://doi.org/10.1103/PhysRevSTPER.1.010103",
+   "source_type": "primary_quasi_experiment",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "APS open-access PDF (journals.aps.org/prper/pdf/10.1103/PhysRevSTPER.1.010103)",
+    "sections_read": [
+     "II. Experimental design (participants, sections, data collection)",
+     "III. Results: timing data, write-up rubric, final examination",
+     "observational notes on equipment constraints"
+    ]
+   },
+   "design": "Quasi-experiment; recitation/lab sections assigned to condition (4 sections simulation, 6 sections real equipment), one DC-circuits lab session; calculus-based course without lab as additional comparison for the challenge task",
+   "population": "Algebra-based introductory physics students at one US university (CCK N = 99, TRAD N = 132)",
+   "operation": "empirical_experimental: conceptual understanding and building a real circuit",
+   "intervention": "PhET Circuit Construction Kit simulation instead of real equipment in one lab",
+   "comparator": "same lab with real bulbs, meters and wires",
+   "outcome": {
+    "measure": "time to build a real circuit in a challenge task; rubric-scored write-up (0-3); three final-exam circuit questions",
+    "assisted": false,
+    "delay": "same session (challenge) and final exam weeks later",
+    "transfer": "near: simulation users then built a real circuit"
+   },
+   "estimate": {
+    "metric": "means",
+    "value": "challenge time 14.0 min (CCK) vs 17.7 min (TRAD); write-up 1.86 vs 1.64 (p < 0.03); final-exam circuit items 0.593 vs 0.476, non-circuit items 0.621 vs 0.612",
+    "ci": "SDs reported for exam scores (0.27; 0.18/0.17)",
+    "k_or_n": "CCK N = 99, TRAD N = 132",
+    "note": "Section-level assignment, statistics partly at section level; no randomisation of individuals."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Non-random section assignment, TA effects only partly controlled, authors are the simulation developers, one session, one topic, simple low-voltage equipment. The simulation showed invisible quantities (electron flow) the real kit cannot. Does not show that simulation trains handling of hazardous or tolerance-critical equipment.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:simulation_can_beat_real_for_concepts",
+     "relation": "supports",
+     "locator": "Results: timing data, write-ups, final examination (Fig. 5 text)"
+    },
+    {
+     "claim_id": "R4:simulation_prepares_not_certifies",
+     "relation": "qualifies",
+     "locator": "Discussion of equipment constraints (observational notes)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "holmes2017labvalue",
+   "citation": "Holmes, N. G., Olsen, J., Thomas, J. L., & Wieman, C. E. (2017). Value added or misattributed? A multi-institution study on the educational benefit of labs for reinforcing physics content. Physical Review Physics Education Research, 13, 010129.",
+   "doi_or_url": "https://doi.org/10.1103/PhysRevPhysEducRes.13.010129",
+   "source_type": "primary_observational (multi-site, within-student difference scores)",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "APS open-access PDF (journals.aps.org/prper/pdf/10.1103/PhysRevPhysEducRes.13.010129)",
+    "sections_read": [
+     "Abstract",
+     "Methods: difference score and mean lab benefit (Eqs. 1-2)",
+     "Results incl. Fig. 1-2 and ANOVA text",
+     "IV. Discussion incl. limitations",
+     "V. Conclusion",
+     "Appendix data sources (part)"
+    ]
+   },
+   "design": "Observational comparison of students who did vs did not enrol in optional labs; within-student difference between lab-related and non-lab-related exam items to adjust for selection",
+   "population": "Nine introductory physics courses at three US institutions (mechanics, E&M)",
+   "operation": "empirical_experimental (content reinforcement through labs)",
+   "intervention": "optional instructional labs designed to reinforce lecture content",
+   "comparator": "students not taking the lab",
+   "outcome": {
+    "measure": "course exam items (final and midterm), all items and conceptual items",
+    "assisted": false,
+    "delay": "midterms and final exam",
+    "transfer": "content of the lab topics"
+   },
+   "estimate": {
+    "metric": "mean lab benefit (difference-score difference, fraction of exam score)",
+    "value": "final exams 0.0024 +/- 0.0067 (0.24 +/- 0.67 %), ANOVA F(1, 2615) = 2.32, p = 0.128; conceptual items -0.0062 +/- 0.0158, F(1, 1114) = 1.60, p = 0.206",
+    "ci": "standard error",
+    "k_or_n": "about 2600 student records (df)"
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Not randomised; difference-score method assumes lab benefits are item-specific. Labs ran after lecture instruction. Authors limit the claim: labs as run showed no measurable added value for content; they do not claim labs cannot teach content, and cite evidence that labs can teach evaluating data and models, uncertainty and experimental design.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:labs_do_not_reinforce_content",
+     "relation": "supports",
+     "locator": "Results (mean lab benefit, Fig. 1); Discussion limitations para."
+    },
+    {
+     "claim_id": "R4:labs_for_experimental_practice",
+     "relation": "supports",
+     "locator": "Discussion (alternative goals; refs 45-50)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "holmes2015criticalthinking",
+   "citation": "Holmes, N. G., Wieman, C. E., & Bonn, D. A. (2015). Teaching critical thinking. Proceedings of the National Academy of Sciences, 112, 11199-11204.",
+   "doi_or_url": "https://doi.org/10.1073/pnas.1505329112",
+   "source_type": "primary_controlled_comparison",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.1073/pnas.1505329112",
+    "sections_read": [
+     "Crossref significance statement only; full abstract and methods not read"
+    ]
+   },
+   "design": "Controlled comparison with a control group (details not read)",
+   "population": "introductory physics lab students (details not read)",
+   "operation": "empirical_experimental: comparing data sets and data with models, deciding how to improve measurements",
+   "intervention": "repeated cycles of quantitative comparison with decisions to improve data or models",
+   "comparator": "control group with conventional lab instruction",
+   "outcome": {
+    "measure": "critical-thinking behaviours in lab work",
+    "assisted": "unknown",
+    "delay": "'sustained' per significance statement",
+    "transfer": "unknown"
+   },
+   "estimate": "unknown",
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Only the significance statement was read; design, N and effect sizes unverified. Positive counterpart to holmes2017labvalue, same group.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:labs_for_experimental_practice",
+     "relation": "supports",
+     "locator": "Crossref significance statement"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "reeves2021virtuallabs",
+   "citation": "Reeves, S. M., & Crippen, K. J. (2021). Virtual laboratories in undergraduate science and engineering courses: a systematic review, 2009-2019. Journal of Science Education and Technology, 30, 16-30.",
+   "doi_or_url": "https://doi.org/10.1007/s10956-020-09866-0",
+   "source_type": "systematic_review (descriptive)",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "ERIC API record EJ1280502",
+    "sections_read": [
+     "ERIC abstract only"
+    ]
+   },
+   "design": "Systematic review of 25 empirical papers (2009-2019)",
+   "population": "undergraduate science and engineering students",
+   "operation": "empirical_experimental",
+   "intervention": "virtual laboratories",
+   "comparator": "various",
+   "outcome": {
+    "measure": "mostly individual content-knowledge change",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "rarely examined"
+   },
+   "estimate": "unknown",
+   "inference": "descriptive",
+   "bias_and_applicability": "Authors report studies were mainly evaluative, narrowly focused on content knowledge, single 2D experiences, and that positive outcomes were attributed 'more on novelty than design'. Crossref dates the online version 2020; issue year 2021.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:simulation_metrics_narrow",
+     "relation": "supports",
+     "locator": "ERIC abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "lazonder2016inquiry",
+   "citation": "Lazonder, A. W., & Harmsen, R. (2016). Meta-analysis of inquiry-based learning: Effects of guidance. Review of Educational Research, 86, 681-718.",
+   "doi_or_url": "https://doi.org/10.3102/0034654315627366",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.3102/0034654315627366",
+    "sections_read": [
+     "Crossref abstract only"
+    ]
+   },
+   "design": "Meta-analysis of 72 studies",
+   "population": "learners of different ages (age categories compared)",
+   "operation": "empirical_experimental (inquiry)",
+   "intervention": "guidance during inquiry (several types)",
+   "comparator": "unguided inquiry",
+   "outcome": {
+    "measure": "learning activities, performance success, learning outcomes",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "Cohen d",
+    "value": "learning activities 0.66 [0.44, 0.88]; performance success 0.71 [0.52, 0.90]; learning outcomes 0.50 [0.37, 0.62]",
+    "ci": "95% CI",
+    "k_or_n": "72 studies"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Comparator is unguided inquiry, not expository instruction. Type of guidance moderated only performance success.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:guided_not_open_inquiry",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "schwichow2016cvs",
+   "citation": "Schwichow, M., Croker, S., Zimmerman, C., Höffler, T., & Härtig, H. (2016). Teaching the control-of-variables strategy: A meta-analysis. Developmental Review, 39, 37-63.",
+   "doi_or_url": "https://doi.org/10.1016/j.dr.2015.12.001",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Semantic Scholar Graph API abstract for DOI",
+    "sections_read": [
+     "abstract only"
+    ]
+   },
+   "design": "Meta-analysis of 72 intervention studies, robust variance meta-regression, outliers excluded",
+   "population": "students (mainly school age; details not read)",
+   "operation": "empirical_experimental: designing and evaluating controlled experiments (CVS)",
+   "intervention": "instruction targeting the control-of-variables strategy",
+   "comparator": "control conditions (various)",
+   "outcome": {
+    "measure": "CVS skill tests (various formats)",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "0.61 [0.53, 0.69]; only cognitive conflict and demonstrations significantly related to achievement; assessment format a major source of variability",
+    "ci": "95% CI",
+    "k_or_n": "72 studies"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Mostly school populations (not verified); outcome depends strongly on test format, which warns against product-internal CVS item scores as competence evidence.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:experimental_design_teachable",
+     "relation": "supports",
+     "locator": "abstract"
+    },
+    {
+     "claim_id": "R4:assessment_format_matters",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "agustian2017prelab",
+   "citation": "Agustian, H. Y., & Seery, M. K. (2017). Reasserting the role of pre-laboratory activities in chemistry education: a proposed framework for their design. Chemistry Education Research and Practice, 18, 518-532.",
+   "doi_or_url": "https://doi.org/10.1039/C7RP00140A",
+   "source_type": "narrative_review_and_framework",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.1039/C7RP00140A",
+    "sections_read": [
+     "Crossref abstract only (article open access, not read)"
+    ]
+   },
+   "design": "Narrative review of more than 60 reports on pre-laboratory activities in higher-education chemistry; cognitive-load-based design framework",
+   "population": "higher-education chemistry",
+   "operation": "empirical_experimental (lab preparation)",
+   "intervention": "pre-lab lectures, quizzes, discussions, interactive simulations, technique videos, mental preparation, safety information",
+   "comparator": "none (review)",
+   "outcome": {
+    "measure": "various (not synthesised quantitatively)",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": "unknown",
+   "inference": "theoretical",
+   "bias_and_applicability": "Framework and guidelines, no effect estimate; separates supportive information (in advance) from procedural information (just in time).",
+   "claim_edges": [
+    {
+     "claim_id": "R4:prelab_preparation",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "not_empirical"
+  },
+  {
+   "source_id": "bartlett2026spatialdesign",
+   "citation": "Bartlett, K. A. (2026). Engineering Design and Spatial Skills: A Systematic Literature Review. Journal of Mechanical Design, 148(4). (Crossref lists one author; article number not verified)",
+   "doi_or_url": "https://doi.org/10.1115/1.4070965",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.1115/1.4070965",
+    "sections_read": [
+     "Crossref abstract only; issue #25 seed"
+    ]
+   },
+   "design": "Systematic literature review of spatial-skills assessment and engineering design studies",
+   "population": "engineering design studies (students; few practising designers)",
+   "operation": "spatial_design",
+   "intervention": "spatial skills (measured or trained)",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "engineering design performance",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": "unknown",
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Finds correlational links between spatial test scores and design performance but most experiments not designed for causal inference; inconsistent researcher beliefs; calls for discipline-specific assessments and closes with a caution against focusing on spatial skills instead of practical design graphics skills (sketching, CAD).",
+   "claim_edges": [
+    {
+     "claim_id": "R4:spatial_training_not_design_competence",
+     "relation": "supports",
+     "locator": "abstract (closing sentences)"
+    },
+    {
+     "claim_id": "R4:spatial_design_link_correlational",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "uttal2013spatial",
+   "citation": "Uttal, D. H., Meadow, N. G., Tipton, E., Hand, L. L., Alden, A. R., Warren, C., & Newcombe, N. S. (2013). The malleability of spatial skills: A meta-analysis of training studies. Psychological Bulletin, 139(2), 352-402.",
+   "doi_or_url": "https://doi.org/10.1037/a0028446",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=22663761&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only"
+    ]
+   },
+   "design": "Meta-analysis of 217 training studies",
+   "population": "children to adults (moderator)",
+   "operation": "spatial_design (spatial skills)",
+   "intervention": "spatial training and experience (courses, video games, practice)",
+   "comparator": "control groups (type moderated)",
+   "outcome": {
+    "measure": "spatial test performance incl. untrained spatial tasks",
+    "assisted": "unknown",
+    "delay": "immediate and delayed (delay did not reduce effects)",
+    "transfer": "near transfer to other spatial tasks"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "0.47 (SE 0.04) after outlier removal",
+    "ci": "SE",
+    "k_or_n": "217 studies"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Outcomes are spatial tests, not STEM course or design performance; the abstract's STEM conclusion is an extrapolation ('could pay substantial dividends'). Control-group type moderated effects.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:spatial_trainable",
+     "relation": "supports",
+     "locator": "abstract"
+    },
+    {
+     "claim_id": "R4:spatial_training_not_design_competence",
+     "relation": "qualifies",
+     "locator": "abstract (STEM benefit stated as potential)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "sorby2018spatialstem",
+   "citation": "Sorby, S., Veurink, N., & Streiner, S. (2018). Does spatial skills instruction improve STEM outcomes? The answer is 'yes'. Learning and Individual Differences, 67, 209-222.",
+   "doi_or_url": "https://doi.org/10.1016/j.lindif.2018.09.001",
+   "source_type": "primary_quasi_experiment (regression discontinuity)",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Semantic Scholar Graph API abstract for DOI",
+    "sections_read": [
+     "abstract only"
+    ]
+   },
+   "design": "Regression discontinuity at a pass/fail cut-off on a spatial test over five years",
+   "population": "> 3000 first-year engineering students at one US university",
+   "operation": "spatial_design; engineering problem solving",
+   "intervention": "1-credit semester spatial-skills course for students below the cut-off",
+   "comparator": "students just above the cut-off (no course)",
+   "outcome": {
+    "measure": "grades in introductory courses, STEM GPA, retention in engineering",
+    "assisted": false,
+    "delay": "first year and later",
+    "transfer": "far (course grades)"
+   },
+   "estimate": "unknown",
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Strong quasi-experimental design, but effect estimated only near the cut-off, at one institution, by the course developers; effect sizes not in abstract. Supports a screening-plus-course model for low scorers, not training for all.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:spatial_training_low_scorers",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "hawes2022spatialmath",
+   "citation": "Hawes, Z. C. K., Gilligan-Lee, K. A., & Mix, K. S. (2022). Effects of spatial training on mathematics performance: A meta-analysis. Developmental Psychology, 58(1), 112-137.",
+   "doi_or_url": "https://doi.org/10.1037/dev0001281",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=35073120&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only"
+    ]
+   },
+   "design": "Meta-analysis of 29 controlled pre-post studies (k = 89)",
+   "population": "ages 3 to 20, N = 3765",
+   "operation": "spatial_design -> symbolic_procedure transfer",
+   "intervention": "spatial training",
+   "comparator": "control conditions",
+   "outcome": {
+    "measure": "mathematics performance; spatial thinking",
+    "assisted": "unknown",
+    "delay": "posttest timing did not moderate",
+    "transfer": "near vs far mathematics outcomes (moderator)"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "mathematics 0.28 (SE 0.07); spatial thinking 0.49 (SE 0.09); larger for concrete manipulatives than computerised training and for near than far outcomes",
+    "ci": "SE",
+    "k_or_n": "29 studies, k = 89, N = 3765"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Mostly children; publication-bias tests non-significant per authors; mechanism of transfer poorly understood (authors). Computerised training less effective than concrete manipulatives, which matters for a digital product.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:spatial_far_transfer_small",
+     "relation": "supports",
+     "locator": "abstract"
+    },
+    {
+     "claim_id": "R4:concrete_beats_screen_spatial",
+     "relation": "supports",
+     "locator": "abstract (manipulatives moderator)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "otey2017designintent",
+   "citation": "Otey, J., Company, P., Contero, M., & Camba, J. D. (2017). Revisiting the design intent concept in the context of mechanical CAD education. Computer-Aided Design and Applications, 15(1), 47-60. (Crossref issued 2017; print year of volume 15 not verified)",
+   "doi_or_url": "https://doi.org/10.1080/16864360.2017.1353733",
+   "source_type": "narrative_review / conceptual",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "Accepted manuscript via Universitat Jaume I repository (hdl 10234/170383)",
+    "sections_read": [
+     "Abstract",
+     "1 Introduction",
+     "passages on rubrics, feedback and model assessment",
+     "4 Conclusions and future work"
+    ]
+   },
+   "design": "Conceptual review of design intent and design rationale in MCAD education",
+   "population": "n/a",
+   "operation": "spatial_design: constraint-based parametric CAD modelling",
+   "intervention": "explicit instruction in design intent at three levels (sketch constraints, modelling operations, relationships between operations); rubrics",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "not empirical",
+    "assisted": "not_applicable",
+    "delay": "not_applicable",
+    "transfer": "not_applicable"
+   },
+   "estimate": "unknown",
+   "inference": "theoretical",
+   "bias_and_applicability": "No new data. Defines design intent commonly as the model's anticipated behaviour when altered; cites secondary figures on CAD model failure rates that were not checked. Useful as construct definition for assessment, not as evidence that any instruction works.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:design_intent_change_test",
+     "relation": "supports",
+     "locator": "Abstract; 4 Conclusions"
+    },
+    {
+     "claim_id": "R4:cad_rubrics",
+     "relation": "context_only",
+     "locator": "rubric passage (Company et al., Devine and Laingen cited)"
+    }
+   ],
+   "verdict": "not_empirical"
+  },
+  {
+   "source_id": "ilgen2015checklistgrs",
+   "citation": "Ilgen, J. S., Ma, I. W. Y., Hatala, R., & Cook, D. A. (2015). A systematic review of validity evidence for checklists versus global rating scales in simulation-based assessment. Medical Education, 49(2), 161-173.",
+   "doi_or_url": "https://doi.org/10.1111/medu.12621",
+   "source_type": "systematic_review_meta_analysis (measurement)",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=25626747&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only"
+    ]
+   },
+   "design": "Systematic review of 45 studies using both a checklist and a global rating scale (GRS); random-effects pooling of reliability and correlation coefficients",
+   "population": "physicians and physicians in training (one study also nurse anaesthetists); open/laparoscopic surgery 22, endoscopy 8, resuscitation 7, anaesthesiology 4",
+   "operation": "embodied_psychomotor (assessment of procedural performance by human raters)",
+   "intervention": "GRS",
+   "comparator": "task-specific checklist",
+   "outcome": {
+    "measure": "inter-rater, inter-item, inter-station reliability; scale correlation; validity evidence",
+    "assisted": "not_applicable",
+    "delay": "not_applicable",
+    "transfer": "not_applicable"
+   },
+   "estimate": {
+    "metric": "pooled coefficients",
+    "value": "GRS-checklist correlation 0.76 [0.69, 0.81] (16 studies); inter-rater reliability GRS 0.78 [0.71, 0.83], checklist 0.81 [0.75, 0.85]; inter-item GRS 0.92 vs checklist 0.66; inter-station GRS 0.80 vs checklist 0.69",
+    "ci": "95% CI",
+    "k_or_n": "45 studies"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Medical simulation only; raters are clinical experts. Says nothing about crafts or cooking; it informs the shape of a human-assessor instrument (GRS plus task checklist), not its validity in other domains.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:human_rater_instruments",
+     "relation": "supports",
+     "locator": "abstract (Results, Conclusions)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "rossen2026cooking",
+   "citation": "Rossen, L. (2026). Learning cooking competence after leaving home: A mixed-methods systematic review of emerging adults. Appetite, 222, 108511.",
+   "doi_or_url": "https://doi.org/10.1016/j.appet.2026.108511",
+   "source_type": "mixed_methods_systematic_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=41722820&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only (Crossref without abstract); issue #25 seed"
+    ]
+   },
+   "design": "Mixed-methods systematic review (JBI; PROSPERO CRD42024534477) of 35 empirical studies 1990-2025, convergent-integrated synthesis",
+   "population": "emerging adults after leaving the parental home",
+   "operation": "embodied_psychomotor; diagnostic_reasoning (everyday cooking)",
+   "intervention": "none (how learning happens)",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "descriptions of learning sources and processes",
+    "assisted": "not_applicable",
+    "delay": "not_applicable",
+    "transfer": "not_applicable"
+   },
+   "estimate": "unknown",
+   "inference": "descriptive",
+   "bias_and_applicability": "Mostly qualitative and self-reported evidence; single author. Finding: learning is predominantly practice-based, using people and tools including social media; parental instruction, school and interventions play a more limited role than assumed. Not evidence about which instruction improves cooking performance.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:craft_learning_practice_based",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "sanaan2026onlinecooking",
+   "citation": "Sanaan, W., Lavelle, F., Taylor, R., Bucher, T., Asher, R., & Collins, C. E. (2026). The effectiveness of online culinary nutrition courses on cooking skills: a systematic review. Critical Reviews in Food Science and Nutrition, 66(3), 504-518.",
+   "doi_or_url": "https://doi.org/10.1080/10408398.2025.2526680",
+   "source_type": "systematic_review (narrative synthesis)",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=40591519&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only"
+    ]
+   },
+   "design": "Systematic review of 29 studies (15 pre-post, 5 quasi-experimental, 6 RCTs); narrative synthesis",
+   "population": "participants of online culinary nutrition interventions",
+   "operation": "embodied_psychomotor (cooking) and food knowledge",
+   "intervention": "online culinary nutrition courses",
+   "comparator": "various / none",
+   "outcome": {
+    "measure": "self-efficacy, confidence, cooking and/or food skills, knowledge, intentions, behaviour (mostly self-reported)",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "unknown"
+   },
+   "estimate": {
+    "metric": "count of studies with significant improvement",
+    "value": "self-efficacy 5 of 11; confidence 3 of 7; cooking and/or food skills 3 of 8; knowledge 2 of 7; intentions/frequency 1 of 5; attitudes/behaviour 3 of 6",
+    "ci": "not applicable",
+    "k_or_n": "29 studies"
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Vote counting; mostly uncontrolled designs; authors call findings mixed and limited by quality and duration. Whether 'skills' were observed or self-reported is not stated in the abstract.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:online_craft_course_mixed",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "teixeira2021culinaryinstruments",
+   "citation": "Teixeira, A. R., Bicalho, D., Slater, B., & Lima, T. M. (2021). Systematic review of instruments for assessing culinary skills in adults: What is the quality of their psychometric properties? PLoS ONE, 16(8), e0235182.",
+   "doi_or_url": "https://doi.org/10.1371/journal.pone.0235182",
+   "source_type": "systematic_review (measurement)",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "PMC8351978 via NCBI efetch db=pmc (open access)",
+    "sections_read": [
+     "Abstract",
+     "Results: characteristics of the instruments",
+     "Discussion: general view of the instruments, psychometric quality"
+    ]
+   },
+   "design": "PRISMA systematic review of 12 studies developing or adapting culinary-skill instruments; two independent reviewers",
+   "population": "adults",
+   "operation": "embodied_psychomotor (measurement of cooking skills)",
+   "intervention": "n/a",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "psychometric properties (internal consistency, test-retest, content, construct, criterion validity)",
+    "assisted": "not_applicable",
+    "delay": "not_applicable",
+    "transfer": "not_applicable"
+   },
+   "estimate": {
+    "metric": "count of studies",
+    "value": "adequate internal consistency 4; adequate test-retest 1; adequate content validity 0; satisfactory construct validity >= 1 type 4; criterion validity reported 1 (inadequate)",
+    "ci": "not applicable",
+    "k_or_n": "12 studies"
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "In the sections read, the instruments are questionnaires (Likert-type confidence, self-efficacy, frequency and knowledge items); no observed-performance instrument is described. Self-rated confidence can overstate skill (e.g. microwaving ready meals counted as cooking).",
+   "claim_edges": [
+    {
+     "claim_id": "R4:self_report_not_skill",
+     "relation": "supports",
+     "locator": "Results 'Characteristics of the instruments'; Discussion 'General view of the instruments', 'Psychometric quality'"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "burke2006safetytraining",
+   "citation": "Burke, M. J., Sarpy, S. A., Smith-Crowe, K., Chan-Serafin, S., Salvador, R. O., & Islam, G. (2006). Relative effectiveness of worker safety and health training methods. American Journal of Public Health, 96(2), 315-324.",
+   "doi_or_url": "https://doi.org/10.2105/AJPH.2004.059840",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.2105/AJPH.2004.059840",
+    "sections_read": [
+     "Crossref abstract only"
+    ]
+   },
+   "design": "Meta-analysis of 95 quasi-experimental studies (n = 20,991)",
+   "population": "workers in safety and health training",
+   "operation": "embodied_psychomotor; rule_based safety knowledge",
+   "intervention": "most engaging methods (behavioural modelling, hands-on training)",
+   "comparator": "least engaging (lecture, pamphlets, video) and moderately engaging (programmed instruction, feedback)",
+   "outcome": {
+    "measure": "safety knowledge, safety performance, accidents/illnesses/injuries",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "workplace"
+   },
+   "estimate": "unknown",
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Quasi-experimental base; engagement categories are broad. Authors explicitly challenge reliance on passive computer-based and distance training.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:safety_needs_engaging_supervised_practice",
+     "relation": "supports",
+     "locator": "abstract (Results, Conclusions)"
+    },
+    {
+     "claim_id": "R4:demonstration_form_not_outcome",
+     "relation": "context_only",
+     "locator": "abstract (behavioural modelling among most engaging)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "burke2011dread",
+   "citation": "Burke, M. J., Salvador, R. O., Smith-Crowe, K., Chan-Serafin, S., Smith, A., & Sonesh, S. (2011). The dread factor: How hazards and safety training influence learning and performance. Journal of Applied Psychology, 96(1), 46-70.",
+   "doi_or_url": "https://doi.org/10.1037/a0021838",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=21244129&rettype=abstract",
+    "sections_read": [
+     "PubMed abstract only"
+    ]
+   },
+   "design": "Meta-analysis testing an engagement x hazard-severity interaction",
+   "population": "workplace safety training studies",
+   "operation": "embodied_psychomotor; safety knowledge",
+   "intervention": "highly engaging safety training",
+   "comparator": "less engaging training",
+   "outcome": {
+    "measure": "safety knowledge and safety performance",
+    "assisted": "unknown",
+    "delay": "unknown",
+    "transfer": "workplace"
+   },
+   "estimate": "unknown",
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Interaction is a moderator association; numbers not read. Highly engaging training clearly better only when hazard severity is high.",
+   "claim_edges": [
+    {
+     "claim_id": "R4:safety_needs_engaging_supervised_practice",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  }
+ ],
+ "search_log": [
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "PubMed E-utilities efetch",
+   "query": "known-item seed PMID 26768734 (issue #25)",
+   "hits_screened": 1,
+   "included": [
+    "sattelmayer2016motorprinciples"
+   ],
+   "excluded_or_note": "Seed resolved to Sattelmayer et al. 2016, BMC Med Educ, open access (PMC4714441); full text read."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST /works/{doi}",
+   "query": "known-item check of issue #25 seeds 10.1115/1.4070965 and 10.1016/j.appet.2026.108511",
+   "hits_screened": 2,
+   "included": [
+    "bartlett2026spatialdesign",
+    "rossen2026cooking"
+   ],
+   "excluded_or_note": "Both resolved. Rossen: no abstract in Crossref; abstract taken from PubMed (PMID 41722820)."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST /works/{doi}",
+   "query": "known-item DOI check of 45 candidate syntheses and primary studies known to the specialist (motor learning, simulation transfer, labs, spatial/CAD, culinary, safety, assessment instruments)",
+   "hits_screened": 45,
+   "included": [
+    "ammar2023cimyth",
+    "wulfshea2002complex",
+    "chua2021externalfocus",
+    "ashford2006observational",
+    "ilgen2015checklistgrs",
+    "cook2011simulation",
+    "dawe2014transfer",
+    "finkelstein2005cck",
+    "holmes2017labvalue",
+    "holmes2015criticalthinking",
+    "lazonder2016inquiry",
+    "agustian2017prelab",
+    "uttal2013spatial",
+    "sorby2018spatialstem",
+    "hawes2022spatialmath",
+    "otey2017designintent",
+    "burke2006safetytraining",
+    "burke2011dread",
+    "keith2008errormanagement",
+    "schwichow2016cvs",
+    "makransky2019immersivevr"
+   ],
+   "excluded_or_note": "44 resolved to the expected record (Radhakrishnan 2021 and Schwendimann 2015 were also found by the queries below); 10.3758/s13423-022-02099-1 (guessed DOI) returned 404 and was discarded. Resolved but not registered: Brady 2004 CI meta-analysis (10.2466/pms.99.1.116-126; abstract read, basic .57 vs applied .19, used only as background via czyz2024ciretention which re-analyses it), Salmoni et al. 1984 KR review (superseded for our question by mckay2022feedbackfrequency), Driskell et al. 1994 mental practice (covered via sattelmayer2016motorprinciples), Martin et al. 1997 OSATS and Hatala et al. 2015 OSATS validity review (no abstract retrievable; ilgen2015checklistgrs used), Nagendran et al. 2013 Cochrane VR laparoscopy (abstract not retrieved), Brinson 2015 virtual vs hands-on labs (no abstract via Crossref, Semantic Scholar or ERIC), de Jong et al. 2013 and Ma & Nickerson 2006 (narrative reviews, abstracts read, not registered), Hofstein & Lunetta 2004 and Furtak et al. 2012 (lazonder2016inquiry preferred for the guidance question), Stieff & Uttal 2015 (commentary), Sorby 2009, Johnson & Diwakaran 2011, Company et al. 2015, Booth et al. 2016 sketching, Dym et al. 2005 (no abstract retrievable or narrative), Reicks et al. 2018 and Lavelle et al. 2017 (cooking; instrument quality covered by teixeira2021culinaryinstruments), Marchand 2008 craft apprenticeship ethnography (no abstract retrieved), Schwendimann et al. 2015 (no abstract; see coverage_gaps)."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "McKay self-controlled motor learning meta-analysis underpowered biased lacking evidence of benefit",
+   "hits_screened": 5,
+   "included": [],
+   "excluded_or_note": "Found McKay et al. 2022 Meta-Psychology (10.15626/mp.2021.2803) and a PsyArXiv preprint on reporting bias in motor learning; self-controlled practice not registered (outside the R4 questions; declared gap)."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "McKay reporting bias not external focus robustness Bayesian meta-analysis attentional focus",
+   "hits_screened": 0,
+   "included": [],
+   "excluded_or_note": "HTTP 429 (rate limited); retried below."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "reduced frequency augmented feedback motor learning meta-analysis",
+   "hits_screened": 8,
+   "included": [
+    "mckay2022feedbackfrequency"
+   ],
+   "excluded_or_note": "Others: theses, handbook chapter, conference abstracts."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "reporting bias not external focus robustness Bayesian meta-analysis attentional focus",
+   "hits_screened": 5,
+   "included": [
+    "mckay2024focusbias"
+   ],
+   "excluded_or_note": "Preprint (SportRxiv), supplement record and dance-teaching books excluded."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "virtual reality welding training transfer skill",
+   "hits_screened": 6,
+   "included": [],
+   "excluded_or_note": "Japanese welding-society articles without retrievable abstracts, a narrative robotic-surgery review and a VR complex-skill study in older adults; none registered. Welding/VR vocational evidence remains a gap."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "cooking skills intervention randomized controlled trial knife skills observed performance assessment",
+   "hits_screened": 6,
+   "included": [],
+   "excluded_or_note": "Only trial-registry and unrelated records; no observed-performance cooking RCT found by this query."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "OpenAlex /works search",
+   "query": "cooking skills intervention systematic review meta-analysis",
+   "hits_screened": 0,
+   "included": [],
+   "excluded_or_note": "HTTP 429 (daily budget exhausted); fell back to PubMed and Crossref."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "OpenAlex /works search",
+   "query": "woodworking skill learning vocational students",
+   "hits_screened": 0,
+   "included": [],
+   "excluded_or_note": "HTTP 429; not retried."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "PubMed E-utilities esearch",
+   "query": "(cooking skills[tiab] OR culinary skills[tiab]) AND (meta-analysis[pt] OR systematic review[pt])",
+   "hits_screened": 12,
+   "included": [
+    "rossen2026cooking",
+    "sanaan2026onlinecooking",
+    "teixeira2021culinaryinstruments"
+   ],
+   "excluded_or_note": "19 records, first 12 screened by title: excluded diet/obesity outcome reviews (Andrade 2026, de Morais 2026), children/school programmes (van der Horst 2024, Vaughan 2024), clinical and population-specific reviews."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "Erfahrraum pedagogical model educational technologies dual vocational systems carpenters",
+   "hits_screened": 5,
+   "included": [],
+   "excluded_or_note": "Found Schwendimann et al. 2015 (10.1080/13636820.2015.1061041, carpenter apprentices); no abstract retrievable (Crossref, Semantic Scholar); not registered, declared gap."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "systematic review immersive virtual reality industrial skills training",
+   "hits_screened": 6,
+   "included": [
+    "radhakrishnan2021ivr"
+   ],
+   "excluded_or_note": "Excluded: orthopaedic conference media items, firefighter human-factors review, qualitative challenge analysis, thesis."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "carpentry apprentices learning hand skills augmented reality joinery",
+   "hits_screened": 6,
+   "included": [],
+   "excluded_or_note": "Only trade textbook chapters returned; no learning research. Hand-tool/joinery learning evidence is a declared gap."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "high contextual interference improves retention motor learning systematic review meta-analysis",
+   "hits_screened": 6,
+   "included": [
+    "czyz2024ciretention",
+    "czyz2024citransfer"
+   ],
+   "excluded_or_note": "Ammar et al. 2023 already known; theses and a conference abstract excluded."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "WebSearch (standard)",
+   "query": "Ammar 2023 \"myth of contextual interference\" meta-analysis abstract effect size",
+   "hits_screened": 10,
+   "included": [],
+   "excluded_or_note": "No abstract of Ammar et al. 2023 found; only secondary descriptions (Czyz et al. 2024, a 2025 commentary). ammar2023cimyth kept at metadata level."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "WebFetch",
+   "query": "University of Mainz open-science repository item for Ammar et al. 2023",
+   "hits_screened": 1,
+   "included": [],
+   "excluded_or_note": "Blocked by bot protection (Anubis); not retried."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "ERIC API",
+   "query": "author:\"Brinson, James R.\"",
+   "hits_screened": 1,
+   "included": [],
+   "excluded_or_note": "Only Brinson 2017 (follow-up characterisation, J Sci Educ Technol) found; the 2015 Computers & Education review is not in ERIC; neither registered."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "ERIC API",
+   "query": "title:\"virtual laboratories\" AND (systematic review OR meta-analysis)",
+   "hits_screened": 8,
+   "included": [
+    "reeves2021virtuallabs"
+   ],
+   "excluded_or_note": "64 records, 8 screened: excluded biotechnology simulation review (school), single-study scaffolding paper, learning-analytics and bibliometric reviews, framework papers."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "Crossref REST query.bibliographic",
+   "query": "Virtual chemical laboratories systematic literature review research technologies instructional design",
+   "hits_screened": 4,
+   "included": [],
+   "excluded_or_note": "Found Chan et al. 2021 (10.1016/j.caeo.2021.100053); abstract retrieval failed (Semantic Scholar HTTP 429); not registered, declared gap."
+  },
+  {
+   "batch": 1,
+   "date": "2026-11-27",
+   "engine": "PubMed E-utilities esearch",
+   "query": "Czyz[au] AND contextual interference[tiab] AND transfer[tiab]; Ilgen[au] AND checklists[tiab] AND global rating[tiab]",
+   "hits_screened": 3,
+   "included": [
+    "czyz2024citransfer",
+    "ilgen2015checklistgrs"
+   ],
+   "excluded_or_note": "Known-item PMID lookups to obtain full abstracts."
+  }
+ ]
+}
