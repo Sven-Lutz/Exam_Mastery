@@ -1,8 +1,8 @@
 {
  "agent_id": "R2",
  "wp": "WP-R2",
- "status": "CHECKPOINTED",
- "updated": "2026-11-27T13:05:00+01:00",
+ "status": "COMPLETED",
+ "updated": "2026-11-27T13:55:00+01:00",
  "done": [
   "read:charter,issue23,R1 synthesis,R1 policy schema,R0 audit s7-8",
   "metadata sweep: Crossref 27 DOIs, OpenAlex ~30, S2 8 (API)",
@@ -10,16 +10,17 @@
   "evidence batch2: weber2013skimming, kollar2014argumentation, davies2020cjproof, jones2015cj, zhao2025inductiongrading, ospanov2026llmgrading, petrov2025proofbluff, thoma2022lean, iannone2023lean, mahinpei2025itp",
   "evidence batch3 (programming+statistics): margulieux2020subgoals, morrison2015subgoals, ericson2017parsons, ericson2022parsonswg, lister2004tracing, lopez2008tracing, xie2018tracing, yang2024debuggingslr, sun2024debuggingmeta, michaeli2019debugging, baniassad2021autograder, messer2024autograding, milovancevic2025formalgrading, sentance2019primm, muldner2023workedexamples, tintle2012retention, chance2022sbi",
   "evidence batch4: mejia2012proofassessment, hembree1992problemsolving, castrosotos2009misconceptions, pelkola2018stack, kinnear2022eassessment, wrenn2021pbt (40 entries total)",
-  "evidence register committed (717e254); r2_learning_policies.json 16 policies + tests/test_r2_learning_policies.py (4c1f02f), headless run"
+  "evidence register committed (717e254); r2_learning_policies.json 16 policies + tests/test_r2_learning_policies.py (4c1f02f), headless run",
+  "R2_FORMAL_QUANTITATIVE.md + lead spot-check + draft PR #38 (390ec80)"
  ],
  "open": [
-  "R2_FORMAL_QUANTITATIVE.md (report: search log, evidence->operation->intervention->observation->outcome chains, worked + adversarial example, verifier matrix, risk/validity audit, reviewer questions)",
-  "search+screen Q1-Q5 log incl. gaps (math physics, finance modelling, complexity, seed 10.1145/3501385.3543977)"
+  "independent review of PR #38"
  ],
  "artifacts": [
+  "docs/research/workstreams/R2_FORMAL_QUANTITATIVE.md",
   "docs/research/workstreams/r2/r2_evidence.json",
   "docs/research/workstreams/r2/r2_learning_policies.json",
   "tests/test_r2_learning_policies.py"
  ],
- "next_step": "write docs/research/workstreams/R2_FORMAL_QUANTITATIVE.md from register + policies; page fetches used 26/45"
+ "next_step": "none autonomous; await review"
 }

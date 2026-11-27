@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T13:05:00+01:00",
+ "updated": "2026-11-27T13:55:00+01:00",
  "updated_by": "headless WP-R2",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -55,9 +55,11 @@
    "note": "independent review pending"
   },
   "R2": {
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "wp": "WP-R2",
-   "issue": 23
+   "issue": 23,
+   "pr": 38,
+   "note": "independent review pending; declared gaps (search log, physics/finance, complexity, causal inference)"
   },
   "R3": {
    "status": "PLANNED",
@@ -272,33 +274,37 @@
   {
    "id": "WP-R2",
    "title": "R2 formal, quantitative and computational mastery",
-   "status": "CHECKPOINTED",
+   "status": "COMPLETED",
    "priority": 2,
    "autostart": true,
    "issue": 23,
    "branch": "research/r2-formal-quantitative-20261127",
    "base": "research/r1-learning-science-20261127 (bec1f62)",
-   "next_step": "Write docs/research/workstreams/R2_FORMAL_QUANTITATIVE.md from r2_evidence.json + r2_learning_policies.json (search log, mechanism chains, worked+adversarial example, verifier matrix, risk audit, reviewer questions, declared gaps). Then lead spot-check and draft PR against base.",
+   "next_step": "None autonomous. Independent review of draft PR #38; coverage gaps listed in report §11 can become a follow-up package if R6 needs them.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
    "worktree": "Exam_Mastery-r2",
    "done": [
     "specialist brief issued; policy file in R1 schema",
     "evidence register 40 entries committed (717e254)",
-    "r2_learning_policies.json: 16 design-hypothesis policies + contract test (4c1f02f); unittest R1+R2 27 ok, 1 skip"
+    "r2_learning_policies.json: 16 design-hypothesis policies + contract test (4c1f02f); unittest R1+R2 27 ok, 1 skip",
+    "R2_FORMAL_QUANTITATIVE.md synthesis report (390ec80): findings, search/access log with declared query gap, operation matrix, verifier matrix, mechanism chains, worked + adversarial examples, risk audit, reviewer questions",
+    "lead spot-check 4/40 abstracts (verification_log): 3 match, 1 mismatch corrected (petrov2025proofbluff)",
+    "draft PR #38 against research/r1-learning-science-20261127"
    ],
    "open": [
-    "R2_FORMAL_QUANTITATIVE.md report incl. search log and coverage gaps",
-    "lead review/spot-check",
-    "draft PR"
+    "independent/human review of PR #38",
+    "optional follow-up: formal search Q1-Q5 with logged queries; physics/finance modelling, complexity analysis, causal inference; seed 10.1145/3501385.3543977"
    ],
    "artifacts": [
+    "docs/research/workstreams/R2_FORMAL_QUANTITATIVE.md",
     "docs/research/workstreams/r2/r2_evidence.json",
     "docs/research/workstreams/r2/r2_learning_policies.json",
     "tests/test_r2_learning_policies.py"
    ],
-   "tests": "python3 -m unittest test_r2_learning_policies test_r1_learning_policies (from tests/): 27 ok, 1 skipped",
+   "tests": "cd tests && python3 -m unittest test_r2_learning_policies test_r1_learning_policies: 27 ok, 1 skipped",
    "blockers": [],
-   "updated": "2026-11-27T13:05:00+01:00"
+   "updated": "2026-11-27T13:55:00+01:00",
+   "pr": 38
   },
   {
    "id": "WP-R5",
@@ -505,7 +511,7 @@
   },
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents."
  },
- "next_milestone": "WP-R2 and WP-R5 draft PRs (parallel specialists), then R3/R4/R9/R7/R8, then R6 architecture decision.",
+ "next_milestone": "WP-R5 draft PR, then R3/R4/R9/R7/R8, then R6 architecture decision.",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
