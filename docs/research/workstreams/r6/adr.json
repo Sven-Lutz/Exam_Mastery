@@ -991,10 +991,10 @@
  ],
  "proposed_decision": {
   "option": "H-AB",
-  "status": "PROPOSED",
-  "decided_by": null,
-  "decided_on": null,
-  "note": "Nur der Owner kann annehmen, ändern oder verwerfen (G0). Agenten setzen nie ACCEPTED.",
+  "status": "OWNER_DELEGATED_V1_CHOICE",
+  "decided_by": "owner (Sven-Lutz), delegated execution mandate",
+  "decided_on": "2026-11-27",
+  "note": "Implementation authorisation by the owner (issue #49), not scientific acceptance. Agents never set ACCEPTED or VALIDATED.",
   "components": [
    {
     "id": "K1",
@@ -1087,7 +1087,13 @@
    "R-3: faktische Verengung auf deterministisch prüfbare Operationen, wenn nicht als Phasenfolge ausgewiesen (AD-3)",
    "R-4: Policy-ID-Etiketten an Regeln täuschen Umsetzungsnähe vor",
    "R-5: Nähe zum Status quo als Bestätigung früherer Arbeit missverstanden"
-  ]
+  ],
+  "provenance": [
+   "https://github.com/Sven-Lutz/Exam_Mastery/issues/49",
+   "PR #48 owner comment 2026-11-27"
+  ],
+  "scope": "provisional implementation architecture for Mastery V1 on isolated integration/feature branches; minimal K1-K4 and only the templates needed for one academic reference; abstractions revisable if the vertical slice shows the complexity is not justified; no merge to main, no RL-pilot change",
+  "research_validation": "NOT_VALIDATED: no option has learning evidence; all 116 policies remain design hypotheses with learning_evaluation NOT_RUN"
  },
  "rejected_options": [
   {

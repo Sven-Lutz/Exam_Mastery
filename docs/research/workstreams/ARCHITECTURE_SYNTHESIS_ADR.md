@@ -1,6 +1,6 @@
 # R6 — Domänenübergreifende Synthese und Architecture Decision Record
 
-Stand 27.11.2026. **Entscheidungsstatus: PROPOSED.** Nur der Owner kann den Vorschlag annehmen, ändern oder verwerfen. Dieses Dokument ist Forschung, keine Implementierung und keine Freigabe. Alle 116 Policies der Workstreams R1–R5 und R7–R9 sind `design_hypothesis` mit `learning_evaluation: NOT_RUN`. Kein Mastery-Produkt hat eine gemessene Lernwirkung. Historische `HUMAN_REJECTED`-Bewertungen bleiben unverändert.
+Stand 27.11.2026. **Entscheidungsstatus: OWNER_DELEGATED_V1_CHOICE** (vorher PROPOSED). Der Owner hat H-AB in [Issue #49](https://github.com/Sven-Lutz/Exam_Mastery/issues/49) als vorläufige Implementierungsarchitektur für Mastery V1 ausgewählt. Das ist eine Implementierungsfreigabe auf isolierten Integrations- und Feature-Branches, **keine wissenschaftliche Validierung** und keine Pauschalannahme der 116 Policies. Die Abstraktionen sind revidierbar, falls der vertikale Schnitt zeigt, dass ihre Komplexität nicht gerechtfertigt ist. Kein Merge nach `main`, keine Änderung am RL-Piloten. Die Forschungsteile dieses Dokuments bleiben Forschung. Alle 116 Policies der Workstreams R1–R5 und R7–R9 sind `design_hypothesis` mit `learning_evaluation: NOT_RUN`. Kein Mastery-Produkt hat eine gemessene Lernwirkung. Historische `HUMAN_REJECTED`-Bewertungen bleiben unverändert.
 
 | Artefakt | Inhalt |
 |---|---|

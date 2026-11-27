@@ -69,16 +69,23 @@ class R6ArchitectureContract(unittest.TestCase):
 
     # --- decision status -------------------------------------------------------------
     def test_decision_status_is_proposed_never_accepted(self):
+        """PROPOSED, or an owner-delegated implementation choice with provenance; never research acceptance."""
         decision = self.adr["proposed_decision"]
-        self.assertEqual(decision["status"], "PROPOSED")
-        self.assertIsNone(decision["decided_by"])
+        self.assertIn(decision["status"], ("PROPOSED", "OWNER_DELEGATED_V1_CHOICE"))
+        if decision["status"] == "PROPOSED":
+            self.assertIsNone(decision["decided_by"])
+        else:  # implementation authorisation by the owner (issue #49), not scientific validation
+            self.assertTrue(any("issues/49" in p for p in decision["provenance"]))
+            self.assertTrue(decision["research_validation"].startswith("NOT_VALIDATED"))
+            self.assertIn("main", decision["scope"])
         for doc in (self.adr, self.ontology, self.observation):
             for path, key, value in _walk(doc):
                 if key == "status" and isinstance(value, str):
                     self.assertNotIn("ACCEPTED", value.upper(), path)
                     self.assertNotIn("APPROVED", value.upper(), path)
                     self.assertNotIn("VALIDATED", value.upper(), path)
-        self.assertIn("Entscheidungsstatus: PROPOSED", self.md)
+        self.assertRegex(self.md, r"Entscheidungsstatus: (PROPOSED|OWNER_DELEGATED_V1_CHOICE)")
+        self.assertIn("keine wissenschaftliche Validierung", self.md) if "OWNER_DELEGATED" in self.md[:600] else None
 
     # --- JSON structure --------------------------------------------------------------
     def test_adr_structure(self):
