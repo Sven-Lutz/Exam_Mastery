@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T22:24:22+01:00",
+ "updated": "2026-11-27T23:02:20+01:00",
  "updated_by": "LEAD (interactive, issue #51)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -369,7 +369,7 @@
    "id": "C2M-AUTHOR",
    "kind": "background subagent of LEAD",
    "scope": "real RL chapter 05 Policy Gradient + page-level QA",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/C2M-AUTHOR.json",
    "worktree": "Exam_Mastery-c2m-author"
   }
@@ -417,14 +417,27 @@
   {
    "id": "WP-C2M-AUTHOR-RL",
    "title": "P0/P1 real chapter from the owner's RL course (Policy Gradient) authored at university-excellence level through the packet contract; four connected products; page-level PDF inspection",
-   "status": "RUNNING",
+   "status": "COMPLETED_PENDING_OWNER_REVIEW",
    "priority": 0.2,
    "autostart": false,
    "next_step": "Specialist: private sources (iCloud, materialise with brctl download), output only to ~/Mastery; AI authorship by the Claude Code subscription session, labelled; every derivation/number verified by computation.",
    "branch": "feat/c2m-author-rl-20261127",
    "base": "integration/mastery-v1-20261127",
    "worktree": "Exam_Mastery-c2m-author",
-   "private_output": "~/Mastery/courses/rl/chapters/05-policy-gradient"
+   "private_output": "~/Mastery/courses/rl/chapters/05-policy-gradient",
+   "updated": "2026-11-27T23:02:20+01:00",
+   "done": [
+    "chapter course/rl/05-policy-gradient authored by a Claude Code session (subscription, no paid API) from the owner's lecture; private outputs only in the Mastery home: Lehrbuch 24 p. (14 sections, 6 derivations incl. policy gradient theorem in time and state form, reward-to-go proof, baseline unbiasedness, exact variance example, counterexample b=J, optimal b*), Arbeitsbuch 22 p. (13 tasks in 5 stages incl. 3 find-the-error, full solutions + rubrics), 23 Anki cards (13 with formula context, 3 with figures), bandit explorable (predict gradient direction, sample, variance with/without baseline, updates)",
+    "verification: sympy exact for score functions and worked numbers, Monte Carlo 400k for variance, Python/JS parity of the bandit model, literature checked via Crossref/arXiv/proceedings",
+    "page-level QA: side-note source bloat, proofs labelled 'Beispiel', figures detached from tasks, stage page breaks, broken TOC links, overlapping labels - fixed in the engine (8714a7a: policy-gradient lab, graduated workbook stages, textbook blocks, short source labels, Anki card figures; tests/test_policy_gradient_lab.py; suite 259 pytest + 906 unittest OK)",
+    "lead: page check of theorem and workbook pages; re-derived b* = pi2 r1 + pi1 r2 for two arms; no private material in 8714a7a; merged --no-ff into integration (b109de3)"
+   ],
+   "open": [
+    "owner review (HUMAN_REVIEW_PENDING)",
+    "slides on importance sampling/PPO only referenced",
+    "prediction check tolerance 8 digits (rounded hand answers show 'differs')",
+    "prerequisite lectures not materialised, linked by number only"
+   ]
   },
   {
    "id": "WP-C2M-IMPORT",
