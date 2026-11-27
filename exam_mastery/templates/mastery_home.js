@@ -97,7 +97,7 @@ function viewStart(lib) {
     el('article', { class: 'm-card', id: 'continue' }, el('p', { class: 'ds-eyebrow' }, 'Weiter, wo Sie aufgehört haben'),
       last ? [el('h2', { class: 'm-h2' }, last.where), el('p', {}, (ACT[last.type] || last.type) + ' · ' + last.task), el('p', { class: 'm-note' }, when(last.t)),
         el('a', { class: 'ds-btn ds-btn-primary', href: last.href, id: 'continue-link' }, 'Weitermachen')]
-        : [el('h2', { class: 'm-h2' }, 'Noch nichts bearbeitet'), el('p', {}, 'Beginnen Sie mit dem empfohlenen Schritt rechts.')]),
+        : [el('h2', { class: 'm-h2' }, 'Noch nichts bearbeitet'), el('p', {}, 'Beginnen Sie mit dem empfohlenen nächsten Schritt.')]),
     el('article', { class: 'm-card m-accent', id: 'next', 'data-rule': rec.rule, 'data-engine-rule': rec.engine_rule }, el('p', { class: 'ds-eyebrow' }, 'Nächster empfohlener Schritt'),
       el('h2', { class: 'm-h2' }, rec.task), el('p', {}, rec.title), el('p', { class: 'm-note' }, rec.why),
       el('p', { class: 'm-rule' }, 'Regel ', el('code', {}, rec.rule), ' · Engine-Regel ', el('code', {}, rec.engine_rule), rec.rationale ? ' – ' + rec.rationale : ''),
