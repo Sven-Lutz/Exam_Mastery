@@ -132,7 +132,11 @@ const category = (tr, c) => tr.categories[c] || GENERIC[c] || GENERIC.unclassifi
 // Retention evidence uses elapsed time, not calendar dates (mirrors policy.py, RETENTION_MIN_GAP_HOURS).
 const RETENTION_MIN_GAP_HOURS = 20;
 const instant = t => { const s = String(t); return Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(s) ? s + 'T00:00:00Z' : /([zZ]|[+-]\d{2}:?\d{2})$/.test(s) ? s : s + 'Z'); };
-const helped = (ev, tid, upto) => (upto === undefined ? ev : ev.slice(0, upto + 1)).some(e => (e.type === 'hint' || e.type === 'solution') && e.task === tid);
+// Mirrors policy.ASSIST_EVENTS: a prepared tutor context counts as help for that task (CD-7).
+const ASSIST_EVENTS = ['hint', 'solution', 'tutor'];
+const helped = (ev, tid, upto) => (upto === undefined ? ev : ev.slice(0, upto + 1)).some(e => ASSIST_EVENTS.includes(e.type) && e.task === tid);
+// Tasks whose purpose is evidence of independent solving: the tutor brief carries no answer key for them (mirrors tutor.KEY_WITHHELD_ROLES).
+const EVIDENCE_ROLES = ['similar', 'transfer', 'retest'];
 const solved = (ev, tid) => ev.some(e => e.type === 'attempt' && e.task === tid && e.diagnosis.result === 'correct');
 const role = (tr, r, kc, ev) => { const t = tr.tasks.find(t => t.role === r && (kc == null || t.kc_id === kc) && !(ev && solved(ev, t.id))); return t ? t.id : null; };
 const dec = (rule, action, next, obs, why, unc, o = {}) => ({ schema: 'em-decision-v1', rule, action, next_task: next, hints_allowed: o.hints_allowed !== false, support: o.support || null, focus: o.focus || null, tutor_offer: !!o.tutor, observation: obs, rationale: why, uncertainty: unc, retention: o.retention || null });
@@ -442,17 +446,18 @@ function boot() {
       hints_used: rel.filter(e => e.type === 'hint').length, solution_viewed: rel.some(e => e.type === 'solution'),
       known_misconceptions: Object.entries(tr.categories).filter(([, c]) => c.kind === 'misconception').map(([id, c]) => ({ id, label: c.label })),
       last_decision: lastDecision && { rule: lastDecision.rule, action: lastDecision.action, rationale: lastDecision.rationale },
-      support_level: rel.some(e => e.type === 'solution') ? 'solution_seen' : rel.some(e => e.type === 'hint') ? 'hints' : 'none',
+      support_level: rel.some(e => e.type === 'solution') ? 'solution_seen' : rel.some(e => e.type === 'tutor') ? 'tutor' : rel.some(e => e.type === 'hint') ? 'hints' : 'none',
       sources: tr.sources, source_status: tr.source_status, learner_question: question || '',
       privacy: 'Enthält nur diese Lernstrecke: Aufgabe, eigene Antworten und Diagnosen. Keine Namen. Wird nur übertragen, wenn Sie die Datei selbst an einen Tutor geben.' };
   }
   function tutorPanel(task) {
     const q = el('textarea', { class: 'wb-input', rows: 2, id: 'tutor-q', 'aria-label': 'Ihre Frage an den Tutor', placeholder: 'Was genau ist unklar?' });
     const outBox = el('pre', { class: 'wb-ctx', hidden: '' });
-    const make = el('button', { type: 'button', class: 'ds-btn', id: 'tutor-make', onclick: () => { const c = tutorContext(task, q.value); outBox.textContent = JSON.stringify(c, null, 1); outBox.hidden = false; save.hidden = false; } }, 'Tutor-Kontext erstellen');
+    const make = el('button', { type: 'button', class: 'ds-btn', id: 'tutor-make', onclick: () => { const c = tutorContext(task, q.value); outBox.textContent = JSON.stringify(c, null, 1); outBox.hidden = false; save.hidden = false; Store.add(SK, { type: 'tutor', task: task.id }); drawPath(); } }, 'Tutor-Kontext erstellen');
     const save = el('button', { type: 'button', class: 'ds-btn', hidden: '', onclick: () => download('tutor-kontext-' + tr.id.replace(/\W+/g, '-') + '.json', outBox.textContent) }, 'Als Datei speichern');
     return el('details', { class: 'wb-tutor' }, el('summary', {}, 'Frage an den Tutor vorbereiten'),
       el('p', { class: 'wb-note' }, 'Keine Live-Verbindung. Die Datei enthält Aufgabe, Ihre Versuche, genutzte Hilfen und Ihre Frage. Öffnen Sie danach Claude Code und schreiben Sie: /exam-mastery tutor <Pfad zur Datei>. Erst dann verlässt der Inhalt den Rechner – als Teil dieser Sitzung.'),
+      EVIDENCE_ROLES.includes(task.role) ? el('p', { class: 'wb-note', 'data-evidence-note': '' }, 'Diese Aufgabe prüft, ob Sie selbstständig lösen. Mit Tutorhilfe zählt sie als unterstützt gelöst; der Tutor erhält für sie keine Musterlösung.') : null,
       q, el('div', { class: 'wb-row' }, make, save), outBox);
   }
 

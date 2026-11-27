@@ -53,9 +53,14 @@ def category(track, cid):
     return track['categories'].get(cid) or GENERIC.get(cid) or GENERIC['unclassified']
 
 
+# Events that make a later attempt on the same task assisted. 'tutor' is written when the learner prepares a tutor
+# context for the task (CD-7, R5-POL-04): what happens in that conversation is not observed, so it counts as help.
+ASSIST_EVENTS = ('hint', 'solution', 'tutor')
+
+
 def helped(events, task_id, upto=None):
     evs = events if upto is None else events[:upto + 1]
-    return any(e['type'] in ('hint', 'solution') and e.get('task') == task_id for e in evs)
+    return any(e['type'] in ASSIST_EVENTS and e.get('task') == task_id for e in evs)
 
 
 def _solved(events, task_id):

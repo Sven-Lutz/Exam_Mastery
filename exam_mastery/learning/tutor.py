@@ -22,6 +22,12 @@ PROTOCOL = """## Tutor-Protokoll (verbindlich)
    und keine Beherrschung behaupten, die nicht beobachtet wurde."""
 
 
+# Roles whose purpose is evidence of independent solving (similar task without hints, transfer, later retest). Their
+# answer key never goes into a brief: only an instruction would keep it from the learner, and the chat provider would
+# receive it (CD-7, R9-POL-04, R5-POL-03). The role comes from the engine's track, never from the context file.
+KEY_WITHHELD_ROLES = ('similar', 'transfer', 'retest')
+
+
 class ContextError(ValueError):
     pass
 
@@ -63,7 +69,12 @@ def brief(ctx, tracks=None):
                 cc = tr['categories'].get(c)
                 if cc:
                     L.append(f'- {c} ({cc["kind"]}): {cc["feedback"]}')
-        if task and task.get('solution'):
+        if task and task.get('role') in KEY_WITHHELD_ROLES:
+            L += ['', '## Keine Musterlösung (Nachweisaufgabe)',
+                  f'Diese Aufgabe (Rolle {task["role"]}) prüft selbstständiges Lösen; ihre Lösung ist bewusst nicht enthalten. '
+                  'Nur mit Fragen und Hinweisen helfen, die Lösung nicht herleiten. Jede Hilfe macht diese Aufgabe für den '
+                  'Lernstand zu einer unterstützten Lösung; danach eine neue, strukturell veränderte Aufgabe stellen.']
+        elif task and task.get('solution'):
             L += ['', '## Musterlösung (NUR für den Tutor; nicht vorlesen, nicht vorzeitig zeigen)'] + [f'- {s}' for s in task['solution']]
         vis = []
         for c in sorted(cats):
