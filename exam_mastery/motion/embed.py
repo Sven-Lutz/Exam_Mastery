@@ -20,11 +20,16 @@ def _json_script(obj):
 
 
 def scene_section(scene_id, equation_svg=True):
-    """A self-contained <section>: static keyframes as no-JS fallback, scene data for the runtime."""
-    scene = load(scene_id)
+    """A self-contained <section> for a stored scene: static keyframes as no-JS fallback, scene data for the runtime."""
+    return section(load(scene_id), equation_svg)
+
+
+def section(scene, equation_svg=True):
+    """Section for a (validated) scene dict, e.g. a plane scene built from an experience unit's variants."""
     frames = scene.get("keyframes", {}).get("textbook") or [scene["steps"][0]["id"]]
-    fallback = "".join(f"<figure>{keyframe_svg(scene, sid)}</figure>" for sid in frames)
-    return (f'<section class="mm-scene" id="motion-{escape(scene_id)}" aria-label="Mastery Motion: {escape(scene["title"])}">'
+    first = (scene.get("presets") or [{}])[0].get("id")
+    fallback = "".join(f"<figure>{keyframe_svg(scene, sid, preset=first)}</figure>" for sid in frames)
+    return (f'<section class="mm-scene" id="motion-{escape(scene["id"])}" aria-label="Mastery Motion: {escape(scene["title"])}">'
             f'<div class="mm-fallback">{fallback}</div>'
             f'<script type="application/json" class="mm-data">{_json_script(payload(scene, equation_svg))}</script>'
             '</section>')
@@ -39,10 +44,11 @@ def scenes_for_unit(unit):
     return ids
 
 
-def unit_html(unit):
-    """Hook for experience units: inline CSS + scripts + sections (the Interaktiv page is one self-contained file)."""
+def unit_html(unit, runtime=False):
+    """Hook for experience units: inline CSS + scripts + sections (the Interaktiv page is one self-contained file).
+    runtime=True adds CSS and runtime even without model scenes (sections placed elsewhere on the page)."""
     ids = scenes_for_unit(unit)
-    if not ids:
+    if not ids and not runtime:
         return ""
     css = (TEMPLATES / "mastery_motion.css").read_text(encoding="utf-8")
     js = (TEMPLATES / "mastery_motion.js").read_text(encoding="utf-8")

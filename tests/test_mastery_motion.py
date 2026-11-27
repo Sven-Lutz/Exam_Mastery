@@ -19,6 +19,7 @@ from exam_mastery.motion.models import linear_map_2d, softmax_simplex_pg
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES = ROOT / "exam_mastery/templates"
 RL = "rl-softmax-simplex"
+PLANE = "plane-linear-map"
 HAVE_NODE = shutil.which("node") is not None
 
 
@@ -114,7 +115,10 @@ def test_grammar_expresses_the_plane_transformation_primitives():
     assert any(p["k"] == "area" and p["neg"] for p in prims)  # orientation flip is drawn hatched, not only coloured
     assert sum(p["k"] == "line" for p in prims) == 18
     half = linear_map_2d({"A": [1.0, 2.0, 1.0, 1.0], "t": 1 / math.sqrt(2), "v": [1.0, 1.0]})  # det M(t) = 1 - 2t^2
-    assert math.isclose(half["det"], 0.0, abs_tol=1e-12) and half["orientation"] == 0  # the plane collapses on the way
+    assert math.isclose(half["det"], 0.0, abs_tol=1e-12)  # the plane collapses on the way ...
+    assert len(half["singular_times"]) == 1 and math.isclose(half["singular_times"][0], 1 / math.sqrt(2), rel_tol=1e-12)
+    flat = linear_map_2d({"A": [1.0, 2.0, 1.0, 1.0], "t": 0.5, "v": [1.0, 1.0]})  # ... and exactly where it is rational:
+    assert linear_map_2d({"A": [0.0, 1.0, 1.0, 0.0], "t": 0.5, "v": [1.0, 0.0]})["orientation"] == 0 and flat["rank"] == 2
 
 
 # ------------------------------------------------------------------ mathematics of the flagship scene (V10)
@@ -232,50 +236,75 @@ def test_embedding_hook_for_units_and_demo_page(tmp_path):
     assert 'class="mm-scene"' in html and "MasteryMotion" in html and "</script><" in html
     data = html.split('class="mm-data">', 1)[1].split("</script>", 1)[0]
     assert "<" not in data and json.loads(data)["revision"] == M.revision(scene())
-    demos = embed.write_demo_pages(tmp_path)
-    assert demos[0]["href"] == f"motion/{RL}.html" and (tmp_path / demos[0]["href"]).is_file()
-    page = (tmp_path / demos[0]["href"]).read_text()
+    demos = {d["id"]: d for d in embed.write_demo_pages(tmp_path)}
+    assert set(demos) == {RL, PLANE} and demos[RL]["href"] == f"motion/{RL}.html" and (tmp_path / demos[RL]["href"]).is_file()
+    page = (tmp_path / demos[PLANE]["href"]).read_text()
     assert "script-src 'self'" in page and "<script>" not in page  # CSP: no inline scripts on the demo page
     assert all((tmp_path / "assets" / n).is_file() for n in embed.ASSETS)
 
 
 # ------------------------------------------------------------------ JS <-> Python parity (V10)
 
+def _close(a, b):
+    if isinstance(b, bool) or b is None or isinstance(b, str):
+        return a == b
+    if isinstance(b, (int, float)):
+        return isinstance(a, (int, float)) and math.isclose(a, b, rel_tol=1e-11, abs_tol=1e-12)
+    if isinstance(b, list):
+        return isinstance(a, list) and len(a) == len(b) and all(_close(x, y) for x, y in zip(a, b))
+    if isinstance(b, dict):
+        return isinstance(a, dict) and set(a) >= set(b) and all(_close(a[k], v) for k, v in b.items())
+    return a == b
+
+
 @pytest.mark.skipif(not HAVE_NODE, reason="node not installed")
-def test_browser_runtime_matches_python_at_every_keyframe(tmp_path):
-    sc = M.payload(scene(), equation_svg=False)
+@pytest.mark.parametrize("sid", [RL, PLANE])
+def test_browser_runtime_matches_python_at_every_keyframe(tmp_path, sid):
+    """V10: every state quantity, display primitive, caption, aria text and computed answer, for every preset."""
+    sc = M.payload(M.load(sid), equation_svg=False)
     path = tmp_path / "scene.json"
     path.write_text(json.dumps(sc), encoding="utf-8")
-    out = _node(NODE_PRELUDE + "const r=sc.steps.map((st,i)=>{const s=MM.evaluate(sc,MM.paramsAt(sc,i));"
-                "return {state:s,display:MM.display(sc,s),caption:MM.textOf(st.caption,s),aria:MM.textOf(st.aria,s),"
-                "answers:st.checkpoint?st.checkpoint.predict.map(q=>MM.correctAnswer(sc,s,q)):null};});"
-                "console.log(JSON.stringify(r));",
-                str(TEMPLATES / "policy_gradient_math.js"), str(TEMPLATES / "mastery_motion.js"), str(path))
+    presets = [None] + [p["id"] for p in sc.get("presets", [])]
+    out = _node(NODE_PRELUDE + "const out={};for(const pr of JSON.parse(process.argv[4])){"
+                "const over=pr?sc.presets.find(x=>x.id===pr).set:null,panels=MM.panelsFor(sc,pr);"
+                "out[pr||'']=sc.steps.map((st,i)=>{const s=MM.evaluate(sc,MM.paramsAt(sc,i,over));"
+                "return {state:s,display:MM.display(sc,s,panels),caption:MM.textOf(st.caption,s),aria:MM.textOf(st.aria,s),"
+                "labels:sc.objects.filter(o=>o.type==='label').map(o=>MM.textOf(o.text,s)),"
+                "answers:st.checkpoint?st.checkpoint.predict.map(q=>MM.correctAnswer(sc,s,q)):null,"
+                "explain:st.checkpoint?MM.textOf(st.checkpoint.explain,s):null};});}"
+                "console.log(JSON.stringify(out));",
+                str(TEMPLATES / "policy_gradient_math.js"), str(TEMPLATES / "mastery_motion.js"), str(path), json.dumps(presets))
     js = json.loads(out)
-    for i, (st, ref) in enumerate(zip(sc["steps"], M.states(sc))):
-        got = js[i]
-        assert got["caption"] == M.text_of(st["caption"], ref), st["id"]
-        assert got["aria"] == M.text_of(st["aria"], ref), st["id"]
-        assert got["state"]["actions"] == ref["actions"], st["id"]
-        for key in ("theta", "pi", "grad", "sample_mean", "dpi", "samples", "pi_trail"):
-            assert np.allclose(got["state"][key], ref[key], rtol=1e-12, atol=1e-12), (st["id"], key)
-        for key in ("J", "var_b", "var_none", "var_opt", "b", "b_opt", "sample_spread", "mean_err"):
-            assert math.isclose(got["state"][key], ref[key], rel_tol=1e-11, abs_tol=1e-12), (st["id"], key)
-        prims = M.display(sc, ref)
-        assert len(got["display"]) == len(prims), st["id"]
-        for a, b in zip(got["display"], prims):
-            assert a["o"] == b["o"] and a["k"] == b["k"] and a["t"] == b["t"]
-            for k, v in b.items():
-                if isinstance(v, float):
-                    assert math.isclose(a[k], v, abs_tol=1e-9), (st["id"], b["o"], k)
-                elif k == "pts":
-                    assert np.allclose(a[k], v, atol=1e-9)
-                else:
-                    assert a[k] == v, (st["id"], b["o"], k)
-        if st.get("checkpoint"):
-            want = [M.correct_answer(sc, ref, q) for q in st["checkpoint"]["predict"]]
-            for x, y in zip(got["answers"], want):
-                assert (math.isclose(x["deg"], y["deg"], abs_tol=1e-9) if isinstance(y, dict) else x == y)
+    checked = 0
+    for pr in presets:
+        for i, st in enumerate(sc["steps"]):
+            ref, got = M.evaluate(sc, M.params_at(sc, i, pr)), js[pr or ""][i]
+            where = (sid, pr, st["id"])
+            assert got["caption"] == M.text_of(st["caption"], ref), where
+            assert got["aria"] == M.text_of(st["aria"], ref), where
+            assert got["labels"] == [M.text_of(o["text"], ref) for o in sc["objects"] if o["type"] == "label"], where
+            for key, value in ref.items():
+                if not key.endswith("_exact"):  # exact rational strings exist only in the Python reference
+                    assert _close(got["state"][key], value), (where, key)
+            prims = M.display(sc, ref, M.panels_for(sc, pr))
+            assert len(got["display"]) == len(prims), where
+            for a, b in zip(got["display"], prims):
+                assert a["o"] == b["o"] and a["k"] == b["k"] and a["t"] == b["t"], where
+                for k, v in b.items():
+                    if isinstance(v, float):
+                        assert math.isclose(a[k], v, abs_tol=1e-9), (where, b["o"], k)
+                    elif k == "pts":
+                        assert np.allclose(a[k], v, atol=1e-9)
+                    else:
+                        assert a[k] == v, (where, b["o"], k)
+            if st.get("checkpoint"):
+                assert got["explain"] == M.text_of(st["checkpoint"]["explain"], ref), where
+                want = [M.correct_answer(sc, ref, q) for q in st["checkpoint"]["predict"]]
+                for x, y in zip(got["answers"], want):
+                    assert (math.isclose(x["deg"], y["deg"], abs_tol=1e-9) if isinstance(y, dict) and "deg" in y
+                            else _close(x, y)), where
+            checked += 1
+    assert checked == len(presets) * len(sc["steps"])
 
 
 @pytest.mark.skipif(not HAVE_NODE, reason="node not installed")
@@ -323,7 +352,7 @@ def test_mastery_app_demo_scene_end_to_end(tmp_path):
     home = tmp_path / "Mastery"
     build(home, only="-no-unit-", log=lambda *_: None)  # shell + motion demos only (no unit build needed here)
     lib = json.loads((home / "library.json").read_text(encoding="utf-8"))
-    assert lib["units"] == [] and [d["id"] for d in lib["motion_demos"]] == [RL]
+    assert lib["units"] == [] and sorted(d["id"] for d in lib["motion_demos"]) == [PLANE, RL]
     server, base = start_in_thread(home)
     errors, external = [], []
     try:

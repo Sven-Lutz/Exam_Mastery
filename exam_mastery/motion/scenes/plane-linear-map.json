@@ -1,0 +1,762 @@
+{
+ "schema": "mastery-motion-v1",
+ "id": "plane-linear-map",
+ "lang": "de",
+ "public": true,
+ "title": "Lineare Abbildung als stetige Verformung der Ebene",
+ "claim": "Die Spalten von A sind die Bilder von e₁ und e₂; Av kombiniert sie mit den Koordinaten von v. det A ist die vorzeichenbehaftete Fläche des Bildquadrats; wo det M(t) = 0 wird, fällt die Ebene auf eine Gerade (Kern ≠ {0}).",
+ "model": "linear_map_2d",
+ "params": {
+  "A": {
+   "value": [
+    2.0,
+    -1.0,
+    1.0,
+    1.0
+   ],
+   "min": -4,
+   "max": 4,
+   "label": "Matrix A"
+  },
+  "v": {
+   "value": [
+    1.0,
+    2.0
+   ],
+   "min": -3,
+   "max": 3,
+   "label": "Testvektor v"
+  },
+  "t": {
+   "value": 0.0,
+   "min": 0,
+   "max": 1
+  }
+ },
+ "view": {
+  "width": 780,
+  "height": 470,
+  "panels": [
+   {
+    "id": "plane",
+    "title": "Die Ebene unter M(t)",
+    "x": 16,
+    "y": 30,
+    "w": 430,
+    "h": 430,
+    "domain": [
+     -4,
+     4,
+     -4,
+     4
+    ],
+    "clip": true
+   },
+   {
+    "id": "read",
+    "title": "Werte aus dem Modell",
+    "x": 470,
+    "y": 44,
+    "w": 300,
+    "h": 300,
+    "domain": [
+     0,
+     1,
+     0,
+     1
+    ]
+   }
+  ]
+ },
+ "objects": [
+  {
+   "id": "ghost",
+   "type": "grid",
+   "panel": "plane",
+   "matrix": "I",
+   "range": [
+    -12,
+    12
+   ],
+   "token": "muted",
+   "meaning": "Das ursprüngliche Gitter (Bezug, bleibt stehen)."
+  },
+  {
+   "id": "grid",
+   "type": "grid",
+   "panel": "plane",
+   "matrix": "M",
+   "range": [
+    -12,
+    12
+   ],
+   "token": "ink",
+   "meaning": "Das Bild des Gitters unter M(t): Geraden bleiben Geraden, Parallelen bleiben parallel."
+  },
+  {
+   "id": "square",
+   "type": "polygon",
+   "panel": "plane",
+   "points": "square",
+   "orientation": "orientation",
+   "token": "area",
+   "meaning": "Bild des Einheitsquadrats; Fläche = |det M|, schraffiert bei umgekehrter Orientierung."
+  },
+  {
+   "id": "kernel",
+   "type": "lines",
+   "panel": "plane",
+   "of": "kernel_line",
+   "token": "kernel",
+   "meaning": "Kern von M(t) (gestrichelt): alle Vektoren, die auf 0 abgebildet werden; nur bei Rang 1 eine Gerade."
+  },
+  {
+   "id": "image",
+   "type": "lines",
+   "panel": "plane",
+   "of": "image_line",
+   "token": "image",
+   "meaning": "Bild von M(t) bei Rang 1: die Gerade, auf die die ganze Ebene fällt."
+  },
+  {
+   "id": "v0",
+   "type": "point",
+   "panel": "plane",
+   "at": "v",
+   "token": "vec",
+   "size": 4.5,
+   "label": "v",
+   "meaning": "Der Testvektor v vor der Abbildung."
+  },
+  {
+   "id": "col1",
+   "type": "vector",
+   "panel": "plane",
+   "to": "e1",
+   "token": "basis1",
+   "label": "Me₁",
+   "meaning": "Erste Spalte von M(t) = Bild von e₁."
+  },
+  {
+   "id": "col2",
+   "type": "vector",
+   "panel": "plane",
+   "to": "e2",
+   "token": "basis2",
+   "label": "Me₂",
+   "meaning": "Zweite Spalte von M(t) = Bild von e₂."
+  },
+  {
+   "id": "mv",
+   "type": "vector",
+   "panel": "plane",
+   "to": "Mv",
+   "token": "vec",
+   "label": "Mv",
+   "meaning": "Bild des Testvektors: Mv = v₁·Me₁ + v₂·Me₂."
+  },
+  {
+   "id": "read-t",
+   "type": "label",
+   "panel": "read",
+   "x": 0,
+   "y": 14,
+   "text": "t = {t_text}   ·   M(t) = (1 − t)·I + t·A",
+   "token": "ink",
+   "meaning": "Zeit des Weges von I nach A."
+  },
+  {
+   "id": "read-e1",
+   "type": "label",
+   "panel": "read",
+   "x": 0,
+   "y": 46,
+   "text": "Me₁ = {e1_text}",
+   "token": "basis1",
+   "meaning": "Erste Spalte."
+  },
+  {
+   "id": "read-e2",
+   "type": "label",
+   "panel": "read",
+   "x": 0,
+   "y": 72,
+   "text": "Me₂ = {e2_text}",
+   "token": "basis2",
+   "meaning": "Zweite Spalte."
+  },
+  {
+   "id": "read-mv",
+   "type": "label",
+   "panel": "read",
+   "x": 0,
+   "y": 104,
+   "text": "Mv = {Mv_text}",
+   "token": "vec",
+   "meaning": "Bild des Testvektors."
+  },
+  {
+   "id": "read-mvf",
+   "type": "label",
+   "panel": "read",
+   "x": 0,
+   "y": 128,
+   "text": "= {Mv_formula}",
+   "token": "vec",
+   "meaning": "Spaltenkombination."
+  },
+  {
+   "id": "read-det",
+   "type": "label",
+   "panel": "read",
+   "x": 0,
+   "y": 160,
+   "text": "det M = {det_formula}",
+   "token": "area",
+   "meaning": "Determinante als Formel."
+  },
+  {
+   "id": "read-or",
+   "type": "label",
+   "panel": "read",
+   "x": 0,
+   "y": 184,
+   "text": "{orientation_text}",
+   "token": "area",
+   "meaning": "Orientierung."
+  },
+  {
+   "id": "read-rank",
+   "type": "label",
+   "panel": "read",
+   "x": 0,
+   "y": 216,
+   "text": "{rank_text}",
+   "token": "ink",
+   "meaning": "Rang."
+  },
+  {
+   "id": "read-ker",
+   "type": "label",
+   "panel": "read",
+   "x": 0,
+   "y": 240,
+   "text": "{kernel_text}",
+   "token": "kernel",
+   "meaning": "Kern."
+  },
+  {
+   "id": "read-img",
+   "type": "label",
+   "panel": "read",
+   "x": 0,
+   "y": 264,
+   "text": "{image_text}",
+   "token": "image",
+   "meaning": "Bild."
+  },
+  {
+   "id": "read-dim",
+   "type": "label",
+   "panel": "read",
+   "x": 0,
+   "y": 288,
+   "text": "{dim_text}",
+   "token": "ink",
+   "meaning": "Dimensionsformel."
+  }
+ ],
+ "terms": {
+  "mv": {
+   "name": "Bild des Testvektors Mv",
+   "token": "vec",
+   "objects": [
+    "mv",
+    "read-mv",
+    "read-mvf"
+   ]
+  },
+  "col1": {
+   "name": "erste Spalte Me₁",
+   "token": "basis1",
+   "objects": [
+    "col1",
+    "read-e1"
+   ]
+  },
+  "col2": {
+   "name": "zweite Spalte Me₂",
+   "token": "basis2",
+   "objects": [
+    "col2",
+    "read-e2"
+   ]
+  },
+  "det": {
+   "name": "Determinante = Fläche mit Vorzeichen",
+   "token": "area",
+   "objects": [
+    "square",
+    "read-det",
+    "read-or"
+   ]
+  },
+  "ker": {
+   "name": "Kern (bei det = 0 eine Gerade)",
+   "token": "kernel",
+   "objects": [
+    "kernel",
+    "read-ker"
+   ]
+  }
+ },
+ "equation": {
+  "label": "Spaltenbild und Determinante",
+  "segments": [
+   {
+    "tex": "M(t)\\,v",
+    "text": "M(t)v",
+    "term": "mv"
+   },
+   {
+    "tex": "=",
+    "text": " = "
+   },
+   {
+    "tex": "v_1",
+    "text": "v₁"
+   },
+   {
+    "tex": "M e_1",
+    "text": "Me₁",
+    "term": "col1"
+   },
+   {
+    "tex": "+",
+    "text": " + "
+   },
+   {
+    "tex": "v_2",
+    "text": "v₂"
+   },
+   {
+    "tex": "M e_2",
+    "text": "Me₂",
+    "term": "col2"
+   },
+   {
+    "tex": "\\qquad",
+    "text": "   "
+   },
+   {
+    "tex": "\\det M(t)",
+    "text": "det M(t)",
+    "term": "det"
+   },
+   {
+    "tex": "= 0 \\iff",
+    "text": " = 0 ⟺ "
+   },
+   {
+    "tex": "\\ker M(t) \\neq \\{0\\}",
+    "text": "Kern M(t) ≠ {0}",
+    "term": "ker"
+   }
+  ]
+ },
+ "steps": [
+  {
+   "id": "identity",
+   "focus": [
+    "grid",
+    "square",
+    "kernel",
+    "image",
+    "col1",
+    "col2",
+    "mv",
+    "v0"
+   ],
+   "title": "Vor der Abbildung (t = 0)",
+   "caption": "Gitter, Basisvektoren e₁ und e₂, Einheitsquadrat und Testvektor v = {v_text}. Gleich verformt M(t) = (1 − t)·I + t·A die Ebene stetig von der Identität zu A.",
+   "aria": "Ein unverformtes Quadratgitter. Die Spalten Me₁ = {e1_text} und Me₂ = {e2_text} sind die Basisvektoren, das Einheitsquadrat hat Fläche 1, der Testvektor zeigt nach {v_text}."
+  },
+  {
+   "id": "quarter",
+   "focus": [
+    "grid",
+    "square",
+    "kernel",
+    "image",
+    "col1",
+    "col2",
+    "mv",
+    "v0"
+   ],
+   "set": {
+    "t": 0.25
+   },
+   "transition": {
+    "kind": "morph",
+    "animate": [
+     "t"
+    ],
+    "ms": 900,
+    "ease": "linear"
+   },
+   "title": "Ein Viertel des Weges (t = 0,25)",
+   "caption": "Die Spalten wandern: Me₁ = {e1_text}, Me₂ = {e2_text}. det M = {det_formula}. {orientation_text}.",
+   "aria": "Das Gitter ist leicht verformt; das Bild des Einheitsquadrats ist ein Parallelogramm mit Fläche {det_formula}. {orientation_text}.",
+   "checkpoint": {
+    "predict": [
+     {
+      "id": "av",
+      "type": "point",
+      "short": "Av",
+      "prompt": "Vorhersage: Wohin landet v unter A? Av ≈",
+      "correct": {
+       "rule": "point",
+       "of": "Av",
+       "tol": 0.25
+      }
+     },
+     {
+      "id": "det-sign",
+      "type": "sign",
+      "short": "det A",
+      "prompt": "Und das Vorzeichen von det A?",
+      "correct": {
+       "rule": "sign",
+       "of": "det_A",
+       "tol": 1e-09
+      }
+     }
+    ],
+    "feedback_step": "image",
+    "explain": "Av = {Av_formula}: Av kombiniert die Spalten von A mit den Koordinaten von v. det A = {det_A_text}. {det_A_note}"
+   }
+  },
+  {
+   "id": "half",
+   "focus": [
+    "grid",
+    "square",
+    "kernel",
+    "image",
+    "col1",
+    "col2",
+    "mv",
+    "v0"
+   ],
+   "set": {
+    "t": 0.5
+   },
+   "transition": {
+    "kind": "morph",
+    "animate": [
+     "t"
+    ],
+    "ms": 900,
+    "ease": "linear"
+   },
+   "title": "Halber Weg (t = 0,5)",
+   "caption": "M(0,5) ist der Mittelwert von I und A. det M = {det_formula}. {rank_text}: {kernel_text}, {image_text}.",
+   "aria": "Das Gitter auf halbem Weg; {orientation_text}. {rank_text}, {kernel_text}, {image_text}."
+  },
+  {
+   "id": "three-quarters",
+   "focus": [
+    "grid",
+    "square",
+    "kernel",
+    "image",
+    "col1",
+    "col2",
+    "mv",
+    "v0"
+   ],
+   "set": {
+    "t": 0.75
+   },
+   "transition": {
+    "kind": "morph",
+    "animate": [
+     "t"
+    ],
+    "ms": 900,
+    "ease": "linear"
+   },
+   "title": "Drei Viertel (t = 0,75)",
+   "caption": "det M = {det_formula}. {orientation_text}. Wo det M(t) unterwegs 0 wird, rastet die Zeitachse ein (rote Marken): Dort zeigen Kern und Bild als Geraden, was verloren geht.",
+   "aria": "Das Gitter ist fast bei A angekommen. {orientation_text}."
+  },
+  {
+   "id": "image",
+   "focus": [
+    "grid",
+    "square",
+    "kernel",
+    "image",
+    "col1",
+    "col2",
+    "mv",
+    "v0"
+   ],
+   "set": {
+    "t": 1.0
+   },
+   "transition": {
+    "kind": "morph",
+    "animate": [
+     "t"
+    ],
+    "ms": 900,
+    "ease": "linear"
+   },
+   "title": "Das Bild unter A (t = 1)",
+   "caption": "Jetzt ist M = A: Me₁ = {e1_text} und Me₂ = {e2_text} sind die Spalten von A, Av = {Mv_formula}. det A = {det_A_text}; {rank_text}, {kernel_text}, {image_text}. Ziehen Sie die Spitzen der Spalten, um A zu verändern.",
+   "aria": "Das Gitter unter A. Die Spalten zeigen nach {e1_text} und {e2_text}, das Bild von v liegt bei {Mv_text}. det A = {det_A_text}. {rank_text}, {kernel_text}, {image_text}."
+  }
+ ],
+ "missions": [
+  {
+   "id": "flatten",
+   "from_step": "image",
+   "prompt": "Auftrag: Machen Sie A singulär (det A = 0), indem Sie nur den Eintrag a₁₂ verändern.",
+   "hint": "det A = a₁₁a₂₂ − a₁₂a₂₁ ist in a₁₂ linear. Bei det A = 0 sind die Spalten parallel.",
+   "feedback": "det A = {det_A_text}; {rank_text}, {kernel_text}.",
+   "sliders": [
+    {
+     "param": "A",
+     "index": 1,
+     "label": "a₁₂",
+     "step": 0.25
+    }
+   ],
+   "goal": {
+    "of": "det_A",
+    "op": "abs<=",
+    "value": 0.05
+   }
+  }
+ ],
+ "presets": [
+  {
+   "id": "allgemein",
+   "label": "Allgemein",
+   "set": {
+    "A": [
+     2.0,
+     -1.0,
+     1.0,
+     1.0
+    ],
+    "v": [
+     1.0,
+     2.0
+    ]
+   },
+   "domain": {
+    "plane": [
+     -4,
+     4,
+     -4,
+     4
+    ]
+   }
+  },
+  {
+   "id": "scherung",
+   "label": "Scherung",
+   "set": {
+    "A": [
+     1.0,
+     1.0,
+     0.0,
+     1.0
+    ],
+    "v": [
+     1.0,
+     2.0
+    ]
+   },
+   "domain": {
+    "plane": [
+     -4,
+     4,
+     -4,
+     4
+    ]
+   }
+  },
+  {
+   "id": "drehung",
+   "label": "Drehung um 90°",
+   "set": {
+    "A": [
+     0.0,
+     -1.0,
+     1.0,
+     0.0
+    ],
+    "v": [
+     2.0,
+     1.0
+    ]
+   },
+   "domain": {
+    "plane": [
+     -3,
+     3,
+     -3,
+     3
+    ]
+   }
+  },
+  {
+   "id": "spiegelung",
+   "label": "Spiegelung",
+   "set": {
+    "A": [
+     0.0,
+     1.0,
+     1.0,
+     0.0
+    ],
+    "v": [
+     1.0,
+     2.0
+    ]
+   },
+   "domain": {
+    "plane": [
+     -3,
+     3,
+     -3,
+     3
+    ]
+   }
+  },
+  {
+   "id": "rang-1",
+   "label": "Rang 1",
+   "set": {
+    "A": [
+     1.0,
+     2.0,
+     2.0,
+     4.0
+    ],
+    "v": [
+     2.0,
+     -1.0
+    ]
+   },
+   "domain": {
+    "plane": [
+     -6.0,
+     6.0,
+     -6.0,
+     6.0
+    ]
+   }
+  },
+  {
+   "id": "null",
+   "label": "Nullabbildung",
+   "set": {
+    "A": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "v": [
+     1.0,
+     1.0
+    ]
+   },
+   "domain": {
+    "plane": [
+     -2.5,
+     2.5,
+     -2.5,
+     2.5
+    ]
+   }
+  }
+ ],
+ "edit": [
+  {
+   "param": "A",
+   "index": 0,
+   "label": "a₁₁",
+   "step": 0.5
+  },
+  {
+   "param": "A",
+   "index": 1,
+   "label": "a₁₂",
+   "step": 0.5
+  },
+  {
+   "param": "A",
+   "index": 2,
+   "label": "a₂₁",
+   "step": 0.5
+  },
+  {
+   "param": "A",
+   "index": 3,
+   "label": "a₂₂",
+   "step": 0.5
+  },
+  {
+   "param": "v",
+   "index": 0,
+   "label": "v₁",
+   "step": 0.5
+  },
+  {
+   "param": "v",
+   "index": 1,
+   "label": "v₂",
+   "step": 0.5
+  }
+ ],
+ "drag": [
+  {
+   "object": "col1",
+   "param": "A",
+   "indices": [
+    0,
+    2
+   ],
+   "step": 0.25
+  },
+  {
+   "object": "col2",
+   "param": "A",
+   "indices": [
+    1,
+    3
+   ],
+   "step": 0.25
+  }
+ ],
+ "snap": {
+  "param": "t",
+  "to": "singular_times",
+  "within": 0.015
+ },
+ "keyframes": {
+  "textbook": [
+   "identity",
+   "half",
+   "image"
+  ],
+  "anki": [
+   "image"
+  ]
+ }
+}
