@@ -651,7 +651,7 @@
    },
    "estimate": {
     "metric": "percentage of maximum score",
-    "value": "one model approx. 25%, all others below 5% (abstract)",
+    "value": "no model above 30%, most below 5% (arXiv abstract v1; lead correction 2026-11-27: earlier entry said one model approx. 25%, not stated in the abstract)",
     "ci": "not reported",
     "k_or_n": "6 problems",
     "note": "Final-answer benchmarks overstated proof capability."

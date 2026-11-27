@@ -10,7 +10,7 @@
  },
  "authorship": {
   "R2": "Spezialist formale, quantitative und computationale Kompetenz (r2/r2_evidence.json)",
-  "lead": "pending: Review/Stichprobenprüfung",
+  "lead": "Synthese R2_FORMAL_QUANTITATIVE.md, Stichprobenprüfung (verification_log), eine Registerkorrektur (petrov2025proofbluff); Lead ist dasselbe Modell wie der Spezialist",
   "independent_review": "pending: keine menschliche Fachprüfung"
  },
  "operations": [
@@ -1474,5 +1474,34 @@
    "learning_evaluation": "NOT_RUN"
   }
  ],
- "verification_log": []
+ "verification_log": [
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "OpenAlex abstract",
+   "checked": "xie2018tracing: block-randomisiert, N = 24, +15 % Tracing (p < .05), +7 % Midterm",
+   "result": "match"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "Crossref abstract",
+   "checked": "sun2024debuggingmeta: g = 0.64, CI (0.32, 0.96), 62 Effekte aus 18 Artikeln, Vorhersagebereich -0.54 bis 1.82",
+   "result": "match"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "OpenAlex abstract",
+   "checked": "neuhaus2025proofskills: N = 153, 2-dimensionales Modell (Konstruktion vs. Lesen) am besten",
+   "result": "match; Abstract formuliert Modellfit positiver als die Volltextnotiz (kein akzeptabler TLI); Policy-Stufe low bleibt"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "arXiv API abstract 2503.21934",
+   "checked": "petrov2025proofbluff: Höchstwert der Modelle",
+   "result": "mismatch: Abstract nennt 'kein Modell über 30 %, die meisten unter 5 %'; Registerwert 'ein Modell ca. 25 %' korrigiert"
+  }
+ ]
 }
