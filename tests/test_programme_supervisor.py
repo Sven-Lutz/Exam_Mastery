@@ -300,5 +300,17 @@ class SupervisorTest(unittest.TestCase):
         self.assertIn("<key>RunAtLoad</key><false/>", xml)
 
 
+class PublicRepoHygiene(unittest.TestCase):
+    """Programme state and agent checkpoints are public: no local absolute paths."""
+
+    def test_no_local_absolute_paths_in_programme_files(self):
+        import re
+        bad = re.compile(r"(/Users/|/home/|/private/tmp/|[A-Z]:\\\\Users)")
+        for path in (ROOT / "docs" / "programme").rglob("*"):
+            if path.is_file() and path.suffix in (".json", ".md"):
+                text = path.read_text(encoding="utf-8")
+                self.assertIsNone(bad.search(text), "%s contains a local absolute path" % path.relative_to(ROOT))
+
+
 if __name__ == "__main__":
     unittest.main()

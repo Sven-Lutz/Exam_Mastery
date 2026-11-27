@@ -14,8 +14,8 @@
   "Gaps G1-G12 (esp. G1 planner RCT, G2 breaks with retention outcomes, G4 chronotype/shift work, G5 test-anxiety meta-analyses, G7 Ciria 2026 correction)"
  ],
  "artifacts": [
-  "/Users/svenlutz/Projects/Exam_Mastery-r1/docs/research/workstreams/r1/R1B_NEURO_INTENSITY.md",
-  "/Users/svenlutz/Projects/Exam_Mastery-r1/docs/research/workstreams/r1/r1b_evidence.json"
+  "Exam_Mastery-r1/docs/research/workstreams/r1/R1B_NEURO_INTENSITY.md",
+  "Exam_Mastery-r1/docs/research/workstreams/r1/r1b_evidence.json"
  ],
  "next_step": "Lead/R6: independent critic review of R1B; reconcile with R1A outputs; no implementation before gate",
  "notes": "Earlier RUNNING checkpoints in this session carried estimated (not clock-read) timestamps; this COMPLETED timestamp is clock-read."
