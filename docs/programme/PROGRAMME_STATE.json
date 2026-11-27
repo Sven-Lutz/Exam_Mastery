@@ -363,8 +363,12 @@
    "title": "Next V1 product improvements (after owner feedback or autonomously)",
    "status": "PLANNED",
    "priority": 1.0,
-   "autostart": false,
-   "next_step": "Priority by learning-quality bottleneck: (1) fix issues from owner hands-on; (2) Arbeitsbuch difficulty stages + explorable interactions for backward pass/multi-head; (3) human subject review path for attention content (OD-23); (4) second contrasting university topic (e.g. a proof-heavy maths topic with construction evidence, CD-11); (5) languages track design. Owner-private real course units only via bin/mastery build --unit outside the repo."
+   "autostart": true,
+   "next_step": "Bounded engineering step (headless allowed): Arbeitsbuch difficulty stages for the attention unit (guided -> independent -> exam-style transfer) and one explorable interaction for the backward pass, on branch feat/mastery-v1-next-20261129 from integration/mastery-v1-20261127. Python: ../Exam_Mastery-integration/.venv/bin/python run from the worktree. Keep unit_id/card keys stable (Anki identity). Verify: CI-equivalent suite on a frozen git-archive copy (pytest module list from .github/workflows/tests.yml + python -m unittest discover -s tests), plus tests/test_mastery_v1_app.py. Push the branch and open/update a draft PR against integration/mastery-v1-20261127; never merge, never touch main or the RL pilot. If owner hands-on feedback exists (issue #49 comments), fix that first.",
+   "branch": "feat/mastery-v1-next-20261129",
+   "base": "integration/mastery-v1-20261127",
+   "worktree": "Exam_Mastery-v1next",
+   "updated": "2026-11-27T21:35:00+01:00"
   },
   {
    "id": "WP-V1-ACCEPT",
