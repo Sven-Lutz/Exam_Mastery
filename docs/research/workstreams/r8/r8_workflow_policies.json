@@ -1,0 +1,493 @@
+{
+ "schema": "em-learning-policies/1",
+ "version": "0.1.0",
+ "status": "DESIGN_HYPOTHESIS_SET",
+ "date": "2026-11-27",
+ "baseline": {
+  "branch": "research/r8-anki-workflows-20261127 (von research/r1-learning-science-20261127)",
+  "builds_on": "R1-Policy-Schema und -Register; Brief docs/research/ANKI_OBSIDIAN_TOOLING_RESEARCH_20261126.md; Engine-Entwurfsstapel origin/integration/quality-recovery-20261126 (nur gelesen)",
+  "kb": "exam_mastery/knowledge/{sources,principles}.json"
+ },
+ "authorship": {
+  "R8": "Spezialist Anki/Obsidian/Alternativen (R8_ANKI_OBSIDIAN_WORKFLOWS.md, r8/r8_tools.json, r8/r8_evidence.json)",
+  "independent_review": "pending: keine Lead-Stichprobe, keine menschliche Prüfung"
+ },
+ "operations": ["recall_discrimination", "symbolic_procedure", "formal_proof", "rule_based_contextual", "diagnostic_reasoning", "empirical_experimental", "computational_construction", "spatial_design", "embodied_psychomotor", "open_synthesis", "self_regulation"],
+ "certainty_scale": {
+  "high": "mehrere unabhängige, biasgeprüfte Belege in passender Population; Produktregel nah am Beleg",
+  "moderate": "konsistente Richtung, aber Indirektheit, Heterogenität oder Bias-Risiko",
+  "low": "indirekte oder einzelne Belege; Produktregel deutlich vom Beleg entfernt",
+  "very_low": "keine direkte Evidenz; plausibel begründete Setzung",
+  "normative": "Sicherheits-, Rechts- oder Ethikgrenze; keine empirische Sicherheit beansprucht",
+  "note": "R8 nutzt 'normative' für Datenerhalt-, Datenschutz- und Owner-Grenzen (AD-1, Review-Historie, aktive Sammlung). Technische Teilaussagen tragen in sub_claims eigene Stufen nach Dokumentlage: 'moderate' = im offiziellen Quelltext oder Handbuch gelesen, nicht ausgeführt; 'low' = nur indirekt oder für Mobilclients unbelegt."
+ },
+ "engine_findings": [
+  {"id": "EF-1", "locator": "origin/integration/quality-recovery-20261126:exam_mastery/anki_v2.py _notetype", "finding": "Notiztyp-ID = Hash aus 'em-notetype-v2' und Anzeigename; Feld-/Template-IDs ebenfalls aus dem Namen. Eine Umbenennung (z. B. Markenwechsel) erzeugt eine neue Notiztyp-ID; der Importer protokolliert vorhandene Notizen dann als 'conflicting' und aktualisiert sie nicht.", "policy": "R8-POL-02"},
+  {"id": "EF-2", "locator": "anki_v2.py guid(); learning/experience_anki.py publish (chapter = unit_id-Token + Digest)", "finding": "GUID enthält Kurs- und Kapitel-Slug. Eine Karte, die in eine andere Einheit wandert, wird zur neuen Notiz; die alte wird Ausmusterungskandidat; die Historie bleibt an der alten Notiz.", "policy": "R8-POL-02"},
+  {"id": "EF-3", "locator": "learning/experience_anki.py publish (deck = 'Exam Mastery::' + Titel)", "finding": "Deckname hängt am Titel. Der Importer ordnet Decks über den Namen zu und verschiebt vorhandene Karten nicht; nach einer Titeländerung landen nur neue Karten im neuen Deck.", "policy": "R8-POL-02"},
+  {"id": "EF-4", "locator": "anki_v2.py build_deck ('update notes set mod=?')", "finding": "Jeder Export setzt die Änderungszeit aller Notizen neu. Mit 'Update notes: if newer' überschreibt jeder Reimport alle Felder, auch unveränderter Karten, und damit lokale Bearbeitungen.", "policy": "R8-POL-05"},
+  {"id": "EF-5", "locator": "anki_v2.py build_deck (Schriften '_em-sans-*.woff2')", "finding": "'_'-Dateien werden beim Import übersprungen, wenn der Name existiert; eine geänderte Schriftdatei erreicht vorhandene Sammlungen nie.", "policy": "R8-POL-04"},
+  {"id": "EF-6", "locator": "anki_v2.py build_deck (Abbildungen 'em-<chapter>-<figure>.svg')", "finding": "Geänderte Abbildung mit gleichem Namen wird beim Import mit Hash-Suffix umbenannt; die alte Datei bleibt als ungenutzte Mediendatei liegen.", "policy": "R8-POL-04"},
+  {"id": "EF-7", "locator": "tests/test_experience_anki.py test_real_reimport_preserves_reviews_and_schedule_after_template_update", "finding": "Der Reimport-Test setzt reps/ivl/due direkt und fügt einen Revlog-Eintrag per SQL ein; echte Antworten über den Scheduler und FSRS-Gedächtniszustände werden nicht geprüft.", "policy": "R8-POL-08"},
+  {"id": "EF-8", "locator": "anki_v2.py verify_package (Filter startswith('Exam Mastery')); docs/brand/MASTERY_BRAND_PHASE_B.md auf origin/feat/mastery-brand-phase-b", "finding": "Notiztyp-Filter über Anzeigenamen koppelt Tests an die Marke; Brand-Dokument verlangt Umstellung auf IDs und Migrationstest.", "policy": "R8-POL-03"}
+ ],
+ "conflict_resolution": [
+  {"id": "R8-CR-1", "between": ["R8-POL-05", "R8-POL-13"], "rule": "Selbst erstellte Karten (POL-13) leben nie in generierten Notizen, sondern in einem eigenen Notiztyp und Deck der Lernenden; nur so überschreibt ein Update sie nicht (POL-05)."},
+  {"id": "R8-CR-2", "between": ["R8-POL-09", "R8-POL-14"], "rule": "Standard ist der manuelle .apkg-Import (POL-09). AnkiConnect (POL-14) nur nach Owner-Gate und nie für Scheduling- oder Löschmethoden."},
+  {"id": "R8-CR-3", "between": ["R8-POL-06", "R8-POL-07"], "rule": "Der generierte Bereich darf jederzeit vollständig neu erzeugt oder gelöscht werden; Sidecar-Notizen werden dabei nie geschrieben, nur ihre fehlenden Linkziele berichtet."}
+ ],
+ "shared_measurement_contract": {
+  "evidence_of_competence": "wie R1: nur unassistierte, verzögerte Versuche an neuen bzw. umformulierten Items",
+  "not_evidence": ["Anki-Kartenstatistik, Retrievability oder Stability aus FSRS", "srs-benchmark-Werte (Log Loss, RMSE, AUC)", "Anzahl geöffneter Obsidian-Notizen oder geschriebener Sidecar-Notizen", "Herstellerangaben zu eingesparten Reviews"],
+  "engineering_handoff": "Kein Import von Anki-Review-Daten in Mastery-Aussagen ohne R6-Entscheidung; falls später: nur opt-in, aggregiert, lokal."
+ },
+ "deferred_operations": [
+  {"operation": "formal_proof", "reason": "Karten tragen höchstens Satzaussagen mit Voraussetzungen (R1-POL-A01); Beweiskonstruktion gehört nicht in Anki/Obsidian-Werkzeugregeln", "owner_workstream": "R2"},
+  {"operation": "rule_based_contextual", "reason": "Werkzeugregeln sind operationsneutral; fallbezogene Subsumtion ist keine Kartenoperation", "owner_workstream": "R3"},
+  {"operation": "diagnostic_reasoning", "reason": "nicht kartenbasiert untersucht", "owner_workstream": "R3"},
+  {"operation": "open_synthesis", "reason": "Sidecar-Notizen ermöglichen sie, R8 prüft aber keine Lernwirkung offener Synthese", "owner_workstream": "R3"},
+  {"operation": "empirical_experimental", "reason": "nicht Gegenstand von R8", "owner_workstream": "R4"},
+  {"operation": "computational_construction", "reason": "Codekarten nur als Abruf; Konstruktion nicht untersucht", "owner_workstream": "R2"},
+  {"operation": "spatial_design", "reason": "Canvas/Visualisierung zurückgestellt", "owner_workstream": "R7/R4"},
+  {"operation": "embodied_psychomotor", "reason": "Karten sind kein Nachweis motorischer Fertigkeit", "owner_workstream": "R4"}
+ ],
+ "coverage_gaps": [
+  "Keine kontrollierte Lernstudie zu FSRS gegenüber SM-2 oder zu einer Alternative gefunden (S09); Benchmarks messen Vorhersage, nicht Lernen.",
+  "Pan et al. 2023 nur auf Abstract-Ebene; Zeitaufwand, Population und Zeitangleichung ungeprüft; Volltext-Lektüre offen.",
+  "Kobayashi 2005 und weitere Notizen-/Elaborationsliteratur nur als Metadaten; Wirkung von Sidecar-Notizen nicht belegt.",
+  "Verhalten von AnkiMobile und AnkiDroid beim .apkg-Update nicht geprüft (Quelltext nur Desktop-Rust-Backend).",
+  "Ob update_tags beim Notiz-Update lokale Tags (marked, leech) ersetzt oder zusammenführt, ist nicht abschließend aus dem Quelltext bestimmt.",
+  "Welche FSRS-Version Anki 26.09.4 ausliefert, nicht aus Release-Notizen geprüft.",
+  "Obsidian-Verhalten bei ungültigem YAML, bei Property-Typkonflikten mit bestehenden Vaults und bei Bases-Bearbeitung generierter Dateien nicht getestet.",
+  "SuperMemo-Identität und -Version nur aus Sekundärquellen.",
+  "Kein einziger Workflow ausgeführt: Migrations- und Betriebsaufwand sind dokumentbasierte Schätzungen."
+ ],
+ "verification_log": [
+  {"by": "R8", "date": "2026-11-27", "method": "gh api contents notes.rs/cards.rs/media.rs/decks.rs", "checked": "GUID-Abgleich, kein Update vorhandener Karten, '_'-Medien übersprungen, Decks über Namen", "result": "match zu den Aussagen in r8_tools.json"},
+  {"by": "R8", "date": "2026-11-27", "method": "srs-benchmark README Tabelle 'Without same-day reviews'", "checked": "FSRS-6 0.3460, MOVING-AVG 0.3369, FSRS-7 recency 0.3370, HLR 0.4694 (Log Loss)", "result": "match"},
+  {"by": "R8", "date": "2026-11-27", "method": "OpenAlex-Abstract 10.1037/mac0000083", "checked": "d = 0.45 [0.25, 0.66]; d = 0.29 [0.12, 0.45]; 48 h; sechs Experimente", "result": "match"}
+ ],
+ "policies": [
+  {
+   "id": "R8-POL-01",
+   "title": "Anki bleibt der einzige Scheduler; kein eigener Planer und keine zweite Warteschlange",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §3, §5",
+   "applies_to_operations": ["recall_discrimination", "symbolic_procedure"],
+   "not_applicable_operations": [{"operation": "embodied_psychomotor", "reason": "Karten sind kein Übungsort motorischer Fertigkeiten"}],
+   "context": {"prior_knowledge": ["any"], "phase": ["acquisition", "consolidation", "final_exam_week"], "conditions": "immer, wenn Wiederholung atomarer Abrufitems geplant wird"},
+   "recommendation": "Wiederholungszeitpunkte für Karten plant ausschließlich natives Anki (SM-2 oder FSRS nach Wahl der Lernenden). Die Engine erzeugt keine Intervalle, keine Fälligkeiten, keine Deck-Presets und keine Lernpläne für Karten; Pakete enthalten kein Scheduling. Kein Obsidian-SRS-Plugin, kein RemNote/Mochi/Logseq/SiYuan-Kartenweg. Kumulative Wiederaufnahme von Aufgaben bleibt im Workbook (R1-POL-A05), nicht als zweite Kartenwarteschlange.",
+   "product_affordances": {
+    "anki": "Paket ohne Scheduling-Daten und ohne Deck-Presets",
+    "workbook": "kumulative Aufgabensätze ohne Kartenfälligkeiten",
+    "interactive": "verweist für Kartenwiederholung auf Anki; zeigt keine eigene Fälligkeitsliste",
+    "textbook": "nennt Anki als Wiederholungsort, ohne Intervallvorgaben"
+   },
+   "abstain_or_fallback": ["keine Planung, wenn Lernende Anki nicht nutzen: dann nur Hinweis auf Workbook-Wiederaufnahme, kein Ersatzscheduler", "keine Behauptung, FSRS sei für Lernergebnisse besser als SM-2"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "murray2025mathspacing", "locator": "R1-POL-A05 (VoR-Abstract)", "relation": "supports", "supports_claim_type": "learning_effect"},
+    {"source_id": "anki_manual_deck_options", "locator": "FSRS / Add-On Compatibility", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "srs_benchmark", "locator": "Result, Tabelle ohne Same-Day-Reviews", "relation": "context_only", "supports_claim_type": "scheduler_prediction"},
+    {"source_id": "ebersbach2020mathspacing", "locator": "R1-POL-A05 (Null für Prozedur)", "relation": "qualifies", "supports_claim_type": "learning_effect"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Owner-Vorgabe AD-1 und KB-Regel SP-R1", "Nutzen verteilten Abrufs (R1-POL-A05, moderat) hängt nicht vom Scheduler-Hersteller ab", "kein Lernvergleich zwischen Schedulern gefunden"], "sub_claims": [{"claim": "verteilter Abruf > massiert für Behalten", "level": "moderate"}, {"claim": "FSRS führt zu besseren Lernergebnissen als SM-2", "level": "very_low"}, {"claim": "FSRS sagt Abruf in Anki-Logs besser vorher als HLR", "level": "moderate"}]},
+   "observable": "Paketinhalt: keine Revlog-/Kartenzustände, keine Deck-Presets; Code: keine Intervallberechnung außerhalb Ankis",
+   "independent_outcome": "unassistierter verzögerter Test (R1-Messvertrag); für diese Regel selbst: Code-Audit ohne Fund einer Intervallberechnung",
+   "failure_modes": ["Workbook-Wiederaufnahme wird schleichend zu einem zweiten Kartenplaner", "Interaktive App zeigt eigene 'fällig'-Listen", "Lernende ohne Anki erhalten keine Wiederholung"],
+   "falsifier": "Eine vorab registrierte Studie zeigt, dass eine integrierte Planung außerhalb Ankis bei gleicher Zeit bessere verzögerte unassistierte Leistung erzielt, ohne Historienverlust.",
+   "kb_rule_links": [{"rule_id": "SP-R1", "relation": "retains"}, {"rule_id": "SP-R2", "relation": "retains"}],
+   "status": "design_hypothesis",
+   "implementation_status": "partially_implemented_unverified",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_evidence": "anki_v2.build_deck exportiert mit with_scheduling=False, with_deck_configs=False (Entwurfsstapel, code_inspected)"
+  },
+  {
+   "id": "R8-POL-02",
+   "title": "Stabile Identität: keine Rücksetzung der Review-Historie durch Umbenennen, Verschieben oder Markenwechsel",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §4.1",
+   "applies_to_operations": ["recall_discrimination", "symbolic_procedure"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation", "final_exam_week"], "conditions": "jede erneute Erzeugung eines Anki-Pakets"},
+   "recommendation": "Note-GUID nur aus Kurs-ID und global eindeutigem semantischem Kartenschlüssel ableiten, nicht aus Kapitel, Titel oder Text (EF-2). Notiztyp-, Feld- und Template-IDs als feste Konstanten im Code führen, unabhängig vom Anzeigenamen (EF-1); Anzeigenamen dürfen sich ändern. Deckname ist keine Identität und ändert vorhandene Kartenzuordnungen nicht (EF-3). Entfernte Karten werden als Ausmusterungskandidaten gemeldet, nie gelöscht. Verschiebungen zwischen Einheiten nur über eine versionierte Identitätszuordnung (alter Schlüssel -> neuer Schlüssel), die die GUID beibehält.",
+   "product_affordances": {
+    "anki": "stabile GUIDs und Notiztyp-IDs; Ausmusterungsliste statt Löschen",
+    "interactive": "Kartenverweise über semantischen Schlüssel, nicht über Anki-IDs",
+    "workbook": "nicht betroffen außer Kartenverweisen",
+    "textbook": "nicht betroffen außer Kartenverweisen"
+   },
+   "abstain_or_fallback": ["wenn eine Identitätsänderung unvermeidlich ist: kein Export, sondern Migrationsauftrag nach R8-POL-03", "bei doppeltem semantischem Schlüssel: Abbruch (CARD_IDENTITY)"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "anki_src_apkg_import", "locator": "notes.rs import_notes / maybe_update_existing_note; cards.rs import_cards", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_manual_packaged_decks", "locator": "Updating", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_manual_text_import", "locator": "Duplicates and Updating (Scheduling bleibt bei Update in place)", "relation": "qualifies", "supports_claim_type": "technical_behaviour"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Review-Historie ist Eigentum der Lernenden (Brief: Application-owned)", "Brand-Dokument verlangt unveränderte GUIDs/Decknamen ohne getestete Migration"], "sub_claims": [{"claim": "Importer findet Notizen über GUID und verändert vorhandene Karten nicht (Desktop, main)", "level": "moderate"}, {"claim": "dasselbe auf AnkiMobile/AnkiDroid", "level": "low"}]},
+   "observable": "Update-Delta je Export (neu/geändert/unverändert/Ausmusterung); GUID-Liste stabil über Titeländerung und Markenwechsel",
+   "independent_outcome": "Wegwerfprofil-Test T3/T4/T6 (R8_ANKI_OBSIDIAN_WORKFLOWS.md §8): Karten-IDs, Revlog und Fälligkeiten vor/nach Reimport identisch",
+   "failure_modes": ["Notiztyp-ID aus Namen (EF-1)", "GUID aus Kapitel-Slug (EF-2)", "Deck-Split nach Titeländerung (EF-3)", "doppelte Notizen bei geänderter Schlüssel-Normalisierung"],
+   "falsifier": "Im Wegwerfprofil ändert ein Reimport nach Titel-, Kapitel- oder Notiztyp-Namensänderung Karten-IDs, Fälligkeiten oder Revlog-Einträge.",
+   "kb_rule_links": [{"rule_id": "SP-R1", "relation": "refines"}, {"rule_id": "R8-POL-02-a", "relation": "new"}],
+   "status": "design_hypothesis",
+   "implementation_status": "partially_implemented_unverified",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_evidence": "GUID aus semantischem Schlüssel vorhanden (anki_v2.guid); EF-1 bis EF-3 offen"
+  },
+  {
+   "id": "R8-POL-03",
+   "title": "Notiztyp-Schemaänderungen nur als versionierte, im Wegwerfprofil getestete Migration",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §4.2",
+   "applies_to_operations": ["recall_discrimination"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation"], "conditions": "Hinzufügen/Entfernen von Feldern oder Templates, Wechsel Basis<->Lückentext, Markenumbenennung"},
+   "recommendation": "Felder und Templates werden nur in gebündelten, seltenen Schemaversionen geändert. Jede Schemaänderung hat einen Migrationsplan, einen Wegwerfprofil-Test mit echten Reviews und einen Hinweis an die Lernenden, dass Anki eine Einweg-Synchronisation verlangen kann. Reine Template-/CSS-Änderungen ohne Feldänderung sind keine Schemaänderung. Notiztyp-Filter in Tests über feste IDs statt über Namen (EF-8). Keine Umwandlung Basis<->Lückentext (Importer lehnt Merge verschiedener Arten ab).",
+   "product_affordances": {
+    "anki": "Schemaversion im Notiztyp, Migrationshinweis im Update-Bericht"
+   },
+   "abstain_or_fallback": ["wenn kein Migrationstest vorliegt: Schemaänderung nicht ausliefern", "wenn Merge nötig wäre: Lernende entscheiden ausdrücklich, Engine setzt die Option nicht voraus"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "anki_src_apkg_import", "locator": "notes.rs update_or_duplicate_notetype, resolve_notetype_conflicts (NotetypeKindMergeConflict)", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_manual_packaged_decks", "locator": "Anki 23.10 and Later (Merge erfordert vollständige Synchronisation)", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_manual_sync", "locator": "Conflicts (neues Feld/entferntes Template)", "relation": "supports", "supports_claim_type": "technical_behaviour"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Datenerhalt und Sync-Integrität der Lernenden"], "sub_claims": [{"claim": "Schemaabweichung ohne Merge erzeugt Duplikat-Notiztyp und blockiert Updates", "level": "moderate"}]},
+   "observable": "Schemaversion je Export; Migrationstest-Protokoll; Anzahl 'conflicting' im Importbericht = 0",
+   "independent_outcome": "Wegwerfprofil-Test T5: nach Schemamigration keine doppelten Notiztypen, keine Kartenverluste, Revlog unverändert",
+   "failure_modes": ["unbemerkter Duplikat-Notiztyp", "erzwungene Einweg-Synchronisation überschreibt Mobil-Reviews", "Markenumbenennung als Schemaänderung missverstanden"],
+   "falsifier": "Ein Schema-Update nach diesem Protokoll führt im Wegwerfprofil zu Kartenverlust, Duplikat-Notiztyp oder Revlog-Änderung.",
+   "kb_rule_links": [{"rule_id": "SP-R1", "relation": "refines"}, {"rule_id": "R8-POL-03-a", "relation": "new"}],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R8-POL-04",
+   "title": "Medien: inhaltsadressierte Dateinamen und versionierte statische Dateien",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §4.3",
+   "applies_to_operations": ["recall_discrimination", "symbolic_procedure"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation"], "conditions": "Karten mit Abbildungen, Schriften oder anderen Medien"},
+   "recommendation": "Abbildungen erhalten einen Namen mit kurzem Inhalts-Hash (geänderter Inhalt = neuer Name, alte Datei wird vom Importer nicht überschrieben). Statische '_'-Dateien (Schriften) tragen eine Version im Namen und werden bei Änderung umbenannt, weil der Importer gleichnamige '_'-Dateien überspringt (EF-5). Keine Symlinks, keine Unterordner in collection.media. Abbildungen bleiben fachlich (MM-R1). Ungenutzte alte Medien entfernen Lernende über Ankis Check Media; die Engine löscht nie.",
+   "product_affordances": {
+    "anki": "Medienliste mit Hash im Update-Bericht"
+   },
+   "abstain_or_fallback": ["wenn eine Abbildung nicht in Light/Dark und 320 px lesbar ist: Karte ohne Abbildung statt mit unlesbarer"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "anki_src_apkg_import", "locator": "media.rs prepare_media / is_static / uniquify_name", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_manual_media", "locator": "Checking Media; Manually Adding Media (Symlinks)", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_manual_sync", "locator": "Media (Bearbeitungen vorhandener Dateien nicht erkannt)", "relation": "supports", "supports_claim_type": "technical_behaviour"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Darstellungsintegrität und Sync-Sicherheit"], "sub_claims": [{"claim": "'_'-Dateien werden bei gleichem Namen übersprungen", "level": "moderate"}, {"claim": "Mobilclients rendern dieselben Medien", "level": "low"}]},
+   "observable": "Medienname enthält Hash bzw. Version; Wegwerf-Import zeigt neue Abbildung nach Änderung",
+   "independent_outcome": "Wegwerfprofil-Test T7: geänderte Abbildung und Schrift erscheinen nach Reimport; Check Media meldet keine fehlenden Dateien",
+   "failure_modes": ["alte Schrift bleibt dauerhaft (EF-5)", "Medienmüll wächst (EF-6)", "Hash-Änderung durch nicht deterministische SVG-Erzeugung"],
+   "falsifier": "Im Wegwerfprofil erscheint eine geänderte Abbildung oder Schrift trotz Namensversionierung nicht oder es fehlen Medien.",
+   "kb_rule_links": [{"rule_id": "MM-R1", "relation": "retains"}, {"rule_id": "R8-POL-04-a", "relation": "new"}],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R8-POL-05",
+   "title": "Drei Eigentumszonen: generiert, anwendungseigen, lernereigen",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §4.4, §6",
+   "applies_to_operations": ["recall_discrimination", "self_regulation"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation", "final_exam_week"], "conditions": "jede Erzeugung oder Aktualisierung von Anki-Paketen und Markdown-Dateien"},
+   "recommendation": "Ein kanonisches Modell in der Engine; Anki-Paket und Markdown sind erzeugte Artefakte. Generierte Anki-Notizen gelten als überschreibbar: Lernende werden informiert, dass Änderungen an ihnen beim nächsten Update verloren gehen; eigene Ergänzungen gehören in eigene Notizen (eigener Notiztyp/Deck) oder in Sidecar-Dateien. Die Engine erhöht die Änderungszeit nur bei inhaltlich geänderten Notizen (EF-4). Generierte Dateien werden nur nach Hash-Vergleich ersetzt; manuell geänderte generierte Dateien werden nicht überschrieben, sondern als Konflikt gemeldet. Anki-Sammlung, Review-Log, Anki- und Obsidian-Einstellungen werden nie geschrieben.",
+   "product_affordances": {
+    "anki": "Hinweis 'generiert, wird aktualisiert' in der Kartenrückseite oder im Deckbeschreibungstext; Änderungszeit nur bei Delta",
+    "interactive": "zeigt Herkunft (generiert vs. eigene Notiz)",
+    "textbook": "Kapitelverweise auf Sidecar-Möglichkeit",
+    "workbook": "nicht betroffen"
+   },
+   "abstain_or_fallback": ["bei unbekannter oder manuell geänderter Zieldatei: nicht schreiben, Konflikt melden", "keine automatische Rückführung von Nutzeränderungen ins kanonische Modell"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "anki_src_apkg_import", "locator": "notes.rs update_note (Felder ersetzt, update_tags: true)", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_manual_packaged_decks", "locator": "Anki 23.10 and Later ('overwriting your changes')", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "obsidian_help_bases", "locator": "Einleitung (Properties aus Bases bearbeitbar)", "relation": "qualifies", "supports_claim_type": "technical_behaviour"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Nutzerdaten dürfen nicht still verloren gehen", "Brief: drei Eigentumszonen"], "sub_claims": [{"claim": "Update überschreibt Felder generierter Notizen", "level": "moderate"}, {"claim": "Tags werden dabei ersetzt statt zusammengeführt", "level": "low"}]},
+   "observable": "Update-Bericht nennt geänderte Notizen; Konfliktliste bei manuell geänderten Dateien; keine Schreibzugriffe außerhalb des Ausgabeordners",
+   "independent_outcome": "Wegwerfprofil-Test T8 (lokal bearbeitete generierte Notiz) und Vault-Test V3 (Sidecar byte-gleich nach Regeneration)",
+   "failure_modes": ["Lernende bearbeiten generierte Karten und verlieren Änderungen", "Hash-Schutz blockiert legitime Updates dauerhaft", "Tags wie 'leech' gehen verloren"],
+   "falsifier": "Nach einem Update ist eine lernereigene Notiz, Datei oder Einstellung verändert oder gelöscht.",
+   "kb_rule_links": [{"rule_id": "SP-R1", "relation": "refines"}, {"rule_id": "R8-POL-05-a", "relation": "new"}],
+   "status": "design_hypothesis",
+   "implementation_status": "partially_implemented_unverified",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_evidence": "experience_anki.publish verweigert Überschreiben unbekannter oder geänderter Anki.apkg (code_inspected); EF-4 offen"
+  },
+  {
+   "id": "R8-POL-06",
+   "title": "Optionale Obsidian-Ansicht als einseitig generierter Markdown-Bereich",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §6",
+   "applies_to_operations": ["recall_discrimination", "self_regulation"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation"], "conditions": "nur wenn Lernende die Markdown-Ansicht aktivieren"},
+   "recommendation": "Die Engine schreibt optional einen Ordner gewöhnlicher Markdown-Dateien (Kurskarte, Konzeptseiten mit flachen YAML-Properties wie em_id, em_version, generated: true, Quellen-Locator, Links auf Lernprodukte) und optional generierte .base-Ansichten. Keine Fälligkeiten, kein Lesefortschritt, keine Community-Plugins, keine Obsidian-CLI/Headless-Abhängigkeit, kein Konto, keine .obsidian-Konfiguration. Der Ordner funktioniert ohne Obsidian. Property-Namen mit Präfix em_ vermeiden Typkonflikte mit bestehenden Vaults.",
+   "product_affordances": {
+    "textbook": "Konzeptseiten verlinken auf Kapitel und Abschnitt",
+    "workbook": "Links auf Aufgaben-IDs",
+    "anki": "Konzeptseite nennt Kartenschlüssel, nicht Fälligkeiten",
+    "interactive": "Link auf die interaktive Einheit"
+   },
+   "abstain_or_fallback": ["standardmäßig aus; ohne Aktivierung wird nichts geschrieben", "keine Canvas-Erzeugung ohne R7-Begründung", "keine Fortschrittsansicht aus Öffnen/Lesen (MC-R2)"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "obsidian_help_data_storage", "locator": "Vault/Markdown; externe Änderungen", "relation": "supports", "supports_claim_type": "product_capability"},
+    {"source_id": "obsidian_help_properties", "locator": "Storage format; vault-weite Typen; keine verschachtelten Properties", "relation": "supports", "supports_claim_type": "product_capability"},
+    {"source_id": "obsidian_help_plugin_security", "locator": "Plugin access; Restricted mode", "relation": "supports", "supports_claim_type": "privacy_security"},
+    {"source_id": "obsidian_help_cli", "locator": "Requirements (laufende App); Developer commands (eval)", "relation": "qualifies", "supports_claim_type": "privacy_security"}
+   ],
+   "certainty": {"level": "very_low", "reasons": ["kein Beleg, dass eine Notizansicht Lernen verbessert", "Entscheidung beruht auf Portabilität und geringem Aufwand"], "sub_claims": [{"claim": "Markdown-Ordner ist ohne Obsidian nutzbar", "level": "moderate"}, {"claim": "Ansicht verbessert Lernergebnisse", "level": "very_low"}]},
+   "observable": "Dateiliste im generierten Bereich; keine Dateien außerhalb; keine .obsidian-Änderung; Property-Präfix em_",
+   "independent_outcome": "Vault-Tests V1-V6; Lernwirkung nicht gemessen (NOT_RUN)",
+   "failure_modes": ["Ansicht wird als Lernfortschritt missverstanden", "Typkonflikte mit vorhandenen Properties", "Lernende bearbeiten generierte Dateien"],
+   "falsifier": "Nutzertests zeigen, dass die Ansicht ohne Obsidian unbrauchbar ist oder dass Lernende generierte Dateien regelmäßig bearbeiten und dabei Inhalte verlieren.",
+   "kb_rule_links": [{"rule_id": "MC-R2", "relation": "retains"}, {"rule_id": "R8-POL-06-a", "relation": "new"}],
+   "status": "design_hypothesis",
+   "implementation_status": "partially_implemented_unverified",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_evidence": "experience.obsidian_note erzeugt eine Navigationsnotiz mit Frontmatter (code_inspected)"
+  },
+  {
+   "id": "R8-POL-07",
+   "title": "Reversible optionale Anmerkungen in lernereigenen Sidecar-Notizen",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §6.2",
+   "applies_to_operations": ["self_regulation", "recall_discrimination"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation"], "conditions": "Lernende möchten eigene Erklärungen, Fragen oder Beispiele festhalten"},
+   "recommendation": "Eigene Notizen liegen in einem getrennten Ordner, den die Engine nie schreibt; sie verweisen per em_id bzw. Wikilink auf generierte Seiten. Auf Wunsch legt die Engine einmalig eine leere Sidecar-Vorlage an (nur wenn die Datei fehlt). Anmerkungen fließen nie automatisch ins kanonische Modell; eine spätere Übernahme ist ein ausdrücklicher Vorschlag mit Diff. Entfernen der Ansicht lässt Sidecars unberührt; fehlende Linkziele werden berichtet. Sidecar-Inhalte werden nicht automatisch bewertet (SE-R2).",
+   "product_affordances": {
+    "textbook": "Abschnittsanker für Verweise aus Sidecars",
+    "interactive": "optional Link 'eigene Notiz öffnen'",
+    "anki": "keine Sidecar-Inhalte in generierten Karten"
+   },
+   "abstain_or_fallback": ["wenn kein Markdown-Bereich aktiv ist: keine Sidecar-Funktion", "keine Synchronisation von Sidecars durch die Engine"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "obsidian_help_data_storage", "locator": "Vault; Dateien mit anderen Editoren bearbeitbar", "relation": "supports", "supports_claim_type": "product_capability"},
+    {"source_id": "bisra2018", "locator": "R1-POL-A06 (Selbsterklärung)", "relation": "context_only", "supports_claim_type": "learning_effect"},
+    {"source_id": "kobayashi2005notetaking", "locator": "nur Metadaten", "relation": "context_only", "supports_claim_type": "learning_effect"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Nutzereigentum an eigenen Notizen; Reversibilität ist Datenschutz-/Autonomiegrenze", "Lernwirkung freier Notizen nicht belegt"], "sub_claims": [{"claim": "freie Notizen verbessern Behalten", "level": "very_low"}, {"claim": "inhaltsbezogene Selbsterklärungsprompts helfen (R1-POL-A06)", "level": "moderate"}]},
+   "observable": "Sidecar-Dateien byte-gleich vor/nach Regeneration und nach Löschen des generierten Bereichs",
+   "independent_outcome": "Vault-Test V3/V5; Lernwirkung NOT_RUN",
+   "failure_modes": ["Sidecar-Vorlage überschreibt vorhandene Datei", "Lernende erwarten Rückfluss in Lernprodukte", "Verweise brechen nach ID-Änderung"],
+   "falsifier": "Eine Regeneration oder das Entfernen des generierten Bereichs verändert eine Sidecar-Datei.",
+   "kb_rule_links": [{"rule_id": "SE-R2", "relation": "retains"}, {"rule_id": "R8-POL-07-a", "relation": "new"}],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R8-POL-08",
+   "title": "Integrationstests nur in Wegwerfprofilen; nie die aktive Sammlung",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §8",
+   "applies_to_operations": ["recall_discrimination"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation", "final_exam_week"], "conditions": "jeder automatische oder manuelle Test von Import, Update, Migration oder Medien"},
+   "recommendation": "Automatische Tests nutzen eine neue Sammlung im temporären Verzeichnis über die offizielle anki-Bibliothek; Desktop-Sichtprüfungen starten Anki mit eigenem Basisordner (-b bzw. ANKI_BASE) auf einem Wegwerfordner, ohne AnkiWeb-Anmeldung. Reviews werden über den Scheduler beantwortet (statt SQL-Einfügungen, EF-7), mit FSRS an und aus. Kein Test liest oder schreibt den Standarddatenordner, ein vorhandenes Profil oder einen privaten Vault; Tests brechen ab, wenn ein Pfad im Standarddatenordner liegt.",
+   "product_affordances": {
+    "anki": "Prüfskript mit Wegwerfsammlung; Bericht im Update-Paket"
+   },
+   "abstain_or_fallback": ["wenn kein isolierter Ordner verfügbar ist: Test nicht ausführen, NOT_RUN melden", "keine Tests über AnkiConnect gegen eine laufende Nutzerinstanz"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "anki_manual_files", "locator": "Startup Options (-b, ANKI_BASE); User Data", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_release_meta", "locator": "PyPI anki 26.9.4", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "ankiconnect_docs", "locator": "Methodenindex (profiles.switch, scheduling.*)", "relation": "qualifies", "supports_claim_type": "privacy_security"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Projektregel: aktive Sammlung nie implizit berühren", "Testisolation ist Sicherheitsgrenze"], "sub_claims": [{"claim": "-b isoliert Profile und Sammlung", "level": "moderate"}, {"claim": "-b isoliert auch Sync-Anmeldedaten", "level": "low"}]},
+   "observable": "Testprotokoll mit temporärem Pfad; Pfadwächter schlägt bei Standarddatenordner an",
+   "independent_outcome": "Prüfung der Testläufe durch eine zweite Person: kein Zugriff auf Standarddatenordner (Dateisystem-Audit)",
+   "failure_modes": ["Desktop-Test meldet sich versehentlich bei AnkiWeb an", "Pfadwächter übersehen bei Symlinks", "synthetische Revlogs täuschen Erhalt vor"],
+   "falsifier": "Ein Testlauf öffnet oder verändert eine Datei im Standarddatenordner oder in einem nicht temporären Profil.",
+   "kb_rule_links": [{"rule_id": "SP-R1", "relation": "refines"}],
+   "status": "design_hypothesis",
+   "implementation_status": "partially_implemented_unverified",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_evidence": "anki_v2.verify_package und test_experience_anki nutzen temporäre Sammlungen (code_inspected)"
+  },
+  {
+   "id": "R8-POL-09",
+   "title": "Expliziter, beobachtbarer Import durch die Lernenden mit Update-Bericht",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §5, §7",
+   "applies_to_operations": ["recall_discrimination"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation", "final_exam_week"], "conditions": "neues oder geändertes Paket"},
+   "recommendation": "Die Engine legt nur Anki.apkg und einen lesbaren Update-Bericht ab (neu, geändert, unverändert, Ausmusterungskandidaten, Schemaversion, Medienänderungen, ob ein Einweg-Sync zu erwarten ist). Den Import starten die Lernenden selbst in Anki (Datei > Importieren). Empfohlene Optionen: Notizen 'wenn neuer' aktualisieren, Notiztypen 'wenn neuer' aktualisieren, Merge nur bei angekündigter Migration, Lernfortschritt und Deck-Presets nicht importieren. In der Prüfungswoche keine Schemaänderungen ausliefern.",
+   "product_affordances": {
+    "anki": "Anki.apkg + Update-Bericht",
+    "interactive": "zeigt den Update-Bericht und den Import-Schritt",
+    "textbook": "kurze Importanleitung im Anhang"
+   },
+   "abstain_or_fallback": ["kein automatischer Import, kein Start von Anki durch die Engine", "bei Schemaänderung ohne Migrationstest: kein Paket"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "anki_manual_packaged_decks", "locator": "Anki 23.10 and Later; Scheduling", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_src_apkg_import", "locator": "notes.rs should_update (IfNewer/Always/Never)", "relation": "supports", "supports_claim_type": "technical_behaviour"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Autonomie und Datenkontrolle der Lernenden"], "sub_claims": [{"claim": "manueller Import ist zumutbar", "level": "very_low"}]},
+   "observable": "Update-Bericht je Paket; keine Prozessstarts von Anki durch die Engine",
+   "independent_outcome": "Bedienungstest mit Lernenden: Anteil korrekt durchgeführter Updates und gemeldete Probleme (NOT_RUN)",
+   "failure_modes": ["Lernende wählen 'immer überschreiben' und verlieren lokale Änderungen", "Bericht wird nicht gelesen", "veraltete Pakete werden erneut importiert"],
+   "falsifier": "Ein Bedienungstest zeigt, dass Lernende den manuellen Import überwiegend falsch ausführen oder abbrechen.",
+   "kb_rule_links": [{"rule_id": "SP-R1", "relation": "refines"}, {"rule_id": "R8-POL-09-a", "relation": "new"}],
+   "status": "design_hypothesis",
+   "implementation_status": "partially_implemented_unverified",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_evidence": "anki_v2.build_deck schreibt update_delta in anki_report.json (code_inspected); Einweg-Sync-Hinweis fehlt"
+  },
+  {
+   "id": "R8-POL-10",
+   "title": "Sicherung vor Import und Konfliktregeln für Anki und Markdown",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §7",
+   "applies_to_operations": ["recall_discrimination", "self_regulation"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation", "final_exam_week"], "conditions": "vor jedem Import mit Schemaänderung, Merge oder großer Ausmusterungsliste; laufend für den Markdown-Bereich"},
+   "recommendation": "Vor riskanten Importen empfiehlt der Bericht eine .colpkg-Sicherung mit Medien (automatische Backups enthalten keine Medien) und vorherigen Sync aller Geräte. Einweg-Sync wird nur angekündigt, nie ausgelöst. Anki-Ordner nicht in Dropbox/iCloud ablegen. Markdown: atomare Schreibvorgänge, Hash-Prüfung, bei Konflikt Kopie mit Suffix .conflict statt Überschreiben; Engine-Zustand liegt außerhalb des Vaults. Engine-Pakete werden versioniert aufbewahrt, damit ein früherer Stand reimportierbar ist (nur Inhalte; Reviews bleiben in Anki).",
+   "product_affordances": {
+    "anki": "Sicherungshinweis und Einweg-Sync-Warnung im Update-Bericht",
+    "interactive": "zeigt Hinweis vor riskantem Update"
+   },
+   "abstain_or_fallback": ["die Engine erstellt keine Backups der Nutzersammlung und liest sie nicht"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "anki_manual_backups", "locator": "Automatic backups (ohne Medien); Manual colpkg backups", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_manual_sync", "locator": "Conflicts; Media", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_manual_files", "locator": "DropBox and File Syncing; Network Filesystems", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "obsidian_help_sync", "locator": "Hinweis zu anderen Cloud-Diensten", "relation": "qualifies", "supports_claim_type": "technical_behaviour"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Datenerhalt"], "sub_claims": [{"claim": "automatische Anki-Backups enthalten keine Medien", "level": "moderate"}]},
+   "observable": "Update-Bericht enthält Sicherungshinweis bei Risiko; Markdown-Konflikte als .conflict-Dateien",
+   "independent_outcome": "Wiederherstellungstest im Wegwerfprofil (T9) und Vault-Test V4",
+   "failure_modes": ["Hinweis wird ignoriert", "Konfliktdateien sammeln sich", "Sicherung ohne Medien wird für vollständig gehalten"],
+   "falsifier": "Im Wegwerfprofil lässt sich nach einem fehlgeschlagenen Import der Vorzustand mit der empfohlenen Sicherung nicht vollständig wiederherstellen.",
+   "kb_rule_links": [{"rule_id": "R8-POL-10-a", "relation": "new"}],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R8-POL-11",
+   "title": "FSRS-Einstellungen bleiben Entscheidung der Lernenden",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §4.5",
+   "applies_to_operations": ["recall_discrimination", "self_regulation"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation", "final_exam_week"], "conditions": "Lernende nutzen Anki mit SM-2 oder FSRS"},
+   "recommendation": "Die Engine setzt weder FSRS noch Desired Retention, Parameter oder 'Reschedule cards on change'. Die Anleitung verweist neutral auf das Handbuch: Standard 90 %, höhere Werte erhöhen die Arbeitslast stark, Empfehlung unter 97 %; Optimierung mit eigener Historie; FSRS nur mit unterstützten Clients (AnkiDroid 2.17+, AnkiMobile 23.10+); keine intervallverändernden Add-ons. Keine Empfehlung, Retention als Exzellenzmaß gegen 100 % zu drehen.",
+   "product_affordances": {
+    "anki": "Anleitungstext ohne Voreinstellung",
+    "textbook": "Hinweis im Anhang",
+    "interactive": "keine Retention-Regler"
+   },
+   "abstain_or_fallback": ["keine kursspezifische Retention aus generierten Daten", "in der Prüfungswoche keine Einstellungsempfehlung"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "anki_manual_deck_options", "locator": "Desired Retention; Reschedule Cards on Change; Before Enabling", "relation": "supports", "supports_claim_type": "technical_behaviour"},
+    {"source_id": "anki_faq_algorithm", "locator": "FSRS", "relation": "context_only", "supports_claim_type": "product_capability"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Autonomie (R1-POL-B07) und Owner-Vorgabe keine Scheduling-Eingriffe"], "sub_claims": [{"claim": "höhere Retention erhöht die Arbeitslast stark", "level": "moderate"}]},
+   "observable": "Paket ohne Deck-Presets; Anleitungstext ohne numerische Empfehlung über den Handbuchstandard hinaus",
+   "independent_outcome": "Code-/Text-Audit; Lernwirkung NOT_RUN",
+   "failure_modes": ["Lernende stellen 99 % ein und brechen wegen Arbeitslast ab", "Mobilclient ohne FSRS führt zu falscher Planung"],
+   "falsifier": "Eine Studie zeigt, dass eine von der Engine gesetzte Retention bei gleicher Zeit bessere verzögerte unassistierte Leistung bringt als die Wahl der Lernenden.",
+   "kb_rule_links": [{"rule_id": "SP-R1", "relation": "retains"}],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R8-POL-12",
+   "title": "Scheduler-Kennzahlen und Benchmarks sind weder Kompetenz- noch Lernnachweis",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §3.2",
+   "applies_to_operations": ["recall_discrimination", "self_regulation"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation", "final_exam_week"], "conditions": "jede Produkt- oder Forschungsaussage über Anki, FSRS oder Alternativen"},
+   "recommendation": "Kartenstatistik, FSRS-Retrievability/Stability und srs-benchmark-Werte werden nicht als Kompetenz, Mastery oder Lernwirkung angezeigt oder behauptet. Herstellerangaben zu eingesparten Reviews werden als Marketing gekennzeichnet. Produkttexte sagen nicht 'FSRS verbessert Lernen'.",
+   "product_affordances": {
+    "interactive": "keine Mastery-Anzeige aus Anki-Daten",
+    "textbook": "keine Wirkversprechen zu FSRS",
+    "anki": "keine Fortschrittsanzeige auf Karten"
+   },
+   "abstain_or_fallback": ["ohne unassistierten verzögerten Test keine Kompetenzaussage"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "srs_benchmark", "locator": "Metrics; Result (MOVING-AVG nahe FSRS-7 recency im Log Loss)", "relation": "supports", "supports_claim_type": "measurement_contract"},
+    {"source_id": "remnote_help_fsrs", "locator": "Intro ('20–30% fewer reviews' ohne Quelle)", "relation": "context_only", "supports_claim_type": "product_capability"},
+    {"source_id": "lindsey2014personalized", "locator": "Abstract", "relation": "qualifies", "supports_claim_type": "learning_effect"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Messvertrag aus R1 (shared_measurement_contract)", "Benchmarks messen Vorhersagegüte"], "sub_claims": [{"claim": "modellbasierte personalisierte Wiederholung kann Kursretention verbessern (ein Feldexperiment, nicht FSRS)", "level": "low"}]},
+   "observable": "Textprüfung auf Wirkversprechen; UI ohne Mastery aus Anki-Daten",
+   "independent_outcome": "Audit der Produkttexte; Lernwirkung NOT_RUN",
+   "failure_modes": ["'Retention 90 %' wird als Wissensstand gelesen", "Benchmarkzahlen in Marketingtexten"],
+   "falsifier": "Eine Validierungsstudie zeigt, dass FSRS-Retrievability unassistierte verzögerte Leistung an neuen Items gut kalibriert vorhersagt; dann wäre eine begrenzte Anzeige zu prüfen.",
+   "kb_rule_links": [{"rule_id": "ITS-R1", "relation": "retains"}, {"rule_id": "MC-R2", "relation": "retains"}],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R8-POL-13",
+   "title": "Generativer Weg: eigene Antworten und eigene Karten als Option neben generierten Karten",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §9 (Gegenargument G1)",
+   "applies_to_operations": ["recall_discrimination"],
+   "not_applicable_operations": [{"operation": "formal_proof", "reason": "Kartenerstellung ersetzt keine Beweiskonstruktion"}, {"operation": "embodied_psychomotor", "reason": "Karten sind kein Übungsort motorischer Fertigkeiten"}],
+   "context": {"prior_knowledge": ["any"], "phase": ["acquisition", "consolidation"], "conditions": "nach Erstinstruktion; nicht in der Prüfungswoche als neue Pflicht"},
+   "recommendation": "Generierte Karten bleiben der Standard. Zusätzlich optional: (a) vor dem Aufdecken einer generierten Karte eine eigene Antwort formulieren (Abruf, R1-POL-A01); (b) eigene Karten in einem eigenen Notiztyp und Deck der Lernenden, die die Engine nie überschreibt (R8-CR-1); (c) im Workbook kurze Aufgaben 'formuliere eine Abfragekarte zu diesem Konzept' mit Musterbeispiel. Keine Behauptung, eigene Karten seien immer besser; Zeitkosten benennen.",
+   "product_affordances": {
+    "anki": "eigener Notiztyp 'Eigene Karte' (lernereigen) als optionale Vorlage",
+    "workbook": "optionale Karten-Formulierungsaufgaben mit Vergleichsbeispiel",
+    "interactive": "Antwort tippen vor Aufdecken",
+    "textbook": "Hinweis auf eigene Karten mit Zeitaufwand"
+   },
+   "abstain_or_fallback": ["bei Zeitnot oder in der Prüfungswoche: generierte Karten genügen", "keine automatische Bewertung eigener Karten (SE-R2)", "keine Übernahme eigener Karten ins kanonische Modell ohne ausdrückliche Zustimmung"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "pan2023usergenerated", "locator": "Abstract (sechs Experimente; d = 0.45 Gedächtnis, d = 0.29 Anwendung; 48 h)", "relation": "supports", "supports_claim_type": "learning_effect"},
+    {"source_id": "higham2022relearning", "locator": "R1-POL-A01 (Abstract)", "relation": "supports", "supports_claim_type": "learning_effect"},
+    {"source_id": "bisra2018", "locator": "R1-POL-A06", "relation": "qualifies", "supports_claim_type": "learning_effect"}
+   ],
+   "certainty": {"level": "low", "reasons": ["eine Publikation mit sechs Experimenten, nur Abstract gelesen", "48 h statt Semester; Lehrtexte statt Prozeduren", "Zeitaufwand und Kartenqualität ungeprüft"], "sub_claims": [{"claim": "selbst erstellte Karten > vorgefertigte bei 48 h Behalten", "level": "low"}, {"claim": "derselbe Vorteil über Wochen verteilter Anki-Wiederholung", "level": "very_low"}]},
+   "observable": "Anteil Lernender, die eigene Karten anlegen; Zeitaufwand; Karten im eigenen Deck",
+   "independent_outcome": "verzögerter unassistierter Test mit neuen Items, Within-Learner-Vergleich eigene vs. generierte Karten bei gleicher Zeit (NOT_RUN)",
+   "failure_modes": ["fehlerhafte eigene Karten", "Zeitverlust gegenüber Aufgabenübung", "Doppelpflege eigener und generierter Karten"],
+   "falsifier": "Ein vorab registrierter Vergleich bei gleicher Gesamtzeit zeigt keinen Vorteil eigener gegenüber generierten Karten im verzögerten unassistierten Test.",
+   "kb_rule_links": [{"rule_id": "RP-R1", "relation": "refines"}, {"rule_id": "RP-R3", "relation": "retains"}, {"rule_id": "SE-R2", "relation": "retains"}],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R8-POL-14",
+   "title": "AnkiConnect nur nach Owner-Gate, opt-in und mit Allowlist ohne Scheduling",
+   "source_section": "R8_ANKI_OBSIDIAN_WORKFLOWS.md §5.2",
+   "applies_to_operations": ["recall_discrimination"],
+   "not_applicable_operations": [],
+   "context": {"phase": ["acquisition", "consolidation"], "conditions": "nur falls ein gemessener Bedienungsnachteil des .apkg-Imports eine Live-Anbindung rechtfertigt"},
+   "recommendation": "In v1 keine AnkiConnect-Anbindung. Falls der Owner sie später freigibt: ausdrückliches Opt-in je Sitzung, Pflicht-API-Schlüssel, Bindung 127.0.0.1, Profilbestätigung durch die Lernenden vor dem ersten Schreibzugriff, Allowlist (Lesen, notes.create/notes.update nur im Engine-Notiztyp), keine Methoden aus scheduling.*, advanced.*, reviews-Import, *.delete, profiles.switch, collection.sync, noteTypes.editStructure; Sicherung vorher (R8-POL-10). Kein Auslesen von Review-Daten ohne R6-Entscheidung.",
+   "product_affordances": {
+    "anki": "optionaler Live-Update-Weg (zurückgestellt)"
+   },
+   "abstain_or_fallback": ["ohne Schlüssel oder ohne Profilbestätigung: kein Zugriff, Rückfall auf .apkg", "nie in Tests gegen eine Nutzerinstanz (R8-POL-08)"],
+   "parameters": [],
+   "evidence": [
+    {"source_id": "ankiconnect_docs", "locator": "README Configuration (apiKey null); API_V1.md Authentifizierung und Methodenindex", "relation": "supports", "supports_claim_type": "privacy_security"}
+   ],
+   "certainty": {"level": "normative", "reasons": ["Sicherheitsgrenze: Schreibzugriff auf die aktive Sammlung"], "sub_claims": [{"claim": "ohne Schlüssel ist die Authentifizierung abgeschaltet", "level": "moderate"}]},
+   "observable": "Client-Allowlist im Code; Ablehnung nicht erlaubter Methoden; Opt-in-Protokoll",
+   "independent_outcome": "Sicherheitsreview des Clients; Wegwerfprofil-Test T10 (nur falls freigegeben)",
+   "failure_modes": ["Allowlist wird später erweitert", "lokale Schadsoftware nutzt offenen Port", "falsches Profil aktiv"],
+   "falsifier": "Ein Bedienungstest zeigt, dass der .apkg-Import den Gebrauch nicht merklich erschwert; dann entfällt der Bedarf.",
+   "kb_rule_links": [{"rule_id": "SP-R1", "relation": "retains"}, {"rule_id": "R8-POL-14-a", "relation": "new"}],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  }
+ ]
+}
