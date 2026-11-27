@@ -1,7 +1,7 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T19:21:05+01:00",
- "updated_by": "LEAD (interactive)",
+ "updated": "2026-11-27T20:44:21+01:00",
+ "updated_by": "LEAD (interactive, issue #49 execution)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
   "Never merge to main; draft PRs only.",
@@ -126,15 +126,23 @@
   },
   {
    "id": "AD-2",
-   "status": "PROPOSED",
+   "status": "OWNER_DELEGATED_V1_CHOICE",
    "decision": "Hybrid H-AB 'Evidenzkern mit Vorlagen': typed semantic contract + observation contract + verifier adapters + deterministic state/decision functions; templates per operation family and domain packs as data; agents only at build time behind gates; no rule language, no runtime agent, no knowledge tracing, no own scheduler. Rationale: verification, safety, measurement integrity, cost, offline, migration - not learning effect (none measured).",
-   "source": "R6 PR #48 (ARCHITECTURE_SYNTHESIS_ADR.md §3.5); awaiting owner OD-01"
+   "source": "owner mandate https://github.com/Sven-Lutz/Exam_Mastery/issues/49 (2026-11-27) + PR #48 owner comment; ADR status updated on research/r6-architecture-20261127 (38167d8)",
+   "scope": "provisional implementation architecture for Mastery V1 on isolated integration/feature branches; minimal K1-K4; abstractions revisable; no merge to main; no RL-pilot change",
+   "not_implied": "no scientific validation; all 116 policies remain design hypotheses with learning_evaluation NOT_RUN"
   },
   {
    "id": "AD-3",
    "status": "OWNER_DECISION",
    "decision": "Product identity Mastery: general knowledge-and-skill platform; exam preparation is an optional mode. Scope-neutral competency taxonomy; historical exam objectives preserved; no technical renames without a tested migration and separate approval.",
    "source": "issue #34"
+  },
+  {
+   "id": "AD-4",
+   "status": "OWNER_DECISION",
+   "decision": "Personal-first, noncommercial Mastery (no blanket licence clearance for NC components or redistribution). Product priorities: (1) university excellence, (2) languages, (3) other skills. A usable local V1 has priority over further research.",
+   "source": "issue #49, PR #48 owner comment, #34"
   }
  ],
  "engine_capabilities": {
@@ -219,18 +227,18 @@
   {
    "id": "CD-10",
    "severity": "P1",
-   "status": "OPEN",
+   "status": "FIXED_ON_INTEGRATION_BRANCH",
    "source": "R6 red team RT-11, reproduced by lead",
    "text": "Randomised expression identity test (learning/expr.py sample_points) samples every variable only in (0.15, 0.95) with a fixed public seed: (x^2)^(1/2) is judged equal to x. Adequate for the current tracks' positive quantities (activations, probabilities) but a false-equivalence risk for any general symbolic task.",
-   "fix": "declare variable domains per task (sign, range) and sample across them; prefer the exact sympy gate (PR #17) where available; report the verifier class per task (R2-POL-14)."
+   "fix": "0ceb143 on integration/mastery-v1-20261127"
   },
   {
    "id": "CD-11",
    "severity": "P1",
-   "status": "OPEN",
-   "source": "R6 red team RT-10 (not yet reproduced by lead)",
+   "status": "FIXED_ON_INTEGRATION_BRANCH",
+   "source": "R6 red team RT-10; reproduced by lead 2026-11-27",
    "text": "Premise-selection ('constraints') tasks count as evidence for the proof competency although they test recognition of premises, not proof construction (R2-POL-02: comprehension, validation and construction measured separately).",
-   "fix": "tag task operation (recognition/validation/construction) and keep construction evidence separate in kc_status."
+   "fix": "bb66530: kc_evidence_basis + learner-view qualifier; full (KC, operation) keyed evidence core is part of V1 K2"
   }
  ],
  "agents": [
@@ -331,9 +339,87 @@
    "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/R6ADR.json",
    "worktree": "Exam_Mastery-r6"
+  },
+  {
+   "id": "V1APP",
+   "kind": "background subagent of LEAD",
+   "scope": "Mastery V1 local app",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/V1APP.json",
+   "worktree": "Exam_Mastery-v1app"
   }
  ],
  "work_packages": [
+  {
+   "id": "WP-V1-ACCEPT",
+   "title": "Owner hands-on acceptance of the local V1 release candidate",
+   "status": "PLANNED",
+   "priority": 0.9,
+   "autostart": false,
+   "depends_on": [
+    "WP-V1-APP"
+   ],
+   "headless_ok": false,
+   "next_step": "Owner runs bin/mastery start and the checklist in docs/MASTERY_V1.md; quality judged against textbook + LLM + Anki baseline."
+  },
+  {
+   "id": "WP-V1-CONTENT",
+   "title": "Deepen the V1 AI unit to university excellence (attention): derivations/proofs, worked + original unassisted problems with full solutions, deterministic attention practice track, Anki retrieval cards",
+   "status": "PLANNED",
+   "priority": 0.8,
+   "autostart": false,
+   "depends_on": [
+    "WP-V1-APP"
+   ],
+   "next_step": "After V1APP: compare the attention unit with a strong textbook chapter + frontier-LLM tutoring; author an em-track-v1 attention track (softmax, scaling variance, masking, gradient through softmax) with engine-computed answers and bug libraries; extend em-experience unit; public fixtures synthetic only."
+  },
+  {
+   "id": "WP-V1-APP",
+   "title": "Mastery V1 local app: one-command start, home START/CONTINUE/STUDY, persistent state, tutor, progress, Anki",
+   "status": "RUNNING",
+   "priority": 0.7,
+   "autostart": false,
+   "branch": "feat/mastery-v1-app-20261127",
+   "base": "integration/mastery-v1-20261127",
+   "worktree": "Exam_Mastery-v1app",
+   "updated": "2026-11-27T20:44:21+01:00",
+   "next_step": "Specialist V1APP builds bin/mastery + python -m exam_mastery.mastery, attention unit + backprop track, E2E tests, docs/MASTERY_V1.md; lead reviews, merges into integration, hands-on check."
+  },
+  {
+   "id": "WP-V1-FIX",
+   "title": "CD-10, CD-11, OD-20 on the integration branch",
+   "status": "COMPLETED",
+   "priority": 0.6,
+   "branch": "integration/mastery-v1-20261127",
+   "updated": "2026-11-27T20:44:21+01:00",
+   "done": [
+    "0ceb143 CD-10: domain-aware sampling (both signs, declared domains), abs/|x|/sqrt, NaN for negative base^fraction; tests/test_expr_domains.py (4/6 fail before)",
+    "bb66530 CD-11 reproduced (argument KC evidenced only by premise selection/MC) -> kc_evidence_basis + learner-view label; tests/test_proof_evidence_basis.py",
+    "fab6c95 OD-20: neutral source label in anki_bridge.py/tracks.py; history not rewritten"
+   ],
+   "open": [],
+   "next_step": "none"
+  },
+  {
+   "id": "WP-V1-INT",
+   "title": "Isolated integration branch: engine stack #11-#47 + research #20/#32/#35/#38-#45/#48 + #36",
+   "status": "COMPLETED",
+   "priority": 0.5,
+   "branch": "integration/mastery-v1-20261127",
+   "base": "origin/main (fast-forward to #47, then --no-ff merges)",
+   "worktree": "Exam_Mastery-v1",
+   "updated": "2026-11-27T20:44:21+01:00",
+   "done": [
+    "linear ancestry #11..#47 verified; fast-forward preserves original commits (88 ahead of main)",
+    "no-ff merges of R1, R2, R3, R4, R5, R7, R8, R9, R6, #36 without conflicts",
+    "frozen-copy suite on f620021: pytest 215 passed, unittest discover 879 OK (skipped=13)",
+    "#33 (control plane) intentionally not merged: programme state changes continuously; supervisor runs from the control worktree"
+   ],
+   "open": [
+    "draft PR integration -> main (never merged by agents)"
+   ],
+   "next_step": "open draft PR after the post-fix suite is green"
+  },
   {
    "id": "WP-P0",
    "title": "Autonomous execution foundation (supervisor, durable state)",
@@ -814,18 +900,15 @@
   {
    "id": "WP-P4",
    "title": "Engineering and golden references on the R6 architecture",
-   "status": "HUMAN_DECISION_REQUIRED",
+   "status": "RUNNING",
    "priority": 10,
    "autostart": false,
    "depends_on": [
     "WP-R6"
    ],
-   "next_step": "After G0: G1 integration per ADR §9, then G2 contract kernel. Before G0 only architecture-independent work: CD-10 expression-domain fix, CD-11 operation tagging (needs care: RT-10 touches K2), test maintenance, document corrections.",
-   "updated": "2026-11-27T19:21:05+01:00",
-   "blockers": [
-    "G0: owner accepts/changes/rejects ADR H-AB (OD-01, PR #48)",
-    "G1: owner merges draft stack in chosen order (OD-02); agents never merge"
-   ],
+   "next_step": "See WP-V1-* packages (issue #49).",
+   "updated": "2026-11-27T20:44:21+01:00",
+   "blockers": [],
    "done": [
     "architecture-independent integrity fixes as stacked draft PRs: #37 CD-2, #43 CD-7, #46 CD-8, #47 CD-9 (each with failing-before tests and CI-equivalent suite)"
    ]
@@ -903,7 +986,7 @@
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents.",
   "lead_pacing": "Lead keeps seven_day <= 0.85 like the supervisor: one specialist while five_hour > 0.6; stop spawning at seven_day >= 0.83 and hand remaining packages to the supervisor after the 2026-11-29 07:00 reset."
  },
- "next_milestone": "OWNER GATE G0 (OD-01 in PR #48) and OD-02 merge order. Meanwhile only architecture-independent work (CD-10, CD-11 scoped, hygiene per OD-20 decision).",
+ "next_milestone": "Mastery V1 local release candidate (WP-V1-APP), then content deepening (WP-V1-CONTENT) and owner hands-on acceptance.",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
@@ -928,5 +1011,26 @@
  },
  "owner_attention": [
   "exam_mastery/learning/anki_bridge.py (draft stack) cites a lecture file name and page ('07 Business Planning & Effectuation.pdf S. 21') in a public branch: owner to decide whether to neutralise (R8 side note, confirmed by lead)."
- ]
+ ],
+ "owner_delegated_defaults": {
+  "source": "issue #49",
+  "OD-03": "freeze note-type identities, decouple display names",
+  "OD-04": "keep GUID scheme for now",
+  "OD-31": "no change on unchanged reexports; keep review history; document substantive edits (PR #46 baseline)",
+  "OD-05": "native Anki+FSRS sole scheduler; Markdown/Obsidian optional, not a fifth product",
+  "OD-07": "AnkiConnect deferred",
+  "OD-09": "desktop first; mobile untested",
+  "OD-10/11/12/30": "keyless exam tutor; explicit solution request allowed, counted assisted, invalidates item as independent evidence; only engine-verified hidden items count",
+  "OD-15": "noncommercial personal use; no blanket NC licence clearance",
+  "OD-18": "small offline Pyodide spike allowed when programming labs are reached",
+  "OD-19": "no technical renames; user-facing name Mastery",
+  "OD-21": "single owner learner, no causal inference",
+  "OD-22": "public fixtures synthetic/redistributable; private course content local only",
+  "OD-23": "owner accepts real product quality later",
+  "OD-24": "safety-critical/physical domains knowledge-only",
+  "OD-25": "time/hint/attempt defaults provisional",
+  "OD-26": "no new blanket research audit",
+  "OD-13": "no paid API budget; independent delayed items required before causal claims but not for usability",
+  "OD-02": "agents prepare/test integration branch and PR; merge to main only by explicit owner action"
+ }
 }
