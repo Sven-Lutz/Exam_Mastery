@@ -1,0 +1,42 @@
+/* Mastery V1 home. Builds on em_tokens.css (same tokens, buttons and eyebrows as the workbench and learning app). */
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font:var(--fs-1)/var(--lh-ui) var(--font-ui)}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.m-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:12px var(--gutter);background:var(--plate);border-bottom:1px solid var(--rule)}
+.m-brand{font:700 var(--fs-3)/1 var(--font-display);color:var(--ink);text-decoration:none;letter-spacing:.01em}
+.m-nav{display:flex;gap:4px;flex-wrap:wrap}
+.m-nav a{padding:6px 12px;border-radius:var(--r-pill);text-decoration:none;color:var(--ink-2)}
+.m-nav a[aria-current=page]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.m-shell{max-width:1080px;margin:0 auto;padding:24px var(--gutter) 64px}
+.m-view[hidden]{display:none}
+.m-h1{font:600 var(--fs-4)/var(--lh-tight) var(--font-display);margin:8px 0 8px}
+.m-h2{font:600 var(--fs-3)/var(--lh-tight) var(--font-display);margin:4px 0 8px}
+.m-h3{font:600 var(--fs-2)/1.3 var(--font-ui);margin:16px 0 6px}
+.m-lead{color:var(--ink-2);max-width:var(--measure);margin:0 0 20px}
+.m-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px}
+.m-card{background:var(--plate);border:1px solid var(--rule);border-radius:var(--r-3);padding:18px 20px;margin:0 0 16px;box-shadow:var(--shadow-1,none)}
+.m-grid2 .m-card{margin:0}
+.m-accent{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.m-note{color:var(--muted);font-size:var(--fs-0)}
+.m-rule{font-size:var(--fs-0);color:var(--ink-2)}
+.m-rule code,.m-card code{font-family:var(--font-mono);font-size:.85em;background:var(--surface-2);padding:1px 5px;border-radius:var(--r-1)}
+.m-badge{display:inline-block;font-size:var(--fs-0);background:var(--warn-soft);color:var(--warn);padding:2px 10px;border-radius:var(--r-pill);margin:0 0 8px}
+.m-products{list-style:none;padding:0;margin:8px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.m-products li{border:1px solid var(--rule);border-radius:var(--r-2);padding:10px 12px;background:var(--surface)}
+.m-products a{font-weight:600;display:block}
+.m-products small{color:var(--muted)}
+.m-steps{padding-left:22px}
+.m-steps li{margin:4px 0}
+.m-limits{background:var(--surface-2)}
+.m-limits ul{margin:0;padding-left:20px}
+.m-statement{background:var(--accent-soft);border-left:4px solid var(--accent);padding:12px 16px;border-radius:var(--r-2);max-width:none}
+.m-scroll{overflow-x:auto}
+.m-table{border-collapse:collapse;width:100%;font-size:var(--fs-0)}
+.m-table th,.m-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.m-table thead th{color:var(--muted);font-weight:600}
+.m-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.m-loading{color:var(--muted)}
+.ds-btn{text-decoration:none;display:inline-block}
+@media (max-width:560px){.m-shell{padding:16px 16px 48px}.m-card{padding:14px}}

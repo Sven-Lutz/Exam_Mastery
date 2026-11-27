@@ -1,0 +1,14 @@
+#!/bin/sh
+# Mastery V1 – one command:  bin/mastery            (= start: build if needed, serve on 127.0.0.1:8765, open browser)
+#                            bin/mastery build|status|export [...]
+# Python: $MASTERY_PYTHON, else the checkout's .venv, else python3. Library: $MASTERY_HOME (default ~/Mastery).
+set -eu
+here=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+if [ -n "${MASTERY_PYTHON:-}" ]; then py=$MASTERY_PYTHON
+elif [ -x "$here/.venv/bin/python" ]; then py=$here/.venv/bin/python
+else py=python3
+fi
+if [ "$#" -eq 0 ]; then set -- start; fi
+PYTHONPATH="$here${PYTHONPATH:+:$PYTHONPATH}"
+export PYTHONPATH
+exec "$py" -m exam_mastery.mastery "$@"
