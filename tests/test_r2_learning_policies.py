@@ -44,5 +44,47 @@ class R2EvidenceRegister(r1.R1EvidenceRegisters):
     REGISTERS = (R2 / "r2_evidence.json",)
 
 
+SEARCH_LOG_FIELDS = ("batch", "date", "engine", "query", "hits_screened", "included", "excluded_or_note")
+FIRST_BATCH5_POLICY = 17
+
+
+class R2Batch5Contract(unittest.TestCase):
+    """Batch 5 (algorithms, quantitative problem solving): search log and traceability."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.register = r1.load(R2 / "r2_evidence.json")
+        cls.policy_doc = r1.load(R2 / "r2_learning_policies.json")
+        cls.entry_ids = {e["source_id"] for e in cls.register["entries"]}
+        cls.batch5_policies = [p for p in cls.policy_doc["policies"]
+                               if int(p["id"].rsplit("-", 1)[1]) >= FIRST_BATCH5_POLICY]
+        cls.batch5_sources = {sid for s in cls.register.get("search_log", []) if s.get("batch") == 5
+                              for sid in s.get("included", [])}
+
+    def test_search_log_entries_are_complete(self):
+        log = self.register.get("search_log", [])
+        self.assertTrue(log)
+        for s in log:
+            for f in SEARCH_LOG_FIELDS:
+                self.assertIn(f, s, s.get("query"))
+            self.assertTrue(s["query"].strip() and s["engine"].strip())
+            self.assertIsInstance(s["hits_screened"], int)
+            self.assertTrue(s["excluded_or_note"].strip(), s["query"])
+            for sid in s["included"]:
+                self.assertIn(sid, self.entry_ids, "search log includes unregistered source %s" % sid)
+
+    def test_batch5_sources_are_used_or_declared(self):
+        cited = {e["source_id"] for p in self.policy_doc["policies"] for e in p["evidence"]}
+        gaps = " ".join(self.policy_doc["coverage_gaps"])
+        for sid in self.batch5_sources:
+            self.assertTrue(sid in cited or sid in gaps, "batch-5 source %s neither cited nor declared" % sid)
+
+    def test_batch5_policies_address_all_products_and_cite_batch5(self):
+        self.assertTrue(self.batch5_policies)
+        for p in self.batch5_policies:
+            self.assertEqual(set(p["product_affordances"]), r1.PRODUCTS, p["id"])
+            self.assertTrue({e["source_id"] for e in p["evidence"]} & self.batch5_sources, p["id"])
+
+
 if __name__ == "__main__":
     unittest.main()
