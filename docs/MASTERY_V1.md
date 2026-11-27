@@ -5,8 +5,12 @@ Laufzeit-Agent, kein Knowledge Tracing, kein eigener Scheduler, keine bezahlten 
 
 Mastery V1 ist die kleinste vollständige Tageslernumgebung für **ein** anspruchsvolles KI/Mathe-Thema:
 *Attention verstehen: vom Skalarprodukt zur gewichteten Information* (Scaled Dot-Product Attention, an Vaswani et
-al. 2017 gebunden, synthetische Zahlen) mit der Übungsstrecke *Backpropagation* als Voraussetzung. Alles läuft
-offline auf dem eigenen Rechner.
+al. 2017 gebunden, synthetische Zahlen) mit zwei regelbasiert geprüften Übungsstrecken: *Attention* (Softmax-Gewichte,
+Skalierung, Maskierung, Gradient; Hauptübung) und *Backpropagation* (Voraussetzung). Alles läuft offline auf dem
+eigenen Rechner.
+
+**Start auf diesem Rechner:** `cd ~/Projects/Exam_Mastery-v1 && bin/mastery` (Integrations-Worktree; `.venv` verweist
+lokal auf die vorhandene Engine-Umgebung).
 
 ## 1. Start mit einem Befehl
 
