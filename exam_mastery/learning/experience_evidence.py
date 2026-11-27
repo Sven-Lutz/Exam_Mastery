@@ -14,7 +14,7 @@ import json
 SCHEMA = "em-practice-evidence-v1"
 MAX_EVENTS = 10000
 MAX_RESPONSE_CHARS = 20000
-TYPES = {"attempt", "hint", "solution_reveal"}
+TYPES = {"attempt", "hint", "solution_reveal", "tutor_brief"}  # a prepared tutor brief is help (CD-7)
 
 
 class EvidenceError(ValueError):
@@ -77,7 +77,7 @@ def summarize(log, unit):
     evidence = {
         key: {
             "status": "NOT_ATTEMPTED", "attempts": 0, "hints": 0,
-            "solutions_viewed": 0, "independent_attempts_before_help": 0,
+            "solutions_viewed": 0, "tutor_briefs": 0, "independent_attempts_before_help": 0,
             "assisted_attempts": 0, "ever_helped": False,
         }
         for key in tasks
@@ -124,6 +124,8 @@ def summarize(log, unit):
             ):
                 raise EvidenceError(f"events[{index}]: hint index out of order")
             state["hints"] += 1
+        elif kind == "tutor_brief":
+            state["tutor_briefs"] += 1
         else:
             if state["solutions_viewed"]:
                 raise EvidenceError(f"events[{index}]: solution already revealed")
@@ -131,6 +133,7 @@ def summarize(log, unit):
         state["ever_helped"] = True
         state["status"] = (
             "SOLUTION_VIEWED" if kind == "solution_reveal"
+            else "TUTOR_HELP_UNVERIFIED" if kind == "tutor_brief"
             else "HINT_USED_UNVERIFIED"
         )
 

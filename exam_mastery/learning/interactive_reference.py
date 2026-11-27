@@ -333,6 +333,10 @@ textarea { min-height:90px; }
 .parsons-reasons li { margin:.5rem 0; }
 .parsons-reasons code { font-size:.9rem; }
 .hidden { display:none!important; }
+.tutor-panel { margin:.6rem 0; } .tutor-panel summary { cursor:pointer; color:var(--blue); }
+.tutor-brief { white-space:pre-wrap; max-height:16rem; overflow:auto; font-size:.8rem; background:#f4f6f9; padding:.6rem; border-radius:6px; }
+.file-button { display:inline-block; padding:.45rem .8rem; border-radius:6px; background:#e8efff; color:#183b78; cursor:pointer; }
+.file-button input { position:absolute; width:1px; height:1px; opacity:0; }
 .small { font-size:.85rem; color:#c0d6f8; }
 @media (max-width:800px) { .experience-grid { grid-template-columns:1fr; } .stage { top:.5rem; order:-1; }
  .scene { min-height:180px; } }
@@ -344,19 +348,89 @@ RUNTIME = r"""(function () {
 "use strict";
 const script = document.getElementById("em-interactive-data");
 const model = JSON.parse(script.textContent);
+// Learner state persists in this browser (localStorage, versioned key), per unit and assessment
+// revision. Changed tasks never inherit old progress: the old record is archived, not reused.
+const KEY = "em-practice-v1", FUTURE_SKEW_MS = 5 * 60e3;
+function readStore() {
+  try { const d = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (d && d.schema === 1 && d.units && typeof d.units === "object") return d; } catch (e) { }
+  return {schema:1, units:{}};
+}
+const store = readStore();
+let record = store.units[model.unit_id], archivedNote = "";
+if (record && record.assessment_revision !== model.assessment_revision) {
+  (store.archived = store.archived || {})[model.unit_id + "@" + record.assessment_revision] = record;
+  record = null;
+  archivedNote = "Die Aufgaben wurden geändert; der frühere Verlauf ist archiviert und zählt nicht für sie. ";
+}
+if (!record || !Array.isArray(record.events) || !Array.isArray(record.policy)) {
+  record = {assessment_revision:model.assessment_revision, events:[], policy:[]};
+}
+store.units[model.unit_id] = record;
+let persisted = false;
+function save() {
+  store.units[model.unit_id] = record;
+  try { localStorage.setItem(KEY, JSON.stringify(store)); persisted = true; } catch (e) { persisted = false; }
+}
+save();
 const practice = {schema:"em-practice-evidence-v1",unit_id:model.unit_id,
-  assessment_revision:model.assessment_revision,events:[]};
+  assessment_revision:model.assessment_revision,events:record.events};
 const evidenceStatus = document.getElementById("evidence-status");
+function statusLine() {
+  return archivedNote + practice.events.length + " Aktionen "
+    + (persisted ? "in diesem Browser gespeichert (bleiben nach dem Neuladen erhalten)"
+                 : "nur in dieser Sitzung erfasst – Browserspeicher nicht verfügbar")
+    + "; keine Antwort wird übertragen, Freitext bleibt unbewertet. Sicherung als JSON exportieren.";
+}
+evidenceStatus.textContent = practice.events.length ? statusLine()
+  : archivedNote + "Noch keine Lernhandlungen erfasst."
+    + (persisted ? " Sie werden in diesem Browser gespeichert." : "");
 function recordPractice(event) {
   if (practice.events.length >= 10000) {
     evidenceStatus.textContent = "Protokollgrenze erreicht. Bitte jetzt exportieren.";
     return;
   }
   practice.events.push({...event,at:new Date().toISOString()});
-  evidenceStatus.textContent = practice.events.length
-    + " Aktionen nur in dieser Sitzung erfasst; keine Antwort wird bewertet. "
-    + "Zur Sicherung JSON exportieren.";
+  save();
+  evidenceStatus.textContent = statusLine();
 }
+function download(name, text) {
+  const url = URL.createObjectURL(new Blob([text], {type:"application/json"}));
+  const link = document.createElement("a");
+  link.href = url; link.download = name; document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+const fileSlug = model.unit_id.replace(/[^a-z0-9_-]/g,"-");
+document.getElementById("practice-backup-export").addEventListener("click", () => {
+  download("mastery-" + fileSlug + "-sicherung.json", JSON.stringify({schema:"em-practice-backup-v1",
+    unit_id:model.unit_id, assessment_revision:model.assessment_revision, exported:new Date().toISOString(),
+    events:record.events, policy:record.policy}, null, 1) + "\n");
+});
+const PRACTICE_TYPES = ["attempt","hint","solution_reveal","tutor_brief"], POLICY_TYPES = ["attempt","hint","solution","tutor"];
+document.getElementById("practice-backup-import").addEventListener("change", ev => {
+  const file = ev.target.files[0];
+  if (!file || file.size > 4e6) return;
+  file.text().then(text => {
+    const o = JSON.parse(text), known = new Set(model.assessments.map(a => a.id)), latest = Date.now() + FUTURE_SKEW_MS;
+    if (!o || o.schema !== "em-practice-backup-v1" || o.unit_id !== model.unit_id
+        || o.assessment_revision !== model.assessment_revision || !Array.isArray(o.events) || !Array.isArray(o.policy)) {
+      throw new Error("Keine Sicherung dieser Einheit und Aufgabenfassung (em-practice-backup-v1).");
+    }
+    const merge = (cur, add, types, taskKey, timeKey) => {
+      const key = e => [e[timeKey], e.type, e[taskKey]].join("|"), have = new Set(cur.map(key)); let n = 0;
+      for (const e of add) {
+        if (!e || typeof e !== "object" || !types.includes(e.type) || !known.has(e[taskKey])
+            || typeof e[timeKey] !== "string" || !(Date.parse(e[timeKey]) <= latest) || have.has(key(e))) continue;
+        cur.push(e); have.add(key(e)); n++;
+      }
+      cur.sort((a, b) => a[timeKey] < b[timeKey] ? -1 : a[timeKey] > b[timeKey] ? 1 : 0); return n;
+    };
+    const n = merge(record.events, o.events, PRACTICE_TYPES, "task_id", "at") + merge(record.policy, o.policy, POLICY_TYPES, "task", "t");
+    save();
+    evidenceStatus.textContent = n + " Einträge übernommen; vorhandene bleiben erhalten. Seite wird neu geladen.";
+    setTimeout(() => location.reload(), 600);
+  }).catch(e => { evidenceStatus.textContent = "Import abgelehnt: " + e.message; });
+});
 document.getElementById("evidence-export").addEventListener("click", () => {
   const blob = new Blob([JSON.stringify(practice,null,2)+"\n"],{type:"application/json"});
   const url = URL.createObjectURL(blob);
@@ -594,7 +668,9 @@ model.interactions.forEach(spec => {
   else setup(spec);
 });
 const byTask = new Map(model.assessments.map(x=>[x.id,x]));
-const policyEvents = []; // ephemeral: evaluated diagnostics never enter exported event logs
+// Persisted with the attempt text in this browser only; diagnostics and answers never enter the exported evidence log.
+const policyEvents = record.policy;
+const competencyText = id => (model.competencies || {})[id] || id;
 function explainPolicy(taskId, diagnosis, container) {
   const decision = window.EMT.decide(model.adaptive_track, policyEvents);
   container.replaceChildren();
@@ -675,7 +751,33 @@ document.querySelectorAll(".assessment").forEach(root=>{
   const hintText = root.querySelector(".hint-text");
   const status = root.querySelector(".attempt-status");
   const guidance = root.querySelector(".adaptive-guidance");
+  const tutorButton = root.querySelector(".tutor-button");
+  const tutorQuestion = root.querySelector(".tutor-question");
+  const tutorStatus = root.querySelector(".tutor-status");
+  const tutorBrief = root.querySelector(".tutor-brief");
   let submitted = false, hintIndex = 0, solutionSeen = false;
+  // Restore from this browser: the evidence log's order rules (hint indices, one reveal) stay valid.
+  hintIndex = Math.min(definition.hints.length,
+    practice.events.filter(e => e.type === "hint" && e.task_id === taskId).length);
+  solutionSeen = practice.events.some(e => e.type === "solution_reveal" && e.task_id === taskId);
+  const priorAttempts = policyEvents.filter(e => e.type === "attempt" && e.task === taskId);
+  if (priorAttempts.length) {
+    const tutors = policyEvents.filter(e => e.type === "tutor" && e.task === taskId).length;
+    submitted = true;
+    input.value = priorAttempts[priorAttempts.length - 1].observed || "";
+    input.readOnly = true; submit.disabled = true; retry.disabled = false; reveal.disabled = false;
+    if (hintButton && hintIndex < definition.hints.length) hintButton.disabled = false;
+    if (tutorButton) tutorButton.disabled = false;
+    if (hintIndex > 0 && hintText) {
+      hintText.textContent = definition.hints[hintIndex - 1]; hintText.classList.remove("hidden");
+    }
+    status.textContent = "Wiederhergestellt: " + priorAttempts.length + " Versuch(e)"
+      + (hintIndex ? ", " + hintIndex + " Hinweis(e)" : "")
+      + (solutionSeen ? ", Musterlösung eingesehen" : "")
+      + (tutors ? ", Tutor-Brief erstellt" : "")
+      + ". Freitext bleibt unbewertet.";
+    root.dataset.restored = String(priorAttempts.length);
+  }
 
   input.addEventListener("input",()=>{
     if (!submitted) submit.disabled = !input.value.trim();
@@ -709,7 +811,9 @@ document.querySelectorAll(".assessment").forEach(root=>{
       : "Numerisch formativ geprüft; die wissenschaftliche Referenzprüfung bleibt offen.";
     // Export records the action and length only, not the answer or grade.
     recordPractice({type:"attempt",task_id:taskId,response_chars:answer.length});
-    policyEvents.push({type:"attempt",task:taskId,t:new Date().toISOString(),diagnosis});
+    policyEvents.push({type:"attempt",task:taskId,t:new Date().toISOString(),diagnosis,observed:answer});
+    save();
+    if (tutorButton) tutorButton.disabled = false;
     explainPolicy(taskId, diagnosis, guidance);
   });
   retry.addEventListener("click",()=>{
@@ -732,6 +836,7 @@ document.querySelectorAll(".assessment").forEach(root=>{
     hintText.classList.remove("hidden");
     recordPractice({type:"hint",task_id:taskId,hint_index:hintIndex});
     policyEvents.push({type:"hint",task:taskId,t:new Date().toISOString()});
+    save();
     hintIndex += 1;
     hintButton.disabled = hintIndex >= definition.hints.length;
     status.textContent = "Hinweis verwendet. Die nächste Antwort gilt nicht als unabhängig.";
@@ -742,9 +847,39 @@ document.querySelectorAll(".assessment").forEach(root=>{
     if (!solutionSeen) {
       recordPractice({type:"solution_reveal",task_id:taskId});
       policyEvents.push({type:"solution",task:taskId,t:new Date().toISOString()});
+      save();
       solutionSeen = true;
     }
     status.textContent = "Lösung eingesehen – kein Nachweis selbstständiger Beherrschung.";
+  });
+  // Tutor brief for Claude/ChatGPT: R9 rules + this task + own attempts + hints + sources. Evidence roles carry no
+  // model solution (CD-7). Preparing it counts as help for this task (logged as tutor_brief / tutor).
+  if (tutorButton) tutorButton.addEventListener("click", () => {
+    const attempts = policyEvents.filter(e => e.type === "attempt" && e.task === taskId);
+    if (!attempts.length) return;
+    const cats = model.adaptive_track.categories || {};
+    const sibling = model.assessments.find(a => a.id !== taskId
+      && a.competency_ids.some(c => definition.competency_ids.includes(c))
+      && !policyEvents.some(e => e.type === "attempt" && e.task === a.id));
+    const text = window.EMT.portableBrief({
+      title: model.title, objective: "", competency: definition.competency_ids.map(competencyText).join("; "),
+      task: {id: taskId, role: definition.role, prompt: definition.prompt},
+      attempts: attempts.map(e => ({t: e.t, observed: e.observed || "", result: e.diagnosis.result,
+        category: e.diagnosis.error_category ? ((cats[e.diagnosis.error_category] || {}).label || e.diagnosis.error_category) : null})),
+      hints: definition.hints.slice(0, hintIndex), solution_viewed: solutionSeen,
+      solution: definition.solution ? [definition.solution] : null,
+      sources: definition.sources || [], source_status: model.source_status,
+      parallel: sibling ? "Aufgabe " + sibling.id + " im Explorable, ohne Tutor." : null,
+      question: tutorQuestion ? tutorQuestion.value : ""});
+    tutorBrief.textContent = text; tutorBrief.classList.remove("hidden");
+    recordPractice({type:"tutor_brief",task_id:taskId});
+    policyEvents.push({type:"tutor",task:taskId,t:new Date().toISOString()});
+    save();
+    status.textContent = "Tutor-Brief erstellt – diese Aufgabe gilt ab jetzt als mit Hilfe bearbeitet.";
+    window.EMT.copyText(text).then(ok => {
+      tutorStatus.textContent = (ok ? "In die Zwischenablage kopiert. " : "Kopieren nicht möglich – Text unten markieren und kopieren. ")
+        + "In Claude oder ChatGPT einfügen; erst dann verlässt er den Rechner.";
+    });
   });
 });
 })();"""
@@ -795,11 +930,15 @@ def render_html(unit):
         '<p class="badge">' + ('Synthetische Referenzeinheit – keine Vorlesungsquellen'
         if unit["source_mode"] == "synthetic" else 'Quellengebundene Einheit – Fachprüfung erforderlich') + '</p>',
         '<section class="card" aria-label="Lernprotokoll"><h2>Lokal üben</h2>',
-        '<p>Versuche und Hilfen werden nur im Arbeitsspeicher dieser Sitzung dokumentiert.',
+        '<p>Versuche, Hinweise, eingesehene Lösungen und Tutor-Briefs werden in diesem Browser gespeichert',
+        ' (localStorage, Schlüssel em-practice-v1) und bleiben nach dem Neuladen erhalten.',
         ' Keine Antworten werden übertragen. Freitext bleibt unbewertet;',
         ' rein numerische Aufgaben können lokal gegen Autoren-Sollwerte geprüft werden.',
-        ' Zur Aufbewahrung das Protokoll vor dem Schließen exportieren.</p>',
+        ' Browserdaten können gelöscht werden: Sicherung regelmäßig exportieren.</p>',
         '<button type="button" id="evidence-export">Lernprotokoll als JSON exportieren</button>',
+        ' <button type="button" id="practice-backup-export" class="secondary">Sicherung exportieren</button>',
+        ' <label class="file-button secondary">Sicherung importieren',
+        '<input type="file" id="practice-backup-import" accept=".json,application/json"></label>',
         '<p id="evidence-status" class="attempt-status" role="status" aria-live="polite">',
         'Noch keine Lernhandlungen erfasst.</p></section>',
         '<section aria-label="Wissenschaftliche Erklärung"><h2>Verstehen</h2>',
@@ -926,6 +1065,15 @@ def render_html(unit):
              if task.get("hints") else ''),
             '<button class="answer-button secondary" type="button" disabled>Musterlösung anzeigen</button>',
             '</div><p class="attempt-status" role="status" aria-live="polite"></p>',
+            '<details class="tutor-panel"><summary>Tutor fragen (Claude oder ChatGPT)</summary>',
+            '<p class="help">Erst nach einem eigenen Versuch. Der Brief enthält Tutor-Regeln, Aufgabe, Ihre Versuche, ',
+            'genutzte Hinweise und Quellen' + ('; keine Musterlösung, weil diese Aufgabe selbstständiges Lösen prüft'
+            if task.get("role", "core") in ("similar", "transfer", "retest") else '') +
+            '. Er zählt als Hilfe für diese Aufgabe.</p>',
+            '<label for="tutor-q-' + slug + '">Ihre Frage (optional)</label>',
+            '<input type="text" class="tutor-question" id="tutor-q-' + slug + '" maxlength="2000" autocomplete="off">',
+            '<button class="tutor-button" type="button" disabled>Tutor-Brief kopieren</button>',
+            '<p class="tutor-status" role="status" aria-live="polite"></p><pre class="tutor-brief hidden"></pre></details>',
             '<div class="adaptive-guidance" role="status" aria-live="polite"></div>',
             ('<p class="hint-text hidden" role="status" aria-live="polite"></p>'
              if task.get("hints") else ''),
@@ -948,22 +1096,48 @@ def render_html(unit):
             parts.append('<p>'+_h(unit['authorship'].get(key,''))+'</p>')
         parts.append('<p>Fachliche und menschliche Abnahme: ausstehend.</p></div>')
     parts.extend([
-        '</section><p class="help">Diese Demo protokolliert nur Lernhandlungen',
-        ' im Sitzungsspeicher, führt keinen fremden Code aus und zertifiziert',
+        '</section><p class="help">Diese Seite speichert Lernhandlungen nur lokal',
+        ' in diesem Browser, führt keinen fremden Code aus und zertifiziert',
         ' keine fachliche Qualität.</p>',
         '<script id="em-interactive-data" type="application/json">',
         _json_script({"schema": SCHEMA, "unit_id": unit["unit_id"],
+                      "title": unit["title"], "source_status": _source_status(unit),
                       "assessment_revision": assessment_revision(unit),
                       "interactions": compiled,
                       "adaptive_track": track_for_unit(unit),
-                      "assessments": [{"id": x["id"], "hints": x.get("hints", []),
-                                       "machine_check": x.get("machine_check"),
-                                       "competency_ids": x["competency_ids"]}
-                                      for x in unit["assessments"]]}),
+                      "competencies": {c["id"]: c.get("description", c["id"])
+                                       for c in unit["competencies"]},
+                      "assessments": [_tutor_view(unit, x) for x in unit["assessments"]]}),
         '</script><script>' + tutor_js + '</script><script>' + RUNTIME +
         '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_experience.js').read_text() + '</script></main></body></html>',
     ])
     return "".join(parts)
+
+
+EVIDENCE_ROLES = ("similar", "transfer", "retest")  # mirrors tutor.KEY_WITHHELD_ROLES
+
+
+def _source_status(unit):
+    return ("Synthetische Referenzeinheit, fachlich nicht unabhängig geprüft" if unit["source_mode"] == "synthetic"
+            else "Quellengebundene Einheit, fachliche Prüfung ausstehend")
+
+
+def _tutor_view(unit, task):
+    """Browser data for one assessment. Evidence roles never carry the model solution (CD-7)."""
+    claims = {c["id"]: c for c in unit.get("claims", [])}
+    sources = {s["id"]: s["locator"] for s in unit.get("sources", [])}
+    locators = []
+    for claim_id in task.get("claim_ids", []):
+        for ref in claims.get(claim_id, {}).get("source_refs", []):
+            if ref in sources and sources[ref] not in locators:
+                locators.append(sources[ref])
+    role = task.get("role", "core")
+    view = {"id": task["id"], "hints": task.get("hints", []), "machine_check": task.get("machine_check"),
+            "competency_ids": task["competency_ids"], "role": role, "prompt": task["prompt"],
+            "sources": locators or [sources[k] for k in sorted(sources)]}
+    if role not in EVIDENCE_ROLES:
+        view["solution"] = task["solution"]
+    return view
 
 
 def re_slug(name):
