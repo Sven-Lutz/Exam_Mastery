@@ -462,7 +462,9 @@ def test_misconception_feedback_and_targeted_contrast_in_real_browser(tmp_path):
             with page.expect_download() as d:
                 page.locator("#evidence-export").click()
             events = json.loads(Path(d.value.path()).read_text(encoding="utf-8"))
-            assert [e["type"] for e in events["events"]] == ["attempt", "attempt"]
+            # opening the worked misconception example (it shows the corrected result) is logged as guided help (R5-POL-04)
+            assert [e["type"] for e in events["events"]] == ["attempt", "guided_help", "attempt"]
+            assert events["events"][1]["lesson_id"].startswith("misconception:")
             assert "corrected_example" not in json.dumps(events)
             assert "wrong_example" not in json.dumps(events)
         finally:

@@ -14,6 +14,8 @@ import math
 from ..labs import build as B
 from ..labs import models as M
 from . import diagnose as D
+from . import guided as G
+from . import track_lessons as TL
 
 SCHEMA = 'em-track-v1'
 f = B._fmt
@@ -153,6 +155,7 @@ def ml_track():
         'worked_examples': {
             'prereq/sigmoid-derivative': {'title': 'Durchgerechnet: σ′ aus σ', 'steps': ['σ(z) = 1/(1 + e^(−z)).', 'Ableiten: σ′(z) = e^(−z)/(1 + e^(−z))² = σ(z)·(1 − σ(z)).', 'Beispiel σ(z) = 0,8: σ′(z) = 0,8·0,2 = 0,16.', 'Für tanh gilt analog tanh′(z) = 1 − tanh²(z).']},
             'ml/backpropagation': {'title': 'Durchgerechnet: ∂L/∂v₁ und der Schritt nach innen', 'steps': ['Ausgabegewicht: ∂L/∂v₁ = δ_o · a₁, denn z_o = v₁a₁ + v₂a₂ + c.', 'Eine Schicht tiefer: ∂L/∂a₁ = δ_o · v₁, dann ∂L/∂z₁ = δ_o · v₁ · f′(z₁) =: δ₁.', 'Gewicht der verdeckten Schicht: ∂L/∂w₁₂ = δ₁ · x₂, denn ∂z₁/∂w₁₂ = x₂.']}},
+        'lessons': TL.ml_lessons(),
         'anki_tags': ['em::lernstrecke::backprop'], 'sources': spec['sources'] + ['Lab ml/backprop-2-2-1 (gleiche Parameter)'],
         'source_status': 'Referenz-Fixture (keine Vorlesung); Gleichungen Standard-Kettenregel, unabhängig geprüft mit sympy und finiten Differenzen.',
     }
@@ -590,6 +593,7 @@ def attention_track():
             ['z → z + c', 'e^c kürzt sich aus Zähler und Nenner', 'Gewichte unverändert'],
             ['z → λ·z', 'alle Abstände z_j − z_ℓ werden mit λ multipliziert', 'λ > 1: spitzer, λ < 1: flacher']],
             'example': 'Die Skalierung 1/√d_k ist ein gemeinsamer Faktor λ < 1, keine Verschiebung: Sie verändert die Gewichte, und zwar gezielt in Richtung flacher.'}},
+        'lessons': TL.attention_lessons(),
         'anki_tags': ['em::lernstrecke::attention'],
         'sources': ['Vaswani et al. (2017), Attention Is All You Need, §3.2.1 Gleichung (1) und Fußnote 4; §3.2.3 (Maskierung mit −∞)',
                     'Eigene Herleitungen (Softmax-Jacobi-Matrix, Gradient), geprüft mit sympy und finiten Differenzen'],
@@ -665,6 +669,7 @@ def validate(track):
                 probs.append(f'category {cid}: worked example {s["ref"]} missing')
             if s and s['type'] == 'contrast' and s['ref'] not in track.get('contrasts', {}):
                 probs.append(f'category {cid}: contrast {s["ref"]} missing')
+    probs += G.validate_lessons(track, 'track')   # optional prerequisite micro-lessons (em-lesson-v1)
     if probs:
         raise TrackError('; '.join(probs))
     return True

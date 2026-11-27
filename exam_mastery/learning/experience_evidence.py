@@ -14,7 +14,8 @@ import json
 SCHEMA = "em-practice-evidence-v1"
 MAX_EVENTS = 10000
 MAX_RESPONSE_CHARS = 20000
-TYPES = {"attempt", "hint", "solution_reveal", "tutor_brief"}  # a prepared tutor brief is help (CD-7)
+TYPES = {"attempt", "hint", "solution_reveal", "tutor_brief", "guided_help"}  # a prepared tutor brief is help (CD-7);
+# guided_help = a prerequisite lesson or a worked misconception example opened for this task (guided.py, R5-POL-04)
 
 
 class EvidenceError(ValueError):
@@ -93,6 +94,8 @@ def summarize(log, unit):
             permitted.add("response_chars")
         if kind == "hint":
             permitted.add("hint_index")
+        if kind == "guided_help":
+            permitted.add("lesson_id")
         if set(event) != permitted:
             raise EvidenceError(f"events[{index}]: unknown or missing fields")
         task_id = event["task_id"]
@@ -126,6 +129,11 @@ def summarize(log, unit):
             state["hints"] += 1
         elif kind == "tutor_brief":
             state["tutor_briefs"] += 1
+        elif kind == "guided_help":
+            lesson = event["lesson_id"]
+            if not isinstance(lesson, str) or not 0 < len(lesson) <= 200:
+                raise EvidenceError(f"events[{index}]: invalid lesson id")
+            state["guided_helps"] = state.get("guided_helps", 0) + 1
         else:
             if state["solutions_viewed"]:
                 raise EvidenceError(f"events[{index}]: solution already revealed")
@@ -134,6 +142,7 @@ def summarize(log, unit):
         state["status"] = (
             "SOLUTION_VIEWED" if kind == "solution_reveal"
             else "TUTOR_HELP_UNVERIFIED" if kind == "tutor_brief"
+            else "GUIDED_HELP_USED" if kind == "guided_help"
             else "HINT_USED_UNVERIFIED"
         )
 

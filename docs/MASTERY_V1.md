@@ -53,7 +53,12 @@ anderen, meist leeren Lernstand; Wechsel über *Sicherung → exportieren/import
 5. **Üben mit Rückmeldung:** Übungsstrecke Backpropagation – Zahlen, Ausdrücke (Zufallsstellen-Identitätstest, kein
    symbolischer Beweis) und Rechenschritte werden regelbasiert geprüft; Fehlerkategorie, Hinweisleiter, durchgerechnete
    Beispiele; jede Empfehlung nennt ihre Regel und was unsicher bleibt.
-6. **Tutor:** bei jeder Aufgabe „Tutor-Brief kopieren“ (im Explorable nach einem eigenen Versuch). Der Brief beginnt
+6. **Geführtes Lernen (offline):** Unter jeder Aufgabe zeigt ein Panel die Voraussetzungen der Aufgabe. Passt eine
+   Antwort zu einer fehlenden Voraussetzung (z. B. Ableitung der Sigmoidfunktion), bietet es eine Mini-Lektion an:
+   Erklärung, Formel, durchgerechnetes Beispiel, eine regelbasiert geprüfte Kontrollfrage, dann zurück zur Aufgabe.
+   Diese Hilfe zählt als Hilfe. Details und Leitplanken: `docs/TUTOR.md`.
+   **Tutor:** bei jeder Aufgabe „Mit Claude/ChatGPT weiterdenken“ → „Brief kopieren“ (im Explorable nach einem eigenen
+   Versuch); optional ein selbst betriebenes lokales Modell (nur `127.0.0.1`/`localhost`, standardmäßig aus). Der Brief beginnt
    mit der Kopiervorlage des R9-Tutorvertrags (`docs/research/workstreams/TUTOR_BEHAVIORAL_CONTRACT.md` §9, wörtlich;
    ein Test hält beide gleich), danach Aufgabe, eigene Versuche, genutzte Hinweise, Quellen und die eigene Frage. Bei
    Nachweisaufgaben (Rollen *similar*, *transfer*, *retest*) enthält er **keine Musterlösung** (CD-7). In Claude oder
@@ -130,7 +135,8 @@ siehe `docs/COURSE_IMPORT.md`.
 - **Nicht getestet:** Handy/Tablet (das Layout ist schmal nutzbar, aber ungeprüft), Screenreader im Detail, Import in
   die Anki-Desktop-App und AnkiMobile (automatisch geprüft nur mit der Anki-26.9.3-Python-Bibliothek gegen eine
   Wegwerf-Sammlung).
-- **Tutor:** kein Live-Tutor; Mastery kopiert einen Brief. Ob Claude/ChatGPT sich an den R9-Vertrag halten, ist nicht
+- **Tutor:** Voraussetzungen lehrt Mastery offline selbst (`docs/TUTOR.md`). Ein Live-Sprachmodell gibt es nur, wenn
+  die lernende Person ein lokales Modell selbst einschaltet. Sonst kopiert Mastery einen Brief. Ob Claude/ChatGPT sich an den R9-Vertrag halten, ist nicht
   geprüft (`TUTOR_EVALUATION_PROTOCOL.md`, nicht gelaufen).
 - Browserdaten können gelöscht werden; die Startseite sichert beim Öffnen an den lokalen Server, aber nur, wenn sie
   geöffnet wird.
@@ -154,7 +160,8 @@ siehe `docs/COURSE_IMPORT.md`.
 - Inhaltsbreite: eine Einheit statt eines ganzen Lehrbuchs; die Inhalte sind nicht unabhängig geprüft – ein
   etabliertes Lehrbuch ist fachlich verlässlicher.
 - Freitext und Beweise bewertet V1 nicht; ein guter Chat-Tutor gibt dazu sofort (unverifiziertes) Feedback.
-- Der Tutor ist nicht eingebaut: Kopieren und Einfügen kostet einen Schritt.
+- Ein Sprach-Tutor ist nicht eingebaut. Offline gibt es nur die festen Voraussetzungs-Lektionen und Hinweise. Ein
+  externes Modell braucht weiterhin einen Kopierschritt oder ein selbst betriebenes lokales Modell.
 - Kein Nachweis, dass Lernende damit mehr lernen; die Baseline ist ebenfalls nicht gemessen.
 - Ein Gerät, ein Browser; die Baseline funktioniert überall.
 

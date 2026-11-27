@@ -368,6 +368,10 @@ def validate(unit):
                     if not _text(item.get(field)):
                         errors.append(f"interactions.{key}: {field} required")
 
+    if "lessons" in unit:   # optional prerequisite micro-lessons (em-lesson-v1, guided.py); backward compatible
+        from .guided import validate_lessons
+        errors.extend("lessons: " + p for p in validate_lessons(unit, "unit"))
+
     from .experience_misconceptions import validate_patterns
     errors.extend(validate_patterns(
         unit, skill_ids=skill_ids, claim_ids=claim_ids,
