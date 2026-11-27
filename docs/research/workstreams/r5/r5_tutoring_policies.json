@@ -1,0 +1,1451 @@
+{
+ "schema": "em-learning-policies/1",
+ "version": "0.2.0",
+ "status": "DESIGN_HYPOTHESIS_SET",
+ "date": "2026-11-27",
+ "baseline": {
+  "branch": "research/r5-tutoring-measurement-20261127",
+  "builds_on": "R1 (bec1f62/3559872): Policy-Schema und Messvertrag",
+  "kb": "exam_mastery/knowledge/{sources,principles}.json"
+ },
+ "authorship": {
+  "R5": "Spezialist (r5/r5_evidence.json)",
+  "lead": "Report und Policies aus dem Register (headless Fortsetzung, gleiches Modell)",
+  "independent_review": "pending: keine menschliche Fachprüfung"
+ },
+ "operations": [
+  "recall_discrimination",
+  "symbolic_procedure",
+  "formal_proof",
+  "rule_based_contextual",
+  "diagnostic_reasoning",
+  "empirical_experimental",
+  "computational_construction",
+  "spatial_design",
+  "embodied_psychomotor",
+  "open_synthesis",
+  "self_regulation"
+ ],
+ "certainty_scale": "wie r1/r1_learning_policies.json",
+ "shared_measurement_contract": "übernommen aus r1/r1_learning_policies.json; R5-POL-04/05 präzisieren Hilfestatus, Quelle und Studiendesign",
+ "operation_notes": {
+  "embodied_psychomotor": "nur Messvertrag (R5-POL-05/07); Instrumente R4",
+  "spatial_design": "nur Messvertrag; R4",
+  "empirical_experimental": "nur Messvertrag; R4/R2",
+  "self_regulation": "Hilfenutzung wird beobachtet (R5-POL-08) und als eigenes Verhalten im Open Learner Model gezeigt (R5-POL-11); kein Lernziel 'Hilfesuchen trainieren' (its.5: besseres Hilfesuchen ohne besseren Domänenlernerfolg)"
+ },
+ "open_research": [
+  "RQ3: Volltexte von darvishi2024agency (nur Abstract) und VoR von fan2025metacognitive nicht gelesen; keine Studie mit verzögertem (>= 1 Woche) unassistiertem Endpunkt zu Leitplanken-Tutoren gefunden; Vorwärtszitationen von bastani2025 nicht gescreent",
+  "RQ5: KT-Fairness nur Simulation (doroudi2019fairkt); spätere empirische Bias-Audits (z. B. arXiv 2205.02333) nicht gescreent",
+  "RQ5: DSGVO/AI Act nur über Sekundär-Mirror gelesen (EUR-Lex nicht erreichbar); keine Rechtsprüfung; Einstufung eines Selbstlernprodukts unter Annex III Nr. 3 ungeklärt",
+  "RQ5: Browser/API-Key-Handhabung und lokale LLMs nicht recherchiert (Engineering-Frage, keine Lernevidenz)",
+  "Hinweise (Batch 5): keine Studie zur Zahl der Hinweisstufen gefunden (CD-4 bleibt Setzung); Vergleich Hinweis auf Anforderung vs. automatisch nur in einer kleinen Sofortstudie; Wirkung von Hinweisqualität auf späteres Hilfesuchen nicht recherchiert; Lesegeschwindigkeitsregel (an2026hintuse) für deutsche Hochschultexte ungeprüft",
+  "Fehlerdiagnose (Batch 5): zweistufige/distraktorbasierte Diagnosetests und Reliabilität automatischer Fehlkonzeptdiagnose nicht recherchiert; constraint-basierte Tutoren (Mitrovic) und Durkin & Rittle-Johnson 2012 nicht gelesen; sleeman1989remediation, vanderkleij2015feedback und grosse2007errors nur Abstract",
+  "Learning Analytics (Batch 5): Bodily & Verbert 2017, Bull & Kay (SMILI) und Jivet et al. 2018 nicht gescreent; matcha2020dashboards, dawson2017retention, gasevic2016onesize nur Abstract; long2017olm nur über Dissertationsfassung gelesen; Course-Signals-Kritik nur aus Presse",
+  "Suchprotokoll: Batches 4 und 5 protokolliert (r5_evidence.json search_log); exakte Queries der Batches 1-3 nicht rekonstruierbar"
+ ],
+ "policies": [
+  {
+   "id": "R5-POL-01",
+   "title": "Beobachtbare Kompetenzzustände statt Mastery-Wahrscheinlichkeit",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §5 R5-POL-01",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure",
+    "computational_construction",
+    "formal_proof"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "open_synthesis",
+     "reason": "keine deterministische Korrektheitsprüfung; Freitext bleibt UNVERIFIED oder agent_judgement (R5-POL-04)"
+    },
+    {
+     "operation": "embodied_psychomotor",
+     "reason": "reale Handlung ist im Produkt nicht beobachtbar; R4"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "deterministisch prüfbare Items (numerisch, symbolisch, Auswahl, Code mit Tests, Beweisverständnis mit geschlossenem Format); Mastery hat keine Lernerdaten im Umfang der KT-Benchmarks"
+   },
+   "recommendation": "Pro Kompetenz zwei getrennte Größen ausweisen: Grad (Anteil unassistiert richtiger Versuche an neuen bzw. umformulierten Items) und Evidenzmenge (Zahl solcher Versuche, tatsächlich verstrichene Zeit seit dem ersten). Daraus einen benannten Zustand (NOT_ASSESSED, ASSISTED, INDEPENDENT_PASS, RETEST_DUE, RETAINED_AFTER_ELAPSED_TIME, INSUFFICIENT_EVIDENCE) ableiten. Keine Prozentzahl, keine Wahrscheinlichkeit, kein Mastery-Label.",
+   "product_affordances": {
+    "interactive": "Zustand plus Grad/Evidenzmenge je Kompetenz; Hinweis, welche Messung fehlt",
+    "workbook": "Selbstprotokoll unassistiert/assistiert je Aufgabe",
+    "anki": "Kartenstatistik wird nicht als Kompetenzzustand angezeigt"
+   },
+   "abstain_or_fallback": [
+    "unter Mindest-Evidenzmenge: INSUFFICIENT_EVIDENCE statt Zustand",
+    "Versuche mit Hinweis, sichtbarer Lösung oder Tutorhilfe zählen nur zu ASSISTED",
+    "Items, die der Lernende schon mit Lösung gesehen hat, zählen nicht als neue Items",
+    "keine Aggregation über Kompetenzen zu einem Gesamtwert"
+   ],
+   "parameters": [
+    {
+     "name": "min_unassisted_attempts_for_state",
+     "value": 2,
+     "unit": "Versuche an verschiedenen Items",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; pelanek2018mastery: N-in-Folge-Kriterien liefern bei wenig Rauschen ähnliche Entscheidungen wie Modelle, N ist kontextabhängig"
+    },
+    {
+     "name": "min_elapsed_for_retention",
+     "value": 20,
+     "unit": "Stunden echte verstrichene Zeit zwischen erstem und späterem unassistiertem Erfolg",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; ersetzt 'verschiedene Kalendertage' (CD-2); nicht empirisch kalibriert"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "pelanek2018mastery",
+     "locator": "Simulationsvergleich NCC vs. LogisticHMM; BKT>=0.95 ist keine 95-%-Sicherheit",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pelanek2017",
+     "locator": "3.2 (Vorteil von Lernermodellen für Mastery-Policies 'not yet completely clear'); 6.1; 7.1 (einfache Modelle bevorzugen)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "gervet2020kt",
+     "locator": "Kalibrierungsanalyse: nur in datendichten Intervallen kalibriert; ähnliche Genauigkeit, sehr verschiedene Empfehlungen",
+     "relation": "supports"
+    },
+    {
+     "source_id": "khajah2016deepkt",
+     "locator": "Abstract (erweitertes BKT ≈ DKT)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "doroudi2019fairkt",
+     "locator": "Abstract; §4 Simulationen: auch N-CCR-Heuristik begünstigt schnelle Lernende bei Fehlspezifikation",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "drei voneinander unabhängige Arbeiten (Review, Simulation, Benchmark auf neun Datensätzen) stützen Abstention von Wahrscheinlichkeiten bei wenig Daten",
+     "keine Studie testet direkt, ob Zustandsanzeigen Lernen verbessern"
+    ],
+    "sub_claims": [
+     {
+      "claim": "ohne große Daten sind KT-Wahrscheinlichkeiten an den Extremen schlecht kalibriert",
+      "level": "moderate"
+     },
+     {
+      "claim": "benannte Zustände helfen Lernenden bei Entscheidungen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Versuchslog mit Item-ID, Itemvariante, Hilfestatus (none/hint_level/solution/tutor), Prüfverfahren, Zeitstempel",
+   "independent_outcome": "unassistierter, verzögerter Test (>= 1 Woche) mit neuen Items; Vergleich: Anteil Lernender mit RETAINED_AFTER_ELAPSED_TIME, die den Test bestehen, vs. Anteil mit INDEPENDENT_PASS (prädiktive Validität des Zustands)",
+   "failure_modes": [
+    "Itemwiederholung erzeugt scheinbare Retention",
+    "Lernende lesen den Zustand als Zertifikat",
+    "zu kleine Itempools machen 'neue Items' unmöglich",
+    "deterministische 'N unassistiert richtig'-Regel ist eine N-CCR-Heuristik und erklärt langsam Lernende zu früh für ausreichend belegt (doroudi2019fairkt)"
+   ],
+   "falsifier": "In einer Validierungsstudie sagt RETAINED_AFTER_ELAPSED_TIME das Bestehen eines unassistierten verzögerten Tests nicht besser vorher als INDEPENDENT_PASS (vorab festgelegte Mindestdifferenz der Bestehensquote).",
+   "kb_rule_links": [
+    {
+     "rule_id": "ITS-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AS-R1",
+     "relation": "retains"
+    }
+   ],
+   "implementation_status": "partially_implemented_unverified",
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R5-POL-02",
+   "title": "Deterministische, stufenbasierte Adaptation als Standard; modellbasierte Adaptation nur nach Validierungsgate",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §4, §5 R5-POL-02",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure",
+    "computational_construction"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice",
+     "consolidation"
+    ],
+    "conditions": "Aufgabenfolgen mit Rollen (Diagnose, Kern, ähnlich, Kontrast, Transfer, Retest) und klassifizierbaren Fehlerkategorien"
+   },
+   "recommendation": "Adaptation bleibt regelbasiert und erklärbar (bestehende em-decision-v1-Regeln mit Regel-ID). Ein Lernermodell (BKT/logistisch/DKT) darf Entscheidungen erst steuern, wenn (a) genug eigene Daten vorliegen, (b) Kalibrierung im entscheidungsrelevanten Intervall auf neuen Lernenden gezeigt ist, (c) die Policy selbst gegen die Regelpolicy auf einem unabhängigen Lernergebnis getestet wurde. Bis dahin höchstens Schattenbetrieb ohne Einfluss.",
+   "product_affordances": {
+    "interactive": "Regel-ID und Begründung je Entscheidung sichtbar",
+    "workbook": "feste Stufenfolge mit Verzweigung nach Selbstcheck"
+   },
+   "abstain_or_fallback": [
+    "Gate nicht erfüllt: Modell läuft nur im Schattenmodus und erscheint nicht in der UI",
+    "unbekannte Fehlerursache: Regel RU, kein Raten",
+    "fehlende Aufgabenrolle: nächste Aufgabe im Flow statt erfundener Variante"
+   ],
+   "parameters": [
+    {
+     "name": "model_gate_min_learners",
+     "value": 500,
+     "unit": "Lernende mit Logdaten je Kurs",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung in der Größenordnung kleiner Datensätze in gervet2020kt; muss vor Nutzung begründet neu festgelegt werden"
+    },
+    {
+     "name": "model_gate_requires_policy_trial",
+     "value": true,
+     "unit": "boolesch",
+     "status": "provisional_product_parameter",
+     "rationale": "gervet2020kt: Prädiktorgenauigkeit sagt wenig über Empfehlungen; Policy muss selbst getestet werden"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "gervet2020kt",
+     "locator": "Diskussion: schwächstes Glied meist Policy und KC-Modell, nicht der Prädiktor",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pelanek2017",
+     "locator": "7.1 einfache Modelle bevorzugen; 6.1 AUC ungeeignet bei absoluten Schwellen",
+     "relation": "supports"
+    },
+    {
+     "source_id": "roschelle2016assistments",
+     "locator": "Impact-Abschnitt: g = 0.18 auf unabhängigem Standardtest; einfaches Hausaufgaben-Feedback-System",
+     "relation": "supports"
+    },
+    {
+     "source_id": "steenbergenhu2013its",
+     "locator": "Abstract: g = 0.01–0.09 in K-12-Mathe-Feldeinsätzen",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "pane2014ctai",
+     "locator": "Abstract: Jahr 1 kein Effekt, Jahr 2 positiv nur High School",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "vanlehn2011",
+     "locator": "Abstract: ITS d = 0.76 vs. kein Tutoring",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "ma2014",
+     "locator": "Abstract: g = 0.42 vs. Großgruppenunterricht, -0.11 vs. Einzeltutoring",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "eu2024aiact",
+     "locator": "Annex III Nr. 3(b); Art. 113(c)(i) in geänderter Fassung: 2.12.2027 (Mirror, nicht gegen EUR-Lex geprüft)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Belege betreffen Prädiktion oder ganze Systeme, nicht den Vergleich Regel- vs. Modellpolicy",
+     "ITS-Feldeffekte heterogen bis null"
+    ],
+    "sub_claims": [
+     {
+      "claim": "bessere KT-Vorhersage führt nicht automatisch zu besserem Lernen",
+      "level": "moderate"
+     },
+     {
+      "claim": "Regelpolicy ist für Mastery mindestens so gut wie eine Modellpolicy",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Entscheidungslog (Regel-ID, Eingabeereignisse, nächste Aufgabe), im Schattenbetrieb zusätzlich Modellempfehlung",
+   "independent_outcome": "unassistierter verzögerter Test mit neuen Items; bei Gate-Studie randomisierte Zuteilung Regel- vs. Modellpolicy",
+   "failure_modes": [
+    "Regeln kodieren falsche Fehlerkategorien",
+    "Lernende umgehen Stufen durch Raten",
+    "Modell wird ohne Gate wegen 'besserer AUC' aktiviert"
+   ],
+   "falsifier": "Eine vorab registrierte randomisierte Studie zeigt, dass eine kalibrierte Modellpolicy die Regelpolicy auf einem unabhängigen verzögerten Test um mehr als die vorab festgelegte Mindestdifferenz übertrifft; dann ist der Standard zu ändern.",
+   "kb_rule_links": [
+    {
+     "rule_id": "ITS-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "ITS-R2",
+     "relation": "refines"
+    }
+   ],
+   "implementation_status": "partially_implemented_unverified",
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R5-POL-03",
+   "title": "Generative Tutorhilfe nur mit Leitplanken; Hilfe ersetzt nie die Zieloperation",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §5 R5-POL-03",
+   "applies_to_operations": [
+    "symbolic_procedure",
+    "computational_construction",
+    "formal_proof",
+    "diagnostic_reasoning"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "embodied_psychomotor",
+     "reason": "Textassistenz ersetzt keine beaufsichtigte Praxis; R4"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice"
+    ],
+    "conditions": "geprüfte Musterlösung und bekannte Fehler liegen dem Tutor vor; Lernender hat einen eigenen Versuch abgegeben; diagnostic_reasoning nur an Lernfällen, nie an realen klinischen oder sicherheitskritischen Entscheidungen"
+   },
+   "recommendation": "Tutor gibt gestufte Hinweise (Orientierung, Strategie, konkreter Schritt) auf Grundlage einer geprüften Referenzlösung, und zwar nur auf Anforderung: keine automatisch eingeblendeten Hinweise nach Fehlern als Standard. Die höchste Stufe, die den konkreten nächsten Schritt nennt, ist ein Bottom-out-Hinweis und zählt für diesen Schritt als Lösungseinsicht (R5-POL-08). Vollständige Lösung nur nach eigenem Versuch oder ausdrücklicher Anforderung und dann als ASSISTED markiert. Jede Tutorsitzung endet mit einer unassistierten Parallelaufgabe. Für Lernende ohne eigenen Lösungsansatz wird statt der Hinweisleiter ein Worked Example angeboten. Die Stufenzahl ist eine ungeprüfte Setzung (CD-4). Keine Behauptung eines Lernvorteils; nur das Ziel, Schaden durch Auslagerung zu vermeiden.",
+   "product_affordances": {
+    "interactive": "Hinweisknopf auf Anforderung, Versuch-vor-Hilfe, Bottom-out-Stufe sichtbar als Lösungsschritt gekennzeichnet, Angebot 'Worked Example statt Hinweis', Parallelaufgabe ohne Hilfe nach Tutorkontakt",
+    "workbook": "gestufte Hinweise im Anhang, getrennt von der Lösung"
+   },
+   "abstain_or_fallback": [
+    "keine geprüfte Referenzlösung: Tutor gibt nur Orientierung und verweist auf Worked Example",
+    "Anfrage zur Lösung ohne Versuch: Strategiehinweis statt Lösung, Lösung erst auf zweite ausdrückliche Anfrage",
+    "Frage außerhalb der Quelle oder des Kurses: ABSTAIN mit Begründung",
+    "klinische, rechtliche oder sicherheitskritische Realentscheidung: ABSTAIN und Verweis an Fachperson"
+   ],
+   "parameters": [
+    {
+     "name": "hint_levels",
+     "value": 3,
+     "unit": "Stufen einschließlich Bottom-out-Stufe",
+     "status": "provisional_product_parameter",
+     "rationale": "AI-R1; Setzung ohne Kalibrierung (CD-4). Untersuchte Systeme nutzten 3-5 Hinweise mit Bottom-out am Ende (razzaq2010hints §3) bzw. 3 Stufen mit Stufe 3 = Bottom-out (an2026hintuse §3.1); keine gefundene Studie vergleicht Stufenzahlen; wann von Zurückhalten auf Geben umzuschalten ist, ist offen (koedinger2007assistance, Conclusion)"
+    },
+    {
+     "name": "unassisted_followup_after_tutor",
+     "value": 1,
+     "unit": "Parallelaufgabe",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; misst, ob Hilfe übernommen oder verstanden wurde"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "bastani2025",
+     "locator": "Table 1; SI A.6 Table A.2: Base vs. Control Exam -0.035 [-0.057, -0.012]; Tutor vs. Control -0.006 [-0.030, 0.018]",
+     "relation": "supports"
+    },
+    {
+     "source_id": "liu2026izavsa",
+     "locator": "5.2: Zugang ohne Integration, exact-match Endnote -0.37 SD; Vollstichprobe n.s.",
+     "relation": "supports"
+    },
+    {
+     "source_id": "boolzen2026genaistem",
+     "locator": "Abstract: RoBMA mu = 0.076 ± 0.254; ISAR-Moderator",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "kestin2025",
+     "locator": "VoR Results; Supplement Table S1 (0.63, sofortiger Post-Test, Expertenprompts)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "risko2016offloading",
+     "locator": "Abstract (Definition Auslagerung)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "aleven2016",
+     "locator": "Abstract: besseres Hilfesuchverhalten ohne besseren Domänenlernerfolg",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "lehmann2025aiclassroom",
+     "locator": "Study 3 §8, Table 10: Copy-and-Paste erhöht Lösungsanfragen, Post-Test -1,4 Aufgaben bei gleichem Fortschritt (p=0,009); 42 % der Lösungsanfragen ohne eigenen Versuch; Gesamteffekt Studien 2/3 n.s.",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pardos2024chatgpthints",
+     "locator": "Results RQ1: 32 % der ChatGPT-Hinweise fielen durch die Qualitätsprüfung (nach Self-Consistency ~0 % Algebra, 13 % Statistik); RQ2 Table 2: gleiche Items pre/post, kein Äquivalenztest",
+     "relation": "supports"
+    },
+    {
+     "source_id": "fan2025metacognitive",
+     "locator": "4.3: Essay-Verbesserung AI > alle (Table 3), Wissenszuwachs F=0,913 p=0,438, Transfer F=0,019 p=0,996",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "razzaq2010hints",
+     "locator": "§4 Table 3: Hinweise auf Anforderung > automatisch nach Fehler, Gewinn 0,137 vs. 0,041, Effekt 0,35 [0,02; 0,74]; n = 61, gleiche Items pre/post, sofort",
+     "relation": "supports"
+    },
+    {
+     "source_id": "koedinger2007assistance",
+     "locator": "Cognitive-Tutor-Abschnitt (mehrstufige Hinweise, Bottom-out nennt den nächsten Schritt); Conclusion: Umschaltpunkt Geben/Zurückhalten offen",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "an2026hintuse",
+     "locator": "§4.2.1, Table 4: Hinweis vor erstem Versuch sagt geringeren verzögerten Test voraus (beta -0,17 bis -0,37, Vortest kontrolliert; korrelativ)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "baker2004gaming",
+     "locator": "Results: Gaming (schnelles Hinweisblättern bis zur Antwort) r = -0,38 mit Post-Test; Re-Designing-Abschnitt: Sperren riskieren 'arms race'",
+     "relation": "supports"
+    },
+    {
+     "source_id": "mclaren2016efficiency",
+     "locator": "Abstract: Tutored Problem Solving nicht besser als Worked Examples, Worked Examples 46-69 % weniger Zeit",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "eine starke Studie (bastani2025) zeigt Schaden ohne Leitplanken und keinen nachgewiesenen Schaden mit Leitplanken, aber ohne NI-Marge und ohne verzögerten Test",
+     "bias-adjustierte Meta-Analyse: mittlerer GenAI-Effekt nicht robust",
+     "Batch 4: zwei Labor-RCTs (lehmann2025aiclassroom, fan2025metacognitive) finden keinen Gesamtnutzen auf unassistierte Tests; Substitution (Lösung ohne Versuch) geht mit geringerem Verständnis einher (Mediationsanalyse, nicht randomisierter Kontrast)",
+     "Batch 5: für Hinweise auf Anforderung statt automatisch nur eine kleine, sofort gemessene Studie (razzaq2010hints); Hinweisnutzung vor eigenem Versuch und schnelles Blättern zum Bottom-out gehen in zwei unabhängigen Gruppen mit schlechterem Lernen einher (baker2004gaming, an2026hintuse; korrelativ); keine Studie zur Stufenzahl gefunden"
+    ],
+    "sub_claims": [
+     {
+      "claim": "ungeführter Zugang zu Antworten kann unassistierte Leistung senken",
+      "level": "low"
+     },
+     {
+      "claim": "Leitplanken-Tutor ist nicht unterlegen gegenüber Üben ohne KI",
+      "level": "very_low"
+     },
+     {
+      "claim": "Leitplanken-Tutor verbessert verzögertes unassistiertes Lernen",
+      "level": "very_low"
+     },
+     {
+      "claim": "ungeprüfte LLM-Hinweise sind häufig fehlerhaft und brauchen eine geprüfte Referenz vor Anzeige",
+      "level": "low"
+     },
+     {
+      "claim": "Hinweise auf Anforderung sind automatisch eingeblendeten Hinweisen nach Fehlern überlegen",
+      "level": "low"
+     },
+     {
+      "claim": "drei Hinweisstufen sind besser als eine andere Stufenzahl",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Hilfeereignisse mit Stufe, Zeitpunkt relativ zum eigenen Versuch, Lösungsabruf; Ergebnis der unassistierten Parallelaufgabe",
+   "independent_outcome": "unassistierter Test >= 1 Woche später mit neuen Items, randomisiert Tutor mit Leitplanken vs. gleich lange Übung mit Worked Examples ohne KI; Nicht-Unterlegenheitsmarge vorab festgelegt",
+   "failure_modes": [
+    "Prompt-Injection oder Umgehung ('gib mir einfach die Lösung')",
+    "Modell halluziniert trotz Referenz",
+    "Lernende nutzen externe KI ohne Leitplanken",
+    "Praxisleistung steigt, unassistierte Leistung nicht (bastani2025-Muster)",
+    "ungeprüfte generierte Hinweise enthalten fachliche Fehler (pardos2024chatgpthints: 32 % vor Self-Consistency)",
+    "Bottom-out-Stufe wird als normaler Hinweis gezählt und der Schritt fälschlich als selbst gelöst gewertet"
+   ],
+   "falsifier": "In einer vorab registrierten Studie liegt die untere Konfidenzgrenze der Differenz Tutor minus Kontrolle im verzögerten unassistierten Test unterhalb der vorab festgelegten Nicht-Unterlegenheitsmarge.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AI-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AI-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  },
+  {
+   "id": "R5-POL-04",
+   "title": "Trennung assistierter und unassistierter Evidenz; Hilfeabhängigkeit sichtbar machen",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §5 R5-POL-04",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure",
+    "formal_proof",
+    "computational_construction",
+    "diagnostic_reasoning",
+    "open_synthesis",
+    "rule_based_contextual"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "jede Lernhandlung im Produkt mit Hilfe- und Prüfquelle"
+   },
+   "recommendation": "Jedes Ereignis trägt assist_level (none, hint_n, solution_seen, tutor) und source (deterministic, agent_judgement, self_report). Kompetenzzustände nutzen nur none + deterministic. Der Fortschritt zeigt getrennt: assistiert gelöst, unassistiert gelöst, Hilfequote; Tutorbewertungen erscheinen nie als Prüfergebnis.",
+   "product_affordances": {
+    "interactive": "zwei getrennte Spalten assistiert/unassistiert; Hilfequote je Kompetenz",
+    "workbook": "Selbstmarkierung 'mit Lösung gelöst'"
+   },
+   "abstain_or_fallback": [
+    "Ereignis ohne Hilfestatus: als assistiert behandeln",
+    "agent_judgement ohne deterministische Bestätigung: UNVERIFIED"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "bastani2025",
+     "locator": "Table 1: Praxis +48 %/+127 % (assistiert) vs. Exam -17 %/n.s. (unassistiert)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "wang2024tutorcopilot",
+     "locator": "Abstract v3; Limitations: Exit-Ticket +4 p.p., MAP n.s.",
+     "relation": "supports"
+    },
+    {
+     "source_id": "kulik2016",
+     "locator": "Abstract: Testausrichtung als entscheidende Determinante",
+     "relation": "supports"
+    },
+    {
+     "source_id": "aleven2016",
+     "locator": "Abstract",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "risko2016offloading",
+     "locator": "Abstract",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "fan2025metacognitive",
+     "locator": "4.3.1-4.3.3: assistiertes Produkt (Essay) besser, unassistierter Wissens- und Transfertest gleich",
+     "relation": "supports"
+    },
+    {
+     "source_id": "darvishi2024agency",
+     "locator": "Abstract: nach Entzug der KI-Prompts fällt die Feedbackqualität; Lernende verlassen sich auf statt lernen von der KI",
+     "relation": "supports"
+    },
+    {
+     "source_id": "lehmann2025aiclassroom",
+     "locator": "Table 13: wahrgenommenes Lernen mit LLM höher als tatsächliches (p=0,044)",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "proximale/assistierte Messungen überschätzen distale unassistierte Leistung in mehreren unabhängigen Quellen",
+     "Trennung selbst ist eine Messregel, deren Lernwirkung nicht geprüft ist"
+    ],
+    "sub_claims": [
+     {
+      "claim": "assistierte Leistung ist kein Indikator unassistierter Leistung",
+      "level": "moderate"
+     },
+     {
+      "claim": "sichtbare Hilfequote ändert Hilfeverhalten günstig",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Ereignisschema mit assist_level und source; Anteil Ereignisse ohne Hilfestatus",
+   "independent_outcome": "Korrelation zwischen unassistiertem In-Produkt-Anteil und externem verzögertem Test höher als zwischen assistiertem Anteil und Test",
+   "failure_modes": [
+    "Lernende nutzen Hilfe außerhalb des Produkts (unsichtbar)",
+    "Hilfequote wird als Scham erlebt und Hilfe vermieden",
+    "Selbsteinschätzung nach KI-Nutzung überschätzt das tatsächliche Lernen (lehmann2025aiclassroom Table 13); Selbstauskunft ersetzt keinen unassistierten Test"
+   ],
+   "falsifier": "Assistierte In-Produkt-Leistung sagt einen externen verzögerten unassistierten Test genauso gut vorher wie unassistierte (Differenz der Korrelationen unter vorab festgelegter Schwelle).",
+   "kb_rule_links": [
+    {
+     "rule_id": "AI-R2",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "ITS-R2",
+     "relation": "retains"
+    }
+   ],
+   "implementation_status": "partially_implemented_unverified",
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R5-POL-05",
+   "title": "Messvertrag für jede Lernwirkungsbehauptung",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §6",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure",
+    "formal_proof",
+    "rule_based_contextual",
+    "diagnostic_reasoning",
+    "empirical_experimental",
+    "computational_construction",
+    "spatial_design",
+    "embodied_psychomotor",
+    "open_synthesis",
+    "self_regulation"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "any"
+    ],
+    "conditions": "jede Aussage, ein Produkt oder eine Funktion verbessere Lernen oder Kompetenz"
+   },
+   "recommendation": "Eine Lernwirkungsbehauptung braucht: vorab registrierte Hypothese und Mindestdifferenz bzw. NI-Marge; randomisierte Zuteilung mit verdeckter Allokation (Cluster mit ICC-basierter Power); Kontrollbedingung mit gleicher Zeit und vergleichbarer Aktivität; unassistierten, verzögerten (echte verstrichene Zeit) Test mit neuen Items, nicht vom Produktteam aus den Übungsitems abgeleitet; Bericht nach Subgruppen (Vorwissen, Erstakademiker) und Attrition. In-Produkt-Messungen gelten nur als proximale Indikatoren.",
+   "product_affordances": {
+    "textbook": "keine Wirksamkeitsbehauptung im Text",
+    "interactive": "Fortschrittsanzeigen ohne Wirksamkeitsversprechen",
+    "workbook": "keine Wirksamkeitsbehauptung",
+    "anki": "keine Wirksamkeitsbehauptung"
+   },
+   "abstain_or_fallback": [
+    "Vertrag nicht erfüllt: nur 'nicht gemessen' kommunizieren",
+    "verkörperte, räumliche, experimentelle Kompetenz: Instrumente durch R4 festzulegen; bis dahin keine Aussage"
+   ],
+   "parameters": [
+    {
+     "name": "min_delay_for_retention_claim",
+     "value": 7,
+     "unit": "Tage echte verstrichene Zeit",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung in Anlehnung an R1-Messvertrag"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "kraft2020effectsizes",
+     "locator": "Benchmarks; ausgerichtete Tests 2–4-fach größere Effekte",
+     "relation": "supports"
+    },
+    {
+     "source_id": "cheungslavin2016methods",
+     "locator": "Abstract: etwa doppelte Effekte bei kleinen, selbstgebauten Messungen",
+     "relation": "supports"
+    },
+    {
+     "source_id": "kulik2016",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "hedgeshedberg2007icc",
+     "locator": "Abstract (ICC-basierte Power)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "piaggio2012consortni",
+     "locator": "Abstract (NI-Berichtsstandard)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "boolzen2026genaistem",
+     "locator": "Abstract: nicht vergleichbare Kontrollaktivität in 33 Studien",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "normative",
+    "reasons": [
+     "Messvertrag ist eine Setzung zur Ehrlichkeit von Aussagen; methodische Belege stützen ihn"
+    ]
+   },
+   "observable": "Studienprotokoll, Registrierung, Analyseplan",
+   "independent_outcome": "entfällt (Policy definiert das unabhängige Ergebnis)",
+   "failure_modes": [
+    "Studie ohne Kontrollaktivität wird als Wirksamkeit gelesen",
+    "Marge nachträglich gewählt",
+    "Retest mit identischen Items"
+   ],
+   "falsifier": "Nicht empirisch falsifizierbar (normativ); zu revidieren, wenn methodische Standards (z. B. eine neuere CONSORT-Erweiterung) andere Mindestanforderungen setzen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AS-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "AS-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  },
+  {
+   "id": "R5-POL-06",
+   "title": "Ausgabe- und Abstentionssemantik des Tutors",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §7",
+   "applies_to_operations": [
+    "symbolic_procedure",
+    "computational_construction",
+    "formal_proof",
+    "recall_discrimination",
+    "open_synthesis",
+    "rule_based_contextual",
+    "diagnostic_reasoning"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice"
+    ],
+    "conditions": "jede Tutorantwort"
+   },
+   "recommendation": "Tutorantworten sind JSON mit genau einem Typ: HINT(level 1..hint_levels, bottom_out), CHECK_STEP(deterministisch bestätigt/nicht bestätigt), FEEDBACK_UNVERIFIED (Modelleinschätzung, source=agent_judgement), ERROR_HYPOTHESIS(error_class, basis, confirmation_item; nie Zustandsänderung, Label erst nach bestätigendem Item, R5-POL-09), SOLUTION_REVEAL (nur nach Versuch oder ausdrücklicher Anforderung, setzt assist_level=solution_seen), ABSTAIN(reason). Ein HINT der höchsten Stufe hat bottom_out=true und setzt assist_level=hint_bottom_out (für den Schritt wie solution_seen). ABSTAIN-Gründe: no_verified_reference, out_of_scope, untrusted_source_instruction, safety_or_professional_boundary, model_unavailable. Kein Freitext außerhalb dieser Typen.",
+   "product_affordances": {
+    "interactive": "Darstellung je Typ; Bottom-out-Hinweis als Lösungsschritt gekennzeichnet; ERROR_HYPOTHESIS als 'möglicher Fehler, wir prüfen mit einer Aufgabe', nie als Urteil; ABSTAIN mit Begründung und Alternative (Worked Example, Quelle, Fachperson)"
+   },
+   "abstain_or_fallback": [
+    "Schema verletzt: Antwort verwerfen, ABSTAIN(model_unavailable)",
+    "kein Modell/kein Netz: deterministische Hinweise aus dem Track",
+    "ERROR_HYPOTHESIS ohne verfügbares Bestätigungsitem: unzulässig; stattdessen allgemeines erklärendes Feedback (korrekter Schritt mit Begründung)"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "bastani2025",
+     "locator": "Methods: GPT Tutor-Prompt mit Lehrerlösungen, häufigen Fehlern, Hinweis- statt Antwortinstruktion",
+     "relation": "supports"
+    },
+    {
+     "source_id": "koedinger2007assistance",
+     "locator": "Cognitive-Tutor-Abschnitt: letzte Hinweisstufe ('bottom-out') nennt den nächsten Schritt; Lernende springen oft direkt dorthin",
+     "relation": "supports"
+    },
+    {
+     "source_id": "razzaq2010hints",
+     "locator": "§3: Hinweissequenzen von 3-5 Hinweisen enden mit einem Bottom-out-Hinweis, der die Antwort gibt",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "sleeman1989remediation",
+     "locator": "Abstract: fehlerspezifische Remediation nicht klar besser als Neuunterrichten des korrekten Verfahrens",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "normative",
+    "reasons": [
+     "Schnittstellen- und Sicherheitsfestlegung; Lernwirkung nicht beansprucht"
+    ]
+   },
+   "observable": "Tutor-Ereignislog nach Typ; Anteil ABSTAIN und Schemaverletzungen",
+   "independent_outcome": "entfällt (Schnittstelle); Wirkung über R5-POL-03 zu prüfen",
+   "failure_modes": [
+    "Modell versteckt Lösung im HINT",
+    "ABSTAIN zu häufig, Lernende wandern zu ungeführter KI ab",
+    "ERROR_HYPOTHESIS wird von Lernenden als Diagnose ihrer Person gelesen"
+   ],
+   "falsifier": "Audit von Tutor-Logs zeigt mehr als die vorab festgelegte Rate an HINTs, die die Lösung vollständig enthalten; dann sind Typen bzw. Prüfungen zu ändern.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AI-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AI-R2",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  },
+  {
+   "id": "R5-POL-07",
+   "title": "Heterogenität und Gerechtigkeit prüfen statt Durchschnittseffekte zu berichten",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §6",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure",
+    "formal_proof",
+    "rule_based_contextual",
+    "diagnostic_reasoning",
+    "empirical_experimental",
+    "computational_construction",
+    "spatial_design",
+    "embodied_psychomotor",
+    "open_synthesis",
+    "self_regulation"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "any"
+    ],
+    "conditions": "jede Auswertung von Adaptation oder Tutor"
+   },
+   "recommendation": "Auswertungen berichten Effekte getrennt nach Vorwissen und, wo erhoben und erlaubt, Erstakademiker-Status; eine Funktion, die für eine Subgruppe schadet, wird für diese nicht als Standard aktiviert. Auch deterministische Abbruchregeln (N richtig in Folge) werden nach Vorwissensgruppe geprüft, weil sie bei Fehlspezifikation schnelle Lernende begünstigen (doroudi2019fairkt). Subgruppenmerkmale sind personenbezogene Daten: nur opt-in, mit benanntem Zweck, standardmäßig lokal gespeichert (DSGVO Art. 5/25 als Gestaltungsrahmen, keine Rechtsprüfung).",
+   "product_affordances": {
+    "interactive": "keine subgruppenspezifische Steuerung ohne Evaluationsgrundlage; Subgruppenmerkmale nur opt-in, lokal gespeichert"
+   },
+   "abstain_or_fallback": [
+    "Subgruppe zu klein: keine Subgruppenaussage, nur Hinweis auf Unsicherheit"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "liu2026izavsa",
+     "locator": "5.2: Erstakademiker zusätzlich -0.28 SD (Vollstichprobe)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "steenbergenhu2013its",
+     "locator": "Abstract: kleinere Effekte für Leistungsschwache",
+     "relation": "supports"
+    },
+    {
+     "source_id": "roschelle2016assistments",
+     "locator": "Impact: größere Effekte bei niedrigem Vorwissen",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "wang2024tutorcopilot",
+     "locator": "Abstract v3: +9 p.p. bei schwächer bewerteten Tutoren",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "lehmann2025aiclassroom",
+     "locator": "Table 12: Interaktion LLM × Vortest > Median p=0,028; unter Median verstanden Behandelte weniger als Kontrolle (p=0,043); post-hoc Mediansplit",
+     "relation": "supports"
+    },
+    {
+     "source_id": "doroudi2019fairkt",
+     "locator": "Abstract; §4: BKT (aggregiert gefittet) und N-CCR begünstigen schnelle Lernende, AFM konservativer (Simulation)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "eu2016gdpr",
+     "locator": "Art. 5(1)(b),(c) Zweckbindung, Datenminimierung; Art. 25 Datenschutz durch Technikgestaltung und Voreinstellungen (Mirror gdpr-info.eu)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "eu2024aiact",
+     "locator": "Annex III Nr. 3(b) Bewertung von Lernergebnissen inkl. Steuerung des Lernprozesses (Mirror artificialintelligenceact.eu); Anwendbarkeit auf Selbstlernprodukt ungeklärt",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Subgruppenbefunde in Einzelstudien, Richtung uneinheitlich",
+     "Batch 4: Vorwissens-Interaktion in einer Laborstudie (post-hoc) und Simulationsbefund zur Ungleichheit von Mastery-Abbruchregeln; kein empirischer Fairnessbefund für Mastery"
+    ]
+   },
+   "observable": "Subgruppenmerkmale nur mit Einwilligung und Datenschutzprüfung",
+   "independent_outcome": "unassistierter verzögerter Test, Interaktion Bedingung × Subgruppe vorab registriert",
+   "failure_modes": [
+    "Erhebung sensibler Merkmale ohne Rechtsgrundlage",
+    "Mehrfachtests erzeugen Scheinbefunde",
+    "Mastery-Abbruchregel erklärt Lernende mit niedrigem Vorwissen zu früh für ausreichend belegt"
+   ],
+   "falsifier": "Vorab registrierte Interaktionsanalysen zeigen über mehrere Studien keine Heterogenität oberhalb der Messunsicherheit; dann kann die Pflicht zur Subgruppenprüfung reduziert werden.",
+   "kb_rule_links": [
+    {
+     "rule_id": "ITS-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  },
+  {
+   "id": "R5-POL-08",
+   "title": "Hilfeleiter auf Anforderung mit Bottom-out als Lösungseinsicht; unproduktive Hilfenutzung nur beobachten, nicht sanktionieren",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §12.2-12.3 R5-POL-08",
+   "applies_to_operations": [
+    "symbolic_procedure",
+    "computational_construction",
+    "formal_proof",
+    "recall_discrimination",
+    "self_regulation"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "open_synthesis",
+     "reason": "keine deterministische Schrittprüfung, Bottom-out-Stufe nicht definierbar; Hilfe bleibt FEEDBACK_UNVERIFIED (R5-POL-06)"
+    },
+    {
+     "operation": "embodied_psychomotor",
+     "reason": "Hilfenutzung bei realer Handlung nicht im Produkt beobachtbar; R4"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice",
+     "consolidation"
+    ],
+    "conditions": "Aufgaben mit geprüfter Referenzlösung und schrittweise formulierbaren Hinweisen; Zeitstempel je Hinweisabruf nur im interaktiven Produkt verfügbar"
+   },
+   "recommendation": "Hinweise sind eine Leiter auf Anforderung (keine automatische Einblendung nach Fehlern als Standard). Die letzte Stufe nennt den konkreten Schritt und ist ein Bottom-out-Hinweis: Der Schritt gilt als assistiert, das Item zählt danach nicht mehr als neues Item (R5-POL-01/04). Hilfe vor dem ersten eigenen Versuch ist erlaubt, wird aber als hint_before_attempt protokolliert; ein einmaliger Hinweis 'erst ein Versuch?' ersetzt Sperren oder Wartezeiten. Zwei deterministische Beobachtungsregeln erfassen unproduktive Hilfenutzung: (a) Hinweis vor erstem Versuch, (b) nächste Stufe schneller abgerufen als der Hinweistext lesbar ist. Diese Beobachtungen erscheinen nur als eigenes Verhalten im Open Learner Model (R5-POL-11) und als Angebot eines Worked Examples, nie als Personenlabel, Rangliste oder Zustandsänderung. Nach wiederholten Fehlern ohne Hilfeanforderung wird Hilfe angeboten, nicht aufgedrängt.",
+   "product_affordances": {
+    "textbook": "Worked Examples im Text; Lösungen und Hinweise nicht direkt unter der Aufgabe, sondern getrennt",
+    "workbook": "Hinweisstufen im Anhang getrennt von der Lösung, letzte Stufe ausdrücklich als 'Lösungsschritt' markiert; Selbstprotokoll 'bis Stufe n benutzt'",
+    "anki": "kein Hinweisfeld, das die Antwort enthält; Lernende bewerten Karten, bei denen sie einen Hinweis brauchten, nicht als 'Good' (Selbstbericht, ungeprüft)",
+    "interactive": "Hinweisknopf, Stufenanzeige, Bottom-out-Kennzeichnung, Protokoll hint_before_attempt und schnelles Blättern, Angebot 'Worked Example statt weiterer Hinweise'"
+   },
+   "tutor_affordance": "Tutor-HINTs folgen derselben Leiter (R5-POL-06, bottom_out); nach Bottom-out oder SOLUTION_REVEAL folgt eine unassistierte Parallelaufgabe (R5-POL-03)",
+   "abstain_or_fallback": [
+    "keine geprüfte Referenzlösung: keine Bottom-out-Stufe, nur Orientierung und Verweis auf Worked Example",
+    "Zeitstempel fehlen oder unzuverlässig (offline, Workbook): Regel (b) wird nicht ausgewertet, keine Beobachtung statt Schätzung",
+    "Hinweistext ohne Wortzahl (Formel, Bild): Regel (b) nicht anwenden",
+    "Beobachtungsregeln nie zur Sperre, Bewertung oder Gruppenvergleich verwenden"
+   ],
+   "parameters": [
+    {
+     "name": "reading_rate_for_superficial_rule",
+     "value": 4,
+     "unit": "Wörter pro Sekunde",
+     "status": "provisional_product_parameter",
+     "rationale": "übernommen aus der Operationalisierung von an2026hintuse §4.2.2 (Grundschul-/Mittelstufen-Mathematik, Englisch); für Hochschultexte und Deutsch nicht geprüft"
+    },
+    {
+     "name": "hint_before_attempt_nudges",
+     "value": 1,
+     "unit": "Nachfrage je Item",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; baker2004gaming warnt vor Sperren ('arms race'); keine Studie zur Wirkung eines einmaligen Hinweises gefunden"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "razzaq2010hints",
+     "locator": "§4 Table 3; §5 Limitations (n = 61, sofort, gleiche Items)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "baker2004gaming",
+     "locator": "Results Table 1: Gaming r = -0,38 mit Post-Test, kontrolliert für Vortest signifikant; 'Which students game': 24 % je einmal, konzentriert bei niedrigem Vorwissen",
+     "relation": "supports"
+    },
+    {
+     "source_id": "an2026hintuse",
+     "locator": "§4.2.1-4.2.2, Table 4: beide Indikatoren in drei Kohorten mit schlechterem sofortigem und verzögertem Test assoziiert (Vortest kontrolliert)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "koedinger2007assistance",
+     "locator": "Abschnitt zu Help Tutor und Gaming: Help Tutor ohne besseren Domänenlernerfolg; Gaming-Detektor ohne verlässlichen Lernunterschied",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "aleven2016",
+     "locator": "Abstract: besseres Hilfesuchen ohne besseren Domänenlernerfolg",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "mclaren2016efficiency",
+     "locator": "Abstract: Worked Examples gleich wirksam, deutlich schneller als Tutored Problem Solving",
+     "relation": "supports"
+    },
+    {
+     "source_id": "lehmann2025aiclassroom",
+     "locator": "Study 3: 42 % der Lösungsanfragen ohne eigenen Versuch",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Zusammenhang unproduktiver Hilfenutzung mit schlechterem Lernen in zwei unabhängigen Gruppen und Jahrzehnten, aber nur korrelativ",
+     "Vergleich Hinweis auf Anforderung vs. automatisch nur in einer kleinen, sofort gemessenen Studie",
+     "Interventionen gegen Hilfemissbrauch (Help Tutor, Gaming-Detektor) verbesserten Domänenlernen nicht verlässlich"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Hinweis vor erstem Versuch und schnelles Blättern zum Bottom-out gehen mit schlechterem unassistiertem Lernen einher",
+      "level": "low"
+     },
+     {
+      "claim": "Beobachten und Anbieten eines Worked Examples verbessert Lernen gegenüber reiner Hinweisleiter",
+      "level": "very_low"
+     },
+     {
+      "claim": "Sperren oder Wartezeiten zwischen Hinweisstufen verbessern Lernen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Hilfeereignisse mit Stufe, bottom_out, Zeitstempel, Zeit seit letztem Hinweis, Wortzahl des Hinweises, Flag hint_before_attempt; Annahme oder Ablehnung des Worked-Example-Angebots",
+   "independent_outcome": "unassistierter Test >= 1 Woche später mit neuen Items; randomisiert Hinweisleiter mit Worked-Example-Angebot vs. Hinweisleiter allein bei gleicher Zeit; sekundär: prädiktive Validität der zwei Beobachtungsregeln für den verzögerten Test nach Kontrolle des Vortests",
+   "failure_modes": [
+    "Hinweisvermeidung: Lernende fragen aus Sorge vor Protokollierung nicht mehr nach Hilfe und raten",
+    "Bottom-out-Hinweise werden als Worked Examples genutzt und produktiv studiert; Regel (b) stuft das fälschlich als oberflächlich ein",
+    "Lesegeschwindigkeit 4 Wörter/s passt nicht zu deutschen Hochschultexten oder Formeln",
+    "Lernende umgehen die Leiter mit externer KI (unsichtbar)"
+   ],
+   "falsifier": "In Mastery-eigenen Daten sagen die zwei Beobachtungsregeln den verzögerten unassistierten Test nach Kontrolle des Vortests nicht voraus (vorab festgelegte Mindeststärke), oder eine randomisierte Studie zeigt, dass der Hinweis 'erst ein Versuch?' die Hilfeanforderungen nach wiederholten Fehlern senkt und den verzögerten Test verschlechtert.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AI-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "WE-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "ITS-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  },
+  {
+   "id": "R5-POL-09",
+   "title": "Fehlerdiagnose nur als Hypothese an einer deterministischen Prüfung; Bestätigungsitem vor jedem Fehlkonzept-Label",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §12.2-12.3 R5-POL-09",
+   "applies_to_operations": [
+    "symbolic_procedure",
+    "computational_construction",
+    "recall_discrimination",
+    "formal_proof",
+    "diagnostic_reasoning"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "open_synthesis",
+     "reason": "keine deterministische Fehlerklasse; nur FEEDBACK_UNVERIFIED"
+    },
+    {
+     "operation": "embodied_psychomotor",
+     "reason": "Fehler realer Handlungen im Produkt nicht beobachtbar; R4"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice",
+     "consolidation"
+    ],
+    "conditions": "Fehlerklassen, die ein deterministischer Prüfer aus der Antwort ableiten kann (Vorzeichen, Einheit, Größenordnung, bekannter Distraktor, typische Umformung); diagnostic_reasoning nur an Lernfällen"
+   },
+   "recommendation": "Rückmeldung nach einem Fehler ist standardmäßig erklärend: korrekter Schritt mit Begründung (elaborated feedback), nicht nur richtig/falsch. Eine fehlerspezifische Rückmeldung gibt es nur, wenn ein deterministischer Prüfer die Fehlerklasse aus der Antwort ableitet (FB-R2); sie wird als Hypothese formuliert ('Dein Ergebnis passt zu einem Vorzeichenfehler'). Ein Fehlkonzept- oder Musterlabel ('wiederkehrender Fehler X') entsteht erst, wenn dieselbe Fehlerklasse auf einem weiteren, neuen Bestätigungsitem erneut auftritt. Diagnosen eines Sprachmodells sind agent_judgement und lösen nie ein Label oder eine Zustandsänderung aus. Wenn keine Klasse ableitbar ist, wird das korrekte Verfahren erneut erklärt bzw. ein Worked Example gezeigt, ohne Diagnose.",
+   "product_affordances": {
+    "textbook": "Abschnitte 'häufige Fehler' als typische Fehler mit Gegenbeispiel, nicht als Diagnose der lesenden Person",
+    "workbook": "Lösungsanhang mit Prüfhinweisen 'Wenn dein Ergebnis X ist, prüfe Schritt Y' nur für deterministisch erkennbare Ergebnisse (bekannte Distraktoren); sonst vollständige Lösung mit Begründung",
+    "anki": "keine Diagnose; Karten zu häufigen Fehlern nur als Diskrimination richtig/falsch mit Begründung (siehe R5-POL-10)",
+    "interactive": "ERROR_HYPOTHESIS mit Prüfer-ID, danach Bestätigungsitem; Musteranzeige im Open Learner Model erst nach Bestätigung; Fallback erklärendes Feedback"
+   },
+   "tutor_affordance": "Tutor darf eine Fehlerhypothese nur als ERROR_HYPOTHESIS mit basis=deterministic_check_id oder basis=agent_judgement ausgeben; ohne Bestätigungsitem gibt er allgemeines erklärendes Feedback (R5-POL-06)",
+   "abstain_or_fallback": [
+    "keine deterministisch ableitbare Fehlerklasse: kein Label, erklärendes Feedback zum korrekten Verfahren",
+    "kein neues Bestätigungsitem im Pool: Hypothese bleibt Hypothese, kein Musterlabel",
+    "Bestätigungsitem richtig gelöst: Hypothese verworfen, keine Anzeige",
+    "Diagnose nur durch Sprachmodell: FEEDBACK_UNVERIFIED, nie Label"
+   ],
+   "parameters": [
+    {
+     "name": "confirmation_items_before_pattern_label",
+     "value": 1,
+     "unit": "neues Item mit derselben deterministisch erkannten Fehlerklasse",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; sleeman1989remediation diskutiert instabile Fehler; Zuverlässigkeit automatischer Fehlklassifikation wurde in Batch 5 nicht belegt (offen)"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "sleeman1989remediation",
+     "locator": "Abstract: modellbasierte (fehlerspezifische) Remediation nicht klar besser als Neuunterrichten; Stabilität der Fehler diskutiert",
+     "relation": "supports"
+    },
+    {
+     "source_id": "vanderkleij2015feedback",
+     "locator": "Abstract: erklärendes Feedback 0,49 > korrekte Antwort 0,32 > richtig/falsch 0,05; 40 Studien/70 Effekte",
+     "relation": "supports"
+    },
+    {
+     "source_id": "koedinger2007assistance",
+     "locator": "Implications: erklärendes Fehlerfeedback besser als reines Ja/Nein (McKendree, wie berichtet)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pardos2024chatgpthints",
+     "locator": "Results RQ1: 32 % der ungeprüften ChatGPT-Hinweise fehlerhaft",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "mclaren2015errex",
+     "locator": "Materials: Fehlkonzepte vorab aus Forschung festgelegt, nicht je Lernendem diagnostiziert; verzögerter Vorteil d = 0,33",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "erklärendes Feedback ist meta-analytisch besser als reines Richtig/Falsch (nur Abstract gelesen)",
+     "die einzige gefundene direkte Prüfung fehlerspezifischer gegen allgemeine Remediation (sleeman1989remediation, alt, menschliche Tutoren, nur Abstract) zeigt keinen klaren Vorteil",
+     "Zuverlässigkeit automatischer Fehldiagnose und zweistufige Diagnosetests nicht recherchiert"
+    ],
+    "sub_claims": [
+     {
+      "claim": "erklärendes Feedback ist wirksamer als reine Richtig/Falsch-Rückmeldung",
+      "level": "moderate"
+     },
+     {
+      "claim": "fehlerspezifische Remediation ist allgemeinem Neuunterrichten überlegen",
+      "level": "very_low"
+     },
+     {
+      "claim": "ein einzelner Fehler erlaubt ein verlässliches Fehlkonzept-Label",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Fehlerereignis mit Prüfer-ID, abgeleiteter Fehlerklasse, Bestätigungsitem-ID und Ergebnis; Anteil bestätigter vs. verworfener Hypothesen",
+   "independent_outcome": "randomisiert fehlerspezifisches vs. allgemeines erklärendes Feedback bei gleicher Zeit, unassistierter Test >= 1 Woche später mit neuen Items; zusätzlich Reliabilitätsstudie: Übereinstimmung der Prüferklasse mit Expertenkodierung und Wiederauftreten auf Bestätigungsitems",
+   "failure_modes": [
+    "Prüfer ordnet eine Antwort der falschen Fehlerklasse zu (z. B. Zufallstreffer auf Distraktorwert)",
+    "Fehler sind instabil; das Label beschreibt einen einmaligen Ausrutscher",
+    "Label wirkt beschämend oder wird als Persönlichkeitsurteil gelesen",
+    "Sprachmodell 'diagnostiziert' plausibel klingend, aber falsch"
+   ],
+   "falsifier": "Eine vorab registrierte Studie zeigt, dass fehlerspezifisches Feedback den verzögerten unassistierten Test um mehr als die vorab festgelegte Mindestdifferenz gegenüber allgemeinem erklärendem Feedback verbessert (dann Diagnoseausbau priorisieren), oder eine Reliabilitätsstudie zeigt eine Übereinstimmung von Prüferklasse und Expertenkodierung unterhalb der vorab festgelegten Schwelle (dann Hypothesenanzeige abschalten).",
+   "kb_rule_links": [
+    {
+     "rule_id": "FB-R2",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "FB-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "AI-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  },
+  {
+   "id": "R5-POL-10",
+   "title": "Fehlerbeispiel-Aufgaben (finden, erklären, korrigieren) nach einem korrekten Worked Example; Bewertung nur verzögert",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §12.2-12.3 R5-POL-10",
+   "applies_to_operations": [
+    "symbolic_procedure",
+    "computational_construction",
+    "recall_discrimination"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "embodied_psychomotor",
+     "reason": "fehlerhafte Handlungsbeispiele erfordern beaufsichtigte Praxis; R4"
+    },
+    {
+     "operation": "open_synthesis",
+     "reason": "Fehler nicht eindeutig markierbar; keine Belege gefunden"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any; Moderation durch Vorwissen widersprüchlich (grosse2007errors vs. mclaren2015errex)",
+     "worked example of the same procedure seen"
+    ],
+    "phase": [
+     "practice",
+     "consolidation"
+    ],
+    "conditions": "Prozedur mit bekannten, in Forschung oder Kursdaten belegten typischen Fehlern; korrekte Referenzlösung geprüft; Lernende haben mindestens ein korrektes Worked Example derselben Prozedur gesehen"
+   },
+   "recommendation": "Nach dem korrekten Worked Example bieten Übungsfolgen Fehlerbeispiele an: eine Lösung mit einem typischen Fehler, die Lernende finden, erklären (Auswahl oder kurze Begründung) und korrigieren, mit Richtig/Falsch-Rückmeldung. Die Fehler stammen aus belegten typischen Fehlern, nicht aus einer Diagnose der einzelnen Person. Kein Vorwissens-Schwellenwert als Ausschluss, weil die Moderation widersprüchlich belegt ist; bei Lernenden im Zustand NOT_ASSESSED steht die korrekte Lösung neben dem Fehlerbeispiel. Wirkung nur am verzögerten unassistierten Test beurteilen; Sofortergebnis und Zufriedenheit sind keine Erfolgsmaße.",
+   "product_affordances": {
+    "textbook": "Kasten 'Fehleranalyse': fehlerhafte Lösung mit Auftrag finden/erklären/korrigieren, korrekte Lösung getrennt nachfolgend",
+    "workbook": "Fehlerbeispiel-Aufgaben in der Übungsfolge nach dem Worked Example, Lösung mit Begründung im Anhang",
+    "anki": "nicht im Standard: wiederholtes Abrufen der fehlerhaften Form ist ungeprüft; höchstens Diskriminationskarte 'Welcher Schritt ist falsch und warum?' mit korrigiertem Schritt auf der Rückseite",
+    "interactive": "Fehlerbeispiel-Item mit Schrittmarkierung, Erklärungsauswahl, Korrektur, deterministische Prüfung; Ergebnis zählt nur zu ASSISTED, nicht als unassistierter Kompetenzbeleg"
+   },
+   "tutor_affordance": "Tutor darf Fehlerbeispiele nur aus der geprüften Referenzlösung plus einem belegten Fehlertyp bilden; ohne geprüfte Referenz ABSTAIN(no_verified_reference)",
+   "abstain_or_fallback": [
+    "kein belegter typischer Fehler für die Prozedur: kein Fehlerbeispiel, normales Üben",
+    "keine geprüfte korrekte Referenz: kein Fehlerbeispiel (generierte Fehler könnten neue Fehler einführen)",
+    "Lernende ohne gesehenes Worked Example: zuerst Worked Example"
+   ],
+   "parameters": [
+    {
+     "name": "min_correct_examples_before_erroneous",
+     "value": 1,
+     "unit": "korrektes Worked Example derselben Prozedur",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; grosse2007errors fand Nachteile für Lernende mit geringem Vorwissen, mclaren2015errex keine Interaktion; die Mindestbedingung ist ein Kompromiss, nicht kalibriert"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "mclaren2015errex",
+     "locator": "Results Table 2: verzögerter Gewinn d = 0,33 (p = 0,002), sofort n.s.; keine Interaktion mit Vorwissen; Schule B n.s. (Fußnote 7)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "adams2014errex",
+     "locator": "Results: verzögerter Post-Test d = 0,62 (p = 0,002), sofort n.s.; n = 208",
+     "relation": "supports"
+    },
+    {
+     "source_id": "grosse2007errors",
+     "locator": "Abstract: Fehlerbeispiele fördern Ferntransfer nur bei günstigem Vorwissen, bei geringem Vorwissen korrekte Beispiele besser; weniger prinzipienbasierte Selbsterklärungen",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "mclaren2016efficiency",
+     "locator": "Abstract: Fehlerbeispiele nicht wirksamer als Worked Examples, aber zeitaufwendiger (Chemie)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "koedinger2007assistance",
+     "locator": "Abschnitt Intelligent-Novice-Feedback: Selbsterklären auch inkorrekter Lösungen (Siegler, wie berichtet)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "zwei randomisierte Klassenstudien aus einem Forschungsprogramm mit verzögertem Vorteil, nahem Transfer und einer Domäne (Dezimalzahlen, Klasse 6)",
+     "widersprüchliche Moderation durch Vorwissen (grosse2007errors vs. mclaren2015errex)",
+     "in einer Chemiestudie kein Vorteil gegenüber Worked Examples bei höherem Zeitaufwand"
+    ],
+    "sub_claims": [
+     {
+      "claim": "interaktive Fehlerbeispiele verbessern den verzögerten Test gegenüber gestütztem Problemlösen (Dezimalzahlen, Mittelstufe)",
+      "level": "low"
+     },
+     {
+      "claim": "Fehlerbeispiele schaden Lernenden mit geringem Vorwissen",
+      "level": "very_low"
+     },
+     {
+      "claim": "der Befund überträgt sich auf Hochschulmathematik oder andere Prozeduren",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Fehlerbeispiel-Items mit gefundener Stelle, Erklärungswahl, Korrektur, Zeit; späterer unassistierter Erfolg an neuen Items derselben Kompetenz",
+   "independent_outcome": "randomisiert Fehlerbeispiele vs. gestütztes Problemlösen bei gleicher Zeit, unassistierter Test >= 1 Woche später mit neuen Items, vorab registrierte Interaktion mit Vorwissen",
+   "failure_modes": [
+    "Lernende prägen sich die fehlerhafte Form ein (Interferenz), besonders bei Wiederholung",
+    "Fehlerbeispiele verdrängen prinzipienbasierte Selbsterklärungen (grosse2007errors)",
+    "geringere Zufriedenheit führt zu Abbruch, obwohl verzögertes Lernen profitiert",
+    "generierte Fehler sind fachlich falsch klassifiziert"
+   ],
+   "falsifier": "Eine vorab registrierte Studie mit Hochschullernenden findet keinen verzögerten Vorteil von Fehlerbeispielen gegenüber zeitgleichem gestütztem Problemlösen (untere Konfidenzgrenze unter der vorab festgelegten Mindestdifferenz) oder einen Nachteil für die Gruppe mit geringem Vorwissen; dann nur für Lernende mit unassistiertem Erfolg anbieten oder streichen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "WE-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "FB-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  },
+  {
+   "id": "R5-POL-11",
+   "title": "Lernendenseitige Analytics als Open Learner Model der R5-POL-01-Zustände; kein Peer-Vergleich, keine Risiko- oder Notenprognosen",
+   "source_section": "r5/AI_TUTOR_MEASUREMENT.md §12.2-12.3 R5-POL-11",
+   "applies_to_operations": [
+    "self_regulation",
+    "recall_discrimination",
+    "symbolic_procedure",
+    "computational_construction",
+    "formal_proof"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "embodied_psychomotor",
+     "reason": "keine Zustände aus Produktbeobachtung; R4"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "practice",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "Einzelnutzung ohne Kurs- oder Kohortendaten; Zustände aus R5-POL-01; keine validierten Vorhersagemodelle für Kursergebnisse"
+   },
+   "recommendation": "Lernende sehen ein Open Learner Model: je Kompetenz den benannten Zustand aus R5-POL-01, Evidenzmenge, Zeitpunkt des letzten unassistierten Erfolgs, getrennt assistierte und unassistierte Versuche (R5-POL-04) und ihre eigene Hilfenutzung (R5-POL-08). Vor dem Aufdecken wird die Selbsteinschätzung abgefragt und danach daneben gezeigt (MC-R1). Bezugsrahmen sind der eigene frühere Stand und selbst gesetzte Ziele; kein Klassen- oder Peer-Durchschnitt, keine Rangliste, keine Ampel, kein 'gefährdet'-Label und keine Noten- oder Bestehensprognose, solange kein für Kurs und Population validiertes Modell mit Interventionsnachweis vorliegt.",
+   "product_affordances": {
+    "textbook": "keine Analytics; Kapitelziele als Checkliste für Selbstprüfung ohne Fortschrittsbalken fürs Lesen (MC-R2)",
+    "workbook": "Selbstprotokoll je Kompetenz über die Zeit (unassistiert gelöst, mit Hilfe gelöst, Datum), eigene Ziele; kein Vergleich mit anderen",
+    "anki": "Anki-Statistiken bleiben Anki-Statistiken und werden nicht als Kompetenzzustand oder Prognose umgedeutet (R5-POL-01)",
+    "interactive": "OLM-Ansicht: Zustand, Evidenzmenge, letzter unassistierter Erfolg, eigene Hilfenutzung, Selbsteinschätzung vs. Messung, Verlauf; keine Peer-Daten, kein Gesamtscore, keine Prognose"
+   },
+   "tutor_affordance": "Tutor darf auf OLM-Zustände verweisen ('2 von 2 neuen Aufgaben ohne Hilfe'), aber keine Prüfungs- oder Bestehensprognose äußern; Anfragen nach Prognose: ABSTAIN(out_of_scope) mit Verweis auf fehlende Validierung",
+   "abstain_or_fallback": [
+    "Evidenz unter Mindestmenge: INSUFFICIENT_EVIDENCE statt Zustand (R5-POL-01)",
+    "keine Selbsteinschätzung abgegeben: Zustand trotzdem zeigen, ohne Vergleich",
+    "Anfrage nach Peer-Vergleich oder Prognose: nicht verfügbar mit Begründung",
+    "keine Aggregation zu Gesamtpunktzahl oder Prozentwert"
+   ],
+   "parameters": [
+    {
+     "name": "peer_comparison_default",
+     "value": false,
+     "unit": "boolesch",
+     "status": "provisional_product_parameter",
+     "rationale": "jivet2017awareness: Peer-Vergleich meist gegen Klassendurchschnitt, theoretisch selten begründet; Mastery hat keine Kohortendaten; Wirkung nicht geprüft"
+    },
+    {
+     "name": "predictive_risk_labels",
+     "value": false,
+     "unit": "boolesch",
+     "status": "provisional_product_parameter",
+     "rationale": "dawson2017retention (kein Interventionseffekt nach Modellierung individueller Unterschiede), gasevic2016onesize (Modelle nicht kursübergreifend übertragbar), arnold2012coursesignals (umstrittene Retentionsbehauptung)"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "jivet2017awareness",
+     "locator": "Results Table 3, Discussion: 26 von 95 Dashboards theoretisch begründet und evaluiert; Peer-Rahmen häufiger als Zielrahmen; Verlauf nur bei 10 Dashboards",
+     "relation": "supports"
+    },
+    {
+     "source_id": "matcha2020dashboards",
+     "locator": "Abstract: Dashboards selten theoriegestützt, Unterstützung von Metakognition nicht belegbar, Evaluationen mit erheblichen Mängeln",
+     "relation": "supports"
+    },
+    {
+     "source_id": "long2017olm",
+     "locator": "Dissertation §3.1: Exp. 1 OLM d = 0,56 (n = 62); Exp. 2 Haupteffekt n.s. (d = 0,11, n = 245), Vorteil nur bei geteilter Aufgabenwahl, nicht besser als Systemsteuerung",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "dawson2017retention",
+     "locator": "Abstract: Risikomodell plus Intervention ohne Effekt auf Retention in Mixed-Effects-Analyse",
+     "relation": "supports"
+    },
+    {
+     "source_id": "gasevic2016onesize",
+     "locator": "Abstract: Vorhersagekraft und Prädiktoren unterscheiden sich zwischen kursspezifischen und generalisierten Modellen",
+     "relation": "supports"
+    },
+    {
+     "source_id": "arnold2012coursesignals",
+     "locator": "Abstract; Sekundärbericht (IHE/THE 11.11.2013): Retentionsbehauptung durch umgekehrte Kausalität erklärbar",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "lehmann2025aiclassroom",
+     "locator": "Table 13: wahrgenommenes Lernen mit LLM höher als tatsächliches",
+     "relation": "supports"
+    },
+    {
+     "source_id": "aleven2016",
+     "locator": "Abstract",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Reviews finden für Lernenden-Dashboards keinen belastbaren Lernnutzen und viel Peer-Vergleich ohne Begründung (Design-Reviews, nicht Effektsynthesen)",
+     "OLM mit Selbsteinschätzung: ein positives kleines und ein im Haupteffekt null Experiment derselben Gruppe",
+     "Frühwarnsysteme: kein Interventionseffekt nach strenger Analyse, Modelle nicht übertragbar; Course Signals umstritten"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Lernenden-Dashboards verbessern Lernergebnisse",
+      "level": "very_low"
+     },
+     {
+      "claim": "ein OLM mit Selbsteinschätzung verbessert Lernen bei lernergesteuerter Aufgabenwahl",
+      "level": "low"
+     },
+     {
+      "claim": "Risikovorhersage mit anschließender Intervention verbessert Ergebnisse",
+      "level": "very_low"
+     },
+     {
+      "claim": "Peer-Vergleich als Standard schadet Lernenden",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "OLM-Aufrufe, Selbsteinschätzung vor Aufdecken, Abweichung Selbsteinschätzung vs. Zustand, anschließende Aufgabenwahl",
+   "independent_outcome": "randomisiert OLM mit Selbsteinschätzung vs. ohne OLM, unassistierter Test >= 1 Woche später mit neuen Items; sekundär Kalibrierung der Selbsteinschätzung gegen diesen Test",
+   "failure_modes": [
+    "Lernende lesen den Zustand als Zertifikat oder Prognose",
+    "Selbsteinschätzungsabfrage wird lästig und durchgeklickt",
+    "Ohne Peer-Rahmen fehlt manchen Lernenden Motivation (Leistungsorientierte)",
+    "Hilfenutzungsanzeige erzeugt Scham und Hilfevermeidung"
+   ],
+   "falsifier": "Eine vorab registrierte Studie zeigt, dass das OLM weder den verzögerten unassistierten Test noch die Kalibrierung der Selbsteinschätzung verbessert (oder schadet) - dann nicht als Standard; oder ein validiertes kursspezifisches Modell mit randomisiertem Interventionsnachweis liegt vor - dann sind Prognosen neu zu prüfen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "MC-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "MC-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "ITS-R1",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "learning_evaluation": "NOT_RUN",
+   "implementation_status": "not_implemented"
+  }
+ ],
+ "changes_batch5": [
+  "R5-POL-03 revidiert: Hinweise nur auf Anforderung; höchste Hinweisstufe = Bottom-out-Hinweis (Lösungseinsicht für den Schritt); Stufenzahl ausdrücklich als ungeprüfte Setzung (CD-4) begründet; Belege razzaq2010hints, koedinger2007assistance, an2026hintuse, baker2004gaming, mclaren2016efficiency ergänzt",
+  "R5-POL-06 revidiert: HINT trägt bottom_out; neuer Ausgabetyp ERROR_HYPOTHESIS (nie Zustandsänderung, nur mit Bestätigungsitem); Belege ergänzt",
+  "R5-POL-08 neu: Hilfeleiter und Beobachtung unproduktiver Hilfenutzung",
+  "R5-POL-09 neu: Fehlerdiagnose nur als Hypothese an deterministischer Prüfung, Bestätigungsitem vor Label",
+  "R5-POL-10 neu: Fehlerbeispiel-Aufgaben (finden, erklären, korrigieren) nach korrektem Worked Example",
+  "R5-POL-11 neu: Lernendenseitige Analytics als Open Learner Model der R5-POL-01-Zustände; kein Peer-Vergleich, keine Risiko-Labels"
+ ]
+}
