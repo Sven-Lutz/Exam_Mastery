@@ -583,7 +583,7 @@
   },
   {
    "source_id": "brookhart2015rubrics",
-   "citation": "Brookhart, S. M., & Chen, F. (2015). The quality and effectiveness of descriptive rubrics. Educational Review, 67(3), 343-368.",
+   "citation": "Brookhart, S. M., & Chen, F. (2015; online 2014). The quality and effectiveness of descriptive rubrics. Educational Review, 67(3), 343-368.",
    "doi_or_url": "https://doi.org/10.1080/00131911.2014.929565",
    "source_type": "narrative_review",
    "kb_status": "new",
@@ -622,6 +622,1045 @@
     }
    ],
    "verdict": "partially_supported"
+  },
+  {
+   "source_id": "nesbit2025argumentmapping",
+   "citation": "Nesbit, J. C., & Liu, Q. (2025). Argument mapping in higher education: A systematic review. Higher Education Quarterly, 79(4), e70063.",
+   "doi_or_url": "https://doi.org/10.1111/hequ.70063",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "domain": "philosophy",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref/OpenAlex abstract; Wiley full text and PDF HTTP 403; not in Europe PMC",
+    "sections_read": []
+   },
+   "design": "systematic review (qualitative, observational, experimental studies) coding 124 studies; assesses prospects for meta-analysis",
+   "population": "postsecondary students using argument maps or diagrams",
+   "operation": "open_synthesis / formal argument analysis: constructing and reading argument maps",
+   "intervention": "argument mapping (individual and collaborative, various software)",
+   "comparator": "various",
+   "outcome": {
+    "measure": "critical thinking measures, map quality, attitudes",
+    "assisted": false,
+    "delay": "not seen",
+    "transfer": "not seen"
+   },
+   "estimate": {
+    "metric": "counts",
+    "value": "124 studies coded; 102 empirical; 44% assessed attitudes, 40% collaborative mapping, 51% quality/structure of student maps",
+    "ci": "not applicable",
+    "k_or_n": "124 studies",
+    "note": "Most frequent causal question: effect of mapping on critical thinking. No pooled effect in abstract."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Seed source. Abstract-level only: we cannot report its verdict on the causal evidence. The large share of attitude and map-quality studies suggests that much of the literature does not measure transfer to unmapped reasoning.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:argument_mapping_evidence_base_heterogeneous",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "cullen2018argumentvisualization",
+   "citation": "Cullen, S., Fan, J., van der Brugge, E., & Elga, A. (2018). Improving analytical reasoning and argument understanding: A quasi-experimental field study of argument visualization. npj Science of Learning, 3, 21.",
+   "doi_or_url": "https://doi.org/10.1038/s41539-018-0038-5",
+   "source_type": "primary_quasi_experiment",
+   "kb_status": "new",
+   "domain": "philosophy",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Publisher PDF (CC BY), pdftotext",
+    "sections_read": [
+     "Abstract",
+     "Results: LSAT logical reasoning pre/post",
+     "Essay measures (blind scoring, Table 1)",
+     "Discussion incl. confound statement",
+     "Methods: recruitment, non-randomisation"
+    ]
+   },
+   "design": "quasi-experiment: 12-week freshman seminar using argument visualisation of philosophy texts with weekly individual feedback vs non-randomised control students; parallel LSAT LR forms; blind-scored essays",
+   "population": "Princeton first-year undergraduates; seminar students over several years vs 56 control students (control matched on interest); essays: 15 seminar vs 44 control",
+   "operation": "open_synthesis + argument analysis: reconstructing and evaluating arguments in real philosophy texts",
+   "intervention": "argument visualisation, problem sets, intensive individualised instructor feedback",
+   "comparator": "standard curriculum (no intensive non-visual argument analysis training)",
+   "outcome": {
+    "measure": "LSAT logical reasoning (parallel forms); blind-scored essays",
+    "assisted": false,
+    "delay": "end of 12-week semester",
+    "transfer": "far-ish: LSAT items are not philosophy texts"
+   },
+   "estimate": {
+    "metric": "Cohen d [95% CI]",
+    "value": "LSAT LR gain d = 0.71 [0.37, 1.04]; essays d = 0.87 [0.26, 1.48]",
+    "ci": "as listed",
+    "k_or_n": "LSAT t(159); essays N = 15 vs 44",
+    "note": "Authors: design cannot separate visualisation from intensive interactive instruction and feedback; students could not be randomised."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Non-randomised, highly selective institution, self-selected seminar, instructors = developers; essay grader blind but single. Treat as: intensive argument-analysis training WITH feedback can transfer to LSAT-type items; the specific contribution of maps is unidentified.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:argument_analysis_training_transfers",
+     "relation": "supports",
+     "locator": "Results LSAT; essay measures"
+    },
+    {
+     "claim_id": "R3:map_specific_effect_unidentified",
+     "relation": "qualifies",
+     "locator": "Discussion, confound paragraph"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "dwyer2012argumentmapping",
+   "citation": "Dwyer, C. P., Hogan, M. J., & Stewart, I. (2012). An evaluation of argument mapping as a method of enhancing critical thinking performance in e-learning environments. Metacognition and Learning, 7(3), 219-244.",
+   "doi_or_url": "https://doi.org/10.1007/s11409-012-9092-1",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "domain": "philosophy",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Semantic Scholar abstract; repository handle not opened",
+    "sections_read": []
+   },
+   "design": "pre-post with allocation to AM-infused CT e-learning course vs no-instruction control, 8 weeks",
+   "population": "74 undergraduate psychology students (Ireland)",
+   "operation": "open_synthesis: argument analysis, critical thinking",
+   "intervention": "argument-mapping-infused critical thinking e-learning course",
+   "comparator": "no instruction",
+   "outcome": {
+    "measure": "Halpern Critical Thinking Assessment",
+    "assisted": false,
+    "delay": "post-test after 8 weeks",
+    "transfer": "general CT test"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "N = 74",
+    "note": "Abstract: AM course group gained more in overall CT and argument analysis than controls; no effect on motivation or need for cognition."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "No-instruction control confounds mapping with receiving any CT instruction; allocation method not verified; abstract-level. Consistent with Cullen but does not isolate the map.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:argument_analysis_training_transfers",
+     "relation": "supports",
+     "locator": "Abstract"
+    },
+    {
+     "claim_id": "R3:map_specific_effect_unidentified",
+     "relation": "qualifies",
+     "locator": "Abstract (no-instruction control)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "abrami2015ctmeta",
+   "citation": "Abrami, P. C., Bernard, R. M., Borokhovski, E., Waddington, D. I., Wade, C. A., & Persson, T. (2015). Strategies for teaching students to think critically: A meta-analysis. Review of Educational Research, 85(2), 275-314.",
+   "doi_or_url": "https://doi.org/10.3102/0034654314551063",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "domain": "philosophy",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; full text not accessed",
+    "sections_read": []
+   },
+   "design": "meta-analysis of quasi- and true-experimental studies with standardised CT measures",
+   "population": "all educational levels and disciplines",
+   "operation": "open_synthesis: critical thinking skills and dispositions",
+   "intervention": "CT instruction strategies (generic and content-specific)",
+   "comparator": "control instruction",
+   "outcome": {
+    "measure": "standardised CT measures",
+    "assisted": false,
+    "delay": "mostly immediate (not verified)",
+    "transfer": "general CT tests"
+   },
+   "estimate": {
+    "metric": "Hedges g (random effects)",
+    "value": "g+ = 0.30, p < .001; heterogeneous",
+    "ci": "not in abstract",
+    "k_or_n": "341 effect sizes",
+    "note": "Abstract: dialogue, authentic/situated problems and examples, and mentoring had positive effects."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Includes quasi-experiments; heterogeneity high; moderator findings are associations; abstract-level. Supports dialogue + authentic problems + mentoring as design ingredients, not any single tool.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:ct_instruction_small_positive",
+     "relation": "supports",
+     "locator": "Abstract"
+    },
+    {
+     "claim_id": "R3:dialogue_and_authentic_problems_moderate_ct",
+     "relation": "supports",
+     "locator": "Abstract (moderators, correlational)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "nussbaum2007counterargument",
+   "citation": "Nussbaum, E. M., & Schraw, G. (2007). Promoting argument-counterargument integration in students' writing. The Journal of Experimental Education, 76(1), 59-92.",
+   "doi_or_url": "https://doi.org/10.3200/JEXE.76.1.59-92",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "domain": "philosophy",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "randomised 2x2-type comparison: criteria instruction, graphic organizer, combined, control",
+   "population": "84 undergraduates in an educational psychology course",
+   "operation": "open_synthesis: objection/reply - integrating arguments and counterarguments in opinion essays",
+   "intervention": "criteria instruction; graphic organizer; both",
+   "comparator": "control",
+   "outcome": {
+    "measure": "coded essays (refutations, integration, rebuttal strength)",
+    "assisted": false,
+    "delay": "not seen",
+    "transfer": "near (essay on given topic)"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "N = 84",
+    "note": "Abstract: organizer produced more refutations; criteria instruction produced better integration (stronger rebuttals, more balanced reasoning)."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Single study, short intervention, immediate essays, abstract-level. Shows two scaffolds act on different aspects: counting refutations is not the same as weighing them.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:objection_reply_scaffold_effects_differ",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "attridge2013conditional",
+   "citation": "Attridge, N., & Inglis, M. (2013). Advanced mathematical study and the development of conditional reasoning skills. PLoS ONE, 8(7), e69399.",
+   "doi_or_url": "https://doi.org/10.1371/journal.pone.0069399",
+   "source_type": "primary_quasi_experiment",
+   "kb_status": "new",
+   "domain": "philosophy",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "Publisher PDF (CC BY), pdftotext",
+    "sections_read": [
+     "Introduction (incl. description of Cheng et al. 1986 logic-training null)",
+     "Method: participants",
+     "Results: three-way interaction, material/defective index analyses"
+    ]
+   },
+   "design": "longitudinal quasi-experiment (non-random: subject choice), conditional inference task at start and after one year",
+   "population": "124 English pupils aged about 16-17 studying A-level mathematics vs English literature",
+   "operation": "formal logic transfer: conditional inference without explicit logic teaching",
+   "intervention": "one year of advanced mathematics",
+   "comparator": "one year of English literature",
+   "outcome": {
+    "measure": "abstract conditional inference task",
+    "assisted": false,
+    "delay": "one year",
+    "transfer": "far: from mathematics study to abstract conditional reasoning"
+   },
+   "estimate": {
+    "metric": "F, t, d",
+    "value": "Group x Time x Inference interaction F(3,228) = 7.476, p < .001; mathematics group moved towards the 'defective' conditional (rejecting DA/AC more), not the normative material conditional",
+    "ci": "not reported",
+    "k_or_n": "N = 124 recruited",
+    "note": "Introduction reports that in Cheng et al. (1986) 40 hours of conditional-logic training produced no significant improvement on four Wason selection tasks (secondary description; original not read)."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "School-level, non-randomised, one country; outcome is a lab task. Relevant warning for philosophy/logic: transfer of formal training is partial and can move learners towards a non-normative interpretation; logic drills alone are not evidence of improved everyday argument evaluation.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:logic_training_transfer_limited",
+     "relation": "supports",
+     "locator": "Introduction (Cheng et al. description); Results"
+    },
+    {
+     "claim_id": "R3:logic_training_transfer_limited",
+     "relation": "qualifies",
+     "locator": "Results: change occurred, but towards defective conditional"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "sellier2019debiasing",
+   "citation": "Sellier, A.-L., Scopelliti, I., & Morewedge, C. K. (2019). Debiasing training improves decision making in the field. Psychological Science, 30(9), 1371-1379.",
+   "doi_or_url": "https://doi.org/10.1177/0956797619861429",
+   "source_type": "primary_quasi_experiment",
+   "kb_status": "new",
+   "domain": "management",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Accepted manuscript, City, University of London repository (pdftotext)",
+    "sections_read": [
+     "Abstract",
+     "Method: participants, game intervention, procedure (natural variation in schedule)",
+     "Results: main effect and short-window robustness analyses",
+     "Selection-effect discussion"
+    ]
+   },
+   "design": "field quasi-experiment: natural variation in when students played a one-shot debiasing serious game relative to an unannounced business case (Challenger-like launch decision)",
+   "population": "290 analysed graduate students (MBA, MSc Entrepreneurship, MSc Strategic Management), France",
+   "operation": "open_synthesis + decision under uncertainty: hypothesis testing in a business case",
+   "intervention": "serious game training on confirmation bias, bias blind spot, correspondence bias (80-100 min) BEFORE the case",
+   "comparator": "training after the case",
+   "outcome": {
+    "measure": "choice of hypothesis-confirming inferior option in case; case write-up coding",
+    "assisted": false,
+    "delay": "days to weeks between training and case",
+    "transfer": "far-ish: unannounced case in a different course"
+   },
+   "estimate": {
+    "metric": "% choosing inferior option; logistic beta",
+    "value": "Trained 19% less likely to choose the hypothesis-confirming option (abstract); 6-day window: 48.0% vs 72.7%, beta = -1.06, p = .016",
+    "ci": "6-day window 95% CI for difference [4.90%, 41.90%]",
+    "k_or_n": "N = 290 (trained 182, untrained 108)",
+    "note": "Robustness: effect persisted in 4- and 2-day windows around the case date."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Not randomised (self-scheduled); authors test selection by narrowing windows. One case, one bias. Commercial game developed by research team. Relevant for management cases: training to generate disconfirming tests can transfer to an unannounced case.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:debiasing_training_transfers_to_case",
+     "relation": "supports",
+     "locator": "Results main analysis; window analyses"
+    },
+    {
+     "claim_id": "R3:debiasing_training_transfers_to_case",
+     "relation": "qualifies",
+     "locator": "Selection-effect discussion (non-random)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "gentner2003analogicalencoding",
+   "citation": "Gentner, D., Loewenstein, J., & Thompson, L. (2003). Learning and transfer: A general role for analogical encoding. Journal of Educational Psychology, 95(2), 393-408.",
+   "doi_or_url": "https://doi.org/10.1037/0022-0663.95.2.393",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "domain": "management",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract (with first page text)",
+    "sections_read": []
+   },
+   "design": "3 experiments on case-based learning of negotiation strategies",
+   "population": "novices learning negotiation (incl. management students/consultants; details not seen)",
+   "operation": "open_synthesis: abstracting a strategy schema from business cases and applying it",
+   "intervention": "comparing two cases (analogical encoding), increasing comparison support",
+   "comparator": "no case; studying the two cases separately",
+   "outcome": {
+    "measure": "use of the strategy in a later face-to-face negotiation (Exp. 3) and problem tasks",
+    "assisted": false,
+    "delay": "not seen",
+    "transfer": "far: from written case to live negotiation"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "unknown",
+    "ci": "not extracted",
+    "k_or_n": "3 experiments",
+    "note": "Abstract: comparing two cases markedly better than studying them separately; more comparison support increased transfer in a live negotiation."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract-level; complements R1 alfieri2013comparison (case comparison meta-analysis). Case discussion alone may not yield transferable schemas; explicit comparison is the active ingredient tested.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:case_comparison_aids_transfer",
+     "relation": "supports",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "dochy2003pbl",
+   "citation": "Dochy, F., Segers, M., Van den Bossche, P., & Gijbels, D. (2003). Effects of problem-based learning: A meta-analysis. Learning and Instruction, 13(5), 533-568.",
+   "doi_or_url": "https://doi.org/10.1016/S0959-4752(02)00025-7",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "domain": "management",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Maastricht University CRIS record abstract (fetch tool paraphrase); ScienceDirect HTTP 403",
+    "sections_read": []
+   },
+   "design": "meta-analysis (vote count + combined effect sizes) of 43 empirical PBL studies in tertiary education, real-life classrooms",
+   "population": "tertiary students, mostly medical education (domains not verified)",
+   "operation": "rule_based_contextual / diagnostic_reasoning / open_synthesis: problem- and case-based learning",
+   "intervention": "problem-based learning",
+   "comparator": "conventional instruction",
+   "outcome": {
+    "measure": "knowledge and skills outcomes",
+    "assisted": false,
+    "delay": "varied; retention moderator",
+    "transfer": "skills = application"
+   },
+   "estimate": {
+    "metric": "vote count; combined ES",
+    "value": "Skills: robust positive effect, no study negative; knowledge: combined ES significantly negative but driven by two studies, vote count n.s. (authors: non-robust)",
+    "ci": "not extracted",
+    "k_or_n": "43 studies",
+    "note": "PBL students gained slightly less knowledge but retained more; expertise level moderates."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Old, mostly medical, non-randomised designs; abstract-level. Cross-domain warning: case/problem work can trade knowledge acquisition for application skills; product must check both.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:case_based_learning_tradeoff_knowledge_skills",
+     "relation": "supports",
+     "locator": "Abstract (CRIS record)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "thistlethwaite2012cbl",
+   "citation": "Thistlethwaite, J. E., Davies, D., Ekeocha, S., Kidd, J. M., MacDougall, C., Matthews, P., Purkis, J., & Clay, D. (2012). The effectiveness of case-based learning in health professional education. A BEME systematic review: BEME Guide No. 23. Medical Teacher, 34(6), e421-e444.",
+   "doi_or_url": "https://doi.org/10.3109/0142159X.2012.680939",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "domain": "management",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "systematic review with narrative synthesis (no meta-analysis), 1965-Sept 2010, 6 databases",
+   "population": "prequalification health professional students (medicine most common)",
+   "operation": "case-based learning (cases as vehicle for integrated knowledge and reasoning)",
+   "intervention": "case-based learning",
+   "comparator": "other activities (varied)",
+   "outcome": {
+    "measure": "varied; 75% post-intervention-only evaluations",
+    "assisted": false,
+    "delay": "varied",
+    "transfer": "varied"
+   },
+   "estimate": {
+    "metric": "counts",
+    "value": "104 papers coded, 23 (22%) higher quality; 61% single cohorts, 2% historical controls",
+    "ci": "not applicable",
+    "k_or_n": "104 papers",
+    "note": "Conclusion: students and teachers enjoy CBL; empirical data inconclusive as to effects on learning compared with other activities."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Health professions, not business; included as the best accessible systematic evidence on the case method. Satisfaction is not learning. No controlled business case-method evidence was found in this run (coverage gap).",
+   "claim_edges": [
+    {
+     "claim_id": "R3:case_method_effect_inconclusive",
+     "relation": "supports",
+     "locator": "Abstract, Conclusion"
+    },
+    {
+     "claim_id": "R3:satisfaction_not_learning",
+     "relation": "supports",
+     "locator": "Abstract, Conclusion"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "wark2025clinicalreasoning",
+   "citation": "Wark, S., Drovandi, A., Alele, F. O., McGee, R. G., et al. (ACHIEVE network) (2025). How and when should clinical reasoning be taught in undergraduate medicine: A systematic review and meta-analyses. Perspectives on Medical Education, 14(1), 1021-1042.",
+   "doi_or_url": "https://doi.org/10.5334/pme.1986",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "PMC12758103 via fetch tool (first 100k chars) and Europe PMC fullTextXML",
+    "sections_read": [
+     "Methods (search, quality appraisal QuADS, meta-analysis models)",
+     "Results: study characteristics, null studies",
+     "Meta-analyses of the RCTs and subgroups",
+     "Strengths and Limitations",
+     "Table 1 (skimmed)"
+    ]
+   },
+   "design": "systematic review (PRISMA 2020), 2014-2024, 6 databases; 50 studies; meta-analysis of 6 RCTs with fixed and random effects on unstandardised mean differences",
+   "population": "undergraduate medical students (Germany 14, USA 11 studies)",
+   "operation": "diagnostic_reasoning: clinical reasoning instruction (online modules, workshops, serious games, virtual patients, reflection, illness-script workshops)",
+   "intervention": "various clinical reasoning teaching interventions",
+   "comparator": "various (often no or usual teaching)",
+   "outcome": {
+    "measure": "varied, often immediate post-tests",
+    "assisted": false,
+    "delay": "mostly immediate; few longitudinal studies",
+    "transfer": "varied"
+   },
+   "estimate": {
+    "metric": "mean difference (RE/FE)",
+    "value": "6 RCTs: RE MD 2.23 [0.67, 3.80], FE MD 2.09 [1.62, 2.57], I2 = 88%; pre-clinical subgroup RE MD 0.32 [-3.99, 4.64] (n.s.)",
+    "ci": "as listed",
+    "k_or_n": "50 studies; 6 RCTs pooled",
+    "note": "46 of 50 studies reported some improvement (publication-bias concern stated by authors); 4 studies with no improvement; units of the pooled mean differences differ across instruments (unstandardised pooling)."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Seed source. Pooling unstandardised mean differences across different scales makes the pooled number hard to interpret; QuADS is not a risk-of-bias tool; strong conclusion wording vs I2 = 88% and 6 RCTs. Use only for: explicit clinical reasoning teaching usually shows immediate gains; timing (clinical years) may moderate.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:explicit_cr_teaching_immediate_gains",
+     "relation": "supports",
+     "locator": "Results; Meta-analyses of the RCTs"
+    },
+    {
+     "claim_id": "R3:explicit_cr_teaching_immediate_gains",
+     "relation": "qualifies",
+     "locator": "Strengths and Limitations; pre-clinical subgroup n.s."
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "schmidt2007illnessscripts",
+   "citation": "Schmidt, H. G., & Rikers, R. M. J. P. (2007). How expertise develops in medicine: Knowledge encapsulation and illness script formation. Medical Education, 41(12), 1133-1139.",
+   "doi_or_url": "https://doi.org/10.1111/j.1365-2923.2007.02915.x",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Crossref/OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "narrative review of knowledge-encapsulation and illness-script research",
+   "population": "medical students and doctors (various studies)",
+   "operation": "diagnostic_reasoning: mental representation of clinical cases",
+   "intervention": "not applicable (theory review)",
+   "comparator": "not applicable",
+   "outcome": {
+    "measure": "various probes of case representation",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "unknown",
+    "note": "Abstract: most findings consistent with encapsulation and illness-script formation through clinical experience; debate remains on the role of biomedical knowledge; recommends basic science in clinical context and reflection on patient problems."
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Theory, authored by its proponents; recommendations are derived, not tested here. Used only as the representational target (illness script: enabling conditions, fault, consequences), not as evidence of an instructional effect.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:illness_scripts_theoretical_target",
+     "relation": "context_only",
+     "locator": "Abstract"
+    }
+   ],
+   "verdict": "not_empirical"
+  },
+  {
+   "source_id": "mamede2012reflection",
+   "citation": "Mamede, S., van Gog, T., Moura, A. S., de Faria, R. M. D., Peixoto, J. M., Rikers, R. M. J. P., & Schmidt, H. G. (2012). Reflection as a strategy to foster medical students' acquisition of diagnostic competence. Medical Education, 46(5), 464-472.",
+   "doi_or_url": "https://doi.org/10.1111/j.1365-2923.2012.04217.x",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex/Crossref abstract (structured, with means and CIs)",
+    "sections_read": []
+   },
+   "design": "three-phase experiment: learning phase (6 cases) under structured reflection vs immediate diagnosis vs differential diagnosis; immediate and 1-week delayed tests with new cases of the same diseases",
+   "population": "46 Year-4 medical students (Brazil)",
+   "operation": "diagnostic_reasoning: diagnosing written clinical cases",
+   "intervention": "structured (deliberate) reflection on each case",
+   "comparator": "immediate single diagnosis; listing a differential diagnosis",
+   "outcome": {
+    "measure": "diagnostic accuracy (0-1) on new cases of studied diseases",
+    "assisted": false,
+    "delay": "immediate and 1 week",
+    "transfer": "near: new cases, same diseases"
+   },
+   "estimate": {
+    "metric": "mean accuracy [95% CI]",
+    "value": "Immediate: reflection 0.48 [0.38, 0.58] < differential 0.62 [0.54, 0.70]; 1 week: reflection 0.66 [0.56, 0.76] > differential 0.48 [0.37, 0.58] and immediate 0.52 [0.43, 0.60]",
+    "ci": "as listed",
+    "k_or_n": "N = 46",
+    "note": "Reflection disadvantage immediately, advantage after a week; generating a differential alone did not help delayed learning."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Small sample, one site, developer group; written vignettes; same diseases at test (near transfer only). Key design lesson: immediate performance would have ranked the conditions the wrong way round.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:deliberate_reflection_improves_delayed_diagnosis",
+     "relation": "supports",
+     "locator": "Abstract Results"
+    },
+    {
+     "claim_id": "R3:immediate_performance_misleads",
+     "relation": "supports",
+     "locator": "Abstract Results (immediate vs 1-week reversal)"
+    },
+    {
+     "claim_id": "R3:listing_differential_alone_insufficient",
+     "relation": "supports",
+     "locator": "Abstract Results"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "mamede2019guidedreflection",
+   "citation": "Mamede, S., Figueiredo-Soares, T., Elói Santos, S. M., de Faria, R. M. D., Schmidt, H. G., & van Gog, T. (2019). Fostering novice students' diagnostic ability: The value of guiding deliberate reflection. Medical Education, 53(6), 628-637.",
+   "doi_or_url": "https://doi.org/10.1111/medu.13829",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; Europe PMC full text (PMC6594026) timed out; Wiley PDF HTTP 403",
+    "sections_read": []
+   },
+   "design": "two-phase experiment: 9 cases under free vs cued vs modelled reflection; test 2 weeks later",
+   "population": "80 third-year medical students",
+   "operation": "diagnostic_reasoning: diagnosing written cases",
+   "intervention": "cued reflection; modelled reflection (studying worked reflection examples)",
+   "comparator": "free reflection",
+   "outcome": {
+    "measure": "diagnostic accuracy (0-1) on new cases of studied diseases and of 'adjacent' non-studied diseases",
+    "assisted": false,
+    "delay": "2 weeks",
+    "transfer": "near (studied) and far (adjacent diseases)"
+   },
+   "estimate": {
+    "metric": "mean (SD)",
+    "value": "Studied diseases: cued 0.58 (0.23) > free 0.41 (0.20), p < .02; modelled 0.54 (0.22) n.s. vs either; adjacent diseases: all groups extremely low, no differences",
+    "ci": "not reported",
+    "k_or_n": "N = 80",
+    "note": "Modelled reflection rated less effortful."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Single study, written cases; far transfer to adjacent diseases absent in all groups - reflection practice does not substitute for disease knowledge.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:deliberate_reflection_improves_delayed_diagnosis",
+     "relation": "supports",
+     "locator": "Abstract Results (studied diseases)"
+    },
+    {
+     "claim_id": "R3:reflection_no_far_transfer_without_knowledge",
+     "relation": "supports",
+     "locator": "Abstract Results (adjacent diseases)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "mamede2022deliberatereflection",
+   "citation": "Mamede, S., & Schmidt, H. G. (2023). Deliberate reflection and clinical reasoning: Founding ideas and empirical findings. Medical Education, 57(1), 76-85 (online 2022).",
+   "doi_or_url": "https://doi.org/10.1111/medu.14863",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "Europe PMC fullTextXML (PMC10083910)",
+    "sections_read": [
+     "Abstract",
+     "Sections on effects for physicians (complex vs straightforward cases, availability bias studies)",
+     "Unresolved issues: vignettes vs real practice"
+    ]
+   },
+   "design": "narrative review by the approach's originators",
+   "population": "physicians and medical students in the reviewed experiments",
+   "operation": "diagnostic_reasoning: deliberate reflection (review grounds, alternatives, discriminating features)",
+   "intervention": "deliberate reflection",
+   "comparator": "intuitive/fast diagnosis; free reflection",
+   "outcome": {
+    "measure": "diagnostic accuracy on vignettes",
+    "assisted": false,
+    "delay": "varied",
+    "transfer": "varied"
+   },
+   "estimate": {
+    "metric": "not applicable",
+    "value": "unknown",
+    "ci": "not applicable",
+    "k_or_n": "unknown",
+    "note": "Review: benefits mainly in non-straightforward cases and against induced availability bias; no added value in routine cases; mechanism unclear; usefulness in real practice, where findings must be gathered rather than given, is untested."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Authored by the proponents; narrative, not systematic. Explicitly limits generalisation from vignettes that contain all needed findings to practice where data must be gathered.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:deliberate_reflection_helps_in_difficult_cases",
+     "relation": "supports",
+     "locator": "Discussion of complex vs straightforward cases"
+    },
+    {
+     "claim_id": "R3:vignette_to_practice_gap",
+     "relation": "supports",
+     "locator": "Unresolved issues paragraph"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "norman2014system1",
+   "citation": "Norman, G., Sherbino, J., Dore, K., Wood, T., Young, M., Gaissmaier, W., Kreuger, S., & Monteiro, S. (2014). The etiology of diagnostic errors: A controlled trial of System 1 versus System 2 reasoning. Academic Medicine, 89(2), 277-284.",
+   "doi_or_url": "https://doi.org/10.1097/ACM.0000000000000105",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract",
+    "sections_read": []
+   },
+   "design": "two-cohort controlled comparison (2010 'speed' vs 2011 'reflect' instruction), 20 computer-based cases",
+   "population": "second-year residents at three Canadian schools (n = 96 and 108)",
+   "operation": "diagnostic_reasoning: diagnosing computer-based internal medicine cases",
+   "intervention": "instruction to be careful, thorough, reflective",
+   "comparator": "instruction to be fast but accurate",
+   "outcome": {
+    "measure": "diagnostic accuracy; time",
+    "assisted": false,
+    "delay": "immediate",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "% accuracy",
+    "value": "Speed 44.5% vs Reflect 45.0% (n.s.); 69 vs 89 s per case",
+    "ci": "not reported",
+    "k_or_n": "N = 204",
+    "note": "Incorrect cases took on average 17 s longer; accuracy correlated with licensing exam scores."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Cohorts not randomised (different years). Generic 'slow down' instructions are not deliberate reflection; null for the generic instruction, not for structured reflection.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:generic_slow_down_instruction_ineffective",
+     "relation": "supports",
+     "locator": "Abstract Results"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "sherbino2014forcing",
+   "citation": "Sherbino, J., Kulasegaram, K., Howey, E., & Norman, G. (2014). Ineffectiveness of cognitive forcing strategies to reduce biases in diagnostic reasoning: A controlled trial. CJEM, 16(1), 34-40.",
+   "doi_or_url": "https://doi.org/10.2310/8000.2013.130860",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "PubMed abstract (PMID 24423999) via NCBI E-utilities",
+    "sections_read": []
+   },
+   "design": "controlled trial: cognitive forcing strategy (CFS) training during a 4-week emergency medicine rotation vs control; computer-based test cases",
+   "population": "191 medical students (145 CFS, 46 control)",
+   "operation": "diagnostic_reasoning: avoiding search-satisficing and availability bias",
+   "intervention": "CFS training as recommended by experts",
+   "comparator": "no CFS training",
+   "outcome": {
+    "measure": "identifying second/uncommon diagnoses; false-positive over-search cases",
+    "assisted": false,
+    "delay": "end of rotation",
+    "transfer": "near"
+   },
+   "estimate": {
+    "metric": "% and chi-square",
+    "value": "Second diagnosis identified 54% vs 48% (p = .13); availability-bias cases 45% in each group (p = .98); over-search in false-positive cases 64% vs 77% (n.s.)",
+    "ci": "not reported",
+    "k_or_n": "N = 191",
+    "note": "Authors: CFS teaching failed to reduce diagnostic error in novices."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Unequal groups, allocation method not verified, abstract-level. Clear null result for teaching generic debiasing heuristics to novices.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:generic_debiasing_teaching_null_in_novices",
+     "relation": "supports",
+     "locator": "Abstract Results/Conclusions"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "ely2015checklists",
+   "citation": "Ely, J. W., & Graber, M. L. (2015). Checklists to prevent diagnostic errors: A pilot randomized controlled trial. Diagnosis, 2(3), 163-169.",
+   "doi_or_url": "https://doi.org/10.1515/dx-2015-0008",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract; De Gruyter PDF returned empty response",
+    "sections_read": []
+   },
+   "design": "pilot cluster-type RCT (physicians randomised), real patients, 1-month follow-up for error ascertainment",
+   "population": "14 primary care physicians, 100 patients (ED and same-day clinic)",
+   "operation": "diagnostic_reasoning in practice (not education)",
+   "intervention": "reading aloud a differential-diagnosis checklist for the chief complaint",
+   "comparator": "usual care",
+   "outcome": {
+    "measure": "diagnostic error by 1-month follow-up",
+    "assisted": false,
+    "delay": "1 month",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "% error",
+    "value": "11.2% vs 17.8% (p = .46, n.s.); post-hoc ED subgroup 19.1% vs 45.0% (p = .04); more diagnoses considered (6.5 vs 3.4)",
+    "ci": "not reported",
+    "k_or_n": "14 physicians / 100 patients",
+    "note": "Post-hoc subgroup only; pilot."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Tiny pilot, underpowered; practice setting with real patients. Shows that considering more diagnoses (process) need not reduce errors (outcome).",
+   "claim_edges": [
+    {
+     "claim_id": "R3:checklist_process_not_outcome",
+     "relation": "supports",
+     "locator": "Abstract Results"
+    },
+    {
+     "claim_id": "R3:generic_debiasing_teaching_null_in_novices",
+     "relation": "context_only",
+     "locator": "practice not education"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "staal2022reasoningtools",
+   "citation": "Staal, J., Hooftman, J., Gunput, S. T. G., Mamede, S., Frens, M. A., Van den Broek, W. W., Alsma, J., & Zwaan, L. (2022). Effect on diagnostic accuracy of cognitive reasoning tools for the workplace setting: Systematic review and meta-analysis. BMJ Quality & Safety, 31(12), 899-910.",
+   "doi_or_url": "https://doi.org/10.1136/bmjqs-2022-014865",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "Europe PMC fullTextXML (PMC9685706)",
+    "sections_read": [
+     "Abstract",
+     "Methods: RoB 2, GRADE, publication bias",
+     "Results: pooled estimate, heterogeneity, GRADE assessment",
+     "Discussion and Limitations"
+    ]
+   },
+   "design": "systematic review and meta-analysis (PROSPERO CRD42020186994), controlled experiments, search to Oct 2021",
+   "population": "29 studies, 2732 participants (medical students and professionals)",
+   "operation": "diagnostic_reasoning: workplace-oriented tools (checklists, reflection prompts, forcing strategies, decision support)",
+   "intervention": "cognitive reasoning tools used during diagnosis",
+   "comparator": "diagnosis without the tool",
+   "outcome": {
+    "measure": "diagnostic accuracy (mostly written/visual cases; few real patients)",
+    "assisted": true,
+    "delay": "mostly immediate",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "Hedges g [95% CI]",
+    "value": "g = 0.20 [0.10, 0.29] after removing 3 studies with prior training (I2 = 38%; with them I2 = 70%)",
+    "ci": "as listed",
+    "k_or_n": "29 studies / 2732 participants",
+    "note": "GRADE moderate (downgraded for risk of bias); no significant subgroup differences; Egger n.s."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Tool use DURING diagnosis (assisted), not learning; mostly vignette tasks. Small effect; authors call it clinically important given base rates, which is an extrapolation.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:reasoning_tools_small_assisted_effect",
+     "relation": "supports",
+     "locator": "Abstract; Results GRADE"
+    },
+    {
+     "claim_id": "R3:vignette_to_practice_gap",
+     "relation": "supports",
+     "locator": "Discussion: need for evaluation in practice"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "meyer2013calibration",
+   "citation": "Meyer, A. N. D., Payne, V. L., Meeks, D. W., Rao, R., & Singh, H. (2013). Physicians' diagnostic accuracy, confidence, and resource requests: A vignette study. JAMA Internal Medicine, 173(21), 1952-1958.",
+   "doi_or_url": "https://doi.org/10.1001/jamainternmed.2013.10081",
+   "source_type": "primary_measurement",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract (structured)",
+    "sections_read": []
+   },
+   "design": "web-based vignette study, 4 validated cases (2 easier, 2 harder) in 4 sequential phases, confidence after each phase",
+   "population": "118 US general internists from an online physician community",
+   "operation": "diagnostic_reasoning + self_regulation: calibration of confidence",
+   "intervention": "not applicable",
+   "comparator": "easier vs harder cases",
+   "outcome": {
+    "measure": "accuracy (0/1), confidence (0-10), calibration, resource requests",
+    "assisted": false,
+    "delay": "not applicable",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "% correct; mean confidence",
+    "value": "Accuracy 55.3% (easier) vs 5.8% (harder); confidence 7.2 vs 6.4 of 10",
+    "ci": "not reported",
+    "k_or_n": "N = 118",
+    "note": "Higher confidence associated with fewer requests for additional tests (p = .01)."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Volunteer online sample, vignettes; practising physicians, not students. Shows confidence is insensitive to accuracy in hard cases: self-rated certainty cannot gate competence claims and should be captured and compared with outcomes (calibration feedback), not trusted.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:confidence_insensitive_to_accuracy",
+     "relation": "supports",
+     "locator": "Abstract Results"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "kononowicz2019virtualpatients",
+   "citation": "Kononowicz, A. A., Woodham, L. A., Edelbring, S., Stathakarou, N., Davies, D., Saxena, N., Tudor Car, L., Carlstedt-Duke, J., Car, J., & Zary, N. (2019). Virtual patient simulations in health professions education: Systematic review and meta-analysis by the Digital Health Education Collaboration. Journal of Medical Internet Research, 21(7), e14676.",
+   "doi_or_url": "https://doi.org/10.2196/14676",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "Europe PMC fullTextXML (PMC6632099)",
+    "sections_read": [
+     "Abstract",
+     "Methods: risk of bias (Cochrane), GRADE",
+     "Results: outcome measurement (standardised vs real patients)",
+     "Discussion: concerns, Limitations"
+    ]
+   },
+   "design": "Cochrane-method systematic review and meta-analysis of RCTs and cluster RCTs, 1990-Sept 2018, 7 databases",
+   "population": "51 trials, 4696 participants, pre- and post-registration health professions",
+   "operation": "diagnostic_reasoning + procedural skills: virtual patient cases",
+   "intervention": "virtual patients",
+   "comparator": "traditional education; blended; other digital education",
+   "outcome": {
+    "measure": "knowledge and skills (skills mostly measured with standardised patients or written/virtual cases; real patients in 1 study)",
+    "assisted": false,
+    "delay": "mostly immediate",
+    "transfer": "near"
+   },
+   "estimate": {
+    "metric": "SMD [95% CI]",
+    "value": "vs traditional: knowledge SMD 0.11 [-0.17, 0.39], I2 = 74%; skills SMD 0.90 [0.49, 1.32], I2 = 88%",
+    "ci": "as listed",
+    "k_or_n": "51 trials / 4696 participants",
+    "note": "Authors: low-quality evidence overall; publication bias could not be assessed firmly; VPs should complement, not replace, real patient contact."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "High heterogeneity, low GRADE; outcome measured almost never on real patients. Supports VPs as a practice environment for reasoning, NOT as evidence of real-patient competence.",
+   "claim_edges": [
+    {
+     "claim_id": "R3:virtual_patients_skills_gain_low_certainty",
+     "relation": "supports",
+     "locator": "Abstract Results"
+    },
+    {
+     "claim_id": "R3:simulation_not_real_patient_competence",
+     "relation": "supports",
+     "locator": "Results outcome measures; Discussion 'complement not replace'"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "goh2024llmdiagnosis",
+   "citation": "Goh, E., Gallo, R., Hom, J., Strong, E., Weng, Y., Kerman, H., et al. (2024). Large language model influence on diagnostic reasoning: A randomized clinical trial. JAMA Network Open, 7(10), e2440969.",
+   "doi_or_url": "https://doi.org/10.1001/jamanetworkopen.2024.40969",
+   "source_type": "primary_experiment",
+   "kb_status": "new",
+   "domain": "clinical",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "Europe PMC fullTextXML (PMC11519755)",
+    "sections_read": [
+     "Abstract",
+     "Methods: structured-reflection scoring rubric, blinded scorers",
+     "Results: assessment tool validation (kappa, alpha)",
+     "Limitations"
+    ]
+   },
+   "design": "single-blind RCT (NCT06157944), 60 min for up to 6 vignettes, stratified by career stage",
+   "population": "50 US physicians (26 attendings, 24 residents) in family, internal, emergency medicine",
+   "operation": "diagnostic_reasoning: differential diagnosis with supporting/opposing findings and next steps",
+   "intervention": "GPT-4 access plus conventional resources",
+   "comparator": "conventional resources only; exploratory LLM-alone arm",
+   "outcome": {
+    "measure": "structured-reflection rubric score (%) graded by blinded experts",
+    "assisted": true,
+    "delay": "immediate",
+    "transfer": "not applicable"
+   },
+   "estimate": {
+    "metric": "percentage points [95% CI]",
+    "value": "LLM-assisted 76% vs conventional 74% median; adjusted difference 2 pp [-4, 8], p = .60; LLM alone +16 pp [2, 30] vs conventional",
+    "ci": "as listed",
+    "k_or_n": "N = 50",
+    "note": "Rubric reliability: weighted kappa 0.66 across 3 graders; Cronbach alpha 0.64."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Small trial, vignettes, single model version (2023), no prompt training. Two R3-relevant points: access to a strong model did not improve human reasoning scores; and grading of differential-diagnosis reasoning reached only moderate reliability even with expert rubric (kappa 0.66).",
+   "claim_edges": [
+    {
+     "claim_id": "R3:assisted_output_not_competence",
+     "relation": "supports",
+     "locator": "Results primary outcome"
+    },
+    {
+     "claim_id": "R3:open_reasoning_grading_moderate_reliability",
+     "relation": "supports",
+     "locator": "Results: Assessment Tool Validation"
+    }
+   ],
+   "verdict": "supported_within_scope"
   }
  ],
  "search_log": [
@@ -897,6 +1936,22 @@
     "gii2026hinweise"
    ],
    "excluded_or_note": "Official notes on non-official consolidated texts and 'Stand'."
+  },
+  {
+   "id": "R3-S23",
+   "date": "2026-11-27",
+   "engine": "Crossref REST /works/{doi}",
+   "query": "identity check of DOIs not covered by R3-S01: 10.5334/pme.1986, 10.3109/0142159x.2012.680939, 10.1080/00131911.2014.929565, 10.1177/2755323X261434265, 10.1111/medu.14863, 10.1111/j.1365-2923.2007.02915.x",
+   "hits_screened": 6,
+   "included": [
+    "wark2025clinicalreasoning",
+    "thistlethwaite2012cbl",
+    "brookhart2015rubrics",
+    "cope2026gradingmachines",
+    "mamede2022deliberatereflection",
+    "schmidt2007illnessscripts"
+   ],
+   "excluded_or_note": "All resolved with matching title/first authors/year; author order of Wark et al. corrected to the Crossref record. Every DOI in this register was resolved via Crossref in R3-S01, S08, S17, S19 or S23; gii2026hinweise (URL) and zubaer2026gradelegal (arXiv id) have no DOI."
   }
  ]
 }
