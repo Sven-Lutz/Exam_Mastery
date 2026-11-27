@@ -94,6 +94,10 @@ bin/mastery build --unit ~/Lernen/meine-einheit.json --slug meine-einheit --trac
 Die Einheit (Schema `em-experience-v1`) muss außerhalb des Repositorys liegen und wird nur nach `~/Mastery` gebaut.
 `library.json` der Bibliothek enthält keinen Pfad. Keine Codeänderung nötig.
 
+**Ganze Lehrveranstaltung importieren** (Ordner mit Folien, Übungen, Lösungen, Klausuren): App → **Kurse** oder
+`bin/mastery import <Ordner>`. Inventar, Vollständigkeit, Kapitelplan, Authoring-Pakete und Bau je Kapitel:
+siehe `docs/COURSE_IMPORT.md`.
+
 ## 5. Mini-Abnahme für den Owner (10 Schritte, ca. 15 Minuten)
 
 1. `bin/mastery` ausführen. Erwartet: Bau ohne Fehler (beim ersten Mal einige Sekunden), Browser zeigt „Mastery“.
