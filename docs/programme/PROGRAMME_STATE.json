@@ -1,7 +1,7 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-27T16:20:00+01:00",
- "updated_by": "headless WP-R5",
+ "updated": "2026-11-27T16:55:00+01:00",
+ "updated_by": "LEAD (interactive, resume 2026-11-27 16:43)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
   "Never merge to main; draft PRs only.",
@@ -55,11 +55,11 @@
    "note": "independent review pending"
   },
   "R2": {
-   "status": "COMPLETED",
+   "status": "RUNNING",
    "wp": "WP-R2",
    "issue": 23,
    "pr": 38,
-   "note": "independent review pending; declared gaps (search log, physics/finance, complexity, causal inference)"
+   "note": "reopened for supplement batch 5 (owner brief 2026-11-27); PR #38 stays the vehicle"
   },
   "R3": {
    "status": "PLANNED",
@@ -72,11 +72,11 @@
    "issue": 25
   },
   "R5": {
-   "status": "COMPLETED",
+   "status": "RUNNING",
    "wp": "WP-R5",
    "issue": 26,
    "pr": 39,
-   "note": "independent review pending"
+   "note": "reopened for supplement batch 5 (owner brief 2026-11-27); PR #39 stays the vehicle"
   },
   "R6": {
    "status": "PLANNED",
@@ -201,7 +201,7 @@
   {
    "id": "R2",
    "kind": "background subagent of LEAD",
-   "scope": "R2 formal, quantitative, computational mastery + measurement contract",
+   "scope": "R2S supplement batch 5: algorithms, complexity, quantitative problem solving/modelling",
    "status": "RUNNING",
    "checkpoint": "docs/programme/agents/R2.json",
    "worktree": "Exam_Mastery-r2"
@@ -209,7 +209,7 @@
   {
    "id": "R5",
    "kind": "background subagent of LEAD",
-   "scope": "R5 AI tutoring, knowledge tracing, measurement, evaluation protocol",
+   "scope": "R5S supplement batch 5: hint levels, error diagnosis, learning analytics",
    "status": "RUNNING",
    "checkpoint": "docs/programme/agents/R5.json",
    "worktree": "Exam_Mastery-r5"
@@ -218,7 +218,7 @@
    "id": "SUPERVISOR",
    "kind": "launchd agent",
    "scope": "headless continuation after limits/crashes/reboots",
-   "status": "IDLE (installed, interval 1800 s)"
+   "status": "IDLE (installed; daily cap 4/4 reached 2026-11-27; lead heartbeat + hold active)"
   }
  ],
  "work_packages": [
@@ -276,13 +276,13 @@
   {
    "id": "WP-R2",
    "title": "R2 formal, quantitative and computational mastery",
-   "status": "COMPLETED",
+   "status": "RUNNING",
    "priority": 2,
    "autostart": true,
    "issue": 23,
    "branch": "research/r2-formal-quantitative-20261127",
    "base": "research/r1-learning-science-20261127 (bec1f62)",
-   "next_step": "None autonomous. Independent review of draft PR #38; coverage gaps listed in report §11 can become a follow-up package if R6 needs them.",
+   "next_step": "Specialist R2S adds batch 5 (evidence, policies, report §12, tests), pushes to PR #38; lead integrates and re-marks COMPLETED.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
    "worktree": "Exam_Mastery-r2",
    "done": [
@@ -305,19 +305,20 @@
    ],
    "tests": "cd tests && python3 -m unittest test_r2_learning_policies test_r1_learning_policies: 27 ok, 1 skipped",
    "blockers": [],
-   "updated": "2026-11-27T13:55:00+01:00",
-   "pr": 38
+   "updated": "2026-11-27T16:55:00+01:00",
+   "pr": 38,
+   "reopened": "Owner resume brief 2026-11-27 requires concrete consequences for algorithms and quantitative problem solving; report §11 lists them as gaps. Supplement batch 5 (R2S) on the same branch/PR #38: algorithm visualisation/complexity, quantitative problem representation and modelling."
   },
   {
    "id": "WP-R5",
    "title": "R5 AI tutoring, adaptation and learning measurement",
-   "status": "COMPLETED",
+   "status": "RUNNING",
    "priority": 3,
    "autostart": false,
    "issue": 26,
    "branch": "research/r5-tutoring-measurement-20261127",
    "base": "research/r1-learning-science-20261127 (bec1f62)",
-   "next_step": "None for headless runs; awaits independent review of draft PR #39.",
+   "next_step": "Specialist R5S adds batch 5 (evidence, policies, report §12, tests), pushes to PR #39; lead integrates and re-marks COMPLETED.",
    "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
    "worktree": "Exam_Mastery-r5",
    "done": [
@@ -332,7 +333,7 @@
     "search queries of batches 1-3 not reconstructible (documented gap)",
     "Darvishi full text; delayed unassisted GenAI-tutor endpoint; post-2019 KT bias audits; legal review of GDPR/AI Act applicability"
    ],
-   "updated": "2026-11-27T16:20:00+01:00",
+   "updated": "2026-11-27T16:55:00+01:00",
    "artifacts": [
     "docs/research/workstreams/r5/r5_evidence.json",
     "docs/research/workstreams/r5/r5_tutoring_policies.json",
@@ -343,7 +344,8 @@
     "python3 -m unittest tests.test_r5_tutoring_policies tests.test_r1_learning_policies: 26 OK (skipped=1), 2026-11-27"
    ],
    "blockers": [],
-   "pr": 39
+   "pr": 39,
+   "reopened": "Owner resume brief 2026-11-27 requires hint levels, error diagnosis and learning analytics; R5 had no hint-, diagnosis- or LA-specific evidence. Supplement batch 5 (R5S) on the same branch/PR #39."
   },
   {
    "id": "WP-R3",
@@ -529,7 +531,7 @@
   },
   "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents."
  },
- "next_milestone": "R3/R4/R9/R7/R8, then R6 architecture decision.",
+ "next_milestone": "R2/R5 supplement batch 5, then R3+R4 (two specialists), R9+R7, R8, then R6 architecture decision.",
  "product_identity": {
   "product_name": "Mastery",
   "legacy_name": "Exam Mastery",
