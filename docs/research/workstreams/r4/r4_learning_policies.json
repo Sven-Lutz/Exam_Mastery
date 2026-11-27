@@ -1,0 +1,1699 @@
+{
+ "schema": "em-learning-policies/1",
+ "version": "0.1.0",
+ "status": "DESIGN_HYPOTHESIS_SET",
+ "date": "2026-11-27",
+ "baseline": {
+  "branch": "research/r4-embodied-20261127",
+  "builds_on": "R1 policies (research/r1-learning-science-20261127, 3559872); Format wie R2 (PR #38)",
+  "kb": "exam_mastery/knowledge/{sources,principles}.json"
+ },
+ "authorship": {
+  "R4": "Spezialist verkörperte Fertigkeiten, Labor, Raum/CAD, Handwerk (r4/r4_evidence.json, R4_EMBODIED_EXPERIMENTAL_DESIGN.md)",
+  "lead": "keine Lead-Stichprobe in diesem Lauf",
+  "independent_review": "pending: keine menschliche Fachprüfung; verification_log ist Selbstprüfung desselben Modells"
+ },
+ "operations": [
+  "recall_discrimination",
+  "symbolic_procedure",
+  "formal_proof",
+  "rule_based_contextual",
+  "diagnostic_reasoning",
+  "empirical_experimental",
+  "computational_construction",
+  "spatial_design",
+  "embodied_psychomotor",
+  "open_synthesis",
+  "self_regulation"
+ ],
+ "certainty_scale": {
+  "high": "mehrere unabhängige, biasgeprüfte Belege in passender Population; Produktregel nah am Beleg",
+  "moderate": "konsistente Richtung, aber Indirektheit, Heterogenität oder Bias-Risiko",
+  "low": "indirekte oder einzelne Belege; Produktregel deutlich vom Beleg entfernt",
+  "very_low": "keine direkte Evidenz; plausibel begründete Setzung",
+  "normative": "Sicherheits-, Rechts- oder Ethikgrenze; keine empirische Sicherheit beansprucht",
+  "note": "Interne, an GRADE angelehnte Einschätzung; die Policy-Stufe bewertet die Produktregel, Teilaussagen stehen in sub_claims."
+ },
+ "competence_tracks": {
+  "A_knowledge": "Konzept-, Verfahrens-, Diagnose- und Planungswissen; im Produkt trainier- und prüfbar nach dem R1-Messvertrag (unassistiert, verzögert, neue Items).",
+  "B_physical_execution": "reale Ausführung an Material, Werkzeug, Gerät, Patient/Modell; im Produkt nur erfass-, nie bewertbar; Status ändert sich ausschließlich durch einen externen Bewertungseintrag einer qualifizierten Person.",
+  "C_certification_and_safety": "Sicherheitsunterweisung, Zulassung, Berufs- oder Sicherheitszertifizierung; vollständig außerhalb des Produkts, wird weder angezeigt noch abgeleitet.",
+  "rule": "Keine Promotion von A nach B oder von B nach C durch Produktdaten (Simulator, Video, Foto, Sensor, Selbstauskunft, Sprachmodell)."
+ },
+ "conflict_resolution": [
+  {
+   "id": "R4-CR-1",
+   "between": [
+    "R4-POL-03",
+    "R1-POL-A04"
+   ],
+   "rule": "Für physische Ausführung gilt R4-POL-03 (geblockt beginnen); R1-POL-A04 und IL-R1 gelten nur für Spur-A-Aufgaben zur Methoden- oder Variantenwahl."
+  },
+  {
+   "id": "R4-CR-2",
+   "between": [
+    "R4-POL-07",
+    "R4-POL-01"
+   ],
+   "rule": "Simulator-, VR- und Lab-Scores sind Spur-A-Daten; sie verändern Spur B nie, auch nicht bei Profizienzkriterium."
+  },
+  {
+   "id": "R4-CR-3",
+   "between": [
+    "R4-POL-15",
+    "R4-POL-13"
+   ],
+   "rule": "Sicherheitsgate hat Vorrang: keine Fehlerermutigung und keine Explore-Modi bei gekennzeichneten Gefahreninhalten."
+  },
+  {
+   "id": "R4-CR-4",
+   "between": [
+    "R4-POL-04",
+    "R1-POL-A08"
+   ],
+   "rule": "Für Spur-A-Aufgaben gilt R1-POL-A08 (korrektives Feedback nach jedem Versuch); für reale Ausführung schreibt R4 keinen Plan vor, gemessen wird nur rückmeldungsfrei."
+  },
+  {
+   "id": "R4-CR-5",
+   "between": [
+    "R4-POL-12",
+    "R4-POL-14"
+   ],
+   "rule": "Selbstbewertung im Übungsprotokoll (R4-POL-14) und externe Bewertung (R4-POL-12) sind getrennte Ereignistypen; nur die externe zählt für Spur B."
+  }
+ ],
+ "shared_measurement_contract": {
+  "inherits": "R1: nur unassistierte, verzögerte Versuche an neuen bzw. umformulierten Items belegen Spur-A-Kompetenz",
+  "track_b_evidence": "nur Ereignis 'external_assessment' (qualifizierte Person, Instrument und Version, Datum, reales Objekt); optional zweite unabhängige Bewertung",
+  "not_evidence": [
+   "Simulator- und VR-Scores für Spur B",
+   "Videos ansehen, Demonstrationen abspielen",
+   "Fotos oder Videos realer Ausführung, bewertet durch Produkt oder Sprachmodell",
+   "Selbstauskunft zu Zutrauen, Selbstwirksamkeit, Übungsminuten",
+   "Übungsprotokolle ohne externe Bewertung",
+   "Sicherheits-Wissensquiz als Unterweisung"
+  ],
+  "event_types": [
+   "practice_log (self)",
+   "self_assessment",
+   "external_assessment",
+   "external_safety_briefing (nur Vermerk, keine Ableitung)"
+  ]
+ },
+ "deferred_operations": [
+  {
+   "operation": "recall_discrimination",
+   "reason": "von R1 abgedeckt; R4 nutzt Abrufkarten nur für Spur-A-Inhalte",
+   "owner_workstream": "R1"
+  },
+  {
+   "operation": "symbolic_procedure",
+   "reason": "von R1/R2 abgedeckt (Messunsicherheitsrechnung als Rechnung: R2)",
+   "owner_workstream": "R2"
+  },
+  {
+   "operation": "formal_proof",
+   "reason": "nicht R4",
+   "owner_workstream": "R2"
+  },
+  {
+   "operation": "rule_based_contextual",
+   "reason": "Rechts- und Normenanwendung (z. B. Arbeitsschutzrecht) nicht untersucht",
+   "owner_workstream": "R3"
+  },
+  {
+   "operation": "open_synthesis",
+   "reason": "offene Entwurfssynthese (Ideation, Designkritik) nicht untersucht",
+   "owner_workstream": "R3"
+  },
+  {
+   "operation": "self_regulation",
+   "reason": "von R1 abgedeckt (B-Policies)",
+   "owner_workstream": "R1"
+  }
+ ],
+ "operation_notes": {
+  "diagnostic_reasoning": "R4 deckt nur technische/handwerkliche Fehlerdiagnose (R4-POL-09, 14, 15) ab; klinische Diagnostik bleibt bei R3",
+  "computational_construction": "nur CAD-Modellierung (R4-POL-11); Programmieren bei R2"
+ },
+ "coverage_gaps": [
+  "Holzbearbeitung/Handwerkzeuge (Fügen, Sägen, Toleranz): keine Lernstudie gefunden (Crossref-Suche lieferte nur Lehrbuchkapitel); Schwendimann et al. 2015 (Zimmerer-Lernende, Erfahrraum) ohne abrufbares Abstract nicht registriert; Marchand 2008 (Ethnografie Handwerkslehre) nicht registriert",
+  "Backen/Gärung: keine Lernstudie zu Fehlerdiagnose beim Backen gefunden; Szenario in §7 ist reine Designillustration",
+  "Kochen: Evidenz überwiegend qualitativ/selbstberichtet (rossen2026cooking, sanaan2026onlinecooking nur Abstract); kein beobachtetes Fertigkeitsinstrument mit Validitätsnachweis gefunden",
+  "CAD: keine Interventionsstudie zu Constraint-Modellierung oder Konstruktionsabsicht gelesen (Company et al. 2015, Johnson & Diwakaran 2011 ohne Abstract); otey2017designintent ist konzeptuell",
+  "Skizzieren: Booth et al. 2016 ohne abrufbares Abstract nicht registriert",
+  "Virtuelle Chemielabore: Brinson 2015 und Chan et al. 2021 nicht registriert (Abstract nicht abrufbar bzw. Rate-Limit); Chemie-spezifische Transferevidenz fehlt, finkelstein2005cck ist Physik",
+  "Materialcharakterisierung, Messunsicherheit als eigenständiges Lernziel: keine Quelle gelesen",
+  "Haptik in Simulation, Schweiß-/Maschinen-VR: keine Quelle registriert",
+  "Selbstgesteuertes Üben (self-controlled practice, McKay et al. 2022 Meta-Psychology) gefunden, nicht registriert",
+  "ammar2023cimyth nur Metadaten; Gegenposition zu Czyż nur aus Sekundärdarstellung bekannt",
+  "Lab-Sicherheitstraining speziell (Chemie/Bio): nur allgemeine Arbeitsschutz-Meta-Analysen (burke2006safetytraining, burke2011dread)",
+  "Seeds: PMID 26768734 = sattelmayer2016motorprinciples (Volltext); 10.1115/1.4070965 = bartlett2026spatialdesign (Abstract); 10.1016/j.appet.2026.108511 = rossen2026cooking (Abstract)",
+  "Suche: ein Batch mit protokollierten Queries (search_log in r4_evidence.json), keine systematische Suche; OpenAlex wegen Tagesbudget nicht nutzbar"
+ ],
+ "verification_log": [
+  {
+   "by": "R4 (Selbstprüfung, dasselbe Modell)",
+   "date": "2026-11-27",
+   "method": "Crossref /works",
+   "checked": "Band/Heft/Seiten bzw. Artikelnummer: mckay2022feedbackfrequency (61, 102165), czyz2024ciretention (14, 15974), reeves2021virtuallabs (30(1), 16-30), radhakrishnan2021ivr (40(12), 1310-1339), dawe2014transfer (101(9)), burke2006safetytraining (96(2))",
+   "result": "match"
+  },
+  {
+   "by": "R4 (Selbstprüfung, dasselbe Modell)",
+   "date": "2026-11-27",
+   "method": "Volltext erneut gelesen",
+   "checked": "czyz2024ciretention angewandt 0,23 [-0,16; 0,62], Sensitivität -0,01; holmes2017labvalue 0,0024 +/- 0,0067, F(1,2615) = 2,32",
+   "result": "match"
+  },
+  {
+   "by": "R4 (Selbstprüfung, dasselbe Modell)",
+   "date": "2026-11-27",
+   "method": "Abstract-Abgleich",
+   "checked": "keith2008errormanagement: Domäne der Studien im Abstract nicht genannt",
+   "result": "Registertext korrigiert (zuvor unbelegte Domänenangabe entfernt)"
+  }
+ ],
+ "policies": [
+  {
+   "id": "R4-POL-01",
+   "title": "Zwei-Spuren-Kompetenzmodell: Wissen im Produkt, physische Ausführung nur über externe menschliche Bewertung",
+   "applies_to_operations": [
+    "embodied_psychomotor",
+    "empirical_experimental",
+    "spatial_design"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "recall_discrimination",
+     "reason": "reine Abrufkompetenz hat keine physische Spur; R1-Messvertrag gilt unverändert"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "jede Lerneinheit, deren Zielkompetenz eine körperliche Handlung, ein reales Werkzeug, ein Labor oder Material einschließt"
+   },
+   "recommendation": "Jede Kompetenz mit physischem Anteil wird in Spur A (Konzepte, Begründungen, Ablaufwissen, Fehlerdiagnose, Planung; im Produkt unassistiert und verzögert prüfbar) und Spur B (reale Ausführung; nur durch eine qualifizierte Person am realen Objekt bewertet) zerlegt. Spur C (Sicherheits- oder Berufszertifizierung) liegt vollständig außerhalb des Produkts. Fortschrittsanzeigen zeigen Spur A und B getrennt; Spur B steht auf 'nicht beobachtet', bis ein externer Bewertungseintrag vorliegt. Simulator-, Video-, Selbstauskunfts- oder Sensorwerte aus der App erhöhen Spur B nie.",
+   "product_affordances": {
+    "textbook": "Kapitelkopf nennt für jede Zielkompetenz Spur A/B/C und was das Buch nicht leisten kann",
+    "workbook": "Aufgaben nur für Spur A; Praxisblätter für Spur B als leere Bewertungsbögen für Ausbildende",
+    "anki": "nur Spur-A-Inhalte (Begriffe, Bedingungen, Fehlerbilder); keine Karten, die Handfertigkeit vortäuschen",
+    "interactive": "getrennte Statusanzeigen A/B; Spur B nur durch signierten externen Bewertungseintrag (Rolle, Datum, Instrument) veränderbar"
+   },
+   "real_world_logging": "Lernende erfassen reale Übungseinheiten (Datum, Aufgabe, Dauer, Ergebnisfoto/Messwert optional, Selbstbeurteilung). Das Log ist Reflexionsmaterial und Planungsgrundlage, kein Kompetenzbeleg. Nur ein Eintrag 'external_assessment' (Bewertende Person mit Rolle, Instrument, Datum) verändert Spur B.",
+   "abstain_or_fallback": [
+    "kein Spur-B-Status ohne externen Bewertungseintrag",
+    "keine Bewertung von Fotos/Videos realer Ausführung durch das Produkt oder ein Sprachmodell als Kompetenzbeleg (AI-R2)",
+    "fehlt eine qualifizierte Bewertungsperson: Spur B bleibt 'nicht beobachtet' und wird so angezeigt"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "dawe2014transfer",
+     "locator": "Abstract (Transfer nur im patientenbasierten Setting gemessen, nach Simulationsprofizienz)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "cook2011simulation",
+     "locator": "Abstract DATA SYNTHESIS (Fertigkeiten > 1, Patienteneffekte 0,50)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "teixeira2021culinaryinstruments",
+     "locator": "Results 'Characteristics of the instruments'; Discussion 'Psychometric quality'",
+     "relation": "supports"
+    },
+    {
+     "source_id": "ilgen2015checklistgrs",
+     "locator": "Abstract (Bewertung durch menschliche Rater mit GRS/Checkliste)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "sanaan2026onlinecooking",
+     "locator": "Abstract (Selbstwirksamkeit häufiger verbessert als Fertigkeiten)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "macnamara2014deliberate",
+     "locator": "R1B-Register (geringer Varianzanteil durch Übung in Professionen)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "normative",
+    "reasons": [
+     "Grenze zwischen Produkt und realer Ausführung ist eine Sicherheits- und Validitätssetzung",
+     "empirisch gestützt ist nur, dass Effekte zur realen Aufgabe hin abnehmen und Selbstauskunft Fertigkeit nicht misst"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Simulationseffekte sind in Testsettings größer als in realen Patientenoutcomes",
+      "level": "moderate"
+     },
+     {
+      "claim": "verfügbare Kochkompetenzinstrumente sind Fragebögen mit schwacher Validität",
+      "level": "low"
+     },
+     {
+      "claim": "Produkt darf physische und Sicherheitskompetenz nicht bescheinigen",
+      "level": "normative"
+     }
+    ]
+   },
+   "observable": "Statusfelder je Kompetenz: spur_a (unassistiert/verzögert, R1-Messvertrag), spur_b (nur externe Einträge), spur_c (immer 'außerhalb des Produkts')",
+   "independent_outcome": "verzögerte reale Ausführung, von einer qualifizierten Person mit Instrument (GRS + aufgabenspezifische Checkliste) blind gegenüber dem App-Status bewertet",
+   "failure_modes": [
+    "Spur-B-Feld wird über Selbstbeurteilung befüllt",
+    "Nutzende lesen Spur-A-Fortschritt als Handfertigkeit",
+    "Anbieter vermarkten Spur A als 'Zertifikat'"
+   ],
+   "falsifier": "Wenn in einer Stichprobe Spur-A-Werte die extern bewertete reale Ausführung so gut vorhersagen wie eine zweite unabhängige Bewertungsperson (vorab festgelegte Übereinstimmung), wäre die Trennung für diese Aufgabe überflüssig; die Sicherheitsgrenze bliebe bestehen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "ITS-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AI-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "MC-R2",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "R4-POL-01-N1",
+     "relation": "new"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet. Kernpolicy der Grenze; alle anderen R4-Policies verweisen hierauf."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-01"
+  },
+  {
+   "id": "R4-POL-02",
+   "title": "Demonstration und Beobachtungslernen als Vorbereitung auf reale Übung, nicht als Lernnachweis",
+   "applies_to_operations": [
+    "embodied_psychomotor"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "neue Bewegungsabläufe oder Werkzeugtechniken mit erkennbarer Form und Reihenfolge (z. B. Sägeführung, Knetbewegung, Pipettieren als Bewegungsform)"
+   },
+   "recommendation": "Vor der ersten realen Übung kurze, segmentierte Demonstrationen der Bewegungsform und Reihenfolge (Experte, Normaltempo und verlangsamt, mehrere Perspektiven), jeweils mit Benennung des Ergebnismerkmals, an dem man gelungene Ausführung erkennt. Zwischen realen Übungseinheiten erneut abrufbar. Ansehen zählt nie als Fortschritt; die Wirkung auf das Ergebnis (Genauigkeit, Passung) ist klein, die auf die Bewegungsform größer.",
+   "product_affordances": {
+    "textbook": "Bildsequenzen mit Bildunterschrift zur fachlichen Aussage (MM-R1) und Ergebniskriterium",
+    "workbook": "Beobachtungsaufgabe: Fehler in einer Demonstrationssequenz finden und benennen (Spur A)",
+    "anki": "Karten zu Reihenfolge und Fehlerbildern (Bild -> was ist falsch, warum)",
+    "interactive": "segmentierte Videos mit lernergesteuertem Tempo; Vorhersagefrage vor dem nächsten Segment"
+   },
+   "real_world_logging": "Nach der realen Übung: welche Demonstration genutzt wurde und welches Ergebniskriterium erreicht schien (Selbstbeurteilung, kein Beleg).",
+   "abstain_or_fallback": [
+    "keine Demonstration gefährlicher Arbeitsschritte ohne Sicherheitskontext und Verweis auf Aufsicht (R4-POL-13)",
+    "kein Fortschritt aus Abspielzeit (MC-R2)",
+    "bei rein ergebnisorientierten, formarmen Aufgaben (z. B. Teig abwiegen) keine Demonstrationspflicht"
+   ],
+   "parameters": [
+    {
+     "name": "demo_segment_length",
+     "value": 60,
+     "unit": "Sekunden (Obergrenze je Segment)",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung aus Segmentierungsregel R1-POL-B06; keine R4-Evidenz zur Länge"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "ashford2006observational",
+     "locator": "Abstract (Bewegungsdynamik 0,77 vs Bewegungsergebnis 0,17; serielle Aufgaben 1,62/0,61)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "burke2006safetytraining",
+     "locator": "Abstract (Verhaltensmodellierung und Hands-on am wirksamsten)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "sattelmayer2016motorprinciples",
+     "locator": "Discussion 'Summary of main results' (Sofortmessungen überschätzen Lernen)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "eine ältere Meta-Analyse ohne sichtbare Biaskorrektur, nur Abstract",
+     "Effekt auf das Ergebnis klein"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Demonstration verbessert die Bewegungsform",
+      "level": "low"
+     },
+     {
+      "claim": "Demonstration verbessert das Aufgabenergebnis",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Abrufzeitpunkt und -dauer der Demonstration; Antworten auf Beobachtungs-/Fehlerbildaufgaben (Spur A)",
+   "independent_outcome": "extern bewertete reale Ausführung (Form und Ergebnis getrennt) >= 1 Woche nach der Übungsphase",
+   "failure_modes": [
+    "Video ersetzt reale Übung",
+    "Lernende imitieren Form ohne Ergebniskontrolle",
+    "Kamerawinkel verdeckt kritisches Detail"
+   ],
+   "falsifier": "In einer randomisierten Studie mit gleicher realer Übungszeit zeigt die Demonstrationsgruppe bei verzögerter, extern bewerteter Ausführung weder in Form noch im Ergebnis einen Vorteil oberhalb einer festgelegten Mindestdifferenz.",
+   "kb_rule_links": [
+    {
+     "rule_id": "MM-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "WE-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "MC-R2",
+     "relation": "retains"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-02"
+  },
+  {
+   "id": "R4-POL-03",
+   "title": "Übungsplan für motorische Fertigkeiten: geblockt beginnen, Variation erst nach stabiler Grundform",
+   "applies_to_operations": [
+    "embodied_psychomotor"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "recall_discrimination",
+     "reason": "für Kategorisierungs- und Methodenwahlaufgaben gelten R1-POL-A04 und IL-R1"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Lernende üben mehrere Varianten einer Technik real (z. B. verschiedene Holzverbindungen, Teigarten, Pipettiervolumina)"
+   },
+   "recommendation": "Für Novizen und komplexe reale Aufgaben Varianten zunächst geblockt üben, bis die Grundform ohne Hilfe gelingt (extern oder per Ergebniskriterium beobachtet); danach schrittweise variable/zufällige Reihenfolge. Keine Behauptung, zufällige Reihenfolge verbessere reale Handwerks- oder Laborleistung; die Wirkung ist vor allem in einfachen Laboraufgaben mit Erwachsenen belegt.",
+   "product_affordances": {
+    "textbook": "Übungsplan als Vorschlag mit Begründung und Unsicherheitshinweis",
+    "workbook": "Planungsblatt für reale Übungsreihen mit Wechselkriterium",
+    "anki": "keine Rolle für die Ausführung; Karten zu Unterschieden zwischen Varianten (Spur A)",
+    "interactive": "Übungsplaner, der das Wechselkriterium abfragt, aber die Ausführung nicht bewertet"
+   },
+   "real_world_logging": "Pro Übungseinheit: Variante(n), Reihenfolge (geblockt/gemischt), Ergebniskriterium erreicht ja/nein (Selbst- oder Ausbilderurteil, getrennt markiert).",
+   "abstain_or_fallback": [
+    "keine Zufallsreihenfolge bei Sicherheitsrelevanz oder solange die Grundform nicht stabil ist",
+    "keine universelle Interleaving-Regel für physische Aufgaben",
+    "ohne Ergebniskriterium kein automatischer Wechsel"
+   ],
+   "parameters": [
+    {
+     "name": "switch_criterion_consecutive_successes",
+     "value": 3,
+     "unit": "aufeinanderfolgende Ausführungen ohne Hilfe mit erfülltem Ergebniskriterium",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; keine Evidenz zum Schwellenwert"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "czyz2024ciretention",
+     "locator": "Results 'Laboratory vs. field-based (applied) studies' (Labor 0,92; angewandt 0,23, nach Sensitivität -0,01)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "czyz2024citransfer",
+     "locator": "Abstract (angewandt 0,34 n. s.)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "wulfshea2002complex",
+     "locator": "Abstract (gegenläufige Effekte bei einfachen vs. komplexen Fertigkeiten)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "sattelmayer2016motorprinciples",
+     "locator": "Results 'Performance tests RP-BP'; Discussion (Umkehr im komplexeren Transfertest)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "czyz2024ciretention",
+     "locator": "Discussion 'Low quality and bias problem' (3 von 54 Studien moderat/hoch)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "ammar2023cimyth",
+     "locator": "Titel; Sekundärbeschreibung in czyz2024ciretention Discussion",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "CI-Vorteil vor allem im Labor, in angewandten Settings klein oder null",
+     "niedrige Studienqualität, Alter und Setting konfundiert, Meta-Analysen widersprechen sich"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Zufallsreihenfolge verbessert Behalten in einfachen Laboraufgaben bei Erwachsenen",
+      "level": "moderate"
+     },
+     {
+      "claim": "Zufallsreihenfolge verbessert reale komplexe Fertigkeiten",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Übungslog mit Reihenfolge und Wechselzeitpunkt",
+   "independent_outcome": "extern bewertete reale Ausführung einer neuen Variante (Transfer) >= 1 Woche nach der letzten Übungseinheit",
+   "failure_modes": [
+    "frühe Variation überlastet Novizen",
+    "Lernende bleiben zu lange geblockt (Leistungsillusion)",
+    "Wechselkriterium wird selbstberichtet geschönt"
+   ],
+   "falsifier": "Eine vorab registrierte Studie in einer realen Handwerks- oder Laboraufgabe zeigt, dass Zufallsreihenfolge von Beginn an bei verzögerter externer Bewertung dem Blocked-then-Variable-Plan überlegen ist.",
+   "kb_rule_links": [
+    {
+     "rule_id": "IL-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "R4-POL-03-N1",
+     "relation": "new"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-03"
+  },
+  {
+   "id": "R4-POL-04",
+   "title": "Rückmeldung zur physischen Ausführung: Häufigkeit und Ausblendung sind offene Parameter, gemessen wird ohne Rückmeldung",
+   "applies_to_operations": [
+    "embodied_psychomotor"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Rückmeldung zu realer Ausführung durch Ausbildende, Messgerät oder Selbstkontrolle (z. B. Winkel, Maß, Gärprobe)"
+   },
+   "recommendation": "Das Produkt schreibt keinen festen Ausblendplan vor und behauptet nicht, seltene Rückmeldung verbessere das Lernen. Es empfiehlt Rückmeldung zum Ergebniskriterium nach eigenem Versuch und zusammenfassend am Ende einer Serie, und es verlangt, dass jede Kompetenzaussage aus einem Versuch ohne Rückmeldung und mit Abstand stammt. Rückmeldungsformulierungen benennen Ergebnis und nächste Korrektur (FB-R1).",
+   "product_affordances": {
+    "textbook": "Abschnitt 'Woran erkenne ich selbst, ob es gelungen ist' je Technik (Messmittel, Sicht-, Tast-, Geruchskriterien)",
+    "workbook": "Selbstkontroll-Checklisten für reale Übung, getrennt von externen Bewertungsbögen",
+    "anki": "Karten zu Fehlerbild -> Ursache -> Korrektur (Spur A)",
+    "interactive": "Rückmeldung zu Spur-A-Aufgaben nach R1-POL-A08; für Spur B nur Erfassungsmaske, keine Bewertung"
+   },
+   "real_world_logging": "Pro Versuch: mit/ohne externe Rückmeldung (Flag), sodass nur rückmeldungsfreie Versuche in Übersichten als 'unassistiert' erscheinen.",
+   "abstain_or_fallback": [
+    "keine Wirksamkeitsbehauptung für Bandbreiten- oder Ausblendpläne",
+    "Sicherheitsfehler werden immer sofort zurückgemeldet und abgebrochen, unabhängig von jedem Ausblendplan (R4-POL-13)"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "mckay2022feedbackfrequency",
+     "locator": "Results publication-bias paragraph (RoBMA g = .021, BF01 = 4.22); Discussion para. 1",
+     "relation": "contradicts"
+    },
+    {
+     "source_id": "sattelmayer2016motorprinciples",
+     "locator": "Results 'Performance tests (AF)' (terminal vs concurrent: Transfer 0,94 in einer Studie, verzögertes Behalten -0,35 n. s.)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "wulfshea2002complex",
+     "locator": "Abstract (Belastungsabhängigkeit bei komplexen Fertigkeiten)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "Leitannahme (Guidance-Hypothese) meta-analytisch nicht gestützt",
+     "Einzelstudie für terminales Feedback, hohes Biasrisiko"
+    ],
+    "sub_claims": [
+     {
+      "claim": "reduzierte Rückmeldungshäufigkeit verbessert verzögertes Behalten",
+      "level": "very_low"
+     },
+     {
+      "claim": "Messung ohne Rückmeldung ist für Kompetenzaussagen nötig",
+      "level": "normative"
+     }
+    ]
+   },
+   "observable": "Flag 'mit Rückmeldung' je Versuch; Anteil rückmeldungsfreier Versuche",
+   "independent_outcome": "verzögerte, rückmeldungsfreie reale Ausführung, extern bewertet",
+   "failure_modes": [
+    "Produkt verkauft Ausblendung als evidenzbasiert",
+    "Lernende werden von Messmitteln abhängig (Hypothese, nicht belegt)"
+   ],
+   "falsifier": "Eine präregistrierte, ausreichend große Studie mit einer komplexen realen Aufgabe zeigt einen Vorteil eines bestimmten Ausblendplans beim verzögerten Behalten; dann würde der Plan als Option aufgenommen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "FB-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "R4-POL-04-N1",
+     "relation": "new"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-04"
+  },
+  {
+   "id": "R4-POL-05",
+   "title": "Aufmerksamkeitsfokus in Anleitungen: ergebnisbezogen formulieren ohne Wirksamkeitsversprechen",
+   "applies_to_operations": [
+    "embodied_psychomotor"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "Anleitungstexte und Hinweise zu Bewegungen und Werkzeugführung"
+   },
+   "recommendation": "Hinweise dürfen das beabsichtigte Ergebnis am Werkzeug oder Material benennen (z. B. 'Sägeblatt bleibt an der Risslinie') statt Körperteile; das ist eine kostenneutrale Stilregel. Das Produkt behauptet keinen Lernvorteil externen Fokus' und personalisiert nicht danach.",
+   "product_affordances": {
+    "textbook": "Formulierungsrichtlinie für Anleitungen",
+    "workbook": "Anleitungsschritte mit Ergebnismerkmal",
+    "anki": "nicht anwendbar außer Begriffskarten; keine Fokuskarten",
+    "interactive": "Hinweistexte nach Richtlinie; kein A/B-Versprechen an Nutzende"
+   },
+   "real_world_logging": "keine eigene Erfassung",
+   "abstain_or_fallback": [
+    "Körperhinweise bleiben erlaubt, wo Sicherheit oder Ergonomie sie erfordern (z. B. Hände hinter der Schneide)",
+    "keine Produktbehauptung 'evidenzbasierter Fokus'"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "chua2021externalfocus",
+     "locator": "Abstract (g = 0,58 Behalten, unkorrigiert)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "mckay2024focusbias",
+     "locator": "Abstract (biaskorrigiert g = 0,01 bis 0,15; BF01 bis 5,75)",
+     "relation": "contradicts"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "die umfassendste Meta-Analyse ist nach Biaskorrektur mit Null vereinbar",
+     "nur Abstracts gelesen"
+    ],
+    "sub_claims": [
+     {
+      "claim": "externer Fokus verbessert motorisches Lernen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Stilprüfung der Anleitungstexte (agent_checklist)",
+   "independent_outcome": "nicht als Lernwirkung evaluiert; nur Verständlichkeit der Anleitung in Nutzertests",
+   "failure_modes": [
+    "Regel wird als Wirkversprechen kommuniziert",
+    "Sicherheitsrelevante Körperhinweise werden gestrichen"
+   ],
+   "falsifier": "Eine präregistrierte Mehrlabor-Replikation mit realen Werkzeugaufgaben findet einen verzögerten Lernvorteil externen Fokus' oberhalb einer festgelegten Mindestdifferenz; dann würde die Stilregel zur Lernpolicy.",
+   "kb_rule_links": [
+    {
+     "rule_id": "R4-POL-05-N1",
+     "relation": "new"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-05"
+  },
+  {
+   "id": "R4-POL-06",
+   "title": "Mentale Probe des Ablaufs als Ergänzung zur realen Übung, nie als Ersatz",
+   "applies_to_operations": [
+    "embodied_psychomotor",
+    "empirical_experimental"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "mehrschrittige Verfahren mit fester Reihenfolge (Laborprozedur, Holzverbindung anreißen und schneiden, Teigführung)"
+   },
+   "recommendation": "Vor realen Übungseinheiten eine kurze mentale Probe: Schritte in Reihenfolge abrufen, kritische Kontrollpunkte und Abbruchkriterien benennen, dann real üben. Die Probe ist Spur-A-Training (Ablaufwissen) und darf reale Übungszeit nicht ersetzen.",
+   "product_affordances": {
+    "textbook": "Ablaufschema mit Kontrollpunkten je Verfahren",
+    "workbook": "Ablauf-Rekonstruktion aus durcheinandergewürfelten Schritten mit Begründung der Reihenfolge",
+    "anki": "Lückenkarten zu Schrittfolge und Abbruchkriterien",
+    "interactive": "geführte mentale Probe (Schritt ansagen lassen, dann aufdecken) mit Vorhersage des nächsten Kontrollpunkts"
+   },
+   "real_world_logging": "Flag 'mentale Probe vor der Einheit ja/nein' im Übungslog.",
+   "abstain_or_fallback": [
+    "keine Reduktion realer Übungszeit zugunsten mentaler Probe",
+    "keine Aussagen über Bewegungsqualität aus der Probe"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "sattelmayer2016motorprinciples",
+     "locator": "Results 'Performance tests (MP)' (0,43 [0,01; 0,85] sofort; Transfer 0,20 n. s.); Discussion 'Agreements' (Ergänzung, kein Ersatz)",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "kleine RCTs mit hohem Biasrisiko, Sofortmessung, Transfer n. s."
+    ],
+    "sub_claims": [
+     {
+      "claim": "mentale Probe verbessert unmittelbare Ausführung chirurgischer Verfahren",
+      "level": "low"
+     },
+     {
+      "claim": "mentale Probe verbessert verzögerte reale Ausführung",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Spur-A-Ergebnisse der Ablaufaufgaben (unassistiert, verzögert)",
+   "independent_outcome": "extern bewertete reale Ausführung des Verfahrens nach >= 1 Woche; Reihenfolgefehler getrennt gezählt",
+   "failure_modes": [
+    "Probe wird als 'Übung erledigt' gezählt",
+    "Ablaufwissen wird mit Handfertigkeit verwechselt"
+   ],
+   "falsifier": "Bei gleicher realer Übungszeit zeigt eine randomisierte Studie keinen Unterschied in verzögerten Reihenfolgefehlern und extern bewerteter Ausführung zwischen Probe- und Kontrollgruppe.",
+   "kb_rule_links": [
+    {
+     "rule_id": "R4-POL-06-N1",
+     "relation": "new"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-06"
+  },
+  {
+   "id": "R4-POL-07",
+   "title": "Simulation und virtuelles Labor als Vorbereitung mit ausdrücklicher Nicht-Transfer-Kennzeichnung",
+   "applies_to_operations": [
+    "empirical_experimental",
+    "embodied_psychomotor",
+    "spatial_design"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "Simulationen, virtuelle Labore, Desktop-VR; Ziel ist Konzeptverständnis, Ablauf, Planung, Fehlerdiagnose"
+   },
+   "recommendation": "Simulationen werden eingesetzt, wo sie Unsichtbares sichtbar machen oder sichere Wiederholung erlauben, mit Vorhersage vor Manipulation (PR-R1). Jede Simulation trägt ein Transferetikett: was sie trainiert (z. B. Konzept, Variablenkontrolle, Reihenfolge) und was ausdrücklich nicht (Haptik, Kraftdosierung, Toleranz am realen Material, Materialstreuung, reales Sicherheitsverhalten, Geruch/Textur). Immersive VR ist kein Standard. Simulator-Scores zählen nur in Spur A.",
+   "product_affordances": {
+    "textbook": "Kasten 'Was diese Simulation nicht lehrt' je Lab",
+    "workbook": "Übergangsaufgaben: Simulationsergebnis -> Planung des realen Versuchs mit Unterschiedsliste",
+    "anki": "Karten zu Konzepten und Unterschieden Simulation vs. Realität",
+    "interactive": "Lab mit Vorhersage, Guided/Explore-Modus (CL-R2, PR-R3) und sichtbarem Transferetikett; kein Spur-B-Effekt"
+   },
+   "real_world_logging": "Nach realem Folgeversuch: Abweichungen zur Simulation notieren (Reflexion, kein Beleg).",
+   "abstain_or_fallback": [
+    "keine Simulation, die gefährliche Synthesen, Mengen oder Bedingungen realistisch einübt (R4-POL-13)",
+    "keine Profizienzaussage zur realen Ausführung aus Simulatorwerten",
+    "kein immersives VR ohne aufgabenbezogenen Grund"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "finkelstein2005cck",
+     "locator": "Results: Zeit 14,0 vs 17,7 min; Write-up 1,86 vs 1,64; Klausur 0,593 vs 0,476",
+     "relation": "supports"
+    },
+    {
+     "source_id": "cook2011simulation",
+     "locator": "Abstract (vs. keine Intervention; Patienteneffekte 0,50)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "dawe2014transfer",
+     "locator": "Abstract (Transfer bei Profizienz im strukturierten Programm)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "makransky2019immersivevr",
+     "locator": "Abstract (VR: mehr Präsenz, weniger Lernen, d = 0,80)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "radhakrishnan2021ivr",
+     "locator": "Effectiveness results (29/6/5 von 40; Gegenbeispiele)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "reeves2021virtuallabs",
+     "locator": "ERIC abstract (Neuheitseffekt, enge Inhaltsoutcomes)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Simulation schlägt keine Intervention, Vergleiche mit realer Übung selten und klein",
+     "Transfer zur realen Aufgabe nur in Chirurgie mit Profizienzprogrammen belegt"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Simulation verbessert Konzeptverständnis mindestens so gut wie reale Geräte (einfache Stromkreise)",
+      "level": "low"
+     },
+     {
+      "claim": "Simulationstraining überträgt auf reale chirurgische Leistung bei Profizienzkriterium",
+      "level": "moderate"
+     },
+     {
+      "claim": "Simulation trainiert Haptik/Toleranz/Sicherheitsverhalten",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Vorhersagen, Manipulationen, Spur-A-Aufgaben nach dem Lab",
+   "independent_outcome": "Spur A: verzögerter Konzepttest mit neuen Situationen; Spur B: extern bewertete reale Durchführung des Folgeversuchs",
+   "failure_modes": [
+    "Transferetikett fehlt oder wird überlesen",
+    "Simulation suggeriert Präzision, die reales Material nicht hat",
+    "Präsenz/Motivation wird als Lernen gemeldet"
+   ],
+   "falsifier": "Eine Studie zeigt, dass Lernende mit Transferetikett bei realer Durchführung nicht weniger Simulations-Fehlübertragungen machen als ohne; dann ist das Etikett wirkungslos und muss durch geführte Übergangsaufgaben ersetzt werden.",
+   "kb_rule_links": [
+    {
+     "rule_id": "PR-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "PR-R3",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "CL-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "TR-R1",
+     "relation": "refines"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet. Simulatorwerte sind ausschließlich Spur-A-Daten."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-07"
+  },
+  {
+   "id": "R4-POL-08",
+   "title": "Laborziele als experimentelle Praxis (Daten, Modelle, Unsicherheit, Versuchsplanung) statt Inhaltswiederholung",
+   "applies_to_operations": [
+    "empirical_experimental"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Labor-, Praktikums- oder Experimentiereinheiten in Natur- und Ingenieurwissenschaften"
+   },
+   "recommendation": "Laboreinheiten werden über experimentelle Ziele beschrieben und geprüft: Variablen kontrollieren, Datensätze und Daten mit Modellen vergleichen, Messunsicherheit begründen, über Verbesserung von Messung oder Modell entscheiden. Geführte statt offene Forschung; kognitiver Konflikt und Demonstrationen für die Variablenkontrollstrategie. Das Produkt behauptet nicht, Laborarbeit festige Vorlesungsinhalte.",
+   "product_affordances": {
+    "textbook": "pro Experiment ausgewiesene experimentelle Lernziele und typische Fehlschlüsse",
+    "workbook": "Aufgaben mit synthetischen Datensätzen: Vergleich mit Unsicherheit, Entscheidung, Begründung; Versuchsplanung mit Störvariablen",
+    "anki": "Karten zu Konzepten der Messunsicherheit und Variablenkontrolle (Spur A)",
+    "interactive": "Lab mit Wiederholungsmessungen, Vergleichsentscheidung und Revisionsschleife (PR-R3)"
+   },
+   "real_world_logging": "Laborjournal-Einträge realer Versuche (Plan, Messung, Unsicherheit, Entscheidung) als Reflexion; Bewertung nur durch Betreuende.",
+   "abstain_or_fallback": [
+    "keine Inhaltsfestigungsversprechen für Labore",
+    "keine offenen Forschungsaufgaben ohne Anleitung für Novizen",
+    "Versuchsplanung mit Gefahrstoffen nur auf Konzeptebene (R4-POL-13)"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "holmes2017labvalue",
+     "locator": "Results (mittlerer Labornutzen 0,24 % +/- 0,67 %; F(1, 2615) = 2,32); Discussion",
+     "relation": "supports"
+    },
+    {
+     "source_id": "holmes2015criticalthinking",
+     "locator": "Crossref significance statement (Vergleichszyklen, anhaltende Verbesserung)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "schwichow2016cvs",
+     "locator": "Abstract (g = 0,61; kognitiver Konflikt und Demonstration)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "lazonder2016inquiry",
+     "locator": "Abstract (Anleitung d = 0,50 für Lernoutcomes)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "schwichow2016cvs",
+     "locator": "Abstract (Testformat als Hauptvarianzquelle)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Nulleffekt der Inhaltsfestigung beobachtend, aber über neun Kurse konsistent",
+     "positive Belege für experimentelle Praxis teils nur Kurzfassung gelesen, Schulpopulationen"
+    ],
+    "sub_claims": [
+     {
+      "claim": "traditionelle Einführungslabore verbessern Klausurleistung zu Laborinhalten nicht messbar",
+      "level": "moderate"
+     },
+     {
+      "claim": "Variablenkontrollstrategie ist lehrbar",
+      "level": "moderate"
+     },
+     {
+      "claim": "Daten-Modell-Vergleichszyklen verbessern kritisches Denken im Labor",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Spur-A-Aufgaben zu Datenvergleich, Unsicherheit und Versuchsplanung",
+   "independent_outcome": "verzögerte, unassistierte Bewertung eines neuen Versuchsplans und einer neuen Datensatzinterpretation durch eine Fachperson; reales Experimentieren nur durch Betreuende",
+   "failure_modes": [
+    "Datensätze zu sauber, Unsicherheit trivial",
+    "Testformat misst Wiedererkennen statt Planung"
+   ],
+   "falsifier": "Eine kontrollierte Studie zeigt, dass Laboreinheiten mit experimentellen Zielen bei verzögerten Planungs- und Interpretationsaufgaben nicht besser abschneiden als inhaltsorientierte Labore.",
+   "kb_rule_links": [
+    {
+     "rule_id": "PR-R3",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "R4-POL-08-N1",
+     "relation": "new"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet. Labor-Sicherheitsunterweisung und Zulassung zum Praktikum erfolgen durch die Einrichtung."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-08"
+  },
+  {
+   "id": "R4-POL-09",
+   "title": "Pre-Lab-Vorbereitung mit Vorhersage und Post-Lab-Fehleranalyse",
+   "applies_to_operations": [
+    "empirical_experimental",
+    "diagnostic_reasoning"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "vor und nach einem realen oder virtuellen Experiment"
+   },
+   "recommendation": "Vor dem Labor: unterstützende Information (Konzepte, Ziel, Gefahrenhinweise der Einrichtung) und eine Vorhersage mit Begründung (PR-R1). Prozedurale Details just in time. Nach dem Labor: Abweichung zwischen Vorhersage, Messung und Modell analysieren, Fehlerquellen klassifizieren (systematisch, zufällig, Bedienfehler), nächsten Versuch planen. Falsche, sichere Vorhersagen werden ausdrücklich aufgelöst (PR-R2).",
+   "product_affordances": {
+    "textbook": "Pre-Lab-Abschnitt (Konzept + Ziel) und Post-Lab-Analyseleitfaden",
+    "workbook": "Vorhersageblatt und Fehleranalyseaufgaben mit synthetischen Messreihen",
+    "anki": "Karten zu Fehlerquellen und ihren Erkennungsmerkmalen",
+    "interactive": "Vorhersage vor Start; nach Lauf Vergleichsansicht Vorhersage-Messung-Modell mit Fehlerklassifikation und deterministischer Prüfung von Rechen-/Einheitenfehlern (FB-R2)"
+   },
+   "real_world_logging": "Pre-Lab-Vorhersage und Post-Lab-Analyse realer Versuche können eingetragen werden; Bewertung der realen Durchführung nur durch Betreuende.",
+   "abstain_or_fallback": [
+    "Pre-Lab ersetzt nie die Sicherheitsunterweisung der Einrichtung",
+    "keine Mengen- oder Bedingungsangaben für gefährliche Prozeduren (R4-POL-13)"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "agustian2017prelab",
+     "locator": "Abstract (Kategorien, kognitive-Belastungs-Rahmung, fünf Leitlinien)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "holmes2017labvalue",
+     "locator": "Discussion (Revision, Fehlersuche, Prozessqualität)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "keith2008errormanagement",
+     "locator": "Abstract (Fehlermanagement für adaptiven Transfer)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "Pre-Lab-Beleg ist ein narrativer Review ohne Effektschätzung",
+     "Post-Lab-Fehleranalyse aus allgemeiner Fehlermanagement-Evidenz abgeleitet"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Pre-Lab-Aktivitäten verbessern Laborlernen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Vorhersage, Konfidenz, Post-Lab-Fehlerklassifikation",
+   "independent_outcome": "verzögerte, unassistierte Analyse eines neuen fehlerhaften Messdatensatzes; Fachpersonbewertung",
+   "failure_modes": [
+    "Vorhersage wird geraten und übersprungen",
+    "Fehleranalyse bleibt bei 'Messfehler' ohne Klasse"
+   ],
+   "falsifier": "Bei gleicher Gesamtzeit zeigt eine randomisierte Studie keinen Vorteil von Vorhersage plus Post-Lab-Analyse gegenüber reiner Durchführung bei der verzögerten Analyse neuer Datensätze.",
+   "kb_rule_links": [
+    {
+     "rule_id": "PR-R1",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "PR-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "FB-R2",
+     "relation": "retains"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-09"
+  },
+  {
+   "id": "R4-POL-10",
+   "title": "Räumliches Training gezielt für Lernende mit niedrigem Eingangswert, nicht als Ersatz für Skizzieren und CAD",
+   "applies_to_operations": [
+    "spatial_design"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "Ingenieur-, Konstruktions- oder Handwerkskurse mit technischen Zeichnungen, Ansichten, 3D-Modellen"
+   },
+   "recommendation": "Zu Beginn ein räumlicher Kurztest (z. B. mentale Rotation, Ansichten zuordnen) als Spur-A-Diagnose; bei niedrigem Wert ein Trainingsmodul mit Skizzieren und, wo möglich, realen Körpern/Modellen. Training wird nicht allen verordnet und nicht als Ersatz für Skizzier- und CAD-Praxis verkauft; Fernwirkung auf Noten oder Konstruktionsleistung wird nicht versprochen.",
+   "product_affordances": {
+    "textbook": "Kapitel Ansichten/Projektionen mit Skizzieraufgaben",
+    "workbook": "Skizzierserien (isometrisch <-> orthogonal) auf Papier, mit Lösungsbildern",
+    "anki": "Bildkarten Ansicht -> Körper (Kurztraining, ergänzend)",
+    "interactive": "Kurztest und Rotationsaufgaben; Hinweis, reale Modelle/Bausteine zu nutzen"
+   },
+   "real_world_logging": "Skizzen auf Papier können fotografiert und abgelegt werden; Bewertung nur durch Lehrende.",
+   "abstain_or_fallback": [
+    "kein Pflichttraining für Lernende über dem Schwellenwert",
+    "keine Aussage über Konstruktionskompetenz aus Rotationstests"
+   ],
+   "parameters": [
+    {
+     "name": "screening_cutoff",
+     "value": "lokal kalibriert",
+     "unit": "Testwert",
+     "status": "provisional_product_parameter",
+     "rationale": "Sorby nutzte einen Pass/Fail-Schwellenwert; kein übertragbarer Wert gelesen"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "uttal2013spatial",
+     "locator": "Abstract (g = 0,47; stabil über Verzögerung; Transfer auf ungeübte räumliche Aufgaben)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "sorby2018spatialstem",
+     "locator": "Abstract (Regressionsdiskontinuität, > 3000 Studierende)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "hawes2022spatialmath",
+     "locator": "Abstract (Mathematik 0,28; konkrete Materialien > computergestützt; nah > fern)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "bartlett2026spatialdesign",
+     "locator": "Abstract (korrelativ; Warnung, Skizzieren/CAD nicht zu verdrängen)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Trainierbarkeit räumlicher Tests gut belegt",
+     "Nutzen für Ingenieur-/Konstruktionsleistung nur an einer Institution quasi-experimentell"
+    ],
+    "sub_claims": [
+     {
+      "claim": "räumliche Fähigkeiten sind trainierbar",
+      "level": "moderate"
+     },
+     {
+      "claim": "Training verbessert Studienleistung bei niedrigem Eingangswert",
+      "level": "low"
+     },
+     {
+      "claim": "Training verbessert Konstruktionskompetenz",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Kurztest vorher/nachher (Spur A), Bearbeitung der Skizzierserien",
+   "independent_outcome": "verzögerter, unassistierter Paralleltest räumlicher Fähigkeiten und eine neue, menschlich bewertete Skizzier- oder Modellieraufgabe",
+   "failure_modes": [
+    "Test-Teaching: Rotationsaufgaben werden auswendig gelernt",
+    "Bildschirmtraining statt konkreter Materialien"
+   ],
+   "falsifier": "Eine Regressionsdiskontinuitäts- oder randomisierte Studie an einer anderen Einrichtung findet bei Lernenden unter dem Schwellenwert keinen Vorteil in verzögerten, menschlich bewerteten Skizzier-/CAD-Aufgaben.",
+   "kb_rule_links": [
+    {
+     "rule_id": "R4-POL-10-N1",
+     "relation": "new"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-10"
+  },
+  {
+   "id": "R4-POL-11",
+   "title": "Constraint-basiertes CAD: Konstruktionsabsicht explizit machen und mit Änderungstests prüfen",
+   "applies_to_operations": [
+    "spatial_design",
+    "computational_construction"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "parametrische, feature-basierte CAD-Modellierung"
+   },
+   "recommendation": "Aufgaben verlangen vor dem Modellieren eine schriftliche Konstruktionsabsicht (welche Maße steuern, was bei Änderung erhalten bleiben muss) auf drei Ebenen: Skizzenbedingungen, Modellieroperationen, Beziehungen zwischen Operationen. Bewertet wird nicht nur die Endgeometrie, sondern ein Änderungstest: vorgegebene Parameteränderungen müssen das Modell regenerieren und die Absicht erhalten. Geometrie- und Regenerationsprüfungen deterministisch, Absicht und Modellqualität per Rubrik durch Menschen.",
+   "product_affordances": {
+    "textbook": "Lösungsbeispiele mit sichtbarem Feature-Baum und begründeten Bedingungen",
+    "workbook": "Aufgaben: Absicht formulieren, Modell erstellen, Änderungstest dokumentieren; Rubrik",
+    "anki": "Karten zu Bedingungstypen und typischen Überbestimmungs-/Unterbestimmungsfehlern",
+    "interactive": "falls CAD-Datei-Upload: deterministische Prüfung von Maßen und Regeneration nach Parameteränderung; Absichtstext bleibt unverifiziert bis menschliche Bewertung (SE-R2)"
+   },
+   "real_world_logging": "nicht physisch; Fertigung eines Teils (z. B. 3D-Druck, Fräsen) ist Spur B und wird extern bewertet.",
+   "abstain_or_fallback": [
+    "keine automatische Bewertung der Absichtsbegründung als richtig",
+    "ohne CAD-Prüfer nur Spur-A-Aufgaben auf Papier/Skizze",
+    "keine Fertigungsfreigabe"
+   ],
+   "parameters": [
+    {
+     "name": "change_tests_per_task",
+     "value": 2,
+     "unit": "Parameteränderungen",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "otey2017designintent",
+     "locator": "Abstract; 4 Conclusions (drei Ebenen der Konstruktionsabsicht)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "bartlett2026spatialdesign",
+     "locator": "Abstract (praktische Design-Graphics-Fertigkeiten wie CAD betonen)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "keith2008errormanagement",
+     "locator": "Abstract (Exploration und Fehler für adaptiven Transfer)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "nur konzeptuelle Quelle zur Konstruktionsabsicht; keine Interventionsstudie gelesen"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Änderungstests messen Konstruktionsabsicht valide",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Absichtstext, CAD-Datei, Ergebnis der Änderungstests, Rubrikbewertung",
+   "independent_outcome": "verzögerte, unassistierte Modellierung eines neuen Teils mit verdeckten Änderungstests, Rubrik durch eine Fachperson",
+   "failure_modes": [
+    "Änderungstests vorab bekannt und gezielt bedient",
+    "Rubrik bewertet Stil statt Absicht"
+   ],
+   "falsifier": "Modelle, die Änderungstests bestehen, werden von unabhängigen Fachleuten nicht häufiger als absichtsgerecht beurteilt als Modelle, die sie nicht bestehen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AS-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "FB-R2",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "SE-R2",
+     "relation": "retains"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet. Gefertigte Teile und Maßhaltigkeit sind Spur B."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-11"
+  },
+  {
+   "id": "R4-POL-12",
+   "title": "Leistungsbewertung realer Ausführung: Globalskala plus aufgabenspezifische Checkliste als Instrument für menschliche Bewertende",
+   "applies_to_operations": [
+    "embodied_psychomotor",
+    "empirical_experimental",
+    "spatial_design"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "Spur-B-Bewertung durch Ausbildende, Betreuende oder Meisterinnen/Meister"
+   },
+   "recommendation": "Das Produkt liefert Bewertungsinstrumente (Globalskala mit verankerten Stufen plus aufgabenspezifische Checkliste mit kritischen Fehlern und Sicherheitsabbruch) und eine Erfassungsmaske; die Bewertung nimmt ein qualifizierter Mensch am realen Objekt vor. Reliabilität wird nicht behauptet, bevor sie im jeweiligen Handwerk mit zwei Bewertenden geprüft ist. Selbstauskunftsskalen (Zutrauen, Selbstwirksamkeit) werden getrennt geführt und nie als Fertigkeit angezeigt.",
+   "product_affordances": {
+    "textbook": "Anhang mit Bewertungsbögen und Ankerbeispielen",
+    "workbook": "Selbstkontrollbogen (Spur A/Reflexion) getrennt vom Fremdbewertungsbogen (Spur B)",
+    "anki": "nicht anwendbar (keine Bewertungsinhalte als Karten)",
+    "interactive": "Erfassungsmaske für externe Bewertung (Rolle, Instrument, Datum, zweite Bewertung optional); Anzeige der Übereinstimmung, wenn zwei vorliegen"
+   },
+   "real_world_logging": "Externe Bewertung als eigener Ereignistyp 'external_assessment' mit Instrumentversion; Selbstbewertung als 'self_assessment'.",
+   "abstain_or_fallback": [
+    "keine Bewertung durch Sprachmodell oder Bildanalyse als Spur-B-Beleg",
+    "keine übernommenen Reliabilitätswerte aus der Chirurgie für Handwerk oder Küche",
+    "ohne qualifizierte Person bleibt Spur B leer"
+   ],
+   "parameters": [
+    {
+     "name": "assessors_for_reliability_check",
+     "value": 2,
+     "unit": "unabhängige Bewertende je Stichprobe",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung zur lokalen Reliabilitätsprüfung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "ilgen2015checklistgrs",
+     "locator": "Abstract (GRS-Checkliste r = 0,76; Interrater 0,78/0,81; Inter-Item 0,92 vs 0,66; Inter-Station 0,80 vs 0,69)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "teixeira2021culinaryinstruments",
+     "locator": "Discussion 'Psychometric quality' (keine adäquate Inhaltsvalidität; Fragebögen)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "sattelmayer2016motorprinciples",
+     "locator": "Results (Checklisten/GRS als Outcomes; Detektionsbias unklar)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Instrumenteigenschaften nur in medizinischer Simulation meta-analytisch belegt",
+     "Übertragung auf Handwerk/Küche ungeprüft"
+    ],
+    "sub_claims": [
+     {
+      "claim": "GRS und Checklisten erreichen in chirurgischer Simulation ähnliche Interrater-Reliabilität",
+      "level": "moderate"
+     },
+     {
+      "claim": "dasselbe gilt für Holz-, Back- oder Laborpraxis",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "externe Bewertungseinträge, Übereinstimmung zweier Bewertender",
+   "independent_outcome": "Übereinstimmung zweier unabhängiger, gegenüber App-Daten verblindeter Bewertender an einer verzögerten realen Aufgabe",
+   "failure_modes": [
+    "Checkliste belohnt Schrittabhaken statt Qualität",
+    "Bewertende kennen App-Fortschritt (Halo)",
+    "Instrument wird ohne Anker benutzt"
+   ],
+   "falsifier": "In einer lokalen Prüfung erreichen zwei Bewertende mit dem Instrument keine vorab festgelegte Mindestübereinstimmung; dann darf es nicht als Spur-B-Instrument dienen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "AS-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "AI-R2",
+     "relation": "retains"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet. Auch eine externe Bewertung im Produkt ist kein Zertifikat; sie dokumentiert nur eine beobachtete Ausführung."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-12"
+  },
+  {
+   "id": "R4-POL-13",
+   "title": "Sicherheitsgrenze: Enthaltung bei gefährlichen Verfahren, Verweis auf beaufsichtigte Settings, Sicherheitswissen nur als Spur A",
+   "applies_to_operations": [
+    "embodied_psychomotor",
+    "empirical_experimental"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "jede Einheit mit Gefahrstoffen, Maschinen, Hitze, scharfen Werkzeugen, biologischen Materialien oder Elektrizität"
+   },
+   "recommendation": "Das Produkt erzeugt keine Schritt-für-Schritt-Anleitungen, Mengen oder Bedingungen, die eine gefährliche Handlung ermöglichen (z. B. Synthesen gefährlicher Stoffe, Umgehung von Schutzeinrichtungen). Sicherheitsinhalte werden als Wissen (Gefahrenerkennung, Begründung von Schutzmaßnahmen, Abbruchkriterien) gelehrt und geprüft und verweisen für Ausführung auf Unterweisung und Aufsicht der Einrichtung. Wo Sicherheitstraining wirksam sein soll, ist es aktiv und praktisch (Modellierung, Hands-on, Dialog) und findet real statt.",
+   "product_affordances": {
+    "textbook": "Sicherheitskasten: Gefahr, Begründung, wer unterweist; keine Ersatzunterweisung",
+    "workbook": "Gefahrenerkennungsaufgaben an synthetischen Szenen",
+    "anki": "Karten zu Gefahrensymbolen, Abbruchkriterien, Schutzmaßnahmen und ihrem Grund",
+    "interactive": "Gate: Inhalte mit Gefahrenkennzeichnung zeigen nur Konzeptebene und den Verweis auf Aufsicht; Anfragen nach gefährlichen Prozeduren werden abgelehnt"
+   },
+   "real_world_logging": "Unterweisungen der Einrichtung können als 'external_safety_briefing' (Datum, Einrichtung) vermerkt werden; das Produkt prüft sie nicht und leitet keine Freigabe ab.",
+   "abstain_or_fallback": [
+    "bei Unklarheit über Gefährdung: Enthaltung und Verweis",
+    "keine 'bestanden'-Anzeige für Sicherheitsunterweisungen",
+    "keine Simulation gefährlicher Prozeduren mit realistischen Parametern"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "burke2006safetytraining",
+     "locator": "Abstract (aktivere Methoden: mehr Wissen, weniger Unfälle; Kritik an passivem computerbasiertem Training)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "burke2011dread",
+     "locator": "Abstract (Engagement x Gefährdungsschwere)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "dawe2014transfer",
+     "locator": "Abstract (Transfer nur im strukturierten Programm mit Profizienz)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "normative",
+    "reasons": [
+     "Sicherheits- und Haftungsgrenze; keine empirische Sicherheit beansprucht",
+     "Evidenz stützt nur, dass passives digitales Sicherheitstraining weniger wirksam ist"
+    ],
+    "sub_claims": [
+     {
+      "claim": "aktiv-praktisches Sicherheitstraining ist wirksamer als passives",
+      "level": "low"
+     },
+     {
+      "claim": "Produkt enthält sich bei gefährlichen Prozeduren",
+      "level": "normative"
+     }
+    ]
+   },
+   "observable": "Gate-Ereignisse (abgelehnte/umgeleitete Anfragen), Spur-A-Ergebnisse zu Gefahrenerkennung",
+   "independent_outcome": "Spur A: verzögerte Gefahrenerkennung an neuen Szenen; real: Beobachtung durch Aufsicht der Einrichtung (außerhalb des Produkts)",
+   "failure_modes": [
+    "Gate zu eng (blockiert harmlose Grundlagen)",
+    "Gate zu weit (Anleitungen über Umwege)",
+    "Nutzende halten Wissenstest für Unterweisung"
+   ],
+   "falsifier": "Normative Grenze, nicht falsifizierbar im Lernsinn; überprüfbar ist das Gate: ein Red-Team-Satz gefährlicher Anfragen wird in einem festgelegten Anteil nicht abgefangen, oder harmlose Grundlagenfragen werden über einer festgelegten Rate blockiert.",
+   "kb_rule_links": [
+    {
+     "rule_id": "R4-POL-13-N1",
+     "relation": "new"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet. Sicherheitszertifizierung (Spur C) erfolgt ausschließlich durch die zuständige Einrichtung."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-13"
+  },
+  {
+   "id": "R4-POL-14",
+   "title": "Handwerk und Küche: praxisbasiertes Lernen mit Übungsprotokoll und Diagnosefällen; Selbstauskunft ist kein Fertigkeitsnachweis",
+   "applies_to_operations": [
+    "embodied_psychomotor",
+    "diagnostic_reasoning"
+   ],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "intermediate"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Kochen, Backen, Holzbearbeitung und ähnliche Praxis außerhalb formaler Labore, oft ohne Ausbildende"
+   },
+   "recommendation": "Das Produkt unterstützt die reale Praxis, statt sie zu ersetzen: Übungsprotokoll mit Ergebnisbeschreibung, Diagnosefälle (Symptom -> mögliche Ursachen -> Prüfschritt -> Korrektur, z. B. Gärfehler, Ausriss an der Schnittkante), Vergleich mit Referenzbildern. Diagnose- und Begründungswissen ist Spur A und wird unassistiert, verzögert, an neuen Fällen geprüft. Zutrauen und Selbstwirksamkeit werden als Selbstauskunft angezeigt, nie als Fertigkeit. Für Feedback zur Ausführung wird an Menschen verwiesen (Kurs, Werkstatt, Mentor).",
+   "product_affordances": {
+    "textbook": "Fehlerbildkataloge mit Ursachenbäumen und Prüfschritten",
+    "workbook": "Diagnosefälle mit konkurrierenden Hypothesen und fehlender Information",
+    "anki": "Karten Symptom -> Ursachenkandidaten -> Unterscheidungsmerkmal",
+    "interactive": "Übungsprotokoll mit Foto/Notiz; Diagnosefallsimulator (Spur A); kein Bewerten der Fotos als Kompetenz"
+   },
+   "real_world_logging": "Protokoll je realer Einheit: Rezept/Werkstück, Bedingungen (z. B. Raumtemperatur), Ergebnis, vermutete Ursache bei Fehlern, nächste Änderung. Reflexion, kein Beleg.",
+   "abstain_or_fallback": [
+    "keine Ferndiagnose von Fotos als Kompetenzbewertung",
+    "keine Lebensmittelsicherheitsfreigaben (z. B. 'noch essbar') und keine Ersatzunterweisung für Maschinen",
+    "Selbstwirksamkeitsskalen nur als solche beschriftet"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "rossen2026cooking",
+     "locator": "Abstract (Lernen überwiegend praxisbasiert, mit Menschen und Werkzeugen inkl. sozialer Medien)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "sanaan2026onlinecooking",
+     "locator": "Abstract (Online-Kurse: gemischte Effekte, Fertigkeiten 3 von 8)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "teixeira2021culinaryinstruments",
+     "locator": "Results/Discussion (Fragebögen, schwache Validität)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "keith2008errormanagement",
+     "locator": "Abstract (Fehlermanagement für adaptiven Transfer)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "ericsson1993deliberate",
+     "locator": "R1B-Register (Rahmen deliberater Übung)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "Kochlern-Evidenz überwiegend qualitativ/selbstberichtet",
+     "keine Studie zu Diagnosefällen im Handwerk gefunden; Holzbearbeitung ohne Evidenz"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Kochkompetenz junger Erwachsener wird überwiegend praxisbasiert erworben",
+      "level": "low"
+     },
+     {
+      "claim": "Online-Kochkurse verbessern beobachtete Fertigkeiten",
+      "level": "very_low"
+     },
+     {
+      "claim": "Diagnosefälle verbessern reale Fehlerbehebung",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Protokolleinträge; Spur-A-Diagnosefälle (unassistiert, verzögert, neue Fälle)",
+   "independent_outcome": "Spur A: verzögerte Diagnose neuer Fehlerfälle; Spur B: von Ausbildenden bewertetes reales Werkstück/Gericht mit Instrument nach R4-POL-12",
+   "failure_modes": [
+    "Protokoll wird zur Fortschrittsanzeige",
+    "Diagnosefälle zu eindeutig (eine Ursache)",
+    "Fotos erzeugen Scheingenauigkeit"
+   ],
+   "falsifier": "Lernende mit Diagnosefällen zeigen bei verzögerter realer Fehlerbehebung (extern beobachtet) keinen Vorteil gegenüber Lernenden mit gleicher Zeit für Rezepte/Anleitungen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "MC-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "R4-POL-14-N1",
+     "relation": "new"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet. Keine Lebensmittelhygiene- oder Maschinenschein-Aussage."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-14"
+  },
+  {
+   "id": "R4-POL-15",
+   "title": "Fehlerbasiertes Erkunden nur in sicheren Spur-A-Umgebungen (CAD, Simulation, Diagnosefälle)",
+   "applies_to_operations": [
+    "spatial_design",
+    "diagnostic_reasoning",
+    "empirical_experimental"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "embodied_psychomotor",
+     "reason": "Fehlerermutigung an realen Werkzeugen, Maschinen oder Gefahrstoffen ist ausgeschlossen (R4-POL-13)"
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "intermediate"
+    ],
+    "phase": [
+     "consolidation"
+    ],
+    "conditions": "nach Grundinstruktion; Aufgaben mit adaptivem Transfer (neue Teile, neue Fehlerbilder)"
+   },
+   "recommendation": "In CAD-Übungen, Simulationen und Diagnosefällen werden Fehler ausdrücklich zugelassen und als Lerngelegenheit gerahmt (z. B. Überbestimmung erzeugen und auflösen, falsche Hypothese prüfen), gefolgt von Analyse. Ziel ist adaptiver Transfer; für Routineaufgaben bleibt fehlervermeidende Anleitung.",
+   "product_affordances": {
+    "textbook": "Fehlerstudien: typische Fehler, ihre Signatur und Behebung",
+    "workbook": "Aufgaben 'mache es kaputt und repariere es' (nur digital/konzeptuell)",
+    "anki": "Karten Fehlersignatur -> Ursache",
+    "interactive": "Explore-Modus mit Fehlerermutigung und anschließender Analyse; nie bei gekennzeichneten Gefahreninhalten"
+   },
+   "real_world_logging": "nicht anwendbar (nur digitale/konzeptuelle Umgebung).",
+   "abstain_or_fallback": [
+    "keine Fehlerermutigung bei realer Ausführung mit Verletzungs- oder Schadensrisiko",
+    "für Novizen ohne Grundinstruktion: zuerst Lösungsbeispiel (R1-POL-A02)"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "keith2008errormanagement",
+     "locator": "Abstract (d = 0,44; adaptiver Transfer 0,80; Exploration und Fehlerermutigung wirksame Elemente)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "lazonder2016inquiry",
+     "locator": "Abstract (Anleitung bei Erkundung nötig)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "eine Meta-Analyse, nur Abstract, Aufgabendomänen nicht geprüft",
+     "Übertragung auf CAD und Diagnosefälle ist Hypothese"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Fehlermanagementtraining fördert adaptiven Transfer",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Fehler im Explore-Modus, Analyseantworten",
+   "independent_outcome": "verzögerte, unassistierte Aufgabe mit strukturell neuem Problem (adaptiver Transfer), menschlich bewertet",
+   "failure_modes": [
+    "Fehlerermutigung wird auf reale Werkstattarbeit übertragen",
+    "Frustration bei Novizen"
+   ],
+   "falsifier": "In einer randomisierten CAD- oder Diagnoseaufgabe zeigt Fehlermanagementtraining bei adaptivem Transfer keinen Vorteil gegenüber fehlervermeidender Anleitung gleicher Dauer.",
+   "kb_rule_links": [
+    {
+     "rule_id": "PR-R3",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "R4-POL-15-N1",
+     "relation": "new"
+    }
+   ],
+   "certification_boundary": {
+    "product_certifies_physical_competence": false,
+    "product_certifies_safety": false,
+    "physical_evidence_source": "external_human_rated_only",
+    "statement": "Das Produkt trainiert und prüft nur Spur A (Konzept- und Verfahrenswissen) und bereitet Spur B vor. Es bescheinigt weder physische Ausführung noch Sicherheitskompetenz; diese werden nur durch externe, von qualifizierten Menschen bewertete Evidenz belegt und nie aus App-Daten abgeleitet."
+   },
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "source_section": "R4_EMBODIED_EXPERIMENTAL_DESIGN.md §5 R4-POL-15"
+  }
+ ]
+}
