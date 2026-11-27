@@ -13,7 +13,7 @@ const when = t => { const d = new Date(t); return Number.isFinite(d.getTime()) ?
 const STATUS = { NOT_ASSESSED: 'noch nicht geprüft', INDEPENDENT_PARTIAL: 'begonnen, noch nicht gelöst', ASSISTED: 'mit Hilfe gelöst', INDEPENDENT_PASS: 'heute ohne Hilfe gelöst', RETEST_DUE: 'spätere Prüfung fällig', RETAINED_ON_LATER_DAY: 'an einem späteren Tag erneut ohne Hilfe gelöst' };
 const BASIS = { none: 'keine selbstständige richtige Lösung', recognition_only: 'nur Wiedererkennen (Auswahl) geprüft', production: 'selbst erzeugte Lösung geprüft' };
 const PRODUCTS = [['interactive', 'Interaktiv', 'Erklären, vorhersagen, experimentieren, üben – im Browser'], ['textbook', 'Lehrbuch (PDF)', 'Herleitungen und Erklärungen zum Lesen'], ['workbook', 'Arbeitsbuch (PDF)', 'Aufgaben mit Lösungen zum Ausdrucken'], ['anki', 'Anki-Paket', 'Karten für Anki – Anki plant die Wiederholung']];
-const HELP = ['hint', 'solution', 'tutor'];
+const HELP = ['hint', 'solution', 'tutor', 'guided'];   // guided = prerequisite lesson opened for a task (counts as help)
 
 /* ------------------------------------------------------------ learner state of this origin */
 const workbenchEvents = tr => (((readJSON(TKEY) || {}).tracks || {})[tr.store_key] || { events: [] }).events.filter(e => e.type !== 'decision');
@@ -88,7 +88,7 @@ function dueRetests(lib) {
 }
 
 /* ------------------------------------------------------------ views */
-const ACT = { attempt: 'Versuch', hint: 'Hinweis', solution: 'Lösung angesehen', tutor: 'Tutor-Brief' };
+const ACT = { attempt: 'Versuch', hint: 'Hinweis', solution: 'Lösung angesehen', tutor: 'Tutor-Brief', guided: 'Geführte Hilfe (Voraussetzung)' };
 function viewStart(lib) {
   const last = lastActivity(lib), rec = recommend(lib), due = dueRetests(lib);
   const s = el('section', { id: 'start', class: 'm-view', 'aria-labelledby': 'h-start' }, el('h1', { id: 'h-start', class: 'm-h1' }, 'Mastery'),

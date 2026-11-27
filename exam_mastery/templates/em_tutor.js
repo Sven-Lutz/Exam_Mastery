@@ -754,7 +754,11 @@ function boot() {
     } }, 'An lokales Modell senden');
     const on = el('input', { type: 'checkbox', id: 'llm-on' }), url = el('input', { type: 'text', class: 'wb-input', id: 'llm-url', value: cfg.url, spellcheck: 'false', 'aria-label': 'Adresse des lokalen Modells' }), model = el('input', { type: 'text', class: 'wb-input', id: 'llm-model', value: cfg.model, 'aria-label': 'Modellname (optional)', placeholder: 'Modellname, z. B. llama3.1' });
     on.checked = cfg.enabled; const setNote = el('p', { class: 'wb-note', role: 'status', id: 'llm-status' });
-    const setup = el('details', { class: 'wb-llm-setup' }, el('summary', {}, 'Lokales Modell (optional, aus)'),
+    /* a button toggle, not a nested <details>: the bridge keeps exactly one summary */
+    const setupBox = el('div', { class: 'wb-llm-box', id: 'llm-box', hidden: '' });
+    const setupBtn = el('button', { type: 'button', class: 'wb-llm-toggle', id: 'llm-toggle', 'aria-expanded': 'false', 'aria-controls': 'llm-box', onclick: () => { setupBox.hidden = !setupBox.hidden; setupBtn.setAttribute('aria-expanded', String(!setupBox.hidden)); } }, 'Lokales Modell (optional, ' + (cfg.enabled ? 'an' : 'aus') + ')');
+    const setup = el('div', { class: 'wb-llm-setup' }, setupBtn, setupBox);
+    setupBox.append(
       el('p', { class: 'wb-note' }, 'Nur ein OpenAI-kompatibler Dienst auf diesem Rechner (127.0.0.1 oder localhost), den Sie selbst betreiben (z. B. Ollama, LM Studio). Mastery liefert kein Modell mit, verwaltet keine API-Schlüssel und ruft keinen bezahlten Dienst auf. Antworten sind Modelleinschätzungen (FEEDBACK_UNVERIFIED), nie eine Bewertung.'),
       el('label', { class: 'wb-choice' }, on, el('span', {}, 'Lokales Modell verwenden')), url, model,
       el('div', { class: 'wb-row' }, el('button', { type: 'button', class: 'ds-btn', id: 'llm-save', onclick: () => {

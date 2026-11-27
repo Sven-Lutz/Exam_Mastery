@@ -168,6 +168,6 @@ html.wb-embed .wb-shell{padding:0 0 var(--sp-4)}
 .wb-badge{display:inline-block;margin:var(--sp-2) 0 0;font:600 var(--fs-xs)/1.2 var(--font-ui);color:var(--ink-2);border:1px solid var(--warn);background:var(--warn-soft);border-radius:var(--r-pill);padding:4px 10px}
 .wb-llm{margin-top:var(--sp-3)}
 .wb-llm-setup{margin-top:var(--sp-3);font:var(--fs-0)/1.5 var(--font-ui)}
-.wb-llm-setup summary{cursor:pointer;color:var(--ink-2);min-height:36px;display:flex;align-items:center}
+.wb-llm-toggle{background:none;border:0;padding:0;min-height:36px;color:var(--ink-2);font:var(--fs-0)/1.5 var(--font-ui);cursor:pointer;text-decoration:underline}
 .wb-llm-setup .wb-input{max-width:28rem;margin-top:var(--sp-2);font-family:var(--font-mono)}
 @media (max-width:560px){.wb-guide{padding:var(--sp-3)}.wb-formula{white-space:normal}}
