@@ -1,5 +1,5 @@
 """CLI: python -m exam_mastery.learning <command>
-  build <out_dir> [--lab-dir REL] [--fonts REL]  write the three track pages (+ JSON) into <out_dir>/lernstrecken
+  build <out_dir> [--lab-dir REL] [--fonts REL]  write the track pages (+ JSON) into <out_dir>/lernstrecken
   validate                                       re-diagnose every expected answer and bug value of all tracks
   tutor-brief <context.json>                     print a Markdown brief for the Claude Code tutor (no model call)
   anki <out_dir>                                 write the review deck (stable identities, see anki_bridge.py)
@@ -19,9 +19,10 @@ def main(argv):
     cmd, rest = argv[0], argv[1:]
     t0 = time.perf_counter()
     if cmd == 'validate':
-        for t in tracks.all_tracks():
+        ts = tracks.all_tracks()
+        for t in ts:
             tracks.validate(t)
-        print(json.dumps({'tracks': 3, 'valid': True, 'model_calls': 0})); return 0
+        print(json.dumps({'tracks': len(ts), 'valid': True, 'model_calls': 0})); return 0
     if cmd == 'build':
         out = Path(rest[0]) / 'lernstrecken'
         lab_dir = rest[rest.index('--lab-dir') + 1] if '--lab-dir' in rest else '../labs'

@@ -111,6 +111,7 @@
 .wb-arc{fill:none;stroke:var(--r-sale);stroke-width:1.6;opacity:.75}.wb-arc.late{stroke-dasharray:3 3;opacity:.5}
 .wb-axis{stroke:var(--stage-mut);stroke-width:1.2}
 .wb-bar.pos{fill:var(--r-inflow);opacity:.85}.wb-bar.neg{fill:var(--r-outflow);opacity:.8}
+.wb-att-track{fill:none;stroke:var(--stage-mut);stroke-width:1;opacity:.6}.wb-att-mask{fill:none;stroke:var(--r-loss);stroke-width:1.5;stroke-dasharray:5 4}
 .wb-area{fill:rgba(140,200,255,.10)}
 .wb-run{fill:none;stroke:var(--r-balance);stroke-width:3.2}.wb-run-pt{fill:var(--r-balance)}
 .wb-run-b{fill:none;stroke:var(--r-gradient);stroke-width:2.2;stroke-dasharray:6 5}

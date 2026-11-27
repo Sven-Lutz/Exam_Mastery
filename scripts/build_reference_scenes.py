@@ -37,11 +37,12 @@ if len(sys.argv) > 2 and sys.argv[2]:
 CASE = {'machine_learning': 'Diagnosefall: Faktor x₁ im Gradienten vergessen – der Pfad im Netz wird markiert.',
         'business_economics': 'Diagnosefall: Endsaldo statt Tiefpunkt – Kontrast und neues Zahlungsziel.',
         'mathematics': 'Diagnosefall: Beweis ohne die Voraussetzung „gleich lang“ – Gegenbeispiel Parallelogramm.'}
+CASE_BY_TRACK = {'ai/attention-track': 'Diagnosefall: Skalierung mit √d_k vergessen oder Maske erst nach Softmax – die Gewichte der Fehlrechnung werden gezeigt.'}
 DOM = {'machine_learning': 'Machine Learning', 'business_economics': 'Finanzierung', 'mathematics': 'Mathematik'}
 track_items = []
 for t in TR.all_tracks(ent):
     pth = TRR.write(t, out / 'lernstrecken', context='referenz', lab_href='../labs/' + t['lab'].replace('/', '__') + '.html', fonts='../assets/fonts' if fonts else None)
-    track_items.append({'href': 'lernstrecken/' + pth.name, 'title': t['title'], 'domain': DOM[t['domain']], 'case': CASE[t['domain']]})
+    track_items.append({'href': 'lernstrecken/' + pth.name, 'title': t['title'], 'domain': DOM[t['domain']], 'case': CASE_BY_TRACK.get(t['id'], CASE[t['domain']])})
 items = []
 for sp in specs:
     p = B.render(sp, out / 'labs', context='referenz', fonts='../assets/fonts' if fonts else None, back_label='Alle Experimente')
