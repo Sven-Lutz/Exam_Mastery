@@ -38,6 +38,9 @@ SF_DATALESS = 0x40000000          # macOS st_flags: iCloud placeholder whose con
 MAX_FILES = 5000
 MAX_PDF_BYTES = 300 * 1024 * 1024
 PAGE_DPI = 110
+# Pixel budget per rendered page (Codex review P1): DPI alone does not bound memory for oversized page boxes.
+# 8 MP ~ 24 MB RGB; larger pages are rendered at a lower zoom, degenerate pages not at all.
+MAX_PAGE_PIXELS = 8_000_000
 CHUNK_CHARS = 3500
 KINDS = ("lecture_slides", "script", "exercise", "solution", "exam", "literature", "notebook", "other")
 KIND_DE = {"lecture_slides": "Vorlesungsfolien", "script": "Skript", "exercise": "Übung", "solution": "Lösung",
@@ -811,6 +814,19 @@ def _refresh(cdir, course, root, previous, materialize_files, log):
     return summary(cdir, course)
 
 
+def _render_page(page, target):
+    """Render one PDF page within MAX_PAGE_PIXELS. Returns False for degenerate page boxes."""
+    import pymupdf
+    w, h = float(page.rect.width), float(page.rect.height)
+    if not (w > 0 and h > 0):
+        return False
+    zoom = PAGE_DPI / 72
+    if w * h * zoom * zoom > MAX_PAGE_PIXELS:
+        zoom = (MAX_PAGE_PIXELS / (w * h)) ** 0.5
+    page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False).save(target)
+    return True
+
+
 def reimport(slug, home=None, materialize_files=False, log=print):
     """Re-inventory; changed/added/removed sources (fidelity.impact) mark affected chapters STALE. Learner state,
     unit.json and existing builds are not touched."""
@@ -819,7 +835,14 @@ def reimport(slug, home=None, materialize_files=False, log=print):
     root = Path(course["source_root"])
     if not root.is_dir():
         raise MasteryError("Der Kursordner ist nicht mehr vorhanden.")
-    old_manifest = _read_json(cdir / "inventory" / "inventory.json") or {"sources": [], "elements": []}
+    # Journal (Codex review P1): _refresh publishes the new inventory before the STALE marks are saved. If a run
+    # stops in between, the next run must still compare against the last *completed* baseline, otherwise it
+    # compares new with new and the affected chapters are never marked. The baseline is removed only after _save.
+    baseline = cdir / "inventory" / "reimport-baseline.json"
+    old_manifest = _read_json(baseline) if baseline.is_file() else None
+    if old_manifest is None:
+        old_manifest = _read_json(cdir / "inventory" / "inventory.json") or {"sources": [], "elements": []}
+        _write_json(baseline, old_manifest)
     old_files = {f["file_id"]: f for f in course.get("files", [])}
     result = _refresh(cdir, course, root, course, materialize_files, log)
     new_manifest = _read_json(cdir / "inventory" / "inventory.json")
@@ -846,6 +869,7 @@ def reimport(slug, home=None, materialize_files=False, log=print):
     hist.mkdir(exist_ok=True)
     _write_json(hist / ("impact-" + stamp.replace(":", "").replace("-", "") + ".json"), report)
     _save(cdir, course)
+    baseline.unlink(missing_ok=True)
     result = summary(cdir, course)
     result["impact"] = {k: report[k] for k in ("changed_files", "added_files", "removed_files", "stale_chapters")}
     return result
@@ -961,9 +985,11 @@ def make_packet(slug, cid, home=None, log=print, force=False):
                         "formula_lines": p["formula_lines"]}
                 if p["needs_vision"] and doc is not None:
                     name = f"{fid}-p{p['n']:03d}.png"
-                    doc[p["n"] - 1].get_pixmap(dpi=PAGE_DPI).save(pages_dir / name)
-                    item["image"] = f"pages/{name}"
-                    rendered += 1
+                    if _render_page(doc[p["n"] - 1], pages_dir / name):
+                        item["image"] = f"pages/{name}"
+                        rendered += 1
+                    else:
+                        warnings.append(f"{f['rel_path']}: Seite {p['n']} hat kein darstellbares Format und wurde nicht gerendert.")
                 entry["pages"].append(item)
         finally:
             if doc is not None:
