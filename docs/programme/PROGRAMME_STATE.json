@@ -426,12 +426,32 @@
   {
    "id": "WP-UPLIFT",
    "title": "Bring the two real chapters to 0 major gate findings (content) and fix engine-side causes (figure label size floor, keep-with-next headings, spill pages)",
-   "status": "PLANNED",
+   "status": "RESUMABLE",
    "priority": 0.09,
    "autostart": true,
    "branch": "feat/mastery-uplift",
    "base": "integration/mastery-v1-20261127",
-   "next_step": "Run 'mastery quality' on RL ch.05 and LinA ch.15; fix engine causes generically with tests; revise unit.json (private, outside Git) for cards with context, complete learning chain, alternative routes; rebuild; report gate counts before/after; page check by eye on changed pages."
+   "next_step": "In Exam_Mastery-uplift: engine fix keep-with-next for headings and spill pages (typeset CSS/page breaking; PG-ORPHAN-HEADING, PG-NEAR-EMPTY) with tests; rebuild RL ch.05 and LinA ch.15; report gate counts; page check by eye. Then content revision of private unit.json (AN-CONTEXT, TB-CHAIN, AN-VISUAL, alt routes).",
+   "worktree": "Exam_Mastery-uplift",
+   "updated": "2026-11-28",
+   "done": [
+    "Baseline 'mastery quality' (blocker/major/minor): RL ch.05 0/26/3 (AN-CONTEXT 10, PG-FONT-FLOOR 8, TB-CHAIN 6, PG-ORPHAN-HEADING 1, PG-NEAR-EMPTY 1; WB-ALT-ROUTES 3 minor); LinA ch.15 0/22/9 (AN-CONTEXT 13, TB-CHAIN 7, AN-VISUAL 1, PG-ORPHAN-HEADING 1; WB-ALT-ROUTES 8, TB-DIVERGENCE 1 minor)",
+    "Engine fix figure label floor (8a34737): typeset.fit_figure_labels; print figures whose smallest label would print < 6.4 pt use the full text block (print-only class 'wide'), else only too-small font sizes are raised; also for lab figures; 6 unit tests, added to CI pytest list",
+    "RL ch.05 rebuilt with the fix (private library): PG-FONT-FLOOR 8 -> 0; now 0/18/3; page check by eye on Lehrbuch p.10 and Arbeitsbuch p.5 (figure full width, no clipping)"
+   ],
+   "open": [
+    "Engine: keep-with-next for headings (PG-ORPHAN-HEADING RL Lehrbuch p.4, LinA Arbeitsbuch p.3) and spill page (PG-NEAR-EMPTY RL Lehrbuch p.5)",
+    "LinA ch.15 not yet rebuilt with 8a34737 (it had no PG-FONT-FLOOR findings)",
+    "Content (private unit.json, outside Git): AN-CONTEXT cards, TB-CHAIN missing steps, AN-VISUAL la/kernel-image, WB-ALT-ROUTES hints",
+    "Seen by eye, not gate-detected: bandit figure axis ticks '-0.5' and '0' collide; workbook RL task 4 (r=(3,1)) shows the bandit figure with r=(2,5,8) and caption 'Abbildung 1.1' repeated in the workbook - check figure/task binding and workbook numbering",
+    "Full CI suite not rerun at 8a34737 (targeted: 6 new + experience_books + b9_quality + edition + chapter_publish + attention_reference + inline_notation + solution_artifacts = 77 passed)"
+   ],
+   "artifacts": [
+    "feat/mastery-uplift@8a34737 (exam_mastery/typeset.py, tests/test_figure_label_floor.py, .github/workflows/tests.yml)",
+    "private: ~/Mastery rl ch.05 build/quality.json (not in Git)"
+   ],
+   "tests": "tests/test_figure_label_floor.py 6 passed; test_experience_books + test_b9_quality 28 passed; test_edition, test_b6_5_chapter_publish, test_attention_reference, test_inline_notation, test_solution_artifacts 49 passed (integration .venv)",
+   "blockers": []
   },
   {
    "id": "WP-GATES",
