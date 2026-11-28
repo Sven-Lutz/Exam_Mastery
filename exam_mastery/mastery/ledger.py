@@ -193,17 +193,20 @@ def _policy_event(acc, store, record, lst, i, e, T, where, product, archived, sc
 
 
 def _assist(evs):
-    """Assisted/unassisted per attempt of one record (same rule as policy.helped and policy._kc_helped)."""
-    seq = [e for e in evs if e["kind"] in ("attempt", "help") and e["t_quality"] in ("exact", "date_only")]
-    for j, e in enumerate(seq):
-        if e["kind"] != "attempt":
+    """Assisted/unassisted per attempt of one record (same rule as policy.helped and policy._kc_helped), in one pass:
+    any earlier help on the same task, or an earlier help on the same competency at most 20 h before the attempt."""
+    task_help, kc_last = set(), {}
+    for e in evs:
+        if e["kind"] not in ("attempt", "help") or e["t_quality"] not in ("exact", "date_only"):
             continue
-        prev = seq[:j]
-        task_help = any(p["kind"] == "help" and p["task"] == e["task"] for p in prev)
+        if e["kind"] == "help":
+            task_help.add(e["task"])
+            for k in {e["_task_kc"], e["help_kc"]} - {None}:
+                kc_last[k] = max(kc_last.get(k, e["_ms"]), e["_ms"])
+            continue
         kc = e["_task_kc"]
-        kc_help = kc is not None and any(p["kind"] == "help" and (p["_task_kc"] == kc or p["help_kc"] == kc)
-                                         and e["_ms"] - p["_ms"] <= HELP_WINDOW_MS for p in prev)
-        e["assist"] = "assisted" if task_help or kc_help else "unassisted"
+        kc_help = kc is not None and kc in kc_last and e["_ms"] - kc_last[kc] <= HELP_WINDOW_MS
+        e["assist"] = "assisted" if e["task"] in task_help or kc_help else "unassisted"
 
 
 def _mirror_matches(policy_evs, mirror):

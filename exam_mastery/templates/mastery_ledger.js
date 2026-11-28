@@ -85,15 +85,14 @@ function policyEvent(acc, store, record, lst, i, e, T, w, product, archived, sco
   ev._task_kc = (td || {}).kc_id || null; ev._valid_attempt = kind === 'attempt' && result !== null;
   return ev;
 }
-function assist(evs) {
-  const seq = evs.filter(e => (e.kind === 'attempt' || e.kind === 'help') && (e.t_quality === 'exact' || e.t_quality === 'date_only'));
-  seq.forEach((e, j) => {
-    if (e.kind !== 'attempt') return;
-    const prev = seq.slice(0, j), kc = e._task_kc;
-    const taskHelp = prev.some(p => p.kind === 'help' && p.task === e.task);
-    const kcHelp = kc !== null && prev.some(p => p.kind === 'help' && (p._task_kc === kc || p.help_kc === kc) && e._ms - p._ms <= HELP_WINDOW_MS);
-    e.assist = taskHelp || kcHelp ? 'assisted' : 'unassisted';
-  });
+function assist(evs) {   // one pass; same rule as ledger._assist (policy.helped + policy._kc_helped)
+  const taskHelp = new Set(), kcLast = new Map();
+  for (const e of evs) {
+    if ((e.kind !== 'attempt' && e.kind !== 'help') || (e.t_quality !== 'exact' && e.t_quality !== 'date_only')) continue;
+    if (e.kind === 'help') { taskHelp.add(e.task); for (const k of new Set([e._task_kc, e.help_kc])) if (k !== null) kcLast.set(k, Math.max(kcLast.has(k) ? kcLast.get(k) : e._ms, e._ms)); continue; }
+    const kc = e._task_kc, kcHelp = kc !== null && kcLast.has(kc) && e._ms - kcLast.get(kc) <= HELP_WINDOW_MS;
+    e.assist = taskHelp.has(e.task) || kcHelp ? 'assisted' : 'unassisted';
+  }
 }
 function markState(evs, scopeOk, T) {
   for (const e of evs) e.state_input = !!(scopeOk && !e.archived && (e.t_quality === 'exact' || e.t_quality === 'date_only')

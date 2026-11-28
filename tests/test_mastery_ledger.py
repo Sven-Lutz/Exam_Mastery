@@ -144,6 +144,11 @@ class BrowserParity(unittest.TestCase):
         self.assertEqual(jl, json.loads(json.dumps(led)))
         self.assertEqual(jp, json.loads(json.dumps(prog)))
         self.assertEqual(self.errors, [])
+        for c in prog["competencies"]:          # the ledger's assist rule agrees with the policy's state and basis
+            solved = c["status"] in ("INDEPENDENT_PASS", "RETEST_DUE", "RETAINED_ON_LATER_DAY")
+            self.assertEqual(c["counts"]["independent"] > 0, solved, c)
+            self.assertEqual(c["basis"] == "none", c["counts"]["independent"] == 0, c)
+            self.assertEqual(c["delayed"] is not None, c["status"] == "RETAINED_ON_LATER_DAY", c)
 
     def test_parity_full_fixture(self):
         self.check(storage(), catalog())
@@ -171,8 +176,8 @@ class BrowserParity(unittest.TestCase):
         cat = catalog()
         tasks = [t for t in ML["tasks"] if t["type"] != "open"]
         from exam_mastery.learning import tracks as TR
-        for _ in range(12):
-            ev, t0 = [], 1795000000000
+        for _ in range(40):
+            ev, t0 = [], 1790000000000   # well before the real clock: the policy also drops attempts after it
             for _ in range(rng.randint(3, 25)):
                 t0 += rng.choice([60_000, 3_600_000, 21 * 3_600_000])
                 at = L.iso(t0)
