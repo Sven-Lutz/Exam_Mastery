@@ -209,11 +209,12 @@ def policy_gradient_trace(parameters):
 
 
 def plane_map_trace(parameters):
-    """Plane transformation scene: the straight morph I -> A with columns, test vector, signed area, kernel, image."""
-    from ..labs.plane_map import compute
+    """Plane transformation scene: the straight morph I -> A with columns, test vector, signed area, kernel, image
+    (Mastery Motion model linear_map_2d; the experience schema {matrix, vector[, t]} is unchanged)."""
+    from ..motion.models import linear_map_2d, plane_params
     from .. import figures_svg
     try:
-        m = compute(parameters)
+        m = linear_map_2d(plane_params(parameters))
     except ValueError as exc:
         raise InteractionError(str(exc)) from exc
     g = lambda x: f"{x:.4g}"  # noqa: E731
@@ -232,7 +233,7 @@ def plane_map_trace(parameters):
             {"title": "2 · Bild des Testvektors", "state": state,
              "body": f"Mv = {g(m['v'][0])}·Me₁ + {g(m['v'][1])}·Me₂ = {pt(m['Mv'])}."},
             {"title": "3 · Fläche und Orientierung", "state": state,
-             "body": f"det M = {m['det_exact']} (Orientierung {m['orientation']}); det A = {m['det_A_exact']}."
+             "body": f"det M = {m['det_exact']} ({m['orientation_text']}); det A = {m['det_A_exact']}."
                      + (f" Der gerade Weg I → A ist singulär bei t = {', '.join(g(x) for x in sing)}." if sing else "")},
             {"title": "4 · Kern, Bild, Rang", "state": state,
              "body": f"Rang {m['rank']}; Kern " + (f"span{pt(m['kernel'][0])}" if m["rank"] == 1 else
@@ -333,7 +334,7 @@ def build_interaction(interaction):
 STYLES = r"""
 .attention-graphic {overflow-x:auto} .attention-graphic svg{min-width:640px} .attention-alternative dl{padding:.7rem;background:#f2f7fc;border-radius:8px} .attention-alternative dt{font-weight:650} .attention-alternative dd{margin:0 0 .4rem} .semantic-figure{overflow-x:auto} .semantic-figure svg{min-width:580px} .task-prompt {font-weight:650;font-size:1.1rem} .attention-editors {display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem} .attention-editors fieldset {border:1px solid #cad5e3;border-radius:8px} .attention-editors label {display:inline-block;width:45%;margin:.3rem} .attention-lab input[type=checkbox] {width:auto} .attention-lab svg,.semantic-figure svg {height:auto;max-width:100%} .semantic-figure {margin:1.5rem 0;padding:1rem;background:white;border:1px solid #d9e2ef;border-radius:12px} .semantic-figure figcaption {font-size:.9rem;color:#405778}
 .pg-controls {display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.3rem 1rem} .pg-control {font-weight:600;font-size:.9rem} .pg-control input[type=range]{padding:0} .pg-control output{font-variant-numeric:tabular-nums;color:var(--muted)} .pg-equations{font-family:ui-monospace,Menlo,monospace;font-size:.86rem;background:#f2f7fc;border-radius:10px;padding:.7rem .9rem;margin:.8rem 0;overflow-x:auto;white-space:pre-wrap} .pg-choice{display:inline-block;border:1px solid var(--line);border-radius:8px;margin:.2rem .4rem .2rem 0} .pg-choice label{display:inline;font-weight:500;margin-right:.6rem} .pg-choice input{width:auto} .pg-feedback div{font-family:ui-monospace,Menlo,monospace;font-size:.85rem} .pg-plot svg{width:100%;height:auto;background:white;border:1px solid var(--line);border-radius:10px} .pg-plot text{font-size:11px;fill:#1d2a3a} .pg-plot .pg-title{font-weight:700;font-size:12px} .pg-error{color:#a3341f}
-.plane-lab .pl-presets{display:flex;flex-wrap:wrap;gap:.4rem;margin:.6rem 0} .plane-lab .pl-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(260px,1fr);gap:1.2rem;align-items:start} @media (max-width:760px){.plane-lab .pl-grid{grid-template-columns:1fr}} .plane-lab .pl-svg{width:100%;height:auto;aspect-ratio:1;background:white;border:1px solid var(--line);border-radius:12px;touch-action:none} .plane-lab .pl-timeline{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:.5rem} .plane-lab .pl-track{position:relative;flex:1 1 160px} .plane-lab .pl-t{width:100%;padding:0} .plane-lab .pl-mark{position:absolute;top:-6px;width:2px;height:10px;background:#be123c;transform:translateX(-1px)} .plane-lab .pl-t-out{font-variant-numeric:tabular-nums;min-width:4.5rem} .plane-lab .pl-matrix{border:1px solid var(--line);border-radius:10px} .plane-lab .pl-bracket{display:inline-grid;grid-template-columns:repeat(2,4.2rem);gap:.25rem;border-left:2px solid var(--ink);border-right:2px solid var(--ink);border-radius:14px;padding:.15rem .45rem;vertical-align:middle} .plane-lab .pl-bracket.pl-col{grid-template-columns:4.2rem} .plane-lab .pl-bracket input{width:100%} .plane-lab .pl-a{margin:.3rem 0} .plane-lab .pl-predict input{width:4.2rem} .plane-lab .pl-sign{border:0;padding:0;margin:.4rem 0} .plane-lab .pl-sign label{display:inline;margin-right:.8rem} .plane-lab .pl-sign input{width:auto} .plane-lab .pl-eq{font-size:.95rem;background:#f4f6fb;border-radius:10px;padding:.5rem .8rem;margin:.7rem 0} .plane-lab .pl-eq p{margin:.35rem 0} .plane-lab .pl-mat{display:inline-table;border-left:2px solid var(--ink);border-right:2px solid var(--ink);border-radius:12px;vertical-align:middle} .plane-lab .pl-mat td{padding:0 .4rem;text-align:right;font-variant-numeric:tabular-nums} .plane-lab .pl-term{font-weight:700;border-radius:4px;padding:0 .1rem;cursor:default} .plane-lab .pl-e1{color:#c26a05} .plane-lab .pl-e2{color:#6d3fc0} .plane-lab .pl-v{color:#0e7490} .plane-lab .pl-kernel{color:#111827} .plane-lab .pl-image{color:#0f766e} .plane-lab .pl-term.is-hot{outline:2px solid currentColor} .plane-lab .pl-note{color:var(--muted);font-size:.88rem} .plane-lab .is-hot{filter:drop-shadow(0 0 3px rgba(0,0,0,.45))} .plane-lab .pl-feedback p{margin:.3rem 0}
+.plane-lab .mm-scene{border:0;padding:0;margin:.6rem 0 0}
 .em-math { display:inline-block; max-width:100%; overflow-x:auto; vertical-align:middle; }
 .em-math svg { max-width:none; }
 .dmath { margin:1rem 0; overflow-x:auto; }
@@ -1197,48 +1198,20 @@ def render_html(unit):
             '<button class="attention-export secondary" type="button">Experimentparameter speichern</button>',
             '<script class="attention-parameters" type="application/json">'+_json_script(parameters)+'</script></section>',
         ])
-    for spec in compiled:
+    motion_runtime = False
+    for spec in compiled:   # plane transformation: rendered by Mastery Motion (one model for app, book and card)
         if spec['variants'][0].get('model') != 'plane_linear_map':
             continue
-        unique, seen_keys = [], set()
-        for v in spec['variants']:   # one preset button per matrix (keyframe variants of the same matrix collapse)
-            item = {"label": v["label"].split(",")[0].strip(), "parameters": {**v["parameters"], "t": 1}}
-            key = json.dumps(item["parameters"], sort_keys=True)
-            if key not in seen_keys:
-                seen_keys.add(key)
-                unique.append(item)
-        entry = lambda i, j: (f'<input class="pl-entry" type="number" step="0.5" min="-4" max="4" data-i="{i}" '  # noqa: E731
-                              f'data-j="{j}" aria-label="Eintrag a{i + 1}{j + 1}">')
+        from ..motion.embed import section as motion_section
+        from ..motion.plane import unit_scene
+        motion_runtime = True
         parts.extend([
             '<section class="plane-lab card" id="plane-lab-' + re_slug(spec['id']) + '" aria-label="Lineare Abbildung als stetige Verformung der Ebene">',
             '<p class="eyebrow">Explorable · erst vorhersagen, dann verformen</p>',
             '<h2>Was macht die Matrix mit der Ebene?</h2>',
             '<p>' + _h(spec['prediction_prompt']) + '</p>',
-            '<div class="pl-presets" aria-label="Beispiele"></div>',
-            '<div class="pl-grid"><div class="pl-stage"><svg class="pl-svg" role="img" aria-label="Ebene mit Gitter, '
-            'Bildern der Basisvektoren, Testvektor und Bildquadrat"></svg>',
-            '<div class="pl-timeline"><button type="button" class="pl-step">Schritt ¼</button>',
-            '<button type="button" class="pl-play secondary">Abspielen</button>',
-            '<span class="pl-track"><input class="pl-t" type="range" min="0" max="1" step="0.01" value="0" '
-            'aria-label="Zeit t von Identität (0) bis A (1)"><span class="pl-marks" aria-hidden="true"></span></span>',
-            '<output class="pl-t-out">t = 0</output></div></div>',
-            '<div class="pl-side"><fieldset class="pl-matrix"><legend>Matrix A und Testvektor v</legend>',
-            '<div class="pl-a">A = <span class="pl-bracket">' + entry(0, 0) + entry(0, 1) + entry(1, 0) + entry(1, 1)
-            + '</span></div><div class="pl-a">v = <span class="pl-bracket pl-col">'
-            '<input class="pl-vec" type="number" step="0.5" min="-3" max="3" data-i="0" aria-label="v₁">'
-            '<input class="pl-vec" type="number" step="0.5" min="-3" max="3" data-i="1" aria-label="v₂"></span></div>'
-            '<button type="button" class="pl-reset secondary">Zurücksetzen</button></fieldset>',
-            '<div class="pl-predict"><p><b>Ihre Vorhersage</b> (vor der Verformung):</p>',
-            '<label>Av ≈ (<input class="pl-guess-x" inputmode="decimal" aria-label="x-Koordinate von Av">; '
-            '<input class="pl-guess-y" inputmode="decimal" aria-label="y-Koordinate von Av">)</label>',
-            '<fieldset class="pl-sign"><legend>Vorzeichen von det A</legend>'
-            + ''.join(f'<label><input type="radio" name="pl-sign-{re_slug(spec["id"])}" value="{v}"> {v}</label>' for v in ("+", "0", "−"))
-            + '</fieldset><button type="button" class="pl-commit">Vorhersage festlegen</button> '
-            '<button type="button" class="pl-skip secondary">Ohne Vorhersage ansehen</button></div>',
-            '<div class="pl-eq" aria-live="polite"></div><div class="pl-feedback" role="status" aria-live="polite"></div>',
-            '<p class="pl-status attempt-status" role="status" aria-live="polite"></p></div></div>',
-            '<p class="help">' + _h(spec['transfer_prompt']) + '</p>',
-            '<script class="pl-parameters" type="application/json">' + _json_script({"presets": unique}) + '</script></section>',
+            motion_section(unit_scene(spec)),
+            '<p class="help">' + _h(spec['transfer_prompt']) + '</p></section>',
         ])
     for spec in compiled:
         if spec['variants'][0].get('model') != 'softmax_policy_gradient':
@@ -1262,7 +1235,7 @@ def render_html(unit):
             '<script class="pg-parameters" type="application/json">' + _json_script(parameters) + '</script></section>',
         ])
     from ..motion.embed import unit_html as motion_html  # Mastery Motion scenes that belong to this unit's models
-    parts.append(motion_html(unit))
+    parts.append(motion_html(unit, runtime=motion_runtime))
     parts.append('<section aria-label="Selbstständige Übungsaufgaben"><h2>Selbstständig anwenden</h2>')
     for task in unit["assessments"]:
         slug = re_slug(task["id"])
@@ -1326,7 +1299,7 @@ def render_html(unit):
                       "assessments": [_tutor_view(unit, x) for x in unit["assessments"]],
                       "lessons": unit.get("lessons", [])}),
         '</script><script>' + tutor_js + '</script><script>' + RUNTIME +
-        '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_experience.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/policy_gradient_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/policy_gradient_lab.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/plane_map_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/plane_map_lab.js').read_text() + '</script></main></body></html>',
+        '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/attention_experience.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/policy_gradient_math.js').read_text() + '</script><script>' + (Path(__file__).resolve().parents[1] / 'templates/policy_gradient_lab.js').read_text() + '</script></main></body></html>',
     ])
     return "".join(parts)
 

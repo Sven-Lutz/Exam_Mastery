@@ -324,9 +324,11 @@ def publish(unit, output_dir):
     from .experience_runtime import fingerprint, fonts
     from . import experience_books, experience_proof_checks, experience_math, experience_graphics
     from ..labs import models
-    from .. import math_publishing
+    from .. import math_publishing, motion
+    from ..motion import models as motion_models, plane as motion_plane, embed as motion_embed
     runtime = fingerprint(
-        [experience_books, experience_proof_checks, experience_math, experience_graphics, models, math_publishing, typeset, typeset.figures_svg],
+        [experience_books, experience_proof_checks, experience_math, experience_graphics, models, math_publishing, typeset,
+         typeset.figures_svg, motion, motion_models, motion_plane, motion_embed],
         assets=[("mathjax", typeset.NODE / "mathjax-full/es5/tex-svg-full.js"),
                 *fonts(typeset.NODE, [(pkg, variants) for _, pkg, variants in typeset.FONTS])],
         packages=["playwright", "PyMuPDF"], settings=[("css", typeset.CSS)])
