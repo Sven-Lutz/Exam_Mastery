@@ -201,7 +201,7 @@ mjx-container[display="true"]{display:block;max-width:100%}mjx-container[display
 /* semantic blocks */
 .def,.box,.ex,.mis,.case,.sum{break-inside:avoid-page;margin:1.1em 0 1.2em}
 .ex{break-inside:auto}.ex>h4,.ex>.lab,.ex>.given{break-after:avoid}.ex ol.steps>li,.ex .res{break-inside:avoid}
-.keephead,.ex-intro{break-inside:avoid-page}
+.keephead,.ex-intro{break-inside:avoid-page}.keephead.heads{break-after:avoid}
 .ex ol.steps.continued{counter-reset:s 1}
 .lab{font-family:var(--sans);font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.3em}
 .def{background:var(--accent-soft);border-top:2px solid var(--accent);padding:.6em .95em .3em}
@@ -442,11 +442,19 @@ def _opener(book):
             + f'<div class="road">{road}</div></section>')
 
 
+SPLITTABLE = ('text', 'lead')   # block types whose content may break across pages
+
+
 def textbook(book):
     d = Doc(book, 'textbook'); m = book['meta']; parts, toc = [], []
     head = []   # headings waiting for their first block: printed together, so no heading ends a page alone
-    def emit(html_):
-        if head:
+    def emit(html_, splittable=False):
+        if head and splittable:
+            # Prose may break across pages: keeping the whole block with its heading would push a long first block
+            # to the next page and leave the rest of this one empty (PG-NEAR-EMPTY). The headings form one unbreakable
+            # group that may not be followed by a break, so the first lines of the prose stay with them (orphans:3).
+            parts.append('<div class="keephead heads">' + ''.join(head) + '</div>' + html_); head.clear()
+        elif head:
             parts.append('<div class="keephead">' + ''.join(head) + html_ + '</div>'); head.clear()
         else:
             parts.append(html_)
@@ -458,7 +466,7 @@ def textbook(book):
                 ssid = f's{si}-{sj}'; toc.append((2, ssid, f'{m["chapter_no"]}.{si}.{sj}\u2002{E(sub["title"])}'))
                 head.append(f'<h3 id="{ssid}"><span class="no">{m["chapter_no"]}.{si}.{sj}</span>{inline(sub["title"])}</h3>')
             for b in sub['blocks']:
-                emit(d.block(b))
+                emit(d.block(b), splittable=b['type'] in SPLITTABLE)
     if head:
         parts.append(''.join(head)); head.clear()
     back = []
@@ -480,8 +488,10 @@ def textbook(book):
 def _item_html(d, it, solution=False, space=True, exam=False):
     meta = ([] if exam or it.get('stage_label') in ('exam', 'recall', 'guided', 'standard', 'transfer') else [it.get('stage_label', '')]) + ([f'≈ {it["minutes"]:g} Min.'] if it.get('minutes') else []) + ([f'{it["points"]:g} P.'] if it.get('points') else [])
     op = OPS.get(it.get('operation') or '', '')
-    h = (f'<div class="item" id="{E(it["id"])}"><div class="head"><span class="id">{"Aufgabe " + E(it["no"])}{(" · " + inline(it["title"])) if it.get("title") else ""}</span>'
-         f'<span class="meta">{f"<span class=op>{E(op)}</span>" if op else ""}{E(" · ".join(x for x in meta if x))}</span></div>{md(it["prompt"])}')
+    # The task head stays with its prompt: an item that may break across pages (a worked example) must not leave its
+    # head alone at the foot of a page (PG-ORPHAN-HEADING).
+    h = (f'<div class="item" id="{E(it["id"])}"><div class="keephead"><div class="head"><span class="id">{"Aufgabe " + E(it["no"])}{(" · " + inline(it["title"])) if it.get("title") else ""}</span>'
+         f'<span class="meta">{f"<span class=op>{E(op)}</span>" if op else ""}{E(" · ".join(x for x in meta if x))}</span></div>{md(it["prompt"])}</div>')
     if it.get('figure'):
         h += d.figure({'id': it['figure']})
     if it.get('table'):

@@ -642,13 +642,31 @@ def _body_size(doc):
     return sizes.most_common(1)[0][0] if sizes else 10.0
 
 
+BOLD_FONT = re.compile(r"(?i)bold|semibold|-bo|-se|heavy|black")
+
+
+def _mark_continuations(lines):
+    """Flag lines that continue a paragraph: the line directly above in the same column sits at normal line spacing,
+    has the same size and is not itself entirely bold. A bold line there is emphasis running on from the paragraph
+    (e.g. a closing question set in bold), not a heading; headings have space above them or follow a bold line."""
+    for k, ln in enumerate(lines):
+        above = [p for p in lines[:k] if abs(p["bbox"][0] - ln["bbox"][0]) < 3 and p["bbox"][3] <= ln["bbox"][1] + 1]
+        ln["cont"] = False
+        if above:
+            p = max(above, key=lambda q: q["bbox"][3])
+            p_bold = all(BOLD_FONT.search(s["font"]) for s in p["spans"])
+            ln["cont"] = (not p_bold and abs(p["size"] - ln["size"]) < 0.3
+                          and ln["bbox"][1] - p["bbox"][3] < 0.6 * ln["size"])
+    return lines
+
+
 def _is_heading(ln, body):
     if len(re.findall(r"[^\W\d_]", ln["text"])) < 3:     # page numbers (table of contents), labels
         return False
     if ln["size"] >= body * 1.3:
         return True
-    bold = all(re.search(r"(?i)bold|semibold|-bo|-se|heavy|black", s["font"]) for s in ln["spans"])
-    return bold and ln["size"] >= body * 0.97 and len(ln["text"]) <= 90 and not ln["text"].endswith((".", ":", ","))
+    bold = all(BOLD_FONT.search(s["font"]) for s in ln["spans"])
+    return bold and not ln.get("cont") and ln["size"] >= body * 0.97 and len(ln["text"]) <= 90 and not ln["text"].endswith((".", ":", ","))
 
 
 def _clipped_objects(page, pymupdf):
@@ -720,6 +738,7 @@ def check_pdf(path, label):
                         small[pno][1] = min(small[pno][1], s["size"])
             bodylines = sorted((ln for ln in lines if ln["bbox"][1] >= BAND_TOP and ln["bbox"][3] <= BAND_BOTTOM),
                                key=lambda ln: (ln["bbox"][1], ln["bbox"][0]))
+            _mark_continuations(bodylines)
             if not bodylines or pno == 1:
                 continue
             heads = [k for k, ln in enumerate(bodylines) if _is_heading(ln, body)]
