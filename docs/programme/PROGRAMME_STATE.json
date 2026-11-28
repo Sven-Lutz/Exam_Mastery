@@ -404,9 +404,35 @@
    "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/TUTOR.json",
    "worktree": "Exam_Mastery-tutor"
+  },
+  {
+   "id": "ANALYTICS",
+   "kind": "background subagent of LEAD",
+   "scope": "transparent learning analytics + ledger",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/ANALYTICS.json",
+   "worktree": "Exam_Mastery-analytics"
+  },
+  {
+   "id": "GATES",
+   "kind": "background subagent of LEAD",
+   "scope": "standard quality gates + report",
+   "status": "RUNNING",
+   "checkpoint": "docs/programme/agents/GATES.json",
+   "worktree": "Exam_Mastery-gates"
   }
  ],
  "work_packages": [
+  {
+   "id": "WP-GATES",
+   "title": "Machine quality gates for standard 5.1-5.4 + per-chapter quality report",
+   "status": "RUNNING",
+   "priority": 0.08,
+   "autostart": false,
+   "branch": "feat/mastery-quality-gates",
+   "base": "integration/mastery-v1-20261127 (71bf7b3)",
+   "worktree": "Exam_Mastery-gates"
+  },
   {
    "id": "WP-MOTION-2",
    "title": "Mastery Motion consolidation and polish: port the plane scene onto Motion, wire keyframes into textbook/Anki builds, RL scene visual polish (3b1b-level clarity), dark mode",
@@ -492,9 +518,12 @@
   {
    "id": "WP-C2M-ANALYTICS",
    "title": "P4 transparent learning analytics: activity timeline, provenance per number, unified stores explained, coverage, delayed unassisted transfer",
-   "status": "PLANNED",
+   "status": "RUNNING",
    "priority": 0.6,
-   "autostart": false
+   "autostart": false,
+   "branch": "feat/mastery-analytics",
+   "base": "integration/mastery-v1-20261127 (71bf7b3)",
+   "worktree": "Exam_Mastery-analytics"
   },
   {
    "id": "WP-C2M-ANKIQA",
