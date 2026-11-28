@@ -62,3 +62,13 @@ class WorkedNumbers(unittest.TestCase):
         self.task["solution_oracle"] = {"interaction": "unknown", "variant": "unknown"}
         self.assertFalse(experience.validate(self.unit)["valid"])
         self.assertEqual(self.coverage()["counts"]["BLOCKER"], 1)
+
+    def test_result_with_attached_reason_is_checked_separately(self):
+        for suffix in [". Das folgt aus der Seitenlänge.", ", weil beide Seiten gleich lang sind."]:
+            with self.subTest(suffix=suffix):
+                self.task["solution"] = "Bei a=2 und b=3 beträgt die Quadratfläche 24" + suffix
+                self.assertFalse(experience.validate(self.unit)["valid"])
+                self.task["solution"] = "Bei a=2 und b=3 beträgt die Quadratfläche 25" + suffix
+                self.assertEqual(self.coverage()["counts"], {"CHECKED": 1, "UNVERIFIED": 1, "BLOCKER": 0})
+        self.task["solution"] = "Die Vermutung lautet: 2 + 2 = 5. Das folgt gerade nicht."
+        self.assertEqual(self.coverage()["counts"], {"CHECKED": 0, "UNVERIFIED": 1, "BLOCKER": 0})

@@ -119,6 +119,12 @@ def coverage(unit, task):
             continue
         for i, line in enumerate(text.splitlines()):
             if line.strip():
-                status, detail = check_text(line.strip(), sides, unit, task)
+                # Split only explicit causal continuations, and only if the prefix
+                # is itself a complete, supported assertion.
+                claim = re.split(r"\.\s+(?=Das folgt aus\b|Denn\b)|,\s+(?=weil\b)", line.strip(), maxsplit=1)
+                status, detail = check_text(claim[0], sides, unit, task)
+                if len(claim) == 2 and status != "UNVERIFIED":
+                    rows.append({"field": f"{field}:{i+1} (Begründung)", "status": "UNVERIFIED",
+                                 "detail": "Fachliche Prüfung erforderlich"})
                 rows.append({"field": f"{field}:{i+1}", "status": status, "detail": detail})
     return rows
