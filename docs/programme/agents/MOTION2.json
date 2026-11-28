@@ -1,0 +1,26 @@
+{
+ "agent": "MOTION-2",
+ "branch": "feat/mastery-motion-2",
+ "base": "integration/mastery-v1-20261127@125a1c6",
+ "worktree": "<private-path>",
+ "updated": "2026-11-28",
+ "state": "DELIVERED",
+ "task": 5,
+ "commits": [
+  "964abcf consolidate plane transformation onto Mastery Motion (one model; presets/edit/drag/snap; parity both scenes)",
+  "018548e keyframes into books and cards (V8)",
+  "dd8801d visual polish, dark mode, honest baseline point",
+  "a078b1c tests: teaching point, declutter, label layout, themes, E2E both scenes",
+  "9e81203 plane scene accepts every unit the former lab accepted",
+  "ea12059 det A note wording"
+ ],
+ "open": [
+  "unittest discover not rerun at ea12059 (delta: plane.py bounds/labels, det A note text)",
+  "MODEL_SCENES still maps softmax_policy_gradient to the fixed public RL scene (synthetic numbers), not unit parameters",
+  "no PR (by instruction)"
+ ],
+ "blockers": [],
+ "head": "ea12059",
+ "suite": "frozen copies: CI pytest list 318 passed at a078b1c and at ea12059; unittest discover 931 OK (13 skipped) at a078b1c (later commits touch only plane scene bounds/texts, covered by the pytest list)",
+ "screenshots": "scratchpad/motion2/shots (session-local)"
+}

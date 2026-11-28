@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-28T00:24:10+01:00",
+ "updated": "2026-11-28T01:06:02+01:00",
  "updated_by": "LEAD (interactive, issue #51)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -393,7 +393,7 @@
    "id": "MOTION2",
    "kind": "background subagent of LEAD",
    "scope": "Motion consolidation, keyframes into books/cards, visual polish",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/MOTION2.json",
    "worktree": "Exam_Mastery-motion2"
   },
@@ -401,7 +401,7 @@
    "id": "TUTOR",
    "kind": "background subagent of LEAD",
    "scope": "guided tutor inside the UI",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/TUTOR.json",
    "worktree": "Exam_Mastery-tutor"
   }
@@ -410,13 +410,21 @@
   {
    "id": "WP-MOTION-2",
    "title": "Mastery Motion consolidation and polish: port the plane scene onto Motion, wire keyframes into textbook/Anki builds, RL scene visual polish (3b1b-level clarity), dark mode",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 0.07,
    "autostart": false,
    "branch": "feat/mastery-motion-2",
    "base": "integration/mastery-v1-20261127",
-   "next_step": "Bounded step: (1) port the plane-transformation explorable onto mastery-motion-v1 (linear_map_2d + kernel/image for det=0) and remove the duplicate model only after parity tests; (2) wire Motion keyframes into experience textbook figures and Anki card figures; (3) RL scene polish per the lead's notes. Tests + CI-equivalent suite on a frozen copy; push branch, draft PR against integration; no main, no private material.",
-   "worktree": "Exam_Mastery-motion2"
+   "next_step": "none",
+   "worktree": "Exam_Mastery-motion2",
+   "updated": "2026-11-28T01:06:02+01:00",
+   "done": [
+    "964abcf..ea12059: single plane model linear_map_2d on Motion (kernel/image at det=0 with snapping, presets, draggable columns, Av/sign(det) prediction), old plane_map files removed after parity; keyframes into textbook figures and Anki card media (CD-8 unchanged rebuild); palette, decluttered RL plane, label halos, dark mode, eased transitions; RL last step states b=J worse than b=0 near the corner and the weighted-mean b*",
+    "lead: screenshots reviewed (reflection passes det=0 at t=0.5 - real teaching moment); merged into integration"
+   ],
+   "open": [
+    "softmax_policy_gradient units show the public synthetic scene, not unit parameters"
+   ]
   },
   {
    "id": "WP-MOTION",
@@ -499,13 +507,23 @@
   {
    "id": "WP-C2M-TUTOR",
    "title": "P2 guided tutor inside the UI (prerequisite teaching, hint ladder, manual-LLM bridge without copy-paste friction where possible)",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 0.4,
    "autostart": false,
    "branch": "feat/mastery-tutor-ui",
    "base": "integration/mastery-v1-20261127 (125a1c6)",
    "worktree": "Exam_Mastery-tutor",
-   "next_step": "Specialist TUTOR: prerequisite graph, guided help panel teaching prerequisites in workbench/explorable, hint ladder with guardrails, honest optional LLM bridge; lead integrates."
+   "next_step": "extend lessons to imported courses (authoring contract) and other tracks",
+   "updated": "2026-11-28T01:06:02+01:00",
+   "done": [
+    "f66cee7..d9fb006: learning/guided.py + track_lessons.py (validated lessons, evidence keys rejected), workbench + explorable guided panel teaching prerequisites (sigmoid derivative, sqrt(d_k) scaling, softmax row derivative), hint ladder Orientierung/Strategie/Konkreter Schritt, explicit solution only on request, honest LLM bridge, optional loopback model (off by default), 'guided' events as help; docs/TUTOR.md; tests/test_guided_tutor.py (17)",
+    "lead: merged into integration; closed the reported gap (e50dcca): automatically shown worked example/contrast/focus now logged as 'support' help with its competency (tests fail before)"
+   ],
+   "open": [
+    "lessons only for backprop/attention tracks",
+    "local-model option only in the workbench",
+    "similar/transfer tasks show the solution on explicit request (logged as help)"
+   ]
   },
   {
    "id": "WP-C2M-QUALITY",
