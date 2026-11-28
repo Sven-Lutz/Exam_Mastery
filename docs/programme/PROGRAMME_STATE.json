@@ -1,7 +1,7 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-28T01:44:25+01:00",
- "updated_by": "LEAD (interactive, issue #51)",
+ "updated": "2026-11-28T12:30:00+01:00",
+ "updated_by": "lead (interactive session, issue #58 M0/M2)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
   "Never merge to main; draft PRs only.",
@@ -424,6 +424,26 @@
  ],
  "work_packages": [
   {
+   "id": "WP-C2M-ORCHESTRATE",
+   "status": "COMPLETED_PENDING_OWNER_REVIEW",
+   "title": "M2 (#58): course-wide AI authoring orchestration (Generate/Continue/Update course)",
+   "branch": "feat/c2m-orchestrate-20261128",
+   "pr": 60,
+   "head": "0dcb707",
+   "integrated_in": "e44f595",
+   "evidence": [
+    "bin/mastery author plan|authorize|run|status|stop|check-draft + app section 'Kurs erarbeiten (KI)'",
+    "tests/test_course_authoring.py 11 tests (fake CLI; app path with background runner)",
+    "real claude -p smoke call: apiKeySource none, write in chapter dir, success",
+    "full suite frozen copy: 385 pytest + 1017 unittest OK"
+   ],
+   "limits": [
+    "no real course authored end-to-end through the orchestrator yet",
+    "offline plan: rl 16 author + 1 revise (17-51 calls); lina1 23 author + 1 revise (24-72 calls)"
+   ],
+   "next_step": "Owner decision: grant model calls per course (bin/mastery author <kurs> authorize --max-runs N, or in the app) and start 'Kurs erarbeiten'. Autonomous sessions must NOT self-authorize authoring runs. After the first real chapter via the orchestrator: page-level PDF inspection, then tune the prompt/feedback loop."
+  },
+  {
    "id": "WP-UPLIFT",
    "title": "Bring the two real chapters to 0 major gate findings (content) and fix engine-side causes (figure label size floor, keep-with-next headings, spill pages)",
    "status": "RESUMABLE",
@@ -431,7 +451,7 @@
    "autostart": true,
    "branch": "feat/mastery-uplift",
    "base": "integration/mastery-v1-20261127",
-   "next_step": "Engine side done. Next: figure/task binding check (RL workbook task 4 shows bandit figure r=(2,5,8) for r=(3,1); 'Abbildung 1.1' numbering in workbook; bandit axis tick collision) in engine with tests; then content revision of private unit.json (AN-CONTEXT, TB-CHAIN, AN-VISUAL, alt routes), rebuild both chapters, report gate counts; full CI suite from a frozen copy before PR.",
+   "next_step": "Engine commits up to ed13546 are merged into integration e44f595 (green). Engine side done. Next: figure/task binding check (RL workbook task 4 shows bandit figure r=(2,5,8) for r=(3,1); 'Abbildung 1.1' numbering in workbook; bandit axis tick collision) in engine with tests; then content revision of private unit.json (AN-CONTEXT, TB-CHAIN, AN-VISUAL, alt routes), rebuild both chapters, report gate counts; full CI suite from a frozen copy before PR.",
    "worktree": "Exam_Mastery-uplift",
    "updated": "2026-11-28",
    "done": [
@@ -582,10 +602,10 @@
   {
    "id": "WP-C2M-ANKIQA",
    "title": "P3 Anki card quality: visuals/context/maths in cards, per-card feedback (unclear, too hard, duplicate, missing context, wrong, suggest visual), controlled updates with stable GUIDs",
-   "status": "DELEGATED_TO_CODEX",
+   "status": "INTEGRATED_PENDING_OWNER_REVIEW",
    "priority": 0.5,
    "autostart": false,
-   "next_step": "Codex (owner-run) builds the card browser, per-card feedback, quality report and controlled update path; lead reviews and integrates its draft PR.",
+   "next_step": "Codex #56 (a0ff7c7) merged into integration e44f595 (additive conflict resolution, tests green); PR #56 stays open. Later Codex commits: merge again.",
    "note": "Codex (owner-run) task; no PR received yet"
   },
   {
@@ -1468,6 +1488,19 @@
     "guided tutor + support-as-help"
    ],
    "owner_library": "rebuilt locally (private): RL ch.05 and LinA ch.15 built with current engine"
+  },
+  {
+   "at": "2026-11-28T12:30:00+01:00",
+   "head": "e44f595",
+   "suite": "pytest list 399 passed, unittest discover 1034 OK (skipped=13) on a frozen copy",
+   "contains": [
+    "quality gates",
+    "analytics",
+    "WP-UPLIFT engine fixes (ed13546)",
+    "Codex #56 card feedback (a0ff7c7)",
+    "M2 authoring orchestration (0dcb707)"
+   ],
+   "pushed": true
   }
  ]
 }
