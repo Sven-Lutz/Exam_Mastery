@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-28T01:15:02+01:00",
+ "updated": "2026-11-28T01:44:25+01:00",
  "updated_by": "LEAD (interactive, issue #51)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -409,7 +409,7 @@
    "id": "ANALYTICS",
    "kind": "background subagent of LEAD",
    "scope": "transparent learning analytics + ledger",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/ANALYTICS.json",
    "worktree": "Exam_Mastery-analytics"
   },
@@ -417,21 +417,42 @@
    "id": "GATES",
    "kind": "background subagent of LEAD",
    "scope": "standard quality gates + report",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "checkpoint": "docs/programme/agents/GATES.json",
    "worktree": "Exam_Mastery-gates"
   }
  ],
  "work_packages": [
   {
+   "id": "WP-UPLIFT",
+   "title": "Bring the two real chapters to 0 major gate findings (content) and fix engine-side causes (figure label size floor, keep-with-next headings, spill pages)",
+   "status": "PLANNED",
+   "priority": 0.09,
+   "autostart": true,
+   "branch": "feat/mastery-uplift",
+   "base": "integration/mastery-v1-20261127",
+   "next_step": "Run 'mastery quality' on RL ch.05 and LinA ch.15; fix engine causes generically with tests; revise unit.json (private, outside Git) for cards with context, complete learning chain, alternative routes; rebuild; report gate counts before/after; page check by eye on changed pages."
+  },
+  {
    "id": "WP-GATES",
    "title": "Machine quality gates for standard 5.1-5.4 + per-chapter quality report",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 0.08,
    "autostart": false,
    "branch": "feat/mastery-quality-gates",
    "base": "integration/mastery-v1-20261127 (71bf7b3)",
-   "worktree": "Exam_Mastery-gates"
+   "worktree": "Exam_Mastery-gates",
+   "updated": "2026-11-28T01:44:25+01:00",
+   "done": [
+    "22793a7..38bfbce: mastery-quality-v1 (27 gates: textbook 5, workbook 5, Anki 5, interactive 3, page QA 5, integrity 4), quality.json/html/md per build, build-chapter exits 3 on blockers, 'mastery quality' CLI, Kurse view status + report link, GATE_ERROR never counts as pass; tests 35",
+    "calibration (counts only): attention reference 0/48/11, RL ch.05 0/26/3, LinA ch.15 0/22/9 (blocker/major/minor); main findings: cards without context, missing learning-chain steps, open tasks without alternative routes, RL figure labels 5.4-5.9 pt on 8 pages, one orphan heading per private chapter",
+    "lead: merged into integration (CI list union)"
+   ],
+   "open": [
+    "Anki.apkg not scanned for private paths (card texts are)",
+    "'Warum' step and alternative routes are keyword heuristics",
+    "page QA is geometry only"
+   ]
   },
   {
    "id": "WP-MOTION-2",
@@ -518,12 +539,22 @@
   {
    "id": "WP-C2M-ANALYTICS",
    "title": "P4 transparent learning analytics: activity timeline, provenance per number, unified stores explained, coverage, delayed unassisted transfer",
-   "status": "RUNNING",
+   "status": "COMPLETED",
    "priority": 0.6,
    "autostart": false,
    "branch": "feat/mastery-analytics",
    "base": "integration/mastery-v1-20261127 (71bf7b3)",
-   "worktree": "Exam_Mastery-analytics"
+   "worktree": "Exam_Mastery-analytics",
+   "updated": "2026-11-28T01:44:25+01:00",
+   "done": [
+    "d95ad5a..ee3473c: mastery-ledger-v1 (Python+JS parity) over em-tutor-v1, em-practice-v1, em-motion-v1, em-learn-v2 and backups with provenance per event; Lernstand page with data-source explanation (incl. why the explorable store was empty), per-competency counts, coverage per chapter, filterable timeline, 'Woher?' + 'Was das nicht misst' for every number, no percentages; consent-gated Anki statistics from learner-made exports (temp dir, Mastery decks only, 'kein Kompetenznachweis'); ledger in exports; docs/LERNSTAND.md",
+    "lead: merged into integration"
+   ],
+   "open": [
+    "compressed .colpkg/CSV Anki exports unsupported",
+    "chapter-app events have no competency mapping",
+    "em-progress-v1 lab attempts not in the ledger"
+   ]
   },
   {
    "id": "WP-C2M-ANKIQA",
@@ -531,7 +562,8 @@
    "status": "DELEGATED_TO_CODEX",
    "priority": 0.5,
    "autostart": false,
-   "next_step": "Codex (owner-run) builds the card browser, per-card feedback, quality report and controlled update path; lead reviews and integrates its draft PR."
+   "next_step": "Codex (owner-run) builds the card browser, per-card feedback, quality report and controlled update path; lead reviews and integrates its draft PR.",
+   "note": "Codex (owner-run) task; no PR received yet"
   },
   {
    "id": "WP-C2M-TUTOR",

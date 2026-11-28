@@ -1,0 +1,27 @@
+{
+ "agent": "GATES",
+ "branch": "feat/mastery-quality-gates",
+ "base": "integration/mastery-v1-20261127@71bf7b3",
+ "worktree": "<private-path>",
+ "updated": "2026-11-28",
+ "state": "DELIVERED",
+ "head": "38bfbce",
+ "commits": [
+  "22793a7 quality: machine gate catalogue mastery-quality-v1 with per-chapter report",
+  "0d03608 tests: quality gates positive/negative per gate, report schema, CLI exit codes, Kurse report link",
+  "ba8f942 quality: calibration fixes (rules, not thresholds)",
+  "38bfbce quality: a failing gate run is reported (GATE_ERROR / build-chapter error), never read as a pass"
+ ],
+ "gates": "27 gates (textbook 5, workbook 5, anki 5, interactive 3, pages 5, integrity 4); blockers: AN-LINT, AN-IDENTITY, PG-OVERFLOW, INT-*",
+ "calibration": "blocker/major/minor: attention reference build 0/48/11; private chapter A 0/22/9; private chapter B 0/26/3; synthetic references (unit only) 0/6-9/0-2",
+ "suite": "frozen copies: at 0d03608 CI pytest list 352 passed, unittest discover 984 OK (13 skipped); at 38bfbce CI pytest list + course import + Mastery app/http/snapshot modules 376 passed",
+ "open": [
+  "Anki.apkg content not scanned for private paths (zstd collection); unit and card texts are",
+  "TB-CHAIN step 1 (Warum) and WB-ALT-ROUTES are keyword heuristics (marked in rule text)",
+  "PG gates measure geometry only: a formula cut inside its box is detected for glyph-sized fills under a container clip; visual QA by a human remains",
+  "experience CLI (python -m exam_mastery.learning experience build) does not write quality reports; library build and build-chapter do",
+  "unittest discover not rerun at 38bfbce (delta covered by targeted modules)",
+  "no PR (by instruction)"
+ ],
+ "blockers": []
+}
