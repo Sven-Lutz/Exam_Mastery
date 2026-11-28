@@ -1,0 +1,32 @@
+{
+ "agent": "C2M-AUTHOR",
+ "updated": "2026-11-27",
+ "state": "DONE_HUMAN_REVIEW_PENDING",
+ "branch": "feat/c2m-author-rl-20261127",
+ "worktree": "Exam_Mastery-c2m-author",
+ "commits": [
+  "8714a7a feat(experience): policy-gradient explorable, graduated workbook, Anki figures"
+ ],
+ "pushed": true,
+ "pull_request": null,
+ "tests": {
+  "ci_pytest_list_plus_new": "259 passed (frozen copy)",
+  "unittest_discover": "906 tests OK, 13 skipped (frozen copy)"
+ },
+ "chapter": {
+  "unit_id": "course/rl/05-policy-gradient",
+  "location": "MASTERY_HOME/courses/rl/chapters/05-policy-gradient (private, outside Git)",
+  "library_slug": "rl-05-policy-gradient",
+  "academic_status": "HUMAN_REVIEW_PENDING",
+  "learning_effect": "NOT_RUN",
+  "contents": "14 sections, 6 step derivations, 22 formulas, 2 figures (3 keyframes), 13 graduated tasks (2 worked, 2 guided, 3 independent, 2 transfer, 4 exam incl. 3 find-the-error), 23 cards (13 with formula context, 3 with figure), 1 explorable + free lab, 3 misconceptions"
+ },
+ "paid_calls": 0,
+ "open_points": [
+  "Owner review of the chapter (books, cards, lab).",
+  "Slides 38-56 (importance sampling, PPO) only referenced, no dedicated section.",
+  "Generic prediction check tolerance (1e-8 relative) is strict for hand calculations.",
+  "docs/COURSE_TO_MASTERY_CONTRACT.md is untracked in the author worktree (not committed by C2M-AUTHOR)."
+ ],
+ "next_step": "Owner opens `bin/mastery` from the author worktree (or any checkout with commit 8714a7a) and reviews unit rl-05-policy-gradient; feedback goes into unit.json via tools/author_unit.py, same unit_id (stable Anki GUIDs)."
+}

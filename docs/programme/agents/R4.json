@@ -1,0 +1,24 @@
+{
+ "agent_id": "R4",
+ "wp": "WP-R4",
+ "status": "COMPLETED",
+ "updated": "2026-11-27T21:05:00+01:00",
+ "done": [
+  "read: issue #25, charter, SEARCH_PROTOCOL, EVIDENCE_REGISTER_SCHEMA, R1 policy schema + contract test, R2 test/policies/register shape, principles.json engine_rules",
+  "evidence register r4_evidence.json: 32 entries (4 fulltext_claim_review, 4 fulltext_partial, 23 abstract, 1 metadata) + search_log 22 rows; commit 9d68eac pushed",
+  "r4_learning_policies.json: 15 policies R4-POL-01..15, competence_tracks A/B/C, 5 conflict rules, coverage_gaps, certification_boundary per policy; tests/test_r4_learning_policies.py (34 tests OK, 1 skipped incl. R1); commit cc6affe",
+  "R4_EMBODIED_EXPERIMENTAL_DESIGN.md (German report, 4 synthetic design scenarios + adversarial examples, risk audit, reviewer questions); commit 9282860",
+  "pushed research/r4-embodied-20261127; draft PR #41 (base research/r1-learning-science-20261127)"
+ ],
+ "open": [
+  "independent/human review of PR #41 (no lead spot-check)",
+  "gaps: woodworking/hand tools and baking learning studies, observed cooking-skill instruments, CAD interventions, sketching, chemistry-specific virtual labs (Brinson 2015, Chan 2021), measurement uncertainty/materials characterisation, haptics/welding VR, Ammar 2023 full text, self-controlled practice"
+ ],
+ "artifacts": [
+  "docs/research/workstreams/R4_EMBODIED_EXPERIMENTAL_DESIGN.md",
+  "docs/research/workstreams/r4/r4_evidence.json",
+  "docs/research/workstreams/r4/r4_learning_policies.json",
+  "tests/test_r4_learning_policies.py"
+ ],
+ "next_step": "none autonomous; await review of PR #41"
+}

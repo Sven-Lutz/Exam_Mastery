@@ -1,0 +1,25 @@
+{
+ "agent_id": "R3",
+ "wp": "WP-R3",
+ "status": "COMPLETED_DRAFT_PR",
+ "updated": "2026-11-27T19:55:00+01:00",
+ "done": [
+  "read: issue #24, charter, SEARCH_PROTOCOL, EVIDENCE_REGISTER_SCHEMA, R1 policy schema + contract test, R2 test/policy shape (read-only), R5 tutor output types (FEEDBACK_UNVERIFIED, ABSTAIN)",
+  "register checkpoint 1 committed a99f12f (13 entries law+grading, 22 searches logged); full texts obtained for ~14 sources",
+  "register complete 8e45b77: 35 entries (4 claim review, 9 fulltext partial, 22 abstract), 23 searches logged",
+  "12 policies + tests/test_r3_learning_policies.py 036903c (32 tests OK, 1 skip)",
+  "R3_ARGUMENT_CASE_DIAGNOSIS.md b675dec",
+  "pushed research/r3-contextual-reasoning-20261127; draft PR #40 (base research/r1-learning-science-20261127)"
+ ],
+ "open": [
+  "independent review of PR #40",
+  "coverage gaps: Gutachtenstil learning evidence, Schwarcz & Farganis (SSRN 403), business case method, interpretive charity, Nesbit & Liu full text"
+ ],
+ "artifacts": [
+  "docs/research/workstreams/r3/r3_evidence.json",
+  "docs/research/workstreams/r3/r3_learning_policies.json",
+  "docs/research/workstreams/R3_ARGUMENT_CASE_DIAGNOSIS.md",
+  "tests/test_r3_learning_policies.py"
+ ],
+ "next_step": "lead: spot-check and independent review of PR #40; no further R3 work pending"
+}

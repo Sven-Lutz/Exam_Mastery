@@ -1,0 +1,25 @@
+{
+ "agent": "ANALYTICS",
+ "branch": "feat/mastery-analytics",
+ "base": "integration/mastery-v1-20261127@71bf7b3",
+ "worktree": "<private-path>",
+ "updated": "2026-11-28",
+ "state": "DELIVERED",
+ "head": "ee3473c",
+ "commits": [
+  "d95ad5a ledger (mastery-ledger-v1) + summary (mastery-progress-v1), Python/JS parity",
+  "d4065a8 Lernstand page with Woher? per number, permission-gated Anki stats, export with ledger, em-learn-v2 in snapshot",
+  "25402da E2E, docs/LERNSTAND.md, CI pytest list (+3 modules)",
+  "ef3432c Woher panel placement, mobile fit at 390 px",
+  "ee3473c linear assist rule; parity test checks counts vs policy state/basis on 40 generated histories"
+ ],
+ "suite": "frozen copies: CI pytest list 339 passed at ee3473c; unittest discover 971 OK (13 skipped) at 25402da (later commits: UI polish + ledger assist rewrite, covered by pytest list and test_mastery_v1_app rerun on worktree)",
+ "open": [
+  "compressed .colpkg and CSV not supported for Anki stats (legacy .colpkg and both .apkg formats are)",
+  "server backup is merged via import, not auto-merged into the browser view",
+  "source coverage per competency not shown; chapter-app (em-learn-v2) events have no competency mapping; em-progress-v1 lab attempts not in the ledger",
+  "server.py and __init__.py touched (anki-stats endpoints, em-learn-v2 in state schema, ASSETS + shell script tag) - check against parallel branches",
+  "no PR (by instruction)"
+ ],
+ "blockers": []
+}

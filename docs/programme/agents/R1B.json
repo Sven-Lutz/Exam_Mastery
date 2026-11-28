@@ -1,0 +1,22 @@
+{
+ "agent_id": "R1B",
+ "wp": "WP-R1",
+ "status": "COMPLETED",
+ "updated": "2026-11-27T09:34:00+01:00",
+ "done": [
+  "Read charter, R0 audit sections 2/8/9, evidence register schema, KB source ids",
+  "Targeted search 2026-11-27: 42 PubMed esearch queries, 8 web searches, 33 page/full-text fetches (incl. failures)",
+  "Evidence register r1b_evidence.json: 42 sources (11 fulltext_claim_review, 2 fulltext_partial, 28 abstract, 1 metadata), validated",
+  "Report R1B_NEURO_INTENSITY.md: questions, query log, evidence tables, competing models, 12 null/negative observations, mechanism map, policies R1-POL-B01..B12, worked case + hard counterexample, transfer/NOT_APPLICABLE, technology candidates, gaps G1-G12, 'Was wir nicht behaupten koennen'"
+ ],
+ "open": [
+  "Independent review pending",
+  "Gaps G1-G12 (esp. G1 planner RCT, G2 breaks with retention outcomes, G4 chronotype/shift work, G5 test-anxiety meta-analyses, G7 Ciria 2026 correction)"
+ ],
+ "artifacts": [
+  "Exam_Mastery-r1/docs/research/workstreams/r1/R1B_NEURO_INTENSITY.md",
+  "Exam_Mastery-r1/docs/research/workstreams/r1/r1b_evidence.json"
+ ],
+ "next_step": "Lead/R6: independent critic review of R1B; reconcile with R1A outputs; no implementation before gate",
+ "notes": "Earlier RUNNING checkpoints in this session carried estimated (not clock-read) timestamps; this COMPLETED timestamp is clock-read."
+}

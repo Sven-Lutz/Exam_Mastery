@@ -1,0 +1,20 @@
+{
+ "agent": "C2M-IMPORT",
+ "branch": "feat/c2m-import-20261127",
+ "worktree": "<private-path>",
+ "updated": "2026-11-27",
+ "state": "DELIVERED",
+ "head": "1348bbd",
+ "commits": [
+  "ef6cfc0 CLI import/inventory/plan/packet/build-chapter/reimport",
+  "eb731b6 wizard + course API + tests",
+  "9c071ca docs/COURSE_IMPORT.md",
+  "9f61fd1 UI fix",
+  "1348bbd generic docstring"
+ ],
+ "suite": "frozen copy at 1348bbd: CI pytest list 238 passed; unittest discover 916 OK (13 skipped)",
+ "rl_smoke": "~/Mastery/courses/rl: 31 files, 28 iCloud files materialized with consent, 1335 pages (1290 text, 1108 need vision), gaps 03/11/18, 5 version conflicts, 7 exercises without solution, 17 chapters; ch05 -> packet.import.json (140 text pages, 102 page images); author's packet.json/pages untouched",
+ "note": "scratchpad is shared with sibling agents: use unique dir names (a sibling's scratchpad/frozen overwrote mine mid-run)",
+ "paid_calls": 0,
+ "network": "brctl download of the owner's RL folder only (consented)"
+}

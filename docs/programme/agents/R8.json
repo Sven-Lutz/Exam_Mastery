@@ -1,0 +1,28 @@
+{
+ "agent_id": "R8",
+ "wp": "WP-R8",
+ "status": "COMPLETED",
+ "updated": "2026-11-27T20:15:00+01:00",
+ "done": [
+  "read: issue #30, ANKI_OBSIDIAN_TOOLING_RESEARCH_20261126.md, SEARCH_PROTOCOL, EVIDENCE_REGISTER_SCHEMA, R1 policy schema + test, R3/R9 test patterns, R9 resource cards",
+  "read-only engine inspection on origin/integration/quality-recovery-20261126: anki_v2.py, learning/experience_anki.py, learning/anki_bridge.py, tests/test_experience_anki.py, experience.obsidian_note; brand doc coupling (notetype filter, deck names)",
+  "official docs fetched: Anki manual (deck options/FSRS, packaged decks, text import, files, sync, backups, media, FAQ), ankitects/anki apkg importer source (notes/cards/media/decks.rs), AnkiConnect README+API_V1, srs-benchmark, FSRS repos, Obsidian help (data storage, properties, Bases, CLI, Headless, connectors, plugin security, Sync), community-plugins.json, RemNote, Mochi, Joplin, Logseq, SiYuan; Crossref/OpenAlex for 8 papers",
+  "r8_tools.json 30 cards (commit 6e94a5c)",
+  "r8_evidence.json 41 entries + S01-S17 (commit 377f3e6); branch pushed",
+  "r8_workflow_policies.json R8-POL-01..14, R8_ANKI_OBSIDIAN_WORKFLOWS.md, tests/test_r8_workflows.py (52 tests OK incl. R1, 1 skipped); commit 8d6194b",
+  "pushed research/r8-anki-workflows-20261127; draft PR #44 (base research/r1-learning-science-20261127)"
+ ],
+ "open": [
+  "independent/human review of PR #44 (no lead spot-check)",
+  "owner decisions 1-8 in R8_ANKI_OBSIDIAN_WORKFLOWS.md §13",
+  "gaps: no FSRS-vs-SM-2 learning trial found; Pan 2023 and Lindsey 2014 abstract only; mobile client import behaviour; update_tags semantics; anki -b credential isolation; SuperMemo identity; nothing executed"
+ ],
+ "artifacts": [
+  "docs/research/workstreams/R8_ANKI_OBSIDIAN_WORKFLOWS.md",
+  "docs/research/workstreams/r8/r8_tools.json",
+  "docs/research/workstreams/r8/r8_evidence.json",
+  "docs/research/workstreams/r8/r8_workflow_policies.json",
+  "tests/test_r8_workflows.py"
+ ],
+ "next_step": "none autonomous; await review of PR #44"
+}

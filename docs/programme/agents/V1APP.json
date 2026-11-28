@@ -1,0 +1,29 @@
+{
+ "agent_id": "V1APP",
+ "wp": "Mastery V1 local app (issue #49)",
+ "status": "COMPLETED",
+ "updated": "2026-11-27T21:35:00+01:00",
+ "branch": "feat/mastery-v1-app-20261127",
+ "worktree": "Exam_Mastery-v1app",
+ "done": [
+  "6bed7f7 explorable persistence (em-practice-v1) + portable R9 tutor brief (EMT.portableBrief), tutor_brief evidence event",
+  "701d456 mastery package: bin/mastery, python -m exam_mastery.mastery {start,build,status,export}, home/progress/tutor/backup, stdlib server 127.0.0.1:8765; pushed",
+  "f94e9e7 tests/test_mastery_v1_app.py (7 tests: e2e browser flow, server guards, repo refusal, Anki throwaway import + unchanged rebuild restamps nothing, private unit, R9 header verbatim)",
+  "55cb491 docs/MASTERY_V1.md; 10cd29b wording fix; pushed",
+  "CI-equivalent suite on frozen copy of 55cb491: pytest module list 215 passed; unittest discover 896 OK (13 skipped)"
+ ],
+ "open": [
+  "lead review + merge into integration/mastery-v1-20261127 (no PR opened)",
+  "owner acceptance checklist docs/MASTERY_V1.md §5",
+  "untested: mobile, Anki desktop/mobile import, learning effect NOT_RUN, attention content not independently reviewed"
+ ],
+ "next_step": "none autonomous; await lead review",
+ "artifacts": [
+  "bin/mastery",
+  "exam_mastery/mastery/",
+  "exam_mastery/templates/mastery_home.js",
+  "exam_mastery/templates/mastery_home.css",
+  "tests/test_mastery_v1_app.py",
+  "docs/MASTERY_V1.md"
+ ]
+}

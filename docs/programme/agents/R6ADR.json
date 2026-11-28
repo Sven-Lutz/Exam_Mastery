@@ -1,0 +1,27 @@
+{
+ "agent_id": "R6ADR",
+ "wp": "WP-R6",
+ "status": "COMPLETED",
+ "updated": "2026-11-27T21:45:00+01:00",
+ "done": [
+  "read: issue #27, charter, product contracts, programme state (AD-0..3, CD-1..8, engine_capabilities, product_identity, owner_attention), policy_index.json (116 policies), summary/decision/owner sections of R0-R5, R7-R9",
+  "read-only engine inspection at 5ad257d (learning/policy.py, tracks.py, diagnose.py, experience*.py, tutor.py, evaluation.py, prompts/, knowledge/principles.json)",
+  "3a95551 draft ARCHITECTURE_SYNTHESIS_ADR.md (written before reading red-team findings)",
+  "d3ea60a r6/adr.json, r6/skill_ontology_v1.json, r6/observation_contract_v1.json, tests/test_r6_architecture.py",
+  "07c5dfe red-team reconciliation (research/r6-red-team-20261127 @ 091ead46): 40 blocker/major findings -> 34 accept, 6 partial, 0 reject; new OD-28..OD-31",
+  "tests: python3 -m unittest tests.test_r6_architecture -> 12 OK (plus R1 contract OK); merge-tree with red-team branch has no conflicts; branch pushed; no PR opened"
+ ],
+ "open": [
+  "lead: merge research/r6-red-team-20261127 into research/r6-architecture-20261127, review reconciliation, open one R6 draft PR",
+  "owner: G0 decision on PROPOSED H-AB; 33 owner decisions (OD-01..OD-31, OD-13a/b/c)",
+  "independent/human review of R6 (same model family as workstreams and red team)"
+ ],
+ "artifacts": [
+  "docs/research/workstreams/ARCHITECTURE_SYNTHESIS_ADR.md",
+  "docs/research/workstreams/r6/adr.json",
+  "docs/research/workstreams/r6/skill_ontology_v1.json",
+  "docs/research/workstreams/r6/observation_contract_v1.json",
+  "tests/test_r6_architecture.py"
+ ],
+ "next_step": "none autonomous; lead reconciliation and R6 draft PR"
+}

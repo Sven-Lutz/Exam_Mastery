@@ -1,0 +1,1506 @@
+{
+ "schema": "exam-mastery-programme-state/1",
+ "updated": "2026-11-28T12:30:00+01:00",
+ "updated_by": "lead (interactive session, issue #58 M0/M2)",
+ "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
+ "hard_rules": [
+  "Never merge to main; draft PRs only.",
+  "Never modify the local RL pilot (main checkout on feat/rl-engine-pilot, 10 unpushed commits).",
+  "Historical HUMAN_REJECTED stays; never invent human or scientific approval.",
+  "No paid API/model calls (authorised budget 0); never work around provider limits.",
+  "Public repo: no lecture material, books, learner records, secrets or local absolute paths.",
+  "No clinical or safety-critical competence certification.",
+  "Do not overwrite other agents' or people's work; check open PRs/branches before writing."
+ ],
+ "autonomy": {
+  "headless_enabled": true,
+  "supervisor": "ops/autonomy/supervisor.py (launchd tick, see docs/programme/README.md)",
+  "resume_prompt": "docs/programme/RESUME_PROMPT.md",
+  "agent_checkpoints": "docs/programme/agents/<agent-id>.json",
+  "lead_heartbeat": "supervisor.py heartbeat --session <id> --wp <wp> at every lead checkpoint",
+  "proven_2026_11_27": [
+   "headless `claude -p` call + `--resume` of the same session returns the earlier token (smoke)",
+   "the same smoke started by launchd: subscription auth, resume, git over SSH and gh auth work in the agent context",
+   "real crash test: tick killed with SIGKILL mid-run; next tick resumed the same session, finished the task without duplicating the completed step; third tick idempotent",
+   "rate_limit_event in stream-json reports five_hour/seven_day utilisation and resetsAt; the supervisor records and respects it",
+   "22 unit tests with a fake CLI: limit pause until reported reset, resume of the same session, failure backoff -> BLOCKED, timeout kill, crash recovery, lock, kill switch, daily cap, window ceilings, dependency order, env without API keys"
+  ],
+  "not_proven": [
+   "a real usage-limit refusal (never hit during testing); the parser follows the CLI's documented rate_limit_info shape",
+   "the CLI's built-in wait-and-resume of an interactive session at limit reset (strings in the binary describe it; not observed)",
+   "behaviour while the Mac sleeps (launchd skips intervals; the next tick after wake catches up)",
+   "a human typing into the lead session while a headless run is active (protocol: run `supervisor.py status` first; `disable` stops new runs)"
+  ]
+ },
+ "science_state": {
+  "summary": "R0 (PR #32) audited the 55-source/52-claim KB: bibliographic checks are not claim checks; retrieval/feedback moderator rankings, transfer to proof construction, tutor non-inferiority and calendar-based mastery are overstated. No Exam Mastery learning effect has been measured. R1 is now deepening cognitive science and sustainable-intensity evidence into context-dependent policies. R1 (PR #35): 23 context-dependent design-hypothesis policies; retrieval is operation-specific, examples first for novices, feedback timing no lever, judgements reactive, sleep protection over weeks, no universal hour caps; no policy has an evaluated learning effect. R2-R9 completed 27.11.2026 (PRs #38-#45); R6 (PR #48): 116 design-hypothesis policies, none with evaluated learning effect; independent red team (same model family) 43 findings; architecture H-AB PROPOSED; minimum credible system = one operation family (symbolic_procedure), within-person randomised, delayed unassisted endpoint on independently authored items.",
+  "key_documents": [
+   "docs/research/RESEARCH_FIRST_PROGRAM_20261126.md (PR #20)",
+   "docs/research/workstreams/KB_GAP_AUDIT.md, SEARCH_PROTOCOL.md, EVIDENCE_REGISTER_SCHEMA.md (PR #32)",
+   "exam_mastery/knowledge/{sources,principles,specs,verification}.json"
+  ]
+ },
+ "workstreams": {
+  "R0": {
+   "status": "COMPLETED",
+   "pr": 32,
+   "issue": 21,
+   "note": "single-agent audit; independent second extraction pending; do not re-audit"
+  },
+  "R1": {
+   "status": "COMPLETED",
+   "wp": "WP-R1",
+   "issue": 22,
+   "pr": 35,
+   "note": "independent review pending"
+  },
+  "R2": {
+   "status": "COMPLETED",
+   "wp": "WP-R2",
+   "issue": 23,
+   "pr": 38,
+   "note": "batch5 added (algorithms, complexity, quantitative problem solving/modelling); independent review pending; finance modelling + causal inference remain gaps"
+  },
+  "R3": {
+   "status": "COMPLETED",
+   "wp": "WP-R3",
+   "issue": 24,
+   "pr": 40,
+   "note": "independent review pending"
+  },
+  "R4": {
+   "status": "COMPLETED",
+   "wp": "WP-R4",
+   "issue": 25,
+   "pr": 41,
+   "note": "independent review pending"
+  },
+  "R5": {
+   "status": "COMPLETED",
+   "wp": "WP-R5",
+   "issue": 26,
+   "pr": 39,
+   "note": "batch5 added (hints, error diagnosis, learning analytics); independent review pending"
+  },
+  "R6": {
+   "status": "COMPLETED",
+   "wp": "WP-R6",
+   "issue": 27,
+   "pr": 48,
+   "note": "H-AB PROPOSED; owner gate G0"
+  },
+  "R7": {
+   "status": "COMPLETED",
+   "wp": "WP-R7",
+   "issue": 29,
+   "pr": 45,
+   "note": "independent review pending; owner decisions (licence/commercial, Think Logic identity, Pyodide spike)"
+  },
+  "R8": {
+   "status": "COMPLETED",
+   "wp": "WP-R8",
+   "issue": 30,
+   "pr": 44,
+   "note": "engine identity findings EF-1..EF-8 -> CD-8; owner decisions §13"
+  },
+  "R9": {
+   "status": "COMPLETED",
+   "wp": "WP-R9",
+   "issue": 31,
+   "pr": 42,
+   "note": "owner decisions listed in TUTOR_ADOPTION_DECISION.md §6; independent review pending"
+  }
+ },
+ "architecture_decisions": [
+  {
+   "id": "AD-0",
+   "status": "WORKING_BASIS",
+   "decision": "Four product containers (textbook, workbook, Anki, interactive) stay; components may be NOT_APPLICABLE with a justified fallback.",
+   "source": "PR #20 charter"
+  },
+  {
+   "id": "AD-1",
+   "status": "WORKING_BASIS",
+   "decision": "Native Anki is the only scheduler; no second spaced-repetition engine without proven added value.",
+   "source": "product contract, R8 brief"
+  },
+  {
+   "id": "AD-2",
+   "status": "OWNER_DELEGATED_V1_CHOICE",
+   "decision": "Hybrid H-AB 'Evidenzkern mit Vorlagen': typed semantic contract + observation contract + verifier adapters + deterministic state/decision functions; templates per operation family and domain packs as data; agents only at build time behind gates; no rule language, no runtime agent, no knowledge tracing, no own scheduler. Rationale: verification, safety, measurement integrity, cost, offline, migration - not learning effect (none measured).",
+   "source": "owner mandate https://github.com/Sven-Lutz/Exam_Mastery/issues/49 (2026-11-27) + PR #48 owner comment; ADR status updated on research/r6-architecture-20261127 (38167d8)",
+   "scope": "provisional implementation architecture for Mastery V1 on isolated integration/feature branches; minimal K1-K4; abstractions revisable; no merge to main; no RL-pilot change",
+   "not_implied": "no scientific validation; all 116 policies remain design hypotheses with learning_evaluation NOT_RUN"
+  },
+  {
+   "id": "AD-3",
+   "status": "OWNER_DECISION",
+   "decision": "Product identity Mastery: general knowledge-and-skill platform; exam preparation is an optional mode. Scope-neutral competency taxonomy; historical exam objectives preserved; no technical renames without a tested migration and separate approval.",
+   "source": "issue #34"
+  },
+  {
+   "id": "AD-4",
+   "status": "OWNER_DECISION",
+   "decision": "Personal-first, noncommercial Mastery (no blanket licence clearance for NC components or redistribution). Product priorities: (1) university excellence, (2) languages, (3) other skills. A usable local V1 has priority over further research.",
+   "source": "issue #49, PR #48 owner comment, #34"
+  }
+ ],
+ "engine_capabilities": {
+  "main": "v0.21.0-rc1 curated snapshot (PR #2)",
+  "draft_stack_unmerged": "PRs #11-#19 four-product experience engine (textbook/workbook PDF, APKG with stable ids and review-history-preserving re-import, offline HTML), adaptive diagnosis (#14), misconception scaffolds (#15), staged publishing (#16), exact symbolic polynomial gates (#17), evidence audit fail-closed (#18), publish recovery + cache invalidation (#19); PR #28 adds exclusive publisher lock, offline MathJax SVG, semantic graphics contract and the Attention lab",
+  "verification_entrypoint": "python scripts/verify_experience_references.py --out <dir> (PR #19/#28 branches)",
+  "not_demonstrated": "automatic high-quality authorship; learning effect; proof-level correctness beyond polynomial identities",
+  "test_environment": "Repo-independent venv with playwright/reportlab/pytest: Projects/Exam_Mastery-integration/.venv (the old ~/.local/share/exam-mastery venv was retired 2026-11-23); run engine suites from a frozen git-archive copy"
+ },
+ "product_quality": {
+  "human_rejected": [
+   "engine RC v0.21.0-rc1 products incl. NLP baseline",
+   "NLP reference unit v1, v3, v4, v5, v6.1",
+   "RL Kap. 3 v1, v3, v4"
+  ],
+  "human_review_pending": [
+   "NLP v7.1 Self-Attention slice (PR #3)",
+   "RL Kap. 3 v6 (local pilot)",
+   "Golden Attention reference candidate (PR #28): technically executable, not scientifically or didactically accepted"
+  ],
+  "learning_evaluation": "NOT_RUN for every product",
+  "mastery_v1": "TECHNICAL_CANDIDATE; PRODUCT_ACCEPTANCE_FAILED (owner hands-on, issue #51, 2026-11-27): no real lecture import, textbook/workbook quality, tutor copy-paste, Anki without visuals/context/feedback, analytics provenance"
+ },
+ "critical_defects": [
+  {
+   "id": "CD-1",
+   "severity": "P0",
+   "text": "No product has a measured learning effect; protocols lack sample size, allocation concealment and delayed unassisted endpoints (R0 §6)."
+  },
+  {
+   "id": "CD-2",
+   "severity": "P0",
+   "text": "policy.kc_status counts distinct calendar dates as spacing/mastery evidence; two dates can be minutes apart (R0 §2).",
+   "status": "FIX_IN_DRAFT_PR",
+   "fix": "PR #37 (stacked on #28): elapsed time >= 20 h (provisional) + different task; Python/JS parity; old code fails 3/5 new checks; 112 related tests OK locally",
+   "note": "RT-26: fix narrows, does not close the hole -> CD-9"
+  },
+  {
+   "id": "CD-3",
+   "severity": "P0",
+   "text": "AI-R1 states tutor harm avoidance as if established; non-significance is not equivalence (R0 §2, D10)."
+  },
+  {
+   "id": "CD-4",
+   "severity": "P1",
+   "text": "Spec numbers (4 fading stages, 3 hints, <=5 min exploration, +-10% blueprint, <=60-word cards) are design hypotheses used as rules (R0 §6)."
+  },
+  {
+   "id": "CD-5",
+   "severity": "P1",
+   "text": "Golden references are session-curated; generalisable authoring quality is unproven (PR #28 limits)."
+  },
+  {
+   "id": "CD-6",
+   "severity": "P1",
+   "text": "Unmerged draft stack #11-#19/#28 and the local RL pilot drift apart from main; integration plan needed before engineering (P4)."
+  },
+  {
+   "id": "CD-7",
+   "severity": "P1",
+   "text": "PR #19 tutor brief embeds the full reference solution; only a prompt instruction keeps it from the learner and the chat provider receives it (R9 TUTOR_ADOPTION_DECISION.md). Conflicts with R5-POL-03/R9-POL-04 (answer key only for practice items; never for mock/retest items).",
+   "status": "FIX_IN_DRAFT_PR",
+   "fix": "PR #43 (stacked on #37): no answer key in the tutor brief for similar/transfer/retest (role from engine track); 'tutor' event counts as assistance in policy.py + em_tutor.js; 7 new checks (5 fail on 5bdfb6f); CI-equivalent suite 215 pytest + 643 unittest OK locally; 5ad257d: chapter app em_app.js logs item tutor briefings as help (3 browser checks; suite 215 pytest + 646 unittest OK)",
+   "note": "RT-27: fix narrows; evidence-task prompts still go into the brief without key, help in outside chats is invisible, practice roles get the key without a prior attempt (instruction-only)"
+  },
+  {
+   "id": "CD-8",
+   "severity": "P1",
+   "status": "FIX_IN_DRAFT_PR",
+   "text": "Anki export identity (anki_v2.build_deck, used by chapter_publish, anki_bridge, experience_anki): (a) every export sets mod=stamp on ALL notes and both note types, so an 'update if newer' import overwrites learner edits to note fields and templates even when content is unchanged; (b) note-type IDs are hashed from the display name ('Exam Mastery · Basis (v2)'), so any rename (Mastery brand) creates new note types; (c) GUID includes the chapter slug, moving a card creates a new note; (d) deck names follow unit titles; (e) '_'-prefixed font media are never updated by Anki. Review history itself is preserved (cards are not changed). Source: R8 EF-1..EF-8 (PR #44), confirmed in code by lead.",
+   "fix": "PR #46 (stacked on #43): conditional restamping of notes/note types by content hash (per-key state, legacy fallback), frozen note-type ID seeds; real anki 26.9.3 imports into throwaway collections show learner edit + ivl + revlog survive; previous commit loses the edit; suite 215 pytest + 650 unittest OK",
+   "open": "GUID includes chapter slug (owner decision R8 §13); deck names from titles; '_' font media never updated; mobile import unchecked"
+  },
+  {
+   "id": "CD-9",
+   "severity": "P0",
+   "status": "FIX_IN_DRAFT_PR",
+   "source": "R6 red team RT-26 (091ead4), reproduced by lead on the PR #46 head",
+   "text": "kc_status still reports RETAINED_ON_LATER_DAY (a) when the learner viewed the solution of a sibling task of the same competency one minute before the later success (help is counted per task, not per competency) and (b) when an attempt carries a future timestamp (client/imported clock). CD-2's fix (PR #37) narrows but does not close the hole. Blocks any use of kc_status as an evaluation endpoint; in-product states stay proximal indicators (R5-POL-05).",
+   "fix": "PR #47 (stacked on #46): KC_HELP_WINDOW_HOURS (provisional, = retention gap) makes help on any same-competency task assisted for kc_status; attempts dated after real clock + 5 min ignored; browser import refuses future events; Python/JS parity; 4/4 new test methods fail on previous commit; suite 215 pytest + 654 unittest OK",
+   "open": "help outside the product stays invisible; in-product states remain proximal indicators (R5-POL-05)"
+  },
+  {
+   "id": "CD-10",
+   "severity": "P1",
+   "status": "FIXED_ON_INTEGRATION_BRANCH",
+   "source": "R6 red team RT-11, reproduced by lead",
+   "text": "Randomised expression identity test (learning/expr.py sample_points) samples every variable only in (0.15, 0.95) with a fixed public seed: (x^2)^(1/2) is judged equal to x. Adequate for the current tracks' positive quantities (activations, probabilities) but a false-equivalence risk for any general symbolic task.",
+   "fix": "0ceb143 on integration/mastery-v1-20261127"
+  },
+  {
+   "id": "CD-11",
+   "severity": "P1",
+   "status": "FIXED_ON_INTEGRATION_BRANCH",
+   "source": "R6 red team RT-10; reproduced by lead 2026-11-27",
+   "text": "Premise-selection ('constraints') tasks count as evidence for the proof competency although they test recognition of premises, not proof construction (R2-POL-02: comprehension, validation and construction measured separately).",
+   "fix": "bb66530: kc_evidence_basis + learner-view qualifier; full (KC, operation) keyed evidence core is part of V1 K2"
+  }
+ ],
+ "agents": [
+  {
+   "id": "LEAD",
+   "kind": "interactive Claude Code session",
+   "scope": "planning, integration, synthesis, PRs, state",
+   "status": "RUNNING"
+  },
+  {
+   "id": "R1A",
+   "kind": "background subagent of LEAD",
+   "scope": "R1 cognitive & instructional science",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R1A.json"
+  },
+  {
+   "id": "R1B",
+   "kind": "background subagent of LEAD",
+   "scope": "R1 neuro, physiology, motivation, intensity",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R1B.json"
+  },
+  {
+   "id": "R2",
+   "kind": "background subagent of LEAD",
+   "scope": "R2 + R2S batch5 (algorithms, complexity, quantitative problem solving)",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R2.json",
+   "worktree": "Exam_Mastery-r2"
+  },
+  {
+   "id": "R5",
+   "kind": "background subagent of LEAD",
+   "scope": "R5 + R5S batch5 (hints, error diagnosis, learning analytics)",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R5.json",
+   "worktree": "Exam_Mastery-r5"
+  },
+  {
+   "id": "SUPERVISOR",
+   "kind": "launchd agent",
+   "scope": "headless continuation after limits/crashes/reboots",
+   "status": "IDLE (installed; daily cap 4/4 reached 2026-11-27; lead heartbeat + hold active)"
+  },
+  {
+   "id": "R3",
+   "kind": "background subagent of LEAD",
+   "scope": "R3 legal, philosophical, case and clinical reasoning",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R3.json",
+   "worktree": "Exam_Mastery-r3"
+  },
+  {
+   "id": "R4",
+   "kind": "background subagent of LEAD",
+   "scope": "R4 embodied, laboratory, spatial/CAD and craft learning",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R4.json",
+   "worktree": "Exam_Mastery-r4"
+  },
+  {
+   "id": "R9",
+   "kind": "background subagent of LEAD",
+   "scope": "R9 tutoring resources, behavioural contract, evaluation protocol",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R9.json",
+   "worktree": "Exam_Mastery-r9"
+  },
+  {
+   "id": "R7",
+   "kind": "background subagent of LEAD",
+   "scope": "R7 learning resources, visualisation, interactive references",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R7.json",
+   "worktree": "Exam_Mastery-r7"
+  },
+  {
+   "id": "R8",
+   "kind": "background subagent of LEAD",
+   "scope": "R8 Anki FSRS, Obsidian, alternatives, integration workflow",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R8.json",
+   "worktree": "Exam_Mastery-r8"
+  },
+  {
+   "id": "R6RT",
+   "kind": "background subagent of LEAD",
+   "scope": "R6 independent red-team review",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R6RT.json",
+   "worktree": "Exam_Mastery-r6rt"
+  },
+  {
+   "id": "R6ADR",
+   "kind": "background subagent of LEAD",
+   "scope": "R6 synthesis, ADR, ontology, contracts, minimum credible system",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/R6ADR.json",
+   "worktree": "Exam_Mastery-r6"
+  },
+  {
+   "id": "V1APP",
+   "kind": "background subagent of LEAD",
+   "scope": "Mastery V1 local app",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/V1APP.json",
+   "worktree": "Exam_Mastery-v1app"
+  },
+  {
+   "id": "V1CONTENT",
+   "kind": "background subagent of LEAD",
+   "scope": "V1 attention content + deterministic track",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/V1CONTENT.json",
+   "worktree": "Exam_Mastery-v1content"
+  },
+  {
+   "id": "C2M-IMPORT",
+   "kind": "background subagent of LEAD",
+   "scope": "course import pipeline + wizard",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/C2M-IMPORT.json",
+   "worktree": "Exam_Mastery-c2m-import"
+  },
+  {
+   "id": "C2M-AUTHOR",
+   "kind": "background subagent of LEAD",
+   "scope": "real RL chapter 05 Policy Gradient + page-level QA",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/C2M-AUTHOR.json",
+   "worktree": "Exam_Mastery-c2m-author"
+  },
+  {
+   "id": "C2M-SECOND",
+   "kind": "background subagent of LEAD",
+   "scope": "second contrasting course (linear algebra) end to end",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/C2M-SECOND.json",
+   "worktree": "Exam_Mastery-c2m-second"
+  },
+  {
+   "id": "MOTION",
+   "kind": "background subagent of LEAD",
+   "scope": "Mastery Motion engine + RL flagship",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/MOTION.json",
+   "worktree": "Exam_Mastery-motion"
+  },
+  {
+   "id": "MOTION2",
+   "kind": "background subagent of LEAD",
+   "scope": "Motion consolidation, keyframes into books/cards, visual polish",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/MOTION2.json",
+   "worktree": "Exam_Mastery-motion2"
+  },
+  {
+   "id": "TUTOR",
+   "kind": "background subagent of LEAD",
+   "scope": "guided tutor inside the UI",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/TUTOR.json",
+   "worktree": "Exam_Mastery-tutor"
+  },
+  {
+   "id": "ANALYTICS",
+   "kind": "background subagent of LEAD",
+   "scope": "transparent learning analytics + ledger",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/ANALYTICS.json",
+   "worktree": "Exam_Mastery-analytics"
+  },
+  {
+   "id": "GATES",
+   "kind": "background subagent of LEAD",
+   "scope": "standard quality gates + report",
+   "status": "COMPLETED",
+   "checkpoint": "docs/programme/agents/GATES.json",
+   "worktree": "Exam_Mastery-gates"
+  }
+ ],
+ "work_packages": [
+  {
+   "id": "WP-C2M-ORCHESTRATE",
+   "status": "COMPLETED_PENDING_OWNER_REVIEW",
+   "title": "M2 (#58): course-wide AI authoring orchestration (Generate/Continue/Update course)",
+   "branch": "feat/c2m-orchestrate-20261128",
+   "pr": 60,
+   "head": "0dcb707",
+   "integrated_in": "e44f595",
+   "evidence": [
+    "bin/mastery author plan|authorize|run|status|stop|check-draft + app section 'Kurs erarbeiten (KI)'",
+    "tests/test_course_authoring.py 11 tests (fake CLI; app path with background runner)",
+    "real claude -p smoke call: apiKeySource none, write in chapter dir, success",
+    "full suite frozen copy: 385 pytest + 1017 unittest OK"
+   ],
+   "limits": [
+    "no real course authored end-to-end through the orchestrator yet",
+    "offline plan: rl 16 author + 1 revise (17-51 calls); lina1 23 author + 1 revise (24-72 calls)"
+   ],
+   "next_step": "Owner decision: grant model calls per course (bin/mastery author <kurs> authorize --max-runs N, or in the app) and start 'Kurs erarbeiten'. Autonomous sessions must NOT self-authorize authoring runs. After the first real chapter via the orchestrator: page-level PDF inspection, then tune the prompt/feedback loop."
+  },
+  {
+   "id": "WP-UPLIFT",
+   "title": "Bring the two real chapters to 0 major gate findings (content) and fix engine-side causes (figure label size floor, keep-with-next headings, spill pages)",
+   "status": "RESUMABLE",
+   "priority": 0.09,
+   "autostart": true,
+   "branch": "feat/mastery-uplift",
+   "base": "integration/mastery-v1-20261127",
+   "next_step": "Engine commits up to ed13546 are merged into integration e44f595 (green). Engine side done. Next: figure/task binding check (RL workbook task 4 shows bandit figure r=(2,5,8) for r=(3,1); 'Abbildung 1.1' numbering in workbook; bandit axis tick collision) in engine with tests; then content revision of private unit.json (AN-CONTEXT, TB-CHAIN, AN-VISUAL, alt routes), rebuild both chapters, report gate counts; full CI suite from a frozen copy before PR.",
+   "worktree": "Exam_Mastery-uplift",
+   "updated": "2026-11-28",
+   "done": [
+    "Baseline 'mastery quality' (blocker/major/minor): RL ch.05 0/26/3 (AN-CONTEXT 10, PG-FONT-FLOOR 8, TB-CHAIN 6, PG-ORPHAN-HEADING 1, PG-NEAR-EMPTY 1; WB-ALT-ROUTES 3 minor); LinA ch.15 0/22/9 (AN-CONTEXT 13, TB-CHAIN 7, AN-VISUAL 1, PG-ORPHAN-HEADING 1; WB-ALT-ROUTES 8, TB-DIVERGENCE 1 minor)",
+    "Engine fix figure label floor (8a34737): typeset.fit_figure_labels; print figures whose smallest label would print < 6.4 pt use the full text block (print-only class 'wide'), else only too-small font sizes are raised; also for lab figures; 6 unit tests, added to CI pytest list",
+    "RL ch.05 rebuilt with the fix (private library): PG-FONT-FLOOR 8 -> 0; now 0/18/3; page check by eye on Lehrbuch p.10 and Arbeitsbuch p.5 (figure full width, no clipping)",
+    "Engine fix keep-with-next (ed13546): textbook headings before splittable prose form one keep group with break-after:avoid (prose follows outside, orphans:3); unbreakable first blocks stay grouped as before; workbook task head + prompt form a keep group, stage heading joins only that group; chosen from 30 synthetic Chromium layouts (whole-block keep left near-empty pages, plain break-after:avoid failed for stacked headings and before boxes)",
+    "Gate calibration (ed13546): PG-ORPHAN-HEADING no longer reads a bold line continuing a regular paragraph at normal line spacing as a heading (RL p.4 was a closing bold question); real bold headings still detected; tests/test_keep_with_next.py 8 passed, added to CI pytest list",
+    "Rebuilt with ed13546 (private library): RL ch.05 0/16/3 (AN-CONTEXT 10, TB-CHAIN 6; WB-ALT-ROUTES 3 minor), Lehrbuch 23 -> 22 pages; LinA ch.15 0/21/9 (AN-CONTEXT 13, TB-CHAIN 7, AN-VISUAL 1; WB-ALT-ROUTES 8, TB-DIVERGENCE 1 minor). All PG-* findings 0 in both chapters. Page check by eye: RL Lehrbuch contact sheet all pages, LinA Arbeitsbuch pages 1-12"
+   ],
+   "open": [
+    "Content (private unit.json, outside Git): AN-CONTEXT cards (RL 10, LinA 13), TB-CHAIN missing steps (RL 6, LinA 7), AN-VISUAL la/kernel-image, WB-ALT-ROUTES hints (minor)",
+    "Seen by eye, not gate-detected: bandit figure axis ticks '-0.5' and '0' collide; workbook RL task 4 (r=(3,1)) shows the bandit figure with r=(2,5,8) and caption 'Abbildung 1.1' repeated in the workbook - check figure/task binding and workbook numbering",
+    "LinA Arbeitsbuch: an unbreakable task with figure moves whole to the next page and leaves the previous page with one short task (p.8); not gate-flagged, cosmetic",
+    "Full CI suite not rerun at ed13546 (targeted: keep_with_next 8 + quality_gates + figure_label_floor + experience_books + b9_quality + edition + chapter_publish + attention_reference + inline_notation + solution_artifacts = 120 passed)"
+   ],
+   "artifacts": [
+    "feat/mastery-uplift@8a34737 (figure label floor)",
+    "feat/mastery-uplift@ed13546 (exam_mastery/typeset.py, exam_mastery/learning/experience_books.py, exam_mastery/mastery/quality.py, tests/test_keep_with_next.py, .github/workflows/tests.yml)",
+    "private: ~/Mastery rl ch.05 and lina1 ch.15 build/quality.json (not in Git)"
+   ],
+   "tests": "at ed13546 (integration .venv): tests/test_keep_with_next.py 8 passed; test_mastery_quality_gates, test_figure_label_floor, test_experience_books, test_b9_quality, test_edition, test_b6_5_chapter_publish, test_attention_reference, test_inline_notation, test_solution_artifacts 112 passed",
+   "blockers": []
+  },
+  {
+   "id": "WP-GATES",
+   "title": "Machine quality gates for standard 5.1-5.4 + per-chapter quality report",
+   "status": "COMPLETED",
+   "priority": 0.08,
+   "autostart": false,
+   "branch": "feat/mastery-quality-gates",
+   "base": "integration/mastery-v1-20261127 (71bf7b3)",
+   "worktree": "Exam_Mastery-gates",
+   "updated": "2026-11-28T01:44:25+01:00",
+   "done": [
+    "22793a7..38bfbce: mastery-quality-v1 (27 gates: textbook 5, workbook 5, Anki 5, interactive 3, page QA 5, integrity 4), quality.json/html/md per build, build-chapter exits 3 on blockers, 'mastery quality' CLI, Kurse view status + report link, GATE_ERROR never counts as pass; tests 35",
+    "calibration (counts only): attention reference 0/48/11, RL ch.05 0/26/3, LinA ch.15 0/22/9 (blocker/major/minor); main findings: cards without context, missing learning-chain steps, open tasks without alternative routes, RL figure labels 5.4-5.9 pt on 8 pages, one orphan heading per private chapter",
+    "lead: merged into integration (CI list union)"
+   ],
+   "open": [
+    "Anki.apkg not scanned for private paths (card texts are)",
+    "'Warum' step and alternative routes are keyword heuristics",
+    "page QA is geometry only"
+   ]
+  },
+  {
+   "id": "WP-MOTION-2",
+   "title": "Mastery Motion consolidation and polish: port the plane scene onto Motion, wire keyframes into textbook/Anki builds, RL scene visual polish (3b1b-level clarity), dark mode",
+   "status": "COMPLETED",
+   "priority": 0.07,
+   "autostart": false,
+   "branch": "feat/mastery-motion-2",
+   "base": "integration/mastery-v1-20261127",
+   "next_step": "none",
+   "worktree": "Exam_Mastery-motion2",
+   "updated": "2026-11-28T01:06:02+01:00",
+   "done": [
+    "964abcf..ea12059: single plane model linear_map_2d on Motion (kernel/image at det=0 with snapping, presets, draggable columns, Av/sign(det) prediction), old plane_map files removed after parity; keyframes into textbook figures and Anki card media (CD-8 unchanged rebuild); palette, decluttered RL plane, label halos, dark mode, eased transitions; RL last step states b=J worse than b=0 near the corner and the weighted-mean b*",
+    "lead: screenshots reviewed (reflection passes det=0 at t=0.5 - real teaching moment); merged into integration"
+   ],
+   "open": [
+    "softmax_policy_gradient units show the public synthetic scene, not unit parameters"
+   ]
+  },
+  {
+   "id": "WP-MOTION",
+   "title": "Mastery Motion engine (scene grammar, runtime, keyframe export) + RL flagship scene (softmax policy gradient on the simplex)",
+   "status": "COMPLETED",
+   "priority": 0.06,
+   "autostart": false,
+   "branch": "feat/mastery-motion-20261128",
+   "base": "integration/mastery-v1-20261127 (a7de21d)",
+   "worktree": "Exam_Mastery-motion",
+   "updated": "2026-11-28T00:24:10+01:00",
+   "next_step": "follow-ups in WP-MOTION-2",
+   "done": [
+    "42aa984/b211dc8/d290742: mastery-motion-v1 grammar (models in Python+JS: softmax_simplex_pg, linear_map_2d), runtime (step/scrub primary, prediction locks, colour+pattern term coupling, reduced motion, aria per step), keyframe SVG export, app demo page + home link, learner events em-motion-v1 shown as 'kein Nachweis von Können', experience hook; tests/test_mastery_motion.py (27)",
+    "lead: screenshots reviewed; merged into integration"
+   ],
+   "open": [
+    "RL scene: pale colours, crowded gradient plane, pi(theta) label overlaps a2, final step should explain b=J worse than b=0 near the corner",
+    "keyframes not yet wired into textbook/Anki builds of experience units",
+    "German only, no dark mode, mobile/screen reader untested"
+   ]
+  },
+  {
+   "id": "WP-STANDARD",
+   "title": "Mastery learning standard v1 (vision, learning chain, evidence tiers, Mastery Motion, acceptance criteria)",
+   "status": "HUMAN_DECISION_REQUIRED",
+   "priority": 0.05,
+   "autostart": false,
+   "branch": "integration/mastery-v1-20261127",
+   "updated": "2026-11-27T23:41:16+01:00",
+   "done": [
+    "docs/MASTERY_LEARNING_STANDARD.md (a7de21d); issue #51 comment 7229522803"
+   ],
+   "blockers": [
+    "owner approval or corrections (§9 questions)"
+   ],
+   "next_step": "apply owner corrections; then gates for §5 in the build"
+  },
+  {
+   "id": "WP-C2M-SECOND",
+   "title": "Second contrasting owner course end-to-end (candidates: Lineare Algebra 1 with proofs; Patentrecht/Entrepreneurship)",
+   "status": "COMPLETED_PENDING_OWNER_REVIEW",
+   "priority": 0.7,
+   "autostart": false,
+   "depends_on": [],
+   "branch": "feat/c2m-second-linalg-20261127",
+   "base": "integration/mastery-v1-20261127 (9f202b0)",
+   "worktree": "Exam_Mastery-c2m-second",
+   "next_step": "Specialist C2M-SECOND: import the owner's linear algebra course through the product path, fix generic pipeline gaps, author one proof-rich chapter, page QA; lead integrates.",
+   "updated": "2026-11-28T00:24:10+01:00",
+   "done": [
+    "import of the owner's linear algebra course (55 files, 736 pages) through the product path; first import failed (unnumbered 'Folien n', 297-page script as one chapter, 0/10 solutions) -> generic fixes 257dd16 (trailing series numbers, title-slide titles with mismatch warning, TOC-based script splitting, series-scoped solution matching, course-order exercise assignment, TeX extraction repair, theorem-based competency proposals); after: 24 chapters, 10/10 solutions, 26/29 exercises attached; tests/test_course_import_math.py",
+    "chapter course/lina1/15-lineare-abbildungen-darstellen (private): 7 sections with complete proofs (injectivity/kernel, rank-nullity, columns as images of the basis) and counterexamples per hypothesis, 17 graded tasks (7 exact numeric, 3 self-assessed proofs with rubric, 3 flawed proofs), 19 cards (4 with scene figures), plane-transformation explorable (prediction lock, scrub, det=0 snap with kernel/image) + proof-step ordering; 27 sympy assertions; page QA 16+21 pages",
+    "95ea432/f3ac1a2 reusable plane-transformation scene in the experience engine; tests/test_plane_map_lab.py",
+    "lead: merged into integration with CI list union; theorem numbers in fixture neutralised (125a1c6); frozen suite 306 pytest + 931 unittest OK; explorable checked in the browser"
+   ],
+   "open": [
+    "owner review",
+    "plan editing cannot attach single exercises (sheet 8 unattached)",
+    "explorable 2x2 only",
+    "needs-vision over-reported on formula-dense pages",
+    "duplicate plane models (experience plane_linear_map vs Motion linear_map_2d) -> consolidate in WP-MOTION-2"
+   ]
+  },
+  {
+   "id": "WP-C2M-ANALYTICS",
+   "title": "P4 transparent learning analytics: activity timeline, provenance per number, unified stores explained, coverage, delayed unassisted transfer",
+   "status": "COMPLETED",
+   "priority": 0.6,
+   "autostart": false,
+   "branch": "feat/mastery-analytics",
+   "base": "integration/mastery-v1-20261127 (71bf7b3)",
+   "worktree": "Exam_Mastery-analytics",
+   "updated": "2026-11-28T01:44:25+01:00",
+   "done": [
+    "d95ad5a..ee3473c: mastery-ledger-v1 (Python+JS parity) over em-tutor-v1, em-practice-v1, em-motion-v1, em-learn-v2 and backups with provenance per event; Lernstand page with data-source explanation (incl. why the explorable store was empty), per-competency counts, coverage per chapter, filterable timeline, 'Woher?' + 'Was das nicht misst' for every number, no percentages; consent-gated Anki statistics from learner-made exports (temp dir, Mastery decks only, 'kein Kompetenznachweis'); ledger in exports; docs/LERNSTAND.md",
+    "lead: merged into integration"
+   ],
+   "open": [
+    "compressed .colpkg/CSV Anki exports unsupported",
+    "chapter-app events have no competency mapping",
+    "em-progress-v1 lab attempts not in the ledger"
+   ]
+  },
+  {
+   "id": "WP-C2M-ANKIQA",
+   "title": "P3 Anki card quality: visuals/context/maths in cards, per-card feedback (unclear, too hard, duplicate, missing context, wrong, suggest visual), controlled updates with stable GUIDs",
+   "status": "INTEGRATED_PENDING_OWNER_REVIEW",
+   "priority": 0.5,
+   "autostart": false,
+   "next_step": "Codex #56 (a0ff7c7) merged into integration e44f595 (additive conflict resolution, tests green); PR #56 stays open. Later Codex commits: merge again.",
+   "note": "Codex (owner-run) task; no PR received yet"
+  },
+  {
+   "id": "WP-C2M-TUTOR",
+   "title": "P2 guided tutor inside the UI (prerequisite teaching, hint ladder, manual-LLM bridge without copy-paste friction where possible)",
+   "status": "COMPLETED",
+   "priority": 0.4,
+   "autostart": false,
+   "branch": "feat/mastery-tutor-ui",
+   "base": "integration/mastery-v1-20261127 (125a1c6)",
+   "worktree": "Exam_Mastery-tutor",
+   "next_step": "extend lessons to imported courses (authoring contract) and other tracks",
+   "updated": "2026-11-28T01:06:02+01:00",
+   "done": [
+    "f66cee7..d9fb006: learning/guided.py + track_lessons.py (validated lessons, evidence keys rejected), workbench + explorable guided panel teaching prerequisites (sigmoid derivative, sqrt(d_k) scaling, softmax row derivative), hint ladder Orientierung/Strategie/Konkreter Schritt, explicit solution only on request, honest LLM bridge, optional loopback model (off by default), 'guided' events as help; docs/TUTOR.md; tests/test_guided_tutor.py (17)",
+    "lead: merged into integration; closed the reported gap (e50dcca): automatically shown worked example/contrast/focus now logged as 'support' help with its competency (tests fail before)"
+   ],
+   "open": [
+    "lessons only for backprop/attention tracks",
+    "local-model option only in the workbench",
+    "similar/transfer tasks show the solution on explicit request (logged as help)"
+   ]
+  },
+  {
+   "id": "WP-C2M-QUALITY",
+   "title": "P1 textbook/workbook/explorable quality: typesetting, integrated original figures, graduated workbook (guided -> unassisted -> transfer), 3b1b/Mathigon-style explorable with equations bound to controls",
+   "status": "PLANNED",
+   "priority": 0.3,
+   "autostart": false
+  },
+  {
+   "id": "WP-C2M-AUTHOR-RL",
+   "title": "P0/P1 real chapter from the owner's RL course (Policy Gradient) authored at university-excellence level through the packet contract; four connected products; page-level PDF inspection",
+   "status": "COMPLETED_PENDING_OWNER_REVIEW",
+   "priority": 0.2,
+   "autostart": false,
+   "next_step": "Specialist: private sources (iCloud, materialise with brctl download), output only to ~/Mastery; AI authorship by the Claude Code subscription session, labelled; every derivation/number verified by computation.",
+   "branch": "feat/c2m-author-rl-20261127",
+   "base": "integration/mastery-v1-20261127",
+   "worktree": "Exam_Mastery-c2m-author",
+   "private_output": "~/Mastery/courses/rl/chapters/05-policy-gradient",
+   "updated": "2026-11-27T23:02:20+01:00",
+   "done": [
+    "chapter course/rl/05-policy-gradient authored by a Claude Code session (subscription, no paid API) from the owner's lecture; private outputs only in the Mastery home: Lehrbuch 24 p. (14 sections, 6 derivations incl. policy gradient theorem in time and state form, reward-to-go proof, baseline unbiasedness, exact variance example, counterexample b=J, optimal b*), Arbeitsbuch 22 p. (13 tasks in 5 stages incl. 3 find-the-error, full solutions + rubrics), 23 Anki cards (13 with formula context, 3 with figures), bandit explorable (predict gradient direction, sample, variance with/without baseline, updates)",
+    "verification: sympy exact for score functions and worked numbers, Monte Carlo 400k for variance, Python/JS parity of the bandit model, literature checked via Crossref/arXiv/proceedings",
+    "page-level QA: side-note source bloat, proofs labelled 'Beispiel', figures detached from tasks, stage page breaks, broken TOC links, overlapping labels - fixed in the engine (8714a7a: policy-gradient lab, graduated workbook stages, textbook blocks, short source labels, Anki card figures; tests/test_policy_gradient_lab.py; suite 259 pytest + 906 unittest OK)",
+    "lead: page check of theorem and workbook pages; re-derived b* = pi2 r1 + pi1 r2 for two arms; no private material in 8714a7a; merged --no-ff into integration (b109de3)"
+   ],
+   "open": [
+    "owner review (HUMAN_REVIEW_PENDING)",
+    "slides on importance sampling/PPO only referenced",
+    "prediction check tolerance 8 digits (rounded hand answers show 'differs')",
+    "prerequisite lectures not materialised, linked by number only"
+   ],
+   "note": "further RL chapters wait for owner approval of the learning standard"
+  },
+  {
+   "id": "WP-C2M-IMPORT",
+   "title": "P0 course import: bin/mastery import + local wizard (inventory, iCloud materialisation, completeness, chapter/competency proposal, authoring packets, status)",
+   "status": "COMPLETED",
+   "priority": 0.1,
+   "autostart": false,
+   "next_step": "none (merged into integration)",
+   "branch": "feat/c2m-import-20261127",
+   "base": "integration/mastery-v1-20261127",
+   "worktree": "Exam_Mastery-c2m-import",
+   "contract": "docs/COURSE_TO_MASTERY_CONTRACT.md (350dce0)",
+   "updated": "2026-11-27T23:29:10+01:00",
+   "done": [
+    "ef6cfc0..1348bbd: bin/mastery import/courses/course/plan/packet/build-chapter/reimport + Kurse wizard; inventory (kinds, pages, text coverage, vision pages, duplicates), warnings (numbering gaps, VERSION_CONFLICT, exercises without solutions, chapters without exercises), iCloud placeholders only with consent (brctl), chapter plan with overrides, deterministic competency proposals ('Vorschlag'), packets, build-chapter with stable unit_id, reimport via fidelity.impact -> STALE; docs/COURSE_IMPORT.md; tests/test_course_import.py (10)",
+    "real-course smoke (private): RL course 31 files/1335 pages, gaps 03/11/18, 5 version conflicts, 17 chapters; lead: wizard checked in the browser; chapter 05 built via the regular build-chapter (UNCHANGED, Anki identity kept)",
+    "Codex review PR #52 merged into integration (same-second snapshots, Git-checkout guard, Office limits); open findings 4/5 fixed by lead in 9f202b0 (reimport baseline journal, page pixel budget); 09462ab adds the pytest-style policy-gradient tests to CI; frozen suite 252 pytest + 922 unittest OK"
+   ],
+   "open": [
+    "no PPTX slide rendering, no OCR",
+    "exercise matching and competency proposals are simple heuristics"
+   ]
+  },
+  {
+   "id": "WP-V1-NEXT",
+   "title": "Next V1 product improvements (after owner feedback or autonomously)",
+   "status": "SUPERSEDED",
+   "priority": 1.0,
+   "autostart": false,
+   "next_step": "superseded by issue #51 P0 (course-to-mastery); difficulty stages/backprop animation only inside WP-C2M packages",
+   "branch": "feat/mastery-v1-next-20261129",
+   "base": "integration/mastery-v1-20261127",
+   "worktree": "Exam_Mastery-v1next",
+   "updated": "2026-11-27T21:35:00+01:00"
+  },
+  {
+   "id": "WP-V1-ACCEPT",
+   "title": "Owner hands-on acceptance of the local V1 release candidate",
+   "status": "FAILED_HUMAN_ACCEPTANCE",
+   "priority": 0.9,
+   "autostart": false,
+   "depends_on": [],
+   "headless_ok": false,
+   "next_step": "see issue #51; re-run acceptance after WP-C2M slice",
+   "updated": "2026-11-27T21:25:31+01:00",
+   "blockers": []
+  },
+  {
+   "id": "WP-V1-CONTENT",
+   "title": "Deepen the V1 AI unit to university excellence (attention): derivations/proofs, worked + original unassisted problems with full solutions, deterministic attention practice track, Anki retrieval cards",
+   "status": "COMPLETED",
+   "priority": 0.8,
+   "autostart": false,
+   "depends_on": [],
+   "next_step": "none (merged into integration)",
+   "branch": "feat/mastery-v1-attention-content-20261127",
+   "base": "integration/mastery-v1-20261127",
+   "worktree": "Exam_Mastery-v1content",
+   "updated": "2026-11-27T21:25:31+01:00",
+   "done": [
+    "audit: top gaps were backward pass, multi-head/cost, masking numerics, equivariance proof, find-the-error tasks/misconception checks",
+    "8bd0430..130b3b8: six new sections (variance limits incl. covariance form; full backward pass with finite-difference check; causal+padding masks with IEEE behaviour; equivariance proof + causal counterexample; multi-head bookkeeping 4*d_model^2; cost n^2 d vs n d^2, crossover n=2d); 8 new problems with full solutions incl. 3 find-the-error; 4 misconceptions with computed wrong values; 16 new cards; 11 sympy formula records; same unit_id, original ids/cards unchanged, status stays HUMAN_REVIEW_PENDING",
+    "ai/attention-track: 10 tasks, 14 error categories, all values computed in tracks.py, Python/JS parity; real Anki reimport keeps the 16 original note ids/GUIDs",
+    "lead: re-derived Var(q^T k|q)=sigma^2||q||^2, crossover n=2d, fp16 overflow of -1e9, all-masked row NaN, 4*d_model^2 params; merged --no-ff into integration; track added to library.json; final frozen suite on 88e9cbf: pytest list 238 passed, unittest discover 906 OK (skipped=13)"
+   ],
+   "open": [
+    "human subject review of the new content",
+    "newly cited Vaswani §3.2.2, §3.5, §4 Table 1 not re-read against the PDF",
+    "no multi-head/backprop interaction in the explorable lab",
+    "Arbeitsbuch has a single difficulty stage",
+    "track step labels overlap on desktop (cosmetic)"
+   ]
+  },
+  {
+   "id": "WP-V1-APP",
+   "title": "Mastery V1 local app: one-command start, home START/CONTINUE/STUDY, persistent state, tutor, progress, Anki",
+   "status": "COMPLETED",
+   "priority": 0.7,
+   "autostart": false,
+   "branch": "feat/mastery-v1-app-20261127",
+   "base": "integration/mastery-v1-20261127",
+   "worktree": "Exam_Mastery-v1app",
+   "updated": "2026-11-27T21:07:51+01:00",
+   "next_step": "none (merged into integration by fast-forward)",
+   "done": [
+    "6bed7f7 explorable persists attempts/hints/solution views/tutor briefs (em-practice-v1, archived on task revision); EMT.portableBrief with R9 contract header; evidence-role tasks never get the key; tutor brief logged as help",
+    "701d456 bin/mastery + python -m exam_mastery.mastery {start,build,status,export}; data-driven library.json + private ~/Mastery/library-spec.local.json; home START/CONTINUE/STUDY; progress page; stdlib server 127.0.0.1:8765 with allow-list, Host/Origin checks, schema/size limits, backup endpoint",
+    "f94e9e7 tests/test_mastery_v1_app.py (7 E2E incl. throwaway Anki import + unchanged rebuild restamps nothing)",
+    "55cb491 docs/MASTERY_V1.md (start, daily flow, owner checklist, limits, baseline comparison)",
+    "lead check: bin/mastery start into a throwaway MASTERY_HOME builds in 6 s and serves offline; E2E 7/7 OK; suite (specialist, frozen 55cb491) pytest 215 + unittest 896 OK; fast-forwarded into integration (PR #50)"
+   ],
+   "open": [
+    "mobile, Anki desktop/AnkiMobile import untested",
+    "explorable tutor button only after an own attempt",
+    "attention free-text tasks counted, never graded",
+    "track title differs between home and progress page (cosmetic)"
+   ]
+  },
+  {
+   "id": "WP-V1-FIX",
+   "title": "CD-10, CD-11, OD-20 on the integration branch",
+   "status": "COMPLETED",
+   "priority": 0.6,
+   "branch": "integration/mastery-v1-20261127",
+   "updated": "2026-11-27T20:44:21+01:00",
+   "done": [
+    "0ceb143 CD-10: domain-aware sampling (both signs, declared domains), abs/|x|/sqrt, NaN for negative base^fraction; tests/test_expr_domains.py (4/6 fail before)",
+    "bb66530 CD-11 reproduced (argument KC evidenced only by premise selection/MC) -> kc_evidence_basis + learner-view label; tests/test_proof_evidence_basis.py",
+    "fab6c95 OD-20: neutral source label in anki_bridge.py/tracks.py; history not rewritten"
+   ],
+   "open": [],
+   "next_step": "none"
+  },
+  {
+   "id": "WP-V1-INT",
+   "title": "Isolated integration branch: engine stack #11-#47 + research #20/#32/#35/#38-#45/#48 + #36",
+   "status": "COMPLETED",
+   "priority": 0.5,
+   "branch": "integration/mastery-v1-20261127",
+   "base": "origin/main (fast-forward to #47, then --no-ff merges)",
+   "worktree": "Exam_Mastery-v1",
+   "updated": "2026-11-27T20:44:21+01:00",
+   "done": [
+    "linear ancestry #11..#47 verified; fast-forward preserves original commits (88 ahead of main)",
+    "no-ff merges of R1, R2, R3, R4, R5, R7, R8, R9, R6, #36 without conflicts",
+    "frozen-copy suite on f620021: pytest 215 passed, unittest discover 879 OK (skipped=13)",
+    "#33 (control plane) intentionally not merged: programme state changes continuously; supervisor runs from the control worktree",
+    "post-fix suite on fab6c95: pytest 215 passed, unittest discover 889 OK (skipped=13); draft PR #50 -> main"
+   ],
+   "open": [
+    "owner review/merge decision (OD-02); agents never merge"
+   ],
+   "next_step": "none",
+   "pr": 50
+  },
+  {
+   "id": "WP-P0",
+   "title": "Autonomous execution foundation (supervisor, durable state)",
+   "status": "COMPLETED",
+   "priority": 0,
+   "branch": "ops/programme-control-20261127",
+   "base": "origin/main",
+   "worktree": "Exam_Mastery-control",
+   "done": [
+    "supervisor + 22 tests",
+    "real smoke + resume",
+    "launchd smoke",
+    "real crash/resume test",
+    "programme state + resume protocol"
+   ],
+   "next_step": "none; maintain"
+  },
+  {
+   "id": "WP-R1",
+   "title": "R1 cognitive science, neuroscience and sustainable intensive study -> context-dependent learning policies",
+   "status": "COMPLETED",
+   "priority": 1,
+   "branch": "research/r1-learning-science-20261127",
+   "base": "origin/research/r0-evidence-audit-20261126 (2fbd203)",
+   "worktree": "Exam_Mastery-r1",
+   "issue": 22,
+   "done": [
+    "R1A report + evidence (31 sources, 12 full-text level)",
+    "R1B report + evidence (42 sources, 13 full-text level)",
+    "lead synthesis R1_LEARNING_SCIENCE.md",
+    "r1_learning_policies.json (23 policies, 8 conflict rules, measurement contract)",
+    "tests/test_r1_learning_policies.py 12 OK, mutation-checked",
+    "lead spot-check 7 key numbers vs abstracts: all match",
+    "draft PR #35"
+   ],
+   "open": [
+    "independent (human or separate) review",
+    "KB claim corrections from R1A §5.12 not applied",
+    "full texts Sinha 2021, Barbieri 2023"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/R1_LEARNING_SCIENCE.md",
+    "docs/research/workstreams/r1/"
+   ],
+   "next_step": "none; review pending",
+   "pr": 35,
+   "updated": "2026-11-27T10:05:00+01:00",
+   "tests": [
+    "python -m unittest tests.test_r1_learning_policies (12 OK)"
+   ]
+  },
+  {
+   "id": "WP-R2",
+   "title": "R2 formal, quantitative and computational mastery",
+   "status": "COMPLETED",
+   "priority": 2,
+   "autostart": true,
+   "issue": 23,
+   "branch": "research/r2-formal-quantitative-20261127",
+   "base": "research/r1-learning-science-20261127 (bec1f62)",
+   "next_step": "None autonomous; PR #38 awaits independent review.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "worktree": "Exam_Mastery-r2",
+   "done": [
+    "specialist brief issued; policy file in R1 schema",
+    "evidence register 40 entries committed (717e254)",
+    "r2_learning_policies.json: 16 design-hypothesis policies + contract test (4c1f02f); unittest R1+R2 27 ok, 1 skip",
+    "R2_FORMAL_QUANTITATIVE.md synthesis report (390ec80): findings, search/access log with declared query gap, operation matrix, verifier matrix, mechanism chains, worked + adversarial examples, risk audit, reviewer questions",
+    "lead spot-check 4/40 abstracts (verification_log): 3 match, 1 mismatch corrected (petrov2025proofbluff)",
+    "draft PR #38 against research/r1-learning-science-20261127",
+    "batch5 (R2S, 00e8f40 + e73c3fe): 17 sources on algorithm visualisation, loop invariants/recursion, efficiency misconceptions, physics problem categorisation, heuristics, modelling, causal diagrams (3 fulltext_claim_review, 3 fulltext_partial, 10 abstract, 1 metadata); search_log with 21 exact queries; new R2-POL-17..21, conflict rules R2-CR-5/6, R2-POL-14 verifiers extended; report §12; tests 30 OK (1 skip); PR #38 comment",
+    "lead spot-check 2026-11-27: all 16 batch5 DOIs resolve to the registered works (Crossref); saraiya2002 via handle; tests re-run 30 OK"
+   ],
+   "open": [
+    "independent review of PR #38",
+    "finance/economic modelling: no learning evidence found; causal inference: one descriptive source, no policy",
+    "no intervention study on teaching complexity analysis; Hundhausen 2002 meta-study only via secondary report",
+    "batches 1-4 search queries not logged (documented gap)"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/R2_FORMAL_QUANTITATIVE.md",
+    "docs/research/workstreams/r2/r2_evidence.json",
+    "docs/research/workstreams/r2/r2_learning_policies.json",
+    "tests/test_r2_learning_policies.py"
+   ],
+   "tests": "cd tests && python3 -m unittest test_r2_learning_policies test_r1_learning_policies: 30 OK, 1 skipped (lead re-run 2026-11-27)",
+   "blockers": [],
+   "updated": "2026-11-27T17:11:36+01:00",
+   "pr": 38,
+   "reopened": "Owner resume brief 2026-11-27 requires concrete consequences for algorithms and quantitative problem solving; report §11 lists them as gaps. Supplement batch 5 (R2S) on the same branch/PR #38: algorithm visualisation/complexity, quantitative problem representation and modelling."
+  },
+  {
+   "id": "WP-R5",
+   "title": "R5 AI tutoring, adaptation and learning measurement",
+   "status": "COMPLETED",
+   "priority": 3,
+   "autostart": false,
+   "issue": 26,
+   "branch": "research/r5-tutoring-measurement-20261127",
+   "base": "research/r1-learning-science-20261127 (bec1f62)",
+   "next_step": "None autonomous; PR #39 awaits independent review.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "worktree": "Exam_Mastery-r5",
+   "done": [
+    "specialist brief issued; policy file in R1 schema",
+    "evidence register committed (23 sources; 70f9d59)",
+    "report AI_TUTOR_MEASUREMENT.md + r5_tutoring_policies.json (7 policies, all NOT_RUN) + contract test (3703542), branch pushed",
+    "batch4: 7 sources (fan2025metacognitive, lehmann2025aiclassroom, darvishi2024agency, pardos2024chatgpthints, doroudi2019fairkt, eu2024aiact, eu2016gdpr) + search_log with exact queries; R5-POL-01/02/03/04/07 and report §1/2/3/6/9/10 reconciled; lead spot-check bastani2025 VoR figures (0920bbc)",
+    "draft PR #39 against research/r1-learning-science-20261127",
+    "batch5 (R5S, caa2112 + 4b444c2): 16 sources on hints/help-seeking/gaming, error diagnosis/erroneous examples, learning analytics dashboards/OLM/early warning (4 fulltext_claim_review, 4 fulltext_partial, 8 abstract); R5-POL-03/06 revised (on-demand hints, bottom_out flag, ERROR_HYPOTHESIS type), new R5-POL-08..11; report §12; tests 27 OK (1 skip); PR #39 comment",
+    "lead spot-check 2026-11-27: all 16 batch5 DOIs resolve to the registered works (Crossref title/author/year); vanderkleij2015 effect sizes consistent with the published abstract"
+   ],
+   "open": [
+    "independent review of PR #39 (questions in report §10, §12)",
+    "8 batch5 sources abstract-only; Course Signals critique only via press article",
+    "two-tier diagnostic tests and reliability of automated misconception diagnosis not covered; Mitrovic constraint-based tutors, Durkin & Rittle-Johnson 2012, Bodily & Verbert 2017, Bull & Kay not read",
+    "number of hint levels (3) remains an untested setting (CD-4)",
+    "search queries of batches 1-3 not reconstructible (documented gap)",
+    "Darvishi full text; delayed unassisted GenAI-tutor endpoint; post-2019 KT bias audits; legal review of GDPR/AI Act applicability"
+   ],
+   "updated": "2026-11-27T17:08:02+01:00",
+   "artifacts": [
+    "docs/research/workstreams/r5/r5_evidence.json",
+    "docs/research/workstreams/r5/r5_tutoring_policies.json",
+    "docs/research/workstreams/r5/AI_TUTOR_MEASUREMENT.md",
+    "tests/test_r5_tutoring_policies.py"
+   ],
+   "tests": [
+    "python3 -m unittest tests.test_r5_tutoring_policies tests.test_r1_learning_policies: 27 OK (skipped=1), lead re-run 2026-11-27"
+   ],
+   "blockers": [],
+   "pr": 39,
+   "reopened": "Owner resume brief 2026-11-27 requires hint levels, error diagnosis and learning analytics; R5 had no hint-, diagnosis- or LA-specific evidence. Supplement batch 5 (R5S) on the same branch/PR #39."
+  },
+  {
+   "id": "WP-R3",
+   "title": "R3 legal, clinical, economic and philosophical reasoning",
+   "status": "COMPLETED",
+   "priority": 4,
+   "autostart": true,
+   "issue": 24,
+   "branch": "research/r3-contextual-reasoning-20261127",
+   "base": "research/r1-learning-science-20261127",
+   "next_step": "None autonomous; PR #40 awaits independent review.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T17:35:45+01:00",
+   "worktree": "Exam_Mastery-r3",
+   "pr": 40,
+   "done": [
+    "R3 specialist: 35 sources (4 fulltext_claim_review, 9 fulltext_partial, 22 abstract; law 10, philosophy 6, management 4, clinical 12, grading 3), 23 logged searches (a99f12f, 8e45b77)",
+    "r3_learning_policies.json: 12 design-hypothesis policies (3 normative boundaries: dated legal authority + abstention, simulation is not practice authority, human grading of ambiguous answers) + tests/test_r3_learning_policies.py (036903c)",
+    "R3_ARGUMENT_CASE_DIAGNOSIS.md (b675dec); draft PR #40",
+    "lead spot-check 2026-11-27: 32 DOIs resolve with matching first authors; dahl2024 (58-88%) and magesh2025 (17-33%) figures match the published abstracts; tests 32 OK (1 skip)"
+   ],
+   "open": [
+    "independent review of PR #40",
+    "Schwarcz & Farganis law-school feedback study not accessible (SSRN blocked)",
+    "Nesbit & Liu 2025 argument-mapping review abstract only",
+    "no controlled evidence on business case method, counterfactual training, interpretive charity, LLM grading of philosophy essays",
+    "German legal/medical education research barely searched",
+    "deliberate-reflection evidence mostly from one research group"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/R3_ARGUMENT_CASE_DIAGNOSIS.md",
+    "docs/research/workstreams/r3/r3_evidence.json",
+    "docs/research/workstreams/r3/r3_learning_policies.json",
+    "tests/test_r3_learning_policies.py"
+   ],
+   "tests": "cd tests && python3 -m unittest test_r3_learning_policies test_r1_learning_policies: 32 OK, 1 skipped",
+   "blockers": []
+  },
+  {
+   "id": "WP-R4",
+   "title": "R4 engineering, CAD, experimental and embodied learning (incl. cooking, baking, woodworking)",
+   "status": "COMPLETED",
+   "priority": 5,
+   "autostart": true,
+   "issue": 25,
+   "branch": "research/r4-embodied-20261127",
+   "base": "research/r1-learning-science-20261127",
+   "next_step": "None autonomous; PR #41 awaits independent review.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T17:35:45+01:00",
+   "worktree": "Exam_Mastery-r4",
+   "pr": 41,
+   "done": [
+    "R4 specialist: 32 sources (4 fulltext_claim_review, 4 fulltext_partial, 23 abstract, 1 metadata), 22 logged searches incl. failures (9d68eac)",
+    "r4_learning_policies.json: 15 design-hypothesis policies incl. two-track competence model (R4-POL-01) and safety gate (R4-POL-13), certification_boundary field + tests (cc6affe)",
+    "R4_EMBODIED_EXPERIMENTAL_DESIGN.md with the four issue scenarios (9282860); draft PR #41",
+    "lead spot-check 2026-11-27: 32 DOIs resolve with matching first authors; tests 34 OK (1 skip)"
+   ],
+   "open": [
+    "independent review of PR #41",
+    "no learning studies for woodworking/hand tools or baking; cooking evidence mostly qualitative",
+    "no CAD intervention studies read; sketching not covered",
+    "chemistry-specific virtual-lab sources (Brinson 2015, Chan 2021) not retrievable",
+    "measurement uncertainty/materials characterisation as learning goals, haptics/welding VR not covered",
+    "single search batch, not a systematic search"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/R4_EMBODIED_EXPERIMENTAL_DESIGN.md",
+    "docs/research/workstreams/r4/r4_evidence.json",
+    "docs/research/workstreams/r4/r4_learning_policies.json",
+    "tests/test_r4_learning_policies.py"
+   ],
+   "tests": "cd tests && python3 -m unittest test_r4_learning_policies test_r1_learning_policies: 34 OK, 1 skipped",
+   "blockers": []
+  },
+  {
+   "id": "WP-R9",
+   "title": "R9 tutoring resource excellence",
+   "status": "COMPLETED",
+   "priority": 6,
+   "autostart": true,
+   "issue": 31,
+   "branch": "research/r9-tutoring-resources-20261127",
+   "base": "research/r1-learning-science-20261127",
+   "next_step": "None autonomous; PR #42 awaits independent review and owner decisions (§6).",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T18:03:41+01:00",
+   "worktree": "Exam_Mastery-r9",
+   "pr": 42,
+   "blockers": [],
+   "done": [
+    "R9 specialist: r9_resources.json 18 resource cards, 72 claims classed marketing/documented_function/benchmark/learning_outcome; decisions reuse 1, adapt 1, emulate 7, defer 4, reject 5 (121fbeb)",
+    "r9_evidence.json 18 sources (1 fulltext_partial, 17 abstract) + search log S01-S11 (fe08a17)",
+    "r9_tutor_policies.json R9-POL-01..10 (3b72878)",
+    "TUTORING_RESOURCE_COMPARISON.md, TUTOR_BEHAVIORAL_CONTRACT.md, TUTOR_EVALUATION_PROTOCOL.md, TUTOR_ADOPTION_DECISION.md + tests (c63e002); draft PR #42",
+    "lead spot-check 2026-11-27: PAIDEIA identity confirmed (both URLs -> repo id 1216957019); 18 source identities resolve via arXiv/Crossref with matching first authors; tests 48 run OK (1 skip); no local paths"
+   ],
+   "open": [
+    "independent review of PR #42",
+    "owner decisions in TUTOR_ADOPTION_DECISION.md §6 (keyless brief default, full-solution request before first attempt, engine-checked unassisted evidence only, budget for paid calls/independent case authors, named chats/Study Mode, licence policy, TutorBench public sample, registry corrections)",
+    "NBER Khanmigo working papers full text; IZA DP 18792, Barcaui only as snippets; no ERIC/PsycINFO search; no tutor studies for proof/law/clinical/CAD",
+    "PR #19 tutor brief embeds the reference solution (only an instruction withholds it; provider receives it): engineering finding for P4"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/r9/r9_resources.json",
+    "docs/research/workstreams/r9/r9_evidence.json",
+    "docs/research/workstreams/r9/r9_tutor_policies.json",
+    "docs/research/workstreams/TUTORING_RESOURCE_COMPARISON.md",
+    "docs/research/workstreams/TUTOR_BEHAVIORAL_CONTRACT.md",
+    "docs/research/workstreams/TUTOR_EVALUATION_PROTOCOL.md",
+    "docs/research/workstreams/TUTOR_ADOPTION_DECISION.md",
+    "tests/test_r9_tutoring_resources.py"
+   ],
+   "tests": "cd tests && python3 -m unittest test_r9_tutoring_resources test_r1_learning_policies: OK (skipped=1)"
+  },
+  {
+   "id": "WP-R7",
+   "title": "R7 learning resources, visualisation and interactive excellence",
+   "status": "COMPLETED",
+   "priority": 7,
+   "autostart": true,
+   "issue": 29,
+   "branch": "research/r7-resources-20261127",
+   "base": "research/r1-learning-science-20261127",
+   "next_step": "None autonomous; PR #45 awaits review and owner decisions.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T18:54:54+01:00",
+   "worktree": "Exam_Mastery-r7",
+   "pr": 45,
+   "blockers": [],
+   "done": [
+    "R7 specialist: r7_resources.json 30 cards + 20 pointers + 6 ideas preserving every registry name (reuse-as-library 1 Pyodide after spike; emulate 10; link 5; defer 10; reject 4) (050715d)",
+    "r7_evidence.json 14 sources (1 fulltext_partial, 10 abstract, 3 metadata) + search log (874d7ea)",
+    "R7-POL-01..10, shortlist of 8 with validation tasks V1-V8, tests (34ec3ce); R7_RESOURCES_VISUALISATION.md (308394a); draft PR #45",
+    "lead spot-check 2026-11-27: tests 52 OK (1 skip); 14 DOIs resolve with matching first authors; no local paths"
+   ],
+   "open": [
+    "independent review of PR #45",
+    "owner: commercial or not (licence gate for GeoGebra/3b1b code); original source for Think Logic and Visually Explained; approve a one-day Pyodide spike",
+    "no database search; 3 metadata-only sources; PhET licence from snippets",
+    "em_scene.js makes 'Play' the primary button (engine finding for P4)"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/R7_RESOURCES_VISUALISATION.md",
+    "docs/research/workstreams/r7/r7_resources.json",
+    "docs/research/workstreams/r7/r7_evidence.json",
+    "docs/research/workstreams/r7/r7_resource_policies.json",
+    "tests/test_r7_resources.py"
+   ],
+   "tests": "cd tests && python3 -m unittest test_r7_resources test_r1_learning_policies: 52 OK (skipped=1)"
+  },
+  {
+   "id": "WP-R8",
+   "title": "R8 Anki, FSRS, Obsidian and knowledge workflows",
+   "status": "COMPLETED",
+   "priority": 8,
+   "autostart": true,
+   "issue": 30,
+   "branch": "research/r8-anki-workflows-20261127",
+   "base": "research/r1-learning-science-20261127",
+   "next_step": "None autonomous; PR #44 awaits review and owner decisions.",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T18:52:49+01:00",
+   "worktree": "Exam_Mastery-r8",
+   "pr": 44,
+   "blockers": [],
+   "done": [
+    "R8 specialist: r8_tools.json 30 cards (ADOPT_DEFAULT: Anki native FSRS, .apkg with stable GUIDs, plain Markdown folder; OPTIONAL_ADAPTER: Obsidian core viewer, Bases; REJECT incl. FSRS Helper add-on, genanki, direct SQLite writes, Obsidian SRS plugins, RemNote, Mochi, SiYuan, SuperMemo) (6e94a5c)",
+    "r8_evidence.json 41 sources (28 fulltext_partial docs/source, 4 abstract, 9 metadata) + search log (377f3e6)",
+    "R8-POL-01..14, R8_ANKI_OBSIDIAN_WORKFLOWS.md incl. test plan T1-T12/V1-V6 and gated coding-agent prompt, tests (8d6194b); draft PR #44",
+    "lead spot-check 2026-11-27: tests 52 OK (1 skip); srs-benchmark log-loss figures match README (MOVING-AVG 0.3369, FSRS-7 recency 0.3370, FSRS-6 0.3460) but AUC favours FSRS-7 recency (0.7220 vs 0.7001): 'roughly matches' holds for log loss only; EF findings 'note-type id from display name' and 'all notes restamped every export' confirmed in anki_v2.py"
+   ],
+   "open": [
+    "independent review of PR #44",
+    "owner decisions in report §13 (default setup, freeze note-type IDs, GUID scheme change, own-card path, AnkiConnect deferred, folder layout/Bases, mobile checks, Markdown view not a fifth product)",
+    "Pan 2023 and Lindsey 2014 full texts; AnkiMobile/AnkiDroid import behaviour; local tag merge on import; '-b' profile isolation of AnkiWeb login/add-ons",
+    "nothing executed: migration/operating effort are documentation estimates"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/R8_ANKI_OBSIDIAN_WORKFLOWS.md",
+    "docs/research/workstreams/r8/r8_tools.json",
+    "docs/research/workstreams/r8/r8_evidence.json",
+    "docs/research/workstreams/r8/r8_workflow_policies.json",
+    "tests/test_r8_workflows.py"
+   ],
+   "tests": "cd tests && python3 -m unittest test_r8_workflows test_r1_learning_policies: 52 OK (skipped=1)"
+  },
+  {
+   "id": "WP-BRAND-B",
+   "title": "Mastery brand phase B: inventory and compatibility/risk matrix, presentation-only changes",
+   "status": "COMPLETED",
+   "priority": 7.5,
+   "autostart": false,
+   "issue": 34,
+   "branch": "feat/mastery-brand-phase-b",
+   "base": "origin/main",
+   "next_step": "none until P4 integration",
+   "acceptance": [
+    "no forced technical renames",
+    "no data loss or review-history reset",
+    "active autonomous continuation unbroken",
+    "owner follow-up marked only where irreversible/public/legal"
+   ],
+   "pr": 36,
+   "updated": "2026-11-27T10:30:00+01:00",
+   "done": [
+    "docs/brand/MASTERY_BRAND_PHASE_B.md",
+    "draft PR #36"
+   ],
+   "open": [
+    "presentation changes after P4 integration (one display constant)",
+    "owner: public name/trademark, phase C, repo rename"
+   ]
+  },
+  {
+   "id": "WP-CD2",
+   "title": "Integrity fix CD-2: retention evidence by elapsed time",
+   "status": "COMPLETED",
+   "priority": 7.6,
+   "pr": 37,
+   "branch": "fix/kc-status-elapsed-time-20261127",
+   "base": "feat/golden-attention-20261126",
+   "updated": "2026-11-27T10:55:00+01:00",
+   "done": [
+    "policy.py + em_tutor.js fixed",
+    "tests/test_kc_status_elapsed_time.py",
+    "regressions b18/b19 + 9 policy-related modules OK"
+   ],
+   "open": [
+    "CI on PR #37",
+    "review"
+   ],
+   "next_step": "none"
+  },
+  {
+   "id": "WP-CD7",
+   "title": "Integrity fix CD-7: tutor brief answer keys and tutor-handoff evidence",
+   "status": "COMPLETED",
+   "priority": 7.7,
+   "pr": 43,
+   "branch": "fix/tutor-evidence-integrity-20261127",
+   "base": "fix/kc-status-elapsed-time-20261127",
+   "worktree": "Exam_Mastery-cd7",
+   "updated": "2026-11-27T18:36:53+01:00",
+   "done": [
+    "tutor.KEY_WITHHELD_ROLES; policy.ASSIST_EVENTS incl. 'tutor'; em_tutor.js mirror + UI event + evidence note",
+    "tests/test_tutor_evidence_integrity.py (7; 5 fail on previous commit)",
+    "frozen-copy CI-equivalent run: pytest 215 passed, unittest discover 643 OK (skipped=6)",
+    "draft PR #43",
+    "5ad257d: chapter app (em_app.js) logs copied/saved item briefings as 'tutor' help; learner status shows 'mit Hilfe richtig'; 3 browser checks (2 fail on 8aed87e); suite 215 + 646 OK"
+   ],
+   "open": [
+    "CI on PR #43",
+    "review"
+   ],
+   "tests": "venv of Exam_Mastery-integration: python -m pytest <CI module list>; python -m unittest discover -s tests",
+   "next_step": "none"
+  },
+  {
+   "id": "WP-CD8",
+   "title": "Integrity fix CD-8: Anki re-import keeps learner edits; frozen note-type identity",
+   "status": "COMPLETED",
+   "priority": 7.8,
+   "pr": 46,
+   "branch": "fix/anki-export-identity-20261127",
+   "base": "fix/tutor-evidence-integrity-20261127",
+   "worktree": "Exam_Mastery-cd8",
+   "updated": "2026-11-27T19:03:26+01:00",
+   "done": [
+    "anki_v2.build_deck: per-key mods/notetypes state, restamp only changed content, legacy fallback, 'restamped' in report",
+    "NOTETYPE_ID_SEED/NOTETYPE_NAME",
+    "tests/test_anki_export_identity.py (4, real anki imports into throwaway collections)",
+    "behaviour check: previous commit loses learner edit, fix keeps it",
+    "suite 215 pytest + 650 unittest OK",
+    "draft PR #46"
+   ],
+   "open": [
+    "CI on PR #46",
+    "review",
+    "remaining R8 EF items need owner decisions"
+   ],
+   "next_step": "none"
+  },
+  {
+   "id": "WP-CD9",
+   "title": "Integrity fix CD-9: competency-level help and future timestamps in kc_status",
+   "status": "COMPLETED",
+   "priority": 7.9,
+   "pr": 47,
+   "branch": "fix/kc-evidence-scope-20261127",
+   "base": "fix/anki-export-identity-20261127",
+   "worktree": "Exam_Mastery-cd9",
+   "updated": "2026-11-27T19:18:53+01:00",
+   "done": [
+    "policy.py + em_tutor.js: KC_HELP_WINDOW_HOURS, FUTURE_SKEW_MINUTES, import guard",
+    "tests/test_kc_evidence_scope.py (all methods fail on previous commit)",
+    "suite 215 + 654 OK",
+    "draft PR #47"
+   ],
+   "open": [
+    "CI on PR #47",
+    "review"
+   ],
+   "next_step": "none"
+  },
+  {
+   "id": "WP-R6",
+   "title": "R6 synthesis and architecture decision record",
+   "status": "COMPLETED",
+   "priority": 9,
+   "autostart": true,
+   "issue": 27,
+   "depends_on": [
+    "WP-R1",
+    "WP-R2",
+    "WP-R3",
+    "WP-R4",
+    "WP-R5"
+   ],
+   "branch": "research/r6-architecture-20261127",
+   "next_step": "None autonomous: owner gate G0 (OD-01).",
+   "scope_note": "Since #34 the product is Mastery: general knowledge-and-skill mastery; exam preparation is one optional mode. Reuse the R1 policy format (r1_learning_policies.json) and measurement contract.",
+   "updated": "2026-11-27T19:21:05+01:00",
+   "worktree": "Exam_Mastery-r6",
+   "base": "research/r1-learning-science-20261127",
+   "done": [
+    "R6-RT red team (091ead4 on research/r6-red-team-20261127): RED_TEAM_REVIEW.md, red_team_findings.json 43 findings (1 blocker RT-26, 39 major, 3 minor; 18 certainty spot-checks, 6 over-claims), tests 10 OK; lead reproduced RT-26 and RT-11 -> CD-9, CD-10",
+    "R6-ADR (3a95551 draft before reading red team, d3ea60a JSON+tests, 07c5dfe reconciliation): ARCHITECTURE_SYNTHESIS_ADR.md, adr.json (H-AB PROPOSED), skill_ontology_v1.json, observation_contract_v1.json, 33 owner decisions with blocks/default, gates G0-G7 + brand gate, MCS, P4 integration plan",
+    "lead: merged red-team branch (93866ad), integration plan updated for #46/#47 (d765252), tests R6 architecture 12 + red team 10 + R1 OK; draft PR #48"
+   ],
+   "pr": 48,
+   "blockers": [],
+   "open": [
+    "OWNER: OD-01 accept/change/reject H-AB (G0)",
+    "OWNER: OD-02 merge order; OD-13b independent item author; OD-31/OD-03/OD-04 Anki edit/identity policy; OD-20 anki_bridge file name; remaining ODs in ADR §8",
+    "independent (non-model) review of R0-R9 and R6 (OD-26)"
+   ],
+   "artifacts": [
+    "docs/research/workstreams/ARCHITECTURE_SYNTHESIS_ADR.md",
+    "docs/research/workstreams/RED_TEAM_REVIEW.md",
+    "docs/research/workstreams/r6/"
+   ],
+   "tests": "python3 -m unittest tests.test_r6_architecture tests.test_r6_red_team (+ tests/test_r1_learning_policies): OK"
+  },
+  {
+   "id": "WP-P4",
+   "title": "Engineering and golden references on the R6 architecture",
+   "status": "RUNNING",
+   "priority": 10,
+   "autostart": false,
+   "depends_on": [
+    "WP-R6"
+   ],
+   "next_step": "See WP-V1-* packages (issue #49).",
+   "updated": "2026-11-27T20:44:21+01:00",
+   "blockers": [],
+   "done": [
+    "architecture-independent integrity fixes as stacked draft PRs: #37 CD-2, #43 CD-7, #46 CD-8, #47 CD-9 (each with failing-before tests and CI-equivalent suite)"
+   ]
+  },
+  {
+   "id": "WP-BRAND-C",
+   "title": "Mastery technical/repository migration",
+   "status": "HUMAN_DECISION_REQUIRED",
+   "priority": 99,
+   "issue": 34,
+   "headless_ok": false,
+   "blockers": [
+    "requires separate owner approval (issue #34 phase C)"
+   ],
+   "next_step": "wait for owner approval"
+  }
+ ],
+ "costs_and_limits": {
+  "paid_calls_authorised": 0,
+  "overage": "disabled at organisation level (reported by rate_limit_event, 2026-11-27)",
+  "observed_windows": [
+   {
+    "at": "2026-11-27T09:00+01:00",
+    "five_hour": {
+     "utilization": 0.04,
+     "resets": "2026-11-27T13:20+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.55,
+     "resets": "2026-11-29T07:00+01:00"
+    }
+   },
+   {
+    "at": "2026-11-27T10:00+01:00",
+    "five_hour": {
+     "utilization": 0.4,
+     "resets": "2026-11-27T13:20+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.6,
+     "resets": "2026-11-29T07:00+01:00"
+    },
+    "note": "R1 (2 specialists ~0.64M tokens + lead) cost about 5 points of the 7-day window"
+   },
+   {
+    "at": "2026-11-27T17:36+01:00",
+    "five_hour": {
+     "utilization": 0.71,
+     "resets": "2026-11-27T18:20+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.76,
+     "resets": "2026-11-29T07:00+01:00"
+    },
+    "note": "after R2S+R5S+R3+R4 (4 specialists, ~1.24M subagent tokens) + lead; measured via supervisor smoke"
+   },
+   {
+    "at": "2026-11-27T18:24+01:00",
+    "five_hour": {
+     "utilization": 0.02,
+     "resets": "2026-11-27T23:20+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.78,
+     "resets": "2026-11-29T07:00+01:00"
+    },
+    "note": "after R9 (~0.33M subagent tokens = ~1 point of the 7-day window)"
+   },
+   {
+    "at": "2026-11-27T20:47+01:00",
+    "five_hour": {
+     "utilization": 0.49,
+     "resets": "2026-11-27T23:20+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.84,
+     "resets": "2026-11-29T07:00+01:00"
+    }
+   },
+   {
+    "at": "2026-11-27T21:25",
+    "five_hour": {
+     "utilization": 0.59,
+     "resets": "2026-11-27T23:20:00+01:00"
+    },
+    "seven_day": {
+     "utilization": 0.85,
+     "resets": "2026-11-29T07:00:00+01:00"
+    },
+    "note": "after V1APP + V1CONTENT"
+   },
+   {
+    "at": "2026-11-27T23:29",
+    "five_hour": {
+     "utilization": 0.02
+    },
+    "seven_day": {
+     "utilization": 0.88,
+     "resets": "2026-11-29T07:00+01:00"
+    }
+   },
+   {
+    "at": "2026-11-28T00:24+01:00",
+    "five_hour": {
+     "utilization": 0.36
+    },
+    "seven_day": {
+     "utilization": 0.93,
+     "resets": "2026-11-29T07:00+01:00"
+    },
+    "note": "owner: continue until the provider limit"
+   }
+  ],
+  "supervisor_ceilings": {
+   "five_hour": 0.9,
+   "seven_day": 0.85,
+   "max_runs_per_24h": 4
+  },
+  "note": "The owner's other Claude sessions share these windows; keep parallelism at <= 3 active agents.",
+  "lead_pacing": "Owner 2026-11-28: no pausing; work continuously until the provider limit; never bypass it. Supervisor resumes after resets (local config ceilings 0.97/0.98)."
+ },
+ "next_milestone": "Issue #51 thin vertical slice: real lecture import wizard + one real RL chapter with four connected products and inspectable PDFs; then quality, tutor, Anki QA, analytics; second contrasting course.",
+ "product_identity": {
+  "product_name": "Mastery",
+  "legacy_name": "Exam Mastery",
+  "scope": "general knowledge and skill mastery (academic, technical, analytical, experimental, creative, embodied/practical); exam preparation is an optional learning mode/track",
+  "decision": "owner, issue #34 (2026-11-27)",
+  "not_implied": "no certification of physical or clinical skills from simulation; no trademark clearance",
+  "phase_A": "DONE 2026-11-27: identity recorded here; forward-looking prose updated; historical titles, paths, artifacts and provenance preserved",
+  "phase_B": "DONE as documentation (PR #36): inventory + compatibility/risk matrix; presentation changes deferred to after the P4 integration via one display-name constant; coupled strings (Anki notetype filter, editorial.py figure-page detection) need joint change + regression test",
+  "phase_C": "HUMAN_DECISION_REQUIRED: technical/repository migration (module, CLI, Anki deck names/GUIDs, schemas, state dirs, launchd labels, worktree paths, GitHub repo name) only after separate owner approval",
+  "unchanged_identifiers": [
+   "exam_mastery Python module",
+   "exam-mastery CLI",
+   "APKG deck names and note GUIDs",
+   "competency/content ids",
+   "em-* schemas",
+   "state directories",
+   "launchd label dev.exam-mastery.programme-supervisor",
+   "worktree paths",
+   "GitHub repo Sven-Lutz/Exam_Mastery"
+  ],
+  "naming_risk": "'Mastery' collides with existing education/AI apps (signal only); trademark/category/territory research before any public commercial naming, final name to owner"
+ },
+ "owner_attention": [
+  "exam_mastery/learning/anki_bridge.py (draft stack) cites a lecture file name and page ('07 Business Planning & Effectuation.pdf S. 21') in a public branch: owner to decide whether to neutralise (R8 side note, confirmed by lead).",
+  "Commit 04fd926 on integration/mastery-v1-20261127 (pushed) contains a home-relative local path in docs/MASTERY_V1.md; removed in 42b75a0. History not rewritten (owner decision required)."
+ ],
+ "owner_delegated_defaults": {
+  "source": "issue #49",
+  "OD-03": "freeze note-type identities, decouple display names",
+  "OD-04": "keep GUID scheme for now",
+  "OD-31": "no change on unchanged reexports; keep review history; document substantive edits (PR #46 baseline)",
+  "OD-05": "native Anki+FSRS sole scheduler; Markdown/Obsidian optional, not a fifth product",
+  "OD-07": "AnkiConnect deferred",
+  "OD-09": "desktop first; mobile untested",
+  "OD-10/11/12/30": "keyless exam tutor; explicit solution request allowed, counted assisted, invalidates item as independent evidence; only engine-verified hidden items count",
+  "OD-15": "noncommercial personal use; no blanket NC licence clearance",
+  "OD-18": "small offline Pyodide spike allowed when programming labs are reached",
+  "OD-19": "no technical renames; user-facing name Mastery",
+  "OD-21": "single owner learner, no causal inference",
+  "OD-22": "public fixtures synthetic/redistributable; private course content local only",
+  "OD-23": "owner accepts real product quality later",
+  "OD-24": "safety-critical/physical domains knowledge-only",
+  "OD-25": "time/hint/attempt defaults provisional",
+  "OD-26": "no new blanket research audit",
+  "OD-13": "no paid API budget; independent delayed items required before causal claims but not for usability",
+  "OD-02": "agents prepare/test integration branch and PR; merge to main only by explicit owner action"
+ },
+ "real_courses_local": {
+  "note": "owner-private, never in Git; outputs only under the private Mastery home",
+  "first": "owner's university course Reinforcement Learning (lecture decks with numbering gaps, exercise notebooks, tutorium); cloud placeholders materialised with consent",
+  "second_candidates": [
+   "a proof-heavy mathematics course (linear algebra) with exercise sheets",
+   "a law or business course"
+  ]
+ },
+ "external_reviewers": {
+  "codex": "owner-run Codex: PR #52 (46d17d8, 32759c1, d98b64c) merged into integration; issue #53; next Codex task (owner-relayed): per-course render budget + review of 9f202b0; Anki card QA feedback loop (standard 5.4)",
+  "gemini": "briefing prepared locally (private), not yet run"
+ },
+ "owner_directives_20261128": [
+  "Do not pause: continue continuously within account limits (lead pacing ceiling removed; supervisor ceilings raised to 0.97/0.98 via local config, max 8 runs/24h; supervisor pause reset)",
+  "Before inserting more RL chapters, core concepts, evidence and vision must be fixed -> docs/MASTERY_LEARNING_STANDARD.md (a7de21d) posted for approval in #51",
+  "3Blue1Brown-level visual quality is missing -> Mastery Motion engine (WP-MOTION) and flagship scenes"
+ ],
+ "generalisation_finding": "Second course (proof-heavy maths) broke every layout assumption of the first (RL) import; fixing needed course-order and document-type rules, not more word matching. Authoring, validation and build generalised once a domain model existed (plane map); the step/proof contract fit without schema changes.",
+ "integration_log": [
+  {
+   "at": "2026-11-28T01:15:02+01:00",
+   "head": "71bf7b3",
+   "suite": "pytest list 318 passed, unittest discover 950 OK (skipped=13) on a frozen copy",
+   "contains": [
+    "engine stack #11-#47",
+    "research R0-R9/R6",
+    "CD-10/11/OD-20",
+    "V1 app",
+    "course import + Codex #52 fixes + journal/pixel budget",
+    "RL and LinA chapter engine support",
+    "Mastery Motion + Motion-2",
+    "guided tutor + support-as-help"
+   ],
+   "owner_library": "rebuilt locally (private): RL ch.05 and LinA ch.15 built with current engine"
+  },
+  {
+   "at": "2026-11-28T12:30:00+01:00",
+   "head": "e44f595",
+   "suite": "pytest list 399 passed, unittest discover 1034 OK (skipped=13) on a frozen copy",
+   "contains": [
+    "quality gates",
+    "analytics",
+    "WP-UPLIFT engine fixes (ed13546)",
+    "Codex #56 card feedback (a0ff7c7)",
+    "M2 authoring orchestration (0dcb707)"
+   ],
+   "pushed": true
+  }
+ ]
+}

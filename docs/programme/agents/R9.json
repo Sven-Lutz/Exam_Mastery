@@ -1,0 +1,32 @@
+{
+ "agent_id": "R9",
+ "wp": "WP-R9",
+ "status": "COMPLETED",
+ "updated": "2026-11-27T23:55:00+01:00",
+ "done": [
+  "read: issue #31, TUTORING_RESOURCE_REGISTRY_20261126.md, RESOURCE_IDEA_REGISTRY §F",
+  "read schemas, R1 policy test, R3 test pattern, R5 policies/evidence ids, PR #19 tutor.py + tutor_protocol.md",
+  "verified identities of 7 repos via gh api (PAIDEIA: one repo id 1216957019, TaewoooPark URL 301 -> OPTIMETA), 10 vendor pages, arXiv/Crossref ids",
+  "r9_resources.json 18 cards; commit 121fbeb (not pushed)",
+  "r9_evidence.json 18 entries (1 fulltext_partial, 17 abstract) + search_log S01-S11; commit fe08a17; branch pushed",
+  "r9_tutor_policies.json R9-POL-01..10 (commit 3b72878)",
+  "4 docs + tests/test_r9_tutoring_resources.py (48 tests OK, 1 skipped incl. R1); commit c63e002",
+  "pushed research/r9-tutoring-resources-20261127; draft PR #42 (base research/r1-learning-science-20261127)"
+ ],
+ "open": [
+  "independent/human review of PR #42 (no lead spot-check)",
+  "owner decisions 1-8 in TUTOR_ADOPTION_DECISION.md §6",
+  "gaps: no execution of any system (cost/latency/offline unmeasured); NBER 35620/35621 full texts; IZA DP 18792; Barcaui RCT; ERIC/PsycINFO search; domain-specific tutor studies (proof, law, clinical, CAD); RemNote Guided Learn identity"
+ ],
+ "artifacts": [
+  "docs/research/workstreams/r9/r9_resources.json",
+  "docs/research/workstreams/r9/r9_evidence.json",
+  "docs/research/workstreams/r9/r9_tutor_policies.json",
+  "docs/research/workstreams/TUTORING_RESOURCE_COMPARISON.md",
+  "docs/research/workstreams/TUTOR_BEHAVIORAL_CONTRACT.md",
+  "docs/research/workstreams/TUTOR_EVALUATION_PROTOCOL.md",
+  "docs/research/workstreams/TUTOR_ADOPTION_DECISION.md",
+  "tests/test_r9_tutoring_resources.py"
+ ],
+ "next_step": "none autonomous; await review of PR #42"
+}

@@ -1,0 +1,27 @@
+{
+ "agent": "TUTOR",
+ "branch": "feat/mastery-tutor-ui",
+ "worktree": "<private-path>",
+ "base": "integration/mastery-v1-20261127@125a1c6",
+ "updated": "2026-11-28",
+ "state": "DELIVERED",
+ "head": "d9fb006",
+ "commits": [
+  "f66cee7 guided core: em-lesson-v1 lessons, prerequisite resolution, checks, brief modes; guided events count as help (Python + JS)",
+  "771fac0 workbench: Geführtes Lernen panel, labelled hint ladder, compact external-model bridge with leak guard, opt-in loopback endpoint",
+  "01bfb1d explorable: guided panel per assessment, unit lessons (fixture), guided_help evidence events, misconception example logged as help",
+  "1d53941 tests/test_guided_tutor.py (17: data, graph, parity, integrity, E2E); Lernstand counts guided help",
+  "d9fb006 docs/TUTOR.md; MASTERY_V1 pointer; explorable contract test updated"
+ ],
+ "suite": "frozen copy of d9fb006: CI pytest list 306 passed; unittest discover 948 OK (skipped=13)",
+ "open": [
+  "lessons only for backprop + attention (liquidity, rectangle proof, imported courses: none yet; authoring must add them as data)",
+  "local-endpoint panel only in the workbench (explorable: copy brief only)",
+  "similar/transfer still show the model solution on explicit request in the workbench (OD-30 default); retest shows none",
+  "pre-existing: RA/RC1 auto-shown worked example in workbench feedback is not logged as help",
+  "no PR (by instruction)",
+  "taught_in kind motion (Mastery Motion scene step) not used: no scene teaches these prerequisites yet"
+ ],
+ "blockers": [],
+ "screenshots": "session scratchpad shots/ (1-backprop-diagnosis-offer, 2-backprop-sigmoid-lesson-checked, 3-bridge-brief-and-local-opt-in, 4-attention-ladder-and-scaling-lesson, 5-mobile-390-lesson, explorable-guide)"
+}

@@ -1,0 +1,30 @@
+{
+ "agent_id": "R2",
+ "wp": "WP-R2",
+ "status": "COMPLETED",
+ "updated": "2026-11-27T18:20:00+01:00",
+ "done": [
+  "read:charter,issue23,R1 synthesis,R1 policy schema,R0 audit s7-8",
+  "metadata sweep: Crossref 27 DOIs, OpenAlex ~30, S2 8 (API)",
+  "evidence batch1: hodds2014selfexplanation, alcock2015notices, roy2017eproofs, neuhaus2025proofskills, inglis2013standards, inglis2012reading, selden2003validation",
+  "evidence batch2: weber2013skimming, kollar2014argumentation, davies2020cjproof, jones2015cj, zhao2025inductiongrading, ospanov2026llmgrading, petrov2025proofbluff, thoma2022lean, iannone2023lean, mahinpei2025itp",
+  "evidence batch3 (programming+statistics): margulieux2020subgoals, morrison2015subgoals, ericson2017parsons, ericson2022parsonswg, lister2004tracing, lopez2008tracing, xie2018tracing, yang2024debuggingslr, sun2024debuggingmeta, michaeli2019debugging, baniassad2021autograder, messer2024autograding, milovancevic2025formalgrading, sentance2019primm, muldner2023workedexamples, tintle2012retention, chance2022sbi",
+  "evidence batch4: mejia2012proofassessment, hembree1992problemsolving, castrosotos2009misconceptions, pelkola2018stack, kinnear2022eassessment, wrenn2021pbt (40 entries total)",
+  "evidence register committed (717e254); r2_learning_policies.json 16 policies + tests/test_r2_learning_policies.py (4c1f02f), headless run",
+  "R2_FORMAL_QUANTITATIVE.md + lead spot-check + draft PR #38 (390ec80)",
+  "R2S: started supplement batch 5 (algorithms/complexity, quantitative problem solving/modelling); read report, policies, register, tests, issue #23",
+  "R2S: batch 5 evidence register committed+pushed (00e8f40): 17 entries (3 fulltext_claim_review, 3 fulltext_partial, 10 abstract, 1 metadata) + search_log (21 searches incl. failed/rate-limited)",
+  "R2S: policies R2-POL-17..21 (AV active engagement, invariant-first, complexity justification, representation before calculation, modelling solution plan), R2-CR-5/6, R2-POL-14 verifier additions, coverage_gaps rewritten; report §12 (old §12/§13 -> §13/§14); 3 batch-5 contract tests; 30 tests OK (1 skipped); commit e73c3fe pushed; PR #38 comment posted"
+ ],
+ "open": [
+  "independent review of PR #38 incl. batch 5 (no lead spot-check for batch 5)",
+  "remaining gaps: finance/economic modelling, causal inference beyond one descriptive source, complexity-analysis interventions, AV meta-study primary text, tertiary Fermi problems; batches 1-4 search queries"
+ ],
+ "artifacts": [
+  "docs/research/workstreams/R2_FORMAL_QUANTITATIVE.md",
+  "docs/research/workstreams/r2/r2_evidence.json",
+  "docs/research/workstreams/r2/r2_learning_policies.json",
+  "tests/test_r2_learning_policies.py"
+ ],
+ "next_step": "none autonomous; await review"
+}

@@ -1,0 +1,21 @@
+{
+ "agent": "MOTION",
+ "branch": "feat/mastery-motion-20261128",
+ "worktree": "<private-path>",
+ "updated": "2026-11-28",
+ "state": "DELIVERED",
+ "head": "d290742",
+ "commits": [
+  "42aa984 motion engine: grammar mastery-motion-v1, Python reference + keyframe SVG, JS runtime, RL flagship scene, tests",
+  "b211dc8 Mastery app demo page + home link, em-motion-v1 backup/Lernstand, Interaktiv hook, Playwright E2E, CI list",
+  "d290742 mission sliders on vector components, generic mission feedback"
+ ],
+ "suite": "frozen copies: CI pytest list 279 passed at d290742; unittest discover 922 OK (13 skipped) at b211dc8 (d290742 touches only motion files covered by the pytest list)",
+ "screenshots": "scratchpad/screenshots (session-local)",
+ "open": [
+  "keyframe SVGs not yet wired into experience textbook/Anki builds (export API + CLI exist)",
+  "plane scene port onto Motion (lead): model linear_map_2d + grid/polygon/vector objects exist; needs a scene JSON, kernel/image lines for det=0",
+  "no PR (by instruction)"
+ ],
+ "blockers": []
+}

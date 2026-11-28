@@ -1,0 +1,29 @@
+{
+ "agent_id": "V1CONTENT",
+ "wp": "V1 attention content + practice track (issue #49)",
+ "status": "COMPLETED_PENDING_REVIEW",
+ "updated": "2026-11-27T23:30:00+01:00",
+ "branch": "feat/mastery-v1-attention-content-20261127",
+ "worktree": "<private-path>",
+ "commits": [
+  "8bd0430 ai/attention-track",
+  "e7a5237 deepened unit",
+  "bc6e17f CI list",
+  "130b3b8 figure legibility"
+ ],
+ "done": [
+  "audit of the unit and built Lehrbuch/Arbeitsbuch (top gaps: no backward pass through attention, no multi-head/complexity, masking numerics thin, equivariance only as task, no validation tasks/misconception specs)",
+  "ai/attention-track (em-track-v1): 10 tasks, 14 error categories, all values computed in tracks.py; JS figure; 5 bridge cards",
+  "unit deepened: +6 sections, +8 problems (3 find-the-error), +4 misconception hypotheses with machine checks, +16 cards, +11 math records, +6 claims (all unverified), +2 competencies; ids and GUIDs unchanged",
+  "tests/test_attention_track.py, tests/test_attention_deepening.py; CI pytest list extended"
+ ],
+ "open": [
+  "human subject review (Fachprüfung) of all new content; status stays NOT_APPROVED",
+  "new paper citations (§3.2.2, §3.5, §4 Table 1) not re-read against the PDF in this session; claims marked unverified",
+  "interactive lab has no multi-head/backprop interaction; the deepened sections are book/workbook/Anki only",
+  "Arbeitsbuch still one stage (no difficulty staging by role)"
+ ],
+ "next_step": "lead: review and merge into integration/mastery-v1-20261127",
+ "suite": "frozen copy of bc6e17f: CI pytest list 238 passed; unittest discover 899 OK (13 skipped); after 130b3b8 browser track suites 56 passed",
+ "model_calls": 0
+}
