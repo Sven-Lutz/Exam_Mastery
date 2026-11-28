@@ -61,3 +61,7 @@ a{color:var(--accent)}
 .m-stale{background:var(--bad-soft);color:var(--bad)}
 .m-action .ds-btn{margin:4px 6px 4px 0}
 @media (max-width:560px){.m-shell{padding:16px 16px 48px}.m-card{padding:14px}}
+/* machine quality gates (mastery-quality-v1) per chapter in the Kurse view */
+.m-quality{margin:8px 0 0;padding:6px 10px;border-left:3px solid var(--line, #c9d6de);font-size:var(--fs-0)}
+.m-quality[data-quality="BLOCKERS"]{border-color:var(--bad);background:var(--bad-soft)}
+.m-quality[data-quality="MAJOR_FINDINGS"]{border-color:var(--warn);background:var(--warn-soft)}

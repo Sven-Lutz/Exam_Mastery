@@ -256,6 +256,9 @@ def _build_unit(root, item, log):
                        "href": base, "json": base[:-5] + ".json", "store_key": f"{STORE_CONTEXT}|{track['id']}"})
     log(f"  {entry['slug']}: Produkte {result['publication']['status']}, Anki {result['changes']['anki']}, "
         f"{len(anki['restamped'])} Karten neu gestempelt ({time.monotonic() - started:.1f} s)")
+    from . import quality
+    report = quality.run(unit, unit_dir, _unit_path(entry).parent if entry.get("course") else None)
+    log(f"  {entry['slug']}: {quality.summary_line(report)}")
     prefix = rel_dir + "/"
     return {
         **({"course": entry["course"], "chapter": entry["chapter"]} if entry.get("course") else {}),
@@ -265,6 +268,7 @@ def _build_unit(root, item, log):
         "products": {"textbook": prefix + "Lehrbuch.pdf", "workbook": prefix + "Arbeitsbuch.pdf",
                      "anki": prefix + "Anki.apkg", "interactive": prefix + "Interaktiv/index.html"},
         "anki": {"report": prefix + "anki_report.json", "deck": anki["deck"], "notes": anki["notes"]},
+        "quality": {**quality.summary(report), "report": prefix + "quality.html", "json": prefix + "quality.json"},
         "practice_store": {"key": "em-practice-v1", "unit_id": unit["unit_id"],
                            "assessment_revision": assessment_revision(unit)},
         "competencies": [{"id": c["id"], "label": c.get("description", c["id"])} for c in unit["competencies"]],

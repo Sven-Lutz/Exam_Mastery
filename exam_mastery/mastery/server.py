@@ -28,10 +28,11 @@ from . import MAX_STATE_BYTES, MasteryError, state_meta, store_state
 
 ALLOWED = re.compile(
     r"^/(index\.html|library\.json|assets/[A-Za-z0-9_.-]+\.(?:css|js)|motion/[a-z0-9][a-z0-9-]{0,60}\.html"
-    r"|units/[a-z0-9][a-z0-9-]*/(?:Lehrbuch\.pdf|Arbeitsbuch\.pdf|Anki\.apkg|anki_report\.json|Interaktiv/index\.html"
+    r"|units/[a-z0-9][a-z0-9-]*/(?:Lehrbuch\.pdf|Arbeitsbuch\.pdf|Anki\.apkg|anki_report\.json|quality\.(?:html|json)"
+    r"|Interaktiv/index\.html"
     r"|tracks/[A-Za-z0-9_.-]+\.(?:html|json))"
     r"|courses/[a-z0-9][a-z0-9-]*/chapters/[a-z0-9][a-z0-9-]*/build/(?:Lehrbuch\.pdf|Arbeitsbuch\.pdf|Anki\.apkg"
-    r"|anki_report\.json|Interaktiv/index\.html|tracks/[A-Za-z0-9_.-]+\.(?:html|json)))$")
+    r"|anki_report\.json|quality\.(?:html|json)|Interaktiv/index\.html|tracks/[A-Za-z0-9_.-]+\.(?:html|json)))$")
 COURSE_GET = re.compile(r"^/api/courses(?:/([a-z0-9][a-z0-9-]{0,40}))?$")
 COURSE_POST = re.compile(r"^/api/(?:import|courses/([a-z0-9][a-z0-9-]{0,40})/(reimport|materialize|plan"
                          r"|chapters/([a-z0-9][a-z0-9-]{0,70})/(packet|build)))$")

@@ -1,5 +1,6 @@
 """Mastery V1 command line: start | build | status | export, and the course import: import | courses | course | plan |
-packet | build-chapter | reimport. German user messages; no network beyond 127.0.0.1 (exception: `--materialize` asks
+packet | build-chapter | quality | reimport. build-chapter and quality exit with 3 when the machine quality gates
+(mastery-quality-v1) find a blocker, unless --allow-blockers. German user messages; no network beyond 127.0.0.1 (exception: `--materialize` asks
 iCloud to download the user's own placeholder files, with that explicit consent)."""
 from __future__ import annotations
 
@@ -159,7 +160,31 @@ def cmd_build_chapter(args):
         print(f"Unverändert – '{r['library_slug']}' ist aktuell, nichts neu gebaut. Fachliche Prüfung: ausstehend.")
     for k, v in r["products"].items():
         print(f"  {k}: {v}")
+    return _print_quality(r["quality"], args.allow_blockers)
+
+
+def _print_quality(q, allow_blockers):
+    print(q["line"])
+    for f in [f for f in q["findings"] if f["severity"] != "minor"][:12]:
+        print(f"  [{f['severity']}] {f['gate']} {f['location']}: {f['message']}")
+    rest = len(q["findings"]) - min(12, sum(f["severity"] != "minor" for f in q["findings"]))
+    if rest > 0:
+        print(f"  … {rest} weitere Befunde im Bericht.")
+    print(f"Qualitätsbericht: {q['report']}  (maschinell; ersetzt nicht die Abnahme durch den Owner)")
+    if q["counts"]["blocker"] and not allow_blockers:
+        print("Mastery: Blocker gefunden – Kapitel nicht an den Owner geben (oder bewusst: --allow-blockers).",
+              file=sys.stderr)
+        return 3
     return 0
+
+
+def cmd_quality(args):
+    from .courses import check_chapter
+    q = check_chapter(args.slug, args.chapter, args.home)
+    if args.json:
+        print(json.dumps(q["data"], ensure_ascii=False, indent=1))
+        return 3 if q["counts"]["blocker"] and not args.allow_blockers else 0
+    return _print_quality(q, args.allow_blockers)
 
 
 def cmd_reimport(args):
@@ -208,6 +233,13 @@ def main(argv=None):
     bc = sub.add_parser("build-chapter", help="erarbeitete unit.json prüfen, vier Produkte bauen, in Bibliothek eintragen")
     bc.add_argument("slug")
     bc.add_argument("chapter")
+    bc.add_argument("--allow-blockers", action="store_true",
+                    help="trotz Blockern der Qualitätsprüfung mit Exit-Code 0 enden (Bericht bleibt)")
+    qc = sub.add_parser("quality", help="Qualitätsprüfung (mastery-quality-v1) eines Kapitels ohne Neubau")
+    qc.add_argument("slug")
+    qc.add_argument("chapter")
+    qc.add_argument("--json", action="store_true", help="vollständigen Bericht als JSON ausgeben")
+    qc.add_argument("--allow-blockers", action="store_true", help="trotz Blockern mit Exit-Code 0 enden")
     r = sub.add_parser("reimport", help="Kursordner neu inventarisieren; betroffene Kapitel als veraltet markieren")
     r.add_argument("slug")
     r.add_argument("--materialize", action="store_true", help="Zustimmung: iCloud-Platzhalter herunterladen")
@@ -217,7 +249,8 @@ def main(argv=None):
     try:
         return {"start": cmd_start, "build": cmd_build, "status": cmd_status, "export": cmd_export,
                 "import": cmd_import, "courses": cmd_courses, "course": cmd_course, "plan": cmd_plan,
-                "packet": cmd_packet, "build-chapter": cmd_build_chapter, "reimport": cmd_reimport}[args.cmd](args)
+                "packet": cmd_packet, "build-chapter": cmd_build_chapter, "reimport": cmd_reimport,
+                "quality": cmd_quality}[args.cmd](args)
     except MasteryError as exc:
         print(f"Mastery: {exc}", file=sys.stderr)
         return 1
