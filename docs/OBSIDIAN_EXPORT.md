@@ -1,0 +1,11 @@
+# Kurswissen als Markdown
+
+Nach dem Import erstellt `bin/mastery obsidian <kurs>` den Kursordner unter `$MASTERY_HOME/Wissensgraph/<kurs>/`. Diesen Ordner in Obsidian als Vault öffnen oder die ausgegebene `Mastery/00-Start.md` mit einem Markdown-Viewer lesen. Zur Aktualisierung denselben Befehl ausführen. Die Schnittstelle für den lokalen Kursworkflow ist `exam_mastery.mastery.knowledge.export_course(slug, home)`.
+
+Die Kursübersicht führt zu den geplanten und ausgearbeiteten Kapiteln. Von einer Kompetenz aus sind die zugehörigen Erklärungen, Aufgaben, Interaktionen und semantischen Anki-Kartenschlüssel erreichbar. Aussagen verweisen auf Quellen und ihren im Kapitel angegebenen Evidenzstatus. Der Paketumfang dokumentiert die inventarisierten Dateien und Seiten getrennt von den Einzelbelegen. Autoren geben mehreren Definitionen in einem Abschnitt unterschiedliche dauerhafte `id`-Werte. Ein Titelwechsel erhält die ID. Die Wiederholungsplanung liegt bei Anki.
+
+Aktuelle, integritätsgeprüfte Kapitelprodukte und aus den semantischen Grafikdaten erzeugte SVGs liegen unter `Mastery/Medien/`. PDF-Verweise verwenden physische Seitenzahlen, wenn der Abschnitt oder die Aufgabe im Dokument identifizierbar ist. Für Kapitel ohne passenden Build zeigt die Ansicht den ausstehenden Produktstand. Der Ordner enthält private abgeleitete Kursinhalte. Weitergabe oder Synchronisation setzt die passenden Rechte voraus.
+
+Eigene Markdown-Dateien unter `Mastery-Notizen/` anlegen und von dort auf die generierten Notizen verlinken. Beim Update prüft der Adapter die generierten Dateien gegen ihr Hashmanifest. Bei Änderungen, Ergänzungen oder Löschungen im generierten Bereich bleibt der veröffentlichte Stand erhalten. Vorschläge für vorhandene kanonische Inhalte liegen unter `Konflikte/`. Eigene Änderungen sichern, den generierten Bestand anhand einer eigenen Sicherung wiederherstellen und den Export erneut starten.
+
+macOS und Linux veröffentlichen den vollständig vorbereiteten Baum durch atomaren Verzeichnistausch. Unveränderte Dateien behalten bei Updates ihren Inode. Nach einem Prozessabbruch kann der Befehl erneut laufen. Ein harter Abbruch kann außerhalb des Vaults temporäre Staging-Daten hinterlassen. Eine Garantie gegen Stromausfall setzt zusätzliche Dateisystem-Sicherungen voraus.
