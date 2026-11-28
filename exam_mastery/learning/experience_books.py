@@ -271,9 +271,12 @@ def _combined_workbook(book):
             html_ = typeset._item_html(d, task, solution=bool(task.get("worked")), space=not task.get("worked"))
             if task.get("worked"):  # a worked example is longer than a page fragment: let it break across pages
                 html_ = html_.replace('<div class="item"', '<div class="item worked" style="break-inside:auto"', 1)
-            # Long worked examples would leave a nearly empty page if kept together with the heading.
-            parts.append((f'<div class="keephead">{head}{html_}</div>' if not task.get("worked") else head + html_)
-                         if number == 0 else html_)
+            # Long worked examples would leave a nearly empty page if kept together with the heading: the stage
+            # heading joins only the task head and prompt (the item's own keep group), never the whole example.
+            if number == 0:
+                html_ = (f'<div class="keephead">{head}{html_}</div>' if not task.get("worked")
+                         else html_.replace('<div class="keephead">', '<div class="keephead">' + head, 1))
+            parts.append(html_)
         parts.append("</section>")
         sections.extend(parts)
     sections.append('<section style="break-before:page"><h2 id="loesungen">'
