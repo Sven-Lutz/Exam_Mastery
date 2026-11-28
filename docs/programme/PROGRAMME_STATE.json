@@ -1,6 +1,6 @@
 {
  "schema": "exam-mastery-programme-state/1",
- "updated": "2026-11-28T01:06:02+01:00",
+ "updated": "2026-11-28T01:15:02+01:00",
  "updated_by": "LEAD (interactive, issue #51)",
  "ambition": "Mastery (formerly Exam Mastery): 1000/1000 is the excellence standard, never a self-assigned score. No product is accepted until a human says so.",
  "hard_rules": [
@@ -1396,5 +1396,23 @@
   "Before inserting more RL chapters, core concepts, evidence and vision must be fixed -> docs/MASTERY_LEARNING_STANDARD.md (a7de21d) posted for approval in #51",
   "3Blue1Brown-level visual quality is missing -> Mastery Motion engine (WP-MOTION) and flagship scenes"
  ],
- "generalisation_finding": "Second course (proof-heavy maths) broke every layout assumption of the first (RL) import; fixing needed course-order and document-type rules, not more word matching. Authoring, validation and build generalised once a domain model existed (plane map); the step/proof contract fit without schema changes."
+ "generalisation_finding": "Second course (proof-heavy maths) broke every layout assumption of the first (RL) import; fixing needed course-order and document-type rules, not more word matching. Authoring, validation and build generalised once a domain model existed (plane map); the step/proof contract fit without schema changes.",
+ "integration_log": [
+  {
+   "at": "2026-11-28T01:15:02+01:00",
+   "head": "71bf7b3",
+   "suite": "pytest list 318 passed, unittest discover 950 OK (skipped=13) on a frozen copy",
+   "contains": [
+    "engine stack #11-#47",
+    "research R0-R9/R6",
+    "CD-10/11/OD-20",
+    "V1 app",
+    "course import + Codex #52 fixes + journal/pixel budget",
+    "RL and LinA chapter engine support",
+    "Mastery Motion + Motion-2",
+    "guided tutor + support-as-help"
+   ],
+   "owner_library": "rebuilt locally (private): RL ch.05 and LinA ch.15 built with current engine"
+  }
+ ]
 }
