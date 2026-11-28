@@ -1,5 +1,10 @@
 # Agent instructions: Exam Mastery
 
+## External and autonomous contributions
+
+Start with [README](README.md), [CONTRIBUTING](CONTRIBUTING.md), [Mastery vision and decision index](docs/MASTERY_VISION.md), and [contributor queue](docs/CONTRIBUTOR_QUEUE.md). For V1 work use the issue's specified integration base, not stale default-branch product state. The live issue, claims, PRs and current base determine your task; owner-local NEXT_ACTION/checkpoints are only for the owning run, never global assignments. Claim a free scoped issue, work in a separate branch/fork, submit a reviewable draft PR and select another non-overlapping useful task within authorized quota. No agent merges to main; no private inputs or paid calls without authorization. Existing research, acceptance contracts and technical constraints below remain binding where applicable. Resolve conflicts with the maintainer instead of inventing a new vision.
+
+
 These are persistent project instructions for Claude Code and other coding agents. Read the repository implementation and actual course artifacts before claiming anything is working.
 
 ## Mission and priorities
