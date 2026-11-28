@@ -383,6 +383,13 @@ function viewTutor(lib) {
 
 /* ------------------------------------------------------------ courses: import wizard (local server API, no model calls) */
 const PIPE = { NICHT_ERARBEITET: 'Nicht erarbeitet', PAKET_BEREIT: 'Paket bereit', ERARBEITET: 'Erarbeitet', GEBAUT: 'Gebaut', 'PRÜFUNG_AUSSTEHEND': 'Prüfung ausstehend' };
+const QSTAT = { BLOCKERS: 'Blocker – nicht zur Prüfung geben', MAJOR_FINDINGS: 'schwere Befunde – vor der Prüfung beheben', MINOR_FINDINGS: 'nur leichte Befunde', NO_MACHINE_FINDINGS: 'ohne maschinellen Befund' };
+function qualityLine(ch) {
+  const q = ch.quality; if (!q) return null; const n = q.counts || {};
+  return el('p', { class: 'm-quality', 'data-quality': q.status },
+    el('strong', {}, 'Maschinelle Qualitätsprüfung: '), (QSTAT[q.status] || q.status) + ' (' + (n.blocker || 0) + ' Blocker, ' + (n.major || 0) + ' schwer, ' + (n.minor || 0) + ' leicht)' + (q.current ? '' : ', Stand des letzten Baus') + '. ',
+    el('a', { href: q.report, 'data-quality-report': ch.id }, 'Qualitätsbericht öffnen'), el('span', { class: 'm-note' }, ' Ersetzt nicht Ihre fachliche Prüfung.'));
+}
 const KIND = { lecture_slides: 'Vorlesungsfolien', script: 'Skript', exercise: 'Übung', solution: 'Lösung', exam: 'Klausur', literature: 'Literatur', notebook: 'Notebook', other: 'Sonstiges' };
 const FSTAT = { ok: 'gelesen', no_text: 'ohne Textebene', not_local: 'nicht lokal verfügbar', unsupported: 'nicht unterstützt', unreadable: 'nicht lesbar', ignored: 'ignoriert', symlink_skipped: 'Verknüpfung übersprungen' };
 let COURSES = null, COURSE_ERR = null;
@@ -418,7 +425,7 @@ function chapterAction(c, ch) {
   }
   if (ch.status === 'ERARBEITET' || ch.rebuild_needed) { const b = el('button', { type: 'button', class: 'ds-btn ds-btn-primary', 'data-action': 'build', onclick: () => busy(b, msg, 'Vier Produkte werden gebaut (offline) …', () => api(base + 'build')) }, 'Bauen (vier Produkte)'); box.append(b); }
   if (ch.products) box.append(el('ul', { class: 'm-links' }, PRODUCTS.map(([k, label]) => el('li', {}, el('a', { href: ch.products[k], 'data-product': k, download: k === 'anki' ? 'Anki.apkg' : null }, label)))),
-    el('p', { class: 'm-note' }, 'Fachliche Prüfung durch Menschen ausstehend; Lernwirkung nicht gemessen.'));
+    el('p', { class: 'm-note' }, 'Fachliche Prüfung durch Menschen ausstehend; Lernwirkung nicht gemessen.'), qualityLine(ch));
   box.append(msg);
   return box;
 }

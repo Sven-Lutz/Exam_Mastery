@@ -1351,7 +1351,11 @@ def chapter_status(cdir, course, ch, spec_slugs=None):
     else:
         status = "NICHT_ERARBEITET"
     st = (course.get("chapter_state") or {}).get(ch["id"], {})
-    return {"status": status, "author": kind, "author_label": label, "stale": st.get("stale"),
+    q = _read_json(chdir / "build" / "quality.json") if built else None
+    quality = ({"status": q.get("status"), "counts": q.get("counts"), "catalogue": q.get("catalogue"),
+                "checked_at": q.get("checked_at"), "current": rec.get("unit_id") == q.get("unit_id") and current,
+                "report": f"{_out_rel(course['slug'], ch['id'])}/quality.html"} if isinstance(q, dict) else None)
+    return {"status": status, "author": kind, "author_label": label, "stale": st.get("stale"), "quality": quality,
             "built_at": rec.get("built_at"), "rebuild_needed": bool(built and unit_sha and not current),
             "products": {k: f"{_out_rel(course['slug'], ch['id'])}/{v}" for k, v in PRODUCTS.items()} if built else None}
 
@@ -1467,10 +1471,42 @@ def build_chapter(slug, cid, home=None, log=print):
         st.pop("stale")
     _save(cdir, course)
     report_anki = _read_json(chdir / "build" / "anki_report.json") or {}
+    from . import quality as Q
+    qrep = _read_json(chdir / "build" / "quality.json")
+    if not qrep or qrep.get("catalogue") != Q.CATALOGUE or qrep.get("unit_id") != unit["unit_id"]:
+        try:                                              # unchanged build from before the gates existed
+            qrep = Q.run(unit, chdir / "build", chdir)
+        except Exception as exc:  # noqa: BLE001 - products are built; the failed check must still be visible
+            raise MasteryError(f"Produkte gebaut, aber die Qualitätsprüfung ist fehlgeschlagen: {exc}") from exc
     return {"library_slug": lib_slug, "built": result["built"], "notes": notes,
+            "quality": {**Q.summary(qrep), "line": Q.summary_line(qrep), "report": str(chdir / "build" / "quality.html"),
+                        "findings": qrep["findings"]},
             "anki": {"notes": report_anki.get("notes"), "restamped": len(report_anki.get("restamped", [])),
                      "package_status": report_anki.get("package_status")},
             "products": {k: str(chdir / "build" / v) for k, v in PRODUCTS.items()}}
+
+
+def check_chapter(slug, cid, home=None):
+    """Run the machine quality gates on the chapter's current unit.json (and its build, if any) without rebuilding.
+    Writes build/quality.{json,html,md} only when a build folder exists; never touches products or Anki state."""
+    from ..learning.experience import validate
+    from . import quality as Q
+    root = resolve_home(home)
+    cdir, course = load_course(slug, root)
+    _chapter(course, cid)
+    chdir = cdir / "chapters" / cid
+    unit = _read_json(chdir / "unit.json")
+    if not isinstance(unit, dict):
+        raise MasteryError(f"{chdir / 'unit.json'} fehlt oder ist kein gültiges JSON.")
+    valid = validate(unit)
+    if not valid["valid"]:
+        raise MasteryError("unit.json ungültig: " + "; ".join(valid["errors"][:8]))
+    build_dir = chdir / "build"
+    built = all((build_dir / p).is_file() for p in PRODUCTS.values())
+    report = Q.run(unit, build_dir, chdir) if built else Q.check(unit, None, chdir)
+    return {**Q.summary(report), "line": Q.summary_line(report), "findings": report["findings"], "data": report,
+            "report": str(build_dir / "quality.html") if built else
+            "(noch nicht gebaut: nur unit.json geprüft, kein Bericht geschrieben)"}
 
 
 def _ts(iso):
