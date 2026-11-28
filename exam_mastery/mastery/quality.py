@@ -42,7 +42,10 @@ NEAR_EMPTY = 0.20            # a page whose body text covers < 20 % of the body 
 
 WHY = re.compile(r"(?i)\b(warum|wozu|wofür|weshalb|wieso|problem\w*|motivation|ziel\w*|frage\w*|why|nutzen|einordnung|"
                  r"anwendung\w*|wo(?:rauf|ran|für) .{0,30}(an|gut)|brauch\w*)\b")
-EXAMPLE = re.compile(r"(?i)(beispiel|example|durchgerechnet|zahlen|konkret)")
+# A worked example inside a section: the word "Beispiel"/"example" followed within the next 400 characters by a
+# computation (a digit next to an operator or an equals sign).
+WORKED = re.compile(r"(?is)(beispiel|example|durchgerechnet|zahlenbeispiel|rechnen wir|konkret)\b.{0,400}?"
+                    r"(\d\s*[=+\-·*/×]|[=+\-·*/×]\s*\d)")
 DEFLIST_FRONT = re.compile(r"(?i)^\s*(was (ist|sind|bedeutet|bezeichnet|versteht man unter)\b|wie (lautet|ist) die "
                            r"definition|definieren sie|geben sie die definition|nennen sie (die|alle)|zählen sie|"
                            r"what (is|are)\b|define\b)")
@@ -298,7 +301,7 @@ def gate_chain(ctx):
                 a.get("stage") == "worked_example" and a.get("solution_steps") for a in tasks):
             have.add(4)
         if any(a.get("stage") == "worked_example" for a in tasks) or any(
-                EXAMPLE.search(t.get("section_title") or "") and re.search(r"\d", t.get("content") or "") for t in secs):
+                WORKED.search(_section_text(t)) for t in secs):
             have.add(5)
         if any(cid in _cids(m) for m in ctx.misconceptions) or any(
                 isinstance(b, dict) and b.get("kind") == "pitfall" for t in secs for b in t.get("blocks") or []) or any(
@@ -314,9 +317,16 @@ def gate_chain(ctx):
                     "Lernkette unvollständig, es fehlt: " + ", ".join(f"({n}) {CHAIN_DE[n]}" for n in missing) + ".")
 
 
+QUOTED = re.compile(r"„[^“”\"]*[“”\"]|“[^”]*”|\"[^\"]*\"|«[^»]*»")   # titles such as „Folien 15“ name a deck, not a page
+
+
+def _unquoted(locator):
+    return QUOTED.sub(" ", locator or "")
+
+
 def _page_numbers(locator):
     pages = []
-    for a, b in PAGE_REF.findall(locator or ""):
+    for a, b in PAGE_REF.findall(_unquoted(locator)):
         lo = int(a)
         hi = int(b) if b else lo
         if hi < lo or hi - lo > 400:
@@ -326,7 +336,8 @@ def _page_numbers(locator):
 
 
 def _has_locator(locator):
-    return bool(PAGE_REF.search(locator or "") or SHEET_REF.search(locator or ""))
+    text = _unquoted(locator)
+    return bool(PAGE_REF.search(text) or SHEET_REF.search(text))
 
 
 def gate_proof(ctx):

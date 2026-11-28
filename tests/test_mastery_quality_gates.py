@@ -171,6 +171,15 @@ class UnitGates(unittest.TestCase):
         u["assessments"][0].pop("solution_steps")                              # worked example without reasons
         self.assertIn("(4) Herleitung/Beweis", self.assertFinds(u, "TB-CHAIN")[0]["message"])
 
+    def test_chain_worked_example_inside_a_section(self):
+        u = good_unit()
+        u["assessments"][0]["stage"] = "guided"                                # no worked-example task left
+        u["teaching"][1]["content"] = "Beispiel: A x = 2·1 − 1·2 = 0 für die erste Komponente."
+        self.assertNotIn("TB-CHAIN", gates_of(Q.check(u)))
+        u["teaching"][1]["content"] = "Beispiele folgen im Arbeitsbuch."
+        u["teaching"][1]["section_title"] = "Ausblick"
+        self.assertIn("(5) durchgerechnetes Beispiel", self.assertFinds(u, "TB-CHAIN")[0]["message"])
+
     def test_proof(self):
         u = good_unit()
         u["teaching"][0].pop("derivation")
@@ -196,6 +205,8 @@ class UnitGates(unittest.TestCase):
                 {"n": 1}, {"n": 2}, {"n": 3}]}]}), encoding="utf-8")
             u = good_unit()
             u["divergences"] = []
+            self.assertNotIn("TB-LOCATOR", gates_of(Q.check(u, chapter_dir=tmp)))
+            u["sources"][0]["locator"] = "Foliensatz „Folien 15“, Folien 1–3"            # quoted deck title
             self.assertNotIn("TB-LOCATOR", gates_of(Q.check(u, chapter_dir=tmp)))
             u["sources"][0]["locator"] = "Vorlesung 1, Folien 3–9"
             self.assertIn("nicht vor", self.assertFinds(u, "TB-LOCATOR", chapter_dir=tmp)[0]["message"])
