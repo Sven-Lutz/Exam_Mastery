@@ -10,14 +10,14 @@ from pathlib import Path
 
 from ..learning.publication_lock import publication_lock
 from . import MasteryError
+from .courses import _sha_file
 
 MANIFEST = ".mastery-manifest.json"
 
 
 def digest(data):
     if isinstance(data, Path):
-        with data.open("rb") as stream:
-            return hashlib.file_digest(stream, "sha256").hexdigest()
+        return _sha_file(data)
     return hashlib.sha256(data).hexdigest()
 
 

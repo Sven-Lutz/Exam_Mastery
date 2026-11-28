@@ -3,9 +3,6 @@ import json
 import re
 from collections import defaultdict
 
-import pymupdf
-import yaml
-
 from .. import figures_svg
 from ..learning import experience_graphics, experience_math
 from ..learning.experience import validate
@@ -53,8 +50,9 @@ class Graph:
                                                else "\n$$\n" + m[2] + "\n$$\n", content)
             props = dict(em_id=kind + "/" + identity, em_kind=kind, em_generated=True, aliases=[title], **properties)
             props["em_version"] = digest((content + json.dumps(props, sort_keys=True)).encode())
-            self.files[path + ".md"] = ("---\n" + yaml.safe_dump(props, allow_unicode=True, sort_keys=False)
-                                        + "---\n\n" + content).encode()
+            # JSON scalars and flow lists are valid YAML and preserve titles literally.
+            front = "\n".join(f"{k}: {json.dumps(v, ensure_ascii=False)}" for k, v in props.items())
+            self.files[path + ".md"] = f"---\n{front}\n---\n\n{content}".encode()
         return self.files
 
 
@@ -68,6 +66,7 @@ def chapter_graph(graph, parent, course_slug, chapter_id, unit, built):
     book_pages = {}
     task_pages = {}
     if built:
+        import pymupdf
         from ..learning.experience_pipeline import preflight
         try:
             preflight(unit, built)
