@@ -117,7 +117,7 @@ class Catalogue(unittest.TestCase):
         u["cards"][0].pop("context")
         r = Q.check(u)
         self.assertEqual(set(r), {"schema", "catalogue", "unit_id", "title", "checked_at", "status", "counts", "gates",
-                                  "findings", "human_review", "learning_evaluation", "model_calls", "scope"})
+                                  "findings", "human_review", "learning_evaluation", "model_calls", "scope", "worked_coverage"})
         self.assertEqual((r["schema"], r["human_review"], r["learning_evaluation"], r["model_calls"]),
                          ("mastery-quality-report-v1", "HUMAN_REVIEW_PENDING", "NOT_RUN", 0))
         self.assertEqual(set(r["counts"]), set(Q.SEVERITIES))

@@ -96,9 +96,12 @@ GATES = (
     _g("WB-STAGES", "workbook", "§5.2", "major",
        "Das Arbeitsbuch hat alle fünf Stufen: Beispiel, geführt, selbstständig, Transfer, Klausurniveau (assessments.stage).",
        "Für jede fehlende Stufe mindestens eine Aufgabe mit passender 'stage' ergänzen."),
+    _g("WB-NUMERIC", "workbook", "§5.2", "blocker",
+       "Gedruckte Rechenschritte müssen mit ihrem Rechenmodell übereinstimmen.",
+       "Zahlenwert oder Variantenbezug in der bezeichneten Lösungsstelle korrigieren."),
     _g("WB-SOLUTION", "workbook", "§5.2", "major",
-       "Jede Aufgabe hat eine vollständige Lösung (mind. 12 Wörter oder begründete solution_steps) und einen Prüfvermerk: "
-       "machine_check (numerisch/CAS), begründete Lösungsschritte (Beweisprüfung) oder eine Rubrik mit mindestens zwei "
+       "Jede Aufgabe hat eine vollständige Lösung (mind. 12 Wörter oder begründete solution_steps) und eine Bewertungsgrundlage: "
+       "formativer Antwortschlüssel, begründete Lösungsschritte oder eine Rubrik mit mindestens zwei "
        "Kriterien.",
        "Lösung ausschreiben; Zahlenergebnis mit machine_check prüfen oder die Rubrik in Kriterien aufteilen."),
     _g("WB-ALT-ROUTES", "workbook", "§5.2", "minor",
@@ -434,14 +437,28 @@ def gate_stages(ctx):
 def _verification(a):
     kinds = []
     if isinstance(a.get("machine_check"), dict):
-        kinds.append("CAS/numerisch")
+        kinds.append("formativer Antwortschlüssel")
     steps = a.get("solution_steps") or []
     if isinstance(steps, list) and len(steps) >= 2 and all(isinstance(s, list) and len(s) == 2 and str(s[1]).strip()
                                                            for s in steps):
-        kinds.append("Beweisprüfung")
+        kinds.append("begründete Schritte")
     if len([r for r in a.get("rubric") or [] if isinstance(r, dict) and str(r.get("criterion") or "").strip()]) >= 2:
         kinds.append("Rubrik")
     return kinds
+
+
+def gate_worked_numbers(ctx):
+    from ..learning.worked_numbers import coverage
+    ctx.worked_coverage = []
+    for task in ctx.tasks:
+        rows = coverage(ctx.unit, task)
+        counts = {status: sum(r["status"] == status for r in rows) for status in ("CHECKED", "UNVERIFIED", "BLOCKER")}
+        ctx.worked_coverage.append({"task": task.get("id"), "counts": counts, "claims": rows})
+        for row in rows:
+            if row["status"] == "BLOCKER":
+                ctx.add("WB-NUMERIC", f"{task.get('id')} · {row['field']}", row["detail"])
+    if any(item["counts"]["UNVERIFIED"] for item in ctx.worked_coverage):
+        ctx.skip("WB-NUMERIC", "Freie Lösungsstellen erfordern fachliche Prüfung.")
 
 
 def gate_solutions(ctx):
@@ -871,7 +888,7 @@ def gate_private_paths(ctx):
                 ctx.add("INT-PRIVATE-PATHS", name, f"Lokaler Pfad („{m.group(0)[:12]}…“).")
 
 
-CHECKS = (gate_chain, gate_proof, gate_figures, gate_locators, gate_divergence, gate_stages, gate_solutions,
+CHECKS = (gate_chain, gate_proof, gate_figures, gate_locators, gate_divergence, gate_stages, gate_worked_numbers, gate_solutions,
           gate_alt_routes, gate_find_error, gate_proof_production, gate_card_lint, gate_deflist, gate_context,
           gate_visual, gate_identity, gate_scenes, gate_persist, gate_pages, gate_review, gate_learning_eval,
           gate_tutor_keys, gate_private_paths)
@@ -900,7 +917,7 @@ def check(unit, build_dir=None, chapter_dir=None, authoring=None):
     status = ("BLOCKERS" if counts["blocker"] else "MAJOR_FINDINGS" if counts["major"] else
               "MINOR_FINDINGS" if counts["minor"] else "NO_MACHINE_FINDINGS")
     return {"schema": SCHEMA, "catalogue": CATALOGUE, "unit_id": unit.get("unit_id"), "title": unit.get("title"),
-            "checked_at": _now(), "status": status, "counts": counts, "gates": gates, "findings": findings,
+            "worked_coverage": ctx.worked_coverage, "checked_at": _now(), "status": status, "counts": counts, "gates": gates, "findings": findings,
             "human_review": "HUMAN_REVIEW_PENDING", "learning_evaluation": "NOT_RUN", "model_calls": 0,
             "scope": "Maschinell entscheidbare Kriterien aus Lernstandard §5.1-§5.4 und V1-V10. Kein Gate gibt ein "
                      "Kapitel frei; die fachliche und didaktische Abnahme bleibt beim Owner."}
@@ -925,6 +942,13 @@ STATUS_DE = {"BLOCKERS": "Blocker vorhanden: nicht an den Owner geben",
 GATE_STATUS_DE = {"pass": "bestanden", "fail": "Befund", "not_checked": "nicht geprüft"}
 
 
+def _coverage_lines(report):
+    for item in report.get("worked_coverage", []):
+        counts = item["counts"]
+        yield (f"{item['task']} · {counts['CHECKED']} geprüft · {counts['BLOCKER']} widersprochen · "
+               f"{counts['UNVERIFIED']} ungeprüfte Lösungsstellen (fachlich prüfen)")
+
+
 def to_markdown(report):
     c = report["counts"]
     lines = [f"# Qualitätsbericht: {report['title']}", "",
@@ -937,6 +961,7 @@ def to_markdown(report):
     for f in report["findings"]:
         lines.append(f"- **{SEVERITY_DE[f['severity']]}** `{f['gate']}` ({PRODUCT_DE[f['product']]}, {f['section']}) – "
                      f"{f['location']}: {f['message']} *Beheben:* {f['fix']}")
+    lines += ["", "## Prüfabdeckung der Musterlösungen", "", *("- " + line for line in _coverage_lines(report))]
     lines += ["", "## Gates", "", "| Gate | Produkt | Schwere | Ergebnis | Befunde |", "|---|---|---|---|---|"]
     for g in report["gates"]:
         lines.append(f"| `{g['id']}` | {PRODUCT_DE[g['product']]} | {SEVERITY_DE[g['severity']]} | "
@@ -984,6 +1009,8 @@ def to_html(report):
             f'<h2>Befunde ({len(report["findings"])})</h2>'
             + (f'<table><thead><tr><th>Schwere</th><th>Gate</th><th>Ort</th><th>Befund</th></tr></thead><tbody>{rows}'
                '</tbody></table>' if report["findings"] else '<p>Keine maschinellen Befunde.</p>') +
+            '<h2>Prüfabdeckung der Musterlösungen</h2><ul>' +
+            "".join("<li>" + escape(line) + "</li>" for line in _coverage_lines(report)) + "</ul>" +
             f'<h2>Gates ({len(report["gates"])})</h2><table><thead><tr><th>Gate</th><th>Produkt</th><th>Schwere</th>'
             f'<th>Ergebnis</th><th>Befunde</th><th>Regel</th></tr></thead><tbody>{gates}</tbody></table>'
             '</main></body></html>\n')

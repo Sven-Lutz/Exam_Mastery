@@ -508,6 +508,8 @@ def _item_html(d, it, solution=False, space=True, exam=False):
             h += '<div class="ex" style="border:none;padding:0"><ol class="steps">' + ''.join(
                 f'<li><span class="do">{inline(x[0])}</span>' + (f'<span class="why">{inline(x[1])}</span>' if len(x) > 1 and x[1] else '') + '</li>' for x in s['steps']) + '</ol></div>'
         h += f'<div class="box key"><span class="lab">Ergebnis</span>{md(s["answer"])}</div>'
+        if s.get('verification_note'):
+            h += f'<p class="meta">{E(s["verification_note"])}</p>'
         for alt in s.get('alternatives') or []:
             h += f'<div class="alt"><span class="lab">Alternativer Lösungsweg</span>{md(alt)}</div>'
         if s.get('errors'):

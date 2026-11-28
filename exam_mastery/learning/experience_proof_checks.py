@@ -31,6 +31,10 @@ class ProofCheckError(ValueError):
     """Invalid, unsupported or disproved symbolic equality."""
 
 
+class FalseIdentity(ProofCheckError):
+    """Both polynomials are supported and their exact difference is nonzero."""
+
+
 def _inspect(ast, names, budget, depth=0):
     if depth > MAX_DEPTH:
         raise ProofCheckError("excessive expression depth")
@@ -144,7 +148,7 @@ def verify(check):
     left, right = (_convert(a, symbols) for a in asts)
     delta = sp.Poly(left - right, *[symbols[v] for v in names], domain="QQ")
     if not delta.is_zero:
-        raise ProofCheckError("polynomial identity is false: nonzero exact difference")
+        raise FalseIdentity("polynomial identity is false: nonzero exact difference")
     return {
         "schema": SCHEMA,
         "status": "VERIFIED_POLYNOMIAL_IDENTITY",
