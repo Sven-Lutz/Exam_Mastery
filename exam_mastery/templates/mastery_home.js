@@ -4,7 +4,7 @@
 (() => {
 'use strict';
 const EMT = window.EMT;
-const TKEY = 'em-tutor-v1', PKEY = 'em-practice-v1', MKEY = 'em-motion-v1';
+const TKEY = 'em-tutor-v1', PKEY = 'em-practice-v1', MKEY = 'em-motion-v1', LKEY = 'em-learn-v2';
 const app = document.getElementById('app');
 const el = (tag, attrs, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs || {})) { if (v === null || v === undefined || v === false) continue; if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v); } for (const c of kids.flat()) if (c !== null && c !== undefined && c !== false) e.append(c.nodeType ? c : document.createTextNode(String(c))); return e; };
 const readJSON = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
@@ -13,7 +13,6 @@ const when = t => { const d = new Date(t); return Number.isFinite(d.getTime()) ?
 const STATUS = { NOT_ASSESSED: 'noch nicht geprüft', INDEPENDENT_PARTIAL: 'begonnen, noch nicht gelöst', ASSISTED: 'mit Hilfe gelöst', INDEPENDENT_PASS: 'heute ohne Hilfe gelöst', RETEST_DUE: 'spätere Prüfung fällig', RETAINED_ON_LATER_DAY: 'an einem späteren Tag erneut ohne Hilfe gelöst' };
 const BASIS = { none: 'keine selbstständige richtige Lösung', recognition_only: 'nur Wiedererkennen (Auswahl) geprüft', production: 'selbst erzeugte Lösung geprüft' };
 const PRODUCTS = [['interactive', 'Interaktiv', 'Erklären, vorhersagen, experimentieren, üben – im Browser'], ['textbook', 'Lehrbuch (PDF)', 'Herleitungen und Erklärungen zum Lesen'], ['workbook', 'Arbeitsbuch (PDF)', 'Aufgaben mit Lösungen zum Ausdrucken'], ['anki', 'Anki-Paket', 'Karten für Anki – Anki plant die Wiederholung']];
-const HELP = ['hint', 'solution', 'tutor', 'guided', 'support'];   // guided = prerequisite lesson opened; support = worked example/contrast shown after a wrong answer (both count as help)
 
 /* ------------------------------------------------------------ learner state of this origin */
 const workbenchEvents = tr => (((readJSON(TKEY) || {}).tracks || {})[tr.store_key] || { events: [] }).events.filter(e => e.type !== 'decision');
@@ -21,26 +20,6 @@ function practiceRecord(u) {
   const rec = (((readJSON(PKEY) || {}).units) || {})[u.practice_store.unit_id];
   return rec && rec.assessment_revision === u.practice_store.assessment_revision ? rec : { events: [], policy: [] };
 }
-/* Explorable free text is never graded: only verified attempts may change a competency state (unverified ones are counted). */
-const verifiedOnly = ev => ev.filter(e => e.type !== 'attempt' || (e.diagnosis && e.diagnosis.result !== 'unverified'));
-
-function kcRows(tr, ev, labels, source, extraUnverified) {
-  const T = Object.fromEntries(tr.tasks.map(t => [t.id, t]));
-  const usable = source === 'explorable' ? verifiedOnly(ev) : ev;
-  const st = EMT.kcStatus(tr, usable), basis = EMT.kcEvidenceBasis(tr, usable);
-  return tr.kcs.map(kc => {
-    let assisted = 0, unassisted = 0, unverified = 0, helps = 0;
-    ev.forEach((e, i) => {
-      const task = T[e.task]; if (!task || task.kc_id !== kc.id) return;
-      if (HELP.includes(e.type)) { helps++; return; }
-      if (e.type !== 'attempt' || !e.diagnosis || e.diagnosis.result === 'invalid') return;
-      if (e.diagnosis.result === 'unverified') unverified++;
-      if (EMT.assisted(tr, ev, i)) assisted++; else unassisted++;
-    });
-    return { id: kc.id, label: labels[kc.id] || kc.label || kc.id, status: st[kc.id], basis: basis[kc.id], assisted, unassisted, unverified, helps, source };
-  });
-}
-
 /* ------------------------------------------------------------ rules M1-M3 (ordering only; decisions are EMT.decide) */
 function recommend(lib) {
   for (const u of lib.units) {
@@ -161,27 +140,234 @@ function limitsCard() {
     el('li', {}, 'Kurse: Import, Inventar, Vollständigkeit, Kapitelplan, Pakete und Bau laufen offline und ohne Modell. Das Erarbeiten eines Kapitels braucht eine Claude-Code-Sitzung (Ihr Abo) oder einen Menschen – Mastery ruft selbst kein Modell auf.')));
 }
 
-function viewProgress(lib) {
-  const s = el('section', { id: 'lernstand', class: 'm-view', 'aria-labelledby': 'h-ls' }, el('h1', { id: 'h-ls', class: 'm-h1' }, 'Lernstand'),
-    el('p', { class: 'm-statement', id: 'proximal' }, 'Diese Zustände sind Näherungsanzeigen innerhalb von Mastery – beobachtete Lernhandlungen in diesem Browser, keine Messung von Lernen oder Können. Es gibt bewusst keinen Prozentwert. „Mit Hilfe“ heißt: Hinweis, Lösung oder Tutor-Brief zu dieser Aufgabe oder (bis 20 Stunden davor) zur selben Kompetenz. Behalten wird nur aus selbstständigen richtigen Lösungen mit mindestens 20 Stunden Abstand abgeleitet.'));
-  const table = (title, rows, note) => el('div', { class: 'm-card' }, el('h2', { class: 'm-h2' }, title), note ? el('p', { class: 'm-note' }, note) : null,
-    el('div', { class: 'm-scroll' }, el('table', { class: 'm-table' }, el('thead', {}, el('tr', {}, ['Kompetenz', 'Zustand', 'Evidenzbasis', 'ohne Hilfe', 'mit Hilfe', 'davon Freitext (unbewertet)', 'Hilfen'].map(h => el('th', { scope: 'col' }, h)))),
-      el('tbody', {}, rows.map(r => el('tr', { 'data-kc': r.id, 'data-source': r.source, 'data-status': r.status, 'data-basis': r.basis, 'data-assisted': String(r.assisted), 'data-unassisted': String(r.unassisted), 'data-unverified': String(r.unverified) },
-        el('th', { scope: 'row' }, r.label), el('td', {}, STATUS[r.status] || r.status), el('td', {}, BASIS[r.basis] || r.basis), el('td', {}, String(r.unassisted)), el('td', {}, String(r.assisted)), el('td', {}, String(r.unverified)), el('td', {}, String(r.helps))))))));
+/* ------------------------------------------------------------ Lernstand: one evidence ledger, every number explains itself */
+/* The ledger (assets/mastery_ledger.js, parity-tested with mastery/ledger.py) merges all learner stores of this browser.
+   This view only presents it: every number is a button that names its rule, the events behind it and what it does not
+   measure. No percentage, no score, no streak. */
+const PRODUCT = { workbench: 'Übungsstrecke', explorable: 'Interaktiv', motion: 'Mastery Motion', chapter_app: 'Kapitel-App' };
+const LKIND = { attempt: 'Versuch', prediction: 'Vorhersage', reveal: 'Aufgedeckt', mission: 'Auftrag geprüft', view: 'Abschnitt geöffnet', self_rating: 'Selbsteinschätzung (Karte)', exam: 'Probeklausur', unknown: 'unbekannter Eintrag' };
+const HELPNAME = { hint: 'Hinweis', solution: 'Lösung angesehen', tutor: 'Tutor-Brief', guided: 'Geführte Hilfe', support: 'Beispiel/Kontrast gezeigt' };
+const RESULT = { correct: 'richtig', incorrect: 'nicht richtig', partial: 'teilweise', invalid: 'nicht lesbar', unverified: 'unbewertet (Freitext)', wrong: 'falsch', met: 'erreicht', not_met: 'nicht erreicht', skipped_prediction: 'ohne Vorhersage' };
+const SOURCE = { deterministic: 'regelbasiert', unjudged: 'nicht bewertet', self_report: 'Selbstauskunft', agent_judgement: 'Sprachmodell außerhalb von Mastery' };
+const ROLE = { practice: 'Übung', evidence: 'Nachweisaufgabe', retest: 'spätere Prüfung' };
+const TQ = { date_only: 'nur Datum bekannt', invalid: 'Zeitangabe unlesbar', missing: 'ohne Zeitangabe', future: 'Zeit liegt in der Zukunft – nicht gewertet' };
+const NOT_GENERAL = 'Gezählt werden beobachtete Handlungen in diesem Browser. Lernwirkung ist nicht gemessen (NOT_RUN); was Sie außerhalb von Mastery können, sieht Mastery nicht.';
+const WHY = {
+  unassisted: ['Versuche ohne Hilfe', 'Alle geprüften oder unbewerteten Versuche dieser Kompetenz (nicht lesbare Eingaben ausgenommen), vor denen es weder zu derselben Aufgabe eine Hilfe gab noch in den 20 Stunden davor eine Hilfe zu einer Aufgabe derselben Kompetenz. Richtig oder falsch spielt hier keine Rolle.', 'Ob der Versuch richtig war; ob Sie die Aufgabe heute ohne Mastery lösen könnten.'],
+  assisted: ['Versuche mit Hilfe', 'Versuche dieser Kompetenz, vor denen zur selben Aufgabe ein Hinweis, die Lösung, ein Tutor-Brief, eine geführte Hilfe oder ein automatisch gezeigtes Beispiel lag – oder in den 20 Stunden davor eine solche Hilfe zu einer Aufgabe derselben Kompetenz.', 'Wie viel die Hilfe beigetragen hat. Jede Hilfe macht den Versuch „mit Hilfe“, auch eine kleine.'],
+  unverified: ['davon Freitext, unbewertet', 'Versuche, deren Antwort Freitext war. Mastery bewertet Freitext nicht; diese Versuche ändern keinen Zustand.', 'Ob die Antwort fachlich stimmt.'],
+  retries: ['wiederholte Versuche', 'Versuche an einer Aufgabe, an der es vorher schon einen Versuch gab (Wiederholung derselben Aufgabe).', 'Ob die Wiederholung besser war.'],
+  hint: ['Hinweise', 'Geöffnete Hinweise zu Aufgaben dieser Kompetenz (jede Stufe einzeln).', 'Ob der Hinweis verstanden wurde.'],
+  solution: ['Lösung angesehen', 'Wie oft die Musterlösung einer Aufgabe dieser Kompetenz geöffnet wurde.', 'Ob die Lösung nachvollzogen wurde.'],
+  tutor: ['Tutor-Briefe', 'Erstellte oder gesendete Tutor-Briefe zu Aufgaben dieser Kompetenz. Was der Tutor (ein Sprachmodell außerhalb von Mastery) antwortet, sieht Mastery nicht.', 'Inhalt und Qualität des Tutor-Gesprächs.'],
+  guided: ['Geführte Hilfen', 'Geöffnete Voraussetzungs-Lektionen, Kontrollfragen dazu und Fehlstrategie-Beispiele für Aufgaben dieser Kompetenz.', 'Ob die Voraussetzung jetzt sitzt.'],
+  support: ['Beispiele/Kontraste', 'Nach einer falschen Antwort automatisch gezeigte durchgerechnete Beispiele, Kontraste oder Schrittfokus für diese Kompetenz.', 'Ob das Beispiel gelesen wurde.'],
+  independent: ['selbstständig richtig', 'Regelbasiert als richtig geprüfte Versuche ohne Hilfe (gleiche Regel wie oben), mit lesbarer Zeit, nicht in der Zukunft, aus der aktuellen Aufgabenfassung.', 'Behalten über die Zeit und Transfer auf neue Aufgabentypen.'],
+  first_independent: ['erste selbstständige Lösung', 'Zeitpunkt des frühesten selbstständig richtigen Versuchs dieser Kompetenz.', 'Wie sicher die Lösung war.'],
+  latest_independent: ['letzte selbstständige Lösung', 'Zeitpunkt des jüngsten selbstständig richtigen Versuchs dieser Kompetenz.', 'Ob Sie es heute noch können.'],
+  delayed: ['späterer Nachweis', 'Erste selbstständig richtige Lösung einer anderen Aufgabe derselben Kompetenz, mindestens 20 Stunden nach einer früheren selbstständigen Lösung (echte verstrichene Zeit, keine Kalendertage). Die Stunden zählen ab der frühesten passenden Lösung.', 'Langfristiges Behalten; eine einzelne spätere Lösung ist eine Stichprobe.'],
+  status: ['Zustand', 'Regel der Übungslogik (policy.kc_status, im Browser EMT.kcStatus): kein Versuch → noch nicht geprüft; nur falsch → begonnen; nur mit Hilfe richtig → mit Hilfe gelöst; selbstständig richtig → heute ohne Hilfe; ≥ 20 h danach → spätere Prüfung fällig; zwei selbstständige Lösungen verschiedener Aufgaben ≥ 20 h auseinander → an einem späteren Tag erneut gelöst.', 'Ein Zustand ist keine Note und keine Wahrscheinlichkeit, dass Sie es können.'],
+  basis: ['Evidenzbasis', 'Woraus die selbstständigen Lösungen bestehen: nur Auswahl-/Ankreuzaufgaben → nur Wiedererkennen; mindestens eine selbst erzeugte Zahl, ein Ausdruck oder Rechenschritte → Produktion.', 'Ob ein Beweis oder eine Begründung selbst konstruiert werden kann (Freitext wird nicht bewertet).'],
+  store_read: ['gelesene Einträge', 'Alle Einträge dieses Speichers in diesem Browser (localStorage), unverändert gelesen.', 'Einträge in anderen Browsern, auf anderen Geräten oder unter anderen Ports.'],
+  store_included: ['in der Zeitleiste', 'Einträge, die als Lernhandlung in die Zeitleiste eingehen – auch unbekannte oder alte, dann gekennzeichnet.', 'Ob die Handlung lernwirksam war.'],
+  store_excluded: ['ausgelassen', 'Einträge, die keine eigene Lernhandlung sind: Entscheidungen der Übungslogik (engine_decision), doppelte Einträge des Aktionsprotokolls im Explorable (mirror_duplicate, dieselbe Handlung steht im Entscheidungsprotokoll) und unlesbare Einträge (malformed).', 'Nichts davon wird gelöscht; der Speicher bleibt unverändert.'],
+  coverage_with: ['mit selbst erzeugter Lösung', 'Kompetenzen dieses Kapitels, für die es mindestens eine selbstständig richtige, regelbasiert geprüfte Lösung mit Produktion (Zahl, Ausdruck, Rechenschritte) gibt – in Übungsstrecke oder Interaktiv.', 'Ob die Kompetenz vollständig beherrscht wird; eine Lösung ist eine Stichprobe.'],
+  coverage_without: ['ohne selbst erzeugte Lösung', 'Kompetenzen dieses Kapitels ohne selbstständig richtige Produktion: nicht bearbeitet, nur mit Hilfe, nur Wiedererkennen oder nur unbewerteter Freitext.', 'Was Sie außerhalb von Mastery dazu schon können.'],
+  motion_predictions: ['Vorhersagen', 'Abgegebene Vorhersagen vor dem Aufdecken in dieser Szene (aktuelle Szenenfassung).', 'Können: Vorhersagen sind Lernhandlungen, kein Nachweis.'],
+  motion_correct: ['davon zutreffend', 'Vorhersagen, die der Szenen-Prüfer als zutreffend erkannt hat (regelbasiert).', 'Verständnis; eine Vorhersage kann geraten sein.'],
+  motion_reveals: ['aufgedeckt', 'Aufgedeckte Schritte, auch ohne Vorhersage.', 'Ob der Schritt verstanden wurde.'],
+  motion_missions: ['Aufträge geprüft', 'Abgegebene Regler-Aufträge dieser Szene.', 'Können außerhalb der Szene.'],
+  motion_met: ['davon erreicht', 'Aufträge, deren Zielbedingung der Szenen-Prüfer als erfüllt erkannt hat.', 'Ob der Weg dorthin verstanden wurde.'],
+  timeline: ['Einträge', 'Lernhandlungen in der Zeitleiste nach den gewählten Filtern.', 'Lernzeit oder Aufmerksamkeit.'],
+  anki_cards: ['Karten', 'Karten aus Mastery-Stapeln („Exam Mastery::…“) in der von Ihnen exportierten Anki-Datei.', 'Karten außerhalb der Mastery-Stapel; Können.'],
+  anki_reviews: ['Wiederholungen', 'Einträge der Anki-Wiederholungshistorie (revlog) zu diesen Karten mit Antwortknopf; manuelle Umplanungen nicht mitgezählt.', 'Lernerfolg. Anki-Planungsdaten sind kein Kompetenznachweis.'],
+  anki_lapses: ['Lapses', 'Anki-Zähler „lapses“ der Karte: wie oft eine gelernte Karte vergessen wurde (Taste „Nochmal“ in der Wiederholung).', 'Ob Sie die Kompetenz beherrschen.'],
+  anki_interval: ['aktuelles Intervall', 'Anki-Feld „ivl“: Abstand bis zur nächsten Wiederholung in Tagen, von Anki/FSRS geplant.', 'Behalten: das Intervall ist eine Planungsgröße.'],
+};
+let LEDGER = null, PROGRESS = null, TL_FILTER = { course: '', unit: '', product: '' }, TL_LIMIT = 100;
+function ledgerNow(lib) {
+  const storage = { [TKEY]: readJSON(TKEY), [PKEY]: readJSON(PKEY), [MKEY]: readJSON(MKEY), [LKEY]: readJSON(LKEY) };
+  LEDGER = window.MasteryLedger.buildLedger(storage, lib); PROGRESS = window.MasteryLedger.summarize(LEDGER, lib);
+  return [LEDGER, PROGRESS];
+}
+function taskTitles(lib) {
+  const out = {};
   for (const u of lib.units) {
-    for (const tr of u.tracks) s.append(table('Übungsstrecke: ' + (tr.label || tr.data.title), kcRows(tr.data, workbenchEvents(tr), {}, 'workbench'), 'Regelbasiert geprüft (Zahl, Ausdruck, Rechenschritte).'));
-    const labels = Object.fromEntries(u.competencies.map(c => [c.id, c.label]));
-    s.append(table('Interaktiv: ' + u.title, kcRows(u.adaptive_track, practiceRecord(u).policy, labels, 'explorable'),
-      'Freitext wird nicht bewertet: Versuche zählen als „ohne/mit Hilfe“, ändern aber keinen Zustand. Zuordnung über die erste Kompetenz der Aufgabe.'));
+    for (const tr of u.tracks) for (const t of tr.data.tasks) out['em-tutor-v1\u0000' + tr.store_key + '\u0000' + t.id] = t.title;
+    for (const a of u.assessments) out['em-practice-v1\u0000' + u.practice_store.unit_id + '\u0000' + a.id] = a.title;
   }
-  const scenes = Object.entries(((readJSON(MKEY) || {}).scenes) || {});
-  if (scenes.length) s.append(el('div', { class: 'm-card', id: 'motion-progress' }, el('h2', { class: 'm-h2' }, 'Mastery Motion: Vorhersagen'),
+  return out;
+}
+/* A number with its "Woher?" button: data-num, data-why = rule key; refs = ledger ids behind it. */
+function num(value, why, refs, box) {
+  const b = el('button', { type: 'button', class: 'm-n', 'data-num': String(value), 'data-why': why, 'aria-label': value + ' – Woher?', title: 'Woher?' }, String(value));
+  b.addEventListener('click', () => explain(box, why, refs || [], value)); return b;
+}
+function stampText(iso) { return iso ? when(iso) : '–'; }
+function dateCell(iso, why, refs, box) {
+  if (!iso) return '–';
+  const b = el('button', { type: 'button', class: 'm-n m-date', 'data-num': iso, 'data-why': why, title: 'Woher?' }, stampText(iso));
+  b.addEventListener('click', () => explain(box, why, refs || [], stampText(iso))); return b;
+}
+function explain(box, why, refs, value) {
+  const [title, rule, not] = WHY[why], byId = Object.fromEntries((LEDGER ? LEDGER.events : []).map(e => [e.id, e]));
+  box.hidden = false;
+  box.replaceChildren(el('p', { class: 'm-why-h' }, el('strong', {}, 'Woher? '), title + ': ' + value),
+    el('p', {}, el('strong', {}, 'Regel: '), rule),
+    refs.length ? el('details', { open: refs.length <= 8 ? true : null }, el('summary', {}, 'Daten: ' + refs.length + ' Einträge aus Ihrem Browser'),
+      el('ul', { class: 'm-why-refs' }, refs.slice(0, 50).map(id => { const e = byId[id]; return el('li', {}, e ? stampText(e.at) + ' · ' + (e.kind === 'help' ? HELPNAME[e.help] : LKIND[e.kind] || e.type) + (e.result ? ' · ' + (RESULT[e.result] || e.result) : '') + ' · ' : '', el('code', {}, id)); })))
+      : el('p', {}, el('strong', {}, 'Daten: '), 'keine passenden Einträge.'),
+    el('p', { class: 'm-not' }, el('strong', {}, 'Was das nicht misst: '), not + ' ' + NOT_GENERAL),
+    el('button', { type: 'button', class: 'ds-btn m-why-close', onclick: () => { box.hidden = true; } }, 'Schließen'));
+  box.focus();
+}
+const whyBox = () => el('div', { class: 'm-why', role: 'region', 'aria-label': 'Woher? Erklärung', tabindex: '-1', hidden: true });
+const unitHead = u => u.course ? 'Kurs ' + u.course.title + ' · Kapitel ' + u.chapter.order + ': ' + u.title : 'Einheit: ' + u.title;
+
+function storesCard(led) {
+  const box = whyBox(), NAMES = { 'em-tutor-v1': ['Übungsstrecken', 'Versuche, Hinweise, Lösungen, Tutor-Briefe, geführte Hilfen je Übungsstrecke'], 'em-practice-v1': ['Interaktiv (Explorable)', 'Entscheidungsprotokoll mit Prüfergebnis und datensparsames Aktionsprotokoll (Export em-practice-evidence-v1)'],
+    'em-motion-v1': ['Mastery Motion', 'Vorhersagen, Aufdecken, Regler-Aufträge'], 'em-learn-v2': ['Kapitel-App', 'Lernhandlungen der älteren Kapitel-App, falls unter dieser Adresse genutzt'] };
+  const byStore = s => led.events.filter(e => e.store === s.store).map(e => e.id);
+  return el('div', { class: 'm-card', id: 'sources' }, el('h2', { class: 'm-h2' }, 'Woher kommen die Daten?'),
+    el('p', {}, 'Mastery speichert jede Lernhandlung dort, wo sie passiert – getrennt nach Produkt, alle im Browser dieser Adresse. Diese Seite liest alle Speicher, ändert keinen und führt sie zu einem Verlauf zusammen (Lernstand-Register ', el('code', {}, led.schema), '). Jede Zahl ist anklickbar: „Woher?“ nennt Regel, Einträge und was sie nicht misst.'),
+    el('p', { class: 'm-note', id: 'mirror-note' }, 'Warum ist ein exportiertes Explorable-Protokoll (em-practice-evidence-v1) manchmal leer, obwohl Sie geübt haben? Übungsstrecken wie Backpropagation speichern ihren Verlauf getrennt (em-tutor-v1). Das Explorable führt zwei Protokolle derselben Handlungen: das Entscheidungsprotokoll mit Prüfergebnis und ein Aktionsprotokoll ohne Antworten für den Export. Hier zählt jede Handlung genau einmal.'),
+    el('div', { class: 'm-scroll' }, el('table', { class: 'm-table' }, el('thead', {}, el('tr', {}, ['Speicher', 'Inhalt', 'gelesen', 'in der Zeitleiste', 'ausgelassen'].map(h => el('th', { scope: 'col' }, h)))),
+      el('tbody', {}, led.stores.map(s => el('tr', { 'data-store': s.store }, el('th', { scope: 'row' }, NAMES[s.store][0], el('div', {}, el('code', {}, s.store))), el('td', {}, s.present ? NAMES[s.store][1] : 'in diesem Browser nicht vorhanden'),
+        el('td', {}, num(s.read, 'store_read', [], box)), el('td', {}, num(s.included, 'store_included', byStore(s), box)),
+        el('td', {}, num(Object.values(s.excluded).reduce((a, b) => a + b, 0), 'store_excluded', [], box), Object.keys(s.excluded).length ? el('small', { class: 'm-note' }, ' (' + Object.entries(s.excluded).map(([k, v]) => k + ': ' + v).join(', ') + ')') : null)))))),
+    box);
+}
+function competencyCards(lib, prog) {
+  const out = el('div', { id: 'competencies' }, el('h2', { class: 'm-h2' }, 'Je Kompetenz'));
+  const HEAD = ['Kompetenz', 'Zustand', 'Evidenzbasis', 'ohne Hilfe', 'mit Hilfe', 'davon Freitext (unbewertet)', 'wiederholt', 'Hilfen', 'selbstständig richtig', 'erste / letzte selbstständige Lösung', 'späterer Nachweis (≥ 20 h)'];
+  for (const u of lib.units) {
+    const rows = prog.competencies.filter(c => c.unit === u.slug);
+    const scopes = [...new Set(rows.map(c => c.scope))];
+    const card = el('div', { class: 'm-card', 'data-unit': u.slug, 'data-course': u.course ? u.course.slug : null }, el('h3', { class: 'm-h3' }, unitHead(u)));
+    const box = whyBox();
+    for (const sc of scopes) {
+      const rs = rows.filter(c => c.scope === sc), first = rs[0], src = first.product;
+      card.append(el('h4', { class: 'm-h4' }, (PRODUCT[src] || src) + ': ' + first.scope_title),
+        el('p', { class: 'm-note' }, src === 'explorable' ? 'Interaktiv: Zahlenaufgaben werden regelbasiert geprüft, Freitext nicht. Zuordnung über die erste Kompetenz der Aufgabe.' : 'Übungsstrecke: Zahl, Ausdruck und Rechenschritte werden regelbasiert geprüft.'),
+        el('div', { class: 'm-scroll' }, el('table', { class: 'm-table m-kc' }, el('thead', {}, el('tr', {}, HEAD.map(h => el('th', { scope: 'col' }, h)))),
+          el('tbody', {}, rs.map(c => { const n = c.counts, r = c.refs;
+            const helps = ['hint', 'solution', 'tutor', 'guided', 'support'].filter(h => n[h]).map(h => el('span', { class: 'm-help' }, num(n[h], h, r[h], box), ' ' + WHY[h][0]));
+            return el('tr', { 'data-kc': c.competency, 'data-source': src, 'data-status': c.status, 'data-basis': c.basis, 'data-assisted': String(n.assisted), 'data-unassisted': String(n.unassisted), 'data-unverified': String(n.unverified), 'data-independent': String(n.independent), 'data-delayed': c.delayed ? c.delayed.at : '' },
+              el('th', { scope: 'row' }, c.label),
+              el('td', {}, el('button', { type: 'button', class: 'm-n m-state', 'data-num': c.status, 'data-why': 'status', onclick: () => explain(box, 'status', r.independent.concat(r.assisted), STATUS[c.status] || c.status) }, STATUS[c.status] || c.status)),
+              el('td', {}, el('button', { type: 'button', class: 'm-n m-state', 'data-num': c.basis, 'data-why': 'basis', onclick: () => explain(box, 'basis', r.independent, BASIS[c.basis] || c.basis) }, BASIS[c.basis] || c.basis)),
+              el('td', {}, num(n.unassisted, 'unassisted', r.unassisted, box)), el('td', {}, num(n.assisted, 'assisted', r.assisted, box)),
+              el('td', {}, num(n.unverified, 'unverified', r.unverified, box)), el('td', {}, num(n.retries, 'retries', r.retries, box)),
+              el('td', {}, helps.length ? helps : 'keine'), el('td', {}, num(n.independent, 'independent', r.independent, box)),
+              el('td', {}, dateCell(c.first_independent, 'first_independent', r.independent.slice(0, 1), box), c.latest_independent && c.latest_independent !== c.first_independent ? [' / ', dateCell(c.latest_independent, 'latest_independent', r.independent.slice(-1), box)] : null),
+              el('td', {}, c.delayed ? [dateCell(c.delayed.at, 'delayed', [c.delayed.ref], box), el('small', { class: 'm-note' }, ' nach ', num(c.delayed.after_hours, 'delayed', [c.delayed.ref], box), ' Stunden')] : 'noch keiner'));
+          })))));
+    }
+    card.append(box); out.append(card);
+  }
+  return out;
+}
+function coverageCard(lib, prog) {
+  const box = whyBox(), card = el('div', { class: 'm-card', id: 'coverage' }, el('h2', { class: 'm-h2' }, 'Abdeckung je Kapitel'),
+    el('p', { class: 'm-note' }, 'Welche Kompetenzen eines Kapitels haben mindestens eine selbst erzeugte, regelbasiert geprüfte Lösung ohne Hilfe – und welche nicht. Keine Quote: Eine Kompetenz ohne Nachweis ist ein Hinweis, wo Sie als Nächstes üben können.'));
+  const why = it => it.basis === 'recognition_only' ? 'nur Wiedererkennen geprüft' : it.attempted ? 'nur mit Hilfe, falsch oder unbewertet' : 'noch nicht bearbeitet';
+  for (const ch of prog.chapters) {
+    const u = lib.units.find(x => x.slug === ch.unit), refsOf = ids => prog.competencies.filter(c => c.unit === ch.unit && ids.includes(c.competency)).flatMap(c => c.refs.independent);
+    const withIt = ch.items.filter(i => i.basis === 'production'), without = ch.items.filter(i => i.basis !== 'production');
+    card.append(el('section', { class: 'm-cov', 'data-unit': ch.unit, 'data-course': ch.course, 'data-with': String(withIt.length), 'data-without': String(without.length) }, el('h3', { class: 'm-h3' }, unitHead(u)),
+      el('p', {}, el('strong', {}, 'Mit selbst erzeugter Lösung: '), num(withIt.length, 'coverage_with', refsOf(ch.with_production), box), withIt.length ? ' – ' + withIt.map(i => i.label).join(', ') : ''),
+      el('p', {}, el('strong', {}, 'Ohne: '), num(without.length, 'coverage_without', [], box)),
+      without.length ? el('ul', { class: 'm-cov-list' }, without.map(i => el('li', { 'data-competency': i.competency }, i.label, el('small', { class: 'm-note' }, ' – ' + why(i))))) : null));
+  }
+  card.append(box);
+  return card;
+}
+function timelineCard(lib, led) {
+  const titles = taskTitles(lib), box = whyBox(), list = el('ol', { class: 'm-tl', id: 'timeline-list', reversed: true }), count = el('span', { id: 'timeline-count' });
+  const courses = [...new Map(lib.units.filter(u => u.course).map(u => [u.course.slug, u.course.title]))];
+  const sel = (id, label, opts, key) => el('label', { class: 'm-field-inline' }, label + ' ', el('select', { class: 'm-input', id, onchange: e => { TL_FILTER[key] = e.target.value; TL_LIMIT = 100; draw(); } },
+    el('option', { value: '' }, 'alle'), opts.map(([v, t]) => el('option', { value: v, selected: TL_FILTER[key] === v ? true : null }, t))));
+  const more = el('button', { type: 'button', class: 'ds-btn', id: 'timeline-more', onclick: () => { TL_LIMIT += 100; draw(); } }, 'Ältere anzeigen');
+  const unitName = slug => { const u = lib.units.find(x => x.slug === slug); return u ? (u.course ? u.course.title + ' · ' : '') + u.title : null; };
+  function draw() {
+    const f = TL_FILTER, evs = led.events.filter(e => (!f.course || e.course === f.course) && (!f.unit || e.unit === f.unit) && (!f.product || e.product === f.product)).slice().reverse();
+    count.replaceChildren(num(evs.length, 'timeline', [], box), ' Einträge');
+    list.replaceChildren(...evs.slice(0, TL_LIMIT).map(e => {
+      const title = titles[e.store + '\u0000' + e.record + '\u0000' + e.task] || e.task, what = e.kind === 'help' ? HELPNAME[e.help] || e.type : LKIND[e.kind] || e.type;
+      return el('li', { class: 'm-tl-item', 'data-id': e.id, 'data-product': e.product, 'data-kind': e.kind, 'data-course': e.course, 'data-unit': e.unit },
+        el('div', { class: 'm-tl-when' }, e.at ? stampText(e.at) : '–', e.t_quality !== 'exact' ? el('small', { class: 'm-badge' }, TQ[e.t_quality]) : null),
+        el('div', { class: 'm-tl-what' }, el('strong', {}, what), title ? ' · ' + title : '', e.result ? ' → ' + (RESULT[e.result] || e.result) : '',
+          el('div', { class: 'm-tl-tags' }, el('span', { class: 'm-tag' }, PRODUCT[e.product] || e.product), e.unit ? el('span', { class: 'm-tag' }, unitName(e.unit)) : null,
+            e.assist ? el('span', { class: 'm-tag ' + (e.assist === 'assisted' ? 'm-tag-help' : 'm-tag-ind') }, e.assist === 'assisted' ? 'mit Hilfe' : 'ohne Hilfe') : null,
+            e.source ? el('span', { class: 'm-tag' }, e.kind === 'help' && e.source === 'deterministic' ? 'vorbereitete Hilfe' : SOURCE[e.source] || e.source) : null,
+            e.role ? el('span', { class: 'm-tag' }, ROLE[e.role]) : null, e.archived ? el('span', { class: 'm-tag' }, 'frühere Fassung') : null),
+          e.note ? el('small', { class: 'm-note' }, e.note) : null,
+          el('small', { class: 'm-prov' }, 'Herkunft: ', el('code', {}, e.id))));
+    }));
+    more.hidden = evs.length <= TL_LIMIT;
+    if (!evs.length) list.replaceChildren(el('li', { class: 'm-note' }, 'Keine Lernhandlungen für diese Auswahl.'));
+  }
+  draw();
+  return el('div', { class: 'm-card', id: 'timeline' }, el('h2', { class: 'm-h2' }, 'Zeitleiste'),
+    el('p', { class: 'm-note' }, 'Alle Lernhandlungen dieses Browsers, neueste zuerst. Jeder Eintrag nennt Produkt, Prüfweg (regelbasiert, Selbstauskunft, nicht bewertet, Sprachmodell) und seine Herkunft im Speicher.'),
+    el('div', { class: 'm-row m-filters' }, sel('tl-course', 'Kurs', courses, 'course'), sel('tl-unit', 'Kapitel/Einheit', lib.units.map(u => [u.slug, unitName(u.slug)]), 'unit'),
+      sel('tl-product', 'Produkt', Object.entries(PRODUCT), 'product'), count), list, more, box);
+}
+function motionCard(lib, prog) {
+  if (!prog.motion.length) return null;
+  const box = whyBox();
+  return el('div', { class: 'm-card', id: 'motion-progress' }, el('h2', { class: 'm-h2' }, 'Mastery Motion: Vorhersagen'),
     el('p', { class: 'm-note' }, 'Vorhersagen sind Lernhandlungen vor dem Aufdecken, kein Nachweis von Können. Sie ändern keinen Kompetenzzustand und keinen Wert oben.'),
     el('div', { class: 'm-scroll' }, el('table', { class: 'm-table' }, el('thead', {}, el('tr', {}, ['Szene', 'Vorhersagen', 'davon zutreffend', 'aufgedeckt', 'Aufträge geprüft', 'davon erreicht'].map(h => el('th', { scope: 'col' }, h)))),
-      el('tbody', {}, scenes.map(([id, r]) => { const ev = Array.isArray(r.events) ? r.events : [], pr = ev.filter(e => e.type === 'predict'), ta = ev.filter(e => e.type === 'task_attempt');
-        const d = (LIB.motion_demos || []).find(x => x.id === id);
-        return el('tr', { 'data-motion-scene': id, 'data-predictions': String(pr.length) }, el('th', { scope: 'row' }, d ? el('a', { href: d.href }, d.title) : id), el('td', {}, String(pr.length)), el('td', {}, String(pr.filter(e => e.correct === true).length)),
-          el('td', {}, String(ev.filter(e => e.type === 'reveal').length)), el('td', {}, String(ta.length)), el('td', {}, String(ta.filter(e => e.met === true).length))); }))))));
+      el('tbody', {}, prog.motion.map(m => { const d = (lib.motion_demos || []).find(x => x.id === m.scene);
+        return el('tr', { 'data-motion-scene': m.scene, 'data-predictions': String(m.predictions.length) }, el('th', { scope: 'row' }, d ? el('a', { href: d.href }, d.title) : m.scene),
+          el('td', {}, num(m.predictions.length, 'motion_predictions', m.predictions, box)), el('td', {}, num(m.predictions_correct.length, 'motion_correct', m.predictions_correct, box)),
+          el('td', {}, num(m.reveals.length, 'motion_reveals', m.reveals, box)), el('td', {}, num(m.missions.length, 'motion_missions', m.missions, box)), el('td', {}, num(m.missions_met.length, 'motion_met', m.missions_met, box))); })))), box);
+}
+/* Optional Anki statistics: only from an export file the learner makes and chooses, only after an explicit consent. */
+let ANKI_STATS = undefined;
+function ankiStatsTable(st, box) {
+  const label = el('p', { class: 'm-badge', id: 'anki-stats-label' }, st.label);
+  return [label, el('p', { class: 'm-note' }, 'Datei ', el('code', {}, st.file.name), ' · gelesen ' + when(st.imported_at) + ' · Karten anderer Stapel nicht ausgewertet: ', num(st.other_cards_ignored, 'anki_cards', [], box)),
+    el('div', { class: 'm-scroll' }, el('table', { class: 'm-table', id: 'anki-stats-decks' }, el('thead', {}, el('tr', {}, ['Stapel', 'Karten', 'Wiederholungen', 'Lapses'].map(h => el('th', { scope: 'col' }, h)))),
+      el('tbody', {}, st.decks.map(d => el('tr', { 'data-deck': d.name }, el('th', { scope: 'row' }, d.name), el('td', {}, num(d.cards, 'anki_cards', [], box)), el('td', {}, num(d.reviews, 'anki_reviews', [], box)), el('td', {}, num(d.lapses, 'anki_lapses', [], box))))))),
+    el('details', {}, el('summary', {}, 'Je Karte'), el('div', { class: 'm-scroll' }, el('table', { class: 'm-table', id: 'anki-stats-cards' },
+      el('thead', {}, el('tr', {}, ['Karte (Vorderseite)', 'Stapel', 'Status in Anki', 'Wiederholungen', 'Lapses', 'Intervall (Tage)', 'zuletzt wiederholt'].map(h => el('th', { scope: 'col' }, h)))),
+      el('tbody', {}, st.cards.map(c => el('tr', { 'data-guid': c.note_guid }, el('th', { scope: 'row' }, c.front || '–'), el('td', {}, c.deck), el('td', {}, c.queue),
+        el('td', {}, num(c.reviews, 'anki_reviews', [], box)), el('td', {}, num(c.lapses, 'anki_lapses', [], box)), el('td', {}, num(c.interval_days, 'anki_interval', [], box)), el('td', {}, c.last_review ? when(c.last_review) : '–'))))))),
+    el('p', { class: 'm-not' }, el('strong', {}, 'Was das nicht misst: '), st.not_measured)];
+}
+function ankiStatsCard() {
+  const box = whyBox(), out = el('div', { id: 'anki-stats-body' }), msg = el('p', { class: 'm-note', role: 'status', id: 'anki-stats-status' });
+  const consent = el('input', { type: 'checkbox', id: 'anki-consent', onchange: () => { pick.disabled = !consent.checked; } });
+  const pick = el('input', { type: 'file', id: 'anki-file', accept: '.apkg,.colpkg', disabled: true, onchange: e => {
+    const f = e.target.files[0]; if (!f || !consent.checked) return;
+    if (f.size > 30e6) { msg.textContent = 'Die Datei ist größer als 30 MB. Bitte nur die Mastery-Stapel ohne Medien exportieren.'; return; }
+    msg.textContent = 'Datei wird lokal gelesen …';
+    f.arrayBuffer().then(buf => { const b = new Uint8Array(buf); let s = ''; for (let i = 0; i < b.length; i += 32768) s += String.fromCharCode.apply(null, b.subarray(i, i + 32768));
+      return api('api/anki-stats', { consent: true, filename: f.name, data_base64: btoa(s) }); })
+      .then(r => { ANKI_STATS = r.stats; msg.textContent = 'Gelesen. Die temporäre Kopie ist gelöscht; gespeichert sind nur die Zahlen unten.'; draw(); })
+      .catch(err => { msg.textContent = 'Nicht gelesen: ' + err.message; });
+  } });
+  const forget = el('button', { type: 'button', class: 'ds-btn', id: 'anki-forget', onclick: () => api('api/anki-stats/forget').then(() => { ANKI_STATS = null; msg.textContent = 'Anki-Statistik entfernt.'; draw(); }).catch(err => { msg.textContent = 'Nicht möglich: ' + err.message; }) }, 'Anki-Statistik entfernen');
+  function draw() { out.replaceChildren(...(ANKI_STATS ? ankiStatsTable(ANKI_STATS, box) : [el('p', { class: 'm-note' }, 'Keine Anki-Statistik geladen.')])); forget.hidden = !ANKI_STATS; }
+  if (ANKI_STATS === undefined) fetch('api/anki-stats', { cache: 'no-store' }).then(r => r.ok ? r.json() : { stats: null }).then(j => { ANKI_STATS = j.stats || null; draw(); }).catch(() => { ANKI_STATS = null; draw(); });
+  draw();
+  return el('div', { class: 'm-card', id: 'anki-stats' }, el('h2', { class: 'm-h2' }, 'Anki-Statistik (optional, nur mit Ihrer Freigabe)'),
+    el('p', {}, 'Mastery öffnet Ihre Anki-Sammlung nie. Wenn Sie möchten, exportieren Sie selbst die Mastery-Stapel aus Anki und geben Mastery genau diese Datei. Sie wird lokal in einem temporären Ordner gelesen und danach gelöscht; nur Zählwerte der Stapel „Exam Mastery::…“ bleiben in Ihrer Bibliothek (anki-stats/), bis Sie sie entfernen.'),
+    el('ol', { class: 'm-steps' }, el('li', {}, 'Anki: Datei → Exportieren …'), el('li', {}, 'Format „Anki-Stapelpaket (.apkg)“, Stapel „Exam Mastery::…“ wählen, „Planungsdaten einschließen“ ankreuzen, Medien weglassen.'),
+      el('li', {}, 'Falls Mastery das Format nicht lesen kann: zusätzlich „Unterstützung für ältere Anki-Versionen“ ankreuzen.'), el('li', {}, 'Hier zustimmen und die Datei wählen.')),
+    el('label', { class: 'm-check' }, consent, ' Ich erlaube Mastery, diese von mir exportierte Datei einmal lokal zu lesen.'),
+    el('div', { class: 'm-row' }, el('label', { class: 'm-field-inline', for: 'anki-file' }, 'Anki-Export wählen: '), pick, forget), msg, out, box);
+}
+function viewProgress(lib) {
+  const [led, prog] = ledgerNow(lib);
+  const s = el('section', { id: 'lernstand', class: 'm-view', 'aria-labelledby': 'h-ls' }, el('h1', { id: 'h-ls', class: 'm-h1' }, 'Lernstand'),
+    el('p', { class: 'm-statement', id: 'proximal' }, 'Was Sie hier sehen, sind beobachtete Lernhandlungen in diesem Browser – Näherungsanzeigen innerhalb von Mastery, keine Messung von Lernen oder Können. Es gibt bewusst keinen Prozentwert, keine Punktzahl und keine Serien. „Mit Hilfe“ heißt: Hinweis, Lösung, Tutor-Brief, geführte Hilfe oder gezeigtes Beispiel zu dieser Aufgabe oder (bis 20 Stunden davor) zur selben Kompetenz. Behalten zeigt erst eine selbstständige Lösung nach echter verstrichener Zeit.'),
+    el('p', { class: 'm-not', id: 'not-measured' }, el('strong', {}, 'Was das nicht misst: '), 'ob Mastery Ihr Lernen verbessert (nicht untersucht, NOT_RUN); was Sie außerhalb von Mastery, in Anki oder auf Papier können; Lernstände in anderen Browsern, Geräten oder unter anderen Ports; die fachliche Qualität von Freitext.'));
+  s.append(storesCard(led), competencyCards(lib, prog), coverageCard(lib, prog));
+  const mc = motionCard(lib, prog); if (mc) s.append(mc);
+  s.append(timelineCard(lib, led), ankiStatsCard());
   return s;
 }
 
@@ -317,7 +503,9 @@ function reload(hash) {
 }
 
 /* ------------------------------------------------------------ backup: file export/import and local server copy */
-function snapshot() { return { schema: 'mastery-state-v1', saved_at: new Date().toISOString(), origin: location.origin, storage: { [TKEY]: readJSON(TKEY), [PKEY]: readJSON(PKEY), [MKEY]: readJSON(MKEY) } }; }
+function snapshot() { return { schema: 'mastery-state-v1', saved_at: new Date().toISOString(), origin: location.origin, storage: { [TKEY]: readJSON(TKEY), [PKEY]: readJSON(PKEY), [MKEY]: readJSON(MKEY), [LKEY]: readJSON(LKEY) } }; }
+/* File export: the raw stores (re-importable) plus the derived ledger and summary for reading; import ignores `derived`. */
+function exportFile() { const snap = snapshot(), led = window.MasteryLedger.buildLedger(snap.storage, LIB); return Object.assign(snap, { derived: { note: 'Abgeleitet aus storage, beim Import ignoriert und neu berechnet.', ledger: led, progress: window.MasteryLedger.summarize(led, LIB) } }); }
 function mergeState(o) {
   if (!o || o.schema !== 'mastery-state-v1' || !o.storage) throw new Error('Keine Mastery-Sicherung (mastery-state-v1).');
   let n = 0; const key = (e, a, b) => [e[a], e.type, e[b] || ''].join('|');
@@ -333,6 +521,10 @@ function mergeState(o) {
       if (cur.revision !== r.revision) { (d.archived = d.archived || {})[k + '@' + r.revision] = r; continue; }
       merge(cur.events, (r.events || []).filter(e => e && ['predict', 'reveal', 'task_attempt'].includes(e.type)), 't', 'question'); }
     writeJSON(MKEY, d); }
+  const l = o.storage[LKEY]; if (l && l.schema === 2 && Array.isArray(l.events)) { const d = readJSON(LKEY) || { schema: 2, created: new Date().toISOString(), events: [], prefs: {} }; d.events = Array.isArray(d.events) ? d.events : [];
+    const key = e => [e.t, e.type, e.item || '', e.section || '', e.card || '', e.result || ''].join('|'), have = new Set(d.events.map(key));
+    for (const e of l.events) if (e && typeof e === 'object' && typeof e.t === 'string' && typeof e.type === 'string' && Date.parse(e.t) <= Date.now() + 3e5 && !have.has(key(e))) { d.events.push(e); have.add(key(e)); n++; }
+    d.events.sort((x, y) => x.t < y.t ? -1 : x.t > y.t ? 1 : 0); writeJSON(LKEY, d); }
   return n;
 }
 function postState(msg) {
@@ -350,7 +542,7 @@ function viewBackup() {
     el('div', { class: 'm-card' }, el('p', {}, 'Ihr Lernstand liegt im Browser (localStorage) unter dieser Adresse. Die Startseite schickt bei jedem Öffnen eine geprüfte Kopie an den lokalen Mastery-Server (Ordner state/ in Ihrer Bibliothek); `mastery export` schreibt daraus eine Sicherungsdatei. Nichts verlässt den Rechner.'),
       el('div', { class: 'm-row' },
         el('button', { type: 'button', class: 'ds-btn ds-btn-primary', id: 'backup-server', onclick: () => postState(msg) }, 'Jetzt am Server sichern'),
-        el('button', { type: 'button', class: 'ds-btn', id: 'backup-export', onclick: () => { const a = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify(snapshot(), null, 1)], { type: 'application/json' })), download: 'mastery-lernstand-' + new Date().toISOString().slice(0, 10) + '.json' }); document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); } }, 'Als Datei exportieren'),
+        el('button', { type: 'button', class: 'ds-btn', id: 'backup-export', onclick: () => { const a = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify(exportFile(), null, 1)], { type: 'application/json' })), download: 'mastery-lernstand-' + new Date().toISOString().slice(0, 10) + '.json' }); document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); } }, 'Als Datei exportieren'),
         el('label', { class: 'ds-btn', for: 'backup-import' }, 'Datei importieren'), file), msg,
       el('p', { class: 'm-note' }, 'Die Sicherung enthält Ihre eigenen Antworten und Diagnosen. Import ergänzt nur; vorhandene Einträge bleiben. Aufgaben in geänderter Fassung übernehmen keinen alten Verlauf.')));
 }
