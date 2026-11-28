@@ -12,6 +12,7 @@ Identity model (rule C5):
 Card kinds (shown as a small label): Begriff, Zusammenhang, Vergleich, Bedingung, Rechnen, Abbildung, Denkfehler, Lückentext.
 """
 import hashlib
+from html import escape as _esc
 import json
 import re
 import shutil
@@ -97,15 +98,23 @@ def _html(s):
     return out[3:-4] if out.startswith('<p>') and out.count('<p>') == 1 and out.endswith('</p>') else out
 
 
-def _notetype(col, name, fields, qfmt, afmt, cloze=False):
+# Note-type, field and template IDs are derived from these frozen seeds, never from the display name, so a later
+# display rename (Mastery brand) keeps the learner's note types and their notes (CD-8, R8 EF-1). The seeds are the
+# historical display names: IDs stay bit-identical to every earlier export.
+NOTETYPE_ID_SEED = {'basic': 'Exam Mastery · Basis (v2)', 'cloze': 'Exam Mastery · Lückentext (v2)'}
+NOTETYPE_NAME = dict(NOTETYPE_ID_SEED)  # display names; may change without changing identity
+
+
+def _notetype(col, name, fields, qfmt, afmt, cloze=False, id_seed=None):
     mm = col.models
+    seed = id_seed or name
     nt = mm.new(name)
-    nt['id'] = _id('em-notetype-v2', name, n=6, signed=False) or 1
+    nt['id'] = _id('em-notetype-v2', seed, n=6, signed=False) or 1
     if cloze:
         nt['type'] = 1
     for f in fields:
-        fld = mm.new_field(f); fld['id'] = _id('em-field-v2', name, f); mm.add_field(nt, fld)
-    t = mm.new_template('Karte'); t['id'] = _id('em-template-v2', name); t['qfmt'] = qfmt; t['afmt'] = afmt
+        fld = mm.new_field(f); fld['id'] = _id('em-field-v2', seed, f); mm.add_field(nt, fld)
+    t = mm.new_template('Karte'); t['id'] = _id('em-template-v2', seed); t['qfmt'] = qfmt; t['afmt'] = afmt
     mm.add_template(nt, t)
     nt['css'] = CSS; nt['sortf'] = 1
     mm.update(nt, preserve_usn=True)
@@ -164,8 +173,8 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
     with tempfile.TemporaryDirectory(prefix='em-anki2-') as td:
         col = Collection(str(Path(td) / 'c.anki2'))
         try:
-            basic = _notetype(col, 'Exam Mastery · Basis (v2)', BASIC_FIELDS, BASIC_Q, BASIC_A)
-            cloze = _notetype(col, 'Exam Mastery · Lückentext (v2)', CLOZE_FIELDS, CLOZE_Q, CLOZE_A, cloze=True)
+            basic = _notetype(col, NOTETYPE_NAME['basic'], BASIC_FIELDS, BASIC_Q, BASIC_A, id_seed=NOTETYPE_ID_SEED['basic'])
+            cloze = _notetype(col, NOTETYPE_NAME['cloze'], CLOZE_FIELDS, CLOZE_Q, CLOZE_A, cloze=True, id_seed=NOTETYPE_ID_SEED['cloze'])
             did = col.decks.id(deck_name)
             media = []
             from .typeset import NODE
@@ -176,7 +185,7 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
             for fid, svg in (figures or {}).items():
                 name = f'em-{chapter_slug}-{slug(fid)}.svg'
                 (Path(col.media.dir()) / name).write_text(svg, encoding='utf-8'); media.append(name)
-            hashes = {}
+            hashes, nids = {}, {}
             for c in cards:
                 nt = cloze if c['kind'] == 'cloze' else basic
                 n = col.new_note(nt)
@@ -186,7 +195,7 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
                             'Source': _html(c.get('source', '')), 'Kind': KIND_LABEL['cloze']}
                 else:
                     ctx = _html(c.get('context', ''))
-                    img = (f'<img src="em-{chapter_slug}-{slug(c["figure"])}.svg" alt="{c.get("figure_alt","Abbildung")}">'
+                    img = (f'<img src="em-{chapter_slug}-{slug(c["figure"])}.svg" alt="{_esc(c.get("figure_alt","Abbildung"), quote=True)}">'
                            if c.get('figure') else '')
                     # rule C1: a figure that shows the answer belongs on the back; only figures that ARE the question go on the front
                     front_fig = c.get('figure_side') == 'front'
@@ -198,11 +207,23 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
                 for k, v in vals.items():
                     n[k] = v
                 n.tags = [f'em::{chapter_slug}', f'em::typ::{KIND_LABEL[c["kind"]].lower()}'] + [f'em::{t}' for t in c.get('tags', [])]
-                col.add_note(n, did)
+                col.add_note(n, did); nids[c['key']] = n.id
                 hashes[c['key']] = hashlib.sha256(json.dumps(vals, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
-            col.db.execute('update notes set mod=?', stamp)
-            for nt in (basic, cloze):
-                nt['mod'] = stamp; col.models.update(nt, preserve_usn=True)
+            # Only content that changed gets a new modification time. Anki's default import ('update if newer')
+            # then leaves unchanged notes and note types alone, so the learner's own edits survive a re-import (CD-8).
+            # Earlier states had no per-key times: every note of that export carried 'last_export'.
+            old_h = prev.get('hashes', {})
+            old_m = prev.get('mods') or {k: int(prev['last_export']) for k in old_h if prev.get('last_export')}
+            mods = {k: (old_m[k] if old_h.get(k) == h and old_m.get(k) else stamp) for k, h in hashes.items()}
+            for k, nid in nids.items():
+                col.db.execute('update notes set mod=? where id=?', mods[k], nid)
+            nt_state = {}
+            for role, nt in (('basic', basic), ('cloze', cloze)):
+                h = hashlib.sha256(json.dumps([nt['name'], [f['name'] for f in nt['flds']], [(t['qfmt'], t['afmt']) for t in nt['tmpls']],
+                                               nt['css'], nt.get('type', 0)], ensure_ascii=False).encode()).hexdigest()
+                before = (prev.get('notetypes') or {}).get(role) or {}
+                nt['mod'] = before['mod'] if before.get('hash') == h and before.get('mod') else stamp
+                col.models.update(nt, preserve_usn=True); nt_state[role] = {'hash': h, 'mod': nt['mod']}
             pkg = out_dir / 'Anki_Karten.apkg'
             col.export_anki_package(out_path=str(pkg), options=ExportAnkiPackageOptions(
                 with_scheduling=False, with_deck_configs=False, with_media=True, legacy=True), limit=None)
@@ -213,42 +234,50 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
     delta = {'new': sorted(set(hashes) - set(old)), 'changed': sorted(k for k in hashes if k in old and old[k] != hashes[k]),
              'unchanged': sorted(k for k in hashes if old.get(k) == hashes[k]),
              'retirement_candidates': sorted(set(old) - set(hashes)), 'automatic_deletion': False}
-    write_json(state_p, {'schema': 'em-anki-v2-state', 'last_export': stamp, 'hashes': hashes,
+    write_json(state_p, {'schema': 'em-anki-v2-state', 'last_export': stamp, 'hashes': hashes, 'mods': mods, 'notetypes': nt_state,
                          'seen': sorted(set(prev.get('seen', [])) | set(hashes))})
     rep = {'package': str(pkg), 'notes': notes, 'cards': n_cards, 'media': media, 'deck': deck_name,
-           'note_types': ['Exam Mastery · Basis (v2)', 'Exam Mastery · Lückentext (v2)'],
+           'note_types': [NOTETYPE_NAME['basic'], NOTETYPE_NAME['cloze']],
+           'restamped': sorted(k for k in mods if mods[k] == stamp),
            'kinds': {k: sum(1 for c in cards if c['kind'] == k) for k in sorted({c['kind'] for c in cards})},
            'identity': 'GUID = hash(course slug, chapter slug, semantic key)', 'update_delta': delta}
     write_json(out_dir / 'anki_report.json', rep)
     return rep
 
 
-def preview_html(pkg, out_dir, limit_keys=None):
+def preview_html(pkg, out_dir, limit_keys=None, *, card_index=None):
     """Render the real card HTML (Anki's own template engine) to standalone pages: light/dark × question/answer."""
     from anki.collection import Collection, ImportAnkiPackageRequest, ImportAnkiPackageOptions
     out_dir = Path(out_dir); out_dir.mkdir(parents=True, exist_ok=True)
     from .typeset import NODE
     shutil.copy2(NODE / 'mathjax-full/es5/tex-svg-full.js', out_dir / 'tex-svg-full.js')
+    # Native Anki delimiters are supported by the bundled MathJax defaults.
+    config = '<script>window.MathJax={tex:{inlineMath:[["\\\\(","\\\\)"]]},svg:{fontCache:"global"}};</script>' if card_index is None else ""
     pages = []
     with tempfile.TemporaryDirectory() as td:
         col = Collection(str(Path(td) / 'p.anki2'))
         try:
             col.import_anki_package(ImportAnkiPackageRequest(package_path=str(pkg), options=ImportAnkiPackageOptions()))
             for f in Path(col.media.dir()).iterdir():
-                shutil.copy2(f, out_dir / f.name)
+                if card_index is None or f.suffix.lower() in {'.svg', '.png', '.jpg', '.jpeg', '.webp', '.gif', '.woff2'}:
+                    shutil.copy2(f, out_dir / f.name)
             for cid in col.db.list('select id from cards order by id'):
                 card = col.get_card(cid); note = card.note()
                 key = note['Key']
                 if limit_keys and key not in limit_keys:
                     continue
+                prefix = f'{slug(key)}-{card.ord}'
+                if card_index is not None:
+                    prefix = hashlib.sha256(key.encode()).hexdigest() + f'-{card.ord}'
+                    card_index.append({'key': key, 'ordinal': card.ord, 'prefix': prefix})
                 css = card.note_type()['css']
                 for side, body in (('q', card.question()), ('a', card.answer())):
                     for mode in ('light', 'dark'):
                         cls = 'card' + (' nightMode night_mode' if mode == 'dark' else '')
                         page = (f'<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-                                f'<style>{css}</style><script>window.MathJax={{tex:{{inlineMath:[["\\\\(","\\\\)"]]}},svg:{{fontCache:"global"}}}};</script>'
+                                f'<style>{css}</style>{config}'
                                 f'<script src="tex-svg-full.js"></script></head><body class="{cls}">{body}</body></html>')
-                        name = f'{slug(key)}-{card.ord}-{side}-{mode}.html'
+                        name = f'{prefix}-{side}-{mode}.html'
                         (out_dir / name).write_text(page, encoding='utf-8'); pages.append(name)
         finally:
             col.close()

@@ -233,8 +233,11 @@ class Security(unittest.TestCase):
         for t in TRACKS.values():
             h = render.page(t)
             csp = re.search(r'Content-Security-Policy" content="([^"]+)"', h).group(1)
-            self.assertIn("default-src 'none'", csp); self.assertNotIn('unsafe', csp); self.assertNotIn('connect-src', csp)
-            self.assertIsNone(re.search(r'https?://', h.replace('http://www.w3.org/2000/svg', '')), t['id'])
+            self.assertIn("default-src 'none'", csp); self.assertNotIn('unsafe', csp)
+            # the only network target is an opt-in local model on this computer (guided bridge, off by default)
+            self.assertEqual(re.findall(r'connect-src [^;]+', csp), ['connect-src http://127.0.0.1:* http://localhost:*'])
+            rest = h.replace('http://www.w3.org/2000/svg', '').replace('http://127.0.0.1:*', '').replace('http://localhost:*', '').replace("'http://127.0.0.1:11434/v1/chat/completions'", '')
+            self.assertIsNone(re.search(r'https?://', rest), t['id'])
         evil = copy.deepcopy(ML); T(evil, 'ml-core')['prompt'] = '</script><script>alert(1)</script>'
         h = render.page(evil); self.assertNotIn('<script>alert(1)', h)
 
@@ -246,7 +249,7 @@ class Security(unittest.TestCase):
             with contextlib.redirect_stdout(buf):
                 self.assertEqual(runtime.main(['lernstrecken', td]), 0)
             self.assertEqual(json.loads(buf.getvalue())['model_calls'], 0)
-            self.assertEqual(len(list((Path(td) / 'lernstrecken').glob('*.html'))), 3)
+            self.assertEqual(len(list((Path(td) / 'lernstrecken').glob('*.html'))), len(TRACKS))
 
 
 class Browser(unittest.TestCase):

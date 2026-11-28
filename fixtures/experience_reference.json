@@ -1,0 +1,262 @@
+{
+  "schema": "em-experience-v1",
+  "unit_id": "cs/binary-search-reference",
+  "title": "Binary Search: trace, prove, transfer",
+  "source_mode": "synthetic",
+  "knowledge_modes": [
+    "computational",
+    "formal_reasoning"
+  ],
+  "sources": [
+    {
+      "id": "synthetic/reference",
+      "kind": "synthetic",
+      "locator": "Trusted Python lower-bound reference algorithm"
+    }
+  ],
+  "claims": [
+    {
+      "id": "synthetic/search-correctness",
+      "text": "The half-open search interval preserves the lower-bound invariant.",
+      "source_refs": [
+        "synthetic/reference"
+      ],
+      "evidence_status": "synthetic"
+    }
+  ],
+  "competencies": [
+    {
+      "id": "binary/search-trace",
+      "operation": "trace",
+      "prerequisites": []
+    }
+  ],
+  "teaching": [
+    {
+      "id": "teach/intuition",
+      "competency_ids": [
+        "binary/search-trace"
+      ],
+      "claim_ids": [
+        "synthetic/search-correctness"
+      ],
+      "content": "Find the first element greater than or equal to the target, not merely any matching element. The candidate interval [lo,hi) shrinks while retaining this boundary. Predict the insertion index before showing steps."
+    },
+    {
+      "id": "teach/proof",
+      "competency_ids": [
+        "binary/search-trace"
+      ],
+      "claim_ids": [
+        "synthetic/search-correctness"
+      ],
+      "content": "The loop maintains: indices < lo are less than the target, and indices >= hi are greater than or equal to the target. Each update strictly reduces hi-lo, ensuring termination. At lo=hi the unique boundary is the lower bound.",
+      "derivation": {
+        "title": "Warum ist die untere Schranke korrekt?",
+        "given": "Gegeben sei ein aufsteigend sortiertes Array a und ein halboffenes Suchintervall [lo, hi). Ziel: der kleinste Index i mit a[i] >= x.",
+        "steps": [
+          {
+            "statement": "Initialisierung: lo = 0, hi = n",
+            "justification": "Vor dem ersten Element gibt es keine Werte < x; hinter dem letzten Element gibt es keine Werte >= x innerhalb des Arrays. Die beiden Aussagen der Invariante gelten daher anfangs leer.",
+            "claim_ids": [
+              "synthetic/search-correctness"
+            ]
+          },
+          {
+            "statement": "Fall a[mid] < x: lo = mid + 1",
+            "justification": "Da a sortiert ist, sind auch alle Indizes bis einschließlich mid zu klein. Sie können nicht die gesuchte Grenze sein.",
+            "claim_ids": [
+              "synthetic/search-correctness"
+            ]
+          },
+          {
+            "statement": "Fall a[mid] >= x: hi = mid",
+            "justification": "Da a sortiert ist, sind alle Indizes ab mid groß genug. Der gesuchte erste passende Index kann höchstens mid sein.",
+            "claim_ids": [
+              "synthetic/search-correctness"
+            ]
+          },
+          {
+            "statement": "Fortschritt: hi - lo nimmt strikt ab",
+            "justification": "Für lo < hi gilt lo <= mid < hi. Beide Updates verkleinern deshalb die nichtnegative ganzzahlige Intervalllänge.",
+            "claim_ids": [
+              "synthetic/search-correctness"
+            ]
+          },
+          {
+            "statement": "Termination: lo = hi",
+            "justification": "Die Invariante liefert: links von lo sind alle Werte < x und ab hi alle Werte >= x. Bei gleicher Grenze ist lo der erste passende Index, oder n, falls kein Wert passt.",
+            "claim_ids": [
+              "synthetic/search-correctness"
+            ]
+          }
+        ],
+        "result": "Binary Search liefert den unteren Einfügeindex auch bei Duplikaten und leeren Arrays."
+      }
+    }
+  ],
+  "assessments": [
+    {
+      "id": "task/prove",
+      "competency_ids": [
+        "binary/search-trace"
+      ],
+      "prompt": "Prove lower-bound binary search correct for duplicates and an empty array.",
+      "solution": "Initially [lo,hi)=[0,n), so both outside assertions hold vacuously. When a[mid]<x, all indices <=mid are below x and lo moves to mid+1; otherwise all indices >=mid have values >=x and hi moves to mid. Every iteration decreases the nonnegative interval length hi-lo. At termination lo=hi, with all earlier elements <x and all later ones >=x; this is the first qualifying index, or n if no such element exists. For an empty array, lo=hi=0 immediately.",
+      "rubric": [
+        {
+          "criterion": "States invariant",
+          "points": 2
+        },
+        {
+          "criterion": "Preserves it in both branches",
+          "points": 4
+        },
+        {
+          "criterion": "Shows termination",
+          "points": 2
+        },
+        {
+          "criterion": "Explains boundary cases",
+          "points": 2
+        }
+      ],
+      "attempt_before_reveal": true,
+      "claim_ids": [
+        "synthetic/search-correctness"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "key": "binary/lower-bound-invariant",
+      "kind": "concept",
+      "front": "Which invariant does lower-bound binary search maintain?",
+      "answer": "Indices before lo have values < target; indices at/after hi have values >= target.",
+      "competency_ids": [
+        "binary/search-trace"
+      ],
+      "claim_ids": [
+        "synthetic/search-correctness"
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "id": "interaction/binary-search",
+      "type": "code_trace",
+      "competency_ids": [
+        "binary/search-trace"
+      ],
+      "model_ref": "binary_search_lower_bound",
+      "prediction_prompt": "Predict the first index with a value at least the target.",
+      "feedback_rule": "Compare each updated interval to the invariant.",
+      "transfer_prompt": "Which branch comparison would change if searching for the first value strictly greater than the target?",
+      "variants": [
+        {
+          "label": "In-between target",
+          "parameters": {
+            "values": [
+              2,
+              5,
+              8,
+              12
+            ],
+            "target": 7
+          }
+        },
+        {
+          "label": "Duplicates",
+          "parameters": {
+            "values": [
+              2,
+              5,
+              5,
+              12
+            ],
+            "target": 5
+          }
+        },
+        {
+          "label": "Empty sequence",
+          "parameters": {
+            "values": [],
+            "target": 7
+          }
+        }
+      ],
+      "claim_ids": [
+        "synthetic/search-correctness"
+      ]
+    },
+    {
+      "id": "interaction/code-reconstruction",
+      "type": "code_parsons",
+      "model_ref": "parsons_reference",
+      "competency_ids": [
+        "binary/search-trace"
+      ],
+      "claim_ids": [
+        "synthetic/search-correctness"
+      ],
+      "prediction_prompt": "Rekonstruiere die Reihenfolge der Referenzimplementierung für lower_bound.",
+      "feedback_rule": "Zeige, warum die Intervallinvariante in beiden Verzweigungen erhalten bleibt.",
+      "transfer_prompt": "Ändere die Vergleichsbedingung für upper_bound. Wo liegt die entscheidende Änderung?",
+      "variants": [
+        {
+          "label": "Binary Search – Referenzcode",
+          "parameters": {
+            "lines": [
+              {
+                "id": "setup",
+                "code": "lo, hi = 0, len(a)",
+                "why": "Initialisierung eines halboffenen Kandidatenintervalls."
+              },
+              {
+                "id": "loop",
+                "code": "while lo < hi:",
+                "why": "Iteriere nur, solange das Kandidatenintervall noch Elemente enthält."
+              },
+              {
+                "id": "middle",
+                "code": "    mid = (lo + hi) // 2",
+                "why": "Berechne einen Index innerhalb des verbleibenden Intervalls."
+              },
+              {
+                "id": "condition",
+                "code": "    if a[mid] < x: lo = mid + 1",
+                "why": "Alle Positionen bis mid sind zu klein; der Kandidatenbereich beginnt rechts davon."
+              },
+              {
+                "id": "alternative",
+                "code": "    else: hi = mid",
+                "why": "mid kann die erste passende Position sein, daher bleibt es im Kandidatenbereich."
+              },
+              {
+                "id": "finish",
+                "code": "return lo",
+                "why": "Bei lo == hi liegt der kleinste passende Einfügeindex vor."
+              }
+            ],
+            "initial_order": [
+              "finish",
+              "condition",
+              "setup",
+              "alternative",
+              "loop",
+              "middle"
+            ],
+            "solution_order": [
+              "setup",
+              "loop",
+              "middle",
+              "condition",
+              "alternative",
+              "finish"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

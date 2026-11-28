@@ -19,7 +19,7 @@ def page(track, back='../index.html', lab_href=None, fonts=None, back_label='All
         css = typeset.font_css(fonts) + css
     js = (TEMPLATES / 'em_tutor.js').read_text(encoding='utf-8')
     csp = (f"default-src 'none'; img-src data:; font-src 'self' file: data:; style-src {_sha(css)}; script-src {_sha(js)}; "
-           "base-uri 'none'; form-action 'none'")
+           "base-uri 'none'; form-action 'none'; connect-src http://127.0.0.1:* http://localhost:*")   # only an opt-in local model (guided bridge)
     data = json.dumps(track, ensure_ascii=False).replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')
     lab = f'<a href="{E(lab_href)}">Zum Experiment</a>' if lab_href else ''
     body = (f'<header class="wb-top"><a href="{E(back)}">← {E(back_label)}</a><span>{lab}</span></header>'

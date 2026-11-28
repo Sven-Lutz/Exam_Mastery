@@ -17,8 +17,12 @@ Rules (ids are stable and appear in the UI, the event log and the tests):
                                   successes incl. transfer -> harder, structurally changed task
   RE   retention unknown          everything solved today -> NOT 'mastered': later retrieval (Anki tags, retest task
                                   on a later day); a retest solved independently on a later day is reported as such
+
+Retention evidence (kc_status) uses elapsed time, not calendar dates: RETAINED_ON_LATER_DAY needs an independent
+success on a *different* task at least RETENTION_MIN_GAP_HOURS after an earlier independent success. Two
+successes at 23:59 and 00:01, or the same task repeated, are not evidence of retention (R0 audit, R1 policies A01/A05).
 """
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 
 SCHEMA = 'em-decision-v1'
 GENERIC = {
@@ -30,17 +34,50 @@ GENERIC = {
 }
 
 
-def _day(t):
-    return datetime.fromisoformat(t.replace('Z', '+00:00')).date() if isinstance(t, str) else t
+# Provisional product parameter, not an empirical constant: roughly one night between the two successes.
+RETENTION_MIN_GAP_HOURS = 20
+
+
+def _instant(t):
+    """Aware UTC instant; a bare date means 00:00 UTC of that day (same rule as em_tutor.js)."""
+    if isinstance(t, datetime):
+        d = t
+    elif isinstance(t, date):
+        d = datetime(t.year, t.month, t.day)
+    else:
+        d = datetime.fromisoformat(str(t).replace('Z', '+00:00'))
+    return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
 
 
 def category(track, cid):
     return track['categories'].get(cid) or GENERIC.get(cid) or GENERIC['unclassified']
 
 
+# Events that make a later attempt on the same task assisted. 'tutor' is written when the learner prepares a tutor
+# context for the task (CD-7, R5-POL-04): what happens in that conversation is not observed, so it counts as help.
+# 'guided' is a prerequisite micro-lesson or its check question opened for the task (guided.py, R5-POL-04).
+# 'support': a worked example, contrast table or step focus shown automatically after a wrong answer (it
+# demonstrates the method; it names the competency it teaches in 'kc').
+ASSIST_EVENTS = ('hint', 'solution', 'tutor', 'guided', 'support')
+
+
 def helped(events, task_id, upto=None):
     evs = events if upto is None else events[:upto + 1]
-    return any(e['type'] in ('hint', 'solution') and e.get('task') == task_id for e in evs)
+    return any(e['type'] in ASSIST_EVENTS and e.get('task') == task_id for e in evs)
+
+
+# Help on ANY task of the same competency shortly before an attempt also makes that attempt assisted for the
+# competency's evidence state: a worked solution of a sibling task shows the method (CD-9, R6 red team RT-26).
+# Provisional design parameter (same order as the retention gap), not an evidence-based constant.
+KC_HELP_WINDOW_HOURS = RETENTION_MIN_GAP_HOURS
+FUTURE_SKEW_MINUTES = 5  # tolerated clock skew for event timestamps (CD-9)
+
+
+def _kc_helped(events, tasks, kc_id, i, t_attempt):
+    window = timedelta(hours=KC_HELP_WINDOW_HOURS)
+    # a guided event also names the competency its lesson teaches ('kc'): studying the prerequisite helps there too
+    return any(e['type'] in ASSIST_EVENTS and (tasks.get(e.get('task'), {}).get('kc_id') == kc_id or e.get('kc') == kc_id)
+               and t_attempt - _instant(e['t']) <= window for e in events[:i])
 
 
 def _solved(events, task_id):
@@ -61,26 +98,58 @@ def _dec(rule, action, nxt, obs, why, unc, support=None, hints_allowed=True, foc
 
 
 def kc_status(track, events, today=None):
-    """Observed state per competency (vocabulary of the tutor protocol). Never a percentage."""
-    today = _day(today) if today else date.today()
+    """Observed state per competency (vocabulary of the tutor protocol). Never a percentage.
+
+    `today` is the reference instant (ISO date or timestamp); default: now (UTC)."""
+    now = _instant(today) if today else datetime.now(timezone.utc)
+    gap = timedelta(hours=RETENTION_MIN_GAP_HOURS)
+    latest = datetime.now(timezone.utc) + timedelta(minutes=FUTURE_SKEW_MINUTES)
     T = {t['id']: t for t in track['tasks']}
     out = {}
     for kc in track['kcs']:
-        evs = [(i, e) for i, e in enumerate(events) if e['type'] == 'attempt' and T.get(e['task'], {}).get('kc_id') == kc['id']]
+        # Attempts dated after the real clock (plus a small skew) are not evidence: client or imported clocks may run
+        # ahead and would turn into 'retention' later (CD-9). The reference instant keeps its CD-2 meaning.
+        evs = [(i, e) for i, e in enumerate(events) if e['type'] == 'attempt' and T.get(e['task'], {}).get('kc_id') == kc['id']
+               and _instant(e['t']) <= latest]
         if not evs:
             out[kc['id']] = 'NOT_ASSESSED'; continue
-        indep_days = sorted({_day(e['t']) for i, e in evs if e['diagnosis']['result'] == 'correct' and not helped(events, e['task'], i)})
+        indep = sorted((_instant(e['t']), e['task']) for i, e in evs
+                       if e['diagnosis']['result'] == 'correct' and not helped(events, e['task'], i)
+                       and not _kc_helped(events, T, kc['id'], i, _instant(e['t'])))
         aided = any(e['diagnosis']['result'] == 'correct' for i, e in evs)
-        if len(indep_days) >= 2:
+        retained = any(t2 - t1 >= gap and k2 != k1 for t1, k1 in indep for t2, k2 in indep)
+        if retained:
             out[kc['id']] = 'RETAINED_ON_LATER_DAY'
-        elif indep_days and indep_days[0] < today:
+        elif indep and now - indep[0][0] >= gap:
             out[kc['id']] = 'RETEST_DUE'
-        elif indep_days:
+        elif indep:
             out[kc['id']] = 'INDEPENDENT_PASS'
         elif aided:
             out[kc['id']] = 'ASSISTED'
         else:
             out[kc['id']] = 'INDEPENDENT_PARTIAL'
+    return out
+
+
+# Task types that only ask to recognise or select. For a competency of type 'argument' (proof) such evidence shows
+# that the learner recognises premises or conclusions, not that they can build the argument (CD-11, R6 RT-10,
+# R2-POL-02: comprehension, validation and construction are reported separately).
+RECOGNITION_TYPES = ('choice', 'constraints')
+
+
+def kc_evidence_basis(track, events, today=None):
+    """Per competency: what its independent evidence consists of - 'none', 'recognition_only' or 'production'.
+
+    Same independence rules as kc_status (per-task and competency-level help, no future-dated attempts)."""
+    latest = datetime.now(timezone.utc) + timedelta(minutes=FUTURE_SKEW_MINUTES)
+    T = {t['id']: t for t in track['tasks']}
+    out = {}
+    for kc in track['kcs']:
+        types = {T[e['task']]['type'] for i, e in enumerate(events)
+                 if e['type'] == 'attempt' and T.get(e['task'], {}).get('kc_id') == kc['id'] and _instant(e['t']) <= latest
+                 and e['diagnosis']['result'] == 'correct' and not helped(events, e['task'], i)
+                 and not _kc_helped(events, T, kc['id'], i, _instant(e['t']))}
+        out[kc['id']] = 'none' if not types else 'recognition_only' if types <= set(RECOGNITION_TYPES) else 'production'
     return out
 
 
@@ -102,11 +171,11 @@ def decide(track, events, now=None):
         cid = d.get('error_category') or 'unclassified'; cat = category(track, cid)
         same = sum(1 for _, e in atts if e['diagnosis'].get('error_category') == cid)
         if cat['kind'] == 'prerequisite':
-            retry = task.get('prereq_retry') or _role(track, 'prereq_retry', exclude_solved=events) or task['id']
+            retry = task.get('prereq_retry') or cat.get('retry_task_id') or _role(track, 'prereq_retry', exclude_solved=events) or task['id']
             return _dec('RA', 'worked_example', retry, obs, f'Die Antwort passt zu einer fehlenden Voraussetzung ({cat["label"]}). Ein durchgerechnetes Beispiel zeigt sie; danach eine parallele Aufgabe zur Voraussetzung.',
                         'Dieselbe Zahl kann auch durch einen Flüchtigkeitsfehler entstehen.', support=cat.get('support'), focus=cat.get('visual'))
         if cat['kind'] == 'misconception' and same >= 2:
-            nxt = _role(track, 'contrast', exclude_solved=events) or _role(track, 'transfer', exclude_solved=events) or task['id']
+            nxt = cat.get('contrast_task_id') or _role(track, 'contrast', exclude_solved=events) or _role(track, 'transfer', exclude_solved=events) or task['id']
             return _dec('RC2', 'contrast_example', nxt, obs + f' Dieselbe Verwechslung zum {same}. Mal.',
                         'Die Verwechslung wiederholt sich. Ein Kontrastbeispiel stellt beide Begriffe nebeneinander; danach eine Aufgabe, in der sie sich deutlich unterscheiden.',
                         'Zwei gleiche Fehler sind ein Muster, kein Beweis einer festen Fehlvorstellung.', support=cat.get('contrast') or cat.get('support'), focus=cat.get('visual'))

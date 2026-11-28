@@ -1,4 +1,5 @@
-"""Three adaptive reference tracks (schema em-track-v1): machine learning, finance, mathematics (argument).
+"""Four adaptive reference tracks (schema em-track-v1): machine learning, finance, mathematics (argument),
+scaled dot-product attention.
 
 Every expected answer and every value in a bug library is computed here from labs/models.py (or plain geometry),
 never typed in. validate() re-diagnoses each task's expected answer (must be 'correct') and each bug (must yield its
@@ -13,6 +14,8 @@ import math
 from ..labs import build as B
 from ..labs import models as M
 from . import diagnose as D
+from . import guided as G
+from . import track_lessons as TL
 
 SCHEMA = 'em-track-v1'
 f = B._fmt
@@ -26,6 +29,7 @@ def _r(x, d=4):
 
 ML_VARS = ['delta_o', 'v1', 'v2', 'a1', 'a2', 'x1', 'x2', 'fp1', 'fp2']
 ML_DEFS = {'fp1': 'a1*(1-a1)', 'fp2': 'a2*(1-a2)'}
+ML_DOMAINS = {'a1': [0.05, 0.95], 'a2': [0.05, 0.95]}   # sigmoid activations; all other symbols are signed reals (CD-10)
 
 
 def _ml_bugs(j, i):
@@ -101,7 +105,7 @@ def ml_track():
          'hints': ['Dieselbe Formel wie im Beispiel.'], 'solution': ['σ′(z) = 0,3 · 0,7 = 0,21.']},
         {'id': 'ml-core', 'role': 'core', 'kc_id': 'ml/backpropagation', 'type': 'expression', 'title': 'Gradient ∂L/∂w₁₁ herleiten',
          'prompt': 'Leiten Sie ∂L/∂w₁₁ als Produkt her. Verwenden Sie δ_o = (ŷ − t)·g′(z_o) für den Fehler am Ausgang und schreiben Sie σ′(z₁) als f′(z1) oder a1(1−a1).',
-         'variables': ML_VARS, 'defs': ML_DEFS, 'expected_expr': 'delta_o*v1*fp1*x1', 'bugs': _ml_bugs(1, 1),
+         'variables': ML_VARS, 'defs': ML_DEFS, 'domains': ML_DOMAINS, 'expected_expr': 'delta_o*v1*fp1*x1', 'bugs': _ml_bugs(1, 1),
          'symbols': [['δ_o', 'delta_o'], ['v₁', 'v1'], ['v₂', 'v2'], ['a₁', 'a1'], ['a₂', 'a2'], ['x₁', 'x1'], ['x₂', 'x2'], ['f′(z₁)', "f'(z1)"], ['f′(z₂)', "f'(z2)"]],
          'hints': ['Gehen Sie den Weg von L zurück bis w₁₁: L → ŷ → z_o → a₁ → z₁ → w₁₁.', 'Jedes Glied liefert einen Faktor: δ_o, dann ∂z_o/∂a₁ = v₁, dann ∂a₁/∂z₁ = f′(z₁), dann ∂z₁/∂w₁₁.', 'z₁ = w₁₁·x₁ + w₁₂·x₂ + b₁ – wonach ändert sich z₁, wenn w₁₁ wächst?'],
          'solution': ['∂L/∂w₁₁ = δ_o · v₁ · f′(z₁) · x₁.', f'Mit den Werten des Labs: {P(bw["delta_o"])} · {P(p["W2"][0])} · {P(fw["a1"][0] * (1 - fw["a1"][0]))} · {P(x[0])} = {f(g11, 6)}.'],
@@ -109,7 +113,7 @@ def ml_track():
          'reference_value': g11},
         {'id': 'ml-similar', 'role': 'similar', 'kc_id': 'ml/backpropagation', 'type': 'expression', 'title': 'Ähnliche Aufgabe ohne Hinweise: ∂L/∂w₂₂',
          'prompt': 'Jetzt für das Gewicht von x₂ in Neuron 2: Schreiben Sie ∂L/∂w₂₂ als Produkt.',
-         'variables': ML_VARS, 'defs': ML_DEFS, 'expected_expr': 'delta_o*v2*fp2*x2',
+         'variables': ML_VARS, 'defs': ML_DEFS, 'domains': ML_DOMAINS, 'expected_expr': 'delta_o*v2*fp2*x2',
          'bugs': [{'expr': b['expr'].replace('v1', 'V').replace('v2', 'v1').replace('V', 'v2').replace('fp1', 'F').replace('fp2', 'fp1').replace('F', 'fp2').replace('a1', 'A').replace('a2', 'a1').replace('A', 'a2').replace('x1', 'x2'), 'category': b['category']} for b in _ml_bugs(1, 1)],
          'symbols': [['δ_o', 'delta_o'], ['v₁', 'v1'], ['v₂', 'v2'], ['a₁', 'a1'], ['a₂', 'a2'], ['x₁', 'x1'], ['x₂', 'x2'], ['f′(z₁)', "f'(z1)"], ['f′(z₂)', "f'(z2)"]],
          'hints': [], 'solution': ['∂L/∂w₂₂ = δ_o · v₂ · f′(z₂) · x₂.'], 'visual': {'kind': 'network_path', 'edges': ['x2-h2', 'h2-o'], 'nodes': ['x2', 'h2', 'o']}},
@@ -133,7 +137,7 @@ def ml_track():
          'hints': ['θ ← θ − η·∂L/∂θ.'], 'solution': [f'w₁₁ ← {f(p["W1"][0][0], 3)} − {f(lr, 1)}·{f(g11, 6)} = {f(w11_new, 6)}.', 'Gegen den Gradienten: Für kleine η sinkt der Verlust.']},
         {'id': 'ml-retest', 'role': 'retest', 'kc_id': 'ml/backpropagation', 'type': 'expression', 'title': 'Spätere Prüfung: ∂L/∂w₂₁',
          'prompt': 'Ohne Hilfen: Schreiben Sie ∂L/∂w₂₁ (Gewicht von x₁ in Neuron 2) als Produkt.',
-         'variables': ML_VARS, 'defs': ML_DEFS, 'expected_expr': 'delta_o*v2*fp2*x1', 'bugs': [{'expr': 'delta_o*v2*fp2', 'category': 'missing_input_factor'}, {'expr': 'delta_o*v2*x1', 'category': 'missing_activation_derivative'}],
+         'variables': ML_VARS, 'defs': ML_DEFS, 'domains': ML_DOMAINS, 'expected_expr': 'delta_o*v2*fp2*x1', 'bugs': [{'expr': 'delta_o*v2*fp2', 'category': 'missing_input_factor'}, {'expr': 'delta_o*v2*x1', 'category': 'missing_activation_derivative'}],
          'symbols': [['δ_o', 'delta_o'], ['v₂', 'v2'], ['a₂', 'a2'], ['x₁', 'x1'], ['f′(z₂)', "f'(z2)"]], 'hints': [], 'solution': ['∂L/∂w₂₁ = δ_o · v₂ · f′(z₂) · x₁.']},
         {'id': 'ml-why', 'role': 'open', 'kc_id': 'ml/backpropagation', 'type': 'open', 'title': 'In eigenen Worten',
          'prompt': 'Warum ist der Gradient von w₁₁ null, wenn x₁ = 0 ist? Begründen Sie in zwei Sätzen.', 'hints': [], 'solution': []},
@@ -151,6 +155,7 @@ def ml_track():
         'worked_examples': {
             'prereq/sigmoid-derivative': {'title': 'Durchgerechnet: σ′ aus σ', 'steps': ['σ(z) = 1/(1 + e^(−z)).', 'Ableiten: σ′(z) = e^(−z)/(1 + e^(−z))² = σ(z)·(1 − σ(z)).', 'Beispiel σ(z) = 0,8: σ′(z) = 0,8·0,2 = 0,16.', 'Für tanh gilt analog tanh′(z) = 1 − tanh²(z).']},
             'ml/backpropagation': {'title': 'Durchgerechnet: ∂L/∂v₁ und der Schritt nach innen', 'steps': ['Ausgabegewicht: ∂L/∂v₁ = δ_o · a₁, denn z_o = v₁a₁ + v₂a₂ + c.', 'Eine Schicht tiefer: ∂L/∂a₁ = δ_o · v₁, dann ∂L/∂z₁ = δ_o · v₁ · f′(z₁) =: δ₁.', 'Gewicht der verdeckten Schicht: ∂L/∂w₁₂ = δ₁ · x₂, denn ∂z₁/∂w₁₂ = x₂.']}},
+        'lessons': TL.ml_lessons(),
         'anki_tags': ['em::lernstrecke::backprop'], 'sources': spec['sources'] + ['Lab ml/backprop-2-2-1 (gleiche Parameter)'],
         'source_status': 'Referenz-Fixture (keine Vorlesung); Gleichungen Standard-Kettenregel, unabhängig geprüft mit sympy und finiten Differenzen.',
     }
@@ -163,7 +168,7 @@ ENT_DATA = {'orders': [0.0, 100.0, 180.0, 190.0, 210.0, 230.0, 250.0, 270.0], 'd
 CONTRAST = {'orders': [0, 0, 100, 100, 100, 100], 'delay': 1, 'cost': [40] * 6, 'invest': [50]}
 
 
-def ent_track(data=None, kc_ids=('kc-d5d3fd65634ab3', 'kc-33639d91c4dfa2'), sources=('07 Business Planning & Effectuation.pdf S. 21',)):
+def ent_track(data=None, kc_ids=('kc-d5d3fd65634ab3', 'kc-33639d91c4dfa2'), sources=('Referenzfall Liquiditätsplanung, Kapitel 7 (private Kursunterlage, nicht im Repository)',)):
     d = data or ENT_DATA
     cf = lambda **k: M.cashflow(**{**dict(orders=d['orders'], delay=d['delay'], cost=d['cost'], invest=d['invest']), **k})
     base, start500, tr, re4 = cf(), cf(start_cash=500), cf(delay=3), cf(delay=4)
@@ -362,9 +367,243 @@ def math_track():
     }
 
 
+# ------------------------------------------------------------------ D. AI: scaled dot-product attention
+
+def _r6(x):
+    """Six decimals: a value such as 0.787 would read as German thousands notation (787) in parse_number."""
+    return round(x, 6)
+
+
+def softmax(z, allowed=None):
+    """Softmax of one row over the allowed indices, max-shifted. Masked entries get weight 0 (not part of the
+    normalisation); an empty allowed set has no positive denominator and is rejected, never silently uniform."""
+    allowed = [True] * len(z) if allowed is None else list(allowed)
+    idx = [j for j, a in enumerate(allowed) if a]
+    if not idx:
+        raise ValueError('softmax: row without an allowed index is undefined')
+    c = max(z[j] for j in idx)
+    e = [math.exp(z[j] - c) if allowed[j] else 0.0 for j in range(len(z))]
+    s = sum(e)
+    return [x / s for x in e]
+
+
+def attention_weight(S, dk, i, j, scale=None):
+    """A_ij of row-wise softmax(S / scale); scale defaults to sqrt(d_k) (Vaswani et al. 2017, eq. 1)."""
+    c = math.sqrt(dk) if scale is None else scale
+    return softmax([s / c for s in S[i]])[j]
+
+
+def attention_bugs(S, dk, i, j):
+    """Wrong values for A_ij, each from a real misconception, computed (never typed)."""
+    col = [S[r][j] / math.sqrt(dk) for r in range(len(S))]
+    return [{'value': _r6(attention_weight(S, dk, i, j, 1.0)), 'category': 'missing_scaling'},
+            {'value': _r6(attention_weight(S, dk, i, j, dk)), 'category': 'scaled_by_dk'},
+            {'value': _r6(softmax(col)[i]), 'category': 'wrong_axis'}]
+
+
+def softmax_grad(a, g):
+    """dL/dz for z -> a = softmax(z) and upstream g = dL/da: (diag(a) - a a^T) g = a * (g - <a, g>)."""
+    m = sum(x * y for x, y in zip(a, g))
+    return [x * (y - m) for x, y in zip(a, g)]
+
+
+ATT_VARS = ['a1', 'a2', 'a3', 'g1', 'g2', 'g3']
+ATT_DEFS = {'a3': '1-a1-a2'}                          # one softmax row: the weights sum to one
+ATT_DOMAINS = {'a1': [0.05, 0.45], 'a2': [0.05, 0.45]}  # weights are positive; a3 then lies in [0.1, 0.9]; g signed (CD-10)
+ATT_SYMBOLS = [['α₁', 'a1'], ['α₂', 'a2'], ['α₃', 'a3'], ['g₁', 'g1'], ['g₂', 'g2'], ['g₃', 'g3']]
+
+
+def _bars(given, label, allowed=None, **variants):
+    """Data for the bar view: only what the prompt already shows (given numbers, mask) plus the weights that a named
+    misconception produces. The correct weights are not drawn, so the picture never reveals the answer."""
+    return {'given': [_r6(x) for x in given], 'label': label, 'masked': [not a for a in (allowed or [True] * len(given))],
+            'variants': {k: [_r6(x) for x in w] for k, w in variants.items()}}
+
+
+def attention_track():
+    P = lambda v: f(v, 4)
+    # core / similar / retest: weight from a score matrix S = QK^T and d_k
+    S1, dk1 = [[6, 2, 0], [0, 2, 6]], 4
+    S2, dk2 = [[8, 4, 0, -4], [0, 8, 4, 0]], 16
+    S3, dk3 = [[3, -3, 0], [0, 3, 3]], 9
+    core, sim, ret = attention_weight(S1, dk1, 0, 0), attention_weight(S2, dk2, 0, 1), attention_weight(S3, dk3, 0, 0)
+    sq = lambda S, dk, i: [s / math.sqrt(dk) for s in S[i]]
+    # prerequisite: softmax of one row
+    zp, zp2 = [1, 0, 0], [0, 2, 0]
+    # contrast: shift vs scale
+    zc = [0.5, 0, -1]
+    shift, scale2 = softmax([x + 3 for x in zc])[0], softmax([2 * x for x in zc])[0]
+    # transfer: padding mask, scalar values
+    zt, mt, vt = [1.0, 0.5, -0.5, 2.0], [True, True, True, False], [2, -1, 4, 10]
+    at, af = softmax(zt, mt), softmax(zt)
+    o_ok = sum(x * y for x, y in zip(at, vt))
+    o_ignored = sum(x * y for x, y in zip(af, vt))
+    o_after = sum(af[j] * vt[j] for j in range(len(vt)) if mt[j])
+    lin = lambda z, j: z[j] / sum(z)
+    cats = {
+        'linear_normalisation': {'kind': 'prerequisite', 'label': 'Scores direkt normiert',
+                                 'feedback': 'Ihre Zahl entsteht, wenn man die Scores selbst durch ihre Summe teilt. Softmax normiert die Exponentialwerte: α_j = e^(z_j) / Σ_ℓ e^(z_ℓ). Nur so sind alle Gewichte positiv, auch bei negativen Scores.',
+                                 'support': {'type': 'worked_example', 'ref': 'prereq/softmax-normalisation'}, 'visual': {'kind': 'attention', 'show': []}},
+        'missing_normalisation': {'kind': 'prerequisite', 'label': 'Normierung vergessen',
+                                  'feedback': 'Ihre Zahl ist e^(z_j) selbst. Ein Gewicht entsteht erst nach Division durch die Summe aller Exponentialwerte der Zeile; dann summieren sich die Gewichte zu eins.',
+                                  'support': {'type': 'worked_example', 'ref': 'prereq/softmax-normalisation'}, 'visual': {'kind': 'attention', 'show': []}},
+        'missing_scaling': {'kind': 'misconception', 'label': 'Skalierung mit 1/√d_k vergessen',
+                            'feedback': 'Ihre Zahl ist das Gewicht der unskalierten Scores. Scaled Dot-Product Attention teilt jeden Score vor Softmax durch √d_k. Ohne diesen Faktor werden die Abstände größer und die Zeile konzentriert sich stärker – vergleichen Sie die beiden Balkenreihen.',
+                            'support': {'type': 'worked_example', 'ref': 'attention/scaled-weights'}, 'contrast': {'type': 'contrast', 'ref': 'shift_vs_scale'},
+                            'visual': {'kind': 'attention', 'show': ['unscaled']}},
+        'scaled_by_dk': {'kind': 'misconception', 'label': 'durch d_k statt √d_k geteilt',
+                         'feedback': 'Ihre Zahl passt zur Division durch d_k. Der Faktor ist 1/√d_k: Unter Unabhängigkeit und Einheitsvarianz hat q·k die Varianz d_k, also die Standardabweichung √d_k. Division durch d_k würde die Varianz auf 1/d_k drücken und die Gewichte zu gleichmäßig machen.',
+                         'support': {'type': 'worked_example', 'ref': 'attention/scaled-weights'}, 'contrast': {'type': 'contrast', 'ref': 'shift_vs_scale'},
+                         'visual': {'kind': 'attention', 'show': ['by_dk']}},
+        'wrong_axis': {'kind': 'misconception', 'label': 'Softmax über die falsche Achse',
+                       'feedback': 'Ihre Zahl entsteht, wenn man eine Spalte (über die Queries) normiert. Softmax läuft je Query-Zeile über die Keys: Jede Query verteilt ihr eigenes Gewicht der Summe eins auf die Keys.',
+                       'support': {'type': 'worked_example', 'ref': 'attention/scaled-weights'}, 'visual': {'kind': 'attention', 'show': ['column']}},
+        'scale_treated_as_shift': {'kind': 'misconception', 'label': 'Skalierung wie Verschiebung behandelt',
+                                   'feedback': 'Eine gemeinsame Verschiebung kürzt sich aus Softmax heraus; ein gemeinsamer Faktor nicht. Er multipliziert alle Abstände z_j − z_ℓ, und genau diese bestimmen die Gewichtsverhältnisse.',
+                                   'contrast': {'type': 'contrast', 'ref': 'shift_vs_scale'}, 'visual': {'kind': 'attention', 'show': ['unchanged']}},
+        'mask_ignored': {'kind': 'slip', 'label': 'Maske nicht angewandt',
+                         'feedback': 'Ihre Ausgabe enthält den Beitrag des maskierten Padding-Keys. Maskierte Positionen werden vor Softmax ausgeschlossen (Logit −∞); ihr Value trägt exakt null bei.',
+                         'support': {'type': 'worked_example', 'ref': 'attention/masking'}, 'visual': {'kind': 'attention', 'show': ['unmasked']}},
+        'mask_after_softmax': {'kind': 'misconception', 'label': 'Maske nach Softmax ohne Neunormierung',
+                               'feedback': 'Ihre Zahl entsteht, wenn man zuerst über alle Keys normiert und danach den maskierten Eintrag auf null setzt. Dann summieren sich die verbleibenden Gewichte nicht mehr zu eins. Die Maske gehört vor Softmax – oder es muss über die erlaubten Keys neu normiert werden.',
+                               'support': {'type': 'worked_example', 'ref': 'attention/masking'}, 'visual': {'kind': 'attention', 'show': ['after_softmax']}},
+        'normaliser_ignored': {'kind': 'misconception', 'label': 'Nenner beim Ableiten übersehen',
+                               'feedback': 'Ihr Ausdruck behandelt α₁ wie e^(z₁) allein. Jedes z_ℓ steckt aber auch im gemeinsamen Nenner D = Σ e^(z_r); deshalb hängt ∂L/∂z₁ von allen g_j ab.',
+                               'support': {'type': 'worked_example', 'ref': 'attention/softmax-gradient'}},
+        'diagonal_only': {'kind': 'misconception', 'label': 'nur der Diagonaleintrag der Jacobi-Matrix',
+                          'feedback': 'Sie haben nur ∂α₁/∂z₁ = α₁(1 − α₁) verwendet. Auch α₂ und α₃ hängen über den Nenner von z₁ ab (∂α_j/∂z₁ = −α_jα₁); ihre Beiträge g₂, g₃ fehlen.',
+                          'support': {'type': 'worked_example', 'ref': 'attention/softmax-gradient'}},
+        'jacobian_sign': {'kind': 'slip', 'label': 'Vorzeichen in der Quotientenregel',
+                          'feedback': 'Der Betrag stimmt, das Vorzeichen nicht. In der Quotientenregel steht (Zähler′·Nenner − Zähler·Nenner′)/Nenner²; der Nenner-Term geht mit Minus ein.',
+                          'support': {'type': 'worked_example', 'ref': 'attention/softmax-gradient'}},
+        'missing_weight_factor': {'kind': 'slip', 'label': 'Faktor α₁ fehlt',
+                                  'feedback': 'Die Klammer g₁ − Σ_j α_j g_j stimmt. Es fehlt der Faktor α₁ aus ∂α_j/∂z₁ = α_j(δ_j1 − α₁): Ein Key mit kleinem Gewicht erhält auch nur einen kleinen Gradienten.',
+                                  'support': {'type': 'worked_example', 'ref': 'attention/softmax-gradient'}},
+        'offdiag_zero': {'kind': 'misconception', 'label': 'Nebendiagonale als null angenommen',
+                         'feedback': 'α₂ hängt von z₃ ab, obwohl z₃ nicht im Zähler steht: z₃ steckt im gemeinsamen Nenner. Die Einträge außerhalb der Diagonale sind −α_jα_ℓ, nicht null.',
+                         'support': {'type': 'worked_example', 'ref': 'attention/softmax-gradient'}},
+        'diagonal_formula_offdiag': {'kind': 'misconception', 'label': 'Diagonalformel außerhalb der Diagonale',
+                                     'feedback': 'α_j(1 − α_j) gilt nur für j = ℓ. Für j ≠ ℓ enthält der Zähler z_ℓ nicht; es bleibt nur der Nenner-Term −α_jα_ℓ.',
+                                     'support': {'type': 'worked_example', 'ref': 'attention/softmax-gradient'}},
+    }
+    g_exp = 'a1*(g1-(a1*g1+a2*g2+a3*g3))'
+    tasks = [
+        {'id': 'att-pre', 'role': 'diagnostic', 'kc_id': 'prereq/softmax-normalisation', 'type': 'numeric', 'title': 'Voraussetzung: Softmax einer Zeile',
+         'prompt': f'Eine Zeile hat die Logits z = ({zp[0]}; {zp[1]}; {zp[2]}). Wie groß ist das Softmax-Gewicht α₁ des ersten Eintrags? (4 Nachkommastellen)',
+         'expected': _r6(softmax(zp)[0]), 'tolerance': 0.0005,
+         'errors': [{'value': _r6(lin(zp, 0)), 'category': 'linear_normalisation'}, {'value': _r6(math.exp(zp[0])), 'category': 'missing_normalisation'}],
+         'hints': ['Softmax exponentiert jeden Eintrag und teilt durch die Summe dieser Exponentialwerte.', 'α₁ = e¹ / (e¹ + e⁰ + e⁰).'],
+         'solution': [f'α₁ = e / (e + 1 + 1) = {P(math.e)} / {P(math.e + 2)} = {P(softmax(zp)[0])}.'], 'prereq_retry': 'att-pre2',
+         'attention': _bars(zp, 'Logit z')},
+        {'id': 'att-pre2', 'role': 'prereq_retry', 'kc_id': 'prereq/softmax-normalisation', 'type': 'numeric', 'title': 'Voraussetzung, neue Zahlen',
+         'prompt': f'Jetzt z = ({zp2[0]}; {zp2[1]}; {zp2[2]}). Wie groß ist α₂? (4 Nachkommastellen)', 'expected': _r6(softmax(zp2)[1]), 'tolerance': 0.0005,
+         'errors': [{'value': _r6(lin(zp2, 1)), 'category': 'linear_normalisation'}, {'value': _r6(math.exp(zp2[1])), 'category': 'missing_normalisation'}],
+         'hints': ['Dieselbe Formel wie im Beispiel.'], 'solution': [f'α₂ = e² / (1 + e² + 1) = {P(math.exp(2))} / {P(math.exp(2) + 2)} = {P(softmax(zp2)[1])}.'],
+         'attention': _bars(zp2, 'Logit z')},
+        {'id': 'att-core', 'role': 'core', 'kc_id': 'attention/scaled-weights', 'type': 'numeric', 'title': 'Gewicht aus der Score-Matrix',
+         'prompt': f'Für zwei Queries und drei Keys ist S = QKᵀ = (({S1[0][0]}; {S1[0][1]}; {S1[0][2]}), ({S1[1][0]}; {S1[1][1]}; {S1[1][2]})) mit d_k = {dk1}. '
+                   'Berechnen Sie das Gewicht A₁₁ (Query 1, Key 1) der Scaled Dot-Product Attention, 4 Nachkommastellen.',
+         'expected': _r6(core), 'tolerance': 0.0005, 'errors': attention_bugs(S1, dk1, 0, 0) + [{'value': _r6(lin(sq(S1, dk1, 0), 0)), 'category': 'linear_normalisation'}],
+         'hints': ['Zuerst skalieren: z = s / √d_k, für die erste Zeile.', 'Dann normiert Softmax die erste Zeile über die drei Keys.', f'z = ({f(S1[0][0] / 2, 0)}; {f(S1[0][1] / 2, 0)}; {f(S1[0][2] / 2, 0)}); α₁ = e³ / (e³ + e¹ + e⁰).'],
+         'solution': [f'√d_k = 2, also z = (3; 1; 0) für Query 1.', f'A₁₁ = e³ / (e³ + e + 1) = {P(math.exp(3))} / {P(math.exp(3) + math.e + 1)} = {P(core)}.',
+                      'Die Zeile von Query 2 wird getrennt normiert; sie spielt für A₁₁ keine Rolle.'],
+         'similar': 'att-similar', 'reference_value': core,
+         'attention': _bars(S1[0], 'Score s', unscaled=softmax(S1[0]), by_dk=softmax([s / dk1 for s in S1[0]]))},
+        {'id': 'att-similar', 'role': 'similar', 'kc_id': 'attention/scaled-weights', 'type': 'numeric', 'title': 'Ähnliche Aufgabe ohne Hinweise',
+         'prompt': f'S = QKᵀ = (({S2[0][0]}; {S2[0][1]}; {S2[0][2]}; {S2[0][3]}), ({S2[1][0]}; {S2[1][1]}; {S2[1][2]}; {S2[1][3]})), d_k = {dk2}. Wie groß ist A₁₂ (Query 1, Key 2)? (4 Nachkommastellen)',
+         'expected': _r6(sim), 'tolerance': 0.0005, 'errors': attention_bugs(S2, dk2, 0, 1) + [{'value': _r6(lin(sq(S2, dk2, 0), 1)), 'category': 'linear_normalisation'}],
+         'hints': [], 'solution': [f'√d_k = 4, z = (2; 1; 0; −1).', f'A₁₂ = e / (e² + e + 1 + e⁻¹) = {P(sim)}.'],
+         'attention': _bars(S2[0], 'Score s', unscaled=softmax(S2[0]), by_dk=softmax([s / dk2 for s in S2[0]]))},
+        {'id': 'att-contrast', 'role': 'contrast', 'kc_id': 'attention/shift-scale', 'type': 'steps', 'title': 'Kontrast: verschieben oder skalieren',
+         'prompt': f'Eine Zeile hat die Logits z = ({f(zc[0], 1)}; {f(zc[1], 0)}; {f(zc[2], 0)}) und damit α₁ = {P(softmax(zc)[0])}. Berechnen Sie α₁ (4 Nachkommastellen) nach zwei verschiedenen Änderungen.',
+         'steps': [{'id': 'shift', 'label': 'α₁ nach z → z + 3 (alle Einträge)', 'expected': _r6(shift), 'tolerance': 0.0005,
+                    'errors': [{'value': _r6(lin([x + 3 for x in zc], 0)), 'category': 'linear_normalisation'}]},
+                   {'id': 'scale', 'label': 'α₁ nach z → 2·z (alle Einträge)', 'expected': _r6(scale2), 'tolerance': 0.0005,
+                    'errors': [{'value': _r6(softmax(zc)[0]), 'category': 'scale_treated_as_shift'}], 'default_category': 'unclassified'}],
+         'hints': ['Was passiert mit den Abständen z_j − z_ℓ bei einer Verschiebung, was bei einer Verdopplung?'],
+         'solution': [f'Verschieben: e^(z_j+3) = e³·e^(z_j); e³ kürzt sich, α₁ bleibt {P(shift)}.',
+                      f'Verdoppeln: z = (1; 0; −2), α₁ = e / (e + 1 + e⁻²) = {P(scale2)} – die Abstände verdoppeln sich, die Zeile wird spitzer. Genau so wirkt 1/√d_k in die Gegenrichtung.'],
+         'attention': _bars(zc, 'Logit z', unchanged=softmax(zc))},
+        {'id': 'att-transfer', 'role': 'transfer', 'kc_id': 'attention/masking', 'type': 'numeric', 'title': 'Transfer: Padding-Maske',
+         'prompt': f'Skalierte Logits einer Query: z = ({f(zt[0], 1)}; {f(zt[1], 1)}; {f(zt[2], 1)}; {f(zt[3], 1)}). Key 4 ist Padding und maskiert. Die Values sind Skalare v = ({vt[0]}; {vt[1]}; {vt[2]}; {vt[3]}). '
+                   'Berechnen Sie die Ausgabe o = Σ_j α_j v_j (4 Nachkommastellen).',
+         'expected': _r6(o_ok), 'tolerance': 0.0005,
+         'errors': [{'value': _r6(o_ignored), 'category': 'mask_ignored'}, {'value': _r6(o_after), 'category': 'mask_after_softmax'}],
+         'hints': ['Der maskierte Key bekommt vor Softmax das Logit −∞: Er fällt aus Zähler und Nenner.', 'Normieren Sie nur über die Keys 1–3.'],
+         'solution': [f'Erlaubt sind Keys 1–3: α = softmax(1,0; 0,5; −0,5) = ({P(at[0])}; {P(at[1])}; {P(at[2])}), α₄ = 0.',
+                      f'o = {P(at[0])}·{vt[0]} + {P(at[1])}·({vt[1]}) + {P(at[2])}·{vt[2]} = {P(o_ok)}.',
+                      f'Kontrolle: Wer erst über alle vier Keys normiert und dann α₄ = 0 setzt, erhält Gewichte mit Summe {P(sum(af[:3]))} ≠ 1 und o = {P(o_after)}.'],
+         'attention': _bars(zt, 'Logit z', mt, unmasked=af, after_softmax=af[:3] + [0.0])},
+        {'id': 'att-harder', 'role': 'harder', 'kc_id': 'attention/softmax-gradient', 'type': 'expression', 'title': 'Anspruchsvoller: Gradient durch Softmax',
+         'prompt': 'Eine Zeile mit drei Keys: α = softmax(z), und g_j = ∂L/∂α_j kommt von oben (aus O = AV). Geben Sie ∂L/∂z₁ an. Variablen: a1, a2, a3 für α₁, α₂, α₃ und g1, g2, g3.',
+         'variables': ATT_VARS, 'defs': ATT_DEFS, 'domains': ATT_DOMAINS, 'expected_expr': g_exp, 'symbols': ATT_SYMBOLS,
+         'bugs': [{'expr': 'a1*g1', 'category': 'normaliser_ignored'}, {'expr': 'a1*(1-a1)*g1', 'category': 'diagonal_only'},
+                  {'expr': 'a1*(a1*g1+a2*g2+a3*g3-g1)', 'category': 'jacobian_sign'}, {'expr': 'g1-(a1*g1+a2*g2+a3*g3)', 'category': 'missing_weight_factor'}],
+         'hints': ['Kettenregel über alle Wege: ∂L/∂z₁ = Σ_j g_j · ∂α_j/∂z₁.', '∂α_j/∂z₁ = α_j(δ_j1 − α₁).'],
+         'solution': ['∂L/∂z₁ = Σ_j g_j α_j (δ_j1 − α₁) = α₁g₁ − α₁ Σ_j α_j g_j = α₁ (g₁ − (α₁g₁ + α₂g₂ + α₃g₃)).',
+                      'In Matrixform: ∂L/∂z = (diag(α) − ααᵀ) g. Ist g für alle j gleich, verschwindet der Gradient – passend zur Verschiebungsinvarianz.'],
+         'similar': 'att-jac'},
+        {'id': 'att-jac', 'role': 'similar', 'kc_id': 'attention/softmax-gradient', 'type': 'expression', 'title': 'Ähnliche Aufgabe: ein Jacobi-Eintrag',
+         'prompt': 'Ohne Hinweise: Geben Sie ∂α₂/∂z₃ für eine Softmax-Zeile mit drei Keys an (Variablen a1, a2, a3).',
+         'variables': ATT_VARS, 'defs': ATT_DEFS, 'domains': ATT_DOMAINS, 'expected_expr': '-a2*a3', 'symbols': ATT_SYMBOLS,
+         'bugs': [{'expr': 'a2*a3', 'category': 'jacobian_sign'}, {'expr': 'a2*(1-a2)', 'category': 'diagonal_formula_offdiag'}, {'expr': '0', 'category': 'offdiag_zero'}],
+         'hints': [], 'solution': ['∂α₂/∂z₃ = α₂(δ₂₃ − α₃) = −α₂α₃: z₃ wirkt nur über den Nenner.']},
+        {'id': 'att-retest', 'role': 'retest', 'kc_id': 'attention/scaled-weights', 'type': 'numeric', 'title': 'Spätere Prüfung',
+         'prompt': f'Ohne Hilfen: S = (({S3[0][0]}; {S3[0][1]}; {S3[0][2]}), ({S3[1][0]}; {S3[1][1]}; {S3[1][2]})), d_k = {dk3}. Wie groß ist A₁₁? (4 Nachkommastellen)',
+         'expected': _r6(ret), 'tolerance': 0.0005, 'errors': attention_bugs(S3, dk3, 0, 0), 'hints': [],
+         'solution': [f'z = (1; −1; 0), A₁₁ = e / (e + e⁻¹ + 1) = {P(ret)}.'],
+         'attention': _bars(S3[0], 'Score s', unscaled=softmax(S3[0]), by_dk=softmax([s / dk3 for s in S3[0]]))},
+        {'id': 'att-why', 'role': 'open', 'kc_id': 'attention/shift-scale', 'type': 'open', 'title': 'In eigenen Worten',
+         'prompt': 'Warum ändert eine gemeinsame Verschiebung aller Logits einer Zeile die Gewichte nicht, eine gemeinsame Multiplikation aber schon? Zwei bis drei Sätze.', 'hints': [], 'solution': []},
+    ]
+    a2 = softmax([1.0, 0.0])
+    return {
+        'schema': SCHEMA, 'id': 'ai/attention-track', 'version': 1, 'domain': 'machine_learning', 'viz': 'attention', 'lab': 'ai/scaled-attention',
+        'title': 'Scaled Dot-Product Attention – Gewichte, Maske, Gradient', 'objective': 'Sie können Attention-Gewichte aus einer Score-Matrix berechnen, Skalierung und Maske richtig anwenden und den Gradienten durch Softmax herleiten.',
+        'kcs': [{'id': 'prereq/softmax-normalisation', 'type': 'prerequisite', 'label': 'Softmax einer Zeile berechnen'},
+                {'id': 'attention/scaled-weights', 'type': 'procedural', 'label': 'Skalierte Gewichte aus S = QKᵀ'},
+                {'id': 'attention/shift-scale', 'type': 'conceptual', 'label': 'Verschiebung und Skalierung der Logits unterscheiden'},
+                {'id': 'attention/masking', 'type': 'procedural', 'label': 'Maske vor der Normierung anwenden'},
+                {'id': 'attention/softmax-gradient', 'type': 'derivation', 'label': 'Gradient durch Softmax herleiten',
+                 'requires': [{'track': 'ml/backprop-track', 'kc_id': 'ml/backpropagation', 'why': 'Kettenregel über mehrere Wege'}]}],
+        'context': {'values': {}, 'equations': ['A = softmax_zeilenweise(QKᵀ / √d_k)', 'O = AV', '∂α_j/∂z_ℓ = α_j(δ_jℓ − α_ℓ)']},
+        'categories': cats, 'tasks': tasks, 'flow': ['att-pre', 'att-core', 'att-similar', 'att-transfer', 'att-harder'],
+        'worked_examples': {
+            'prereq/softmax-normalisation': {'title': 'Durchgerechnet: Softmax einer Zeile', 'steps': [
+                'α_j = e^(z_j) / Σ_ℓ e^(z_ℓ): exponentieren, dann durch die Zeilensumme teilen.',
+                f'Beispiel z = (2; 0): e² = {P(math.exp(2))}, e⁰ = 1, Summe {P(math.exp(2) + 1)}.',
+                f'α = ({P(softmax([2, 0])[0])}; {P(softmax([2, 0])[1])}); die Gewichte sind positiv und summieren sich zu eins.',
+                'Direktes Teilen der Scores (2/2 = 1 und 0) wäre keine Softmax und versagt bei negativen Scores.']},
+            'attention/scaled-weights': {'title': 'Durchgerechnet: von S zu A', 'steps': [
+                'S = QKᵀ hat eine Zeile je Query und eine Spalte je Key.',
+                'Skalieren: Z = S / √d_k (bei d_k = 16 also Division durch 4, nicht durch 16).',
+                f'Normieren je Zeile: Für die Zeile z = (1; 0) ergibt sich ({P(a2[0])}; {P(a2[1])}).',
+                'Kontrolle: Jede Zeile von A summiert sich zu eins; Spalten müssen das nicht.']},
+            'attention/masking': {'title': 'Durchgerechnet: Maske vor Softmax', 'steps': [
+                'Verbotene Positionen erhalten vor Softmax das Logit −∞, also e^(−∞) = 0 in Zähler und Nenner.',
+                f'Beispiel z = (1; 0; 5), Key 3 maskiert: α = softmax(1; 0) auf Keys 1–2 = ({P(a2[0])}; {P(a2[1])}; 0).',
+                f'Falsch: erst über alle drei normieren und dann α₃ = 0 setzen – die Summe wäre {P(sum(softmax([1, 0, 5])[:2]))}.',
+                'Ist eine ganze Zeile maskiert, gibt es keinen positiven Nenner: Die Zeile ist undefiniert und muss gesondert behandelt werden.']},
+            'attention/softmax-gradient': {'title': 'Durchgerechnet: Gradient durch Softmax mit zwei Keys', 'steps': [
+                'Quotientenregel mit D = e^(z₁) + e^(z₂): ∂α₁/∂z₁ = α₁(1 − α₁), ∂α₂/∂z₁ = −α₂α₁.',
+                '∂L/∂z₁ = g₁α₁(1 − α₁) − g₂α₂α₁ = α₁(g₁ − (α₁g₁ + α₂g₂)).',
+                f'Zahlen: α = ({P(a2[0])}; {P(a2[1])}), g = (1; 0): ∂L/∂z₁ = {P(softmax_grad(a2, [1, 0])[0])}, ∂L/∂z₂ = {P(softmax_grad(a2, [1, 0])[1])}.',
+                'Die Komponenten summieren sich zu null: Eine gemeinsame Verschiebung von z ändert L nicht.']}},
+        'contrasts': {'shift_vs_scale': {'title': 'Verschieben und Skalieren nebeneinander', 'rows': [
+            ['z → z + c', 'e^c kürzt sich aus Zähler und Nenner', 'Gewichte unverändert'],
+            ['z → λ·z', 'alle Abstände z_j − z_ℓ werden mit λ multipliziert', 'λ > 1: spitzer, λ < 1: flacher']],
+            'example': 'Die Skalierung 1/√d_k ist ein gemeinsamer Faktor λ < 1, keine Verschiebung: Sie verändert die Gewichte, und zwar gezielt in Richtung flacher.'}},
+        'lessons': TL.attention_lessons(),
+        'anki_tags': ['em::lernstrecke::attention'],
+        'sources': ['Vaswani et al. (2017), Attention Is All You Need, §3.2.1 Gleichung (1) und Fußnote 4; §3.2.3 (Maskierung mit −∞)',
+                    'Eigene Herleitungen (Softmax-Jacobi-Matrix, Gradient), geprüft mit sympy und finiten Differenzen'],
+        'source_status': 'Referenz-Fixture (keine Vorlesung); alle Erwartungs- und Fehlerwerte werden in tracks.py berechnet.',
+    }
+
+
 def all_tracks(ent_data=None):
     from .anki_bridge import review_cards, review_tags
-    out = [ml_track(), ent_track(ent_data), math_track()]
+    out = [ml_track(), ent_track(ent_data), math_track(), attention_track()]
     for t in out:
         t['review_tags'] = review_tags(t); t['review_cards'] = review_cards(t)
     return out
@@ -430,6 +669,7 @@ def validate(track):
                 probs.append(f'category {cid}: worked example {s["ref"]} missing')
             if s and s['type'] == 'contrast' and s['ref'] not in track.get('contrasts', {}):
                 probs.append(f'category {cid}: contrast {s["ref"]} missing')
+    probs += G.validate_lessons(track, 'track')   # optional prerequisite micro-lessons (em-lesson-v1)
     if probs:
         raise TrackError('; '.join(probs))
     return True

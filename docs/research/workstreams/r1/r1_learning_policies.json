@@ -1,0 +1,2436 @@
+{
+ "schema": "em-learning-policies/1",
+ "version": "0.1.0",
+ "status": "DESIGN_HYPOTHESIS_SET",
+ "date": "2026-11-27",
+ "baseline": {
+  "branch": "research/r1-learning-science-20261127",
+  "builds_on": "R0 audit PR #32 (2fbd203)",
+  "kb": "exam_mastery/knowledge/{sources,principles}.json (55 Quellen, 17 Prinzipien)"
+ },
+ "authorship": {
+  "R1A": "Spezialist Kognitions-/Instruktionswissenschaft (r1/R1A_COGNITIVE_INSTRUCTIONAL.md, r1/r1a_evidence.json)",
+  "R1B": "Spezialist Neuro/Physiologie/Motivation/Intensität (r1/R1B_NEURO_INTENSITY.md, r1/r1b_evidence.json)",
+  "lead": "Synthese, Konfliktregeln, Korrekturen, Stichprobenprüfung (R1_LEARNING_SCIENCE.md)",
+  "independent_review": "pending: Lead ist nicht Autor der Spezialberichte, aber dasselbe Modell; keine menschliche Fachprüfung"
+ },
+ "operations": [
+  "recall_discrimination",
+  "symbolic_procedure",
+  "formal_proof",
+  "rule_based_contextual",
+  "diagnostic_reasoning",
+  "empirical_experimental",
+  "computational_construction",
+  "spatial_design",
+  "embodied_psychomotor",
+  "open_synthesis",
+  "self_regulation"
+ ],
+ "certainty_scale": {
+  "high": "mehrere unabhängige, biasgeprüfte Belege in passender Population; Produktregel nah am Beleg",
+  "moderate": "konsistente Richtung, aber Indirektheit, Heterogenität oder Bias-Risiko",
+  "low": "indirekte oder einzelne Belege; Produktregel deutlich vom Beleg entfernt",
+  "very_low": "keine direkte Evidenz; plausibel begründete Setzung",
+  "normative": "Sicherheits-, Rechts- oder Ethikgrenze; keine empirische Sicherheit beansprucht",
+  "note": "Interne, an GRADE angelehnte Einschätzung; die Policy-Stufe bewertet die Produktregel, Teilaussagen stehen in sub_claims."
+ },
+ "conflict_resolution": [
+  {
+   "id": "CR-1",
+   "between": [
+    "R1-POL-A01",
+    "R1-POL-A02"
+   ],
+   "rule": "Für ein neues Verfahren bei Novizen hat A02 Vorrang; A01 gilt parallel nur für deklarative Bausteine (Definitionen, Bedingungen)."
+  },
+  {
+   "id": "CR-2",
+   "between": [
+    "R1-POL-A07",
+    "R1-POL-A02"
+   ],
+   "rule": "Standard ist Instruktion zuerst (A02); A07 nur bei bestandenem Voraussetzungstest, >= 2 Wochen bis zur Prüfung und garantierter Konsolidierung, nie in der Prüfungswoche."
+  },
+  {
+   "id": "CR-3",
+   "between": [
+    "R1-POL-A04",
+    "R1-POL-A03"
+   ],
+   "rule": "Ein Typ wird erst gemischt, wenn er nach A03 ohne Hilfe begonnen werden kann."
+  },
+  {
+   "id": "CR-4",
+   "between": [
+    "R1-POL-A05",
+    "R1-POL-B01",
+    "R1-POL-B02",
+    "R1-POL-B04"
+   ],
+   "rule": "Reicht die Zeit nicht für verteiltes Üben, wird der Umfang nach Prüfungsgewicht priorisiert; Schlaf- und Off-Fenster werden nie gekürzt."
+  },
+  {
+   "id": "CR-5",
+   "between": [
+    "R1-POL-A09",
+    "R1-POL-A01"
+   ],
+   "rule": "Keine Konfidenzabfrage nach jedem Abrufitem; Urteile stichprobenartig und nicht in Modi, deren Wirkung gemessen wird."
+  },
+  {
+   "id": "CR-6",
+   "between": [
+    "R1-POL-A08",
+    "R1-POL-B05"
+   ],
+   "rule": "Mit Hilfe gelöste Versuche zählen nie als Beleg unassistierter Kompetenz und nicht in den Fortschritt."
+  },
+  {
+   "id": "CR-7",
+   "between": [
+    "R1-POL-B06",
+    "R1-POL-A01"
+   ],
+   "rule": "Segmentierung passiver Inputs ist A01 angewandt auf Vorlesungen/Videos; in Prüfungssimulationen keine Zwischenchecks."
+  },
+  {
+   "id": "CR-8",
+   "between": [
+    "R1-POL-B03",
+    "R1-POL-B04",
+    "R1-POL-B10"
+   ],
+   "rule": "Wohlbefindensfunktionen sind Angebote, nie Blockaden; sie lösen keinen neuen Planer-Ausbau aus, solange R6 keinen Planer beschließt."
+  }
+ ],
+ "shared_measurement_contract": {
+  "evidence_of_competence": "nur unassistierte, verzögerte (echte verstrichene Zeit) Versuche an neuen bzw. umformulierten Items",
+  "not_evidence": [
+   "gelesene Seiten oder Minuten",
+   "Kalenderdaten ohne verstrichene Zeit",
+   "Versuche mit Hinweis oder sichtbarer Lösung",
+   "Konfidenzangaben",
+   "Kartenstatistik als Kompetenz"
+  ],
+  "engineering_handoff": "CD-2: policy.kc_status muss verstrichene Zeit und Hilfestatus statt verschiedener Kalenderdaten nutzen (P4, nach R6)."
+ },
+ "deferred_operations": [
+  {
+   "operation": "rule_based_contextual",
+   "reason": "nur als Hypothese in A04/A10; juristische Subsumtion braucht eigene Evidenz",
+   "owner_workstream": "R3"
+  },
+  {
+   "operation": "open_synthesis",
+   "reason": "Argumentkritik und offene Synthese nicht untersucht",
+   "owner_workstream": "R3"
+  },
+  {
+   "operation": "empirical_experimental",
+   "reason": "Experiment- und Laborlernen nicht untersucht",
+   "owner_workstream": "R4 (mit R2 für Statistik)"
+  },
+  {
+   "operation": "spatial_design",
+   "reason": "räumliches Denken/CAD nicht untersucht",
+   "owner_workstream": "R4"
+  },
+  {
+   "operation": "embodied_psychomotor",
+   "reason": "motorisches Lernen und reale Handlungskompetenz nicht untersucht",
+   "owner_workstream": "R4"
+  }
+ ],
+ "operation_notes": {
+  "formal_proof": "nur Beweisverständnis (A06) und Satzaussagen mit Voraussetzungen (A01); Beweiskonstruktion an R2"
+ },
+ "kb_rules_out_of_r1_scope": [
+  {
+   "rule_id": "PR-R1",
+   "owner": "R7/R2",
+   "note": "Vorhersage im Lab; R1 liefert nur A09 (Urteile als Daten) und A11 (Vorfragen)"
+  },
+  {
+   "rule_id": "PR-R2",
+   "owner": "R7/R2",
+   "note": "Widerspruchsdarstellung bei falscher Vorhersage"
+  },
+  {
+   "rule_id": "PR-R3",
+   "owner": "R7/R2",
+   "note": "Experimentierhilfen"
+  },
+  {
+   "rule_id": "MM-R1",
+   "owner": "R7",
+   "note": "Multimedia-Regeln"
+  },
+  {
+   "rule_id": "MM-R2",
+   "owner": "R7",
+   "note": "Signalisierung/Kontiguität"
+  },
+  {
+   "rule_id": "CL-R1",
+   "owner": "R7",
+   "note": "räumliche Kontiguität; R1-Hinweis: Belastung wird in CLT-Studien oft nicht unabhängig gemessen (dejong2010clt)"
+  },
+  {
+   "rule_id": "CL-R2",
+   "owner": "R7",
+   "note": "Guided Mode; R0-D9: Zieloperation darf nicht ausgelagert werden"
+  },
+  {
+   "rule_id": "ITS-R1",
+   "owner": "R5",
+   "note": "Mastery-Wahrscheinlichkeiten"
+  },
+  {
+   "rule_id": "ITS-R2",
+   "owner": "R5",
+   "note": "Schrittrückmeldung (vgl. A08)"
+  },
+  {
+   "rule_id": "AI-R1",
+   "owner": "R5",
+   "note": "Tutor-Hinweise; R0 P0: keine Schadensfreiheitsbehauptung"
+  },
+  {
+   "rule_id": "AI-R2",
+   "owner": "R5",
+   "note": "agent_judgement-Kennzeichnung"
+  },
+  {
+   "rule_id": "AS-R1",
+   "owner": "R2/R5",
+   "note": "Aufgabenmetadaten"
+  },
+  {
+   "rule_id": "AS-R2",
+   "owner": "R2/R5",
+   "note": "Blueprint-Abgleich"
+  }
+ ],
+ "verification_log": [
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "NCBI E-utilities / Crossref abstract",
+   "checked": "newbury2021sleepdeprivation g = 0.277 (nach), 0.621 (vor)",
+   "result": "match"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "NCBI E-utilities",
+   "checked": "crowley2024sleeprestriction g = 0.29; 125 Effekte, 39 Berichte, 1234 Personen",
+   "result": "match"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "NCBI E-utilities",
+   "checked": "macnamara2014deliberate 26/21/18/4/<1 %",
+   "result": "match (Corrigendum 2018, Psychol Sci 29(7):1202-1204, Inhalt nicht gelesen)"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "NCBI E-utilities",
+   "checked": "yang2021classroom g = 0.499",
+   "result": "match"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "Crossref abstract",
+   "checked": "fyfe2021manyclasses 0.002 [-0.05, 0.05]",
+   "result": "match"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "Crossref abstract",
+   "checked": "ruitenburg2026classroom g = 0.37 / 0.20 / 0.40",
+   "result": "match"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "Crossref abstract",
+   "checked": "sinha2021 g = 0.36",
+   "result": "match"
+  },
+  {
+   "by": "lead",
+   "date": "2026-11-27",
+   "method": "abstract not retrievable",
+   "checked": "rohrer2020interleaved d = 0.83; bisra2018 g = .55; murray2025mathspacing g = 0.24/0.18",
+   "result": "not independently verified"
+  }
+ ],
+ "policies": [
+  {
+   "id": "R1-POL-A01",
+   "title": "Abruf mit Korrektur und Successive Relearning für abrufbare Bausteine",
+   "source_section": "r1/R1A_COGNITIVE_INSTRUCTIONAL.md §5 R1-POL-A01",
+   "applies_to_operations": [
+    "recall_discrimination"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "formal_proof",
+     "reason": "Beweiskonstruktion ist nicht abgedeckt; nur Beweisverständnis/Satzaussagen. Konstruktion gehört zu R2."
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any"
+    ],
+    "phase": [
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "nach verständnisorientierter Erstinstruktion; Definitionen, Satzaussagen mit Voraussetzungen, Tatbestandsmerkmale, Formeln mit Gültigkeitsbedingungen"
+   },
+   "recommendation": "Abrufitems mit verdeckter Antwort, unmittelbar korrektivem Feedback und Wiedervorlage falscher Items in derselben und in späteren Sitzungen; Planung über Anki, kein eigener Scheduler.",
+   "product_affordances": {
+    "anki": "atomare, eindeutig beantwortbare Karten mit Bedingungen",
+    "workbook": "Abrufsätze mit Korrektur am Kapitelende",
+    "interactive": "Abruf vor Aufdecken; Wiedervorlage falscher Items"
+   },
+   "abstain_or_fallback": [
+    "kein Abruf als Ersatz für Instruktion, solange das Verfahren nicht verstanden ist (A02)",
+    "keine Abrufitems für Beweis- oder Lösungsketten, deren Teile nur im Zusammenhang Sinn ergeben",
+    "keine Mastery-Aussage aus Kartenstatistik"
+   ],
+   "parameters": [
+    {
+     "name": "relearning_sessions",
+     "value": 3,
+     "unit": "Sitzungen",
+     "status": "provisional_product_parameter",
+     "rationale": "higham2022 nutzte 3 Sitzungen; Kriteriumsforschung (Rawson & Dunlosky) nicht gelesen"
+    },
+    {
+     "name": "criterion_per_session",
+     "value": 1,
+     "unit": "korrekter Abruf je Item",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    },
+    {
+     "name": "min_gap_between_sessions",
+     "value": 1,
+     "unit": "Tag (echte verstrichene Zeit, nicht Kalenderdatum)",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; vgl. CD-2"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "yang2021classroom",
+     "locator": "PDF S. 12, Tab. 2 S. 15, S. 18 (Hochschule .486; Korrekturfeedback .537 vs .374)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "higham2022relearning",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "roediger2006",
+     "locator": "R0-D1, S. 250–253",
+     "relation": "supports"
+    },
+    {
+     "source_id": "rowland2014",
+     "locator": "R0-D2, Tab. 1/2",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "ruitenburg2026classroom",
+     "locator": "Results 3.2.1 (Transfer n. s.)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "agarwal2021classroom",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "higham2023reactivity",
+     "locator": "Abstract",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "große, biasgeprüfte Klassenraum-Meta-Analyse",
+     "hohe Heterogenität und viele quasi-experimentelle Studien"
+    ],
+    "sub_claims": [
+     {
+      "claim": "verzögerter Abruf von Kursinhalten profitiert von Quizzing mit Korrektur",
+      "level": "moderate"
+     },
+     {
+      "claim": "Effekte auf Anwendung und Transfer",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Versuchslog: Antwort vor Aufdecken, Korrektheit, Sitzung, tatsächlich verstrichene Zeit",
+   "independent_outcome": "unangekündigter, unassistierter Test >= 1 Woche nach letzter Sitzung mit neu formulierten Items und separaten Anwendungsitems",
+   "failure_modes": [
+    "Atomisierung zerstört Bedingungen",
+    "Wiedererkennen der Kartenform statt Abruf",
+    "Verdrängung von Verständnisarbeit"
+   ],
+   "falsifier": "In einer vorab registrierten Within-Learner-Randomisierung von Items (Relearning vs. zeitgleiches Restudy) zeigt der verzögerte unassistierte Abruf keinen Vorteil oberhalb einer vorab festgelegten Mindestdifferenz.",
+   "kb_rule_links": [
+    {
+     "rule_id": "RP-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "RP-R3",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "SP-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-A02",
+   "title": "Beispiel vor Abruf bei Novizen und hoher Elementinteraktivität",
+   "source_section": "r1/R1A_COGNITIVE_INSTRUCTIONAL.md §5 R1-POL-A02",
+   "applies_to_operations": [
+    "symbolic_procedure",
+    "computational_construction"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "prior_knowledge": [
+     "novice",
+     "unknown"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "neues Verfahren, niedriges aufgabenspezifisches Vorwissen"
+   },
+   "recommendation": "Zuerst mehrere oberflächenvariierte Worked Examples mit Selbsterklärungsprompt (A06), dann Completion-Aufgaben; selbstständiges Lösen und Abruf erst, wenn ein unbekanntes Isomorph ohne Hilfe gelöst wurde.",
+   "product_affordances": {
+    "textbook": "durchgerechnete Beispiele vor Übungsaufgaben",
+    "workbook": "Beispiel -> Completion -> eigenständige Aufgabe",
+    "interactive": "reversible Beispielanzeige"
+   },
+   "abstain_or_fallback": [
+    "nachgewiesenes Vorwissen (A03): Beispiele überspringen oder ausblenden (Expertise Reversal)",
+    "keine verlässliche Diagnose möglich: Lernenden wählen lassen, Beispiele reversibel anbieten"
+   ],
+   "parameters": [
+    {
+     "name": "worked_examples_before_first_independent_attempt",
+     "value": 2,
+     "unit": "Beispiele",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "vangog2015testingwe",
+     "locator": "Abstract; S. 283–284 (vier Experimente ohne Testvorteil)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "yeo2019retrievalwe",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "leahy2015testingwe",
+     "locator": "sekundär",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "kalyuga2007",
+     "locator": "R0-D6, S. 515–518",
+     "relation": "supports"
+    },
+    {
+     "source_id": "barbieri2023",
+     "locator": "ungelesen (nur Snippet)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "dejong2010clt",
+     "locator": "S. 114–117 (Belastung nicht unabhängig gemessen)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "vier kontrollierte Experimente ohne Testvorteil in der Erwerbsphase",
+     "Umschaltpunkt und Abfolge nicht direkt getestet"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Abruf hat in der Erwerbsphase keinen Zusatznutzen gegenüber weiterem Beispielstudium",
+      "level": "moderate"
+     },
+     {
+      "claim": "genaue Abfolge und Umschaltpunkt",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Zahl studierter Beispiele, Completion-Korrektheit, erstes unassistiertes Isomorph",
+   "independent_outcome": "verzögerte (>= 1 Woche) unassistierte Lösung isomorpher und strukturell variierter Aufgaben",
+   "failure_modes": [
+    "Fortgeschrittene werden gebremst",
+    "passive Beispielrezeption ohne Selbsterklärung",
+    "fehlerhafte Beispiele verwirren Novizen"
+   ],
+   "falsifier": "Bei gleicher Zeit schneidet 'Beispiel -> sofort Abruf/Problemlösen' im verzögerten unassistierten Test besser ab als 'Beispiel -> weiteres Beispiel -> Problemlösen'; dann Reihenfolgeregel für die geprüfte Operation verwerfen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "WE-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "RP-R1",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "hypothesis_only_operations": [
+    "diagnostic_reasoning"
+   ]
+  },
+  {
+   "id": "R1-POL-A03",
+   "title": "Reversible Übergangsdiagnose (Erster-Schritt-Probe) und Fading",
+   "source_section": "r1/R1A_COGNITIVE_INSTRUCTIONAL.md §5 R1-POL-A03",
+   "applies_to_operations": [
+    "symbolic_procedure"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "formal_proof",
+     "reason": "Erster Schritt eines Beweises ist meist mehrdeutig; keine automatische Einstufung."
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "heterogeneous"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "zwischen Beispielphase und selbstständigem Üben"
+   },
+   "recommendation": "Kurze Probes, die nur den ersten Lösungsschritt an unbekannten Isomorphen verlangen; weniger Unterstützung erst nach wiederholtem Erfolg, Rückkehr nach Fehlschlag; Hilfen jederzeit reversibel.",
+   "product_affordances": {
+    "interactive": "Erster-Schritt-Probe mit reversibler Unterstützungsstufe",
+    "workbook": "Selbsttest 'erster Schritt' vor Aufgabenblöcken"
+   },
+   "abstain_or_fallback": [
+    "keine Expertenklassifikation aus einem Item",
+    "Beweise, offene Modellierungen oder mehrdeutiger erster Schritt: keine automatische Einstufung, Selbstwahl plus vollständige Aufgabe"
+   ],
+   "parameters": [
+    {
+     "name": "successes_before_fading",
+     "value": 2,
+     "unit": "aufeinanderfolgende korrekte erste Schritte",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    },
+    {
+     "name": "failures_before_return",
+     "value": 1,
+     "unit": "Fehlschlag",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "kalyuga2004measuring",
+     "locator": "Abstract (konkurrente Validität, Klasse 9–10)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "kalyuga2007",
+     "locator": "R0-D6",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "dejong2010clt",
+     "locator": "S. 114–117",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "indirekte Population",
+     "nur Abstract",
+     "keine Fehlklassifikationsraten",
+     "keine Daten zur Wirkung der Adaptivität"
+    ],
+    "sub_claims": []
+   },
+   "observable": "Erster-Schritt-Korrektheit, Latenz, Folge der Unterstützungsstufen",
+   "independent_outcome": "Fehlklassifikationsrate der Probe gegenüber einer vollständigen, unabhängig bewerteten Lösung neuer Aufgaben und verzögerter Leistungsvergleich adaptiv vs. feste Sequenz",
+   "failure_modes": [
+    "falsch-positive Einstufung: zu früh ohne Hilfe",
+    "falsch-negative: Langeweile",
+    "Raten des ersten Schritts"
+   ],
+   "falsifier": "Die Fehlklassifikationsrate gegenüber vollständigen Lösungen liegt über einer vorab festgelegten Grenze, oder die adaptive Sequenz ist der festen im verzögerten Test nicht überlegen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "WE-R2",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-A04",
+   "title": "Interleaving verwechselbarer Aufgabentypen nach Erstkontakt",
+   "source_section": "r1/R1A_COGNITIVE_INSTRUCTIONAL.md §5 R1-POL-A04",
+   "applies_to_operations": [
+    "symbolic_procedure",
+    "recall_discrimination"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "prior_knowledge": [
+     "each type introduced and solved once"
+    ],
+    "phase": [
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "verwechselbare Typen derselben Kompetenzfamilie; Methodenwahl ist Teil der Prüfungsanforderung"
+   },
+   "recommendation": "Erst geblockte Einführung je Typ, dann gemischte Sätze, die die Typwahl erzwingen; Lösungen gesammelt bzw. verzögert; mindestens ein Item, für das keine geübte Methode passt.",
+   "product_affordances": {
+    "workbook": "gemischte Übungssätze mit Distraktoritem",
+    "interactive": "gemischte Sätze nach Typeinführung"
+   },
+   "abstain_or_fallback": [
+    "kein Interleaving vor Erstverständnis eines Typs",
+    "kein Mischen unähnlicher, nicht verwechselbarer Inhalte"
+   ],
+   "parameters": [
+    {
+     "name": "blocked_sets_per_type_before_mixing",
+     "value": 1,
+     "unit": "Satz",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    },
+    {
+     "name": "min_types_per_mixed_set",
+     "value": 3,
+     "unit": "Typen",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "rohrer2020interleaved",
+     "locator": "Abstract; S. 8 (Spacing-Konfundierung)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "brunmair2019",
+     "locator": "R0-D5, Tab. 2/3 (Mathematik g = 0.34; Wörter negativ)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "ruitenburg2026classroom",
+     "locator": "Results 3.2.3 (Feedback-Moderator, k = 5)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "murray2025mathspacing",
+     "locator": "Diskussion (Konfundierung)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "starke Schul-RCT, aber Indirektheit für Hochschule und Spacing-Konfundierung"
+    ],
+    "sub_claims": [
+     {
+      "claim": "gemischte Übung verbessert Methodenwahl in Schulmathematik",
+      "level": "moderate"
+     },
+     {
+      "claim": "dasselbe in Hochschulmathematik",
+      "level": "low"
+     },
+     {
+      "claim": "dasselbe in Recht/Medizin",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Fehlerklassifikation 'falsche Methode gewählt' vs. 'richtig gewählt, falsch ausgeführt'",
+   "independent_outcome": "unangekündigter gemischter Test >= 2 Wochen später mit neuen Items und Distraktoritem",
+   "failure_modes": [
+    "gefühlte geringere Kompetenz während der Übung -> Abbruch",
+    "zu frühes Mischen"
+   ],
+   "falsifier": "Bei konstant gehaltenen Abständen zeigt gemischte gegenüber geblockter Übung im verzögerten Test keinen Vorteil bei der Methodenwahl; dann Wirkung auf Spacing zurückführen und Policy in A05 einschmelzen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "IL-R1",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "hypothesis_only_operations": [
+    "rule_based_contextual",
+    "diagnostic_reasoning"
+   ]
+  },
+  {
+   "id": "R1-POL-A05",
+   "title": "Verteiltes, kumulatives Üben statt Massierung unter festem Zeitbudget",
+   "source_section": "r1/R1A_COGNITIVE_INSTRUCTIONAL.md §5 R1-POL-A05",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "ab Kursbeginn bis zur Prüfung; bei kurzer Restzeit kleinere Abstände statt Verzicht"
+   },
+   "recommendation": "Bei gleicher Gesamtzeit Übung auf mehrere Tage verteilen und frühere Themen kumulativ wiederaufnehmen, mit Abruf ohne Unterlagen; atomare Items über Anki, Aufgaben über kumulative Sätze.",
+   "product_affordances": {
+    "anki": "Scheduling bleibt bei Anki",
+    "workbook": "kumulative Wiederholungssätze je Kapitel",
+    "interactive": "kumulative Sätze; echte Zeitabstände protokollieren"
+   },
+   "abstain_or_fallback": [
+    "keine festen Abstandskonstanten und keine eigene Intervallberechnung",
+    "keine Behauptung, Spacing wirke für jede Prozedur",
+    "Wiederholung mit offenen Unterlagen gilt nicht als verteilter Abruf"
+   ],
+   "parameters": [
+    {
+     "name": "min_cumulative_revisits_before_exam",
+     "value": 2,
+     "unit": "Wiederaufnahmen je Thema",
+     "status": "provisional_product_parameter",
+     "rationale": "Lead-Setzung ersetzt die von R1A vorgeschlagene Prozentregel"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "murray2025mathspacing",
+     "locator": "VoR-Abstract (kursintegriert g = 0.24)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "ruitenburg2026classroom",
+     "locator": "Results 3.2.2",
+     "relation": "supports"
+    },
+    {
+     "source_id": "ebersbach2020mathspacing",
+     "locator": "Results (Null für Prozedur)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "cepeda2008",
+     "locator": "R0-D4",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "konsistente Richtung in Klassenraum-Meta-Analysen",
+     "kleinere Effekte und Nullbefund für Mathematikprozeduren"
+    ],
+    "sub_claims": [
+     {
+      "claim": "verteilt > massiert für Behalten",
+      "level": "moderate"
+     },
+     {
+      "claim": "dasselbe für Mathematikprozeduren",
+      "level": "low"
+     },
+     {
+      "claim": "konkrete Intervalle",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "tatsächlicher Abstand je Item in verstrichener Zeit, Anteil kumulativer Items, Abruf ohne Unterlagen ja/nein",
+   "independent_outcome": "Leistung zum festen Prüfungstermin bzw. verzögerter Test mit unbekannten Items",
+   "failure_modes": [
+    "Planungsaufwand",
+    "Verdrängung vertiefender Erarbeitung",
+    "Pseudo-Spacing an Kalendertagen ohne Abruf (CD-2)"
+   ],
+   "falsifier": "Gleich lange massierte Übung in der letzten Woche ergibt im unassistierten Prüfungstest gleiche oder bessere Leistung innerhalb einer Äquivalenzgrenze.",
+   "kb_rule_links": [
+    {
+     "rule_id": "SP-R2",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "SP-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "lead_correction": "R1A schlug Abstände von 10–30 % der Restzeit vor. Das ist eine Umformung der Cepeda-Retentionsfläche (Faktenlernen), vor der R0-D4 ausdrücklich warnt; der Lead streicht sie zugunsten von Anki plus kumulativer Wiederaufnahme."
+  },
+  {
+   "id": "R1-POL-A06",
+   "title": "Offene, inhaltsbezogene Selbsterklärungsprompts mit Referenzabgleich",
+   "source_section": "r1/R1A_COGNITIVE_INSTRUCTIONAL.md §5 R1-POL-A06",
+   "applies_to_operations": [
+    "symbolic_procedure",
+    "formal_proof",
+    "diagnostic_reasoning",
+    "computational_construction"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "formal_proof",
+     "reason": "Beweiskonstruktion ist nicht abgedeckt; nur Beweisverständnis/Satzaussagen. Konstruktion gehört zu R2."
+    }
+   ],
+   "context": {
+    "prior_knowledge": [
+     "any; Promptdichte sinkt mit Kompetenz (Hypothese)"
+    ],
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "beim Studieren von Beispielen, Beweisen (Verständnis, nicht Konstruktion), gelösten Fällen, Code-Tracing"
+   },
+   "recommendation": "Prompts nach der Begründung eines konkreten Schritts ('Warum ist dieser Schritt zulässig? Welche Voraussetzung wird genutzt?'), offen formuliert; Referenzerklärung erst nach eigener Antwort.",
+   "product_affordances": {
+    "textbook": "aufklappbare Expertenbegründung nach eigener Antwort",
+    "workbook": "Begründungsfragen in Musterlösungen",
+    "interactive": "Freitext + Referenzabgleich, Status UNVERIFIED"
+   },
+   "abstain_or_fallback": [
+    "keine rein metakognitiven Prompts ('Wie gut verstehst du das?') als Lernintervention",
+    "keine Multiple-Choice-'Selbsterklärung' als Ersatz",
+    "keine automatische Bewertung freier Erklärungen als korrekt"
+   ],
+   "parameters": [
+    {
+     "name": "prompts_per_example",
+     "value": "1 je kritischem Schritt, max. 3",
+     "unit": "Prompts",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "bisra2018",
+     "locator": "Tab. 1 (.552; Studierende .611)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "bisra2018",
+     "locator": "S. 16 (vs. Instruktionserklärung .354, k = 6)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "nesbit2006conceptmaps",
+     "locator": "Abstract",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "Meta-Analyse mit vielen Studien",
+     "Publikationsbias nur per Fail-safe-N; Vergleich mit guter Instruktionserklärung klein"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Prompts > keine zusätzliche Erklärung",
+      "level": "moderate"
+     },
+     {
+      "claim": "Prompts > gute Instruktionserklärung",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Erklärungstext, Zeit, Abdeckung der Referenz-Kernaussagen (nur Indikator)",
+   "independent_outcome": "verzögerte unassistierte Problemlöse- und Transferaufgaben ohne Prompts",
+   "failure_modes": [
+    "Verfestigung falscher Erklärungen",
+    "Zeitkosten",
+    "Kopieren aus vorab sichtbarer Referenz"
+   ],
+   "falsifier": "Gegenüber zeitgleich gelesener, guter Instruktionserklärung zeigt sich im verzögerten Transfertest kein Vorteil.",
+   "kb_rule_links": [
+    {
+     "rule_id": "SE-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "SE-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-A07",
+   "title": "Problemlösen vor Instruktion nur optional und mit Konsolidierung",
+   "source_section": "r1/R1A_COGNITIVE_INSTRUCTIONAL.md §5 R1-POL-A07",
+   "applies_to_operations": [
+    "symbolic_procedure"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "prior_knowledge": [
+     "prerequisite check passed"
+    ],
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": ">= 2 Wochen bis zur Prüfung; neues Konzept; konzeptuelles Verständnis als Ziel"
+   },
+   "recommendation": "Kurze, zeitlich begrenzte Generierungsaufgabe vor der Erklärung, danach zwingend Konsolidierung mit Vergleich eigener Ansätze und kanonischer Lösung; Instruktion-zuerst bleibt gleichwertige Standardoption.",
+   "product_affordances": {
+    "textbook": "optionaler Erkundungseinstieg mit anschließendem Vergleich",
+    "interactive": "optionales Erkundungsproblem"
+   },
+   "abstain_or_fallback": [
+    "niedriges Vorwissen und hohe Elementinteraktivität, kurz vor der Prüfung oder ohne Konsolidierung: Instruktion zuerst (A02)",
+    "nicht für reine Prozedurflüssigkeit oder Sicherheitsprozeduren"
+   ],
+   "parameters": [
+    {
+     "name": "generation_phase_max",
+     "value": 15,
+     "unit": "min",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung; bestehende Spec nennt <= 5 min, ebenfalls Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "sinha2021",
+     "locator": "Abstract (g = 0.36; Treue-Moderator; biasadjustiert 0.87 ungeklärt)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "sinha2021",
+     "locator": "Abstract (I-PS besser für Klasse 2–5)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "ashman2020sequence",
+     "locator": "Abstract",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "kapur2023prior",
+     "locator": "Results (korrelativ)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "kirschner2006",
+     "locator": "KB pf.2",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Volltext der Haupt-Meta-Analyse ungelesen",
+     "Allegiance",
+     "Populationsindirektheit",
+     "widersprüchliche randomisierte Einzelstudien"
+    ],
+    "sub_claims": []
+   },
+   "observable": "Anzahl und Vielfalt generierter Ansätze, Zeit, ob Konsolidierung absolviert wurde",
+   "independent_outcome": "verzögerte konzeptuelle und Transferitems im randomisierten Vergleich PS-I vs. I-PS bei gleicher Zeit",
+   "failure_modes": [
+    "Frustration und Abbruch",
+    "Zeitverlust",
+    "fehlerhafte Eigenansätze ohne Konsolidierung"
+   ],
+   "falsifier": "Kein Vorteil oder ein Nachteil von PS-I gegenüber I-PS bei Studierenden mit gemessenem Vorwissen auf verzögerten konzeptuellen Items.",
+   "kb_rule_links": [
+    {
+     "rule_id": "PF-R1",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-A08",
+   "title": "Korrektives Feedback nach jedem Versuch, Schritthilfen erst nach eigenem Versuch, Hilfeabhängigkeit messen",
+   "source_section": "r1/R1A_COGNITIVE_INSTRUCTIONAL.md §5 R1-POL-A08",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure",
+    "computational_construction"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "phase": [
+     "acquisition",
+     "consolidation"
+    ],
+    "conditions": "Übungsphase mit Rückmeldung"
+   },
+   "recommendation": "Nach jedem Versuch korrigierende Information (richtige Antwort plus kurze Begründung); bei Mehrschrittaufgaben Fehler markieren, gestufte Hinweise erst nach eigenem Versuch; Hilfeabrufe protokollieren und 'mit Hilfe gelöst' getrennt ausweisen; keine Timing-Regel auf Aufgabenebene.",
+   "product_affordances": {
+    "workbook": "Musterlösung mit Begründung; Hinweise getrennt von Lösung",
+    "interactive": "gestufte Hinweise nach Versuch; Hilfestatus im Lernstand",
+    "anki": "Rückseite mit Begründung"
+   },
+   "abstain_or_fallback": [
+    "keine Behauptung, sofortiges Feedback sei generell überlegen",
+    "keine Fehlerursachendiagnose aus gleichem Endergebnis",
+    "Lösung auf Wunsch zugänglich, aber als Hilfe gekennzeichnet"
+   ],
+   "parameters": [
+    {
+     "name": "hint_levels_before_solution",
+     "value": 3,
+     "unit": "Stufen",
+     "status": "provisional_product_parameter",
+     "rationale": "bestehende Spec, Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "yang2021classroom",
+     "locator": "S. 18 (.537 vs .374, Moderator)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "kluger1996",
+     "locator": "R0-D7",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "wisniewski2020",
+     "locator": "R0-D8",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "fyfe2021manyclasses",
+     "locator": "Abstract (Timing 0.002)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "ruitenburg2026classroom",
+     "locator": "Results 3.2.3",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "bastani2025",
+     "locator": "R0-D10 (Offloading)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "Moderatorvergleich, nicht randomisiert",
+     "Feedback kann schaden; Designunterschiede"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Korrektur nach Abruf",
+      "level": "moderate"
+     },
+     {
+      "claim": "Details des Schrittfeedbacks",
+      "level": "low"
+     },
+     {
+      "claim": "konkrete Hinweisleitern",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Hinweisstufe je Schritt, Zeit bis zum ersten Hinweis, Anteil Bottom-out, Wiederholungsfehler",
+   "independent_outcome": "unassistierte Leistung an neuen Items ohne Hinweise; separat Anteil Lernender, die ohne Hilfe nicht mehr starten",
+   "failure_modes": [
+    "Hilfemissbrauch",
+    "Offloading",
+    "Feedback auf Personenebene"
+   ],
+   "falsifier": "Gruppen mit gestuften Hinweisen zeigen im unassistierten verzögerten Test keine bessere Leistung als Gruppen mit nur 'richtig/falsch + Lösung'.",
+   "kb_rule_links": [
+    {
+     "rule_id": "FB-R1",
+     "relation": "refines"
+    },
+    {
+     "rule_id": "FB-R2",
+     "relation": "retains"
+    },
+    {
+     "rule_id": "RP-R2",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-A09",
+   "title": "Konfidenz und Lernurteile als Daten, nicht als Lernintervention",
+   "source_section": "r1/R1A_COGNITIVE_INSTRUCTIONAL.md §5 R1-POL-A09",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "phase": [
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "nach Abruf- oder Lösungsversuchen, stichprobenartig"
+   },
+   "recommendation": "Konfidenz retrospektiv nach einer Antwort oder als verzögertes Urteil erheben; Kalibrierung gegen tatsächliche Ergebnisse sichtbar machen; nur stichprobenartig fragen; nahe und Transferitems getrennt kalibrieren.",
+   "product_affordances": {
+    "interactive": "stichprobenartige retrospektive Konfidenz; Kalibrierungsansicht pro Operation"
+   },
+   "abstain_or_fallback": [
+    "keine Behauptung, Kalibrierungstraining verbessere Prüfungsleistung",
+    "keine Konfidenzabfrage nach jedem Abrufitem in Lernmodi, deren Wirkung gemessen wird",
+    "keine Timing-Manipulation von Urteilen als Intervention"
+   ],
+   "parameters": [
+    {
+     "name": "min_judgements_before_calibration_view",
+     "value": 20,
+     "unit": "Urteile je Operation",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    },
+    {
+     "name": "confidence_scale",
+     "value": "0-100",
+     "unit": "Prozent",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "rhodes2011delayedjol",
+     "locator": "Abstract (relative Genauigkeit g = 0.93)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "janssen2024monitoring",
+     "locator": "Results (Genauigkeit g = 0.25; Timing negativ)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "higham2023reactivity",
+     "locator": "Abstract (Umkehr des Testeffekts mit Urteilen)",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "double2018reactivity",
+     "locator": "Metadaten",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Wortmaterial; Übertragbarkeit auf Problemlösen unklar",
+     "kein Leistungsnutzen gezeigt"
+    ],
+    "sub_claims": [
+     {
+      "claim": "verzögerte/retrospektive Urteile sind genauer",
+      "level": "moderate"
+     },
+     {
+      "claim": "Leistungsnutzen von Kalibrierungsanzeigen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Konfidenz vs. Ergebnis (Brier-Score, Kalibrierungskurve) pro Operation",
+   "independent_outcome": "Kalibrierung an unbekannten verzögerten Items; Prüfungsleistung im randomisierten Vergleich mit/ohne Kalibrierungsanzeige",
+   "failure_modes": [
+    "Reaktivität",
+    "Überschätzung auf Transferitems",
+    "Demotivation"
+   ],
+   "falsifier": "Eine Kalibrierungsanzeige verbessert weder die Kalibrierung an neuen Items noch Lernentscheidungen gegenüber einer Kontrolle.",
+   "kb_rule_links": [
+    {
+     "rule_id": "MC-R1",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "lead_correction": "MC-R1 verlangt eine prospektive Einschätzung vor jedem Lösen. Wegen möglicher Reaktivität (higham2023, Wortmaterial) wird daraus eine stichprobenartige, bevorzugt retrospektive Erhebung; die Übertragbarkeit der Reaktivität auf Problemlösen ist ungeklärt."
+  },
+  {
+   "id": "R1-POL-A10",
+   "title": "Fallvergleich mit nachgelagertem Prinzip für Strukturtransfer",
+   "source_section": "r1/R1A_COGNITIVE_INSTRUCTIONAL.md §5 R1-POL-A10",
+   "applies_to_operations": [
+    "recall_discrimination",
+    "symbolic_procedure"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "phase": [
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "nach Erwerb der Einzelverfahren; Prüfungen mit neuen Oberflächen"
+   },
+   "recommendation": "Paare strukturgleicher, oberflächenverschiedener Fälle vergleichen lassen, danach das Prinzip explizit nennen, plus ein oberflächlich ähnlicher, strukturell verschiedener Kontrastfall.",
+   "product_affordances": {
+    "textbook": "Vergleichsabschnitte mit Prinzip nach dem Vergleich",
+    "workbook": "Vergleichs- und Kontrastaufgaben mit Transferdimension"
+   },
+   "abstain_or_fallback": [
+    "keine Ferntransfer-Behauptung",
+    "kein Transferanspruch ohne verzögerten Test an neuen Oberflächen"
+   ],
+   "parameters": [
+    {
+     "name": "cases_per_principle",
+     "value": "2 strukturgleiche + 1 Kontrastfall",
+     "unit": "Fälle",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "alfieri2013comparison",
+     "locator": "Abstract (d = .50; Prinzip nach Vergleich besser)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "sala2017fartransfer",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "barnett2002",
+     "locator": "KB tr.1",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Abstract-Ebene",
+     "verzögerte Effekte unklar",
+     "gemischte Populationen"
+    ],
+    "sub_claims": []
+   },
+   "observable": "Benennung des Prinzips, Klassifikation neuer Fälle nach Struktur",
+   "independent_outcome": "verzögerter unassistierter Test mit strukturell gleichen, oberflächlich neuen Aufgaben und strukturell verschiedenen Kontrastfällen",
+   "failure_modes": [
+    "Prinzip wird auswendig gelernt statt angewendet",
+    "Kontrastfälle verwirren Novizen"
+   ],
+   "falsifier": "Gegenüber zeitgleicher zusätzlicher gemischter Übung zeigt sich auf strukturell neuen Items nach >= 1 Woche kein Vorteil.",
+   "kb_rule_links": [
+    {
+     "rule_id": "TR-R1",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "hypothesis_only_operations": [
+    "rule_based_contextual",
+    "diagnostic_reasoning"
+   ]
+  },
+  {
+   "id": "R1-POL-A11",
+   "title": "Vorfragen (Pretesting) optional vor neuen Inhalten",
+   "source_section": "r1/R1A_COGNITIVE_INSTRUCTIONAL.md §5 R1-POL-A11",
+   "applies_to_operations": [
+    "recall_discrimination"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "phase": [
+     "acquisition"
+    ],
+    "conditions": "begleitete Lernsituation mit unmittelbar folgender Erklärung"
+   },
+   "recommendation": "Wenige Vorfragen vor dem Studium neuer Inhalte, danach Gelegenheit zur korrekten Antwort; ausdrücklich als 'noch nicht gelernt - Raten erlaubt' gerahmt.",
+   "product_affordances": {
+    "textbook": "optionale Vorfragen am Abschnittsbeginn",
+    "interactive": "optionale Vorfragen vor Videos/Labs"
+   },
+   "abstain_or_fallback": [
+    "nicht in selbstgesteuerten Kontexten mit Abbruchrisiko ohne Monitoring",
+    "nicht als Diagnose verwenden",
+    "nicht für Inferenz- oder Transferziele beanspruchen"
+   ],
+   "parameters": [
+    {
+     "name": "pretest_questions_per_unit",
+     "value": 3,
+     "unit": "Fragen (Maximum)",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "pan2023pretesting",
+     "locator": "Review (vorgetestete Inhalte)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pan2023pretesting",
+     "locator": "ungetestete Inhalte gemischt; Inferenztransfer oft null; MOOC-Abbruch",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "narrativer Review",
+     "teils nicht randomisierte Klassenstudien",
+     "Mathematik nicht gesehen"
+    ],
+    "sub_claims": []
+   },
+   "observable": "Vorfragenantworten, Fortsetzung oder Abbruch nach Vorfragen",
+   "independent_outcome": "verzögerter Test auf vorgetestete und nicht vorgetestete Inhalte; Verbleibsrate",
+   "failure_modes": [
+    "Demotivation",
+    "Abbruch",
+    "unkorrigierte Fehlantworten"
+   ],
+   "falsifier": "Kein Vorteil für vorgetestete Inhalte bei gleicher Zeit oder erhöhter Abbruch.",
+   "kb_rule_links": [
+    {
+     "rule_id": "NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-B01",
+   "title": "Schlafschützende Lernplanung über die gesamte Lernphase",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B01",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "embodied_psychomotor",
+     "reason": "Schlaf-/Pausenbefunde für motorisches Lernen und Sicherheitsermüdung gehören zu R4; hier nicht übertragen."
+    }
+   ],
+   "context": {
+    "phase": [
+     "acquisition",
+     "consolidation",
+     "final_exam_week"
+    ],
+    "conditions": "jeder automatisch erzeugte Tages-/Wochen-/Prüfungsplan; Schlaf-/Off-Fenster vom Nutzer angegeben oder nicht"
+   },
+   "recommendation": "Keine Einheiten im angegebenen Schlaffenster, nie eine durchgearbeitete Nacht vorschlagen; fehlt das Fenster, einmal fragen, sonst neutraler Default. Regelmäßigkeit über Wochen schützen; Nickerchen nur als vom Nutzer gewählter Baustein, nie als Ersatz für Nachtschlaf.",
+   "product_affordances": {
+    "interactive": "Planer respektiert Schlaf-/Off-Fenster; keine Nachtsitzungen"
+   },
+   "abstain_or_fallback": [
+    "Schichtarbeit, Betreuungspflichten, abweichende Chronobiologie: ausschließlich das Nutzerfenster, keine Bewertung",
+    "anhaltende Schlafprobleme gemeldet: keine Schlafratschläge, nur allgemeine Information und Verweis (R1-POL-B12)"
+   ],
+   "parameters": [
+    {
+     "name": "default_sleep_opportunity",
+     "value": 8,
+     "unit": "h",
+     "status": "provisional_product_parameter",
+     "rationale": "Neutraler Default ohne Nutzerangabe; Kontrollbedingungen in crowley2024 lagen bei 7–11 h, das ist kein individueller Schwellenwert"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "newbury2021sleepdeprivation",
+     "locator": "Results MA1/MA2, trim-and-fill-adjustierte g",
+     "relation": "supports"
+    },
+    {
+     "source_id": "crowley2024sleeprestriction",
+     "locator": "Abstract, g = 0.29",
+     "relation": "supports"
+    },
+    {
+     "source_id": "okano2019sleep",
+     "locator": "Results: sleep duration, quality, consistency",
+     "relation": "supports"
+    },
+    {
+     "source_id": "baron2021sleepextension",
+     "locator": "Abstract: Zeitplanvorgaben wirksamer als Edukation",
+     "relation": "supports"
+    },
+    {
+     "source_id": "cousins2019nap",
+     "locator": "Results factual knowledge task, Tag 8",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "ericsson1993deliberate",
+     "locator": "S. 376 Schlaf der besten Violinisten",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "keine Interventionsstudie zu schlafschützenden Lernplanern",
+     "Laborbefunde, Publikationsbias und geringe Power in den Meta-Analysen"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Schlafverlust vor und nach dem Lernen beeinträchtigt die Gedächtnisbildung im Labor",
+      "level": "moderate"
+     },
+     {
+      "claim": "Ein schlafschützender Planer verbessert Prüfungsleistung",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Anteil geplanter und protokollierter Sitzungen innerhalb des Fensters; Overrides; ob ein Fenster angegeben wurde",
+   "independent_outcome": "verzögerte (>= 7 Tage), unassistierte Leistung auf zurückgehaltenen Items; optional gemeldete Prüfungsnote",
+   "failure_modes": [
+    "Schuld/Angst durch wertende Meldungen",
+    "Über-Medikalisierung",
+    "Schlafdaten sind Gesundheitsdaten (nur lokal, nur Fenster)",
+    "Starrheit vor Prüfungen"
+   ],
+   "falsifier": "Ein randomisierter Produktvergleich (schlafschützender vs. unbeschränkter Planer) zeigt bei ausreichender Präzision keine Verbesserung oder eine Verschlechterung der verzögerten unassistierten Leistung, oder Lernen wandert in unprotokollierte Nachtzeiten.",
+   "kb_rule_links": [
+    {
+     "rule_id": "NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-B02",
+   "title": "Prüfungsvorabend und Prüfungswoche",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B02",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "phase": [
+     "final_exam_week"
+    ],
+    "conditions": "letzte Tage vor einem eingetragenen Prüfungstermin"
+   },
+   "recommendation": "Jeder prüfungsrelevante Block wird mindestens eine Nacht vor der Prüfung erstmals gelernt und danach mindestens einmal abgerufen; am Vorabend leichte prüfungsnahe Wiederholung statt großer neuer Blöcke. Nicht behaupten, die letzte Nacht entscheide die Note.",
+   "product_affordances": {
+    "interactive": "Prüfungswochenplan mit Erstlern- und Abrufzeitpunkten je Block",
+    "workbook": "Vorabend-Set aus bekannten, prüfungsnahen Aufgaben"
+   },
+   "abstain_or_fallback": [
+    "Plan geht rechnerisch nicht auf: Zielkonflikt offen zeigen und nach Prüfungsgewicht priorisieren, ohne Moralisierung und ohne Nachtschicht"
+   ],
+   "parameters": [
+    {
+     "name": "min_nights_between_first_study_and_exam",
+     "value": 1,
+     "unit": "Nacht",
+     "status": "provisional_product_parameter",
+     "rationale": "Plausibel aus Konsolidierungsbefunden, nicht getestet"
+    },
+    {
+     "name": "min_retrievals_after_first_study",
+     "value": 1,
+     "unit": "Abruf",
+     "status": "provisional_product_parameter",
+     "rationale": "Sicherstellung mindestens eines Abrufs vor der Prüfung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "newbury2021sleepdeprivation",
+     "locator": "MA2 Schlafentzug vor dem Lernen",
+     "relation": "supports"
+    },
+    {
+     "source_id": "okano2019sleep",
+     "locator": "Results 'Night before assessments'",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "shields2017stress",
+     "locator": "Results Retrieval",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "keine Studie zu genau dieser Planregel",
+     "okano2019: Einzelnacht nicht mit Noten assoziiert"
+    ],
+    "sub_claims": []
+   },
+   "observable": "Zeitpunkt der ersten Bearbeitung je Block relativ zum Prüfungstermin; Anzahl Abrufe danach",
+   "independent_outcome": "Prüfungsleistung je Block (falls gemeldet), verzögerter Test",
+   "failure_modes": [
+    "Panik durch 'zu spät'-Meldungen",
+    "falsche Sicherheit durch Plan-Compliance"
+   ],
+   "falsifier": "Blöcke, die erst am Vortag eingeführt wurden, schneiden bei gleicher Lernzeit und kontrollierter Schwierigkeit nicht schlechter ab als früher eingeführte.",
+   "kb_rule_links": [
+    {
+     "rule_id": "NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-B03",
+   "title": "Sitzungslänge und Pausen als Wohlbefindensangebot",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B03",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "conditions": "Lernsitzungen mit Timer oder Planblöcken"
+   },
+   "recommendation": "Konfigurierbare Fokusblöcke mit kurzen Pausen und gelegentlicher längerer Pause; frei änderbar und abschaltbar. Begründung nur 'kann Müdigkeit und Stimmung verbessern', nicht 'verbessert dein Lernen'.",
+   "product_affordances": {
+    "interactive": "abschaltbarer Fokus-/Pausentimer"
+   },
+   "abstain_or_fallback": [
+    "Timer wird regelmäßig übersprungen oder als störend gemeldet: nicht weiter nahelegen",
+    "Prüfungssimulation: Prüfungsbedingungen statt Pausentakt"
+   ],
+   "parameters": [
+    {
+     "name": "focus_block",
+     "value": "25-50",
+     "unit": "min",
+     "status": "provisional_product_parameter",
+     "rationale": "Konvention, keine Behaltensstudie"
+    },
+    {
+     "name": "short_break",
+     "value": "5-10",
+     "unit": "min",
+     "status": "provisional_product_parameter",
+     "rationale": "Konvention"
+    },
+    {
+     "name": "long_break_after_focus",
+     "value": ">=20 nach ~120",
+     "unit": "min",
+     "status": "provisional_product_parameter",
+     "rationale": "Konvention"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "albulescu2022microbreaks",
+     "locator": "Results Task-Typ; Discussion",
+     "relation": "supports"
+    },
+    {
+     "source_id": "albulescu2022microbreaks",
+     "locator": "Moderator: kognitive Aufgaben n. s.",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "biwer2023pomodoro",
+     "locator": "Abstract Results",
+     "relation": "supports"
+    },
+    {
+     "source_id": "hagger2016egodepletion",
+     "locator": "Abstract",
+     "relation": "contradicts"
+    },
+    {
+     "source_id": "vohs2021egodepletion",
+     "locator": "Abstract",
+     "relation": "contradicts"
+    },
+    {
+     "source_id": "kurzban2013opportunitycost",
+     "locator": "Abstract",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "keine Pausenstudie mit Behaltensmaß",
+     "kleine Effekte, unklares Bias-Risiko"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Kurze Pausen verbessern selbstberichtete Vitalität/Müdigkeit",
+      "level": "low"
+     },
+     {
+      "claim": "Pausentakte verbessern Lernen",
+      "level": "very_low"
+     },
+     {
+      "claim": "Willenskraft als aufladbarer Akku (Ego Depletion) als Begründung",
+      "level": "high"
+     }
+    ]
+   },
+   "observable": "Pausenannahme, Übersprungsrate, optionaler Müdigkeitsselbstbericht",
+   "independent_outcome": "verzögerte Behaltensleistung unter verschiedenen Takt-Einstellungen (Studie, nicht Produktdefault)",
+   "failure_modes": [
+    "Unterbrechung produktiver Phasen",
+    "Timer als Kontrollinstrument",
+    "pseudowissenschaftliche Begründungen"
+   ],
+   "falsifier": "Randomisierte Takt-Defaults zeigen keinen Unterschied in Müdigkeit oder Abbrüchen, oder feste Takte senken die verzögerte Leistung gegenüber selbstregulierten Pausen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-B04",
+   "title": "Arbeitslasthinweise ohne universelle Stundenquote",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B04",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "conditions": "sehr hohe geplante Tageslast oder abrupte Laststeigerung"
+   },
+   "recommendation": "Keine allgemeingültige Obergrenze an Lernstunden; nicht blockierender, abschaltbarer Reflexionshinweis nur relativ zur eigenen jüngsten Basis; optionale persönliche Obergrenze.",
+   "product_affordances": {
+    "interactive": "Lasthinweis relativ zur eigenen 7-Tage-Basis"
+   },
+   "abstain_or_fallback": [
+    "weniger als 7 Tage Historie: kein Vergleich, nur neutrale Information",
+    "kein Hinweis während einer Prüfungssimulation"
+   ],
+   "parameters": [
+    {
+     "name": "load_ratio_trigger",
+     "value": 1.5,
+     "unit": "x gleitendes 7-Tage-Mittel über 3 Tage",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung zur Erkennung abrupter Steigerung"
+    },
+    {
+     "name": "days_without_light_day_trigger",
+     "value": 7,
+     "unit": "Tage",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "macnamara2014deliberate",
+     "locator": "Abstract: Bildung 4 % Varianz (Corrigendum 2018 nicht gelesen)",
+     "relation": "contradicts"
+    },
+    {
+     "source_id": "madigan2021burnout",
+     "locator": "Results: Burnout und Leistung (korrelativ)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "macnamara2019violin",
+     "locator": "Results Tagebuch vs. Schätzung",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "ericsson1993deliberate",
+     "locator": "S. 369–371 effort constraint; S. 391 'around 4 hr' als Hypothese",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "pencavel2015hours",
+     "locator": "Abstract (Beschäftigte, indirekt)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "pega2021longhours",
+     "locator": "Abstract (Beschäftigte, indirekt)",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "keine Studie zu Lasthinweisen bei Studierenden",
+     "Evidenz indirekt und korrelativ"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Übungsstunden allein erklären Leistung nur begrenzt",
+      "level": "moderate"
+     },
+     {
+      "claim": "4 h/Tag als allgemeine Obergrenze",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "geplante vs. erledigte Minuten je Tag; Tage ohne leichten Tag; Reaktion auf Hinweis",
+   "independent_outcome": "Prüfungsleistung, Planabbruch, Wohlbefinden (nur in genehmigter Studie mit validierten Instrumenten)",
+   "failure_modes": [
+    "Stundenquote durch die Hintertür",
+    "Bevormundung legitimer Intensivphasen",
+    "Arbeitslastdaten zur Fremdüberwachung"
+   ],
+   "falsifier": "Nutzer mit Hinweisen unterscheiden sich in verzögerter Leistung und Abbruchquote nicht von Nutzern ohne Hinweise, oder die Hinweise senken Lernzeit ohne Gewinn an Behalten oder Wohlbefinden.",
+   "kb_rule_links": [
+    {
+     "rule_id": "NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-B05",
+   "title": "Qualitäts- statt Stundenmetriken im Fortschritt",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B05",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "conditions": "Dashboards, Fortschrittsanzeigen, Gamification"
+   },
+   "recommendation": "Primäre Fortschrittsanzeige ist verzögerte, unassistierte Abrufleistung und Abdeckung prüfungsrelevanter Items; Lernzeit darf angezeigt, aber nicht belohnt werden (keine Stunden-Badges, keine Stunden-Ranglisten).",
+   "product_affordances": {
+    "interactive": "Fortschritt = verzögerte unassistierte Leistung + Abdeckung",
+    "anki": "Anki-Statistik bleibt Anki-intern; keine Umdeutung als Kompetenz"
+   },
+   "abstain_or_fallback": [
+    "noch keine verzögerten Abrufdaten: 'noch keine Aussage möglich' statt Ersatz durch Stunden"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "macnamara2014deliberate",
+     "locator": "Abstract",
+     "relation": "contradicts"
+    },
+    {
+     "source_id": "macnamara2019violin",
+     "locator": "Results Tagebuch",
+     "relation": "supports"
+    },
+    {
+     "source_id": "howard2021sdt",
+     "locator": "Abstract: externe Regulation",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "plant2005studytime",
+     "locator": "nur Titel/Metadaten",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "Begründung über Negativevidenz und Konstruktvalidität, kein Dashboard-Experiment"
+    ],
+    "sub_claims": []
+   },
+   "observable": "Dashboard-Interaktion; Anteil Items mit verzögertem Abruf",
+   "independent_outcome": "unabhängiger Transfertest; Prüfungsnote",
+   "failure_modes": [
+    "Leistungsdruck durch Abrufquoten",
+    "Messung wird zum Trainingsziel (Testnähe)"
+   ],
+   "falsifier": "Eine stundenbasierte Fortschrittsanzeige führt bei gleicher Zeit zu gleich guter oder besserer verzögerter Leistung und geringerer Abbruchrate.",
+   "kb_rule_links": [
+    {
+     "rule_id": "MC-R2",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-B06",
+   "title": "Aufmerksamkeitsschützendes Sitzungsdesign",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B06",
+   "applies_to_operations": [
+    "self_regulation",
+    "recall_discrimination",
+    "symbolic_procedure"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "conditions": "lange passive Inputs (Video, lange Texte) und Unterbrechungen"
+   },
+   "recommendation": "Lange passive Inputs segmentieren und nach jedem Segment einen kurzen Abrufcheck anbieten; eigene Benachrichtigungen während Sitzungen unterdrücken; optionaler Fokusmodus nur mit der Begründung 'Unterbrechungen reduzieren'.",
+   "product_affordances": {
+    "textbook": "Abschnittsweise kurze Abrufchecks",
+    "interactive": "Segmentierte Videos/Labs mit Zwischenabruf; keine Produkt-Pushs während Sitzungen"
+   },
+   "abstain_or_fallback": [
+    "Zwischenchecks führen zu häufigem Überspringen: Frequenz senken",
+    "Prüfungssimulation: keine Zwischenchecks"
+   ],
+   "parameters": [
+    {
+     "name": "segment_length",
+     "value": "10-20",
+     "unit": "min Video bzw. ein Textabschnitt",
+     "status": "provisional_product_parameter",
+     "rationale": "Größenordnung der Laborvorlesungen, nicht optimiert"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "szpunar2013interpolated",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "ruizpardo2022braindrain",
+     "locator": "Abstract",
+     "relation": "contradicts"
+    },
+    {
+     "source_id": "bottger2023braindrain",
+     "locator": "Results gepoolter Effekt",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "wiradhany2017mediamultitasking",
+     "locator": "Abstract",
+     "relation": "contradicts"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "kontrollierte Experimente, konsistent mit R1A-Abrufevidenz",
+     "nur Abstract-Ebene, kurze Laborvorlesungen",
+     "Lead-Korrektur: Produktwirkung nur aus Abstracts kurzer Laborvorlesungen abgeleitet"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Interpolierte Tests verringern Mind Wandering bei Videovorlesungen",
+      "level": "moderate"
+     },
+     {
+      "claim": "Fokusmodus verbessert Lernen",
+      "level": "low"
+     }
+    ]
+   },
+   "observable": "Antworten/Überspringen bei Zwischenchecks; Fokusmodus-Aktivierung",
+   "independent_outcome": "verzögerter Endtest ohne Hilfe",
+   "failure_modes": [
+    "Fragmentierung, Frust",
+    "Überwachung von Gerätenutzung (nicht erlaubt)",
+    "Brain-Drain-Mythos"
+   ],
+   "falsifier": "Segmentierte Inputs mit Zwischenchecks zeigen bei gleicher Zeit keine bessere verzögerte Leistung als unsegmentierte, oder erhöhen Abbrüche deutlich.",
+   "kb_rule_links": [
+    {
+     "rule_id": "RP-R1",
+     "relation": "refines"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN",
+   "lead_correction": "R1B setzte 'moderate'. Auf Policy-Ebene (Produktwirkung) herabgestuft auf 'low'; die Teilaussage zu interpolierten Tests bleibt 'moderate'."
+  },
+  {
+   "id": "R1-POL-B07",
+   "title": "Autonomieunterstützendes Motivationsframing",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B07",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "conditions": "Produktsprache, Onboarding, Rückmeldungen nach Fehlern, Erinnerungen"
+   },
+   "recommendation": "Autonomieunterstützend formulieren, Fehler als Information zeigen, keine Scham-, Schuld- oder Verlustmechaniken (keine Streak-Strafen); optionale kurze Relevanzreflexion (Utility Value), Growth-Mindset-Botschaften nie als Leistungsversprechen.",
+   "product_affordances": {
+    "textbook": "Sprache ohne Drohung und Personenlob",
+    "interactive": "keine Streak-Verluststrafen; optionale Relevanzreflexion",
+    "anki": "keine Schuld-Erinnerungen"
+   },
+   "abstain_or_fallback": [
+    "Reflexionsaufgaben weglassen, wenn sie Lernzeit verdrängen oder ignoriert werden"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "howard2021sdt",
+     "locator": "Abstract (korrelativ)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "hulleman2009utility",
+     "locator": "Abstract (moderiert)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "macnamara2023mindset",
+     "locator": "Abstract",
+     "relation": "contradicts"
+    },
+    {
+     "source_id": "yeager2019mindset",
+     "locator": "GPA-Ergebnisse",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "burnette2023mindset",
+     "locator": "Abstract",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "sisk2018mindset",
+     "locator": "Abstract",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "SDT-Evidenz korrelativ",
+     "Utility-Value schulbezogen und moderiert",
+     "Mindset-Effekte umstritten"
+    ],
+    "sub_claims": []
+   },
+   "observable": "Nutzung optionaler Reflexion; Rückkehr nach Fehlversuchen; Abbrüche",
+   "independent_outcome": "Persistenz bis zur Prüfung; Prüfungsleistung; validierte Motivationsskalen nur in Studie",
+   "failure_modes": [
+    "manipulative Gamification",
+    "toxische Positivität",
+    "Reflexion als Zeitverschwendung"
+   ],
+   "falsifier": "Eine kontrollierende oder Verlust-Framing-Variante führt im Vergleich zu höherer Persistenz und Leistung ohne Wohlbefindenseinbuße.",
+   "kb_rule_links": [
+    {
+     "rule_id": "FB-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-B08",
+   "title": "Stress und Prüfungsangst: Übung statt Versprechen",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B08",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "phase": [
+     "final_exam_week"
+    ],
+    "conditions": "gemeldete Prüfungsangst oder nahender Prüfungstermin"
+   },
+   "recommendation": "Prüfungsnahe Simulation und Abrufübung bis zu stabiler Leistung anbieten; optional ehrliche Information zur Neubewertung von Anspannung mit Hinweis auf kleine mittlere Effekte; expressives Schreiben nicht als wirksam bewerben; starke Angst: Verweis (B12).",
+   "product_affordances": {
+    "workbook": "zeitlich begrenzte Probeklausur",
+    "interactive": "Simulation unter Prüfungsbedingungen; optionale Infokarte"
+   },
+   "abstain_or_fallback": [
+    "keine Stressmessung, keine Physiologie, keine Bewertung von Angstsymptomen"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "shields2017stress",
+     "locator": "Results Retrieval",
+     "relation": "supports"
+    },
+    {
+     "source_id": "bosshard2024reappraisal",
+     "locator": "Results Publication bias (adjustiert klein)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "smith2016retrievalstress",
+     "locator": "Abstract (Einzelstudie)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "wolf2017commentary",
+     "locator": "Absatz 2",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "ramirez2011writing",
+     "locator": "Abstract (Original)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "camerer2018ssrp",
+     "locator": "sekundär kodiertes Replikationsergebnis",
+     "relation": "contradicts"
+    }
+   ],
+   "certainty": {
+    "level": "low",
+    "reasons": [
+     "kleine, biasanfällige Effekte",
+     "Laborstress ist nicht Prüfungsangst",
+     "zentrale Schutzstudie unrepliziert"
+    ],
+    "sub_claims": []
+   },
+   "observable": "Nutzung von Simulation und Infokarte; optional gemeldete Anspannung (nicht gespeichert ohne Zustimmung)",
+   "independent_outcome": "Prüfungsleistung; Leistung in unabhängiger, zeitlich begrenzter Testsituation",
+   "failure_modes": [
+    "Bagatellisierung behandlungsbedürftiger Angst",
+    "Druck durch 'Stress ist gut'",
+    "falsche Wirksamkeitsversprechen"
+   ],
+   "falsifier": "Die Reappraisal-Karte verbessert in einer präregistrierten Produktstudie die Leistung in zeitlich begrenzten Tests nicht oder erhöht berichtete Belastung.",
+   "kb_rule_links": [
+    {
+     "rule_id": "NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-B09",
+   "title": "Keine Kognitionsversprechen für Bewegung",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B09",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [
+    {
+     "operation": "embodied_psychomotor",
+     "reason": "Schlaf-/Pausenbefunde für motorisches Lernen und Sicherheitsermüdung gehören zu R4; hier nicht übertragen."
+    }
+   ],
+   "context": {
+    "conditions": "Fragen nach Sport für bessere Noten; Bewegungspausen im Plan"
+   },
+   "recommendation": "Nicht behaupten, Sport verbessere Kognition oder Prüfungsleistung; Bewegung darf als nutzergewählte Erholungsaktivität im Plan stehen; keine Trainingsvorgaben.",
+   "product_affordances": {
+    "interactive": "Bewegungsblock als freie Planoption ohne Wirkversprechen"
+   },
+   "abstain_or_fallback": [
+    "Gesundheitsfragen zu Sport: allgemeiner Verweis auf öffentliche Gesundheitsinformationen bzw. ärztliche Beratung"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "ciria2023exercise",
+     "locator": "Abstract (Korrektur 2026 nicht geprüft)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "roig2013exercise",
+     "locator": "Abstract (akute Laboreffekte)",
+     "relation": "qualifies"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "bias-sensitive Umbrella-Analyse mit vernachlässigbarem chronischem Effekt",
+     "Korrektur ungeprüft, gemischte Altersgruppen"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Die Unterlassungsregel (kein Kognitionsversprechen) ist gerechtfertigt",
+      "level": "moderate"
+     },
+     {
+      "claim": "akuter Timing-Nutzen von Bewegung für Lernen",
+      "level": "very_low"
+     }
+    ]
+   },
+   "observable": "Nutzer plant Bewegungsblöcke (nur Information)",
+   "independent_outcome": "nicht anwendbar: Unterlassungsregel; Revision nur bei neuer Synthese (siehe Falsifier)",
+   "failure_modes": [
+    "unbelegte Versprechen",
+    "Druck bei Krankheit/Behinderung",
+    "Gesundheitsdatensammlung"
+   ],
+   "falsifier": "Eine neue, bias-sensitive Synthese von RCTs mit jungen Erwachsenen findet robuste Effekte akuter oder chronischer Bewegung auf verzögerte Lernleistung; dann Policy neu prüfen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-B10",
+   "title": "Erholung, Off-Zeiten und Benachrichtigungen",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B10",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "conditions": "Erinnerungen, Push-Nachrichten, Wochenplanung"
+   },
+   "recommendation": "Keine Lern-Erinnerungen im Schlaf- oder Off-Fenster; Wochenpläne enthalten standardmäßig einen entfernbaren leichten Tag; Erinnerungsfrequenz begrenzt und abschaltbar.",
+   "product_affordances": {
+    "interactive": "Off-Fenster für Erinnerungen; leichter Tag als Default",
+    "anki": "keine zusätzlichen Produkt-Erinnerungen über Anki hinaus im Off-Fenster"
+   },
+   "abstain_or_fallback": [
+    "letzte Tage vor einer Prüfung: leichter Tag ohne Warnschleife streichbar"
+   ],
+   "parameters": [
+    {
+     "name": "light_days_per_week",
+     "value": 1,
+     "unit": "Tag",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    },
+    {
+     "name": "max_reminders_per_day",
+     "value": 2,
+     "unit": "Erinnerungen",
+     "status": "provisional_product_parameter",
+     "rationale": "Setzung"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "wendsche2017detachment",
+     "locator": "Abstract (Beschäftigte)",
+     "relation": "supports"
+    },
+    {
+     "source_id": "ericsson1993deliberate",
+     "locator": "S. 371, 377",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "madigan2021burnout",
+     "locator": "Results",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "very_low",
+    "reasons": [
+     "indirekte, korrelative Evidenz aus der Arbeitswelt",
+     "keine Studierendenstudie zu Benachrichtigungsregeln"
+    ],
+    "sub_claims": []
+   },
+   "observable": "Benachrichtigungen im Off-Fenster (Soll 0); Deaktivierungsrate",
+   "independent_outcome": "Planabbruch, Prüfungsleistung, Wohlbefinden in Studie",
+   "failure_modes": [
+    "verpasste Termine durch zu wenige Erinnerungen",
+    "Paternalismus"
+   ],
+   "falsifier": "Nutzer mit Off-Fenster-Regel brechen Pläne häufiger ab oder schneiden schlechter ab, ohne Wohlbefindensvorteil.",
+   "kb_rule_links": [
+    {
+     "rule_id": "NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-B11",
+   "title": "Register verbotener Produktbehauptungen",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B11",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "conditions": "jede generierte oder redaktionelle Produktsprache, Marketing, Tutor-Antworten; nicht Fachinhalte, die Nutzer lernen"
+   },
+   "recommendation": "Nicht als Fakt oder Funktionsbegründung: Lernstil-Meshing, Hemisphärentypen, '10 % des Gehirns'; 'gehirnbasiert/neuro-optimiert' als Validierung; Ego-Depletion-Akku; Lernen im Schlaf/Cue-Abspielen/Hirnstimulation; '10.000 Stunden' und 'maximal 4 h/Tag' als Tatsache; Mindset oder Stressumdeutung als garantierter Boost; Handy-Präsenz senkt Intelligenz; Sport als Notenbooster; Wearable-Schlafscores als valide; jede Substanz-/Koffein-/Dosierungsempfehlung; Study-Maxing als validiert.",
+   "product_affordances": {
+    "textbook": "Begriffsprüfung gegen Liste",
+    "workbook": "Begriffsprüfung",
+    "anki": "Begriffsprüfung",
+    "interactive": "Begriffsprüfung inkl. Tutor-Antworten"
+   },
+   "abstain_or_fallback": [
+    "explizite Nutzerfrage: neutrale Einordnung des Evidenzstands ohne Handlungsanweisung; Substanzen nur Verweis auf ärztliche/pharmazeutische Beratung",
+    "Fachinhalte über Neuromythen (z. B. Vorlesung zu Neuromythen) sind keine Produktbehauptungen"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "hagger2016egodepletion",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "vohs2021egodepletion",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "dekker2012neuromyths",
+     "locator": "Table 1",
+     "relation": "supports"
+    },
+    {
+     "source_id": "pashler2008",
+     "locator": "KB-Quelle, nicht neu auditiert",
+     "relation": "supports"
+    },
+    {
+     "source_id": "bowers2016educationalneuro",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "ruizpardo2022braindrain",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "macnamara2014deliberate",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "macnamara2019violin",
+     "locator": "Results",
+     "relation": "supports"
+    },
+    {
+     "source_id": "ciria2023exercise",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "macnamara2023mindset",
+     "locator": "Abstract",
+     "relation": "supports"
+    },
+    {
+     "source_id": "hu2020tmr",
+     "locator": "Abstract (Laborverfahren)",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "okano2019sleep",
+     "locator": "Discussion: Fitbit-Score ohne publizierte Validierung",
+     "relation": "supports"
+    }
+   ],
+   "certainty": {
+    "level": "moderate",
+    "reasons": [
+     "Punkte stützen sich auf Synthesen und Replikationen mit laufenden Debatten",
+     "Punkte 9–11 sind normative Sicherheitsregeln"
+    ],
+    "sub_claims": [
+     {
+      "claim": "Ego Depletion nicht repliziert (zwei präregistrierte Multi-Lab-Studien)",
+      "level": "high"
+     },
+     {
+      "claim": "Meshing, Brain-Drain, Lernen im Schlaf, 10.000 h, Mindset-Boost, Sport-Booster als Tatsachen unzulässig",
+      "level": "moderate"
+     },
+     {
+      "claim": "Substanzen, Wearable-Scores, Study-Maxing",
+      "level": "normative"
+     }
+    ]
+   },
+   "observable": "automatisierte Prüfung generierter Texte gegen eine Begriffsliste (technisch, kein Lernoutcome)",
+   "independent_outcome": "unabhängiger redaktioneller Review von Stichproben generierter Texte",
+   "failure_modes": [
+    "Überblocken legitimer Fachinhalte",
+    "falsche Sicherheit durch Wortliste"
+   ],
+   "falsifier": "Neue präregistrierte, unabhängig replizierte Evidenz für eine der Aussagen (z. B. Meshing-Interaktion) führt zur gezielten Revision des betroffenen Eintrags.",
+   "kb_rule_links": [
+    {
+     "rule_id": "LS-R1",
+     "relation": "retains"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  },
+  {
+   "id": "R1-POL-B12",
+   "title": "Medizinische Grenze, Weiterverweisung und Datenschutz",
+   "source_section": "r1/R1B_NEURO_INTENSITY.md §5 R1-POL-B12",
+   "applies_to_operations": [
+    "self_regulation"
+   ],
+   "not_applicable_operations": [],
+   "context": {
+    "conditions": "gemeldete anhaltende Schlafprobleme, Erschöpfung/Burnout-Anzeichen, starke Angst, Panik, depressive Stimmung oder Krisen"
+   },
+   "recommendation": "Nur allgemeine Information und Verweis auf professionelle Hilfe (Studierendenberatung, psychologische Beratung, ärztliche Versorgung; in akuten Krisen Notrufnummern); keine Diagnose, kein Scoring, keine Therapieelemente, keine Medikamenten-/Substanzhinweise; Plan auf Wunsch entlasten. Keine Gesundheits-, Schlaf- oder Stimmungsdaten als Default; opt-in nur lokal und löschbar.",
+   "product_affordances": {
+    "interactive": "Verweisdialog; Planentlastung auf Wunsch; keine Gesundheitsdaten als Default"
+   },
+   "abstain_or_fallback": [
+    "unklare Meldung: einmal nachfragen, ob Unterstützung gewünscht ist; keine wiederholten Nachfragen"
+   ],
+   "parameters": [],
+   "evidence": [
+    {
+     "source_id": "lu2025digitalsleep",
+     "locator": "Abstract: wirksame digitale Komponenten sind klinische Interventionen",
+     "relation": "qualifies"
+    },
+    {
+     "source_id": "madigan2021burnout",
+     "locator": "Results",
+     "relation": "context_only"
+    },
+    {
+     "source_id": "wendsche2017detachment",
+     "locator": "Abstract",
+     "relation": "context_only"
+    }
+   ],
+   "certainty": {
+    "level": "normative",
+    "reasons": [
+     "Sicherheits- und Rechtsgrenze, keine empirische Ableitung"
+    ],
+    "sub_claims": []
+   },
+   "observable": "Anzahl angezeigter Verweise (aggregiert, ohne Inhalte)",
+   "independent_outcome": "externer Sicherheits- und Datenschutzreview; Nutzerbeschwerden",
+   "failure_modes": [
+    "Über-Medikalisierung normaler Prüfungsaufregung",
+    "Untererkennung echter Krisen (kein Screening-Instrument)",
+    "Datenlecks"
+   ],
+   "falsifier": "Ein externer Review zeigt, dass Verweise nicht verstanden werden, stigmatisierend wirken oder sensible Daten das Gerät verlassen.",
+   "kb_rule_links": [
+    {
+     "rule_id": "NEW",
+     "relation": "new"
+    }
+   ],
+   "status": "design_hypothesis",
+   "implementation_status": "not_implemented",
+   "learning_evaluation": "NOT_RUN"
+  }
+ ]
+}

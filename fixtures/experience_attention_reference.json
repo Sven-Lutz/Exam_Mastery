@@ -1,0 +1,3025 @@
+{
+  "schema": "em-experience-v1",
+  "unit_id": "math/scaled-attention-golden-reference",
+  "title": "Attention verstehen: vom Skalarprodukt zur gewichteten Information",
+  "source_mode": "grounded",
+  "knowledge_modes": [
+    "formal_reasoning",
+    "computational",
+    "experimental"
+  ],
+  "sources": [
+    {
+      "id": "paper/vaswani-2017",
+      "kind": "paper",
+      "locator": "Vaswani et al. (2017), Attention Is All You Need, NeurIPS, §3.2.1, Gleichung (1), Fußnote 4; §3.2.2 (Multi-Head); §3.2.3; §3.5 (Positionskodierung); §4, Tabelle 1. https://proceedings.neurips.cc/paper/7181--attention-is-all-you-need.pdf"
+    },
+    {
+      "id": "paper/blanchard-2019",
+      "kind": "paper",
+      "locator": "Blanchard, D. J. Higham & N. J. Higham (2019), Accurate Computation of the Log-Sum-Exp and Softmax Functions, arXiv:1909.03469v1, §1, Gleichungen (1.2)–(1.4); Rundungsfehleranalyse §4. https://arxiv.org/pdf/1909.03469"
+    },
+    {
+      "id": "original/attention-reference",
+      "kind": "original_derivation",
+      "locator": "Eigenständige Herleitungen, Gegenbeispiele und synthetische Zahlen dieser Referenz, alle Abschnitte ohne Quellenzitat. Kein Vorlesungsstoff; unabhängige wissenschaftliche Abnahme ausstehend."
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim/operator",
+      "text": "Eine Attention-Zeile normalisiert skaliert berechnete Query-Key-Scores und mischt damit Value-Zeilen.",
+      "source_refs": [
+        "paper/vaswani-2017"
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "id": "claim/stability",
+      "text": "Eine gemeinsame reelle Verschiebung erhält Softmax in exakter Arithmetik; Max-Shift vermeidet exponentiellen Overflow bei endlichen Logits.",
+      "source_refs": [
+        "paper/blanchard-2019"
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "id": "claim/scaling",
+      "text": "Unter expliziten Unabhängigkeits- und Momentannahmen hat ein Skalarprodukt Varianz d_k; die Skalierung ergibt Varianz eins. Das ist keine universelle Aussage über gelernte Repräsentationen.",
+      "source_refs": [
+        "original/attention-reference"
+      ],
+      "evidence_status": "unverified"
+    },
+    {
+      "id": "claim/geometry",
+      "text": "Nichtnegative normalisierte Gewichte bilden eine konvexe Kombination von Values; Scores sind keine Kausalitätsnachweise.",
+      "source_refs": [
+        "original/attention-reference"
+      ],
+      "evidence_status": "unverified"
+    },
+    {
+      "id": "claim/mask",
+      "text": "Maskierte Indizes werden vor der Normalisierung ausgeschlossen; ohne erlaubten Index ist die Zeile undefiniert.",
+      "source_refs": [
+        "original/attention-reference"
+      ],
+      "evidence_status": "unverified"
+    },
+    {
+      "id": "claim/scaling-paper",
+      "text": "Vaswani et al. vermuten, dass große Skalarprodukte Softmax in Bereiche sehr kleiner Gradienten drängen, und begründen die Skalierung mit Varianz d_k von q·k unter unabhängigen, zentrierten Komponenten mit Varianz eins.",
+      "source_refs": [
+        "paper/vaswani-2017"
+      ],
+      "evidence_status": "unverified"
+    },
+    {
+      "id": "claim/backprop",
+      "text": "Für O=AV mit zeilenweiser Softmax gilt ∂L/∂V=AᵀG, ∂L/∂A=GVᵀ, je Zeile ∂L/∂z=α⊙(g−⟨α,g⟩) und ∂L/∂Q=(∂L/∂Z)K/√d, ∂L/∂K=(∂L/∂Z)ᵀQ/√d.",
+      "source_refs": [
+        "original/attention-reference"
+      ],
+      "evidence_status": "unverified"
+    },
+    {
+      "id": "claim/multihead",
+      "text": "Multi-Head Attention projiziert in h Teilräume mit d_k=d_v=d_model/h (Basismodell: h=8, d_k=d_v=64), verkettet die Köpfe und projiziert mit W^O zurück.",
+      "source_refs": [
+        "paper/vaswani-2017"
+      ],
+      "evidence_status": "unverified"
+    },
+    {
+      "id": "claim/complexity",
+      "text": "Self-Attention kostet pro Schicht O(n²·d), eine rekurrente Schicht O(n·d²); die Gewichtsmatrizen belegen h·n² Einträge je Schicht und Sequenz.",
+      "source_refs": [
+        "paper/vaswani-2017",
+        "original/attention-reference"
+      ],
+      "evidence_status": "unverified"
+    },
+    {
+      "id": "claim/equivariance",
+      "text": "Ohne Positionsinformation und ohne Maske ist Self-Attention permutationsäquivariant; eine kausale Maske bricht diese Eigenschaft.",
+      "source_refs": [
+        "original/attention-reference",
+        "paper/vaswani-2017"
+      ],
+      "evidence_status": "unverified"
+    },
+    {
+      "id": "claim/mask-numerics",
+      "text": "In IEEE-Gleitkomma ergibt Max-Shift einer vollständig mit −∞ maskierten Zeile NaN, ein endlicher Ersatzwert ergibt Gleichverteilung; NaN·0 ist NaN.",
+      "source_refs": [
+        "original/attention-reference"
+      ],
+      "evidence_status": "unverified"
+    }
+  ],
+  "competencies": [
+    {
+      "id": "attention/shapes",
+      "operation": "derive",
+      "prerequisites": [],
+      "description": "Dimensionen und Score-Matrix herleiten"
+    },
+    {
+      "id": "attention/softmax",
+      "operation": "derive",
+      "prerequisites": [
+        "attention/shapes"
+      ],
+      "description": "Softmax, Stabilität und Ableitung begründen"
+    },
+    {
+      "id": "attention/scaling",
+      "operation": "prove",
+      "prerequisites": [
+        "attention/shapes",
+        "attention/softmax"
+      ],
+      "description": "Skalierungsargument mit Annahmen und Gegenbeispiel beurteilen"
+    },
+    {
+      "id": "attention/aggregation",
+      "operation": "calculate",
+      "prerequisites": [
+        "attention/shapes",
+        "attention/softmax"
+      ],
+      "description": "Gewichte und Value-Aggregation vollständig berechnen"
+    },
+    {
+      "id": "attention/masking",
+      "operation": "debug",
+      "prerequisites": [
+        "attention/softmax",
+        "attention/aggregation"
+      ],
+      "description": "Maskierung und Grenzfälle diagnostizieren"
+    },
+    {
+      "id": "attention/transfer",
+      "operation": "transfer",
+      "prerequisites": [
+        "attention/scaling",
+        "attention/masking"
+      ],
+      "description": "Invarianzen und Nichtidentifizierbarkeit eigenständig untersuchen"
+    },
+    {
+      "id": "attention/backprop",
+      "operation": "derive",
+      "prerequisites": [
+        "attention/softmax",
+        "attention/aggregation"
+      ],
+      "description": "Gradienten nach Scores, Queries, Keys und Values herleiten und prüfen"
+    },
+    {
+      "id": "attention/multihead",
+      "operation": "calculate",
+      "prerequisites": [
+        "attention/shapes",
+        "attention/scaling"
+      ],
+      "description": "Mehrere Köpfe dimensionieren und Kosten in der Sequenzlänge abschätzen"
+    }
+  ],
+  "teaching": [
+    {
+      "id": "teach/motivation",
+      "section_title": "Informationen auswählen, ohne alles gleich zu behandeln",
+      "content": "Stellen Sie sich drei Messstationen vor. Jede Station liefert eine Beschreibung dessen, was sie beobachtet, und einen zweidimensionalen Messwert. Eine Anfrage sucht einen bestimmten Beobachtungstyp. Ein ungewichteter Mittelwert ignoriert die Anfrage; die Auswahl genau einer Station ist empfindlich gegen kleine Änderungen. Attention konstruiert stattdessen eine kontinuierliche Mischung. Das Beispiel ist ein selbst entworfenes Rechenmodell, keine Behauptung über die Semantik gelernter Sprachmodelle.\n\nDie Query beschreibt im Modell die Anfrage, ein Key dient zum Vergleich, ein Value liefert die zu mischende Information. Key und Value haben denselben Zeilenindex, müssen aber weder dieselben Zahlen noch dieselbe Dimension besitzen. Das Skalarprodukt ist eine gewählte Kompatibilitätsfunktion. Ein großer Wert bedeutet nicht automatisch Wahrheit, Zuverlässigkeit oder eine kausale Erklärung.\n\nLernweg: zuerst Zeilenvektoren und Matrixmultiplikation klären, dann normalisieren, anschließend die Skalierung begründen und erst zuletzt experimentieren. Vorausgesetzt sind endliche Summen, die Exponentialfunktion, Ableitungsregeln und für den Varianzabschnitt Erwartungswert und Unabhängigkeit. Diese Grundlagen werden an den entscheidenden Schritten nochmals erläutert. Die Referenz behandelt einen Attention-Kopf ohne Dropout oder Ausgabeprojektion; ein vollständiger Transformer benötigt weitere Bausteine.",
+      "competency_ids": [
+        "attention/shapes"
+      ],
+      "claim_ids": [
+        "claim/operator",
+        "claim/geometry"
+      ]
+    },
+    {
+      "id": "teach/shapes",
+      "section_title": "Warum die Transposition entscheidend ist",
+      "content": "Wir verwenden kurz d=d_k und p=d_v. m ist die Anzahl der Queries; n ist die Anzahl der zugehörigen Key-Value-Paare. Alle diese Anzahlen sind positive ganze Zahlen. Die Zeilen tragen die Vektoren, nicht die Spalten.\n\n[[math:att.shapes]]\n\nFür Self-Attention können Q=XW_Q, K=XW_K und V=XW_V aus derselben Eingabematrix X entstehen. Bei Cross-Attention dürfen die Queries aus einer anderen Sequenz kommen; deshalb wird m nicht stillschweigend mit n gleichgesetzt. Die gelernten Projektionsmatrizen sind hier nicht Gegenstand eines Trainingsversuchs.\n\n[[math:att.score]]\n\nDie i-te Zeile von Q besitzt d Einträge; die j-te Spalte von Kᵀ ist genau die j-te Key-Zeile. Ihre paarweise Multiplikation und Summation ergibt eine Zahl. Für alle i und j entsteht eine m×n-Matrix. Der Ausdruck QK wäre im Allgemeinen nicht einmal definiert. Eine zufällige quadratische Beispielmatrix kann diesen Fehler verstecken; Dimensionen sind deshalb vor jedem Zahlenbeispiel zu prüfen.\n\n[[math:att.operator]]\n\nA ist m×n, die Ausgabe O ist m×p. Die Normalisierung erfolgt für jede Query separat.",
+      "competency_ids": [
+        "attention/shapes"
+      ],
+      "claim_ids": [
+        "claim/operator"
+      ]
+    },
+    {
+      "id": "teach/softmax",
+      "section_title": "Aus beliebigen Scores werden relative Gewichte",
+      "content": "Ein Score kann negativ sein. Negative Mischungsgewichte würden die einfache Mittelwertinterpretation zerstören. Softmax exponentiert die Logits z und normalisiert ihre positiven Werte. Betrachten Sie zunächst eine feste Query mit n erlaubten Keys.\n\n[[math:att.softmax]]\n\nFür endliche reelle Logits ist jede Exponentialfunktion positiv. Der Nenner ist damit positiv, und die Summe der Gewichte ist eins. Die Normalisierung gilt je Query-Zeile. Eine Normierung über alle Matrixeinträge würde unabhängige Queries miteinander koppeln.\n\n[[math:att.logratio]]\n\nDer gemeinsame Nenner kürzt sich beim Verhältnis zweier Gewichte. Nach dem Logarithmieren bleibt z_j−z_ℓ. Das erklärt, weshalb absolute Score-Niveaus unwichtig sind: Unterschiede entscheiden. Softmax ist keine Wahrscheinlichkeit für eine sachlich richtige Antwort; es sind modellinterne Mischungsgewichte.",
+      "competency_ids": [
+        "attention/softmax"
+      ],
+      "claim_ids": [
+        "claim/operator",
+        "claim/geometry"
+      ],
+      "derivation": {
+        "title": "Zeilensumme und gemeinsame Verschiebung",
+        "given": "Eine feste nichtleere Zeile mit endlichen reellen Logits; c ist eine beliebige endliche reelle Konstante.",
+        "steps": [
+          {
+            "statement": "\\(\\sum_j\\alpha_j=(\\sum_j e^{z_j})/(\\sum_\\ell e^{z_\\ell})=1\\).",
+            "justification": "Der Nenner ist derselbe positive Wert für jeden Summanden; deshalb darf er vor die Summe gezogen werden.",
+            "claim_ids": [
+              "claim/stability"
+            ]
+          },
+          {
+            "statement": "\\(e^{z_j-c}=e^{-c}e^{z_j}\\).",
+            "justification": "Exponentialgesetz für reelle Zahlen. Derselbe Faktor steht in jedem Summanden des Nenners.",
+            "claim_ids": [
+              "claim/stability"
+            ]
+          },
+          {
+            "statement": "Der Faktor \\(e^{-c}>0\\) kürzt sich aus Zähler und Nenner.",
+            "justification": "Division durch den gemeinsamen, von j unabhängigen positiven Faktor verändert den Quotienten nicht.",
+            "claim_ids": [
+              "claim/stability"
+            ]
+          }
+        ],
+        "result": "Softmax(z−c·1)=Softmax(z) in exakter reeller Arithmetik. Das ist eine algebraische Identität, keine Behauptung identischer Rundungsfehler."
+      }
+    },
+    {
+      "id": "teach/stability",
+      "section_title": "Eine richtige Formel kann numerisch falsch ausgeführt werden",
+      "content": "Die Eingabe z=(1000,999) ist mathematisch harmlos: Das Verhältnis der exponentiellen Werte beträgt e. Eine direkte Berechnung von exp(1000) läuft in üblicher binärer Gleitkommaarithmetik dennoch über. Die gemeinsame Verschiebung aus dem vorherigen Abschnitt liefert z−max(z)=(0,−1). Damit werden nur exp(0)=1 und exp(−1)≈0,367879 benötigt.\n\n[[math:att.shift]]\n\nDie Gewichte sind rund 0,731059 und 0,268941. Bei endlichen Logits ist nach Max-Shift mindestens ein Exponentialwert exakt eins im mathematischen Modell. Der Nenner kann deshalb nicht durch Unterlauf vollständig zu null werden. Sehr kleine andere Beiträge können numerisch zu null runden; die mathematische Softmax besitzt dort weiterhin positive Gewichte. Max-Shift beseitigt auch keine bereits übergelaufenen Skalarprodukte und macht aus unendlichen oder NaN-Eingaben keine gültigen Daten.\n\nDie gelesene numerische Quelle untersucht Rundungsfehler mathematisch und experimentell. Daraus übernehmen wir die verschobene Quotientenform, keinen pauschalen Fehlerfreiheitsanspruch für alle Datentypen. Das Labor begrenzt Eingabewerte und Dimensionen und arbeitet mit endlichen Zahlen.",
+      "competency_ids": [
+        "attention/softmax"
+      ],
+      "claim_ids": [
+        "claim/stability"
+      ]
+    },
+    {
+      "id": "teach/gradient",
+      "section_title": "Wie aus großen Score-Abständen schwache Gradienten werden",
+      "content": "Schreiben Sie für eine Zeile D=Σ_r exp(z_r). Beim Ableiten von α_j=exp(z_j)/D wird sowohl der Zähler als auch der Nenner von z_ℓ beeinflusst. Das Kronecker-Delta δ_{jℓ} ist eins für j=ℓ und sonst null.\n\n[[math:att.jacobian]]\n\nFür j=ℓ lautet der diagonale Eintrag α_j(1−α_j). Er nähert sich null, wenn ein Gewicht gegen eins oder gegen null geht. Außerhalb der Diagonale steht −α_jα_ℓ. Wenn eine ganze Zeile nahezu auf einem Index konzentriert ist, werden sämtliche Einträge klein. Das erklärt eine lokale Empfindlichkeit der Softmax-Funktion; die Gradienten eines kompletten trainierten Netzes hängen von weiteren Faktoren ab.",
+      "competency_ids": [
+        "attention/softmax",
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/scaling"
+      ],
+      "derivation": {
+        "title": "Quotientenregel ohne übersprungene Ableitung",
+        "given": "Endliche reelle Logits. D=Σ_r exp(z_r)>0. δ_{jℓ}=1 genau dann, wenn j=ℓ.",
+        "steps": [
+          {
+            "statement": "\\(\\partial e^{z_j}/\\partial z_\\ell=\\delta_{j\\ell}e^{z_j}\\) und \\(\\partial D/\\partial z_\\ell=e^{z_\\ell}\\).",
+            "justification": "Nur der Summand mit Index ℓ hängt bei dieser partiellen Ableitung von z_ℓ ab.",
+            "claim_ids": [
+              "claim/scaling"
+            ]
+          },
+          {
+            "statement": "\\(\\partial\\alpha_j/\\partial z_\\ell=(\\delta_{j\\ell}e^{z_j}D-e^{z_j}e^{z_\\ell})/D^2\\).",
+            "justification": "Die Quotientenregel ist anwendbar, da D positiv und alle beteiligten Funktionen differenzierbar sind.",
+            "claim_ids": [
+              "claim/scaling"
+            ]
+          },
+          {
+            "statement": "Einsetzen von \\(e^{z_j}/D=\\alpha_j\\) ergibt [[math:att.jacobian]].",
+            "justification": "Im ersten Term kürzt sich ein Faktor D; der zweite Term zerfällt in zwei normierte Exponentialwerte.",
+            "claim_ids": [
+              "claim/scaling"
+            ]
+          }
+        ],
+        "result": "Die Jacobi-Matrix lautet diag(α)−ααᵀ. Ihre Zeilensummen sind null, passend zur Invarianz gegenüber gemeinsamen Logit-Verschiebungen."
+      }
+    },
+    {
+      "id": "teach/scaling",
+      "section_title": "Warum die Quadratwurzel – und unter welchen Voraussetzungen?",
+      "content": "Die Skalierung ist keine Folge der Matrixdimension allein. Für eine begrenzte Modellrechnung seien sämtliche 2d Komponenten q_r und k_r unabhängig, jeweils mit Erwartungswert null und Varianz eins. Die Produkte X_r=q_r k_r sind dann ebenfalls unabhängig. Mit E[X_r]=E[q_r]E[k_r]=0 und E[X_r²]=E[q_r²]E[k_r²]=1 folgt Var(X_r)=1. Unabhängigkeit verschiedener Produkte lässt ihre Kovarianzen verschwinden.\n\n[[math:att.variance]]\n\nDie Standardabweichung der Summe wächst also wie √d, nicht wie d. Division durch √d lässt die Varianz im Modell bei eins. Division durch d würde sie auf 1/d reduzieren. Größere Logit-Abstände können Softmax stärker konzentrieren; die Skalierung wirkt diesem Größeneffekt unter den genannten Annahmen entgegen.\n\nDas Argument erklärt eine Modellierungsentscheidung. Gelernte Queries und Keys sind nicht automatisch unabhängig, zentriert oder auf Varianz eins normiert. Auch die Aussage, größere Varianz verursache in jeder einzelnen Probe kleinere Gradienten, folgt nicht: Varianz beschreibt eine Verteilung, keine monotone Ordnung aller Realisationen. Die empirische Güte der Transformer-Architektur ist von dieser konditionalen Rechnung zu trennen.",
+      "competency_ids": [
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/scaling"
+      ],
+      "derivation": {
+        "title": "Varianz der Summe",
+        "given": "X_r=q_r k_r. Alle q_r und k_r unabhängig, zentriert, Varianz eins. Zweite Momente sind endlich.",
+        "steps": [
+          {
+            "statement": "\\(E[X_r]=0\\) und \\(E[X_r^2]=1\\).",
+            "justification": "Die Faktoren q_r und k_r sind unabhängig. Zentrierung und Varianz eins bedeuten jeweils zweites Moment eins.",
+            "claim_ids": [
+              "claim/scaling"
+            ]
+          },
+          {
+            "statement": "\\(\\operatorname{Var}(\\sum_r X_r)=\\sum_r\\operatorname{Var}(X_r)=d\\).",
+            "justification": "Allgemein kommen doppelte Kovarianzterme hinzu. Hier entfallen sie aufgrund der Unabhängigkeit der Produkte.",
+            "claim_ids": [
+              "claim/scaling"
+            ]
+          },
+          {
+            "statement": "\\(\\operatorname{Var}(Y/c)=\\operatorname{Var}(Y)/c^2\\) mit \\(c=\\sqrt d\\).",
+            "justification": "Die Varianz skaliert quadratisch mit einem konstanten Faktor. Somit ist das Resultat d/d=1.",
+            "claim_ids": [
+              "claim/scaling"
+            ]
+          }
+        ],
+        "result": "Bedingt auf die expliziten Annahmen ist die Varianz exakt eins. Dies beweist keine Eigenschaft beliebiger gelernter Q/K."
+      }
+    },
+    {
+      "id": "teach/counterexample",
+      "section_title": "Gegenbeispiele gehören zur Begründung",
+      "content": "Nehmen Sie unabhängige symmetrische Zufallszeichen X,Y∈{−1,+1}. Setzen Sie q=(X,…,X) und k=(Y,…,Y). Jeder einzelne Eintrag ist zentriert und hat Varianz eins; q und k als ganze Vektoren sind unabhängig. Innerhalb jedes Vektors sind die Komponenten jedoch vollständig korreliert. Nun ist qᵀk=dXY und seine Varianz d². Nach Division durch √d verbleibt Varianz d statt eins. Die bloße Unabhängigkeit der beiden Vektoren reicht also nicht aus.\n\nEin zweiter Grenzfall betrifft Cosinusähnlichkeit. Für q≠0 und k≠0 gilt qᵀk=||q||·||k||·cos θ. Eine doppelt so lange Query verdoppelt alle Rohscores, obwohl die Winkel unverändert bleiben. Dot-Product Attention ist deshalb ohne weitere Normierung keine reine Winkelsuche. Bei q=0 sind alle erlaubten Scores null und die Gewichte gleichverteilt; ein Query-Richtungswinkel ist dann nicht definiert.",
+      "competency_ids": [
+        "attention/scaling",
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/scaling",
+        "claim/geometry"
+      ]
+    },
+    {
+      "id": "teach/variance-limits",
+      "section_title": "Was die Varianzrechnung tatsächlich steuert",
+      "content": "Vaswani et al. begründen die Skalierung in §3.2.1 mit einer Vermutung: Für große d_k wachsen Skalarprodukte betragsmäßig und drängen Softmax in Bereiche mit sehr kleinen Gradienten. Fußnote 4 stützt das mit der Varianzrechnung aus dem Abschnitt über die Quadratwurzel. Drei Präzisierungen zeigen, wo diese Rechnung trägt und wo nicht.\n\nErstens zählt nur die Streuung innerhalb einer Zeile. Für eine feste Query q verschiebt ein gemeinsamer Anteil μ aller Keys, \\(k_j=\\mu+u_j\\), jeden Score der Zeile um denselben Wert qᵀμ. Nach dem Verschiebungssatz ändert das die Gewichte nicht. Sind die Komponenten von \\(u_j\\) unabhängig, zentriert und haben Varianz \\(\\sigma_k^2\\), so gilt bedingt auf q:\n\n[[math:att.variance-conditional]]\n\nDie Streuung einer Zeile wächst also mit der Länge der Query. Für zentrierte Query-Komponenten mit Varianz \\(\\sigma_q^2\\) ist \\(E\\lVert q\\rVert^2=d\\,\\sigma_q^2\\); mit \\(\\sigma_q=\\sigma_k=1\\) ergibt sich im Mittel wieder d. Eine einzelne lange Query macht ihre Zeile trotz Skalierung spitz – passend zur Bemerkung über Cosinusähnlichkeit.\n\nZweitens gilt ohne Unabhängigkeit die allgemeine Zerlegung\n\n[[math:att.variance-general]]\n\nmit X_r = q_r k_r. Haben alle Produkte Varianz eins, liegt die Summenvarianz zwischen null (etwa X₂ = −X₁) und d² (alle X_r gleich), denn nach Cauchy–Schwarz ist |Cov(X_r, X_s)| ≤ 1. Die Skalierung mit 1/√d normiert nur den unkorrelierten Fall auf eins; im vollständig korrelierten Fall bleibt nach Skalierung Varianz d.\n\nDrittens sagt die Rechnung nichts über Gradienten einzelner Proben. Sie begründet eine Größenordnung. Ihre Annahmen sind am ehesten bei zufällig initialisierten Projektionen plausibel; ob sie in einem trainierten Modell gelten, muss man messen.",
+      "competency_ids": [
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/scaling",
+        "claim/scaling-paper"
+      ],
+      "derivation": {
+        "title": "Summenvarianz mit Kovarianzen",
+        "given": "X_r = q_r k_r für r = 1, …, d mit endlichen zweiten Momenten; keine Unabhängigkeit vorausgesetzt.",
+        "steps": [
+          {
+            "statement": "Mit \\(Y=\\sum_r X_r\\) ist \\(Y-EY=\\sum_r x_r\\), wobei \\(x_r=X_r-EX_r\\).",
+            "justification": "Linearität des Erwartungswertes.",
+            "claim_ids": [
+              "claim/scaling"
+            ]
+          },
+          {
+            "statement": "Für d = 3 enthält das Quadrat der Summe drei Quadrate und jedes Paar doppelt:",
+            "justification": "Ausmultiplizieren; allgemein gibt es d(d−1)/2 Paare r < s.",
+            "claim_ids": [
+              "claim/scaling"
+            ],
+            "math_check": {
+              "kind": "polynomial_identity",
+              "lhs": "(x1+x2+x3)^2",
+              "rhs": "x1^2+x2^2+x3^2+2*(x1*x2+x1*x3+x2*x3)",
+              "variables": [
+                "x1",
+                "x2",
+                "x3"
+              ]
+            }
+          },
+          {
+            "statement": "Erwartungswert: \\(\\operatorname{Var}(Y)=\\sum_r\\operatorname{Var}(X_r)+2\\sum_{r<s}\\operatorname{Cov}(X_r,X_s)\\).",
+            "justification": "E[x_r²] = Var(X_r) und E[x_r x_s] = Cov(X_r, X_s).",
+            "claim_ids": [
+              "claim/scaling"
+            ]
+          },
+          {
+            "statement": "Bei \\(\\operatorname{Var}(X_r)=1\\) für alle r gilt \\(0\\le\\operatorname{Var}(Y)\\le d^2\\).",
+            "justification": "Cauchy–Schwarz gibt |Cov(X_r, X_s)| ≤ 1, also Var(Y) ≤ d + d(d−1) = d². Varianzen sind nie negativ. Beide Grenzen werden erreicht.",
+            "claim_ids": [
+              "claim/scaling"
+            ]
+          }
+        ],
+        "result": "Den Wert d liefern genau verschwindende Kovarianzsummen; paarweise unkorrelierte Produkte genügen. Unabhängigkeit aller Komponenten ist hinreichend, nicht notwendig."
+      }
+    },
+    {
+      "id": "teach/worked",
+      "section_title": "Ein vollständig gerechneter Attention-Kopf",
+      "content": "Wir wählen m=2 Queries, n=3 Key-Value-Paare, d=2 und p=2. Alle Zahlen sind eigenständig festgelegt; Zeilenvektoren werden hier als Zeilen geschrieben:\n\n\\[Q=\\begin{pmatrix}1&0\\\\0&1\\end{pmatrix},\\quad K=\\begin{pmatrix}1&0\\\\0&1\\\\-1&0\\end{pmatrix}.\\]\n\\[V=\\begin{pmatrix}2&0\\\\0&2\\\\2&2\\end{pmatrix}.\\]\n\nDie erste Query ist q₁=(1; 0). Ihre drei Skalarprodukte sind 1·1+0·0=1, 1·0+0·1=0 und 1·(−1)+0·0=−1. Die zweite Query q₂=(0; 1) liefert dagegen 0,1,0. Für die erste Query teilen wir durch √2 und subtrahieren danach den größten Logit 1/√2. Die folgende Tabelle verwendet gerundete Werte; intern wird nicht zwischengerundet.\n\n| Key | Rohscore | Logit z | exp(z−max z) |\n|---|---|---|---|\n| 1 | 1 | 0,707107 | 1 |\n| 2 | 0 | 0 | 0,493069 |\n| 3 | −1 | −0,707107 | 0,243117 |\n\nDer Nenner ist 1+exp(−1/√2)+exp(−√2)≈1,736185426. Die ungerundeten Exponentialwerte werden jeweils durch diesen Nenner geteilt. Das ergibt α₁≈(0,575975345; 0,283995410; 0,140029245). Die drei Gewichte summieren sich bis auf Druckrundung zu eins.\n\nJetzt wird jeder Value mit seinem eigenen Gewicht multipliziert. Das Skalarprodukt bestimmt also nur, wie stark ein Value beiträgt; es ersetzt den Value nicht durch den Key.\n\n| Key | Zugehöriger Value | Gewichteter Beitrag |\n|---|---|---|\n| 1 | (2; 0) | (1,151950690; 0) |\n| 2 | (0; 2) | (0; 0,567990819) |\n| 3 | (2; 2) | (0,280058490; 0,280058490) |\n\nDie erste Koordinate addiert den Beitrag von Value 1 und Value 3. Die zweite addiert den Beitrag von Value 2 und Value 3:\n\n\\[o_1\\approx(1{,}432009181;\\ 0{,}848049310).\\]\n\nAls unabhängige Plausibilitätskontrolle liegen beide Koordinaten zwischen null und zwei, den jeweiligen Value-Extremen. Für q₂ ist der größte Logit am zweiten Key. Seine Gewichtszeile ist α₂≈(0,248255078; 0,503489843; 0,248255078). Weil Keys 1 und 3 bezüglich q₂ denselben Score haben, erhalten sie exakt dasselbe Gewicht. Die zweite Ausgabe lautet o₂≈(0,993020313; 1,503489843).\n\nDamit ist die ganze 2×2-Ausgabematrix bestimmt. Die Grafik isoliert zur besseren Lesbarkeit die erste Query; das freie Labor zeigt beide Ausgaben. Die Referenztests berechnen die Resultate zusätzlich mit hochpräzisen Dezimalexponentialwerten. Diese unabhängige Rechenroute kontrolliert Zahlen, nicht den gesamten sprachlichen Beweis.",
+      "competency_ids": [
+        "attention/aggregation"
+      ],
+      "claim_ids": [
+        "claim/operator",
+        "claim/geometry"
+      ]
+    },
+    {
+      "id": "teach/convex",
+      "section_title": "Was die Ausgabe leisten kann – und was nicht",
+      "content": "[[math:att.output]]\n\nDa alle Gewichte nichtnegativ sind und sich zu eins summieren, ist o_i eine konvexe Kombination der Value-Vektoren. Jede Koordinate liegt zwischen Minimum und Maximum der betreffenden Value-Koordinate. Für das Beispiel liegen beide Ausgabekoordinaten zwischen null und zwei. Diese Kontrolle entdeckt viele Index- oder Normalisierungsfehler.\n\nKonvexe Mischung bedeutet nicht, dass eine Wertemischung einen tatsächlich vorkommenden Token bezeichnet. Sie bedeutet auch nicht, dass man aus o_i die Gewichte eindeutig rekonstruieren kann. Haben alle Values denselben Vektor v, dann ergibt jede normierte Gewichtszeile genau v. Verschiedene Gewichtsmuster können dieselbe Ausgabe erzeugen; eine Ausgabe allein erklärt daher nicht, welcher Key bevorzugt wurde.\n\nDie Konvexitätsaussage bezieht sich auf die hier definierte Mischung ohne Dropout und ohne nachfolgende Ausgabeprojektion. Nach weiteren linearen oder nichtlinearen Operationen darf man diese Koordinatenschranke nicht ungeprüft auf die endgültige Netzwerkausgabe übertragen.",
+      "competency_ids": [
+        "attention/aggregation",
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/geometry"
+      ]
+    },
+    {
+      "id": "teach/backprop",
+      "section_title": "Gradienten durch den ganzen Attention-Kopf",
+      "content": "Training verlangt die Ableitungen eines skalaren Verlusts L nach Q, K und V. Gegeben ist G = ∂L/∂O mit Form m×p, der Gradient aus den folgenden Schichten. Wir gehen den Rechenweg Z → A → O rückwärts und prüfen nach jedem Schritt die Form: Ein Gradient hat stets die Form der Größe, nach der abgeleitet wird.\n\n[[math:att.grad-v]]\n\nDer Value-Gradient braucht nur die Gewichte, keine Ableitung der Softmax. Für Zeile i ist g = ∂L/∂α der Vektor mit g_j = ⟨G_i, v_j⟩: So schnell würde L steigen, wenn Query i mehr von Value j nähme.\n\n[[math:att.grad-z]]\n\nDas ist die Jacobi-Matrix diag(α) − ααᵀ angewandt auf g, ohne die n×n-Matrix aufzustellen. ⟨α, g⟩ ist der gewichtete Mittelwert von g: Ein Key erhält genau dann einen positiven Score-Gradienten, wenn sein g_ℓ über diesem Mittel liegt. Die Komponenten summieren sich zu null.\n\n[[math:att.grad-qk]]\n\nDie Skalierung wirkt hier ein zweites Mal: Der Faktor 1/√d erscheint auch im Rückwärtsschritt.\n\nZahlenbeispiel (eigene Rechnung, Q, K und V aus dem gerechneten Kopf): Sei L = o₁₁, die erste Koordinate der ersten Ausgabe. Dann hat G nur den Eintrag G₁₁ = 1. Für Query 1 ist g = (⟨(1; 0), (2; 0)⟩; ⟨(1; 0), (0; 2)⟩; ⟨(1; 0), (2; 2)⟩) = (2; 0; 2). Der gewichtete Mittelwert ⟨α₁, g⟩ = 1,432009 ist genau o₁₁. Damit ist ∂L/∂z ≈ (0,327149; −0,406684; 0,079535); die Summe ist null bis auf Rundung. Weiter ist ∂L/∂q₁ = (1/√2)·Σ_ℓ (∂L/∂z_ℓ)·k_ℓ ≈ (0,175089; −0,287569). Zentrale Differenzenquotienten mit Schrittweite 10⁻⁶ bestätigen beide Koordinaten. Query 2 erhält den Gradienten null, weil L nicht von o₂ abhängt.",
+      "competency_ids": [
+        "attention/backprop",
+        "attention/softmax"
+      ],
+      "claim_ids": [
+        "claim/backprop"
+      ],
+      "derivation": {
+        "title": "Rückwärtsrechnung Schritt für Schritt",
+        "given": "O = AV, A = zeilenweise Softmax von Z, Z = QKᵀ/√d mit \\(Q\\in\\mathbb{R}^{m\\times d}\\), \\(K\\in\\mathbb{R}^{n\\times d}\\), \\(V\\in\\mathbb{R}^{n\\times p}\\); G = ∂L/∂O; L skalar und differenzierbar; endliche Logits, keine Maske.",
+        "steps": [
+          {
+            "statement": "\\(O_{ir}=\\sum_j A_{ij}V_{jr}\\), also \\(\\partial L/\\partial V_{jr}=\\sum_i G_{ir}A_{ij}=(A^{\\mathsf T}G)_{jr}\\).",
+            "justification": "V_jr steht in jeder Ausgabezeile i genau einmal, mit Faktor A_ij. Form: (n×m)(m×p) = n×p wie V.",
+            "claim_ids": [
+              "claim/backprop"
+            ]
+          },
+          {
+            "statement": "\\(\\partial L/\\partial A_{ij}=\\sum_r G_{ir}V_{jr}=(GV^{\\mathsf T})_{ij}\\).",
+            "justification": "Dieselbe Summe, nach dem anderen Faktor abgeleitet. Form m×n wie A.",
+            "claim_ids": [
+              "claim/backprop"
+            ]
+          },
+          {
+            "statement": "Zeile i: \\(\\partial L/\\partial z_\\ell=\\sum_j g_j\\,\\alpha_j(\\delta_{j\\ell}-\\alpha_\\ell)=\\alpha_\\ell g_\\ell-\\alpha_\\ell\\sum_j\\alpha_j g_j\\).",
+            "justification": "Kettenregel über alle n Gewichte der Zeile mit der Softmax-Jacobi-Matrix. Andere Zeilen hängen nicht von dieser Zeile ab, weil Softmax zeilenweise wirkt.",
+            "claim_ids": [
+              "claim/backprop"
+            ]
+          },
+          {
+            "statement": "Für n = 2 ist das eine Polynomidentität in α₁, α₂, g₁, g₂:",
+            "justification": "Exakt geprüft, ohne α₁ + α₂ = 1 zu verwenden; die Umformung gilt also unabhängig von der Normierung.",
+            "claim_ids": [
+              "claim/backprop"
+            ],
+            "math_check": {
+              "kind": "polynomial_identity",
+              "lhs": "g1*a1*(1-a1) - g2*a2*a1",
+              "rhs": "a1*(g1 - (a1*g1 + a2*g2))",
+              "variables": [
+                "a1",
+                "a2",
+                "g1",
+                "g2"
+              ]
+            }
+          },
+          {
+            "statement": "Aus \\(Z_{ij}=\\frac{1}{\\sqrt d}\\sum_r Q_{ir}K_{jr}\\) folgt \\(\\partial L/\\partial Q_{ir}=\\frac{1}{\\sqrt d}\\sum_j \\frac{\\partial L}{\\partial Z_{ij}}K_{jr}\\) und \\(\\partial L/\\partial K_{jr}=\\frac{1}{\\sqrt d}\\sum_i \\frac{\\partial L}{\\partial Z_{ij}}Q_{ir}\\).",
+            "justification": "Z ist bilinear in Q und K; jede Ableitung lässt den anderen Faktor stehen. Formen: (m×n)(n×d) = m×d wie Q und (n×m)(m×d) = n×d wie K.",
+            "claim_ids": [
+              "claim/backprop"
+            ]
+          }
+        ],
+        "result": "∂L/∂V = AᵀG, ∂L/∂A = GVᵀ, je Zeile ∂L/∂z = α ⊙ (g − ⟨α, g⟩), ∂L/∂Q = (∂L/∂Z)K/√d, ∂L/∂K = (∂L/∂Z)ᵀQ/√d. Mit Maske gilt dieselbe Zeilenformel; maskierte Einträge haben \\(\\alpha_\\ell=0\\) und damit Score-Gradient null."
+      }
+    },
+    {
+      "id": "teach/mask",
+      "section_title": "Maskieren heißt aus der Normalisierung ausschließen",
+      "content": "Eine boolesche Maske legt pro Query fest, welche Keys erlaubt sind. Unser Vertrag verwendet true für erlaubt. Mathematisch setzt man verbotene Logits vor Softmax auf −∞ oder normalisiert gleichwertig nur über die erlaubte Indexmenge. Im Beispiel mit q₁ und ausschließlich erlaubten Keys 1 und 3 werden die Gewichte ungefähr (0,804429683; 0; 0,195570317). Ein verbotener Value trägt exakt null bei.\n\nEine Zeile ohne erlaubten Index hat keinen positiven Nenner. Sie ist in dieser Referenz undefiniert und erzeugt einen erklärten Fehler. Nullvektor-Ausgaben wären eine gesondert zu dokumentierende Anwendungskonvention. Ein großer negativer endlicher Ersatzwert ist nicht identisch mit −∞: Sind alle Einträge gleich stark abgesenkt, normalisiert Softmax sie zur Gleichverteilung. Das wäre hier eine unbemerkte Verletzung der Maske.\n\nIn autoregressiver Self-Attention kann eine Dreiecksmaske zukünftige Positionen ausschließen. Bei Cross-Attention mit unterschiedlichen Sequenzen darf eine Dreiecksregel nicht ohne semantische Begründung übernommen werden. Permutiert man Keys, müssen Values und Maskenspalten gemeinsam mitpermutiert werden; sonst wird die Zuordnung von Vergleich und Information zerstört.",
+      "competency_ids": [
+        "attention/masking",
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/mask",
+        "claim/operator"
+      ]
+    },
+    {
+      "id": "teach/mask-numerics",
+      "section_title": "Kausale Maske, Padding und die Arithmetik von −∞",
+      "content": "In der Praxis treten zwei Masken gemeinsam auf. Eine kausale Maske erlaubt Query i nur Keys j ≤ i; eine Padding-Maske verbietet Key-Positionen, die eine Sequenz nur auf eine gemeinsame Länge auffüllen. Kombiniert wird mit logischem Und: M_ij = 1 genau dann, wenn j ≤ i und Key j kein Padding ist. Vaswani et al. setzen in §3.2.3 verbotene Eingänge der Softmax auf −∞:\n\n[[math:att.mask-logit]]\n\nBeispiel mit Padding rechts (eigene Rechnung): n = 3, Position 3 ist Padding. Zeile 3 hat die Logits (0; 1; 5) und erlaubt nur die Keys 1 und 2. Ihre Gewichte sind (0,268941; 0,731059; 0), obwohl der verbotene Logit 5 der größte ist. Für die Max-Verschiebung nimmt man das Maximum über die erlaubten Einträge: Algebraisch wäre jede Konstante zulässig, aber ein großer verbotener Logit als Verschiebung kann die erlaubten Exponentialwerte unterlaufen lassen.\n\nIn exakter Mathematik ist e^(−∞) = 0, und eine Zeile mit mindestens einem erlaubten Index ist wohldefiniert. In IEEE-754-Gleitkomma hängt das Ergebnis von der Zeile ab:\n\n- Mindestens ein erlaubter endlicher Logit: Max-Shift subtrahiert einen endlichen Wert, −∞ − c = −∞ und exp(−∞) = 0. Das Ergebnis stimmt.\n- Kein erlaubter Index, Ersatzwert −∞: Das Maximum ist −∞, und −∞ − (−∞) ist NaN. Die ganze Zeile wird NaN.\n- Kein erlaubter Index, endlicher Ersatzwert wie −10⁹: Alle Einträge sind gleich, die Zeile wird gleichverteilt, und verbotene Values tragen still bei.\n- Halbe Genauigkeit: −10⁹ ist dort nicht darstellbar (größter endlicher Betrag 65504) und wird bei der Umwandlung zu −∞.\n\nWann entsteht eine leere Zeile? Mit kausaler Maske sieht Query i sich selbst. Steht das Padding aber links und ist Query 1 selbst Padding, erlaubt die kausale Regel nur j = 1 – und genau dieser Key ist verboten. Solche Ausgaben verwirft man zwar meist, doch NaN ist ansteckend: In IEEE-Arithmetik ist NaN · 0 = NaN. Ein Verlust, der die Zeile mit null gewichtet, wird trotzdem NaN. Sicher ist, leere Zeilen vor Softmax zu erkennen und dort eine dokumentierte Konvention zu setzen, etwa Ausgabe null, oder das Padding so anzuordnen, dass keine leere Zeile entsteht.\n\nMaskieren nach Softmax mit anschließendem Neunormieren ist algebraisch dasselbe wie Maskieren davor, denn der Gesamtnenner kürzt sich. Numerisch ist es schlechter: Dominiert ein verbotener Logit das Maximum, können alle erlaubten Gewichte zu null unterlaufen, und das Neunormieren teilt null durch null.",
+      "competency_ids": [
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/mask",
+        "claim/mask-numerics"
+      ]
+    },
+    {
+      "id": "teach/equivariance",
+      "section_title": "Permutationen: was Self-Attention über Reihenfolge weiß",
+      "content": "Self-Attention ohne Positionsinformation behandelt eine Sequenz wie eine Menge. Präzise: Sei f(X) die Self-Attention mit \\(Q=XW_Q\\), \\(K=XW_K\\), \\(V=XW_V\\) ohne Maske und P eine n×n-Permutationsmatrix. Dann gilt\n\n[[math:att.equivariance]]\n\nVertauscht man die Eingabezeilen, werden die Ausgabezeilen genauso vertauscht; sonst ändert sich nichts. Das ist Äquivarianz, nicht Invarianz: Die Ausgabe von Token i hängt nicht davon ab, an welcher Stelle Token i steht. Deshalb fügt der Transformer Positionsinformation hinzu (Vaswani et al., §3.5); ohne sie wären „Hund beißt Mann“ und „Mann beißt Hund“ für jede einzelne Token-Ausgabe ununterscheidbar.\n\nDie Maske gehört zur Eingabe: f(PX; PMPᵀ) = P f(X; M). Eine kausale Maske ist an die Reihenfolge gebunden; für P ≠ I ist PMPᵀ keine untere Dreiecksmatrix mehr. Kausale Self-Attention ist daher nicht äquivariant, und das ist gewollt: Sie modelliert eine Leserichtung.\n\nZahlenbeispiel (eigene Rechnung): d = 1, alle Projektionen gleich eins, also q = k = v = x. Ohne Maske ergibt X = (1; 0) die Ausgabe (0,731059; 0,500000), und X = (0; 1) ergibt genau die vertauschte Ausgabe. Mit kausaler Maske ergibt X = (1; 0) dagegen (1,0; 0,5) und X = (0; 1) ergibt (0,0; 0,731059) – keine Vertauschung.",
+      "competency_ids": [
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/equivariance"
+      ],
+      "derivation": {
+        "title": "Beweis der Äquivarianz",
+        "given": "\\(X\\in\\mathbb{R}^{n\\times d_{\\mathrm{model}}}\\), feste Projektionen \\(W_Q, W_K, W_V\\), Permutationsmatrix P mit PᵀP = I, keine Maske, endliche Logits.",
+        "steps": [
+          {
+            "statement": "\\(Q'=(PX)W_Q=PQ\\), ebenso \\(K'=PK\\) und \\(V'=PV\\).",
+            "justification": "Assoziativität: Die Projektion wirkt auf jede Zeile einzeln und vertauscht deshalb mit dem Umordnen der Zeilen.",
+            "claim_ids": [
+              "claim/equivariance"
+            ]
+          },
+          {
+            "statement": "\\(S'=Q'K'^{\\mathsf T}/\\sqrt d=P\\,S\\,P^{\\mathsf T}\\).",
+            "justification": "(PK)ᵀ = KᵀPᵀ. Zeilen und Spalten von S werden mit derselben Permutation umgeordnet.",
+            "claim_ids": [
+              "claim/equivariance"
+            ]
+          },
+          {
+            "statement": "\\(\\operatorname{softmax}(PSP^{\\mathsf T})=P\\,\\operatorname{softmax}(S)\\,P^{\\mathsf T}\\).",
+            "justification": "P links ordnet ganze Zeilen um. Pᵀ rechts ordnet die Einträge innerhalb jeder Zeile um; der Nenner summiert über alle Einträge der Zeile und bleibt gleich.",
+            "claim_ids": [
+              "claim/equivariance"
+            ]
+          },
+          {
+            "statement": "\\(O'=P A P^{\\mathsf T} P V=P A V=P O\\).",
+            "justification": "PᵀP = I für Permutationsmatrizen.",
+            "claim_ids": [
+              "claim/equivariance"
+            ]
+          }
+        ],
+        "result": "f(PX) = P f(X). Mit Maske gilt das, wenn auch die Maske zu PMPᵀ mitpermutiert wird; eine feste kausale Maske erfüllt diese Bedingung nicht."
+      }
+    },
+    {
+      "id": "teach/multihead",
+      "section_title": "Mehrere Köpfe: Teilräume, Dimensionen, Parameter",
+      "content": "Vaswani et al. (§3.2.2) verwenden statt eines Kopfes voller Breite h parallele Köpfe in kleineren Teilräumen:\n\n[[math:att.multihead]]\n\nJeder Kopf i hat eigene Projektionen \\(W_i^Q\\) und \\(W_i^K\\) mit Form d_model×d_k sowie \\(W_i^V\\) mit Form d_model×d_v; \\(W^O\\) mit Form (h·d_v)×d_model projiziert die verketteten Köpfe zurück. Im Basismodell des Artikels ist h = 8 und\n\n[[math:att.multihead-dims]]\n\nalso d_k = d_v = 64 bei d_model = 512. Diese Konvention setzt voraus, dass h die Modellbreite teilt.\n\nFormen für eine Sequenz der Länge n: \\(XW_i^Q\\) ist n×d_k, die Score-Matrix jedes Kopfes n×n, \\(\\mathrm{head}_i\\) ist n×d_v, die Verkettung n×(h·d_v) = n×d_model, die Ausgabe nach \\(W^O\\) wieder n×d_model. Für die Skalierung heißt das: Jeder Kopf teilt durch √d_k = 8, nicht durch √d_model, denn sein Skalarprodukt läuft nur über die d_k Komponenten seines Teilraums.\n\nWas leisten mehrere Köpfe? Ein einzelner Kopf mischt für jede Query die Values mit genau einer Gewichtsverteilung. h Köpfe können h verschiedene Verteilungen über dieselben Positionen erzeugen, etwa eine auf den vorigen Token und eine auf ein entferntes Bezugswort. Verkettung und \\(W^O\\) sind dabei eine Summe:\n\n[[math:att.multihead-sum]]\n\nmit \\(W^O\\) zerlegt in h Zeilenblöcke \\(W_i^O\\) der Form d_v×d_model. Jeder Kopf liefert also einen eigenen additiven Beitrag zur Ausgabe.\n\nParameter ohne Biasterme (eigene Zählung): 3·h·d_model·d_k für die Kopfprojektionen und h·d_v·d_model für \\(W^O\\). Mit h·d_k = h·d_v = d_model sind das 4·d_model², bei d_model = 512 also 1 048 576 – unabhängig von h. Mehr Köpfe kosten in dieser Konvention keine zusätzlichen Projektionsparameter.",
+      "competency_ids": [
+        "attention/multihead",
+        "attention/shapes"
+      ],
+      "claim_ids": [
+        "claim/multihead"
+      ],
+      "derivation": {
+        "title": "Verkettung als Summe und Parameterzahl",
+        "given": "\\(\\mathrm{head}_i\\) mit Form n×d_v; \\(W^O\\) mit Form (h·d_v)×d_model, zerlegt in Zeilenblöcke \\(W_1^O,\\dots,W_h^O\\) der Form d_v×d_model.",
+        "steps": [
+          {
+            "statement": "\\([\\mathrm{head}_1,\\dots,\\mathrm{head}_h]\\) hat Form \\(n\\times hd_v\\); ihr i-ter Spaltenblock ist \\(\\mathrm{head}_i\\).",
+            "justification": "Verkettet wird entlang der Merkmalsachse; die Positionen (Zeilen) bleiben getrennt.",
+            "claim_ids": [
+              "claim/multihead"
+            ]
+          },
+          {
+            "statement": "Blockregel: \\([\\mathrm{head}_1,\\dots,\\mathrm{head}_h]\\,W^O=\\sum_{i=1}^{h}\\mathrm{head}_i\\,W_i^O\\).",
+            "justification": "Jeder Eintrag ist eine Summe über alle h·d_v Spalten; sie zerfällt in h Teilsummen über die Spalten je eines Blocks.",
+            "claim_ids": [
+              "claim/multihead"
+            ]
+          },
+          {
+            "statement": "Parameter mit m = d_model und k = d_k = d_v:",
+            "justification": "Drei Projektionen je Kopf mit m·k Einträgen, dazu W^O mit (h·k)·m Einträgen. Mit h·k = m folgt 4m².",
+            "claim_ids": [
+              "claim/multihead"
+            ],
+            "math_check": {
+              "kind": "polynomial_identity",
+              "lhs": "3*h*m*k + h*k*m",
+              "rhs": "4*m*(h*k)",
+              "variables": [
+                "h",
+                "m",
+                "k"
+              ]
+            }
+          }
+        ],
+        "result": "MultiHead(X) = Σ_i \\(\\mathrm{head}_i W_i^O\\); die Projektionen haben 4·d_model² Parameter, wenn h·d_k = h·d_v = d_model."
+      }
+    },
+    {
+      "id": "teach/complexity",
+      "section_title": "Was quadratische Kosten in der Sequenzlänge bedeuten",
+      "content": "Zählen wir die Multiplikationen von Self-Attention über n Positionen mit h Köpfen und h·d_k = h·d_v = d_model (eigene Zählung; Additionen und Softmax vernachlässigt): QKᵀ kostet je Kopf n·n·d_k, AV ebenso n·n·d_v. Über alle Köpfe sind das 2n²·d_model. Die vier Projektionen für Q, K, V und \\(W^O\\) kosten zusammen 4n·d_model².\n\n[[math:att.complexity]]\n\nVaswani et al. vergleichen in §4 (Tabelle 1) Schichttypen: Self-Attention kostet pro Schicht O(n²·d), eine rekurrente Schicht O(n·d²). Dafür braucht Self-Attention nur O(1) sequenzielle Schritte und verbindet beliebige Positionen über einen Pfad konstanter Länge. Aus der Zählung folgt: Die Score-Terme überwiegen die Projektionen, sobald n > 2·d_model ist; bei d_model = 512 also ab n = 1024.\n\nAuch der Speicher wächst quadratisch. Wer A für den Rückwärtsschritt aufbewahrt – ∂L/∂V = AᵀG braucht A –, hält je Schicht h Matrizen mit n² Einträgen. Zahlenbeispiel: Bei h = 8 und n = 4096 sind das 8·4096² = 134 217 728 Einträge je Sequenz und Schicht, in 16-Bit-Gleitkomma rund 268 MB. Verdoppelt man n, vervierfachen sich Score-Rechenzeit und Score-Speicher; die Projektionen verdoppeln sich nur.\n\nDeshalb brauchen lange Kontexte eigene Verfahren. Wer A blockweise berechnet und nie vollständig speichert, senkt den Speicherbedarf, rechnet aber weiterhin alle n² Scores je Kopf. Ein Verfahren mit linearem Aufwand berechnet eine andere, angenäherte Funktion und muss eigens bewertet werden.",
+      "competency_ids": [
+        "attention/multihead"
+      ],
+      "claim_ids": [
+        "claim/complexity"
+      ]
+    },
+    {
+      "id": "teach/experiment",
+      "section_title": "Ein Experiment mit getrennten Ursachen",
+      "content": "Arbeiten Sie zunächst mit dem Ausgangsbeispiel. Vor jeder Änderung formulieren Sie eine überprüfbare Vorhersage: Welche Größen sollten unverändert bleiben, welche könnten sich bewegen?\n\n1. Ändern Sie nur einen Eintrag von V. Scores und Gewichte müssen gleich bleiben; die Ausgabe reagiert linear auf die Änderung des betreffenden Values mit seinem aktuellen Gewicht als Faktor.\n2. Ändern Sie Q[1,1] von 1 auf 2. Die erste Score-Zeile verändert sich, die zweite bleibt gleich. Vergleichen Sie die Konzentration der Gewichte.\n3. Deaktivieren Sie die Skalierung und stellen Sie danach den Ausgangszustand wieder her. Dies ist eine andere Modellparametrisierung, kein experimenteller Beweis besserer Trainingsleistung.\n4. Erhöhen Sie die Temperatur. Sie teilt die bereits skalierten Logits zusätzlich durch T>0. Prüfen Sie, ob die Gewichte gleichmäßiger werden. Temperatur null wird im Labor nicht als reguläre Eingabe akzeptiert.\n5. Blenden Sie einen Key aus. Prüfen Sie die Neunormalisierung; blenden Sie dann alle Keys einer Query aus und erklären Sie den Fehler.\n\nGespeichert werden auf ausdrücklichen Wunsch nur Modellparameter. Das Experiment bewertet keine Antworten, vergibt keine Beherrschung und plant keine Wiederholungen. Atomare Wiederholung bleibt Aufgabe von Anki.",
+      "competency_ids": [
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/operator",
+        "claim/mask",
+        "claim/geometry"
+      ]
+    }
+  ],
+  "assessments": [
+    {
+      "id": "task/dimensions",
+      "prompt": "Gegeben Q∈R^(5×8), K∈R^(7×8), V∈R^(7×3). Bestimmen Sie die Dimensionen von QKᵀ, A und O. Erklären Sie, weshalb QᵀK im Allgemeinen nicht die gewünschten Scores liefert.",
+      "solution": "Kᵀ hat Dimension 8×7, daher ist QKᵀ eine 5×7-Matrix: fünf Queries vergleichen sich mit sieben Keys. A besitzt dieselbe Dimension 5×7, da Softmax jede Zeile normalisiert. AV ist (5×7)(7×3), also 5×3. QᵀK wäre (8×5)(7×8) und ist wegen 5≠7 nicht definiert. Auch bei zufällig passenden Anzahlen wäre eine andere Indexkontraktion zu prüfen.",
+      "rubric": [
+        {
+          "criterion": "Score- und Gewichtsdimension mit Begründung",
+          "points": 2
+        },
+        {
+          "criterion": "Ausgabedimension",
+          "points": 1
+        },
+        {
+          "criterion": "Falsche Transposition erklärt",
+          "points": 2
+        }
+      ],
+      "role": "core",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/shapes"
+      ],
+      "claim_ids": [
+        "claim/operator"
+      ],
+      "hints": [
+        "Welche Dimension hat die transponierte Key-Matrix?"
+      ]
+    },
+    {
+      "id": "task/guided-numeric",
+      "prompt": "Führen Sie die erste Query des Lehrbuchbeispiels selbst weiter. Gegeben sind die verschobenen Exponentialwerte (1; 0,493068691; 0,243116734) und die dortige Value-Matrix. Berechnen Sie Summe, Gewichte, drei Beiträge und Ausgabe mit mindestens sechs signifikanten Ziffern.",
+      "solution": "Die Summe ist 1,736185425. Division jedes Eintrags durch diese Summe ergibt ungefähr (0,575975345;0,283995410;0,140029245). Die Beiträge sind (1,151950690;0), (0;0,567990819), (0,280058490;0,280058490). Komponentensumme: (1,432009181;0,848049310). Rundungsabweichungen in den letzten Stellen sind zulässig. Zur Kontrolle summieren sich die Gewichte zu eins und beide Koordinaten liegen zwischen null und zwei. Diese Aufgabe nutzt vorgegebene Zwischenschritte; sie ist keine unabhängige Transferprüfung.",
+      "rubric": [
+        {
+          "criterion": "Summe und Normierung",
+          "points": 2
+        },
+        {
+          "criterion": "Drei Value-Beiträge",
+          "points": 3
+        },
+        {
+          "criterion": "Ausgabe und Kontrolle",
+          "points": 2
+        }
+      ],
+      "role": "core",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/aggregation"
+      ],
+      "claim_ids": [
+        "claim/operator",
+        "claim/geometry"
+      ],
+      "hints": [
+        "Normieren Sie zunächst nur die drei skalaren Exponentialwerte."
+      ]
+    },
+    {
+      "id": "task/fresh-numeric",
+      "prompt": "Unabhängige Rechnung: Q=((0,0)), K=((1,2),(-3,4),(5,-6)), V=((3,-1),(0,2),(6,5)). Keine Maske, d=2, T=1. Berechnen Sie Scores, Gewichte und Ausgabe. Welche Rolle spielt die Skalierung in genau diesem Beispiel?",
+      "solution": "Die Nullquery hat zu jedem Key Skalarprodukt null. Division durch √2 belässt alle Scores bei null. exp(0)=1 für jeden Index, der Nenner ist drei, also α=(1/3,1/3,1/3). Der Value-Mittelwert ist ((3+0+6)/3,(-1+2+5)/3)=(3,2). Jede positive konstante Skalierung der Nullscores lässt das Ergebnis unverändert. Daraus folgt keine allgemeine Wirkungslosigkeit der Skalierung bei anderen Queries.",
+      "rubric": [
+        {
+          "criterion": "Nullscores begründet",
+          "points": 2
+        },
+        {
+          "criterion": "Gewichte und Ausgabe",
+          "points": 3
+        },
+        {
+          "criterion": "Lokale Grenze der Skalierungswirkung",
+          "points": 2
+        }
+      ],
+      "role": "core",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/aggregation",
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/operator",
+        "claim/geometry"
+      ]
+    },
+    {
+      "id": "task/shift-proof",
+      "prompt": "Beweisen Sie für beliebige endliche reelle z₁,…,z_n und c, dass eine gemeinsame Verschiebung z_j→z_j−c Softmax erhält. Erklären Sie zusätzlich am Beispiel (1000,999), weshalb rechnerisch verschiedene Implementierungen nötig sind.",
+      "solution": "Für jeden j gilt exp(z_j−c)=exp(−c)exp(z_j). Im Nenner ist exp(−c) von j unabhängig und lässt sich aus der Summe herausziehen. Der Faktor ist positiv und kürzt sich. Somit sind die Quotienten exakt gleich. Bei (1000,999) können direkte Exponentialwerte überlaufen. Mit c=1000 berechnet man (1,exp(−1)); Normalisierung ergibt ungefähr (0,731058579;0,268941421). Die algebraische Identität beweist nicht identische Gleitkommarundungen. Endliche Logits und eine nichtleere Zeile sind vorausgesetzt.",
+      "rubric": [
+        {
+          "criterion": "Gemeinsamen Faktor herausziehen",
+          "points": 2
+        },
+        {
+          "criterion": "Kürzung unter Voraussetzungen",
+          "points": 2
+        },
+        {
+          "criterion": "Numerisches Beispiel und Grenze",
+          "points": 3
+        }
+      ],
+      "role": "core",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/softmax"
+      ],
+      "claim_ids": [
+        "claim/stability"
+      ]
+    },
+    {
+      "id": "task/jacobian",
+      "prompt": "Leiten Sie den Softmax-Jacobi-Eintrag ∂α_j/∂z_ℓ her. Prüfen Sie Ihre Formel bei zwei gleichen Logits und erläutern Sie anschließend den Grenzfall einer nahezu deterministischen Gewichtszeile.",
+      "solution": "Mit D=Σ_r exp(z_r) gilt ∂D/∂z_ℓ=exp(z_ℓ) und ∂exp(z_j)/∂z_ℓ=δ_jℓ exp(z_j). Quotientenregel: (δ_jℓ exp(z_j)D−exp(z_j)exp(z_ℓ))/D² = α_j(δ_jℓ−α_ℓ). Bei zwei gleichen Logits ist α=(1/2,1/2), also J=((1/4,−1/4),(−1/4,1/4)). Konzentriert sich die Zeile auf einen Index, nähern sich alle Einträge null. Das ist eine Aussage über die lokale Softmax-Ableitung, nicht über sämtliche Gradienten eines vollständigen Netzes.",
+      "rubric": [
+        {
+          "criterion": "Korrekte partielle Ableitungen",
+          "points": 2
+        },
+        {
+          "criterion": "Quotientenregel und Umformung",
+          "points": 3
+        },
+        {
+          "criterion": "Prüffall und Einordnung",
+          "points": 3
+        }
+      ],
+      "role": "core",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/softmax",
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/scaling"
+      ]
+    },
+    {
+      "id": "task/variance",
+      "prompt": "Begründen Sie unter vollständiger Unabhängigkeit, Zentrierung und Einheitsvarianz aller 2d Komponenten die Skalierung durch √d. Bestimmen Sie auch die Varianz bei Division durch d. Welche Annahme benötigen die verschwindenden Kovarianzterme?",
+      "solution": "Für X_r=q_rk_r gilt wegen Unabhängigkeit der beiden Faktoren E[X_r]=0, E[X_r²]=E[q_r²]E[k_r²]=1, also Var(X_r)=1. Die Produkte für verschiedene r sind unter den gegebenen Annahmen unabhängig; damit sind ihre Kovarianzen null. Folglich Var(Σ_r X_r)=d. Var(Y/c)=Var(Y)/c² liefert bei c=√d den Wert eins und bei c=d den Wert 1/d. Unkorreliertheit der Produkte wäre für den Summenschritt bereits hinreichend; vollständige Komponentenunabhängigkeit ist eine stärkere ausreichende Annahme. Die Rechnung ist keine universelle Aussage über gelernte Repräsentationen.",
+      "rubric": [
+        {
+          "criterion": "Produktmomente",
+          "points": 3
+        },
+        {
+          "criterion": "Kovarianzen und Summenvarianz",
+          "points": 3
+        },
+        {
+          "criterion": "Beide Skalierungen und Reichweite",
+          "points": 3
+        }
+      ],
+      "role": "core",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/scaling"
+      ]
+    },
+    {
+      "id": "task/correlated-transfer",
+      "prompt": "X und Y seien unabhängige faire Zufallszeichen. Für d=4 setze q=(X,X,X,X), k=(Y,Y,Y,Y). Bestimmen Sie die Verteilung und Varianz von qᵀk und von qᵀk/√d. Widerlegt dies den zuvor bewiesenen Satz?",
+      "solution": "Das Produkt XY ist wiederum ein faires Vorzeichen. qᵀk=4XY nimmt +4 und −4 mit Wahrscheinlichkeit je 1/2 an. Erwartungswert null, zweites Moment und Varianz 16. Nach Division durch √4=2 entstehen ±2 mit Varianz vier. Der Satz ist nicht widerlegt: Innerhalb jedes Vektors sind die Komponenten identisch und damit abhängig; seine vollständige Unabhängigkeitsannahme ist verletzt. Zwar sind q und k als Vektoren unabhängig, doch das genügt nicht.",
+      "rubric": [
+        {
+          "criterion": "Verteilung mit Wahrscheinlichkeiten",
+          "points": 2
+        },
+        {
+          "criterion": "Beide Varianzen",
+          "points": 3
+        },
+        {
+          "criterion": "Präzise verletzte Annahme",
+          "points": 3
+        }
+      ],
+      "role": "transfer",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/scaling",
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/scaling"
+      ]
+    },
+    {
+      "id": "task/mask-debug",
+      "prompt": "Eine Implementierung ersetzt bei einer vollständig verbotenen Zweierzeile beide Logits durch −10⁹ und berechnet stabile Softmax. Warum liefert sie trotz Maske eine falsche Gewichtszeile? Geben Sie eine sichere Behandlung an und erläutern Sie den Fall genau eines erlaubten Keys.",
+      "solution": "Max-Shift subtrahiert −10⁹ von beiden Einträgen; es verbleibt (0,0). Beide Exponentialwerte sind eins, daher entsteht (1/2,1/2): verbotene Values würden beitragen. In dieser Referenz muss zuerst geprüft werden, ob die erlaubte Indexmenge leer ist. Falls ja, Fehler statt Normierung. Falls genau ein Key erlaubt ist, normiert dessen positiver Exponentialwert sich auf eins; alle verbotenen Gewichte sind null. Ein Nullvektor als Alternative bei leerer Menge wäre eine ausdrücklich andere Anwendungskonvention.",
+      "rubric": [
+        {
+          "criterion": "Falsche Gleichverteilung hergeleitet",
+          "points": 3
+        },
+        {
+          "criterion": "Leere Menge sicher behandelt",
+          "points": 2
+        },
+        {
+          "criterion": "Ein erlaubter Key",
+          "points": 2
+        }
+      ],
+      "role": "core",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/mask",
+        "claim/stability"
+      ]
+    },
+    {
+      "id": "task/permutation",
+      "prompt": "Beweisen Sie: Gleichzeitiges Permutieren der Zeilen von K und V sowie der entsprechenden Maskenspalten erhält O. Warum genügt es nicht, nur K zu permutieren? Nutzen Sie für den Gegenfall eine Query und zwei unterschiedliche Values.",
+      "solution": "Eine gemeinsame Permutation ordnet die Key-Scores und ihre erlaubten Indizes lediglich um. Zeilenweise Softmax vertauscht die Gewichte in derselben Weise. Da jeder permutierte Gewichtseintrag wieder mit seinem zugehörigen Value multipliziert wird, ist die Summe unverändert; äquivalent APᵀ·PV=AV für eine Permutationsmatrix P. Wird nur K vertauscht, werden Gewichte anderen Values zugeordnet. Beispiel d=1, q=1, Keys (1,0), Values (1,0): Ausgabe e/(e+1). Nach alleiniger Key-Vertauschung ist sie 1/(e+1). Die Ausgaben sind verschieden.",
+      "rubric": [
+        {
+          "criterion": "Gemeinsame Permutation mathematisch begründet",
+          "points": 4
+        },
+        {
+          "criterion": "Maskenbezug",
+          "points": 1
+        },
+        {
+          "criterion": "Konkretes Gegenbeispiel",
+          "points": 3
+        }
+      ],
+      "role": "transfer",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/operator",
+        "claim/geometry",
+        "claim/mask"
+      ]
+    },
+    {
+      "id": "task/inverse",
+      "prompt": "Alle drei Value-Zeilen seien (2,−1). Kann die Ausgabe die Gewichte eindeutig bestimmen? Konstruieren Sie zwei unterschiedliche endliche Logit-Zeilen mit derselben Ausgabe und erläutern Sie den Unterschied zwischen Gewichten und einer Kausalerklärung.",
+      "solution": "Jede normierte Gewichtszeile ergibt Σ_j α_j(2,−1)=(2,−1). Beispielsweise erzeugen z=(0,0,0) die Gleichverteilung und z=(log 2,0,0) die Gewichte (1/2,1/4,1/4). Beide liefern dieselbe Ausgabe. Die nicht eindeutige Umkehrung zeigt: Die Ausgabe identifiziert in diesem Fall nicht einmal die Gewichte. Gewichte beschreiben im Modell eine Mischung und belegen ohne zusätzliche Untersuchung keine kausale Bedeutung eines Eingabetokens.",
+      "rubric": [
+        {
+          "criterion": "Normierung ausgenutzt",
+          "points": 2
+        },
+        {
+          "criterion": "Zwei endliche Logit-Konstruktionen",
+          "points": 3
+        },
+        {
+          "criterion": "Interpretationsgrenze",
+          "points": 2
+        }
+      ],
+      "role": "transfer",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/geometry"
+      ]
+    },
+    {
+      "id": "task/backprop-numeric",
+      "prompt": "Unabhängige Rechnung mit Q, K und V aus dem gerechneten Kopf (d = 2). Der Verlust sei L = o₁₂, die zweite Koordinate der ersten Ausgabe. (a) Geben Sie G = ∂L/∂O und den Gewichtsgradienten g = ∂L/∂α₁ an. (b) Berechnen Sie ∂L/∂z für Query 1 und prüfen Sie die Summe. (c) Berechnen Sie ∂L/∂q₁ und ∂L/∂V. Kontrollzahl für die interaktive Prüfung: ∂L/∂z₃ mit sechs Nachkommastellen.",
+      "solution": "(a) G hat nur den Eintrag G₁₂ = 1. Damit ist g_j = ⟨(0; 1), v_j⟩, also g = (0; 2; 2). (b) ⟨α₁, g⟩ = 2·0,283995 + 2·0,140029 = 0,848049; das ist o₁₂. ∂L/∂z = α₁ ⊙ (g − 0,848049) ≈ (−0,488455; 0,327149; 0,161307). Die Summe ist null bis auf Rundung, wie es die Verschiebungsinvarianz verlangt. (c) ∂L/∂q₁ = (1/√2)·(∂L/∂z₁·k₁ + ∂L/∂z₂·k₂ + ∂L/∂z₃·k₃) ≈ (−0,459451; 0,231329); ∂L/∂q₂ = 0. ∂L/∂V = AᵀG: Nur die zweite Spalte ist besetzt, mit den Gewichten von Query 1: ((0; 0,575975), (0; 0,283995), (0; 0,140029)). Kontrollzahl ∂L/∂z₃ ≈ 0,161307. Typische Fehler: α₃g₃ = 0,280058 (Nenner übersehen) oder α₃(1 − α₃)g₃ = 0,240842 (nur die Diagonale der Jacobi-Matrix).",
+      "rubric": [
+        {
+          "criterion": "G und Gewichtsgradient",
+          "points": 2
+        },
+        {
+          "criterion": "Score-Gradient mit Summenkontrolle",
+          "points": 3
+        },
+        {
+          "criterion": "Query- und Value-Gradient mit Formen",
+          "points": 3
+        }
+      ],
+      "role": "core",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/backprop"
+      ],
+      "claim_ids": [
+        "claim/backprop"
+      ],
+      "hints": [
+        "g_j = ⟨G₁, v_j⟩: Wie stark ändert sich L, wenn Query 1 mehr von Value j nimmt?",
+        "∂L/∂z = α ⊙ (g − ⟨α, g⟩)."
+      ],
+      "machine_check": {
+        "type": "numeric",
+        "expected": 0.161307,
+        "tolerance": 1e-05,
+        "errors": [
+          {
+            "value": 0.280058,
+            "category": "attention/softmax-normaliser-ignored"
+          },
+          {
+            "value": 0.240842,
+            "category": "attention/softmax-diagonal-only"
+          }
+        ]
+      }
+    },
+    {
+      "id": "task/flawed-jacobian",
+      "prompt": "Prüfen Sie diese Herleitung: „Da z_ℓ für ℓ ≠ j nicht in e^(z_j) vorkommt, ist ∂α_j/∂z_ℓ = 0 für ℓ ≠ j. Die Jacobi-Matrix der Softmax ist also diag(α₁(1 − α₁), …, α_n(1 − α_n)).“ (a) Benennen Sie den fehlerhaften Schritt. (b) Widerlegen Sie das Ergebnis ohne Rechnung mit der Verschiebungsinvarianz. (c) Zeigen Sie den Fehler bei z = (0; 0) mit einem Differenzenquotienten.",
+      "solution": "(a) z_ℓ kommt zwar nicht im Zähler e^(z_j) vor, aber im Nenner D = Σ_r e^(z_r). Richtig ist ∂α_j/∂z_ℓ = −α_jα_ℓ für j ≠ ℓ. (b) Aus softmax(z + c·1) = softmax(z) folgt durch Ableiten nach c an der Stelle c = 0: J·1 = 0, jede Zeilensumme der Jacobi-Matrix J ist null. Die behauptete Diagonalmatrix hat die Zeilensummen α_j(1 − α_j) > 0 – Widerspruch. Die richtige Matrix diag(α) − ααᵀ hat die Zeilensumme α_j − α_j·Σ_ℓ α_ℓ = 0. (c) Bei z = (0; 0) ist α₁ = 1/2. Erhöht man z₂ um h, wird α₁ = 1/(1 + e^h). Der Differenzenquotient (α₁(h) − α₁(0))/h strebt gegen −1/4 = −α₁α₂, nicht gegen null.",
+      "rubric": [
+        {
+          "criterion": "Fehlerstelle Nenner benannt",
+          "points": 2
+        },
+        {
+          "criterion": "Widerspruch über Zeilensummen",
+          "points": 3
+        },
+        {
+          "criterion": "Numerischer Gegenbeleg",
+          "points": 2
+        }
+      ],
+      "role": "contrast",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/softmax"
+      ],
+      "claim_ids": [
+        "claim/stability",
+        "claim/backprop"
+      ],
+      "hints": [
+        "Wo steht z_ℓ in α_j = e^(z_j)/Σ_r e^(z_r) überall?"
+      ]
+    },
+    {
+      "id": "task/flawed-variance",
+      "prompt": "Prüfen Sie diese Herleitung: „Jedes Produkt X_r = q_r k_r hat Erwartungswert null und Varianz eins, weil jede Komponente zentriert ist und Varianz eins hat. Da die Varianz linear ist, gilt Var(Σ_r X_r) = Σ_r Var(X_r) = d. Also haben die skalierten Scores qᵀk/√d in jedem Modell mit zentrierten Komponenten der Varianz eins die Varianz eins.“ (a) Welche zwei Schritte sind ohne Zusatzannahme falsch? (b) Konstruieren Sie für d = 2 zentrierte Komponenten mit Varianz eins, für die Var(qᵀk) = 0 ist. (c) Welche Zusatzannahme genügt für das Ergebnis d?",
+      "solution": "(a) Erstens folgen E[X_r] = 0 und Var(X_r) = 1 nicht ohne Unabhängigkeit von q_r und k_r: Für k_r = q_r ist E[X_r] = E[q_r²] = 1. Zweitens ist die Varianz nicht linear: Var(Σ X_r) = Σ Var(X_r) + 2·Σ_{r<s} Cov(X_r, X_s). (b) Seien q₁ und k₁ unabhängige faire Vorzeichen, q₂ = −q₁ und k₂ = k₁. Alle vier Komponenten sind zentriert mit Varianz eins, aber X₂ = −q₁k₁ = −X₁. Also ist qᵀk = 0 sicher und Var(qᵀk) = 0. (c) Genügend ist: Für jedes r sind q_r und k_r unabhängig (das gibt E[X_r] = 0 und Var(X_r) = 1), und die Produkte X_r sind paarweise unkorreliert (das lässt die Kovarianzen verschwinden). Vollständige Unabhängigkeit aller 2d Komponenten ist eine stärkere, hinreichende Annahme.",
+      "rubric": [
+        {
+          "criterion": "Beide Fehlschritte benannt",
+          "points": 3
+        },
+        {
+          "criterion": "Gegenbeispiel mit Varianz null",
+          "points": 3
+        },
+        {
+          "criterion": "Hinreichende Annahme",
+          "points": 2
+        }
+      ],
+      "role": "transfer",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/scaling",
+        "claim/scaling-paper"
+      ],
+      "hints": [
+        "Wann ist Var(X + Y) = Var(X) + Var(Y)?"
+      ]
+    },
+    {
+      "id": "task/flawed-mask",
+      "prompt": "Ein Review behauptet: „Wir berechnen A = softmax(Z) über alle Keys und multiplizieren danach elementweise mit der 0/1-Maske M. Maskierte Keys erhalten so Gewicht null; das ist korrekt.“ (a) Zeigen Sie an z = (0; 0; 0) mit maskiertem Key 3, was dabei schiefgeht. (b) Beweisen Sie, dass Neunormieren nach dem Maskieren algebraisch dasselbe ergibt wie Maskieren vor Softmax. (c) Warum ist diese Reparatur numerisch trotzdem schlechter? Geben Sie ein Beispiel.",
+      "solution": "(a) softmax(0; 0; 0) = (1/3; 1/3; 1/3); nach dem Maskieren bleibt (1/3; 1/3; 0) mit Summe 2/3. Die Ausgabe ist keine konvexe Kombination mehr, sondern um den Faktor 2/3 geschrumpft; richtig wäre (1/2; 1/2; 0). (b) Sei E die Menge der erlaubten Indizes und D = Σ_r e^(z_r). Nach Maskieren und Neunormieren ist das Gewicht von j ∈ E gleich (e^(z_j)/D)/(Σ_{ℓ∈E} e^(z_ℓ)/D) = e^(z_j)/Σ_{ℓ∈E} e^(z_ℓ); D kürzt sich. Das ist die Softmax über E. (c) Dominiert ein verbotener Logit, etwa z = (0; 0; 1000) mit Key 3 maskiert, liefert stabile Softmax über alle Keys (e^(−1000); e^(−1000); 1). In doppelter Genauigkeit unterläuft e^(−1000) zu 0. Nach dem Maskieren bleibt (0; 0; 0), und das Neunormieren teilt 0 durch 0. Maskieren vor Softmax ergibt dagegen exakt (1/2; 1/2; 0).",
+      "rubric": [
+        {
+          "criterion": "Summe 2/3 erkannt",
+          "points": 2
+        },
+        {
+          "criterion": "Algebraische Gleichheit bewiesen",
+          "points": 3
+        },
+        {
+          "criterion": "Unterlauf-Beispiel",
+          "points": 3
+        }
+      ],
+      "role": "contrast",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/mask",
+        "claim/mask-numerics"
+      ],
+      "hints": [
+        "Summieren Sie die Gewichte nach dem Maskieren."
+      ]
+    },
+    {
+      "id": "task/mask-padding",
+      "prompt": "Kausale Self-Attention über n = 3 Positionen; Position 1 ist Padding (links aufgefüllt). Die skalierten Logits sind Z = ((0; 1; 2), (1; 0; 1), (2; 1; 0)), die skalaren Values v = (10; 1; 3). (a) Bestimmen Sie die kombinierte Maske. (b) Berechnen Sie die Gewichtszeilen 2 und 3 sowie die Ausgabe o₃. (c) Was liefern Implementierungen mit −∞ beziehungsweise −10⁹ für Zeile 1, und warum ist das auch dann gefährlich, wenn o₁ verworfen wird? Kontrollzahl für die interaktive Prüfung: o₃ mit vier Nachkommastellen.",
+      "solution": "(a) (i, j) ist erlaubt genau dann, wenn j ≤ i und j ≠ 1: Zeile 1 erlaubt nichts, Zeile 2 nur Key 2, Zeile 3 die Keys 2 und 3. (b) Zeile 2: (0; 1; 0). Zeile 3: Softmax von (1; 0) auf den Keys 2 und 3, also (0; 0,731059; 0,268941). o₃ = 0,731059·1 + 0,268941·3 = 1,537883. (c) Zeile 1 ist leer. Mit −∞ ergibt Max-Shift −∞ − (−∞) = NaN, die Zeile wird NaN. Mit −10⁹ sind alle drei Einträge gleich, die Zeile wird (1/3; 1/3; 1/3) und mischt den Padding-Value 10 ein. Verwerfen durch Multiplikation mit null hilft nicht, denn in IEEE-Arithmetik ist NaN · 0 = NaN; Verlust und Gradienten werden NaN. Sicher ist, leere Zeilen vor Softmax zu erkennen und eine dokumentierte Konvention zu setzen. Typische Fehler: Ohne Padding-Maske (nur kausal) wird o₃ = 7,167230; mit Maske erst nach Softmax und ohne Neunormierung wird o₃ = 0,514820.",
+      "rubric": [
+        {
+          "criterion": "Kombinierte Maske",
+          "points": 2
+        },
+        {
+          "criterion": "Zeilen 2 und 3 und o₃",
+          "points": 3
+        },
+        {
+          "criterion": "Leere Zeile in IEEE-Arithmetik",
+          "points": 3
+        }
+      ],
+      "role": "core",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/mask",
+        "claim/mask-numerics"
+      ],
+      "hints": [
+        "Erlaubt ist ein Key nur, wenn beide Masken ihn erlauben."
+      ],
+      "machine_check": {
+        "type": "numeric",
+        "expected": 1.537883,
+        "tolerance": 6e-05,
+        "errors": [
+          {
+            "value": 7.16723,
+            "category": "attention/padding-mask-ignored"
+          },
+          {
+            "value": 0.51482,
+            "category": "attention/mask-after-softmax"
+          }
+        ]
+      }
+    },
+    {
+      "id": "task/equivariance-proof",
+      "prompt": "(a) Beweisen Sie für Self-Attention ohne Maske und ohne Positionsinformation f(PX) = P f(X) für jede Permutationsmatrix P. (b) Zeigen Sie mit d = 1, \\(W_Q=W_K=W_V=1\\) und X = (2; 0), dass kausale Self-Attention diese Eigenschaft verletzt. (c) Ist f ohne Maske permutationsinvariant, also f(PX) = f(X)?",
+      "solution": "(a) Q′ = PXW_Q = PQ, ebenso K′ = PK und V′ = PV. Damit S′ = PQ(PK)ᵀ/√d = PSPᵀ. Zeilenweise Softmax vertauscht mit der Zeilenpermutation P links und mit der Umordnung innerhalb jeder Zeile durch Pᵀ rechts, weil der Nenner über alle Einträge der Zeile summiert: softmax(PSPᵀ) = P·softmax(S)·Pᵀ. Also O′ = PAPᵀPV = PAV = PO wegen PᵀP = I. (b) Kausal: Für X = (2; 0) sieht Query 1 nur sich selbst, o₁ = 2; Query 2 hat q = 0, Scores (0; 0), also o₂ = 1. f(X) = (2; 1). Für PX = (0; 2) ist o₁ = 0 und Query 2 hat die Scores (0; 4), also o₂ = 2·e⁴/(1 + e⁴) ≈ 1,964028. f(PX) = (0; 1,964028) ≠ (1; 2) = P f(X). (c) Nein. Ohne Maske ist f(X) ≈ (1,964028; 1,000000) und f(PX) ≈ (1,000000; 1,964028): die Ausgabe wird mitvertauscht, sie bleibt nicht gleich.",
+      "rubric": [
+        {
+          "criterion": "Beweis mit PSPᵀ und PᵀP = I",
+          "points": 4
+        },
+        {
+          "criterion": "Kausales Gegenbeispiel",
+          "points": 3
+        },
+        {
+          "criterion": "Äquivarianz statt Invarianz",
+          "points": 1
+        }
+      ],
+      "role": "transfer",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/equivariance"
+      ],
+      "hints": [
+        "Schreiben Sie Q′, K′, V′ für die permutierte Eingabe und vereinfachen Sie S′."
+      ]
+    },
+    {
+      "id": "task/multihead-dims",
+      "prompt": "Self-Attention mit d_model = 512, h = 8 Köpfen und n = 10 Tokens, d_k = d_v = d_model/h. (a) Geben Sie die Formen von W_i^Q, \\(XW_i^Q\\), der Score-Matrix eines Kopfes, \\(\\mathrm{head}_i\\), der Verkettung und der Ausgabe an. (b) Durch welchen Faktor werden die Scores eines Kopfes geteilt, und warum nicht durch √512? (c) Wie viele Projektionsparameter ohne Bias hat die Schicht, und wie ändert sich die Zahl bei h = 16? (d) Warum passt h = 6 nicht in diese Konvention? Kontrollzahl für die interaktive Prüfung: die Parameterzahl aus (c) bei h = 8.",
+      "solution": "(a) d_k = d_v = 64. \\(W_i^Q\\): 512×64; \\(XW_i^Q\\): 10×64; Scores eines Kopfes: 10×10; \\(\\mathrm{head}_i\\): 10×64; Verkettung: 10×512; \\(W^O\\): 512×512; Ausgabe: 10×512. (b) Durch √64 = 8: Das Skalarprodukt eines Kopfes summiert über 64 Komponenten und hat unter den Annahmen der Varianzrechnung Varianz 64. Division durch √512 würde die Varianz auf 64/512 = 1/8 drücken. (c) 3·8·512·64 + 512·512 = 786 432 + 262 144 = 1 048 576 = 4·512². Bei h = 16 ist d_k = 32, und 3·16·512·32 + 512·512 ergibt wieder 1 048 576. (d) 512/6 ist keine ganze Zahl; es gäbe keine gemeinsame ganzzahlige Kopfdimension mit h·d_k = d_model.",
+      "rubric": [
+        {
+          "criterion": "Sechs Formen",
+          "points": 3
+        },
+        {
+          "criterion": "Skalierung je Kopf begründet",
+          "points": 2
+        },
+        {
+          "criterion": "Parameterzahl für h = 8 und h = 16",
+          "points": 2
+        },
+        {
+          "criterion": "Teilbarkeit",
+          "points": 1
+        }
+      ],
+      "role": "core",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/multihead"
+      ],
+      "claim_ids": [
+        "claim/multihead"
+      ],
+      "hints": [
+        "Beginnen Sie mit d_k = d_model/h."
+      ],
+      "machine_check": {
+        "type": "numeric",
+        "expected": 1048576,
+        "tolerance": 0.5
+      }
+    },
+    {
+      "id": "task/complexity",
+      "prompt": "Eine Self-Attention-Schicht mit d_model = 768 und h = 12 verarbeitet Sequenzen der Länge n. Zählen Sie Multiplikationen wie im Lehrtext. (a) Ab welchem n überwiegen die Score-Terme 2n²·d_model die Projektionen 4n·d_model²? (b) Um welchen Faktor wachsen Score-Kosten, Projektionskosten und der Speicher für A, wenn n von 1024 auf 4096 steigt? (c) Wie viele Einträge haben die Gewichtsmatrizen einer Schicht bei n = 4096, und wie viel Speicher ist das in 32-Bit-Gleitkomma? (d) Jemand sagt, blockweise Berechnung ohne Speichern von A mache Attention linear in n. Stimmt das? Kontrollzahl für die interaktive Prüfung: die Grenze aus (a).",
+      "solution": "(a) 2n²d > 4nd² ⇔ n > 2d = 1536. (b) Score-Kosten und Speicher für A wachsen um (4096/1024)² = 16, die Projektionen um 4. (c) h·n² = 12·4096² = 201 326 592 Einträge; mal 4 Byte sind das 805 306 368 Byte, rund 805 MB, je Sequenz und Schicht. (d) Nein. Der Speicher muss dann nicht mehr quadratisch wachsen, aber die exakte Rechnung braucht weiterhin alle n² Scores je Kopf, also O(n²·d) Multiplikationen. Linear wird nur ein Verfahren, das eine andere, angenäherte Funktion berechnet.",
+      "rubric": [
+        {
+          "criterion": "Grenze n > 2d",
+          "points": 2
+        },
+        {
+          "criterion": "Wachstumsfaktoren",
+          "points": 2
+        },
+        {
+          "criterion": "Einträge und Speicher",
+          "points": 2
+        },
+        {
+          "criterion": "Rechenaufwand vs. Speicher",
+          "points": 2
+        }
+      ],
+      "role": "transfer",
+      "attempt_before_reveal": true,
+      "competency_ids": [
+        "attention/multihead"
+      ],
+      "claim_ids": [
+        "claim/complexity"
+      ],
+      "machine_check": {
+        "type": "numeric",
+        "expected": 1536,
+        "tolerance": 0.5
+      }
+    }
+  ],
+  "cards": [
+    {
+      "key": "attention/shape-score",
+      "kind": "concept",
+      "front": "Welche Dimension hat QKᵀ bei Q∈R^(m×d), K∈R^(n×d)?",
+      "answer": "m×n.",
+      "explanation": "Jede Query-Zeile wird mit jeder Key-Zeile über d Komponenten verglichen.",
+      "competency_ids": [
+        "attention/shapes"
+      ],
+      "claim_ids": [
+        "claim/operator"
+      ]
+    },
+    {
+      "key": "attention/shape-value",
+      "kind": "concept",
+      "front": "Welche Dimension darf V besitzen, damit eine m×n-Gewichtsmatrix A damit multipliziert werden kann?",
+      "answer": "n×p; die Ausgabe AV besitzt Dimension m×p.",
+      "explanation": "Keys und Values müssen zeilenweise zugeordnet sein; die Value-Dimension p darf von d abweichen.",
+      "competency_ids": [
+        "attention/shapes"
+      ],
+      "claim_ids": [
+        "claim/operator"
+      ]
+    },
+    {
+      "key": "attention/softmax-axis",
+      "kind": "concept",
+      "front": "Entlang welcher Achse wird die Score-Matrix für gewöhnliche Dot-Product Attention normalisiert?",
+      "answer": "Je Query-Zeile über die erlaubten Keys.",
+      "explanation": "Jede Query erhält eine eigene Gewichtsverteilung; Queries werden nicht gegeneinander normalisiert.",
+      "competency_ids": [
+        "attention/softmax"
+      ],
+      "claim_ids": [
+        "claim/operator"
+      ]
+    },
+    {
+      "key": "attention/shift",
+      "kind": "math",
+      "front": "Warum verändert gemeinsames Subtrahieren von c aus allen Logits einer Zeile deren Softmax nicht?",
+      "answer": "Der gemeinsame Faktor \\(e^{-c}\\) kürzt sich aus Zähler und Nenner.",
+      "explanation": "Dies gilt in exakter Arithmetik bei endlichen reellen Logits und nichtleerer Zeile.",
+      "competency_ids": [
+        "attention/softmax"
+      ],
+      "claim_ids": [
+        "claim/stability"
+      ]
+    },
+    {
+      "key": "attention/overflow",
+      "kind": "math",
+      "front": "Wie berechnet man Softmax von (1000,999) ohne exponentiellen Overflow?",
+      "answer": "Maximum abziehen: \\((0,-1)\\), dann \\((1,e^{-1})\\) normalisieren.",
+      "explanation": "Ergebnis ungefähr (0,731059;0,268941). Unendliche Eingaben werden dadurch nicht repariert.",
+      "competency_ids": [
+        "attention/softmax"
+      ],
+      "claim_ids": [
+        "claim/stability"
+      ]
+    },
+    {
+      "key": "attention/jacobian",
+      "kind": "math",
+      "front": "Wie lautet die Softmax-Ableitung nach einem Logit?",
+      "answer": "\\(\\partial\\alpha_j/\\partial z_\\ell=\\alpha_j(\\delta_{j\\ell}-\\alpha_\\ell)\\).",
+      "explanation": "Quotientenregel; Kronecker-Delta δ_jℓ ist eins genau für j=ℓ.",
+      "competency_ids": [
+        "attention/softmax"
+      ],
+      "claim_ids": [
+        "claim/scaling"
+      ]
+    },
+    {
+      "key": "attention/variance-premise",
+      "kind": "math",
+      "front": "Welche Annahmen rechtfertigen hier Var(qᵀk)=d?",
+      "answer": "Alle \\(2d\\) Komponenten unabhängig, zentriert und mit Varianz eins.",
+      "explanation": "Dann haben die Produkte Varianz eins und ihre Kovarianzen verschwinden. Vektorunabhängigkeit allein reicht nicht.",
+      "competency_ids": [
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/scaling"
+      ]
+    },
+    {
+      "key": "attention/sqrt",
+      "kind": "math",
+      "front": "Warum wird im Einheitsvarianz-Modell durch √d statt durch d skaliert?",
+      "answer": "\\(\\operatorname{Var}(Y/c)=\\operatorname{Var}(Y)/c^2\\); bei Var(Y)=d ergibt c=√d Varianz eins.",
+      "explanation": "Division durch d ergäbe 1/d. Das ist ein konditionales Modellargument, keine universelle Trainingsgarantie.",
+      "competency_ids": [
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/scaling"
+      ]
+    },
+    {
+      "key": "attention/correlation",
+      "kind": "math",
+      "front": "Welche skalierte Varianz besitzt qᵀk/√d bei q=(X,…,X), k=(Y,…,Y) für unabhängige faire Vorzeichen X,Y?",
+      "answer": "\\(d\\), weil \\(q^Tk=dXY\\) die Varianz \\(d^2\\) hat.",
+      "explanation": "Die Komponenten innerhalb der Vektoren sind vollständig korreliert.",
+      "competency_ids": [
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/scaling"
+      ]
+    },
+    {
+      "key": "attention/value-change",
+      "kind": "concept",
+      "front": "Welche Attention-Größen bleiben bei festem Q,K und geänderter Value-Matrix V gleich?",
+      "answer": "Scores und Gewichte bleiben gleich.",
+      "explanation": "Nur die gewichteten Value-Beiträge und die Ausgabe können sich ändern.",
+      "competency_ids": [
+        "attention/aggregation"
+      ],
+      "claim_ids": [
+        "claim/operator"
+      ]
+    },
+    {
+      "key": "attention/convex",
+      "kind": "concept",
+      "front": "Welche geometrische Eigenschaft besitzt die Attention-Ausgabe ohne Dropout und Ausgabeprojektion?",
+      "answer": "Sie liegt in der konvexen Hülle der erlaubten Values.",
+      "explanation": "Nichtnegative Gewichte mit Summe eins bilden eine konvexe Kombination; pro Koordinate gilt die Min-Max-Schranke.",
+      "competency_ids": [
+        "attention/aggregation"
+      ],
+      "claim_ids": [
+        "claim/geometry"
+      ]
+    },
+    {
+      "key": "attention/mask-empty",
+      "kind": "concept",
+      "front": "Welches Ergebnis definiert diese Referenz für eine vollständig maskierte Query-Zeile?",
+      "answer": "Keines: Die Zeile ist undefiniert und wird als Fehler behandelt.",
+      "explanation": "Die erlaubte Indexmenge ist leer; es gibt keinen positiven Normalisierungsnenner.",
+      "competency_ids": [
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/mask"
+      ]
+    },
+    {
+      "key": "attention/mask-one",
+      "kind": "concept",
+      "front": "Welche Gewichte entstehen bei genau einem erlaubten Key und endlichen erlaubten Logits?",
+      "answer": "Gewicht eins für diesen Key, null für alle verbotenen.",
+      "explanation": "Der einzig erlaubte positive Exponentialwert normiert sich selbst auf eins.",
+      "competency_ids": [
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/mask"
+      ]
+    },
+    {
+      "key": "attention/cosine",
+      "kind": "math",
+      "front": "Warum ist Dot-Product Attention ohne weitere Normierung keine reine Cosinusähnlichkeit?",
+      "answer": "\\(q^Tk=\\|q\\|\\|k\\|\\cos\\theta\\) hängt auch von Vektorlängen ab.",
+      "explanation": "Ein Skalieren der Query verändert Score-Abstände, obwohl ihre Richtung gleich bleibt. Der Winkel setzt Nichtnullvektoren voraus.",
+      "competency_ids": [
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/geometry"
+      ]
+    },
+    {
+      "key": "attention/permutation",
+      "kind": "concept",
+      "front": "Welche gleichzeitige Permutation erhält die Attention-Ausgabe bei festem Q?",
+      "answer": "Keys und zugehörige Values sowie Maskenspalten gemeinsam permutieren.",
+      "explanation": "Scores und Gewichte werden gleich umgeordnet; die gewichtete Summe bleibt unverändert.",
+      "competency_ids": [
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/operator",
+        "claim/mask"
+      ]
+    },
+    {
+      "key": "attention/nonidentifiability",
+      "kind": "concept",
+      "front": "Bestimmt die Attention-Ausgabe bei identischen Value-Vektoren die Gewichte eindeutig?",
+      "answer": "Nein: Jede normierte Gewichtszeile liefert denselben Value-Vektor.",
+      "explanation": "Beispielsweise liefern Gleichverteilung und (1/2,1/4,1/4) bei drei identischen Values dieselbe Ausgabe.",
+      "competency_ids": [
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/geometry"
+      ]
+    },
+    {
+      "key": "attention/grad-scores",
+      "kind": "math",
+      "front": "Wie lautet ∂L/∂z für eine Softmax-Zeile α, wenn g = ∂L/∂α gegeben ist?",
+      "answer": "α ⊙ (g − ⟨α, g⟩), also (diag(α) − ααᵀ)g.",
+      "explanation": "Jeder Key wird mit der Abweichung seines g vom gewichteten Mittel gewichtet.",
+      "pitfall": "Nur α ⊙ g: Der gemeinsame Nenner fehlt.",
+      "competency_ids": [
+        "attention/backprop"
+      ],
+      "claim_ids": [
+        "claim/backprop"
+      ]
+    },
+    {
+      "key": "attention/grad-qk",
+      "kind": "math",
+      "front": "Welche Gradienten erhalten Q und K aus ∂L/∂Z bei Z = QKᵀ/√d?",
+      "answer": "∂L/∂Q = (∂L/∂Z)K/√d und ∂L/∂K = (∂L/∂Z)ᵀQ/√d.",
+      "explanation": "Z ist bilinear: Jede Ableitung lässt den anderen Faktor stehen; die Formen müssen m×d und n×d sein.",
+      "competency_ids": [
+        "attention/backprop"
+      ],
+      "claim_ids": [
+        "claim/backprop"
+      ]
+    },
+    {
+      "key": "attention/grad-value",
+      "kind": "mechanism",
+      "front": "Warum braucht ∂L/∂V keine Ableitung der Softmax?",
+      "answer": "Weil O = AV linear in V ist: ∂L/∂V = AᵀG hängt nur von den Gewichten A und vom Ausgabegradienten G ab.",
+      "competency_ids": [
+        "attention/backprop"
+      ],
+      "claim_ids": [
+        "claim/backprop"
+      ]
+    },
+    {
+      "key": "attention/jacobian-rowsum",
+      "kind": "mechanism",
+      "front": "Warum hat jede Zeile der Softmax-Jacobi-Matrix die Summe null?",
+      "answer": "Weil softmax(z + c·1) = softmax(z) gilt; Ableiten nach c ergibt J·1 = 0.",
+      "competency_ids": [
+        "attention/softmax",
+        "attention/backprop"
+      ],
+      "claim_ids": [
+        "claim/stability",
+        "claim/backprop"
+      ]
+    },
+    {
+      "key": "attention/variance-row-shift",
+      "kind": "mechanism",
+      "front": "Warum ändert ein gemeinsamer Anteil μ aller Keys die Gewichte einer festen Query nicht?",
+      "answer": "Er addiert qᵀμ zu jedem Score der Zeile – eine gemeinsame Verschiebung, die sich aus Softmax kürzt.",
+      "competency_ids": [
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/scaling",
+        "claim/stability"
+      ]
+    },
+    {
+      "key": "attention/variance-bounds",
+      "kind": "condition",
+      "front": "Zwischen welchen Grenzen liegt Var(Σ X_r) für d Produkte mit Varianz eins ohne Unkorreliertheitsannahme?",
+      "answer": "Zwischen 0 und d²; den Wert d liefern verschwindende Kovarianzsummen.",
+      "explanation": "Cauchy–Schwarz: |Cov(X_r, X_s)| ≤ 1.",
+      "competency_ids": [
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/scaling"
+      ]
+    },
+    {
+      "key": "attention/mask-empty-row-ieee",
+      "kind": "mechanism",
+      "front": "Was liefert Max-Shift-Softmax für eine vollständig mit −∞ maskierte Zeile in IEEE-Gleitkomma?",
+      "answer": "NaN, denn das Maximum ist −∞ und −∞ − (−∞) ist NaN.",
+      "pitfall": "Ein endlicher Ersatz wie −10⁹ gibt stattdessen still eine Gleichverteilung.",
+      "competency_ids": [
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/mask-numerics"
+      ]
+    },
+    {
+      "key": "attention/mask-left-padding",
+      "kind": "condition",
+      "front": "Wann erzeugen kausale Maske und Padding-Maske zusammen eine leere Zeile?",
+      "answer": "Bei Padding links: Eine Padding-Query an Position 1 darf kausal nur Key 1 sehen, und der ist Padding.",
+      "competency_ids": [
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/mask",
+        "claim/mask-numerics"
+      ]
+    },
+    {
+      "key": "attention/nan-times-zero",
+      "kind": "misconception",
+      "front": "Warum hilft es nicht, eine NaN-Zeile im Verlust mit null zu gewichten?",
+      "answer": "Weil in IEEE-Arithmetik NaN · 0 = NaN ist; Verlust und Gradienten werden NaN.",
+      "competency_ids": [
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/mask-numerics"
+      ]
+    },
+    {
+      "key": "attention/equivariance",
+      "kind": "mechanism",
+      "front": "Was passiert mit der Ausgabe von Self-Attention ohne Maske und Positionsinformation, wenn man die Eingabezeilen permutiert?",
+      "answer": "Die Ausgabezeilen werden genauso permutiert: f(PX) = P f(X).",
+      "pitfall": "Das ist Äquivarianz, nicht Invarianz.",
+      "competency_ids": [
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/equivariance"
+      ]
+    },
+    {
+      "key": "attention/causal-not-equivariant",
+      "kind": "condition",
+      "front": "Warum ist kausale Self-Attention nicht permutationsäquivariant?",
+      "answer": "Weil die Maske mitpermutiert werden müsste; PMPᵀ ist für P ≠ I keine untere Dreiecksmatrix mehr.",
+      "competency_ids": [
+        "attention/transfer",
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/equivariance"
+      ]
+    },
+    {
+      "key": "attention/multihead-scale",
+      "kind": "condition",
+      "front": "Durch welche Wurzel teilt ein Kopf bei d_model = 512 und h = 8 seine Scores?",
+      "answer": "Durch √64 = 8, denn sein Skalarprodukt läuft über d_k = d_model/h = 64 Komponenten.",
+      "competency_ids": [
+        "attention/multihead",
+        "attention/scaling"
+      ],
+      "claim_ids": [
+        "claim/multihead",
+        "claim/scaling"
+      ]
+    },
+    {
+      "key": "attention/multihead-sum",
+      "kind": "mechanism",
+      "front": "Warum ist Concat(head₁, …, head_h)W^O dasselbe wie Σ_i head_i W_i^O?",
+      "answer": "Blockmultiplikation: W^O zerfällt in h Zeilenblöcke, jeder multipliziert genau den Spaltenblock seines Kopfes.",
+      "competency_ids": [
+        "attention/multihead"
+      ],
+      "claim_ids": [
+        "claim/multihead"
+      ]
+    },
+    {
+      "key": "attention/multihead-vs-single",
+      "kind": "compare",
+      "front": "Was leisten h Köpfe, was ein einzelner Kopf gleicher Breite nicht leistet?",
+      "answer": "h verschiedene Gewichtsverteilungen je Query statt einer; ein Kopf mischt die Values mit genau einer Verteilung.",
+      "competency_ids": [
+        "attention/multihead"
+      ],
+      "claim_ids": [
+        "claim/multihead"
+      ]
+    },
+    {
+      "key": "attention/complexity-doubling",
+      "kind": "condition",
+      "front": "Wie ändern sich Score-Rechenzeit und Score-Speicher, wenn sich die Sequenzlänge n verdoppelt?",
+      "answer": "Sie vervierfachen sich (O(n²)); die Projektionskosten verdoppeln sich nur.",
+      "competency_ids": [
+        "attention/multihead"
+      ],
+      "claim_ids": [
+        "claim/complexity"
+      ]
+    },
+    {
+      "key": "attention/complexity-crossover",
+      "kind": "math",
+      "front": "Ab welcher Länge n überwiegen die Score-Terme 2n²d die Projektionen 4nd²?",
+      "answer": "Ab n > 2d, bei d = 512 also ab n = 1024.",
+      "competency_ids": [
+        "attention/multihead"
+      ],
+      "claim_ids": [
+        "claim/complexity"
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "id": "interaction/attention",
+      "type": "explorable_model",
+      "model_ref": "scaled_dot_product_attention",
+      "prediction_prompt": "Welche erste Ausgabekoordinate erwarten Sie für die erste Query? Rechnen Sie vor dem Aufdecken.",
+      "feedback_rule": "Vergleichen Sie Rohscore, skalierte Logits, Gewichte und Value-Beiträge.",
+      "transfer_prompt": "Ändern Sie V bei festen Q,K. Was bleibt gleich? Konstruieren Sie dann eine leere erlaubte Indexmenge.",
+      "variants": [
+        {
+          "label": "Zwei Queries, drei Keys",
+          "parameters": {
+            "Q": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "K": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "V": [
+              [
+                2,
+                0
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                2,
+                2
+              ]
+            ],
+            "scaled": true,
+            "temperature": 1,
+            "mask": [
+              [
+                true,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                true
+              ]
+            ]
+          }
+        },
+        {
+          "label": "Zweiter Key für Query 1 maskiert",
+          "parameters": {
+            "Q": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "K": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "V": [
+              [
+                2,
+                0
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                2,
+                2
+              ]
+            ],
+            "scaled": true,
+            "temperature": 1,
+            "mask": [
+              [
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                true
+              ]
+            ]
+          }
+        }
+      ],
+      "competency_ids": [
+        "attention/aggregation",
+        "attention/masking",
+        "attention/transfer"
+      ],
+      "claim_ids": [
+        "claim/operator",
+        "claim/mask",
+        "claim/geometry"
+      ]
+    }
+  ],
+  "mathematics": [
+    {
+      "id": "att.shapes",
+      "tex": "Q\\in\\mathbb{R}^{m\\times d},\\quad K\\in\\mathbb{R}^{n\\times d},\\quad V\\in\\mathbb{R}^{n\\times p}",
+      "alt": "m Queries, n Keys und Values, gemeinsame Key-Dimension d, Value-Dimension p",
+      "display": true,
+      "symbols": [
+        {
+          "name": "Q",
+          "definition": "Query-Matrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "K",
+          "definition": "Key-Matrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "V",
+          "definition": "Value-Matrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "m",
+          "definition": "Anzahl der Queries",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "n",
+          "definition": "Anzahl der Keys und Values",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "d",
+          "definition": "Key-Dimension d=d_k",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "p",
+          "definition": "Value-Dimension p=d_v",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "Q",
+        "K",
+        "V",
+        "m",
+        "n",
+        "d",
+        "p"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.score",
+      "tex": "S=QK^{\\mathsf{T}},\\qquad S_{ij}=\\sum_{r=1}^{d}Q_{ir}K_{jr}",
+      "alt": "Jeder Score ist das Skalarprodukt einer Query-Zeile mit einer Key-Zeile",
+      "display": true,
+      "symbols": [
+        {
+          "name": "S",
+          "definition": "Unskalierte Score-Matrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "Q",
+          "definition": "Queries",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "K",
+          "definition": "Keys",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "i",
+          "definition": "Query-Index",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "j",
+          "definition": "Key-Index",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "r",
+          "definition": "Komponentenindex",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "d",
+          "definition": "Key-Dimension",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "S",
+        "Q",
+        "K",
+        "i",
+        "j",
+        "r",
+        "d"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.operator",
+      "tex": "Z=\\frac{QK^{\\mathsf{T}}}{\\sqrt d},\\qquad A=\\operatorname{softmax}_{\\text{zeilenweise}}(Z),\\qquad O=AV",
+      "alt": "Skalieren, je Zeile normalisieren, Values mischen",
+      "display": true,
+      "symbols": [
+        {
+          "name": "Z",
+          "definition": "Skalierte Logits",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "Q",
+          "definition": "Queries",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "K",
+          "definition": "Keys",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "d",
+          "definition": "Key-Dimension",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "A",
+          "definition": "Gewichtsmatrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "O",
+          "definition": "Ausgabematrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "V",
+          "definition": "Values",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "Z",
+        "Q",
+        "K",
+        "d",
+        "A",
+        "O",
+        "V"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.softmax",
+      "tex": "\\alpha_j=\\frac{\\exp(z_j)}{\\sum_{\\ell=1}^{n}\\exp(z_\\ell)}",
+      "alt": "Exponentieller Score geteilt durch die Summe aller exponentiellen Scores",
+      "display": true,
+      "symbols": [
+        {
+          "name": "alpha",
+          "definition": "Gewicht einer festen Query",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "j",
+          "definition": "Key-Index",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "z",
+          "definition": "Logit-Vektor einer festen Zeile",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "n",
+          "definition": "Anzahl erlaubter Keys",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "alpha",
+        "j",
+        "z",
+        "n"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.shift",
+      "tex": "\\alpha_j=\\frac{\\exp(z_j-c)}{\\sum_{\\ell=1}^{n}\\exp(z_\\ell-c)},\\qquad c=\\max_\\ell z_\\ell",
+      "alt": "Softmax bleibt bei gemeinsamer Verschiebung invariant",
+      "display": true,
+      "symbols": [
+        {
+          "name": "alpha",
+          "definition": "Softmax-Gewichte",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "j",
+          "definition": "Key-Index",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "z",
+          "definition": "Logits",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "c",
+          "definition": "Maximaler erlaubter Logit",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "n",
+          "definition": "Anzahl erlaubter Keys",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "alpha",
+        "j",
+        "z",
+        "c",
+        "n"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.jacobian",
+      "tex": "\\frac{\\partial\\alpha_j}{\\partial z_\\ell}=\\alpha_j(\\delta_{j\\ell}-\\alpha_\\ell)",
+      "alt": "Softmax-Jacobi-Matrix: Diagonale minus äußeres Produkt",
+      "display": true,
+      "symbols": [
+        {
+          "name": "alpha",
+          "definition": "Softmax-Gewicht",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "j",
+          "definition": "Ausgabeindex",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "z",
+          "definition": "Logit",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "delta",
+          "definition": "Kronecker-Delta",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "alpha",
+        "j",
+        "z",
+        "delta"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.variance",
+      "tex": "\\operatorname{Var}(q^{\\mathsf{T}}k)=d,\\qquad\\operatorname{Var}\\!\\left(\\frac{q^{\\mathsf{T}}k}{\\sqrt d}\\right)=1",
+      "alt": "Varianz unter den im Text ausdrücklich genannten Unabhängigkeitsannahmen",
+      "display": true,
+      "symbols": [
+        {
+          "name": "q",
+          "definition": "Zufällige Query",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "k",
+          "definition": "Unabhängiger zufälliger Key",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "d",
+          "definition": "Anzahl Komponenten",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "q",
+        "k",
+        "d"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [
+        "Alle 2d Komponenten unabhängig, zentriert, Varianz eins; endliche zweite Momente"
+      ],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.output",
+      "tex": "o_i=\\sum_{j=1}^{n}\\alpha_{ij}v_j",
+      "alt": "Ausgabe i ist eine konvexe Kombination der Value-Vektoren",
+      "display": true,
+      "symbols": [
+        {
+          "name": "o",
+          "definition": "Ausgabevektor",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "i",
+          "definition": "Query-Index",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "j",
+          "definition": "Key-/Value-Index",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "n",
+          "definition": "Anzahl erlaubter Values",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "alpha",
+          "definition": "Gewichte",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "v",
+          "definition": "Value-Vektor",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "o",
+        "i",
+        "j",
+        "n",
+        "alpha",
+        "v"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.logratio",
+      "tex": "\\log\\frac{\\alpha_j}{\\alpha_\\ell}=z_j-z_\\ell",
+      "alt": "Log-Gewichtsverhältnis entspricht dem Logit-Unterschied",
+      "display": true,
+      "symbols": [
+        {
+          "name": "alpha",
+          "definition": "Strikt positive Softmax-Gewichte",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "j",
+          "definition": "Key-Index",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "z",
+          "definition": "Endliche Logits",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "alpha",
+        "j",
+        "z"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.grad-v",
+      "tex": "\\frac{\\partial L}{\\partial V}=A^{\\mathsf{T}}G,\\qquad \\frac{\\partial L}{\\partial A}=GV^{\\mathsf{T}}",
+      "alt": "Value-Gradient: transponierte Gewichte mal Ausgabegradient; Gewichtsgradient: Ausgabegradient mal transponierte Values",
+      "display": true,
+      "symbols": [
+        {
+          "name": "L",
+          "definition": "Skalarer Verlust",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "V",
+          "definition": "Value-Matrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "A",
+          "definition": "Gewichtsmatrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "G",
+          "definition": "Ausgabegradient ∂L/∂O",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "L",
+        "V",
+        "A",
+        "G"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.grad-z",
+      "tex": "\\frac{\\partial L}{\\partial z_\\ell}=\\alpha_\\ell\\Big(g_\\ell-\\sum_{j=1}^{n}\\alpha_j g_j\\Big)",
+      "alt": "Score-Gradient einer Zeile: Gewicht mal Abweichung des Gewichtsgradienten von seinem gewichteten Mittel",
+      "display": true,
+      "symbols": [
+        {
+          "name": "L",
+          "definition": "Skalarer Verlust",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "z",
+          "definition": "Logits einer Zeile",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "alpha",
+          "definition": "Gewichte der Zeile",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "g",
+          "definition": "Gewichtsgradient ∂L/∂α",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "j",
+          "definition": "Key-Index",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "n",
+          "definition": "Anzahl der Keys",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "L",
+        "z",
+        "alpha",
+        "g",
+        "j",
+        "n"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.grad-qk",
+      "tex": "\\frac{\\partial L}{\\partial Q}=\\frac{1}{\\sqrt d}\\,\\frac{\\partial L}{\\partial Z}\\,K,\\qquad \\frac{\\partial L}{\\partial K}=\\frac{1}{\\sqrt d}\\Big(\\frac{\\partial L}{\\partial Z}\\Big)^{\\mathsf{T}}Q",
+      "alt": "Query- und Key-Gradient: Score-Gradient mal jeweils andere Matrix, geteilt durch Wurzel d",
+      "display": true,
+      "symbols": [
+        {
+          "name": "L",
+          "definition": "Skalarer Verlust",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "Q",
+          "definition": "Queries",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "K",
+          "definition": "Keys",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "Z",
+          "definition": "Skalierte Logits",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "d",
+          "definition": "Key-Dimension",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "L",
+        "Q",
+        "K",
+        "Z",
+        "d"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.mask-logit",
+      "tex": "\\tilde z_{ij}=\\begin{cases} z_{ij}, & M_{ij}=1,\\\\ -\\infty, & M_{ij}=0\\end{cases}",
+      "alt": "Verbotene Logits werden vor Softmax auf minus unendlich gesetzt",
+      "display": true,
+      "symbols": [
+        {
+          "name": "z",
+          "definition": "Logits",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "i",
+          "definition": "Query-Index",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "j",
+          "definition": "Key-Index",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "M",
+          "definition": "Maske, 1 für erlaubt",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "z",
+        "i",
+        "j",
+        "M"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "paper/vaswani-2017"
+      ]
+    },
+    {
+      "id": "att.equivariance",
+      "tex": "f(PX)=P\\,f(X),\\qquad \\operatorname{softmax}(PSP^{\\mathsf{T}})=P\\,\\operatorname{softmax}(S)\\,P^{\\mathsf{T}}",
+      "alt": "Permutierte Eingabe ergibt permutierte Ausgabe; zeilenweise Softmax vertauscht mit gleichzeitiger Zeilen- und Spaltenpermutation",
+      "display": true,
+      "symbols": [
+        {
+          "name": "f",
+          "definition": "Self-Attention ohne Maske",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "P",
+          "definition": "Permutationsmatrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "X",
+          "definition": "Eingabematrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "S",
+          "definition": "Score-Matrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "f",
+        "P",
+        "X",
+        "S"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [
+        "Keine Maske, keine Positionsinformation"
+      ],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.multihead",
+      "tex": "\\mathrm{head}_i=\\operatorname{Attention}(XW_i^{Q},XW_i^{K},XW_i^{V}),\\qquad \\operatorname{MultiHead}(X)=[\\mathrm{head}_1,\\dots,\\mathrm{head}_h]\\,W^{O}",
+      "alt": "Jeder Kopf rechnet Attention in eigenen Projektionen; die Köpfe werden verkettet und zurückprojiziert",
+      "display": true,
+      "symbols": [
+        {
+          "name": "i",
+          "definition": "Kopfindex",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "X",
+          "definition": "Eingabematrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "W",
+          "definition": "Projektionsmatrix",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "Q",
+          "definition": "Beschriftung Query",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "K",
+          "definition": "Beschriftung Key",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "V",
+          "definition": "Beschriftung Value",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "h",
+          "definition": "Anzahl der Köpfe",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "O",
+          "definition": "Beschriftung Ausgabe",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "i",
+        "X",
+        "W",
+        "Q",
+        "K",
+        "V",
+        "h",
+        "O"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "paper/vaswani-2017"
+      ]
+    },
+    {
+      "id": "att.multihead-dims",
+      "tex": "d_{\\mathrm{k}}=d_{\\mathrm{v}}=\\frac{d_{\\mathrm{model}}}{h}",
+      "alt": "Teilraumdimension je Kopf ist Modellbreite durch Kopfanzahl",
+      "display": true,
+      "symbols": [
+        {
+          "name": "d",
+          "definition": "Dimension mit Index k, v oder model",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "h",
+          "definition": "Anzahl der Köpfe",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "d",
+        "h"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [
+        "h teilt d_model"
+      ],
+      "source_refs": [
+        "paper/vaswani-2017"
+      ]
+    },
+    {
+      "id": "att.multihead-sum",
+      "tex": "[\\mathrm{head}_1,\\dots,\\mathrm{head}_h]\\,W^{O}=\\sum_{i=1}^{h}\\mathrm{head}_i\\,W_i^{O}",
+      "alt": "Verkettung mit anschließender Projektion ist die Summe der Kopfbeiträge",
+      "display": true,
+      "symbols": [
+        {
+          "name": "h",
+          "definition": "Anzahl der Köpfe",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "W",
+          "definition": "Ausgabeprojektion und ihre Zeilenblöcke",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "O",
+          "definition": "Beschriftung Ausgabe",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "i",
+          "definition": "Kopfindex",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "h",
+        "W",
+        "O",
+        "i"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.complexity",
+      "tex": "C_{\\mathrm{scores}}=2n^{2}d,\\qquad C_{\\mathrm{proj}}=4nd^{2},\\qquad \\frac{C_{\\mathrm{scores}}}{C_{\\mathrm{proj}}}=\\frac{n}{2d}",
+      "alt": "Multiplikationen der Score-Terme und der Projektionen; ihr Verhältnis ist n durch 2d",
+      "display": true,
+      "symbols": [
+        {
+          "name": "C",
+          "definition": "Anzahl Multiplikationen",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "n",
+          "definition": "Sequenzlänge",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "d",
+          "definition": "Modellbreite d_model",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "C",
+        "n",
+        "d"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [
+        "h·d_k = h·d_v = d_model; Additionen und Softmax vernachlässigt"
+      ],
+      "source_refs": [
+        "original/attention-reference"
+      ],
+      "checks": [
+        {
+          "kind": "equivalence",
+          "lhs": "(2*n**2*d)/(4*n*d**2)",
+          "rhs": "n/(2*d)"
+        },
+        {
+          "kind": "numeric",
+          "expression": "n/(2*d)",
+          "values": {
+            "n": 1024,
+            "d": 512
+          },
+          "expected": 1
+        }
+      ]
+    },
+    {
+      "id": "att.variance-general",
+      "tex": "\\operatorname{Var}\\Big(\\sum_{r=1}^{d}X_r\\Big)=\\sum_{r=1}^{d}\\operatorname{Var}(X_r)+2\\sum_{r<s}\\operatorname{Cov}(X_r,X_s)",
+      "alt": "Varianz einer Summe: Einzelvarianzen plus doppelte paarweise Kovarianzen",
+      "display": true,
+      "symbols": [
+        {
+          "name": "X",
+          "definition": "Produkte X_r = q_r k_r",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "r",
+          "definition": "Komponentenindex",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "s",
+          "definition": "zweiter Komponentenindex",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "d",
+          "definition": "Key-Dimension",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "X",
+        "r",
+        "s",
+        "d"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [
+        "Endliche zweite Momente"
+      ],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    },
+    {
+      "id": "att.variance-conditional",
+      "tex": "\\operatorname{Var}(q^{\\mathsf{T}}k_j\\mid q)=\\sigma_k^{2}\\,\\lVert q\\rVert^{2}",
+      "alt": "Bei fester Query wächst die Streuung der Scores einer Zeile mit dem Quadrat der Query-Länge",
+      "display": true,
+      "symbols": [
+        {
+          "name": "q",
+          "definition": "Feste Query",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "k",
+          "definition": "Key-Vektoren",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "j",
+          "definition": "Key-Index",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        },
+        {
+          "name": "sigma",
+          "definition": "Standardabweichung der Key-Komponenten",
+          "domain": "Im Lehrtext definierte reelle Größe oder ganzzahliger Index",
+          "unit": "dimensionslos"
+        }
+      ],
+      "used_symbols": [
+        "q",
+        "k",
+        "j",
+        "sigma"
+      ],
+      "domain": "Reelle endlichdimensionale Vektoren und Matrizen; endliche Logits",
+      "assumptions": [
+        "Key-Komponenten (ohne gemeinsamen Anteil) unabhängig, zentriert, Varianz sigma_k²"
+      ],
+      "source_refs": [
+        "original/attention-reference"
+      ]
+    }
+  ],
+  "graphics": [
+    {
+      "id": "graphic/attention-flow",
+      "model_ref": "scaled_dot_product_attention",
+      "interaction_id": "interaction/attention",
+      "teaching_id": "teach/worked",
+      "assessment_ids": [
+        "task/guided-numeric",
+        "task/fresh-numeric"
+      ],
+      "claim_ids": [
+        "claim/operator",
+        "claim/geometry"
+      ],
+      "competency_ids": [
+        "attention/aggregation"
+      ],
+      "objects": {
+        "score": "Skalarprodukt einer Query mit einem Key",
+        "logit": "Score geteilt durch √d und optionale Temperatur",
+        "weight": "Normalisierter erlaubter Exponentialwert; grüne Balkenlänge",
+        "value": "Zu mischender Vektor, nicht Key",
+        "contribution": "Gewicht mal zugehöriger Value"
+      },
+      "keyframes": [
+        0,
+        1
+      ],
+      "alt": "Drei Key-Zeilen mit Rohscore, skaliertem Logit, Gewicht, Value und Beitrag; darunter die erste Ausgabe. Die zweite Query wird im Zahlenbeispiel separat gerechnet.",
+      "caption": "Vom Vergleich zur Mischung – dieselben Zahlen in Rechnung, Grafik und Labor"
+    }
+  ],
+  "authorship": {
+    "content": "Von der Codex-Sitzung kuratierte Originalprosa, Aufgaben und Karten; keine automatische Kursautorenschaft nachgewiesen",
+    "automatic": "Deterministische Projektion, Rechnungen, Satz, Grafik-Keyframes und Paketierung",
+    "independent": "Decimal-Referenzrechnungen und Eigenschaftstests als getrennte Rechenwege; keine unabhängige Person oder Fachabnahme",
+    "human_status": "NOT_APPROVED",
+    "historical_status": "HUMAN_REJECTED remains unchanged",
+    "sources_read": "Quellenpassagen anhand öffentlich abrufbarer PDFs geprüft: Vaswani §3.2.1, Fußnote 4, §3.2.3; Blanchard et al. arXiv v1 §1 Gleichungen (1.2)–(1.4), Algorithmus 4.1 und Satz 4.3. Keine umfassende Literaturübersicht, keine Übertragung fremder Abbildungen. Überarbeitung V1CONTENT (2026-11-27): Abschnitte zu Rückwärtsrechnung, Masken-Arithmetik, Äquivarianz, Multi-Head und Kosten ergänzt; zitierte Stellen §3.2.2, §3.5 und §4 Tabelle 1 wurden in dieser Überarbeitung nicht erneut am PDF geprüft, die zugehörigen Aussagen sind als ungeprüft markiert. Alle Zahlen der neuen Abschnitte sind mit numpy berechnet und in Tests unabhängig nachgerechnet."
+  },
+  "misconceptions": [
+    {
+      "id": "attention/softmax-normaliser-ignored",
+      "kind": "misconception",
+      "label": "Nenner beim Ableiten übersehen",
+      "feedback": "Ihre Zahl passt zu α₃·g₃: als hinge α₃ nur von e^(z₃) ab. z₃ steckt aber auch im gemeinsamen Nenner; erhöht man z₃, schrumpfen alle anderen Gewichte. Prüfen Sie, wo z₃ in α_j überall vorkommt.",
+      "wrong_example": "∂o₁₂/∂z₃ = α₃·g₃ = 0,140029·2 = 0,280058.",
+      "corrected_example": "∂o₁₂/∂z₃ = α₃·(g₃ − ⟨α, g⟩) = 0,140029·(2 − 0,848049) ≈ 0,161307.",
+      "explanation": "Der Score z₃ wirkt auf zwei Wegen: direkt im Zähler von α₃ und über den Nenner auf jedes Gewicht. Der zweite Weg liefert den Term −α₃⟨α, g⟩. Ohne ihn summieren sich die Score-Gradienten nicht zu null, was der Verschiebungsinvarianz widerspricht.",
+      "competency_ids": [
+        "attention/backprop",
+        "attention/softmax"
+      ],
+      "claim_ids": [
+        "claim/backprop"
+      ],
+      "worked_example_id": "teach/backprop",
+      "contrast_task_id": "task/flawed-jacobian"
+    },
+    {
+      "id": "attention/softmax-diagonal-only",
+      "kind": "misconception",
+      "label": "nur die Diagonale der Jacobi-Matrix",
+      "feedback": "Ihre Zahl passt zu α₃(1 − α₃)·g₃: Sie haben nur den Diagonaleintrag verwendet. Auch α₁ und α₂ hängen über den Nenner von z₃ ab und tragen mit −α_jα₃·g_j bei.",
+      "wrong_example": "∂o₁₂/∂z₃ = α₃(1 − α₃)·g₃ = 0,240842.",
+      "corrected_example": "∂o₁₂/∂z₃ = Σ_j g_j·α_j(δ_j3 − α₃) = α₃(1 − α₃)g₃ − α₂α₃g₂ − α₁α₃g₁ ≈ 0,161307.",
+      "explanation": "Die Jacobi-Matrix diag(α) − ααᵀ ist voll besetzt. Ihre Nebendiagonale ist negativ, weil ein steigender Score die anderen Gewichte verdrängt. Nur mit allen Einträgen ist jede Zeilensumme null.",
+      "competency_ids": [
+        "attention/backprop",
+        "attention/softmax"
+      ],
+      "claim_ids": [
+        "claim/backprop"
+      ],
+      "worked_example_id": "teach/backprop",
+      "contrast_task_id": "task/flawed-jacobian"
+    },
+    {
+      "id": "attention/mask-after-softmax",
+      "kind": "misconception",
+      "label": "Maske nach Softmax ohne Neunormierung",
+      "feedback": "Ihre Zahl entsteht, wenn man über alle erlaubten und verbotenen Keys normiert und danach die verbotenen Gewichte auf null setzt. Die übrigen Gewichte summieren sich dann nicht mehr zu eins.",
+      "wrong_example": "Zeile 3: softmax(2; 1; 0) = (0,665241; 0,244728; 0,090031), dann Key 1 auf null: o₃ = 0,514820.",
+      "corrected_example": "Zeile 3: Softmax nur über die Keys 2 und 3: (0; 0,731059; 0,268941), o₃ = 1,537883.",
+      "explanation": "Maskieren heißt, verbotene Indizes aus der Normierung auszuschließen. Nach Softmax gesetzte Nullen lassen den Nenner unverändert; die Ausgabe ist dann keine konvexe Kombination der erlaubten Values mehr.",
+      "competency_ids": [
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/mask"
+      ],
+      "worked_example_id": "teach/mask-numerics",
+      "contrast_task_id": "task/flawed-mask"
+    },
+    {
+      "id": "attention/padding-mask-ignored",
+      "kind": "slip",
+      "label": "Padding-Maske vergessen",
+      "feedback": "Ihre Zahl passt zur rein kausalen Maske: Der Padding-Key 1 wurde mitgezählt. Beide Masken müssen gleichzeitig gelten.",
+      "wrong_example": "Nur kausal: Zeile 3 erlaubt alle drei Keys, o₃ = 7,167230.",
+      "corrected_example": "Kausal und Padding: Zeile 3 erlaubt die Keys 2 und 3, o₃ = 1,537883.",
+      "explanation": "Die kombinierte Maske ist das logische Und beider Masken. Ein Padding-Key ist für jede Query verboten, auch wenn die kausale Regel ihn erlauben würde.",
+      "competency_ids": [
+        "attention/masking"
+      ],
+      "claim_ids": [
+        "claim/mask"
+      ],
+      "worked_example_id": "teach/mask-numerics"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "prereq/softmax-normalisation",
+      "title": "Softmax: aus Scores werden Gewichte",
+      "explain": "Softmax macht aus beliebigen Scores positive Gewichte mit Summe eins: erst jeden Eintrag exponentieren, dann durch die Summe der Exponentialwerte teilen. Direktes Teilen der Scores scheitert, sobald ein Score negativ oder null ist.",
+      "formula": "α_j = e^(z_j) / Σ_ℓ e^(z_ℓ)",
+      "example": [
+        "z = (1; 0).",
+        "e¹ = 2,7183, e⁰ = 1, Summe 3,7183.",
+        "α = (0,7311; 0,2689); beide positiv, Summe eins."
+      ],
+      "check": {
+        "type": "numeric",
+        "prompt": "Eine Zeile hat die Logits z = (0; 1; 1). Wie groß ist α₁? (4 Nachkommastellen)",
+        "expected": 0.155362,
+        "tolerance": 0.0005,
+        "errors": [
+          {
+            "value": 0.0,
+            "category": "linear_normalisation",
+            "feedback": "Sie haben die Scores direkt geteilt (0/2). Softmax teilt Exponentialwerte: e⁰ / (e⁰ + e¹ + e¹)."
+          },
+          {
+            "value": 1.0,
+            "category": "missing_normalisation",
+            "feedback": "1 = e⁰ ist der Zähler allein. Teilen Sie durch die Summe aller Exponentialwerte der Zeile."
+          }
+        ],
+        "explain": "α₁ = 1 / (1 + 2e) = 1 / 6,4366 = 0,1554."
+      },
+      "for": {
+        "competencies": [
+          "attention/softmax"
+        ],
+        "misconceptions": []
+      },
+      "taught_in": [
+        {
+          "kind": "section",
+          "ref": "teach/softmax",
+          "label": "Abschnitt „Aus beliebigen Scores werden relative Gewichte“"
+        }
+      ]
+    },
+    {
+      "id": "prereq/softmax-jacobian",
+      "title": "Ableitung einer Softmax-Zeile",
+      "requires": [
+        "prereq/softmax-normalisation"
+      ],
+      "explain": "Alle Gewichte einer Zeile teilen sich denselben Nenner D = Σ_r e^(z_r). Erhöht man ein z_ℓ, wächst D, und alle anderen Gewichte schrumpfen. Die Quotientenregel liefert deshalb zwei Fälle: auf der Diagonale und daneben.",
+      "formula": "∂α_j/∂z_ℓ = α_j(δ_jℓ − α_ℓ): α_j(1 − α_j) für j = ℓ, −α_j·α_ℓ für j ≠ ℓ",
+      "example": [
+        "Quotientenregel: (u/D)′ = (u′·D − u·D′) / D².",
+        "j = ℓ: u = e^(z_j), u′ = D′ = e^(z_j) ⇒ α_j − α_j² = α_j(1 − α_j).",
+        "j ≠ ℓ: u′ = 0, D′ = e^(z_ℓ) ⇒ −α_j·α_ℓ (nur der Nenner wirkt).",
+        "Zahlen α = (0,5; 0,3; 0,2): ∂α₁/∂z₁ = 0,5 · 0,5 = 0,25; ∂α₁/∂z₂ = −0,5 · 0,3 = −0,15."
+      ],
+      "check": {
+        "type": "numeric",
+        "prompt": "Eine Zeile hat die Gewichte α = (0,6; 0,3; 0,1). Wie groß ist ∂α₂/∂z₁?",
+        "expected": -0.18,
+        "tolerance": 0.0005,
+        "errors": [
+          {
+            "value": 0.0,
+            "category": "offdiag_zero",
+            "feedback": "z₁ steht nicht im Zähler von α₂, aber im gemeinsamen Nenner: Der Eintrag ist −α₂α₁, nicht null."
+          },
+          {
+            "value": 0.18,
+            "category": "jacobian_sign",
+            "feedback": "Der Betrag stimmt, das Vorzeichen nicht: Der Nenner-Term geht mit Minus ein."
+          },
+          {
+            "value": 0.21,
+            "category": "diagonal_formula_offdiag",
+            "feedback": "α₂(1 − α₂) gilt nur für ∂α₂/∂z₂, nicht für einen Eintrag neben der Diagonale."
+          }
+        ],
+        "explain": "∂α₂/∂z₁ = −α₂·α₁ = −0,3 · 0,6 = −0,18."
+      },
+      "for": {
+        "competencies": [
+          "attention/backprop"
+        ],
+        "misconceptions": [
+          "attention/softmax-normaliser-ignored",
+          "attention/softmax-diagonal-only"
+        ]
+      },
+      "taught_in": [
+        {
+          "kind": "section",
+          "ref": "teach/gradient",
+          "label": "Abschnitt „Wie aus großen Score-Abständen schwache Gradienten werden“"
+        },
+        {
+          "kind": "section",
+          "ref": "teach/backprop",
+          "label": "Abschnitt „Gradienten durch den ganzen Attention-Kopf“"
+        }
+      ]
+    },
+    {
+      "id": "prereq/masked-softmax",
+      "title": "Maske vor der Normierung",
+      "requires": [
+        "prereq/softmax-normalisation"
+      ],
+      "explain": "Ein maskierter Key bekommt vor Softmax das Logit −∞: e^(−∞) = 0 fällt aus Zähler und Nenner. Normiert wird also nur über die erlaubten Keys; ihre Gewichte summieren sich wieder zu eins.",
+      "formula": "α_j = e^(z_j) / Σ_(ℓ erlaubt) e^(z_ℓ), α_j = 0 für maskierte j",
+      "example": [
+        "z = (2; 0; 9), Key 3 maskiert.",
+        "Erlaubt sind Keys 1–2: α = softmax(2; 0) = (0,8808; 0,1192; 0).",
+        "Wer erst über alle drei normiert und dann α₃ = 0 setzt, erhält Gewichte mit Summe weit unter eins."
+      ],
+      "check": {
+        "type": "numeric",
+        "prompt": "Logits z = (0; 0; 3), Key 3 ist maskiert. Wie groß ist α₁? (4 Nachkommastellen)",
+        "expected": 0.5,
+        "tolerance": 0.0005,
+        "errors": [
+          {
+            "value": 0.045279,
+            "category": "mask_after_softmax",
+            "feedback": "Sie haben über alle drei Keys normiert. Der maskierte Key fällt vor Softmax heraus: Normiert wird nur über Keys 1 und 2."
+          }
+        ],
+        "explain": "Nur Keys 1 und 2 zählen: α₁ = e⁰ / (e⁰ + e⁰) = 0,5."
+      },
+      "for": {
+        "competencies": [
+          "attention/masking"
+        ],
+        "misconceptions": [
+          "attention/mask-after-softmax",
+          "attention/padding-mask-ignored"
+        ]
+      },
+      "taught_in": [
+        {
+          "kind": "section",
+          "ref": "teach/mask",
+          "label": "Abschnitt „Maskieren heißt aus der Normalisierung ausschließen“"
+        }
+      ]
+    }
+  ]
+}

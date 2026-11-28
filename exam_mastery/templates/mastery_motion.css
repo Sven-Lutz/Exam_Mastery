@@ -1,0 +1,80 @@
+/* Mastery Motion: scene layout. Own palette (motion.PALETTE); stroke and fill colours are set by the runtime per theme
+   (light/dark) as SVG attributes; this sheet styles the frame, the equation and the controls. The runtime sets
+   data-theme on .mm-scene from the page (html[data-theme]) or the system setting. */
+.mm-scene { --mm-ink: #1b1f2a; --mm-muted: #586072; --mm-line: #d8dce4; --mm-accent: #007d71; --mm-on-accent: #ffffff;
+  --mm-bg: #ffffff; --mm-stage: #ffffff; --mm-soft: #f3f5f8; --mm-hot: #fff1c7; --mm-hot-ring: #e3a21a; --mm-warn: #c2410c;
+  --mm-predict: #fffaf0; --mm-feedback: #effaf8; --mm-mission: #f5f3ff; --mm-mission-line: #5b45d6;
+  color: var(--mm-ink); background: var(--mm-bg); border: 1px solid var(--mm-line); border-radius: 12px; padding: 18px 20px; margin: 1.5rem 0;
+  font-family: "Source Sans 3", "Helvetica Neue", Arial, sans-serif; line-height: 1.45; }
+.mm-scene[data-theme="dark"] { --mm-ink: #e6e8ee; --mm-muted: #a3aaba; --mm-line: #2c3343; --mm-accent: #34d1bf; --mm-on-accent: #0b1414;
+  --mm-bg: #0d1017; --mm-stage: #12161f; --mm-soft: #171c27; --mm-hot: rgba(242, 181, 68, .18); --mm-hot-ring: #f2b544; --mm-warn: #ff8a5c;
+  --mm-predict: #1d1a12; --mm-feedback: #0f1f1d; --mm-mission: #18152a; --mm-mission-line: #a597ff; color-scheme: dark; }
+.mm-scene:focus { outline: none; }
+.mm-fallback svg { max-width: 100%; height: auto; }
+.mm-head { margin-bottom: 12px; }
+.mm-eyebrow { margin: 0; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--mm-muted); font-weight: 600; }
+.mm-title { margin: .15rem 0 .3rem; font-size: 1.4rem; }
+.mm-claim { margin: 0; color: var(--mm-muted); max-width: 76ch; }
+.mm-formula { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; margin: 6px 0 10px; }
+.mm-equation { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 2px; font-size: 1.6rem; margin: 0; padding: 12px 18px;
+  background: var(--mm-soft); border-radius: 10px; color: var(--mm-ink); }
+.mm-seg { display: inline-flex; align-items: center; line-height: 1; }
+.mm-seg svg { overflow: visible; }
+.mm-op { margin: 0 .28em; }
+.mm-term { border-bottom: 3px solid currentColor; padding: 3px 4px 4px; border-radius: 5px; cursor: help; transition: background-color .25s, box-shadow .25s; }
+.mm-term.mm-term-on { background: var(--mm-hot); }
+.mm-legend { list-style: none; display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 0; padding: 0; font-size: .88rem; color: var(--mm-muted); }
+.mm-legend li { display: flex; gap: 6px; align-items: center; padding: 1px 5px; border-radius: 4px; transition: background-color .25s; }
+.mm-legend li.mm-term-on { color: var(--mm-ink); font-weight: 600; }
+.mm-swatch { width: 14px; height: 14px; flex: none; }
+.mm-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+.mm-figure { max-width: 1040px; }
+.mm-stage { width: 100%; height: auto; display: block; background: var(--mm-stage); border-radius: 10px; touch-action: none; }
+.mm-panel-title { font-size: 14px; font-weight: 600; fill: var(--mm-muted); }
+.mm-hl { filter: drop-shadow(0 0 3px rgba(27, 31, 42, .55)); }
+.mm-scene[data-theme="dark"] .mm-hl { filter: drop-shadow(0 0 4px rgba(255, 255, 255, .55)); }
+.mm-handle { cursor: grab; }
+.mm-timeline { position: relative; margin-top: 8px; }
+.mm-scrub { width: 100%; accent-color: var(--mm-accent); }
+.mm-snaps { position: relative; height: 8px; margin: 0 8px -4px; }
+.mm-snap { position: absolute; top: 0; width: 3px; height: 9px; border-radius: 2px; background: var(--mm-warn); transform: translateX(-1.5px); }
+.mm-ticks { list-style: none; display: flex; justify-content: space-between; margin: 2px 0 0; padding: 0; }
+.mm-tick { min-width: 30px; min-height: 30px; border: 1px solid var(--mm-line); border-radius: 50%; background: var(--mm-bg); color: var(--mm-muted); font: inherit; font-size: .8rem; cursor: pointer; }
+.mm-done .mm-tick { border-color: var(--mm-accent); color: var(--mm-accent); }
+.mm-tick[aria-current="step"] { background: var(--mm-accent); color: var(--mm-on-accent); }
+.mm-tick:disabled { opacity: .4; cursor: not-allowed; }
+.mm-controls, .mm-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+.mm-controls .mm-counter { margin: 0 0 0 auto; }
+.mm-btn { font: inherit; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--mm-line); background: var(--mm-bg); color: var(--mm-ink); cursor: pointer; min-height: 40px; }
+.mm-btn.mm-primary { background: var(--mm-accent); border-color: var(--mm-accent); color: var(--mm-on-accent); font-weight: 600; }
+.mm-btn.mm-secondary { color: var(--mm-muted); }
+.mm-btn:disabled { opacity: .5; cursor: not-allowed; }
+.mm-btn:focus-visible, .mm-tick:focus-visible, .mm-opt:focus-visible, .mm-term:focus-visible, .mm-edit-input:focus-visible { outline: 3px solid var(--mm-hot-ring); outline-offset: 2px; }
+.mm-layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(260px, 2fr); gap: 22px; align-items: start; margin-top: 8px; }
+@media (max-width: 860px) { .mm-layout { grid-template-columns: 1fr; } }
+.mm-counter { margin: 8px 0 0; font-size: .84rem; color: var(--mm-muted); }
+.mm-step-title { margin: .1rem 0 .3rem; font-size: 1.12rem; }
+.mm-caption { margin: 0 0 8px; max-width: 70ch; }
+.mm-predict, .mm-feedback, .mm-mission, .mm-edit { border: 1px solid var(--mm-line); border-left: 4px solid var(--mm-hot-ring); border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: var(--mm-predict); }
+.mm-feedback { border-left-color: var(--mm-accent); background: var(--mm-feedback); }
+.mm-mission { border-left-color: var(--mm-mission-line); background: var(--mm-mission); }
+.mm-edit { border-left-color: var(--mm-line); background: var(--mm-soft); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; }
+.mm-edit legend { font-weight: 600; font-size: .9rem; padding: 0 4px; }
+.mm-edit-field { display: flex; gap: 8px; align-items: center; }
+.mm-edit-field span { min-width: 2.2rem; }
+.mm-edit-input { font: inherit; width: 5.2rem; padding: 4px 6px; border: 1px solid var(--mm-line); border-radius: 6px; background: var(--mm-bg); color: var(--mm-ink); }
+.mm-q-prompt { margin: .2rem 0 .4rem; font-weight: 600; }
+.mm-q-options { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.mm-q-direction { display: grid; grid-template-columns: repeat(3, 44px); gap: 4px; }
+.mm-q-center { display: grid; place-items: center; color: var(--mm-muted); }
+.mm-opt { font: inherit; min-width: 44px; min-height: 40px; padding: 4px 10px; border: 1px solid var(--mm-line); border-radius: 8px; background: var(--mm-bg); color: var(--mm-ink); cursor: pointer; }
+.mm-opt[aria-pressed="true"] { border: 2px solid var(--mm-ink); background: var(--mm-hot); font-weight: 700; }
+.mm-opt:disabled { cursor: default; }
+.mm-num { font: inherit; width: 8rem; padding: 6px; border: 1px solid var(--mm-line); border-radius: 6px; background: var(--mm-bg); color: var(--mm-ink); }
+.mm-coord { width: 4.6rem; }
+.mm-note, .mm-store { font-size: .86rem; color: var(--mm-muted); }
+.mm-slider { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.mm-slider input { flex: 1 1 160px; accent-color: var(--mm-mission-line); }
+.mm-val { font-variant-numeric: tabular-nums; min-width: 3.5rem; }
+.mm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .mm-term, .mm-legend li { transition: none; } }

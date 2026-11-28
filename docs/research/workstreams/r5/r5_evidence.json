@@ -1,0 +1,2287 @@
+{
+ "schema": "r1-evidence/1",
+ "agent": "R5",
+ "updated": "2026-11-27T18:00:00+01:00",
+ "entries": [
+  {
+   "source_id": "bastani2025",
+   "citation": "Bastani, H., Bastani, O., Sungu, A., Ge, H., Kabakcı, Ö., & Mariman, R. (2025). Generative AI without guardrails can harm learning: Evidence from high school mathematics. PNAS, 122(26), e2422633122. Correction (affiliation only): PNAS 122(34), e2518204122.",
+   "doi_or_url": "https://doi.org/10.1073/pnas.2422633122",
+   "source_type": "primary_study",
+   "kb_status": "existing",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Europe PMC REST fullTextXML PMC12232635 (CC BY-NC-ND 4.0); SI appendix via Europe PMC supplementaryFiles (pnas.2422633122.sapp.pdf); correction PMC12403119",
+    "sections_read": [
+     "Version of record: Experimental Design; Main Results incl. Table 1; Student Perception; Heterogeneity; Robustness; Potential Mechanism incl. Table 2; Student Engagement; Discussion; footnotes (allocation, preregistration, consent)",
+     "SI A.4 Treatment Assignment and Covariate Balance incl. Table A.1",
+     "SI A.5 Grading (blinded independent graders)",
+     "SI A.6 Pre-Registration Details incl. Tables A.2/A.3 (preregistered pairwise t-tests)",
+     "SI B.1 Non-compliance Table B.4/B.5; B.2 Table B.7 robustness; B.6 absenteeism",
+     "Correction notice PMC12403119: affiliation of one author only, no change to results",
+     "NOT read: AsPredicted registration text itself (4DL_Q3J), SI C.1-C.3 in detail, raw data/code on GitHub"
+    ]
+   },
+   "design": "cluster-randomized field experiment, 3 arms (control / GPT Base / GPT Tutor), classroom = unit of allocation and of SE clustering; about fifty grade 9-11 classes; four 90-min sessions in Fall 2023; classes assigned to arms 'using an integer program' accounting for scheduling/laptop constraints plus student-count balance constraints (SI A.4); the main text describes the integer program as matching observable characteristics (footnote #); student-to-class assignment by the school is described as random except honors classes (excluded from main sample)",
+   "population": "high-school students grades 9-11, one large private-sector school in Ankara, Turkey; main sample 839 survey completers (Tutor 277, Control 320, Base 242; SI Table A.1); 943 incl. honors",
+   "operation": "symbolic_procedure (school mathematics review topics, e.g. combinatorics); exam items 'conceptually very similar' to practice items",
+   "intervention": "assisted practice phase with GPT-4 chat: GPT Base (standard tutor prompt with the problem) or GPT Tutor (prompt with teacher solutions, common mistakes and instruction to give hints, not answers); laptops supervised by teacher and staff",
+   "comparator": "business-as-usual practice with textbook and notes; solutions shown only after submission",
+   "outcome": {
+    "measure": "teacher-rubric normalized grade 0-1, graded by independent graders blinded to arm (SI A.5); practice (assisted) and exam (closed-book, unassisted)",
+    "assisted": "practice phase assisted; primary preregistered outcome = unassisted exam",
+    "delay": "none beyond the same 90-min session: exam immediately follows practice; no delayed retention test",
+    "transfer": "near: each exam item paired with a conceptually very similar practice item"
+   },
+   "estimate": {
+    "metric": "ITT regression coefficient on normalized grade 0-1 (Table 1, class-clustered SE); relative % of control mean; preregistered pairwise difference with 95% CI (SI Table A.2)",
+    "value": "Exam: GPT Base -0.054 (SE 0.022), GPT Tutor -0.004 (SE 0.013); control mean 0.321, SD 0.277. Practice: Base +0.137 (0.031), Tutor +0.361 (0.032); control mean 0.284. Relative: practice +48% / +127%, exam Base -17% (relative to control mean, NOT percentage points). Preregistered pairwise exam differences: Base vs Control -0.035 [-0.057, -0.012]; Tutor vs Control -0.006 [-0.030, 0.018]; Tutor vs Base +0.028 [0.005, 0.052]",
+    "ci": "pairwise CIs as reported in SI Table A.2; Table 1 reports SE only",
+    "k_or_n": "2,848 student-session observations (Table 1); 839 students main sample; about fifty classes",
+    "note": "R5 own arithmetic, not reported by authors: Tutor 95% interval from Table 1 approx. -0.004 +/- 1.96*0.013 = [-0.030, 0.021] on the 0-1 scale, i.e. about [-0.11, +0.08] control-SD units (normal approximation, ignores few-cluster small-sample correction). The Base exam effect -0.054 equals about -0.19 control SD. Non-significance of Tutor is NOT equivalence; whether it is non-inferior depends on a margin the study did not prespecify."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Strengths: preregistered primary outcome (unassisted exam), blinded independent grading, ITT, no differential absenteeism (12.3% average), robustness to honors inclusion/controls/clustering (SI B.2). Concerns: allocation is constrained (integer program) rather than a simple concealed random draw, and main text vs SI describe it differently (matching observables vs randomizing under constraints); few clusters (~50 over 3 arms) for class-level allocation; preregistered pairwise t-tests do not appear to cluster SEs; five class-sessions non-compliant; outcome is immediate and near (no delay, no novel transfer); GPT Tutor students could have answers checked during practice; GPT-4 of Fall 2023; single school, school mathematics, Turkey. Mechanism ('crutch') rests on non-preregistered exploratory error-rate and message-cluster analyses. Students' self-perceived learning did not track measured exam performance (SI B.3). Data and code public (GitHub obastani/GenAICanHarmLearning) -> reanalysis possible.",
+   "claim_edges": [
+    {
+     "claim_id": "ai.1",
+     "relation": "qualifies",
+     "locator": "Main Results Table 1; SI A.4, A.6 Table A.2: numbers confirmed; 'verhinderte den Schaden' is too strong: Tutor vs Control CI [-0.030, 0.018] does not establish non-inferiority without a margin; exam was immediate and near"
+    },
+    {
+     "claim_id": "its.5",
+     "relation": "context_only",
+     "locator": "Student Engagement Fig. 3; SI C.2 (help-seeking style differs by tool design)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "kestin2025",
+   "citation": "Kestin, G., Miller, K., Klales, A., Milbourne, T., & Ponti, G. (2025). AI tutoring outperforms in-class active learning: An RCT introducing a novel research-based design in an authentic educational setting. Scientific Reports, 15, 17458. Preprint v1: Research Square rs-4243877/v1, 14 May 2024, titled 'AI Tutoring Outperforms Active Learning'.",
+   "doi_or_url": "https://doi.org/10.1038/s41598-025-97652-6",
+   "source_type": "primary_study",
+   "kb_status": "existing",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Europe PMC REST fullTextXML PMC12179260 (version of record, open access); Supplementary Material 1 (MOESM1 docx) via Europe PMC supplementaryFiles; preprint v1 PDF (Research Square, CC BY 4.0) for version comparison",
+    "sections_read": [
+     "VoR: Abstract; Results (post-test, time on task, regression, perceptions); Discussion; 'Context, limitations, and future directions'; Methods (population, course setting, study design, additional controls); footnotes; data availability",
+     "Supplement: Table S1 standardized regression coefficients; Table S2A group demographics; Table S4 description (item psychometrics); AI tutor system description incl. persona prompt and a question-specific prompt",
+     "Preprint v1: full text searched for N, coefficients, quantile range, discussion wording, limitations section",
+     "NOT read: GitHub study data; Table S2B/S3 content in detail (images)"
+    ]
+   },
+   "design": "two-period crossover RCT in one course; students randomized to two groups (96 / 98) with peer-instruction groups (2-3 students) kept together, i.e. allocation at small-group level; each student had one AI-tutor lesson at home and one in-class active-learning lesson (topics surface tension, fluids); pre-test and post-test per lesson",
+   "population": "Harvard introductory physics for life sciences (PS2), Fall 2023; 233 enrolled, 194 eligible (consent, participation in both conditions, completion of all tests)",
+   "operation": "symbolic_procedure and conceptual physics (first exposure; items 33% analyzing, 41% applying, 21% understanding, 4% remembering per footnote)",
+   "intervention": "structured GPT-4-0613 tutor ('PS2 Pal') with expert persona prompt and question-specific step-by-step solutions, sequential scaffolding through problem parts, pre-recorded videos, self-paced at home; persona allows confirming answers and giving the answer if the student demands it",
+   "comparator": "in-class active learning lesson (peer instruction with staff support and instructor feedback) by the course instructors",
+   "outcome": {
+    "measure": "post-lesson quiz (not graded; participation credit), written by a separate team member from learning goals; item psychometrics reported in Table S4",
+    "assisted": "post-test presumably without tutor; supervision of the AI-condition post-test at home is not described in the sections read",
+    "delay": "immediate post-test after each lesson; no delayed test",
+    "transfer": "same-lesson learning goals; no separate transfer measure"
+   },
+   "estimate": {
+    "metric": "standardized regression coefficient for condition (Table S1, student-clustered), plus quantile-regression range in SD units; medians",
+    "value": "0.63 (p < 0.001; R2 0.21); authors' quantile regression 0.73-1.3 SD; median post-score 4.5 (AI, N=142) vs 3.5 (in class, N=174), pre-test median 2.75 (N=316); median AI time on task 49 min vs 60 min assumed in class",
+    "ci": "no CI reported for 0.63 in VoR or supplement",
+    "k_or_n": "194 eligible students; medians reported with N=142/174/316 post/pre scores",
+    "note": "Internal inconsistency not explained in text read: 194 students x 2 lessons would give 388 post-tests, but medians use N=142 + 174 = 316. Same numbers appear in preprint v1. 0.63 is a covariate-adjusted standardized coefficient, not a raw Cohen d."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Version comparison: core numbers (194/233, 0.63, 0.73-1.3 SD, N 142/174/316, 49 min) identical in v1 and VoR. The VoR adds a 'Context, limitations, and future directions' section (first exposure, Bloom levels, dependence on expert prompts/videos/GPT-4; explicitly no presumption for complex synthesis/higher-order thinking), a note that authors overlap with those who established the in-class approach, FCI/CLASS subgroup statements and a supplement with item psychometrics; v1 headline 'learn more than twice as much' became 'learn significantly more in less time'. Risks: package comparison (medium, location, self-pacing, video, feedback all differ); unsupervised home condition vs class; low-stakes post-test; ceiling effect; no delayed or transfer outcome; exclusion of 39 non-eligible students conditional on completing both conditions; author-developer and instructor roles overlap; no CI for main estimate. Data public (GitHub HarvardAItutor/Study-Data-v4).",
+   "claim_edges": [
+    {
+     "claim_id": "ai.2",
+     "relation": "qualifies",
+     "locator": "VoR Results 'Learning gains: linear regression model'; Supplement Table S1; VoR 'Context, limitations, and future directions' (limitation wording verified in VoR, absent in v1)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "boolzen2026genaistem",
+   "citation": "Boolzen, C., Kuhn, J., Flegr, S., Rott, E., Stausberg, N., & Küchemann, S. (2026). Evidence of impact and interpretational limits of generative AI in STEM education: A systematic review and meta-analysis on cognitive learning outcomes. Artificial Intelligence Review, 59(10), 223.",
+   "doi_or_url": "https://doi.org/10.1007/s10462-026-11665-9",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.1007/s10462-026-11665-9 (abstract, CC BY 4.0); full text NOT reached: link.springer.com returned a client challenge / cookie redirect for HTML and PDF; not in Europe PMC",
+    "sections_read": [
+     "abstract only (Crossref deposit)"
+    ]
+   },
+   "design": "preregistered (AsPredicted 176450) systematic review and random-effects meta-analysis plus Robust Bayesian Meta-Analysis (RoBMA), moderator and coincidence analysis; search ERIC, PsycINFO, Web of Science updated 7 May 2026; two pairs of independent raters",
+   "population": "mostly higher-education STEM learners; peer-reviewed quantitative studies after 2017 with comparison group",
+   "operation": "STEM knowledge and skills (externally assessed cognitive outcomes)",
+   "intervention": "learner interaction with generative AI, mostly text-based tools such as ChatGPT",
+   "comparator": "control/comparison groups as in primary studies; coded by ISAR level (inversion/substitution/augmentation/redefinition) relative to ICAP activity of control",
+   "outcome": {
+    "measure": "externally assessed cognitive learning outcomes",
+    "assisted": "unknown from abstract (whether tests were taken with AI not stated)",
+    "delay": "unknown from abstract",
+    "transfer": "outcome type knowledge vs skills coded"
+   },
+   "estimate": {
+    "metric": "Hedges g (random effects); RoBMA bias-adjusted mean mu and heterogeneity tau",
+    "value": "85 eligible studies, 49 studies / 59 effect sizes meta-analysed; I2 = 96.32%; prediction interval g = -1.52 to 3.20; RoBMA mu = 0.076 +/- 0.254, tau = 1.190 +/- 0.166; moderators outcome type (R2 12.5%) and ISAR level (R2 13.0%) robust under bias correction",
+    "ci": "unadjusted pooled g and its CI are not given in the abstract",
+    "k_or_n": "49 studies / 59 effect sizes",
+    "note": "Abstract states that the overall positive effect 'can be largely attributed to publication bias'; 33 studies reported large effects only because intervention and control cognitive activity were not comparable; substitution of learner activity described as potentially detrimental. Numbers as in abstract; the meaning of '+/-' (posterior SD) not verified in full text."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Strong design features (preregistration, dual coding, bias-adjusted model) but full text not read: unadjusted estimate, risk-of-bias tool, delay/assistance coding and the ISAR subgroup estimates unverified. Directly relevant population (higher education) and operation (STEM). Key decision relevance: a positive average effect of GenAI in STEM is not robust; activity comparability between arms explains part of large effects.",
+   "claim_edges": [
+    {
+     "claim_id": "ai.2",
+     "relation": "qualifies",
+     "locator": "abstract (RoBMA mu; ISAR moderator; non-comparable control activity in 33 studies)"
+    },
+    {
+     "claim_id": "ai.1",
+     "relation": "context_only",
+     "locator": "abstract (substitution can be detrimental)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "liu2026izavsa",
+   "citation": "Liu, J., Sweet, T., Chen, M. H., Engelberg, J., Masters, M. C., Clark, M., Persaud, A., Lancaster, A., Hollingsworth, J. K., & Rice, J. K. (2026). The effects of course-integrated AI tutoring on student performance and engagement: A randomized university trial. IZA Discussion Paper No. 18989, October 2026.",
+   "doi_or_url": "https://www.iza.org/publications/dp/18989",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://docs.iza.org/dp18989.pdf (working paper, not peer reviewed)",
+    "sections_read": [
+     "Abstract",
+     "2.1 Virtual Study Assistant",
+     "2.2 Experimental Design",
+     "2.3 Study Conditions",
+     "3 Data, 3.1-3.6",
+     "4 Methods incl. footnotes 3-4",
+     "5.1 Uptake, 5.2 Impact (text; Table 3 not reproduced)",
+     "6.1-6.2 Heterogeneity",
+     "7.1-7.3 Mechanisms",
+     "8 Discussion (first part)"
+    ]
+   },
+   "design": "group-randomized trial, Fall 2025; randomization of instructors within 13 blocks of same/similar courses (9 exact-match blocks); ITT with block fixed effects and student covariates, SE clustered by course-section; analysis plan registered on OSF after data collection but before analysis",
+   "population": "2,379 undergraduates, 30 instructors, 34 course-sections, large U.S. public university, 11 of 12 schools/colleges; exact-match sample 22 instructors / 1,353 students; 3 non-activating treatment instructors removed from sample",
+   "operation": "mixed course learning across disciplines (STEM, humanities, social sciences)",
+   "intervention": "access to a course-integrated GPT-4o chatbot with retrieval over course materials (citations), instructor-configurable tutor vs direct-instruction mode (most used the default direct mode); no prescribed instructional integration",
+   "comparator": "same/similar course sections without the assistant (other AI tools available to all students)",
+   "outcome": {
+    "measure": "instructor-posted final grade (0-100) and letter grade (primary); homework score; LMS engagement",
+    "assisted": "unknown: researchers did not know which assessments were proctored or AI-permitted",
+    "delay": "end of semester",
+    "transfer": "course grades, not a designed transfer test"
+   },
+   "estimate": {
+    "metric": "ITT coefficient in raw points and control-group SD units",
+    "value": "exact-match sample with controls: final grade -4.12 points = -0.37 SD; letter grade -0.11 GPA points = -0.13 SD; homework n.s. Full sample: no significant adverse academic effect (text 5.2). LMS total participation about -0.9 SD in both samples. First-generation students: additional -2.87 points (-0.28 SD) in full sample",
+    "ci": "not extracted (Table 3 not reproduced)",
+    "k_or_n": "2,379 students / 34 sections (full); 1,353 / 22 instructors (exact match)",
+    "note": "Only about 15% of treated students ever used the tool (13% exact match); 73.8% of 3,460 requests were direct-answer requests, feedback on own attempt 0.7%. Users and non-users in treated sections had similarly lower grades; IV estimates (-1.99 / -2.83 SD) judged implausible as tool effects by the authors."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Working paper. Few clusters (34 sections, fewer in exact match); adverse academic effect only in the exact-match subsample; analysis plan registered post data collection; student sorting imbalance across instructors; grades are instructor-specific and assessment conditions (proctored/AI use) unknown; survey response 18% with differential response. Internal inconsistencies in the text read: Discussion says a significant difference in the 'full-match' sample whereas 5.2 reports no significant full-sample effect; Discussion cites 7.6% feedback requests whereas 7.3 reports 0.7% (7.6% = navigation). Mechanism (permissive AI climate vs tool use) not identified. Highly relevant as university, multi-discipline, semester-long, naturalistic access condition.",
+   "claim_edges": [
+    {
+     "claim_id": "ai.1",
+     "relation": "qualifies",
+     "locator": "5.2 Impact of VSA Access; 7.1 (access effect not explained by use)"
+    },
+    {
+     "claim_id": "ai.2",
+     "relation": "contradicts",
+     "locator": "Abstract; 5.2: university AI tutor access without instructional integration did not improve and in exact-match sections lowered grades"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "wang2024tutorcopilot",
+   "citation": "Wang, R. E., Ribeiro, A. T., Robinson, C. D., Loeb, S., & Demszky, D. (2024, rev. 2026). Tutor CoPilot: A human-AI approach for scaling real-time expertise. arXiv:2410.03017 (v3, 10 Oct 2026). Preregistration https://osf.io/8d6ha.",
+   "doi_or_url": "https://arxiv.org/abs/2410.03017",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "https://arxiv.org/pdf/2410.03017v3 plus arXiv API metadata for v3 and v1 abstract",
+    "sections_read": [
+     "Abstract v3 and v1 (via arXiv API)",
+     "Randomization and Participants",
+     "Tutors/Students/Data paragraphs",
+     "Limitations paragraph on end-of-year scores",
+     "Appendix D student-level analysis (opening)",
+     "exit-ticket validity paragraph"
+    ]
+   },
+   "design": "preregistered RCT randomizing tutors (not students) to access to an LLM tool that suggests expert-like moves to human tutors during live chat tutoring; spring 2024, about two months",
+   "population": "v3: 783 tutors with study sessions (388 treatment / 395 control; 900 initially randomized) and 1,013 grade 3-6 students below grade level in a large southern U.S. district (79% Hispanic, 67% economically disadvantaged). v1 abstract had reported 900 tutors and 1,800 students",
+   "operation": "symbolic_procedure (elementary/middle school mathematics)",
+   "intervention": "human tutor with on-demand AI suggestions (human-in-the-loop)",
+   "comparator": "human tutors without the tool (business as usual)",
+   "outcome": {
+    "measure": "session exit ticket pass (topic 'mastery') - proximal; end-of-year NWEA MAP (distal) in an exposure-based student-level analysis",
+    "assisted": "exit ticket after tutoring within the session; MAP unassisted",
+    "delay": "exit ticket immediate; MAP end of year",
+    "transfer": "MAP is a standardized distal test"
+   },
+   "estimate": {
+    "metric": "percentage points of exit-ticket pass probability",
+    "value": "+4 p.p. (p < .01); +9 p.p. for students of lower-rated tutors; end-of-year MAP: no statistically significant improvement (authors, Limitations; SI D)",
+    "ci": "not extracted",
+    "k_or_n": "783 tutors / 1,013 students (v3)",
+    "note": "Cost about $20 per tutor per year (authors). Students were not randomized; exposure varied by tutor matching."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Strong for proximal tutor behaviour and session outcome; distal achievement effect not shown. Exit ticket is a curriculum-progression gate, so it is a proximal and partly assisted-context measure. Version drift between v1 and v3 in sample counts illustrates why version of record must be tracked. Human-AI co-pilot design is not the same as a learner-facing autonomous tutor.",
+   "claim_edges": [
+    {
+     "claim_id": "ai.2",
+     "relation": "context_only",
+     "locator": "Abstract v3; Limitations (no significant end-of-year MAP effect)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "henkel2024rori",
+   "citation": "Henkel, O., Horne-Robinson, H., Kozhakhmetova, N., & Lee, A. (2024). Effective and scalable math support: Evidence on the impact of an AI-tutor on math achievement in Ghana. arXiv:2402.09809 (v2, 5 May 2024).",
+   "doi_or_url": "https://arxiv.org/abs/2402.09809",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://arxiv.org/pdf/2402.09809v2 (preprint)",
+    "sections_read": [
+     "Abstract",
+     "3.1 design",
+     "3.2 Participation",
+     "4.1 Estimated Learning Gains incl. Table 1",
+     "5.1 Implications",
+     "5.2 Limitations"
+    ]
+   },
+   "design": "school-level random assignment of 11 schools (5 treatment, 6 control); baseline Feb and endline Aug 2023; analysis by independent-samples t-test on individual growth scores (no adjustment for clustering reported in sections read)",
+   "population": "grades 3-8/9 students in Rising Academies schools, Ghana; 637 at baseline, 477 completed both tests (241 control, 236/237 treatment); abstract says approximately 1,000",
+   "operation": "symbolic_procedure (foundational numeracy and algebra, grades 3-5 Global Proficiency Framework)",
+   "intervention": "WhatsApp chat-based math tutor with NLP/LLM components, two 30-min sessions per week during study hall, additional to regular instruction",
+   "comparator": "regular study hall without the tutor (no matched extra practice)",
+   "outcome": {
+    "measure": "same 35-item assessment at baseline and endline for all grades",
+    "assisted": "unassisted test (presumably); not detailed",
+    "delay": "endline about 6-7 months after baseline",
+    "transfer": "curriculum-level assessment; ceiling at baseline for older students"
+   },
+   "estimate": {
+    "metric": "Cohen d on growth scores (pooled SD over both conditions and time points, Morris)",
+    "value": "0.36 in text (abstract: 0.37); growth 5.13 vs 2.12 points",
+    "ci": "not reported",
+    "k_or_n": "11 schools / 477 students analysed",
+    "note": "p < 0.001 from an individual-level t-test; with 11 clusters this p-value is not interpretable as design-based precision."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "High risk: 11 clusters, unadjusted analysis, 25% attrition, same test twice, ceiling effects, extra practice time confounded with the AI component, year-1 preprint only. Shows feasibility of low-bandwidth chat tutoring in LMIC; does not show advantage of GenAI over equivalent non-AI practice.",
+   "claim_edges": [
+    {
+     "claim_id": "ai.2",
+     "relation": "context_only",
+     "locator": "4.1, 5.2"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "desimone2025nigeria",
+   "citation": "De Simone, M., Tiberti, F., Barron Rodriguez, M., Manolio, F., Mosuro, W., & Dikoru, E. J. (2025). From chalkboards to chatbots: Evaluating the impact of generative AI on learning outcomes in Nigeria. World Bank Policy Research Working Paper 11125.",
+   "doi_or_url": "https://doi.org/10.1596/1813-9450-11125",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "World Bank Open Knowledge Repository bitstream (served as plain text), handle 10986/43212",
+    "sections_read": [
+     "Abstract",
+     "Introduction results summary",
+     "2.2 Sample and Randomization (opening)",
+     "sample sizes/attrition passage",
+     "robustness: Lee bounds and IPW",
+     "4.1 cost-effectiveness opening"
+    ]
+   },
+   "design": "student-level lottery among volunteers (52% of eligible expressed interest) in nine senior secondary schools; ITT; differential attrition handled by Lee bounds and IPW; no preregistration found in text searched",
+   "population": "first-year senior secondary students, Benin City, Nigeria; 657 assigned treatment, 671 control; endline completed by 422 treatment and 337 control",
+   "operation": "recall_discrimination and language skills (English), plus AI knowledge and digital skills",
+   "intervention": "twelve 90-min after-school sessions over six weeks with Microsoft Copilot (GPT-4), teacher-guided prompts and peer work",
+   "comparator": "no program (business as usual; no extra session time)",
+   "outcome": {
+    "measure": "program-specific endline assessment (English, digital skills, AI skills, IRT composite) and regular third-term English exam",
+    "assisted": "endline presumably without AI; not verified",
+    "delay": "end of intervention; third-term exam later in term",
+    "transfer": "third-term exam covered broader year content"
+   },
+   "estimate": {
+    "metric": "ITT in SD units",
+    "value": "overall 0.31 SD; English 0.23 (abstract) / 0.24 (intro) SD; AI skills 0.31; digital 0.14; IRT 0.26; third-term English exam 0.21 SD",
+    "ci": "not extracted",
+    "k_or_n": "1,328 randomized; 759 at endline",
+    "note": "Endline completion 64% treatment vs 50% control (own computation from counts); authors report significant differential attrition and positive Lee bounds."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Package effect (extra time, teachers, peers, AI) vs nothing; volunteers only; heavy differential attrition; partly program-aligned test; English abstract/intro figures differ slightly (0.23/0.24). Supports 'structured, teacher-guided extra practice with AI can help' but not AI-specific causality or comparison with direct LLM use.",
+   "claim_edges": [
+    {
+     "claim_id": "ai.2",
+     "relation": "context_only",
+     "locator": "Abstract; robustness section (Lee bounds)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "vanlehn2011",
+   "citation": "VanLehn, K. (2011). The relative effectiveness of human tutoring, intelligent tutoring systems, and other tutoring systems. Educational Psychologist, 46(4), 197-221.",
+   "doi_or_url": "https://doi.org/10.1080/00461520.2011.611369",
+   "source_type": "systematic_review",
+   "kb_status": "existing",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "ERIC EJ946764 description; author PDF (public.asu.edu) connection failed",
+    "sections_read": [
+     "abstract (ERIC)"
+    ]
+   },
+   "design": "review of experiments comparing human tutoring, computer tutoring (answer-, step-, substep-based) and no tutoring",
+   "population": "mixed, mostly STEM experiments (details not verified)",
+   "operation": "symbolic_procedure, problem solving",
+   "intervention": "human tutoring; step-based ITS; answer-based CAI",
+   "comparator": "'no tutoring' = same content without tutoring",
+   "outcome": {
+    "measure": "learning outcomes in included experiments",
+    "assisted": "not verified",
+    "delay": "not verified",
+    "transfer": "not verified"
+   },
+   "estimate": {
+    "metric": "Cohen d vs no tutoring",
+    "value": "human tutoring d = 0.79; ITS d = 0.76 (abstract); widely believed values 0.3/1.0/2.0 not confirmed",
+    "ci": "not in abstract",
+    "k_or_n": "not in abstract",
+    "note": "Step-based vs answer-based split values not verified in this run."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract-level only. Comparison against 'no tutoring' with same content; mostly researcher-developed systems and aligned tests (see kulik2016, cheungslavin2016methods). Does not address generative AI or delayed unassisted transfer.",
+   "claim_edges": [
+    {
+     "claim_id": "its.1",
+     "relation": "supports",
+     "locator": "abstract (ERIC EJ946764)"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "kulik2016",
+   "citation": "Kulik, J. A., & Fletcher, J. D. (2016). Effectiveness of intelligent tutoring systems: A meta-analytic review. Review of Educational Research, 86(1), 42-78.",
+   "doi_or_url": "https://doi.org/10.3102/0034654315581420",
+   "source_type": "meta_analysis",
+   "kb_status": "existing",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.3102/0034654315581420",
+    "sections_read": [
+     "abstract (Crossref)"
+    ]
+   },
+   "design": "meta-analysis of 50 controlled evaluations; separate description of 6 evaluations with nonconventional controls and 4 with flawed implementations",
+   "population": "mixed",
+   "operation": "mixed",
+   "intervention": "intelligent tutoring systems",
+   "comparator": "conventional instruction",
+   "outcome": {
+    "measure": "test scores; locally developed vs standardized",
+    "assisted": "not verified",
+    "delay": "not verified",
+    "transfer": "standardized tests as more distal"
+   },
+   "estimate": {
+    "metric": "median effect in SD",
+    "value": "0.66 SD median over 50 evaluations; much smaller on standardized than locally developed tests (values not in abstract); small effects with nonconventional controls or flawed implementations",
+    "ci": "not in abstract",
+    "k_or_n": "50 evaluations",
+    "note": "Test alignment is the authors' stated critical determinant."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract-level. Median of aligned and standardized tests mixes outcome types; supports treating locally developed in-product tests as inflated proxies.",
+   "claim_edges": [
+    {
+     "claim_id": "its.3",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "ma2014",
+   "citation": "Ma, W., Adesope, O. O., Nesbit, J. C., & Liu, Q. (2014). Intelligent tutoring systems and learning outcomes: A meta-analysis. Journal of Educational Psychology, 106(4), 901-918.",
+   "doi_or_url": "https://doi.org/10.1037/a0037123",
+   "source_type": "meta_analysis",
+   "kb_status": "existing",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "ERIC EJ1049508 description",
+    "sections_read": [
+     "abstract (ERIC)"
+    ]
+   },
+   "design": "meta-analysis, 107 effect sizes, 14,321 participants",
+   "population": "all education levels",
+   "operation": "procedural and declarative knowledge across domains",
+   "intervention": "ITS (as principal instruction, supplement, integral component or homework aid)",
+   "comparator": "teacher-led large group; non-ITS CBI; textbooks/workbooks; individual human tutoring; small-group instruction",
+   "outcome": {
+    "measure": "achievement",
+    "assisted": "not verified",
+    "delay": "not verified",
+    "transfer": "not verified"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "vs teacher-led large group 0.42; vs non-ITS CBI 0.57; vs textbooks/workbooks 0.35; vs individual human tutoring -0.11 (n.s.); vs small-group instruction 0.05 (n.s.)",
+    "ci": "not in abstract",
+    "k_or_n": "107 ES / 14,321 participants",
+    "note": "Authors judge findings consistent with their publication-bias analysis."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract-level; outcome alignment and delay not verifiable; pre-LLM ITS.",
+   "claim_edges": [
+    {
+     "claim_id": "its.2",
+     "relation": "supports",
+     "locator": "abstract (ERIC EJ1049508)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "steenbergenhu2013its",
+   "citation": "Steenbergen-Hu, S., & Cooper, H. (2013). A meta-analysis of the effectiveness of intelligent tutoring systems on K-12 students' mathematical learning. Journal of Educational Psychology, 105(4), 970-987.",
+   "doi_or_url": "https://doi.org/10.1037/a0032447",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "ERIC EJ1054449 description",
+    "sections_read": [
+     "abstract (ERIC)"
+    ]
+   },
+   "design": "meta-analysis of 26 reports / 34 independent samples (1997-2010)",
+   "population": "K-12 students, mathematics",
+   "operation": "symbolic_procedure",
+   "intervention": "ITS, mostly vs regular classroom instruction",
+   "comparator": "regular classroom; few vs homework or human tutoring",
+   "outcome": {
+    "measure": "mathematical learning",
+    "assisted": "not verified",
+    "delay": "not verified",
+    "transfer": "not verified"
+   },
+   "estimate": {
+    "metric": "Hedges g (several averaging models)",
+    "value": "average g = 0.01 to 0.09; larger for interventions shorter than a school year; larger for general population than low achievers",
+    "ci": "not in abstract",
+    "k_or_n": "26 reports / 34 samples",
+    "note": "Explicit null-to-small result for K-12 math field use."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract-level. Disconfirming observation for optimistic ITS averages: longer real-world deployments in K-12 math show near-zero average effects; potential widening of achievement gap.",
+   "claim_edges": [
+    {
+     "claim_id": "its.1",
+     "relation": "qualifies",
+     "locator": "abstract"
+    },
+    {
+     "claim_id": "its.2",
+     "relation": "qualifies",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "aleven2016",
+   "citation": "Aleven, V., Roll, I., McLaren, B. M., & Koedinger, K. R. (2016). Help helps, but only so much: Research on help seeking with intelligent tutoring systems. International Journal of Artificial Intelligence in Education, 26(1), 205-223.",
+   "doi_or_url": "https://doi.org/10.1007/s40593-015-0089-1",
+   "source_type": "narrative_review",
+   "kb_status": "existing",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "ERIC EJ1091255 description",
+    "sections_read": [
+     "abstract (ERIC)"
+    ]
+   },
+   "design": "retrospective review of Help Tutor classroom work plus literature review",
+   "population": "ITS classroom learners (details not verified)",
+   "operation": "self_regulation (help seeking) within symbolic_procedure tutors",
+   "intervention": "real-time feedback on help-seeking behaviour (Help Tutor)",
+   "comparator": "ITS without help-seeking feedback",
+   "outcome": {
+    "measure": "help-seeking behaviour; domain learning",
+    "assisted": "not verified",
+    "delay": "help-seeking change persisted after feedback stopped",
+    "transfer": "domain learning not improved"
+   },
+   "estimate": {
+    "metric": "qualitative (abstract)",
+    "value": "more deliberate help use, persisting after feedback ended; no better domain learning outcomes",
+    "ci": "n/a",
+    "k_or_n": "not in abstract",
+    "note": "Authors no longer view on-demand help as important as they once did but still recommend it in some circumstances."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract-level. Null for domain learning from metacognitive help-seeking feedback; relevant to whether a tutor should coach help seeking.",
+   "claim_edges": [
+    {
+     "claim_id": "its.5",
+     "relation": "supports",
+     "locator": "abstract (ERIC EJ1091255)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "pane2014ctai",
+   "citation": "Pane, J. F., Griffin, B. A., McCaffrey, D. F., & Karam, R. (2014). Effectiveness of Cognitive Tutor Algebra I at scale. Educational Evaluation and Policy Analysis, 36(2), 127-144.",
+   "doi_or_url": "https://doi.org/10.3102/0162373713507480",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "https://api.crossref.org/works/10.3102/0162373713507480",
+    "sections_read": [
+     "abstract (Crossref)"
+    ]
+   },
+   "design": "matched-pair cluster RCT of schools in seven U.S. states, two implementation years",
+   "population": "middle and high school Algebra I students",
+   "operation": "symbolic_procedure",
+   "intervention": "Cognitive Tutor Algebra I (personalized, mastery-learning, blended curriculum) under naturalistic adoption conditions",
+   "comparator": "existing algebra curriculum",
+   "outcome": {
+    "measure": "algebra proficiency posttest",
+    "assisted": "unassisted test (presumed)",
+    "delay": "end of year 1 and year 2",
+    "transfer": "standardized algebra exam"
+   },
+   "estimate": {
+    "metric": "percentile points for median student (abstract)",
+    "value": "year 1: no effects; year 2: positive, significant for high schools, not for middle schools; about eight percentile points for the median student",
+    "ci": "not in abstract",
+    "k_or_n": "not in abstract",
+    "note": "Null first-year effect is a disconfirming observation for quick adoption."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract-level; large-scale, independent outcome; implementation learning curve.",
+   "claim_edges": [
+    {
+     "claim_id": "its.2",
+     "relation": "qualifies",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "roschelle2016assistments",
+   "citation": "Roschelle, J., Feng, M., Murphy, R. F., & Mason, C. A. (2016). Online mathematics homework increases student achievement. AERA Open, 2(4).",
+   "doi_or_url": "https://doi.org/10.1177/2332858416673968",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "https://files.eric.ed.gov/fulltext/EJ1194398.pdf (OA)",
+    "sections_read": [
+     "Abstract",
+     "Recruitment, school-level attrition",
+     "impact results incl. effect size paragraph and Table 2/3 notes",
+     "Limitations"
+    ]
+   },
+   "design": "school-level random assignment within matched pairs (40 paired + 3 unpaired schools), two-level HLM; impact measured in the second school year after a year of teacher implementation",
+   "population": "2,850 seventh-grade students, 43 schools, Maine (1:1 laptops)",
+   "operation": "symbolic_procedure (mathematics homework)",
+   "intervention": "ASSISTments online homework with immediate feedback and hints plus teacher reports and training",
+   "comparator": "existing homework practice",
+   "outcome": {
+    "measure": "TerraNova end-of-year standardized mathematics test",
+    "assisted": false,
+    "delay": "end of school year",
+    "transfer": "standardized, not researcher-designed"
+   },
+   "estimate": {
+    "metric": "Hedges g",
+    "value": "0.18 (adjusted difference 8.84 scale points); larger for students with lower prior achievement",
+    "ci": "not extracted",
+    "k_or_n": "43 schools / 2,850 students",
+    "note": "School-level attrition 6.5%, differential 3.8% (within WWC standards per authors)."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Strong independent standardized outcome and cluster design; rural homogeneous state with universal laptops; effect includes teacher-facing reports and training, so not a pure student-hint effect.",
+   "claim_edges": [
+    {
+     "claim_id": "its.4",
+     "relation": "context_only",
+     "locator": "Results effect-size paragraph; Limitations"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "pelanek2017",
+   "citation": "Pelánek, R. (2017). Bayesian knowledge tracing, logistic models, and beyond: An overview of learner modeling techniques. User Modeling and User-Adapted Interaction, 27(3-5), 313-350.",
+   "doi_or_url": "https://doi.org/10.1007/s11257-017-9193-2",
+   "source_type": "narrative_review",
+   "kb_status": "existing",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://www.fi.muni.cz/~xpelanek/publications/umuai-overview.pdf (author accepted manuscript)",
+    "sections_read": [
+     "3.2 Instructional Policy",
+     "6.1 Metrics for Model Comparison incl. Table 3",
+     "7.1 Developers' Perspective",
+     "section list"
+    ]
+   },
+   "design": "narrative overview of learner modeling (BKT, logistic models, extensions), framed by KLI",
+   "population": "n/a",
+   "operation": "recall_discrimination, symbolic_procedure (knowledge components)",
+   "intervention": "learner models feeding instructional policies (mastery learning, item sequencing, spacing)",
+   "comparator": "simple heuristics such as 'k correct in a row'",
+   "outcome": {
+    "measure": "predictive accuracy metrics (RMSE, LL, AUC) vs policy impact",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "none (conceptual)",
+    "value": "unknown",
+    "ci": "n/a",
+    "k_or_n": "n/a",
+    "note": "Key statements: advantage of learner modeling for mastery policies 'not yet completely clear' (3.2); AUC not meaningful if policy uses absolute probabilities (6.1); small accuracy gains often negligible but can change decisions; prefer simple learner models unless clear reason (7.1)."
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Accepted manuscript, not version of record (page numbers may differ). Expert narrative; directly relevant to whether Mastery needs probabilities.",
+   "claim_edges": [
+    {
+     "claim_id": "its.6",
+     "relation": "supports",
+     "locator": "3.2; 6.1; 7.1 (accepted manuscript)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "pelanek2018mastery",
+   "citation": "Pelánek, R. (2018). Conceptual issues in mastery criteria: Differentiating uncertainty and degrees of knowledge. In Artificial Intelligence in Education (AIED 2018), Lecture Notes in Computer Science, pp. 450-461. Springer.",
+   "doi_or_url": "https://doi.org/10.1007/978-3-319-93843-1_33",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://www.fi.muni.cz/~xpelanek/publications/mastery-modeling.pdf (author version); Crossref for bibliographic data",
+    "sections_read": [
+     "Abstract",
+     "Introduction",
+     "3.1 Comparison with N consecutive correct",
+     "4.1 Consequences for Practice"
+    ]
+   },
+   "design": "model proposal (LogisticHMM) plus simulation comparison of mastery criteria",
+   "population": "simulated learners",
+   "operation": "symbolic_procedure (mastery learning)",
+   "intervention": "mastery criterion separating degree of knowledge and uncertainty",
+   "comparator": "N consecutive correct; exponential moving average; BKT with 0.95 threshold",
+   "outcome": {
+    "measure": "agreement of mastery decisions with simulated ground truth",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "qualitative simulation result",
+    "value": "with low observation noise, NCC with suitable N gives nearly the same decisions; NCC worse under noisy observations; author does not expect the new model to change real decisions significantly",
+    "ci": "n/a",
+    "k_or_n": "simulations (e.g. 1000 simulated learners)",
+    "note": "Reading BKT >= 0.95 as '95% certainty of mastery' is misleading unless data match BKT's strong assumptions."
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Simulation only, single author; strong conceptual support for reporting degree (e.g. unassisted success share) and evidence amount (attempts) separately instead of one probability.",
+   "claim_edges": [
+    {
+     "claim_id": "its.6",
+     "relation": "qualifies",
+     "locator": "4.1 Consequences for Practice"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "gervet2020kt",
+   "citation": "Gervet, T., Koedinger, K., Schneider, J., & Mitchell, T. (2020). When is deep learning the best approach to knowledge tracing? Journal of Educational Data Mining, 12(3), 31-54.",
+   "doi_or_url": "https://doi.org/10.5281/zenodo.4143614",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "https://jedm.educationaldatamining.org/index.php/JEDM/article/download/451/123 (OA)",
+    "sections_read": [
+     "Abstract",
+     "calibration section (Figures 8-9 text)",
+     "9 Limitations, Conclusion, Future Research"
+    ]
+   },
+   "design": "empirical comparison of learner performance models on nine real-world datasets, cross-validation across students, ablations, calibration analysis",
+   "population": "tutoring-system datasets (e.g. ASSISTments)",
+   "operation": "symbolic_procedure, recall_discrimination",
+   "intervention": "logistic regression with features, DKT, BKT and other Markov models",
+   "comparator": "each other",
+   "outcome": {
+    "measure": "predictive accuracy; calibration",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "no cross-validation in item space (authors' main limitation)"
+   },
+   "estimate": {
+    "metric": "qualitative ranking",
+    "value": "LR best on moderate data; DKT best on large or time-sensitive data; BKT lags; models calibrated only in data-dense intervals, e.g. assistments09 severe over/underestimation at extremes",
+    "ci": "n/a",
+    "k_or_n": "nine datasets",
+    "note": "Authors: weakest links are usually the instructional policy and KC model, not the predictor; models with similar accuracy can make vastly different recommendations."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Predictive benchmarking only; no learning outcome. Mastery has no data of this size; supports abstention from calibrated probabilities.",
+   "claim_edges": [
+    {
+     "claim_id": "its.6",
+     "relation": "qualifies",
+     "locator": "calibration section; 9.2-9.3"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "khajah2016deepkt",
+   "citation": "Khajah, M., Lindsey, R. V., & Mozer, M. C. (2016). How deep is knowledge tracing? Proceedings of the 9th International Conference on Educational Data Mining. arXiv:1604.02416.",
+   "doi_or_url": "https://arxiv.org/abs/1604.02416",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "arXiv API abstract",
+    "sections_read": [
+     "abstract"
+    ]
+   },
+   "design": "model comparison on tutoring datasets",
+   "population": "tutoring-system datasets",
+   "operation": "symbolic_procedure",
+   "intervention": "BKT extended with forgetting, skill discovery, individual abilities",
+   "comparator": "DKT",
+   "outcome": {
+    "measure": "predictive accuracy",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "qualitative",
+    "value": "extended BKT performance indistinguishable from DKT",
+    "ci": "n/a",
+    "k_or_n": "not in abstract",
+    "note": "Per pelanek2017 6.1, AUC averaging choices had inflated earlier DKT advantages."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Predictive accuracy only; supports 'depth not needed' for KT; venue details from arXiv metadata, not verified against proceedings.",
+   "claim_edges": [
+    {
+     "claim_id": "its.6",
+     "relation": "qualifies",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "kraft2020effectsizes",
+   "citation": "Kraft, M. A. (2020). Interpreting effect sizes of education interventions. Educational Researcher, 49(4), 241-253. (EdWorkingPaper 19-10, 2019, read.)",
+   "doi_or_url": "https://doi.org/10.3102/0013189X20912798",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "https://files.eric.ed.gov/fulltext/ED602384.pdf (working-paper version, ERIC ED602384); journal version not read; journal bibliographic data verified via Crossref",
+    "sections_read": [
+     "Guideline 2 (what, when, how outcomes are measured)",
+     "New Empirical Benchmarks paragraph"
+    ]
+   },
+   "design": "methodological guidance plus empirical distribution of 1,942 effect sizes from 747 RCTs with standardized achievement outcomes",
+   "population": "pre-K-12 education interventions",
+   "operation": "n/a",
+   "intervention": "n/a",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "standardized achievement",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "researcher-designed vs standardized contrasted"
+   },
+   "estimate": {
+    "metric": "SD units",
+    "value": "benchmarks: < 0.05 small, 0.05 to < 0.20 medium, >= 0.20 large; median 0.10 SD; researcher-designed aligned tests often 2-4 times larger effects than broad standardized tests",
+    "ci": "n/a",
+    "k_or_n": "1,942 ES / 747 RCTs",
+    "note": "Benchmarks are for K-12 standardized outcomes, not for university or in-product tests."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Working-paper text read; journal bibliographic data verified via Crossref, journal text not read. Useful to justify small non-inferiority margins and to discount aligned/proximal in-product measures.",
+   "claim_edges": [
+    {
+     "claim_id": "its.3",
+     "relation": "supports",
+     "locator": "Guideline 2 (EdWorkingPaper)"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "cheungslavin2016methods",
+   "citation": "Cheung, A. C. K., & Slavin, R. E. (2016). How methodological features affect effect sizes in education. Educational Researcher, 45(5), 283-292.",
+   "doi_or_url": "https://doi.org/10.3102/0013189X16656615",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "ERIC EJ1106562 / ED567237 descriptions",
+    "sections_read": [
+     "abstracts"
+    ]
+   },
+   "design": "meta-analysis of 645 studies from 12 reviews (Best Evidence Encyclopedia)",
+   "population": "preschool, reading, mathematics, science programme evaluations",
+   "operation": "n/a",
+   "intervention": "n/a (methodological moderators)",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "effect sizes by methodological feature",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "experimenter-made vs independent measures"
+   },
+   "estimate": {
+    "metric": "ratio of effect sizes",
+    "value": "roughly twice as large for published, small-scale and experimenter-made measures vs unpublished, large-scale, independent measures; quasi-experiments larger than RCTs",
+    "ci": "not in abstract",
+    "k_or_n": "645 studies",
+    "note": "Journal bibliographic data verified via Crossref."
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract-level; directly relevant to discounting in-product, small-sample, developer-made measures.",
+   "claim_edges": [
+    {
+     "claim_id": "its.3",
+     "relation": "supports",
+     "locator": "abstract"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "hedgeshedberg2007icc",
+   "citation": "Hedges, L. V., & Hedberg, E. C. (2007). Intraclass correlation values for planning group-randomized trials in education. Educational Evaluation and Policy Analysis, 29(1), 60-87.",
+   "doi_or_url": "https://doi.org/10.3102/0162373707299706",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "ERIC EJ782420 description",
+    "sections_read": [
+     "abstract"
+    ]
+   },
+   "design": "compilation of intraclass correlations and covariate variance components for achievement",
+   "population": "U.S. schools (K-12)",
+   "operation": "n/a",
+   "intervention": "n/a",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "ICC of academic achievement",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "ICC",
+    "value": "unknown (values in tables not read)",
+    "ci": "n/a",
+    "k_or_n": "n/a",
+    "note": "Used only for the principle that cluster designs need ICC-based power; no ICC value is taken from it."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Abstract-level; school-level K-12 ICCs are not course-section ICCs in higher education. Bibliographic data verified via Crossref.",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "piaggio2012consortni",
+   "citation": "Piaggio, G., Elbourne, D. R., Pocock, S. J., Evans, S. J., Altman, D. G., & CONSORT Group (2012). Reporting of noninferiority and equivalence randomized trials: Extension of the CONSORT 2010 statement. JAMA, 308(24), 2594-2604.",
+   "doi_or_url": "https://doi.org/10.1001/jama.2012.87802",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "NCBI E-utilities efetch PMID 23268518",
+    "sections_read": [
+     "abstract"
+    ]
+   },
+   "design": "reporting guideline (checklist extension)",
+   "population": "n/a",
+   "operation": "n/a",
+   "intervention": "n/a",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "n/a",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "none",
+    "value": "unknown",
+    "ci": "n/a",
+    "k_or_n": "n/a",
+    "note": "Checklist items (e.g. margin rationale) not read in this run; cited only for the existence of the reporting standard for NI/equivalence trials. Whether a newer CONSORT version/extension supersedes it was not checked."
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Medical trial standard, applicable by analogy to educational NI trials.",
+   "claim_edges": [],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "risko2016offloading",
+   "citation": "Risko, E. F., & Gilbert, S. J. (2016). Cognitive offloading. Trends in Cognitive Sciences, 20(9), 676-688.",
+   "doi_or_url": "https://doi.org/10.1016/j.tics.2016.07.002",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "NCBI E-utilities efetch PMID 27542527",
+    "sections_read": [
+     "abstract"
+    ]
+   },
+   "design": "review with a metacognitive framework",
+   "population": "n/a (cognitive psychology across domains)",
+   "operation": "self_regulation",
+   "intervention": "physical action/external tools that reduce cognitive demand",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "triggers and consequences of offloading",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "none",
+    "value": "unknown",
+    "ci": "n/a",
+    "k_or_n": "n/a",
+    "note": "Defines offloading as using action to alter processing requirements to reduce demand; poses two questions: triggers and cognitive consequences."
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Pre-GenAI; framework only. Provides definitions for separating offloaded peripheral demand from offloaded target operation (cf. R0-D9).",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "fan2025metacognitive",
+   "citation": "Fan, Y., Tang, L., Le, H., Shen, K., Tan, S., Zhao, Y., Shen, Y., Li, X., & Gašević, D. (2025). Beware of metacognitive laziness: Effects of generative artificial intelligence on learning motivation, processes, and performance. British Journal of Educational Technology, 56(2), 489-530.",
+   "doi_or_url": "https://doi.org/10.1111/bjet.13544",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "arXiv 2412.09315 (author version); metadata via Crossref 10.1111/bjet.13544",
+    "sections_read": [
+     "Abstract",
+     "3 Method: participants, groups, procedure, learning task, measures",
+     "4.3 Learning performance: 4.3.1 essay improvement incl. Table 3, 4.3.2 knowledge gain, 4.3.3 transfer",
+     "Discussion and limitations",
+     "NOT read: version of record PDF; SRL process-mining sections in detail; appendix tables beyond descriptives"
+    ]
+   },
+   "design": "randomised lab experiment, 4 parallel arms (no support / ChatGPT-4 / human writing expert / writing-analytics checklist), individual allocation; allocation concealment and preregistration not reported in the sections read",
+   "population": "117 university students (ESL, mixed disciplines; CN 30, AI 35, HE 25, CL 27), one lab, Jul-Sep 2023",
+   "operation": "open_synthesis (English reading and essay writing/revision); knowledge test on the reading topic",
+   "intervention": "support agent available during a 1-hour essay revision after a 2-hour reading/writing phase",
+   "comparator": "no support; human expert; checklist tool (active controls with comparable time)",
+   "outcome": {
+    "measure": "essay score improvement (assisted product); knowledge test pre/post (same test) and 10-item transfer test (AI in healthcare)",
+    "assisted": "essay improvement assisted; knowledge and transfer tests unassisted",
+    "delay": "post-test within one day",
+    "transfer": "near-topic transfer test"
+   },
+   "estimate": {
+    "metric": "mean difference / ANOVA",
+    "value": "essay improvement AI vs CN +1.97 points [-3.858,-0.083 for CN-AI], p_adj=0.037; knowledge post-test F=0.913 p=0.438; transfer F=0.019 p=0.996",
+    "ci": "Tukey 95% CI reported for essay improvement only",
+    "k_or_n": "117",
+    "note": "Assisted product improves, unassisted knowledge and transfer do not differ; 'metacognitive laziness' is the authors' interpretation of fewer evaluation/orientation SRL events, which they say lacks a mature measure."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Small arms (25-35), single task, single lab, no delayed test; null on knowledge/transfer is not equivalence (no margin, low power). Supports the pattern 'assisted product quality is not evidence of learning' (R5-POL-04), not a harm claim.",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "lehmann2025aiclassroom",
+   "citation": "Lehmann, M., Cornelius, P. B., & Sting, F. J. (2025). AI meets the classroom: When do large language models harm learning? arXiv:2409.09047v2 (working paper; v1 2024 titled 'When does ChatGPT harm learning?').",
+   "doi_or_url": "https://arxiv.org/abs/2409.09047v2",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "arXiv PDF 2409.09047v2",
+    "sections_read": [
+     "Abstract, Introduction",
+     "Study 1 field panel (N=6,594 student-question observations) incl. Tables 1-3 (IV via ChatGPT outages)",
+     "Study 2 lab §6 incl. Tables 4-5",
+     "Study 3 lab §8 incl. Tables 6-7, 9-10 (copy-and-paste)",
+     "Heterogeneity by pre-test median (Table 12)",
+     "Perceived learning (Table 13)",
+     "NOT read: preregistration documents themselves; Appendix tables in full"
+    ]
+   },
+   "design": "(1) observational field panel with instrumental variable (ChatGPT outages); (2)+(3) two preregistered, incentivised individually randomised lab experiments (LLM access vs none during a 45-min Python learning phase); Study 3 identical but with copy-and-paste enabled",
+   "population": "university students; Study 2 n=107 (after preregistered exclusion), Study 3 n=69; ~80% no prior Python",
+   "operation": "computational_construction (introductory Python programming)",
+   "intervention": "free chat access to an LLM during the learning phase only",
+   "comparator": "same learning phase without LLM (same time)",
+   "outcome": {
+    "measure": "20-item programming post-test minus pre-test",
+    "assisted": "post-test unassisted",
+    "delay": "immediate, same ~90-min session",
+    "transfer": "near (same topics)"
+   },
+   "estimate": {
+    "metric": "regression coefficient (questions solved)",
+    "value": "overall effect n.s. in Study 2 (0.396, SE 0.713, p=0.580) and Study 3 (0.959, SE 0.912, p=0.298); copy-paste: -1.4 questions post-test holding learning-phase progress constant (p=0.009); treatment x pre-test>median interaction p=0.028; below-median treated understood less than controls p=0.043; perceived learning higher than actual (p=0.044)",
+    "ci": "SEs reported",
+    "k_or_n": "107 + 69 (lab)",
+    "note": "In Study 3, 42% of solution requests were sent without any own attempt."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Lab, short, immediate post-test, small n; the 'understanding' estimate conditions on a post-randomisation variable (learning-phase progress), so it is a mediation-type decomposition, not a randomised contrast; subgroup split post hoc on median. Working paper, not peer reviewed. Consistent with attempt-before-help (R5-POL-03) and with heterogeneity concerns (R5-POL-07); does not show harm overall.",
+   "claim_edges": [],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "darvishi2024agency",
+   "citation": "Darvishi, A., Khosravi, H., Sadiq, S., Gašević, D., & Siemens, G. (2024). Impact of AI assistance on student agency. Computers & Education, 210, 104967.",
+   "doi_or_url": "https://doi.org/10.1016/j.compedu.2023.104967",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract for DOI 10.1016/j.compedu.2023.104967; Crossref metadata",
+    "sections_read": [
+     "abstract"
+    ]
+   },
+   "design": "randomised controlled field experiment (per abstract), 4 weeks with AI prompts for all, then 4 weeks in 4 groups: AI prompts continued / no prompts / self-monitoring checklist / AI + checklist; unit of randomisation not stated in abstract",
+   "population": "1,625 students across 10 university courses (peer-review platform)",
+   "operation": "self_regulation (writing peer feedback)",
+   "intervention": "AI prompts flagging insufficiently detailed peer feedback (rule-based, semantic similarity)",
+   "comparator": "withdrawal of AI prompts with/without self-monitoring checklists",
+   "outcome": {
+    "measure": "quality of peer feedback after AI prompts are removed",
+    "assisted": "mixed (AI arm still assisted)",
+    "delay": "weeks 5-8",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "unknown",
+    "value": "unknown",
+    "ci": "unknown",
+    "k_or_n": "1625",
+    "note": "Abstract: students tended to rely on rather than learn from AI assistance; checklists partly filled the gap but less than AI; AI+checklist not better than AI alone."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract only: effect sizes, clustering and attrition unknown. Outcome is feedback-writing quality, not domain learning. Direct evidence that assisted performance does not persist after assistance is withdrawn (fading/withdrawal test) - supports measuring after removal, not a general harm claim.",
+   "claim_edges": [],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "pardos2024chatgpthints",
+   "citation": "Pardos, Z. A., & Bhandari, S. (2024). ChatGPT-generated help produces learning gains equivalent to human tutor-authored help on mathematics skills. PLOS ONE, 19(5), e0304013.",
+   "doi_or_url": "https://doi.org/10.1371/journal.pone.0304013",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "Europe PMC REST fullTextXML PMC11125466 (CC BY), incl. published peer-review history",
+    "sections_read": [
+     "Abstract",
+     "Methods: hint generation, quality check, study design",
+     "Results RQ1 (hint quality) and RQ2 (Table 2, exclusions, power)",
+     "Limitations",
+     "Peer-review history (reviewer notes study was not preregistered)"
+    ]
+   },
+   "design": "individually randomised 3 (no hints / human-authored hints / ChatGPT hints) x 4 (subject) online experiment; not preregistered",
+   "population": "394 Mechanical Turk adults recruited, 274 analysed (30% excluded for not completing; 36-43 per arm); median age group 36-40",
+   "operation": "symbolic_procedure (algebra, statistics)",
+   "intervention": "worked-solution hints generated by ChatGPT (quality-checked) during 5 practice problems",
+   "comparator": "human tutor-authored hints (OATutor); no hints",
+   "outcome": {
+    "measure": "3-item post-test with the exact same items as the pre-test",
+    "assisted": "unassisted",
+    "delay": "immediate (~6-8 min sessions)",
+    "transfer": "none (identical items)"
+   },
+   "estimate": {
+    "metric": "pre-post difference (% correct), Kruskal-Wallis",
+    "value": "ChatGPT +17.0 pp (pre 43.5%), human +11.6 pp (pre 53.5%), control +1.9 pp n.s.; ChatGPT vs human difference n.s.",
+    "ci": "not reported",
+    "k_or_n": "274",
+    "note": "ChatGPT hints failed quality checks on 32% of problems before self-consistency; ~0% algebra / 13% statistics after."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "'Equivalent' is not an equivalence test (no margin, no TOST); identical pre/post items measure item memory; lower ChatGPT-arm pre-test invites regression to the mean; 30% completer-only analysis; MTurk adults. Evidence that LLM hints need verification before display (32% failure) - supports the verified-reference requirement in R5-POL-03/06; not evidence of tutor non-inferiority.",
+   "claim_edges": [],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "doroudi2019fairkt",
+   "citation": "Doroudi, S., & Brunskill, E. (2019). Fairer but not fair enough: On the equitability of knowledge tracing. In Proceedings of LAK19 (pp. 335-339). ACM.",
+   "doi_or_url": "https://doi.org/10.1145/3303772.3303838",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "author PDF cs.stanford.edu/~ebrun/papers/LAK2019_fairness.pdf",
+    "sections_read": [
+     "Abstract",
+     "1 Introduction",
+     "3 Models (BKT, AFM, N-CCR)",
+     "4 simulations with slow/fast learner populations incl. Tables 1-2 and equity-gap definition",
+     "NOT read: every simulation configuration in detail"
+    ]
+   },
+   "design": "simulation study (no learners); mastery-learning policies evaluated on synthetic slow/fast learner populations under correct and misspecified models",
+   "population": "simulated students (two learner types)",
+   "operation": "symbolic_procedure (mastery learning, single skill)",
+   "intervention": "mastery-learning stopping rules: BKT, N-consecutive-correct (N-CCR), AFM-based knowledge tracing",
+   "comparator": "non-adaptive fixed practice; true (individualised) model",
+   "outcome": {
+    "measure": "equity gap = % slow learners vs % fast learners reaching mastery, plus extra practice",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "simulated equity gap",
+    "value": "adaptive KT far more equitable than fixed practice, but BKT fit to a mixed population and N-CCR still favour fast learners; AFM more conservative under misspecification",
+    "ci": "n/a",
+    "k_or_n": "simulation",
+    "note": "Echoes Corbett & Anderson: aggregate models overestimate below-average learners, who then receive less remedial practice than they need."
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Simulation with stylised two-type populations; no empirical learner outcome. Relevant because Mastery's deterministic 'N unassisted correct' rule (R5-POL-01) is an N-CCR heuristic and is not exempt from this inequity; motivates reporting stop decisions by prior-knowledge group (R5-POL-07).",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "eu2024aiact",
+   "citation": "Regulation (EU) 2024/1689 (Artificial Intelligence Act), OJ L, 12.7.2024; Annex III point 3 (education and vocational training); Article 113 as amended by the 2026 Digital Omnibus on AI.",
+   "doi_or_url": "http://data.europa.eu/eli/reg/2024/1689/oj",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "EUR-Lex returned empty responses (HTTP 202) on the access date; text read on the secondary mirror artificialintelligenceact.eu (Annex III, Article 113); amendment status from secondary legal commentary found via web search",
+    "sections_read": [
+     "Annex III point 3(a)-(d) (mirror)",
+     "Article 113 dates of application incl. amended (c)(i) (mirror)",
+     "NOT read: official consolidated EUR-Lex text; Article 6(3) exemptions; Omnibus OJ text"
+    ]
+   },
+   "design": "legal text (primary norm), read via secondary mirror",
+   "population": "providers/deployers of AI systems in the EU",
+   "operation": "n/a",
+   "intervention": "classification of education AI systems as high-risk",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "legal classification",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "none",
+    "value": "unknown",
+    "ci": "n/a",
+    "k_or_n": "n/a",
+    "note": "Annex III 3(b) lists AI systems intended to evaluate learning outcomes, including when used to steer the learning process, in education and vocational training institutions; mirror shows Annex III obligations applying from 2 Dec 2027 after the Omnibus amendment (unverified against EUR-Lex)."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Not legal advice; no lawyer review. Whether a self-study product outside an institution falls under 3(b), and whether Article 6(3) exemptions apply, is unresolved. Product consequence is precautionary only: an AI-driven learning-outcome evaluation that steers learning is a design choice with potential regulatory weight, which strengthens R5-POL-02 (deterministic default) but is not evidence about learning.",
+   "claim_edges": [],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "eu2016gdpr",
+   "citation": "Regulation (EU) 2016/679 (General Data Protection Regulation), Articles 5 and 25.",
+   "doi_or_url": "http://data.europa.eu/eli/reg/2016/679/oj",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "EUR-Lex returned empty responses (HTTP 202); Articles 5 and 25 read on secondary mirror gdpr-info.eu",
+    "sections_read": [
+     "Article 5(1)(a)-(f) principles",
+     "Article 25(1)-(2) data protection by design and by default",
+     "NOT read: Articles 6, 8, 9, 22, 35; recitals"
+    ]
+   },
+   "design": "legal text (primary norm), read via secondary mirror",
+   "population": "controllers processing personal data in the EU",
+   "operation": "n/a",
+   "intervention": "processing principles",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "legal principles",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "none",
+    "value": "unknown",
+    "ci": "n/a",
+    "k_or_n": "n/a",
+    "note": "Art. 5(1): lawfulness/fairness/transparency, purpose limitation, data minimisation, accuracy, storage limitation, integrity/confidentiality; Art. 25: data protection by design and by default."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Not legal advice; whether Mastery is a controller depends on deployment (local-only vs hosted), which is undecided. Product consequence: attempt logs and subgroup attributes (R5-POL-04/07) are personal data once linked to a person; default to local storage, collect subgroup attributes only opt-in with a stated purpose.",
+   "claim_edges": [],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "koedinger2007assistance",
+   "citation": "Koedinger, K. R., & Aleven, V. (2007). Exploring the assistance dilemma in experiments with Cognitive Tutors. Educational Psychology Review, 19(3), 239-264.",
+   "doi_or_url": "https://doi.org/10.1007/s10648-007-9049-0",
+   "source_type": "narrative_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "author-hosted PDF (pslcdatashop.web.cmu.edu, Koedinger-Aleven-EPR-07.pdf); pagination not reconciled with the version of record",
+    "sections_read": [
+     "Cognitive Tutors: interactive features incl. multi-level hints, bottom-out hint (Figure 3 text)",
+     "Implications (yes/no feedback, feedback content, hint use)",
+     "Should worked examples be added to cognitive tutors?",
+     "Cognitive Tutors for improving help-seeking skills and reducing 'gaming'",
+     "Conclusion",
+     "NOT read in detail: sections on self-explanation and intelligent-novice feedback; primary studies not re-checked"
+    ]
+   },
+   "design": "narrative review and theoretical framework (assistance dilemma) over Cognitive Tutor experiments",
+   "population": "Cognitive Tutor experiments, mostly middle/high-school mathematics and college programming (as described by the authors)",
+   "operation": "symbolic_procedure, computational_construction",
+   "intervention": "giving vs withholding assistance: yes/no feedback, explanatory hints, bottom-out hints, worked/faded examples, help-seeking feedback",
+   "comparator": "varies by reviewed study",
+   "outcome": {
+    "measure": "learning outcomes of reviewed studies (not re-extracted)",
+    "assisted": "n/a",
+    "delay": "not coded",
+    "transfer": "not coded"
+   },
+   "estimate": {
+    "metric": "none",
+    "value": "unknown",
+    "ci": "n/a",
+    "k_or_n": "n/a",
+    "note": "Hints come in several levels of increasing specificity; the last 'bottom-out' hint states the next step. Hint requests before a first attempt lower the tutor's mastery estimate (incentive to try first). Log data: learners often jump to bottom-out hints without reading earlier levels and often do not ask for help after repeated errors. Help Tutor: fewer poor help-seeking actions, no improvement in geometry learning. Gaming-detector tutor: less gaming; supplementary exercises associated with learning, domain-learning difference not reliable across the whole sample. Authors: when to switch from withholding to giving help (e.g. an error-probability threshold) is an open question with no single solution."
+   },
+   "inference": "theoretical",
+   "bias_and_applicability": "Authors developed the Cognitive Tutors (allegiance); review not systematic; primary numbers not re-checked. The authors' generalisation that information 'should be withheld very sparingly' applies to step-based tutored problem solving, not to LLM chat tutors. Product consequence: there is no evidence-based number of hint levels; a bottom-out hint turns the task into a worked example and must count as assisted.",
+   "claim_edges": [
+    {
+     "claim_id": "its.5",
+     "relation": "supports",
+     "locator": "section 'Cognitive Tutors for improving help-seeking skills and reducing gaming': fewer poor help-seeking actions, no improvement in geometry learning"
+    },
+    {
+     "claim_id": "its.4",
+     "relation": "context_only",
+     "locator": "Implications: yes/no feedback, explanatory feedback, on-demand hints"
+    }
+   ],
+   "verdict": "unresolved"
+  },
+  {
+   "source_id": "razzaq2010hints",
+   "citation": "Razzaq, L., & Heffernan, N. T. (2010). Hints: Is it better to give or wait to be asked? In V. Aleven, J. Kay, & J. Mostow (Eds.), Intelligent Tutoring Systems (ITS 2010), LNCS 6094 (pp. 349-358). Springer.",
+   "doi_or_url": "https://doi.org/10.1007/978-3-642-13388-6_39",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "author-hosted PDF (web.cs.wpi.edu, ITS 2010 paper); not reconciled with LNCS pagination",
+    "sections_read": [
+     "Abstract",
+     "3 Methodology incl. 3.1 Experiment Design (Table 1), 3.2 Participants, 3.3 Procedure",
+     "4 Results incl. Tables 2-4",
+     "5 Conclusion incl. stated limitations"
+    ]
+   },
+   "design": "randomised within-subject (repeated-measures) experiment; students randomly assigned to four groups counterbalancing condition order, topic order and problem order; one class period",
+   "population": "72 eighth-grade students (age 12-14) in a suburban US middle school, math enrichment class, regular ASSISTments users; 61 completed both conditions",
+   "operation": "symbolic_procedure (algebra: symbolization; slope/intercept)",
+   "intervention": "hints on demand: hint only after the learner clicks the hint button; hint sequences of 3-5 hints ending in a bottom-out hint that gives the answer",
+   "comparator": "proactive hints: a hint is shown automatically after each incorrect answer",
+   "outcome": {
+    "measure": "4-problem pre- and post-test per topic, no feedback; gain score",
+    "assisted": "unassisted",
+    "delay": "immediate (same class period)",
+    "transfer": "none: pre- and post-test problems were identical"
+   },
+   "estimate": {
+    "metric": "repeated-measures F on gain scores (proportion correct); effect size as reported",
+    "value": "Mean gain on-demand 0.137 vs proactive 0.041, F(59,1)=4.42, p=0.04, reported effect size 0.35 [0.02, 0.74] (section 4, Table 3). Students above the median of hint requests (7): on-demand better, F(29,1)=7.36, p=0.01; below the median: n.s., F(28,1)=0.077, p=0.78; interaction marginal, p=0.079. No aptitude-treatment interaction by math ability (median split). Lower-ability students requested more hints (11 vs 5.4). Both high and low bottom-out users gained more with on-demand hints (Table 4).",
+    "ci": "[0.02, 0.74] for the effect size 0.35",
+    "k_or_n": "61 analysed of 72",
+    "note": "Authors: learners were used to on-demand hints, proactive hints were unfamiliar; very short study."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Small sample, single session, identical pre/post items (item memory), immediate test only, post-hoc median splits; familiarity favours on-demand hints. Weak evidence that on-demand hints beat automatic hints after errors; nothing about the number of hint levels (3-5 were used).",
+   "claim_edges": [
+    {
+     "claim_id": "its.4",
+     "relation": "context_only",
+     "locator": "section 4 Table 3: on-demand vs proactive hints"
+    }
+   ],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "baker2004gaming",
+   "citation": "Baker, R. S., Corbett, A. T., Koedinger, K. R., & Wagner, A. Z. (2004). Off-task behavior in the Cognitive Tutor classroom: When students 'game the system'. In Proceedings of CHI 2004 (pp. 383-390). ACM.",
+   "doi_or_url": "https://doi.org/10.1145/985692.985741",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "conference PDF mirror (hci.rwth-aachen.de, CHI 2004 paper 1p383)",
+    "sections_read": [
+     "Abstract",
+     "Introduction (definition of gaming the system)",
+     "Methods: Data Collection, observation protocol",
+     "Results: Tables 1-2, gaming vs other off-task behaviour, 'Which Students Game The System?'",
+     "Re-Designing Tutors to Appropriately Respond to Gaming the System",
+     "Conclusion"
+    ]
+   },
+   "design": "observational field study: quantitative classroom observation (20-second windows, 563 observations, about 8 per student) plus pre/post test; correlational",
+   "population": "70 middle-school students (about 12-14 years), Northeastern US city, classes piloting a Cognitive Tutor curriculum; two-class-period unit on scatterplots",
+   "operation": "symbolic_procedure (scatterplot generation and interpretation)",
+   "intervention": "none assigned; natural variation in 'gaming the system' = rapid repeated help requests until the tutor gives the answer, or systematic guessing",
+   "comparator": "students never observed gaming; other off-task behaviours",
+   "outcome": {
+    "measure": "two nearly isomorphic exercises, counterbalanced as pre/post test, scored by steps",
+    "assisted": "unassisted",
+    "delay": "immediate (end of the tutor unit)",
+    "transfer": "near (isomorphic exercise)"
+   },
+   "estimate": {
+    "metric": "Pearson r with post-test; partial correlation controlling pre-test and general achievement",
+    "value": "Gaming frequency vs post-test r=-0.38, F(1,68)=11.82, p<0.01; still significant controlling pre-test and achievement, F(1,59)=7.73 (Results). No other off-task behaviour significant. 24% of students observed gaming at least once, 11% in more than 10% of observations; gaming in 3% of observations. High-gaming students (n=8) post-test 44% vs never-gaming (n=53) 78%; vs never-gaming students with equally low pre-test (n=24) 68%, t(30)=1.69, p=0.10.",
+    "ci": "not reported",
+    "k_or_n": "70 students; 563 observations",
+    "note": "Two observers; formal inter-rater reliability not computed (agreement only in one practice class)."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Correlational, small sample, short unit, observer coding without formal reliability; gaming is concentrated among low prior knowledge students (partly adjusted). Authors warn that redesigns which block gaming may start an 'arms race' and hurt non-gamers, and propose targeted detection. Product consequence: rapid hint paging to the bottom-out hint is observable and associated with lower learning; this is not evidence that blocking or delaying hints helps.",
+   "claim_edges": [
+    {
+     "claim_id": "its.5",
+     "relation": "context_only",
+     "locator": "Results: gaming vs post-test; Re-Designing Tutors section"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "an2026hintuse",
+   "citation": "An, M., Mehrvarz, M., Stamper, J., & McLaren, B. M. (2026). Revisiting the hint button: Consistent negative associations between unproductive hint use and learning outcomes in intelligent tutoring systems. In Proceedings of the 16th International Learning Analytics and Knowledge Conference (LAK26) (pp. 150-159). ACM.",
+   "doi_or_url": "https://doi.org/10.1145/3785022.3785040",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "author-hosted PDF (cs.cmu.edu, McLaren publications); DOI and pages verified via Crossref",
+    "sections_read": [
+     "Abstract",
+     "1 Introduction",
+     "3 Method: system (three-level hints, level 3 bottom-out), 3.2 Participants and Design, Table 1",
+     "4.1 RQ1",
+     "4.2.1-4.2.2 indicator definitions",
+     "Table 4 and cross-semester replication text",
+     "5 Discussion (first part)",
+     "NOT read: full related work, remainder of discussion and limitations"
+    ]
+   },
+   "design": "secondary analysis of tutor logs from classroom studies over three semesters; correlations and OLS regressions controlling for pre-test",
+   "population": "999 of 1,370 US middle-school students (excluded: incomplete materials, +/-2.5 z outliers); cohorts N=277/344/378",
+   "operation": "symbolic_procedure (decimals, game-based ITS 'Decimal Point')",
+   "intervention": "none assigned; on-demand three-level hints (level 3 = bottom-out hint)",
+   "comparator": "within-sample variation in hint use",
+   "outcome": {
+    "measure": "43-item decimal tests, three counterbalanced versions",
+    "assisted": "unassisted",
+    "delay": "immediate post-test and one-week delayed post-test",
+    "transfer": "near (parallel test versions)"
+   },
+   "estimate": {
+    "metric": "Spearman rho; OLS coefficient beta controlling pre-test",
+    "value": "Premature hint request (first learner action on a problem is a hint): rho with pre-test -0.567 to -0.697; beta post-test -0.14 to -0.28, delayed -0.17 to -0.37. Superficial hint reading (next hint requested faster than the hint text can be read at 4 words/s): beta post-test -0.06 to -0.11, delayed -0.08 to -0.14; all p<0.001 in every semester (Table 4, sections 4.2-4.3).",
+    "ci": "not reported",
+    "k_or_n": "999 students, 3 cohorts",
+    "note": "Both indicators are simple, tutor-agnostic rules computed from timestamps."
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Correlational: reverse causation and unmeasured confounding (motivation, prior knowledge beyond the pre-test) possible; 27% exclusions; developer group of the tutor; conference paper. Product consequence: two deterministic observation rules (hint before first attempt; hint paging faster than reading time) are usable as observations and research variables, not as labels for individual learners.",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "mclaren2016efficiency",
+   "citation": "McLaren, B. M., van Gog, T., Ganoe, C., Karabinos, M., & Yaron, D. (2016). The efficiency of worked examples compared to erroneous examples, tutored problem solving, and problem solving in computer-based learning environments. Computers in Human Behavior, 55, 87-99.",
+   "doi_or_url": "https://doi.org/10.1016/j.chb.2015.08.038",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Erasmus University repository record repub.eur.nl/pub/91923 (abstract only; full text requires sign-in)",
+    "sections_read": [
+     "abstract (repository record)"
+    ]
+   },
+   "design": "two classroom experiments, four conditions: worked examples, erroneous examples, tutored problem solving (hints and feedback), untutored problem solving",
+   "population": "secondary-school chemistry classes (N not in abstract; not verified)",
+   "operation": "symbolic_procedure (chemistry problem solving; topic not verified)",
+   "intervention": "worked examples; erroneous examples; tutored problem solving",
+   "comparator": "untutored problem solving",
+   "outcome": {
+    "measure": "test performance, time on task, mental effort",
+    "assisted": "not verified",
+    "delay": "not verified",
+    "transfer": "not verified"
+   },
+   "estimate": {
+    "metric": "percentage less time on task (as reported)",
+    "value": "No differences in learning outcomes among conditions in both experiments; worked-example study needed 46-68% (Exp. 1) and 48-69% (Exp. 2) less time than the other conditions.",
+    "ci": "not in abstract",
+    "k_or_n": "two experiments; N not in abstract",
+    "note": "Error feedback was elaborate worked examples in Exp. 1 and basic correctness feedback in Exp. 2."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract-level; a null difference is not equivalence; delay not verified. Product consequence: hint-based tutored problem solving did not beat studying worked examples on learning and took much longer; a hint ladder is not the only, nor the cheapest, form of help for novices.",
+   "claim_edges": [
+    {
+     "claim_id": "we.1",
+     "relation": "qualifies",
+     "locator": "abstract: equal learning, large time savings for worked examples vs tutored problems"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "sleeman1989remediation",
+   "citation": "Sleeman, D., Kelly, A. E., Martinak, R., Ward, R. D., & Moore, J. L. (1989). Studies of diagnosis and remediation with high school algebra students. Cognitive Science, 13(4), 551-568.",
+   "doi_or_url": "https://doi.org/10.1207/s15516709cog1304_3",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract_inverted_index (Wiley PDF blocked by bot protection)",
+    "sections_read": [
+     "abstract (OpenAlex)"
+    ]
+   },
+   "design": "three studies comparing model-based (error-specific) remediation with reteaching and with no tutoring; human tutors",
+   "population": "high-school algebra students (N not in abstract)",
+   "operation": "symbolic_procedure (algebra)",
+   "intervention": "model-based remediation (MBR): diagnose the individual's buggy rules, address them, then reteach the correct procedure",
+   "comparator": "reteaching the correct procedure without addressing specific errors; no tutoring",
+   "outcome": {
+    "measure": "algebra performance",
+    "assisted": "not verified",
+    "delay": "not verified",
+    "transfer": "not verified"
+   },
+   "estimate": {
+    "metric": "qualitative (abstract)",
+    "value": "MBR and reteaching both better than no tutoring; MBR not clearly better than reteaching.",
+    "ci": "n/a",
+    "k_or_n": "three studies; N not in abstract",
+    "note": "Authors discuss the stability of errors and conclude that, for procedurally taught algebra, classical CAI would be as effective as an ITS for remediation. The abstract cites one earlier null result (Bunderson & Olsen 1983) and one positive result for a conflict approach (Swan 1983)."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract-level; old studies with human tutors; sample sizes not verified. Disconfirming evidence for the assumption that a per-learner bug diagnosis is required for effective remediation. Product consequence: a misconception label is not needed to give useful corrective feedback; reteaching the correct procedure is a valid fallback.",
+   "claim_edges": [
+    {
+     "claim_id": "its.4",
+     "relation": "qualifies",
+     "locator": "abstract: error-specific remediation not clearly better than reteaching"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "adams2014errex",
+   "citation": "Adams, D. M., McLaren, B. M., Durkin, K., Mayer, R. E., Rittle-Johnson, B., Isotani, S., & van Velsen, M. (2014). Using erroneous examples to improve mathematics learning with a web-based tutoring system. Computers in Human Behavior, 36, 401-411.",
+   "doi_or_url": "https://doi.org/10.1016/j.chb.2014.03.053",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "author-hosted PDF (cs.cmu.edu, McLaren AdaptErrEx publications page)",
+    "sections_read": [
+     "Abstract",
+     "2.1 Participants and design",
+     "materials and feedback description",
+     "procedure (5 sessions, delayed test one week later)",
+     "Results: immediate and delayed post-test ANCOVA, grade-level analysis",
+     "NOT read: discussion and metacognitive analyses in detail"
+    ]
+   },
+   "design": "individually randomised between-subjects experiment, erroneous examples vs problem solving; test versions counterbalanced (six orders)",
+   "population": "208 US middle-school students",
+   "operation": "symbolic_procedure (decimal magnitude and operations; common decimal misconceptions)",
+   "intervention": "interactive erroneous examples: find, explain and fix an error that reflects a common misconception; correctness feedback",
+   "comparator": "solving isomorphic problems with correctness feedback",
+   "outcome": {
+    "measure": "decimal test, three isomorphic versions",
+    "assisted": "unassisted",
+    "delay": "immediate post-test and delayed post-test one week later",
+    "transfer": "near (isomorphic versions)"
+   },
+   "estimate": {
+    "metric": "ANCOVA with pre-test covariate; Cohen d (as reported)",
+    "value": "Immediate post-test: n.s., F(1,205)=0.768, p=0.382. Delayed post-test: erroneous examples > problem solving, F(1,205)=9.896, p=0.002, d=0.62. No condition x grade-level interaction.",
+    "ci": "not reported",
+    "k_or_n": "208",
+    "note": "Replicated with a larger sample and a smaller delayed effect in mclaren2015errex."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Developer-run; single research programme and material; near transfer; one-week delay; misconceptions were chosen by designers from prior research, not diagnosed per learner.",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "mclaren2015errex",
+   "citation": "McLaren, B. M., Adams, D. M., & Mayer, R. E. (2015). Delayed learning effects with erroneous examples: A study of learning decimals with a web-based tutor. International Journal of Artificial Intelligence in Education, 25(4), 520-542.",
+   "doi_or_url": "https://doi.org/10.1007/s40593-015-0064-x",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "author-hosted PDF (cs.cmu.edu, McLaren AdaptErrEx publications page)",
+    "sections_read": [
+     "Abstract",
+     "Background on decimal misconceptions",
+     "Participants and Design",
+     "Materials (tests A/B/C; erroneous-example and problem-solving items)",
+     "Results: group equivalence, Table 2, ANCOVA on gain scores, footnote 7 (per school)",
+     "Prior-knowledge analyses (median split and continuous regression)",
+     "start of misconception-awareness section"
+    ]
+   },
+   "design": "individually randomised two-group experiment (erroneous examples vs problem solving), six counterbalanced test orders, five sessions",
+   "population": "463 sixth graders recruited from two Pittsburgh-area schools; 390 analysed (70 missed a test, 3 removed); attrition not differential by condition",
+   "operation": "symbolic_procedure (decimal magnitude; four named misconceptions)",
+   "intervention": "interactive erroneous examples targeting a designer-specified misconception: find, explain and fix the error; self-explanation prompts; correctness feedback",
+   "comparator": "supported problem solving of the same problems with explanation prompts and correctness feedback",
+   "outcome": {
+    "measure": "46-item decimal test, three isomorphic versions",
+    "assisted": "unassisted",
+    "delay": "immediate post-test and delayed post-test one week later",
+    "transfer": "near (isomorphic versions)"
+   },
+   "estimate": {
+    "metric": "ANCOVA on gain scores with pre-test covariate; Cohen d",
+    "value": "Immediate gain: erroneous examples vs problem solving marginal, F(1,387)=3.72, p=0.055, d=0.22. Delayed gain: erroneous examples higher, F(1,387)=10.15, p=0.002, d=0.33 (Results, Table 2). No condition x prior-knowledge interaction (median split p=0.55/0.41; continuous beta=-0.04, p=0.36); delayed benefit in both low (d=0.35) and high (d=0.37) prior-knowledge halves. School B alone: delayed difference n.s. (d=0.2, footnote 7). Problem-solving group liked the intervention more (d=0.21) and rated the interface easier (d=0.37).",
+    "ci": "not reported",
+    "k_or_n": "390 of 463",
+    "note": "Directly contradicts the prior-knowledge moderation reported by grosse2007errors for this material and age group."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Developer-run; 16% attrition (balanced); effect not significant in one of two schools; near transfer; one-week delay. Learner liking ran opposite to delayed learning, so satisfaction is no proxy. Product consequence: erroneous examples built around misconceptions known from research (not diagnosed per learner) produced a delayed advantage with no evidence of harm for low prior knowledge.",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "grosse2007errors",
+   "citation": "Große, C. S., & Renkl, A. (2007). Finding and fixing errors in worked examples: Can this foster learning outcomes? Learning and Instruction, 17(6), 612-634.",
+   "doi_or_url": "https://doi.org/10.1016/j.learninstruc.2007.09.008",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "ERIC EJ780439 description",
+    "sections_read": [
+     "abstract (ERIC)"
+    ]
+   },
+   "design": "two experiments; Exp. 1 2x3 factorial: (correct and incorrect solutions with error highlighting / without highlighting / correct only) x (self-explanation prompts / none); Exp. 2 replication",
+   "population": "university students (as described in adams2014errex; not stated in the abstract)",
+   "operation": "symbolic_procedure (probability problems)",
+   "intervention": "worked examples that include incorrect solutions; error highlighting; self-explanation prompts",
+   "comparator": "correct worked examples only",
+   "outcome": {
+    "measure": "near and far transfer",
+    "assisted": "not verified",
+    "delay": "not verified",
+    "transfer": "near and far transfer"
+   },
+   "estimate": {
+    "metric": "qualitative (abstract)",
+    "value": "Aptitude-treatment interaction: incorrect plus correct solutions fostered far transfer only for learners with favourable prior knowledge; with poor prior knowledge, correct solutions only were better; replicated in Exp. 2. Incorrect solutions reduced principle-based self-explanations (Exp. 2).",
+    "ci": "not in abstract",
+    "k_or_n": "two experiments; N not in abstract",
+    "note": ""
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Abstract-level; numbers not extracted. Contradicted on the moderator by mclaren2015errex (no interaction); differences in age, domain, interactivity and feedback may explain the divergence. Product consequence: erroneous examples may not suit novices; prior-knowledge moderation is possible but not established.",
+   "claim_edges": [
+    {
+     "claim_id": "we.4",
+     "relation": "context_only",
+     "locator": "abstract: prior-knowledge x incorrect-example interaction"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "vanderkleij2015feedback",
+   "citation": "Van der Kleij, F. M., Feskens, R. C. W., & Eggen, T. J. H. M. (2015). Effects of feedback in a computer-based learning environment on students' learning outcomes: A meta-analysis. Review of Educational Research, 85(4), 475-511.",
+   "doi_or_url": "https://doi.org/10.3102/0034654314564881",
+   "source_type": "meta_analysis",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "ERIC EJ1081708 description (identical text via OpenAlex)",
+    "sections_read": [
+     "abstract (ERIC)"
+    ]
+   },
+   "design": "meta-analysis, 40 studies, 70 effect sizes, mixed model",
+   "population": "students in computer-based learning environments (primary to higher education)",
+   "operation": "mixed (lower- and higher-order learning outcomes)",
+   "intervention": "item-based feedback: elaborated feedback (EF, e.g. explanation), knowledge of correct response (KCR), knowledge of results (KR, correct/incorrect)",
+   "comparator": "not verified (per effect size)",
+   "outcome": {
+    "measure": "learning outcomes, coded lower vs higher order",
+    "assisted": "not verified",
+    "delay": "not verified",
+    "transfer": "higher-order outcomes coded separately"
+   },
+   "estimate": {
+    "metric": "mean effect size per feedback type (as reported in abstract)",
+    "value": "EF 0.49, KCR 0.32, KR 0.05; EF particularly more effective for higher-order outcomes; larger effects in mathematics; smaller with delayed feedback and in primary/high school; timing x outcome-level interaction n.s.",
+    "ci": "not in abstract",
+    "k_or_n": "40 studies / 70 effect sizes (range -0.78 to 2.29)",
+    "note": ""
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract-level; comparators and risk of bias not verified; EF is a broad category and is not the same as misconception-specific feedback. Product consequence: correctness-only feedback shows little effect; an explanation after an error is supported; no evidence that a diagnosed misconception label adds value beyond a general explanation.",
+   "claim_edges": [
+    {
+     "claim_id": "fb.2",
+     "relation": "supports",
+     "locator": "abstract: EF 0.49 > KCR 0.32 > KR 0.05"
+    }
+   ],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "matcha2020dashboards",
+   "citation": "Matcha, W., Uzir, N. A., Gašević, D., & Pardo, A. (2020). A systematic review of empirical studies on learning analytics dashboards: A self-regulated learning perspective. IEEE Transactions on Learning Technologies, 13(2), 226-245.",
+   "doi_or_url": "https://doi.org/10.1109/TLT.2019.2916802",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Semantic Scholar Graph API abstract field (paper 66bb48d765a26b51b9e004163bd99091e501d76a)",
+    "sections_read": [
+     "abstract (Semantic Scholar)"
+    ]
+   },
+   "design": "systematic review of empirical studies on learning analytics dashboards, analysed through the Winne and Hadwin model of self-regulated learning",
+   "population": "learners and teachers using dashboards (number of studies not in abstract)",
+   "operation": "self_regulation",
+   "intervention": "learning analytics dashboards (LADs)",
+   "comparator": "varies",
+   "outcome": {
+    "measure": "reported impact on learning and teaching",
+    "assisted": "not verified",
+    "delay": "not verified",
+    "transfer": "not verified"
+   },
+   "estimate": {
+    "metric": "qualitative (abstract)",
+    "value": "LADs are rarely grounded in learning theory, cannot be suggested to support metacognition, offer no information about effective learning tactics and strategies, and have significant limitations in how evaluations are conducted and reported; authors propose a user-centred model (MULAS).",
+    "ci": "n/a",
+    "k_or_n": "not in abstract",
+    "note": ""
+   },
+   "inference": "synthesis_mixed",
+   "bias_and_applicability": "Abstract-level; study count and appraisal method not verified. Product consequence: a learner dashboard has no established learning benefit; it is a design hypothesis that needs its own evaluation.",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "jivet2017awareness",
+   "citation": "Jivet, I., Scheffel, M., Drachsler, H., & Specht, M. (2017). Awareness is not enough: Pitfalls of learning analytics dashboards in the educational practice. In Data Driven Approaches in Digital Education (EC-TEL 2017), LNCS 10474 (pp. 82-96). Springer.",
+   "doi_or_url": "https://doi.org/10.1007/978-3-319-66610-5_7",
+   "source_type": "systematic_review",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_claim_review",
+    "url": "peer-reviewed author version, Open Universiteit research portal (research.ou.nl, CC BY-NC-ND)",
+    "sections_read": [
+     "Abstract",
+     "2 Method (search 20 Feb 2017, 1,439 hits, inclusion criteria)",
+     "3 Results incl. reference frames (Table 3)",
+     "4 Discussion"
+    ]
+   },
+   "design": "systematic literature review of learner-facing dashboards: 95 eligible, 26 analysed (grounded in educational concepts and empirically evaluated)",
+   "population": "learner-facing learning analytics dashboards (mostly higher/online education; not verified per paper)",
+   "operation": "self_regulation",
+   "intervention": "dashboards; reference frames: social (peers), achievement (goals), progress (earlier self)",
+   "comparator": "n/a",
+   "outcome": {
+    "measure": "design concepts and evaluation practice (no pooled learning effect)",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "counts of dashboards",
+    "value": "26 of 95 dashboards grounded in learning sciences and evaluated; peer comparison (often against the class average) more common than goal framing; only 10 dashboards showed progress over time; one let learners set own goals (Results 3, Table 3; Discussion).",
+    "ci": "n/a",
+    "k_or_n": "26 papers analysed of 95 eligible",
+    "note": "Most dashboards aim at awareness and reflection, which are rarely measured objectively."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Design review, not an effect synthesis; 'foster competition' is the authors' interpretation; class averages are skewed by inactive learners. Product consequence: default peer comparison has no support; progress (vs earlier self) and goal frames are under-used and fit a mastery orientation.",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "long2017olm",
+   "citation": "Long, Y., & Aleven, V. (2017). Enhancing learning outcomes through self-regulated learning support with an Open Learner Model. User Modeling and User-Adapted Interaction, 27(1), 55-88.",
+   "doi_or_url": "https://doi.org/10.1007/s11257-016-9186-6",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "fulltext_partial",
+    "url": "Version of record closed (not read). Read: the first author's CMU PhD dissertation (Long, 'Supporting Learner-Controlled Problem Selection in Intelligent Tutoring Systems', KiltHub/figshare article 6723413), section 3.1, which reports the OLM classroom experiments; correspondence with the UMUAI article not verified",
+    "sections_read": [
+     "dissertation 3.1.1 introduction",
+     "3.1 Classroom Experiment 1 (design and results)",
+     "3.1.5 Classroom Experiment 2 (learning, enjoyment, interaction, student-selected sequences)",
+     "NOT read: UMUAI version of record"
+    ]
+   },
+   "design": "two classroom experiments, 2x2 factorial: redesigned Open Learner Model (self-assessment prompts, delayed skill-bar update as feedback on self-assessment) vs none, x shared vs full system control over problem selection",
+   "population": "Exp. 1: 62 seventh graders (3 advanced classes, one teacher); Exp. 2: 245 seventh/eighth graders (16 classes, 3 schools, 6 teachers)",
+   "operation": "symbolic_procedure (linear equations); self_regulation (self-assessment, problem selection)",
+   "intervention": "OLM with self-assessment prompts after each problem and delayed update of skill bars",
+   "comparator": "no OLM; system-controlled problem selection",
+   "outcome": {
+    "measure": "paper pre- and post-test on equation solving",
+    "assisted": "unassisted",
+    "delay": "immediate after five class periods; no delayed test reported in the section read",
+    "transfer": "not verified"
+   },
+   "estimate": {
+    "metric": "ANOVA/ANCOVA F; Cohen d (as reported in the dissertation)",
+    "value": "Exp. 1: OLM main effect on post-test F(1,58)=4.90, p=0.031, d=0.56. Exp. 2: OLM main effect n.s., F(1,236)=0.77, p=0.38, d=0.11; OLM x control interaction F(1,236)=7.54, p=0.007; under shared control OLM > no OLM (p=0.012); without OLM, system control > shared control (Bonferroni p=0.03); OLM plus shared control not better than system-controlled conditions.",
+    "ci": "not reported",
+    "k_or_n": "62 + 245",
+    "note": "Students with shared control mostly chose a blocked order; the OLM helped mainly when learners chose their own problems."
+   },
+   "inference": "experimental_causal_within_scope",
+   "bias_and_applicability": "Dissertation version, not the VoR; developer-run; small Exp. 1; Exp. 2 main effect null and benefit only within the interaction; clustering by class not addressed in the reported tests (not verified). Product consequence: an OLM with self-assessment prompts is plausible support for learner-chosen practice, not a demonstrated improvement over system-controlled sequencing.",
+   "claim_edges": [],
+   "verdict": "partially_supported"
+  },
+  {
+   "source_id": "dawson2017retention",
+   "citation": "Dawson, S., Jovanovic, J., Gašević, D., & Pardo, A. (2017). From prediction to impact: Evaluation of a learning analytics retention program. In Proceedings of the Seventh International Learning Analytics & Knowledge Conference (LAK17) (pp. 474-478). ACM.",
+   "doi_or_url": "https://doi.org/10.1145/3027385.3027405",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract_inverted_index",
+    "sections_read": [
+     "abstract (OpenAlex)"
+    ]
+   },
+   "design": "observational evaluation of a pilot retention programme (2012-2014): predictive attrition model flags students, early learning/remediation support; effect estimated with several analysis methods",
+   "population": "11,160 enrolled students (combined), 1,868 flagged as academically at risk; one university (country not verified)",
+   "operation": "n/a (institutional early-warning programme)",
+   "intervention": "predictive at-risk flag (student information system, LMS interactions, assessment) plus early learning and remediation support",
+   "comparator": "students without the intervention (details not verified)",
+   "outcome": {
+    "measure": "retention",
+    "assisted": "n/a",
+    "delay": "programme period",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "qualitative (abstract)",
+    "value": "Common statistical methods: positive association between intervention and retention, small effect size. Mixed-effects models (explaining over 99% of variance): no effect of the intervention on retention.",
+    "ci": "not in abstract",
+    "k_or_n": "11,160 students; 1,868 flagged",
+    "note": ""
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Abstract-level; observational; the '>99% variance' model fit is unusual and not checked. Product consequence: an at-risk prediction plus outreach showed no effect once individual differences were modelled; predictive accuracy does not imply intervention benefit.",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "gasevic2016onesize",
+   "citation": "Gašević, D., Dawson, S., Rogers, T., & Gasevic, D. (2016). Learning analytics should not promote one size fits all: The effects of instructional conditions in predicting academic success. The Internet and Higher Education, 28, 68-84.",
+   "doi_or_url": "https://doi.org/10.1016/j.iheduc.2015.10.002",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "Semantic Scholar Graph API abstract field; green OA author version (research.ed.ac.uk) returned HTTP 403",
+    "sections_read": [
+     "abstract (Semantic Scholar)"
+    ]
+   },
+   "design": "secondary analysis of LMS log data and academic outcomes in nine courses; course-specific vs generalised predictive regression models",
+   "population": "4,134 undergraduates in nine blended-learning courses (institution not verified)",
+   "operation": "n/a (prediction of academic success)",
+   "intervention": "none (prediction study)",
+   "comparator": "generalised (pooled) model vs course-specific models",
+   "outcome": {
+    "measure": "academic success (operationalisation not verified)",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "qualitative (abstract)",
+    "value": "Predictive power and significant predictors differ between course-specific and generalised models; ignoring instructional conditions can over- or under-estimate effects of LMS features; implications for 'generalised and portable' at-risk models.",
+    "ci": "not in abstract",
+    "k_or_n": "4,134 students, 9 courses",
+    "note": ""
+   },
+   "inference": "correlational",
+   "bias_and_applicability": "Abstract-level; single institution. Product consequence: risk models do not transfer across courses; Mastery has no course-specific outcome data, so it cannot validate an at-risk model.",
+   "claim_edges": [],
+   "verdict": "supported_within_scope"
+  },
+  {
+   "source_id": "arnold2012coursesignals",
+   "citation": "Arnold, K. E., & Pistilli, M. D. (2012). Course Signals at Purdue: Using learning analytics to increase student success. In Proceedings of the 2nd International Conference on Learning Analytics and Knowledge (LAK12) (pp. 267-270). ACM.",
+   "doi_or_url": "https://doi.org/10.1145/2330601.2330666",
+   "source_type": "primary_study",
+   "kb_status": "new",
+   "access": {
+    "date": "2026-11-27",
+    "level": "abstract",
+    "url": "OpenAlex abstract_inverted_index; critique read only in secondary press coverage (Straumsheim, Inside Higher Ed, 11 Nov 2013, reprinted by Times Higher Education 'Student retention software comes under microscope'); EDUCAUSE Review blog on the critique returned HTTP 403",
+    "sections_read": [
+     "abstract (OpenAlex)",
+     "secondary: Times Higher Education / Inside Higher Ed article (whole text)"
+    ]
+   },
+   "design": "descriptive institutional report of an early-warning system and its retention/performance outcomes; comparison design not verified",
+   "population": "Purdue University students in Signals-enabled courses",
+   "operation": "n/a (institutional early-warning system)",
+   "intervention": "traffic-light risk signal from grades, demographics, academic history and LMS activity, plus personalised instructor email",
+   "comparator": "not verified",
+   "outcome": {
+    "measure": "retention and performance (not verified)",
+    "assisted": "n/a",
+    "delay": "n/a",
+    "transfer": "n/a"
+   },
+   "estimate": {
+    "metric": "none (paper not read)",
+    "value": "unknown",
+    "ci": "n/a",
+    "k_or_n": "not verified",
+    "note": "Per press coverage: Purdue claimed +21.48% six-year graduation for students taking two Signals courses (number not checked against the paper). Critique (Caulfield; Essa simulation, as reported): students who persist take more Signals courses (reverse causation); the effect 'disappeared' once Signals courses were widespread."
+   },
+   "inference": "descriptive",
+   "bias_and_applicability": "Paper not read; critique from press and blogs, not peer reviewed. Illustrates that exposure dose (number of Signals courses) is confounded with persistence. Product consequence: no traffic-light or at-risk labels and no retention claims from usage correlations.",
+   "claim_edges": [],
+   "verdict": "unresolved"
+  }
+ ],
+ "search_log": {
+  "protocol": "docs/research/workstreams/SEARCH_PROTOCOL.md (R0 v1); bounded targeted search, not a systematic review",
+  "tool": "general web search index (Claude Code WebSearch); identity and full text then via arXiv, Europe PMC REST, Crossref, OpenAlex and author PDFs",
+  "batches_1_to_3": "Exact queries of the specialist run (batches 1-3, 23 sources) were NOT logged and cannot be reconstructed; access routes per entry are recorded in access.url. Gate item 'exact queries' remains unmet for these 23 entries.",
+  "batch4": [
+   {
+    "id": "R5-Q01",
+    "date": "2026-11-27",
+    "query": "Fan 2025 \"metacognitive laziness\" generative AI learning motivation processes performance British Journal of Educational Technology",
+    "decision": "arXiv 2412.09315 author version read; Crossref for VoR metadata; commentary (Psychology Today, KQED) excluded as secondary"
+   },
+   {
+    "id": "R5-Q02",
+    "date": "2026-11-27",
+    "query": "Lehmann Cornelius Sting \"AI meets the classroom\" large language models harm learning",
+    "decision": "arXiv v2 (2025) read; v1 noted as earlier version, not cited separately"
+   },
+   {
+    "id": "R5-Q03",
+    "date": "2026-11-27",
+    "query": "Darvishi 2024 \"Impact of AI assistance on student agency\" Computers & Education",
+    "decision": "abstract via OpenAlex; PsyPost summary excluded; full text not read"
+   },
+   {
+    "id": "R5-Q04",
+    "date": "2026-11-27",
+    "query": "Pardos Bhandari 2024 ChatGPT-generated help learning gains equivalent human tutor-authored help PLOS ONE",
+    "decision": "PMC11125466 full text via Europe PMC REST; 2023 arXiv pilot (N=77) not included separately"
+   },
+   {
+    "id": "R5-Q05",
+    "date": "2026-11-27",
+    "query": "Doroudi Brunskill 2019 \"Fairer but not fair enough\" equitability of knowledge tracing LAK",
+    "decision": "author PDF read; later bias audits (arXiv 2205.02333, 2609.20249) seen but not screened - open"
+   },
+   {
+    "id": "R5-Q06",
+    "date": "2026-11-27",
+    "query": "AI Act digital omnibus delay high-risk Annex III obligations 2027 adopted 2026",
+    "decision": "secondary legal commentary used only to locate the amendment; date taken from mirror text and flagged unverified against EUR-Lex"
+   },
+   {
+    "id": "R5-A01",
+    "date": "2026-11-27",
+    "query": "direct fetch EUR-Lex OJ:L_202401689 and CELEX:32016R0679",
+    "decision": "HTTP 202 empty body; fallback to mirrors artificialintelligenceact.eu and gdpr-info.eu (labelled secondary)"
+   }
+  ],
+  "not_searched": [
+   "browser/API-key handling and local LLM deployment (engineering question, no learning evidence sought)",
+   "forward citations of bastani2025 since 2025 for delayed unassisted GenAI endpoints",
+   "FSRS/Anki scheduling (AD-1 retained)"
+  ],
+  "batch5": [
+   {
+    "id": "R5-Q07",
+    "date": "2026-11-27",
+    "engine": "WebSearch (general web index)",
+    "query": "Razzaq Heffernan \"Hints: is it better to give or wait to be asked\" proactive on-demand hints ASSISTments",
+    "screened": 18,
+    "included": [
+     "razzaq2010hints"
+    ],
+    "excluded": "later ASSISTments hint-timing studies (adaptive proactive hints; early vs late hint access) seen in snippets, not screened: time box",
+    "decision": "author PDF read in full"
+   },
+   {
+    "id": "R5-Q08",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Baker Corbett Koedinger \"gaming the system\" cognitive tutor learning outcomes hint abuse",
+    "screened": 10,
+    "included": [
+     "baker2004gaming",
+     "an2026hintuse"
+    ],
+    "excluded": "Baker 2008 detector papers and retrospective (Baker 'Gaming the System: A Retrospective Look') not registered: the 2004 study carries the learning association, detector accuracy is not needed for a deterministic rule",
+    "decision": "CHI 2004 PDF read; LAK 2026 hint-button paper found in the same result list, DOI verified, PDF read in part"
+   },
+   {
+    "id": "R5-Q09",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Koedinger Aleven 2007 \"assistance dilemma\" cognitive tutors Educational Psychology Review",
+    "screened": 10,
+    "included": [
+     "koedinger2007assistance"
+    ],
+    "excluded": "Koedinger et al. 2008 CogSci (assistance dilemma follow-up) and arXiv 2610.06446 (RL tutor) not screened",
+    "decision": "author-hosted PDF read in part"
+   },
+   {
+    "id": "R5-Q10",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "McLaren van Gog 2016 efficiency worked examples erroneous examples tutored problem solving Computers in Human Behavior",
+    "screened": 10,
+    "included": [
+     "mclaren2016efficiency"
+    ],
+    "excluded": "ITS 2014 precursor ('Exploring the assistance dilemma: comparing instructional support') not registered separately",
+    "decision": "abstract only; ScienceDirect accepted manuscript not retrieved"
+   },
+   {
+    "id": "R5-Q11",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Sleeman Kelly Martinak Ward Moore 1989 \"Studies of diagnosis and remediation with high school algebra students\" buggy rules remediation",
+    "screened": 17,
+    "included": [
+     "sleeman1989remediation"
+    ],
+    "excluded": "PIXIE technical reports (DTIC) and Payne & Squibb 1990 (mal-rule stability) seen, not screened: time box",
+    "decision": "abstract via OpenAlex; Wiley PDF blocked"
+   },
+   {
+    "id": "R5-Q12",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "McLaren Adams Mayer 2015 \"Delayed learning effects with erroneous examples\" decimals web-based tutor",
+    "screened": 10,
+    "included": [
+     "mclaren2015errex",
+     "adams2014errex"
+    ],
+    "excluded": "AIED/EC-TEL conference precursors not registered (same samples or pilots)",
+    "decision": "both author PDFs read from the AdaptErrEx publications page"
+   },
+   {
+    "id": "R5-Q13",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Große Renkl 2007 \"Finding and fixing errors in worked examples\" prior knowledge erroneous examples Learning and Instruction",
+    "screened": 10,
+    "included": [
+     "grosse2007errors"
+    ],
+    "excluded": "2025 review of erroneous examples (Educ Psychol Rev, s10648-025-10071-x) seen, not screened: time box; programming erroneous-example studies not screened",
+    "decision": "abstract via ERIC API"
+   },
+   {
+    "id": "R5-Q14",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Van der Kleij Feskens Eggen 2015 meta-analysis feedback computer-based learning environment elaborated feedback knowledge of correct response",
+    "screened": 10,
+    "included": [
+     "vanderkleij2015feedback"
+    ],
+    "excluded": "news coverage (Hechinger Report) excluded as secondary",
+    "decision": "abstract via ERIC API"
+   },
+   {
+    "id": "R5-Q15",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Durkin Rittle-Johnson 2012 incorrect examples decimal magnitude misconceptions Learning and Instruction",
+    "screened": 10,
+    "included": [],
+    "excluded": "durkin2012 NOT registered: journal text not accessible; the related dissertation reports null main effects while later reviews cite a benefit, so neither version can be summarised honestly without the article - open",
+    "decision": "excluded (access/version conflict)"
+   },
+   {
+    "id": "R5-Q16",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Mitrovic 2012 \"Fifteen years of constraint-based tutors\" evaluation learning gains UMUAI",
+    "screened": 10,
+    "included": [],
+    "excluded": "mitrovic2012 NOT registered: evaluation section not accessible in the time box; constraint-based diagnosis remains an open item",
+    "decision": "excluded (not read)"
+   },
+   {
+    "id": "R5-Q17",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Matcha Uzir Gašević Pardo 2020 systematic review learning analytics dashboards self-regulated learning perspective IEEE Transactions on Learning Technologies",
+    "screened": 10,
+    "included": [
+     "matcha2020dashboards"
+    ],
+    "excluded": "later dashboard reviews (Educ Inf Technol 2023, 2022) seen, not screened",
+    "decision": "abstract via Semantic Scholar API"
+   },
+   {
+    "id": "R5-Q18",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Jivet Scheffel Drachsler Specht \"Awareness is not enough\" pitfalls learning analytics dashboards social comparison",
+    "screened": 10,
+    "included": [
+     "jivet2017awareness"
+    ],
+    "excluded": "Jivet et al. 2018 LAK 'License to evaluate' seen, not screened (time box)",
+    "decision": "peer-reviewed author version read (research.ou.nl via OpenAlex OA location)"
+   },
+   {
+    "id": "R5-Q19",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Long Aleven 2017 \"Enhancing learning outcomes through self-regulated learning support with an open learner model\" UMUAI",
+    "screened": 10,
+    "included": [
+     "long2017olm"
+    ],
+    "excluded": "Long & Aleven 2013 AIED precursor not registered separately",
+    "decision": "VoR closed; dissertation version read via figshare API (labelled as different version)"
+   },
+   {
+    "id": "R5-Q20",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Dawson Jovanovic Gašević Pardo 2017 \"From prediction to impact\" evaluation learning analytics retention program LAK",
+    "screened": 10,
+    "included": [
+     "dawson2017retention"
+    ],
+    "excluded": "other retention-programme papers in results not screened",
+    "decision": "abstract via OpenAlex"
+   },
+   {
+    "id": "R5-Q21",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Gašević Dawson Rogers Gasevic 2016 \"Learning analytics should not promote one size fits all\" instructional conditions predicting academic success",
+    "screened": 10,
+    "included": [
+     "gasevic2016onesize"
+    ],
+    "excluded": "Jovanović et al. 2021 portability study seen in snippet, not screened",
+    "decision": "abstract via Semantic Scholar; Edinburgh author version HTTP 403"
+   },
+   {
+    "id": "R5-Q22",
+    "date": "2026-11-27",
+    "engine": "WebSearch",
+    "query": "Course Signals Purdue retention claim critique Caulfield Essa causality more courses taken",
+    "screened": 10,
+    "included": [
+     "arnold2012coursesignals"
+    ],
+    "excluded": "blog posts (Caulfield, Feldstein) and EDUCAUSE Review blog not read (EDUCAUSE HTTP 403); critique taken only from one press article, labelled secondary",
+    "decision": "Arnold & Pistilli abstract via OpenAlex; THE/IHE article read"
+   },
+   {
+    "id": "R5-A02",
+    "date": "2026-11-27",
+    "engine": "Crossref REST API (api.crossref.org/works/{doi}), generic User-Agent",
+    "query": "DOI lookup for all 16 batch-5 DOIs",
+    "screened": 16,
+    "included": [
+     "all 16 resolved; title, authors, venue, volume/pages match the citations"
+    ],
+    "excluded": "none",
+    "decision": "identity verified"
+   },
+   {
+    "id": "R5-A03",
+    "date": "2026-11-27",
+    "engine": "OpenAlex API (open_access, locations, abstract_inverted_index); Semantic Scholar Graph API (abstract, openAccessPdf); ERIC API (api.ies.ed.gov/eric)",
+    "query": "OA location and abstract lookup by DOI/title for closed-access batch-5 items",
+    "screened": 11,
+    "included": [
+     "abstracts for sleeman1989remediation, dawson2017retention, arnold2012coursesignals (OpenAlex); matcha2020dashboards, gasevic2016onesize (Semantic Scholar); grosse2007errors, vanderkleij2015feedback (ERIC)"
+    ],
+    "excluded": "publisher-elided abstracts for long2017olm and mclaren2016efficiency in Semantic Scholar/OpenAlex",
+    "decision": "abstract-level entries labelled as such"
+   },
+   {
+    "id": "R5-A04",
+    "date": "2026-11-27",
+    "engine": "direct HTTP fetch",
+    "query": "core.ac.uk download PDFs (Jivet, Long, Gasevic), research.ed.ac.uk, onlinelibrary.wiley.com pdfdirect, link.springer.com, er.educause.edu",
+    "screened": 7,
+    "included": [],
+    "excluded": "HTML challenge pages or HTTP 403/303 redirects; no paywall bypass attempted",
+    "decision": "fallback to other OA locations (research.ou.nl, figshare) or abstract level"
+   }
+  ],
+  "batch5_not_searched": [
+   "two-tier / distractor-driven diagnostic tests and their reliability (no query run: time box)",
+   "constraint-based modelling evaluations (Mitrovic) beyond the search hit; reliability of automated misconception diagnosis",
+   "Bodily & Verbert 2017 and Bull & Kay open-learner-model frameworks (SMILI) not searched",
+   "hint-quality effects on later help seeking (e.g. data-driven hint generation) not searched"
+  ]
+ }
+}

@@ -37,3 +37,61 @@ Numeric lab specifications require `numeric.prediction_target`, a finite slider-
 ## Mathematical & Visual Quality candidate v0.5
 
 See `docs/MATHEMATICAL_VISUAL_SPECIFICATION.md`. Canonical offline TeX records, vector scientific figures, operation-specific reading patterns and actual cross-media geometry gates extend the existing publishers. Legacy author contracts remain readable but receive no advanced-mathematics validation claim. The one-path interface remains unchanged. Dedicated dependencies are installed by `scripts/SETUP_MATH_RUNTIME.sh` outside the Documents source tree; no previous environment is modified. Native Anki clients, historical migration and independent external review remain separate mandatory gates. This is a working candidate, not a released freeze.
+
+## Source-free Experience prototype (draft)
+
+The new experience layer is validated with synthetic cross-domain fixtures **before any lecture inputs**. It creates an actual **single offline interactive HTML**, not fake textbook or Anki output:
+
+```bash
+python -m exam_mastery.cli experience validate fixtures/experience_reference.json
+python -m exam_mastery.cli experience render fixtures/experience_reference.json --out /tmp/em-reference
+# Open /tmp/em-reference/Interaktiv/index.html
+```
+
+Supported deterministic exploratory models: lower-bound binary search and finite discounted returns. The player requires a numerical prediction before revealing its stepwise trace, uses verified Python reference calculations, and unlocks solutions only after an independent answer attempt. Browser code runs offline without network access or LLMs; it **does not execute learner code**, certify scientific accuracy, or provide a secure coding sandbox. Other domains remain contract-valid but require their own tested renderers. Obsidian is an optional Markdown view and Anki remains the only repetition scheduler.
+
+The same checked synthetic unit may also be exported through the **existing** Anki engine: `python -m exam_mastery.cli experience anki fixtures/experience_reference.json --out /tmp/em-reference`. Only `Anki.apkg` is user-visible; the incremental, stable-identity metadata resides in a hidden state folder. Exports never modify a learner's Anki collection; imported scheduling remains Anki/FSRS's responsibility. Do not interpret a successful export as proof of card quality.
+
+Two **consolidated PDF** products from the same canonical unit now reuse the existing MathJax/Chromium typesetter (not a second rendering engine):
+
+```bash
+python -m exam_mastery.cli experience books fixtures/experience_reference.json --out /tmp/em-reference
+```
+
+The workbook contains both tasks and complete solutions in distinct sections; there is no separate solution or mock-exam file. Outputs are exactly `Lehrbuch.pdf` and `Arbeitsbuch.pdf`, with hidden incremental integrity state. The source-free fixture is a technical test, not proof of book-level scientific depth. Existing outputs with unknown provenance or manual modifications are never overwritten.
+
+### One-command four-product publishing (source-free development)
+
+```bash
+python -m exam_mastery.cli experience build fixtures/experience_reference.json --out /tmp/em-reference
+```
+
+This dispatches the **existing** PDF typesetting and Anki pipelines plus the offline interactive player. The only visible artifacts are `Lehrbuch.pdf`, `Arbeitsbuch.pdf` (with solutions), `Anki.apkg`, `Interaktiv/index.html`. A hidden `.em-state/` directory holds manifest hashes and stable Anki update state. All existing targets undergo overwrite preflight before any production. An interruption may yield a resumable partial build; publication remains at **HUMAN_REVIEW_PENDING**, not an academic release.
+
+A small, offline, accessible **Parsons/code-reconstruction exercise** now complements numeric code tracing. It checks the ordering of supplied reference fragments and reveals per-step explanations only after a correct attempt. It does **not** execute arbitrary learner code or claim to validate every semantically equivalent solution. The implementation stays within the existing interactive product and has Playwright tests.
+
+### Engineering recovery baseline (26 November 2026)
+
+The stacked four-product implementation remains experimental. Process-interrupted
+publication now supports explicit, hash-checked restoration:
+`python -m exam_mastery.cli experience recover <output-directory>`.
+A pending recovery blocks further builds; manual changes are never silently discarded.
+This is not group-atomic publication or a power-loss guarantee.
+
+Run `python scripts/verify_experience_references.py --out /tmp/em-reference-evidence`
+for synthetic mathematics, algorithmic and finance four-product builds, no-op rebuild
+checks, PDF page renders and offline browser/Anki previews. Outputs stay outside the
+repository. See `docs/ENGINEERING_RECOVERY_20261126.md` for findings and limitations.
+
+### Attention Golden Reference candidate
+
+`fixtures/experience_attention_reference.json` is an explicitly curated, publicly
+source-grounded candidate, with synthetic matrices and original prose/tasks.
+It is not evidence of automatic academic authoring or human acceptance.
+`experience build` produces exactly the four existing products; publishers and
+recovery now take a process-exclusive POSIX directory lock.
+
+`python scripts/verify_experience_references.py --out /tmp/em-golden-reference`
+builds the Attention, geometry, algorithmic and finance references and captures
+PDF pages, Anki previews and real offline browser interventions.
+See `docs/GOLDEN_ATTENTION_20261126.md` for sources, provenance, tests and limits.

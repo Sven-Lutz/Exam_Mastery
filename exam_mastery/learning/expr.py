@@ -4,6 +4,11 @@ Grammar: sum = prod (('+'|'-') prod)*; prod = unary (('*'|'/'|implicit) unary)*;
 pow = atom ('^' unary)?; atom = number | identifier | '(' sum ')'.
 Notation that learners actually type is normalised first: · × − ′ subscripts, δ_o, f'(z1), decimal comma.
 
+Functions: abs(.) (also |.|) and sqrt(.). A negative base with a non-integer exponent is undefined (NaN), as in
+the browser. Sample points are domain-aware (CD-10): a variable without a declared domain is drawn with both signs
+and magnitudes in [0.15, 2.5]; tasks declare narrower domains only where the mathematics fixes them (e.g. a sigmoid
+activation in (0, 1)). Before this, every variable lay in (0.15, 0.95), so (x^2)^(1/2) passed as x.
+
 Equivalence is decided two ways:
 - randomised identity testing (same seeded generator as the browser): evaluate both expressions at 12 points;
   agreement at all points of two rational functions of this size is overwhelming evidence of identity,
@@ -14,6 +19,8 @@ import math
 import re
 
 SUB = str.maketrans('₀₁₂₃₄₅₆₇₈₉', '0123456789')
+FUNCS = ('abs', 'sqrt')
+DEFAULT_MAGNITUDE = (0.15, 2.5)   # provisional sampling range for undeclared variables (sign drawn separately)
 
 
 class ExprError(ValueError):
@@ -30,6 +37,8 @@ def normalise(s, aliases=None):
     s = re.sub(r'\bdelta_?o\b|\bdeltao\b', 'delta_o', s)
     s = re.sub(r'\bdelta_?(\d)\b', r'delta_\1', s)
     s = re.sub(r'(\d),(\d)', r'\1.\2', s)
+    s = s.replace('√', 'sqrt')
+    s = re.sub(r'\|([^|]+)\|', r'abs(\1)', s)                # |x| -> abs(x) (not nested)
     for a, b in (aliases or {}).items():
         s = re.sub(r'\b' + re.escape(a) + r'\b', b, s)
     return s
@@ -67,6 +76,11 @@ def parse(s, variables, aliases=None):
         t = take()
         if t[0] == 'n':
             return ('n', t[1])
+        if t[0] == 'v' and t[1] in FUNCS and peek() == ('o', '('):
+            take(); e = sum_()
+            if take() != ('o', ')'):
+                raise ExprError('Klammer nicht geschlossen')
+            return ('f', t[1], e)
         if t[0] == 'v':
             if t[1] not in variables:
                 raise ExprError(f'Unbekanntes Symbol: {t[1]}')
@@ -121,16 +135,24 @@ def evaluate(ast, env):
         return env[ast[1]]
     if k == 'neg':
         return -evaluate(ast[1], env)
+    if k == 'f':
+        x = evaluate(ast[2], env)
+        if ast[1] == 'abs':
+            return abs(x)
+        return math.sqrt(x) if x >= 0 else math.nan
     a, b = evaluate(ast[1], env), evaluate(ast[2], env)
     if k == '+': return a + b
     if k == '-': return a - b
     if k == '*': return a * b
     if k == '/': return a / b if b != 0 else math.nan
     if k == '^':
+        if a < 0 and not float(b).is_integer():
+            return math.nan                      # real-valued only, like Math.pow in the browser
         try:
-            return a ** b
+            r = a ** b
         except (OverflowError, ZeroDivisionError):
             return math.nan
+        return r if isinstance(r, float) or isinstance(r, int) else math.nan
     raise ExprError(k)
 
 
@@ -142,6 +164,8 @@ def symbols(ast, acc=None):
         symbols(ast[1], acc); symbols(ast[2], acc)
     elif ast[0] == 'neg':
         symbols(ast[1], acc)
+    elif ast[0] == 'f':
+        symbols(ast[2], acc)
     return acc
 
 
@@ -160,12 +184,19 @@ def mulberry32(seed):
     return nxt
 
 
-def sample_points(variables, defs=None, n=12, seed=20261110):
-    """defs: {name: expression string in other variables} for derived symbols (e.g. fp1 = a1*(1-a1))."""
+def sample_points(variables, defs=None, n=12, seed=20261110, domains=None):
+    """defs: {name: expression string in other variables} for derived symbols (e.g. fp1 = a1*(1-a1)).
+    domains: {name: [lo, hi]} for variables whose range the task fixes; all others are drawn with both signs.
+    Two draws per variable (sign, magnitude) keep the sequence identical to the browser."""
     r = mulberry32(seed); pts = []
     base = sorted(v for v in variables if v not in (defs or {}))
+    lo0, hi0 = DEFAULT_MAGNITUDE
     for _ in range(n):
-        env = {v: 0.15 + 0.8 * r() for v in base}
+        env = {}
+        for v in base:
+            sgn, m = r(), r()
+            d = (domains or {}).get(v)
+            env[v] = d[0] + (d[1] - d[0]) * m if d else (lo0 + (hi0 - lo0) * m) * (-1 if sgn < 0.5 else 1)
         for k, d in (defs or {}).items():
             env[k] = evaluate(parse(d, base), env)
         pts.append(env)
@@ -211,6 +242,8 @@ def to_sympy(ast, defs=None):
             return sp.Symbol(a[1])
         if k == 'neg':
             return -go(a[1])
+        if k == 'f':
+            return {'abs': sp.Abs, 'sqrt': sp.sqrt}[a[1]](go(a[2]))
         x, y = go(a[1]), go(a[2])
         return {'+': x + y, '-': x - y, '*': x * y, '/': x / y, '^': x ** y}[k]
     return go(ast)

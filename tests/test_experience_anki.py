@@ -1,0 +1,156 @@
+"""Experience Anki adapter tests: stable output, reuse, no collection mutation."""
+import copy
+import json
+from pathlib import Path
+import zipfile
+
+import pytest
+
+from exam_mastery.learning import experience as ex
+from exam_mastery.learning import experience_anki as bridge
+
+
+def synthetic_unit():
+    return {
+        "schema": "em-experience-v1", "unit_id": "cs/trace-demo",
+        "title": "Trace Demo", "source_mode": "synthetic",
+        "knowledge_modes": ["computational"],
+        "sources": [{"id": "synthetic/trace", "kind": "synthetic", "locator": "Synthetic reference"}],
+        "claims": [{"id": "synthetic/claim", "text": "Verified synthetic property",
+                    "evidence_status": "synthetic", "source_refs": ["synthetic/trace"]}],
+        "competencies": [{"id": "skill/trace", "operation": "trace", "prerequisites": []}],
+        "teaching": [{"id": "teaching/explain", "content": "A precise independent explanation.",
+                      "competency_ids": ["skill/trace"], "claim_ids": ["synthetic/claim"]}],
+        "assessments": [{"id": "task/solve", "prompt": "Derive the correct result.",
+                         "solution": "Apply the invariant, then verify the result.",
+                         "rubric": [{"criterion": "Correct argument", "points": 2}],
+                         "attempt_before_reveal": True, "competency_ids": ["skill/trace"]}],
+        "cards": [{"key": "trace/why", "kind": "concept", "front": "Why must the index increase?",
+                   "answer": "Because the candidate interval becomes strictly shorter.",
+                   "competency_ids": ["skill/trace"]}],
+        "interactions": [],
+        "interaction_not_applicable_reason": "This unit tests only the Anki exporter.",
+    }
+
+
+def test_lint_and_refusal_without_cards(tmp_path):
+    lesson = synthetic_unit()
+    assert ex.validate(lesson)["valid"]
+    lesson["cards"] = []
+    lesson["anki_not_applicable_reason"] = "Not appropriate to memorise."
+    with pytest.raises(ValueError, match="empty Anki"):
+        bridge.publish(lesson, tmp_path)
+
+
+def test_single_public_package_and_idempotent_reexport(tmp_path):
+    pytest.importorskip("anki")
+    unit = synthetic_unit()
+    first = bridge.publish(unit, tmp_path)
+    pkg = tmp_path / "Anki.apkg"
+    assert first["status"] == "CREATED_OR_UPDATED"
+    assert first["notes"] == 1
+    assert first["model_calls"] == 0
+    assert first["user_collection_touched"] is False
+    assert pkg.is_file()
+    with zipfile.ZipFile(pkg) as z:
+        assert any("collection." in n for n in z.namelist())
+    mtime = pkg.stat().st_mtime_ns
+    second = bridge.publish(unit, tmp_path)
+    assert second["status"] == "UNCHANGED"
+    assert pkg.stat().st_mtime_ns == mtime
+    visible = sorted(p.name for p in tmp_path.iterdir() if not p.name.startswith("."))
+    assert visible == ["Anki.apkg"]
+
+
+def test_unmanaged_or_modified_package_is_never_overwritten(tmp_path):
+    unit = synthetic_unit()
+    (tmp_path / "Anki.apkg").write_bytes(b"personal data")
+    with pytest.raises(ValueError, match="unmanaged"):
+        bridge.publish(unit, tmp_path)
+    assert (tmp_path / "Anki.apkg").read_bytes() == b"personal data"
+
+
+def test_changed_card_keeps_semantic_identity(tmp_path):
+    pytest.importorskip("anki")
+    unit = synthetic_unit()
+    bridge.publish(unit, tmp_path)
+    from exam_mastery import anki_v2
+    old_guid = anki_v2.guid("cs", "trace-demo-" +
+                            __import__("hashlib").sha256(b"cs/trace-demo").hexdigest()[:8], "trace/why")
+    changed = copy.deepcopy(unit)
+    changed["cards"][0]["answer"] = "The interval's nonnegative length strictly decreases."
+    result = bridge.publish(changed, tmp_path)
+    assert result["status"] == "CREATED_OR_UPDATED"
+    assert result["update_delta"]["changed"] == ["trace/why"]
+    new_guid = anki_v2.guid("cs", "trace-demo-" +
+                            __import__("hashlib").sha256(b"cs/trace-demo").hexdigest()[:8], "trace/why")
+    assert old_guid == new_guid
+
+
+def test_anki_card_refs_resolve_to_canonical_source(tmp_path):
+    pytest.importorskip("anki")
+    lesson = synthetic_unit()
+    lesson["cards"][0]["claim_ids"] = ["synthetic/claim"]
+    report = bridge.publish(lesson, tmp_path)
+    assert report["notes"] == 1
+    # Modern APKG may contain a compatibility-only collection.anki2.
+    # Import via Anki's public API rather than reading its placeholder DB.
+    from anki.collection import Collection, ImportAnkiPackageRequest, ImportAnkiPackageOptions
+    collection = Collection(str(tmp_path / "readback.anki2"))
+    try:
+        collection.import_anki_package(ImportAnkiPackageRequest(
+            package_path=str(tmp_path / "Anki.apkg"),
+            options=ImportAnkiPackageOptions(),
+        ))
+        note_ids = collection.find_notes("")
+        assert len(note_ids) == 1
+        note = collection.get_note(note_ids[0])
+        assert "Synthetic reference" in note["Source"]
+    finally:
+        collection.close()
+
+
+def test_template_change_invalidates_package_cache(monkeypatch, tmp_path):
+    from exam_mastery import anki_v2
+    lesson = synthetic_unit()
+    bridge.publish(lesson, tmp_path)
+    monkeypatch.setattr(anki_v2, "CSS", anki_v2.CSS + "\n/* revised design */")
+    result = bridge.publish(lesson, tmp_path)
+    assert result["status"] == "CREATED_OR_UPDATED"
+    assert result["update_delta"]["unchanged"] == ["trace/why"]
+
+
+def test_real_reimport_preserves_reviews_and_schedule_after_template_update(monkeypatch, tmp_path):
+    from anki.collection import Collection, ImportAnkiPackageRequest, ImportAnkiPackageOptions
+    from exam_mastery import anki_v2
+    import time
+    unit = synthetic_unit()
+    bridge.publish(unit, tmp_path / "products")
+    col = Collection(str(tmp_path / "isolated.anki2"))
+    def load():
+        col.import_anki_package(ImportAnkiPackageRequest(
+            package_path=str(tmp_path / "products/Anki.apkg"),
+            options=ImportAnkiPackageOptions(merge_notetypes=True, update_notes=1,
+                                            with_scheduling=False, with_deck_configs=False)))
+    try:
+        load()
+        card = col.get_card(col.find_cards("")[0])
+        card.reps, card.ivl, card.due = 7, 13, 42
+        col.update_card(card)
+        col.db.execute('insert into revlog (id,cid,usn,ease,ivl,lastIvl,factor,time,type) values (?,?,?,?,?,?,?,?,?)',
+                       int(time.time()*1000), card.id, -1, 3, 13, 5, 2500, 1200, 1)
+        before = col.db.all('select id,nid,reps,ivl,due from cards order by id')
+        history = col.db.all('select * from revlog')
+        unit['title'] = 'Revised title with the same semantic unit identity'
+        unit['cards'][0]['answer'] += ' Revised explanation.'
+        monkeypatch.setattr(anki_v2, 'CSS', anki_v2.CSS + '\n/* new-template-version */')
+        bridge.publish(unit, tmp_path / "products")
+        load()
+        assert col.note_count() == 1
+        assert col.db.all('select id,nid,reps,ivl,due from cards order by id') == before
+        assert col.db.all('select * from revlog') == history
+        note = col.get_note(col.find_notes("")[0])
+        assert 'Revised explanation.' in note['Answer']
+        assert 'new-template-version' in note.note_type()['css']
+    finally:
+        col.close()

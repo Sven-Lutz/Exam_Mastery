@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anki-Karten und Feedback · Mastery</title>
+<style>
+*{box-sizing:border-box}body{font:1rem/1.5 system-ui,sans-serif;color:#182832;background:#f7f8f5;margin:0 auto;padding:1.5rem;max-width:60rem}
+label{display:block;margin:.6rem 0}select,textarea,button{font:inherit;padding:.4rem;max-width:100%}textarea,iframe{width:100%}iframe{height:22rem;border:1px solid #aeb9b7;background:white}h2{margin-bottom:.4rem}a{color:#155f59}
+</style></head><body><main><a href="/#kurse">Zur Kursübersicht</a>
+<h1>Anki-Karten und Feedback</h1><label>Karte <select id="card"></select></label>
+<label>Ansicht <select id="side"><option value="q">Frage</option><option value="a">Antwort</option></select></label>
+<iframe title="Anki-Kartenvorschau" sandbox="allow-scripts allow-same-origin"></iframe>
+<form><h2>Rückmeldung zur Karte</h2><label>Feedback-Art <select id="kind"></select></label>
+<label>Kommentar (optional)<textarea maxlength="2000" id="text"></textarea></label><button disabled>Feedback speichern</button></form>
+<p role="status"></p><section><h2>Qualitätsbericht</h2><p>Kartenzahl und Rückmeldungen beschreiben das Material. Lernerfolg wird hier nicht gemessen.</p>
+<p id="total"></p><ul id="counts"></ul><h3>Betroffene Karten</h3><ul id="affected"></ul></section>
+</main><script src="browser.js"></script></body></html>

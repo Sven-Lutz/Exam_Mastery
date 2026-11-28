@@ -1,0 +1,22 @@
+{
+ "schema": "mastery-library-spec-v1",
+ "note": "Public V1 library. Private units are added per machine with `mastery build --unit /path/unit.json`; they are recorded in MASTERY_HOME/library-spec.local.json, never here.",
+ "units": [
+  {
+   "slug": "attention",
+   "unit": "fixtures/experience_attention_reference.json",
+   "tracks": [
+    {
+     "id": "ai/attention-track",
+     "relation": "practice",
+     "label": "Übung: Softmax-Gewichte, Skalierung, Maskierung und Gradient (Attention)"
+    },
+    {
+     "id": "ml/backprop-track",
+     "relation": "prerequisite",
+     "label": "Voraussetzung und Übung: Gradienten mit der Kettenregel (Backpropagation)"
+    }
+   ]
+  }
+ ]
+}

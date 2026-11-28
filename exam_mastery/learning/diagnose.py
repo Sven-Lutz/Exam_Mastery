@@ -86,7 +86,7 @@ def diagnose(task, answer):
             f = X.parse(answer, vs)
         except X.ExprError as e:
             return _out(task, answer, 'expression', 'invalid', None, 'DETERMINISTIC', str(e))
-        pts = X.sample_points(vs, task.get('defs'))
+        pts = X.sample_points(vs, task.get('defs'), domains=task.get('domains'))
         g = X.parse(task['expected_expr'], vs)
         bad = [env for env in pts if not math.isfinite(X.evaluate(f, env))]
         if bad:   # division by zero / undefined at a sample point: no verdict on equivalence

@@ -1,0 +1,96 @@
+/* Mastery V1 home. Builds on em_tokens.css (same tokens, buttons and eyebrows as the workbench and learning app). */
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font:var(--fs-1)/var(--lh-ui) var(--font-ui)}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.m-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:12px var(--gutter);background:var(--plate);border-bottom:1px solid var(--rule)}
+.m-brand{font:700 var(--fs-3)/1 var(--font-display);color:var(--ink);text-decoration:none;letter-spacing:.01em}
+.m-nav{display:flex;gap:4px;flex-wrap:wrap}
+.m-nav a{padding:6px 12px;border-radius:var(--r-pill);text-decoration:none;color:var(--ink-2)}
+.m-nav a[aria-current=page]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.m-shell{max-width:1080px;margin:0 auto;padding:24px var(--gutter) 64px}
+.m-view[hidden]{display:none}
+.m-h1{font:600 var(--fs-4)/var(--lh-tight) var(--font-display);margin:8px 0 8px}
+.m-h2{font:600 var(--fs-3)/var(--lh-tight) var(--font-display);margin:4px 0 8px}
+.m-h3{font:600 var(--fs-2)/1.3 var(--font-ui);margin:16px 0 6px}
+.m-lead{color:var(--ink-2);max-width:var(--measure);margin:0 0 20px}
+.m-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px}
+.m-card{background:var(--plate);border:1px solid var(--rule);border-radius:var(--r-3);padding:18px 20px;margin:0 0 16px;box-shadow:var(--shadow-1,none)}
+.m-grid2 .m-card{margin:0}
+.m-accent{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.m-note{color:var(--muted);font-size:var(--fs-0)}
+.m-rule{font-size:var(--fs-0);color:var(--ink-2)}
+.m-rule code,.m-card code{font-family:var(--font-mono);font-size:.85em;background:var(--surface-2);padding:1px 5px;border-radius:var(--r-1)}
+.m-badge{display:inline-block;font-size:var(--fs-0);background:var(--warn-soft);color:var(--warn);padding:2px 10px;border-radius:var(--r-pill);margin:0 0 8px}
+.m-products{list-style:none;padding:0;margin:8px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.m-products li{border:1px solid var(--rule);border-radius:var(--r-2);padding:10px 12px;background:var(--surface)}
+.m-products a{font-weight:600;display:block}
+.m-products small{color:var(--muted)}
+.m-steps{padding-left:22px}
+.m-steps li{margin:4px 0}
+.m-limits{background:var(--surface-2)}
+.m-limits ul{margin:0;padding-left:20px}
+.m-statement{background:var(--accent-soft);border-left:4px solid var(--accent);padding:12px 16px;border-radius:var(--r-2);max-width:none}
+.m-scroll{overflow-x:auto}
+.m-table{border-collapse:collapse;width:100%;font-size:var(--fs-0)}
+.m-table th,.m-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.m-table thead th{color:var(--muted);font-weight:600}
+.m-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.m-loading{color:var(--muted)}
+.ds-btn{text-decoration:none;display:inline-block}
+.m-course-head{margin:24px 0 8px}
+.m-input{font:inherit;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:var(--r-1);background:var(--surface);color:var(--ink);max-width:100%}
+.m-wide{width:100%}
+.m-num{width:4.5em}
+.m-field{display:block;font-weight:600;margin:12px 0 4px}
+.m-check{display:inline-flex;gap:6px;align-items:center;margin:8px 0}
+.m-pipe{list-style:none;display:flex;flex-wrap:wrap;gap:4px;padding:0;margin:0 0 8px}
+.m-pipe li{font-size:var(--fs-xs,12px);padding:2px 8px;border-radius:var(--r-pill);background:var(--surface-2);color:var(--muted)}
+.m-pipe li.done{background:var(--ok-soft);color:var(--ok)}
+.m-pipe li.now{background:var(--accent);color:var(--accent-ink,#fff);font-weight:600}
+.m-warn{padding-left:20px;margin:6px 0}
+.m-warn li{margin:3px 0}
+.m-warn li.sev-error{color:var(--bad)}
+.m-icloud{background:var(--warn-soft);border-left:4px solid var(--warn);padding:10px 14px;border-radius:var(--r-2);margin:10px 0}
+.m-instr{background:var(--surface-2);border-radius:var(--r-2);padding:10px 12px;margin:6px 0}
+.m-prompt{display:block;white-space:pre-wrap;word-break:break-word;margin:4px 0}
+.m-links{list-style:none;display:flex;flex-wrap:wrap;gap:10px;padding:0;margin:6px 0}
+.m-plan td{min-width:120px}
+.m-skip{opacity:.6}
+.m-stale{background:var(--bad-soft);color:var(--bad)}
+.m-action .ds-btn{margin:4px 6px 4px 0}
+/* Lernstand: numbers explain themselves ("Woher?"), timeline, coverage */
+.m-h4{font:600 var(--fs-1)/1.3 var(--font-ui);margin:14px 0 4px}
+.m-n{font:inherit;font-variant-numeric:tabular-nums;color:var(--ink);background:none;border:0;padding:0 2px;cursor:help;text-decoration:underline dotted var(--muted);text-underline-offset:3px;border-radius:var(--r-1)}
+.m-n:hover{background:var(--accent-soft);color:var(--accent)}
+.m-state{text-align:left}
+.m-why{background:var(--surface-2);border-left:4px solid var(--accent);border-radius:var(--r-2);padding:10px 14px;margin:10px 0 0}
+.m-why p{margin:4px 0}
+.m-why-refs{margin:4px 0;padding-left:20px;font-size:var(--fs-0)}
+.m-why-refs code,.m-prov code{word-break:break-all}
+.m-not{font-size:var(--fs-0);color:var(--ink-2)}
+.m-help{display:inline-block;margin-right:8px;white-space:nowrap}
+.m-filters{align-items:flex-end}
+.m-field-inline{display:inline-flex;gap:6px;align-items:center;font-size:var(--fs-0);max-width:100%;min-width:0}
+.m-field-inline select{max-width:min(320px,100%);min-width:0;text-overflow:ellipsis}
+.m-kc th[scope=row]{min-width:170px}
+.m-kc td{white-space:nowrap}
+.m-kc td:nth-child(2),.m-kc td:nth-child(3){white-space:normal;min-width:150px}
+.m-kc td:nth-child(8){white-space:normal;min-width:120px}
+.m-tl{list-style:none;padding:0;margin:8px 0}
+.m-tl-item{display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:12px;padding:8px 0;border-bottom:1px solid var(--rule)}
+.m-tl-when{font-size:var(--fs-0);color:var(--ink-2);font-variant-numeric:tabular-nums}
+.m-tl-tags{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}
+.m-tag{font-size:var(--fs-xs,12px);padding:1px 8px;border-radius:var(--r-pill);background:var(--surface-2);color:var(--ink-2)}
+.m-tag-help{background:var(--warn-soft);color:var(--warn)}
+.m-tag-ind{background:var(--ok-soft);color:var(--ok)}
+.m-prov{display:block;color:var(--muted);font-size:var(--fs-xs,12px)}
+.m-cov{border-top:1px solid var(--rule);padding-top:6px}
+.m-cov-list{margin:4px 0;padding-left:20px;font-size:var(--fs-0)}
+@media (max-width:560px){.m-tl-item{grid-template-columns:1fr;gap:2px}}
+@media (max-width:560px){.m-shell{padding:16px 16px 48px}.m-card{padding:14px}}
+/* machine quality gates (mastery-quality-v1) per chapter in the Kurse view */
+.m-quality{margin:8px 0 0;padding:6px 10px;border-left:3px solid var(--line, #c9d6de);font-size:var(--fs-0)}
+.m-quality[data-quality="BLOCKERS"]{border-color:var(--bad);background:var(--bad-soft)}
+.m-quality[data-quality="MAJOR_FINDINGS"]{border-color:var(--warn);background:var(--warn-soft)}

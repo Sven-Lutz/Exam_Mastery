@@ -8,6 +8,9 @@ All text uses the design system's sans font; colours are a calm, print-safe pale
 """
 from html import escape as E
 
+import hashlib
+import json
+import math
 INK = '#1d2a3a'
 MUTED = '#5b6878'
 LINE = '#c9d1db'
@@ -367,3 +370,135 @@ def render(spec):
     if spec.get('type') not in RENDER:
         raise ValueError(f"unknown figure type {spec.get('type')!r}")
     return RENDER[spec['type']](spec)
+
+
+def binomial_partition(spec):
+    from .learning.interactive_reference import binomial_area_trace
+    p = spec['parameters']; reference = binomial_area_trace(p)
+    a,b = p['a'],p['b']; side=240; cut=side*a/(a+b); x,y=45,42
+    body=[]
+    for name,rx,ry,rw,rh,color,area in [
+        ('a²',x,y,cut,cut,'#d7e7f5',a*a),
+        ('ab',x+cut,y,side-cut,cut,'#f8ddab',a*b),
+        ('ab',x,y+cut,cut,side-cut,'#f8ddab',a*b),
+        ('b²',x+cut,y+cut,side-cut,side-cut,'#bde5da',b*b)]:
+        body.append(f'<rect x="{rx:g}" y="{ry:g}" width="{rw:g}" height="{rh:g}" fill="{color}" stroke="{INK}"/>')
+        body.append(_t(rx+rw/2,ry+rh/2+4,f'{name} = {area:g}',12,weight=600))
+    body += [_t(x+cut/2,25,f'a = {a:g}'),_t(x+cut+(side-cut)/2,25,f'b = {b:g}'),
+             _t(322,85,'Vier disjunkte Teilflächen',18,'start',700),
+             _t(322,122,f'{a*a:g} + {a*b:g} + {a*b:g} + {b*b:g}',18,'start'),
+             _t(322,158,f'= {reference["result"]:g} = ({a:g} + {b:g})²',18,'start',700),
+             _t(322,209,'Gemischte Flächen: zweimal ab.',14,'start'),
+             _t(322,237,'Längen positiv; Algebra gilt auch',13,'start'),
+             _t(322,257,'für negative reelle a und b.',13,'start')]
+    return _svg(660,320,''.join(body),spec.get('alt',spec['title']))
+
+
+def attention_pipeline(spec):
+    from .labs.models import scaled_attention
+    m = scaled_attention(spec['parameters']); n=len(m['K']); h=180+n*47
+    if n > 4 or len(m['V'][0]) > 2:
+        raise ValueError('Attention graphic currently supports at most four Keys and two Value components')
+    body = [_t(24,27,'1 · Vergleichen',16,'start',700),
+            _t(260,27,'2 · Normalisieren',16,'start',700),
+            _t(500,27,'3 · Mischen',16,'start',700)]
+    def text(field,x,y,value,**kwargs):
+        return _t(x,y,value,**kwargs).replace('<text ',f'<text data-field="{field}" ',1)
+    body += [_t(25,60,'Key',12,'start'),_t(93,60,'q · k',12),_t(176,60,'Logit z',12),
+             _t(310,60,'Gewicht α',12),_t(460,60,'Value v',12),_t(583,60,'Beitrag αv',12)]
+    for j in range(n):
+        y=95+j*47
+        body += [_t(25,y,f'k{j+1}',14,'start',600),text(f'raw-{j}',93,y,f'{m["raw"][0][j]:.5g}'),
+                 text(f'score-{j}',176,y,f'{m["scores"][0][j]:.5g}'),
+                 f'<rect x="240" y="{y-18}" width="{125*m["weights"][0][j]:.6g}" height="27" fill="#bde5da" data-bar="{j}"/>',
+                 text(f'weight-{j}',305,y,f'{m["weights"][0][j]:.5g}',weight=600),
+                 text(f'value-{j}',460,y,', '.join(f'{x:.5g}' for x in m['V'][j])),
+                 text(f'contribution-{j}',583,y,', '.join(f'{x:.5g}' for x in m['contributions'][0][j]))]
+    y=105+n*47
+    body += [f'<line x1="20" y1="{y-20}" x2="650" y2="{y-20}" stroke="{LINE}"/>',
+             _t(25,y+10,'Ausgabe der ersten Query',15,'start',600),
+             text('output',430,y+10,', '.join(f'{x:.6g}' for x in m['output'][0]),size=20,weight=700,fill='#0d7a70'),
+             _t(25,y+43,'Grün: Gewichte · Zahlen und Labels bleiben ohne Farbe lesbar.',12,'start')]
+    return _svg(680,h,''.join(body),spec.get('alt',spec['title']))
+
+
+def policy_gradient_bandit(spec):
+    """Softmax bandit: policy, exact gradient and single-batch estimator variance as a function of the baseline."""
+    from .labs.policy_gradient import compute, exact
+    m = compute(spec['parameters']); prm = m['parameters']; k = len(m['pi'])
+    ex = exact(prm['theta'], prm['rewards'], prm['noise_sd'])
+    n = prm['batch']; h = 120 + 46 * k + 110
+    body = [_t(20, 26, '1 · Politik und exakter Gradient', 15, 'start', 700),
+            _t(400, 26, '2 · Schätzervarianz über b', 15, 'start', 700),
+            _t(20, 52, 'Aktion', 11.5, 'start', 600, MUTED), _t(70, 52, 'θ', 11.5, 'middle', 600, MUTED, True),
+            _t(130, 52, 'π(a)', 11.5, 'middle', 600, MUTED), _t(196, 52, 'r(a)', 11.5, 'middle', 600, MUTED),
+            _t(300, 52, '∂J/∂θ = π(r − J)', 11.5, 'middle', 600, MUTED)]
+    gmax = max(1e-9, max(abs(g) for g in m['grad']))
+    for j in range(k):
+        y = 82 + j * 46
+        g = m['grad'][j]; w = 34 * abs(g) / gmax
+        body += [_t(20, y + 5, f'a{j + 1}', 14, 'start', 700),
+                 _t(70, y + 5, f'{prm["theta"][j]:.3g}', 13),
+                 f'<rect x="95" y="{y - 11}" width="70" height="20" fill="#eef2f7"/>',
+                 f'<rect x="95" y="{y - 11}" width="{70 * m["pi"][j]:.4g}" height="20" fill="{ACCENT[1]}"/>',
+                 _t(130, y + 5, f'{m["pi"][j]:.3f}', 12.5, 'middle', 700),
+                 _t(196, y + 5, f'{prm["rewards"][j]:.3g}', 13),
+                 f'<line x1="300" y1="{y - 15}" x2="300" y2="{y + 13}" stroke="{LINE}"/>',
+                 f'<rect x="{300 if g >= 0 else 300 - w:.4g}" y="{y - 9}" width="{w:.4g}" height="16" '
+                 f'fill="{ACCENT[4] if g >= 0 else ACCENT[3]}"/>',
+                 _t(300 + (w + 5 if g >= 0 else -w - 5), y + 5, f'{g:+.3f}', 12, 'start' if g >= 0 else 'end', 700,
+                    ACCENT[4] if g >= 0 else ACCENT[3])]
+    yb = 82 + k * 46
+    body += [f'<line x1="20" y1="{yb - 16}" x2="372" y2="{yb - 16}" stroke="{LINE}"/>',
+             _t(20, yb + 6, f'J(θ) = Σ π(a) r(a) = {m["J"]:.4f}', 13, 'start', 600),
+             _t(20, yb + 28, 'Grün: r(a) > J, Logit steigt · Rost: r(a) < J, Logit sinkt.', 11, 'start', 400, MUTED),
+             _t(20, yb + 44, 'Die Komponenten summieren sich zu null.', 11, 'start', 400, MUTED)]
+    # Variance panel: x = baseline, y = trace of covariance of the N-sample estimator.
+    rs = prm['rewards']; lo = min(min(rs), 0.0, m['b_opt']) - 0.5; hi = max(max(rs), 0.0, m['b_opt']) + 0.5
+    xs = [lo + (hi - lo) * i / 60 for i in range(61)]
+    vs = [ex['variance'](b) / n for b in xs]
+    vmax = max(vs) * 1.08 or 1.0
+    X = lambda b: 410 + 250 * (b - lo) / (hi - lo)
+    Y = lambda v: 70 + (h - 180) * (1 - v / vmax)
+    base = Y(0)
+    pts = ' '.join(f'{X(b):.1f},{Y(v):.1f}' for b, v in zip(xs, vs))
+    body += [f'<line x1="410" y1="{base:.1f}" x2="660" y2="{base:.1f}" stroke="{MUTED}"/>',
+             f'<line x1="410" y1="70" x2="410" y2="{base:.1f}" stroke="{MUTED}"/>',
+             f'<polyline points="{pts}" fill="none" stroke="{ACCENT[0]}" stroke-width="2"/>',
+             _t(535, base + 30, 'Baseline b', 12, 'middle', 600, MUTED),
+             _t(404, 66, f'Var/N (N = {n})', 11, 'start', 600, MUTED)]
+    for val in sorted({round(lo, 6), 0.0, round(hi, 6)}):
+        body.append(_t(X(val), base + 15, f'{val:.2g}', 10.5, 'middle', 400, MUTED))
+    marks = [(0.0, 'ohne', ACCENT[3]), (m['J'], 'b = J', ACCENT[4]), (m['b_opt'], 'b*', ACCENT[2])]
+    for i, (b, label, col) in enumerate(marks):
+        v = ex['variance'](b) / n
+        body += [f'<circle cx="{X(b):.1f}" cy="{Y(v):.1f}" r="{5 - i}" fill="{col}"/>',
+                 f'<circle cx="416" cy="{base + 46 + 16 * i:.1f}" r="4.5" fill="{col}"/>',
+                 _t(426, base + 50 + 16 * i, f'{label} (b = {b:.3g}): Var/N = {v:.4g}', 11.5, 'start', 600, col)]
+    if prm['baseline_mode'] == 'constant':
+        v = ex['variance'](prm['baseline']) / n
+        body.append(f'<circle cx="{X(prm["baseline"]):.1f}" cy="{Y(v):.1f}" r="7" fill="none" stroke="{INK}" stroke-width="1.5"/>')
+    body.append(_t(20, h - 12, 'Varianz = Spur der Kovarianz des Schätzers ĝ = (1/N) Σ (R − b)(e_A − π); '
+                   'exakt berechnet, nicht simuliert.', 11, 'start', 400, MUTED))
+    return _svg(680, h, ''.join(body), spec.get('alt', spec['title']))
+
+
+def plane_linear_map(spec):
+    """Plane transformation figure: a keyframe of the Mastery Motion plane scene (same model, palette, object ids and
+    scale as the explorable; readouts computed by motion.models.linear_map_2d)."""
+    from .motion.plane import figure_svg
+    return figure_svg(spec['parameters'], spec.get('title'), spec.get('alt'))
+
+def mastery_motion(spec):
+    """A keyframe of a Mastery Motion scene (book figure / card image; V8). The scene is validated on export."""
+    from .motion import keyframe_svg, validate
+    scene = spec['scene']
+    validate(scene)
+    first = (scene.get('presets') or [{}])[0].get('id')
+    return keyframe_svg(scene, spec['step'], caption=False, preset=first)
+
+
+RENDER.update({'binomial_area_partition':binomial_partition, 'mastery_motion':mastery_motion,
+               'plane_linear_map':plane_linear_map,
+               'softmax_policy_gradient':policy_gradient_bandit,
+               'scaled_dot_product_attention':attention_pipeline})

@@ -52,7 +52,7 @@ def kb_command(a):
 
 def main(argv=None):
     args=sys.argv[1:] if argv is None else argv
-    if not args:print('Usage: exam-mastery start <root> [--dry-run --out <dir>] [--legacy-packages] | inventory <root> --out <dir> | plan <root> --out <dir> | freeze | verify-freeze | preflight');return 2
+    if not args:print('Usage: exam-mastery start <root> [--dry-run --out <dir>] [--legacy-packages] | inventory <root> --out <dir> | plan <root> --out <dir> | experience validate|plan|obsidian <unit.json> [--out <note.md>] | freeze | verify-freeze | preflight');return 2
     action=args[0]
     if action in ('--version','-V','version'):
         from .common import version_info
@@ -63,6 +63,9 @@ def main(argv=None):
         if action=='verify-freeze':print('LOCK VERIFIED '+check_lock()['sha256']);return 0
         if action=='preflight':
             print(json.dumps({'version':'0.4.0','codex_available':bool(shutil.which('codex')),'default_backend':'codex','claude_required':False,'gemini_required':False,'python':sys.version.split()[0]},indent=2));return 0
+        if action=='experience':
+            from .learning.experience import command
+            return command(args[1:])
         if action=='kb':
             return kb_command(args[1:])
         if action in ('inventory', 'plan'):
