@@ -1474,7 +1474,10 @@ def build_chapter(slug, cid, home=None, log=print):
     from . import quality as Q
     qrep = _read_json(chdir / "build" / "quality.json")
     if not qrep or qrep.get("catalogue") != Q.CATALOGUE or qrep.get("unit_id") != unit["unit_id"]:
-        qrep = Q.run(unit, chdir / "build", chdir)        # unchanged build from before the gates existed
+        try:                                              # unchanged build from before the gates existed
+            qrep = Q.run(unit, chdir / "build", chdir)
+        except Exception as exc:  # noqa: BLE001 - products are built; the failed check must still be visible
+            raise MasteryError(f"Produkte gebaut, aber die Qualitätsprüfung ist fehlgeschlagen: {exc}") from exc
     return {"library_slug": lib_slug, "built": result["built"], "notes": notes,
             "quality": {**Q.summary(qrep), "line": Q.summary_line(qrep), "report": str(chdir / "build" / "quality.html"),
                         "findings": qrep["findings"]},

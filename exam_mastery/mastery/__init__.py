@@ -257,9 +257,14 @@ def _build_unit(root, item, log):
     log(f"  {entry['slug']}: Produkte {result['publication']['status']}, Anki {result['changes']['anki']}, "
         f"{len(anki['restamped'])} Karten neu gestempelt ({time.monotonic() - started:.1f} s)")
     from . import quality
-    report = quality.run(unit, unit_dir, _unit_path(entry).parent if entry.get("course") else None)
-    log(f"  {entry['slug']}: {quality.summary_line(report)}")
     prefix = rel_dir + "/"
+    try:   # the products are built; a crashing gate must not hide them, but it is reported, never read as a pass
+        report = quality.run(unit, unit_dir, _unit_path(entry).parent if entry.get("course") else None)
+        q_entry = {**quality.summary(report), "report": prefix + "quality.html", "json": prefix + "quality.json"}
+        log(f"  {entry['slug']}: {quality.summary_line(report)}")
+    except Exception as exc:  # noqa: BLE001
+        q_entry = {"status": "GATE_ERROR", "error": f"{type(exc).__name__}: {exc}"[:300], "catalogue": quality.CATALOGUE}
+        log(f"  {entry['slug']}: Qualitätsprüfung fehlgeschlagen ({q_entry['error']})")
     return {
         **({"course": entry["course"], "chapter": entry["chapter"]} if entry.get("course") else {}),
         "slug": entry["slug"], "title": unit["title"], "unit_id": unit["unit_id"], "private": entry["private"],
@@ -268,7 +273,7 @@ def _build_unit(root, item, log):
         "products": {"textbook": prefix + "Lehrbuch.pdf", "workbook": prefix + "Arbeitsbuch.pdf",
                      "anki": prefix + "Anki.apkg", "interactive": prefix + "Interaktiv/index.html"},
         "anki": {"report": prefix + "anki_report.json", "deck": anki["deck"], "notes": anki["notes"]},
-        "quality": {**quality.summary(report), "report": prefix + "quality.html", "json": prefix + "quality.json"},
+        "quality": q_entry,
         "practice_store": {"key": "em-practice-v1", "unit_id": unit["unit_id"],
                            "assessment_revision": assessment_revision(unit)},
         "competencies": [{"id": c["id"], "label": c.get("description", c["id"])} for c in unit["competencies"]],
