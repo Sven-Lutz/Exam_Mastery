@@ -36,6 +36,7 @@ COURSE_GET = re.compile(r"^/api/courses(?:/([a-z0-9][a-z0-9-]{0,40}))?$")
 COURSE_POST = re.compile(r"^/api/(?:import|courses/([a-z0-9][a-z0-9-]{0,40})/(reimport|materialize|plan"
                          r"|chapters/([a-z0-9][a-z0-9-]{0,70})/(packet|build)))$")
 MAX_API_BYTES = 64_000
+MAX_ANKI_STATS_BYTES = 41_000_000   # base64 of an Anki export up to anki_stats.MAX_FILE_BYTES plus the JSON envelope
 TYPES = {".html": "text/html; charset=utf-8", ".json": "application/json; charset=utf-8",
          ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".pdf": "application/pdf",
          ".apkg": "application/octet-stream"}
@@ -106,6 +107,9 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, {"app": "mastery", "version": 1})
         if path == "/api/state/meta":
             return self._send(200, state_meta(self.server.root))
+        if path == "/api/anki-stats":
+            from . import anki_stats
+            return self._send(200, {"stats": anki_stats.load(self.server.root)})
         m = COURSE_GET.match(path)
         if m:
             from . import courses as C
@@ -139,12 +143,14 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(403, {"error": "origin"})
         path = urlsplit(self.path).path
         course = COURSE_POST.match(path)
-        if path != "/api/state" and not course:
+        if path not in ("/api/state", "/api/anki-stats", "/api/anki-stats/forget") and not course:
             return self._send(404, {"error": "not found"})
         if not self.headers.get("Content-Type", "").startswith("application/json"):
             return self._send(415, {"error": "json only"})
         if course:
             return self._course_post(path, course)
+        if path.startswith("/api/anki-stats"):
+            return self._anki_stats_post(path)
         try:
             length = int(self.headers.get("Content-Length", "-1"))
         except ValueError:
@@ -157,6 +163,37 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError, MasteryError, UnicodeDecodeError) as exc:
             return self._send(400, {"error": str(exc)[:200]})
         return self._send(200, {"ok": True, "received_at": received})
+
+    def _anki_stats_post(self, path):
+        """Permission-gated Anki statistics: only an export file the learner chose, only after consent: true."""
+        import base64
+        import binascii
+        from . import anki_stats
+        try:
+            length = int(self.headers.get("Content-Length", "-1"))
+        except ValueError:
+            length = -1
+        if length < 0 or length > MAX_ANKI_STATS_BYTES:
+            return self._send(413, {"error": "Datei zu groß (höchstens 30 MB)."})
+        try:
+            body = json.loads(self.rfile.read(length).decode("utf-8") or "{}")
+            if not isinstance(body, dict):
+                raise MasteryError("JSON-Objekt erwartet")
+            if path.endswith("/forget"):
+                return self._send(200, {"ok": True, "removed": anki_stats.forget(self.server.root)})
+            if body.get("consent") is not True:
+                raise MasteryError("Anki-Statistik nur mit Ihrer ausdrücklichen Zustimmung (consent: true).")
+            if set(body) - {"consent", "filename", "data_base64"} or not isinstance(body.get("data_base64"), str):
+                raise MasteryError("Erwartet: {consent, filename, data_base64}")
+            data = base64.b64decode(body["data_base64"], validate=True)
+            with self.server.course_lock:
+                stats = anki_stats.parse_export(data, str(body.get("filename") or "export.apkg"))
+                anki_stats.store(self.server.root, stats)
+            return self._send(200, {"stats": stats})
+        except (ValueError, MasteryError, UnicodeDecodeError, binascii.Error) as exc:
+            return self._send(400, {"error": str(exc)[:400]})
+        except Exception as exc:  # report, never crash the server
+            return self._send(500, {"error": f"{type(exc).__name__}: {str(exc)[:300]}"})
 
     def _course_post(self, path, m):
         from . import courses as C

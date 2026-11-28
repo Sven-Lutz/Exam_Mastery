@@ -60,4 +60,33 @@ a{color:var(--accent)}
 .m-skip{opacity:.6}
 .m-stale{background:var(--bad-soft);color:var(--bad)}
 .m-action .ds-btn{margin:4px 6px 4px 0}
+/* Lernstand: numbers explain themselves ("Woher?"), timeline, coverage */
+.m-h4{font:600 var(--fs-1)/1.3 var(--font-ui);margin:14px 0 4px}
+.m-n{font:inherit;font-variant-numeric:tabular-nums;color:var(--ink);background:none;border:0;padding:0 2px;cursor:help;text-decoration:underline dotted var(--muted);text-underline-offset:3px;border-radius:var(--r-1)}
+.m-n:hover{background:var(--accent-soft);color:var(--accent)}
+.m-state{text-align:left}
+.m-why{background:var(--surface-2);border-left:4px solid var(--accent);border-radius:var(--r-2);padding:10px 14px;margin:10px 0 0}
+.m-why p{margin:4px 0}
+.m-why-refs{margin:4px 0;padding-left:20px;font-size:var(--fs-0)}
+.m-why-refs code,.m-prov code{word-break:break-all}
+.m-not{font-size:var(--fs-0);color:var(--ink-2)}
+.m-help{display:inline-block;margin-right:8px;white-space:nowrap}
+.m-filters{align-items:flex-end}
+.m-field-inline{display:inline-flex;gap:6px;align-items:center;font-size:var(--fs-0);max-width:100%;min-width:0}
+.m-field-inline select{max-width:min(320px,100%);min-width:0;text-overflow:ellipsis}
+.m-kc th[scope=row]{min-width:170px}
+.m-kc td{white-space:nowrap}
+.m-kc td:nth-child(2),.m-kc td:nth-child(3){white-space:normal;min-width:150px}
+.m-kc td:nth-child(8){white-space:normal;min-width:120px}
+.m-tl{list-style:none;padding:0;margin:8px 0}
+.m-tl-item{display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:12px;padding:8px 0;border-bottom:1px solid var(--rule)}
+.m-tl-when{font-size:var(--fs-0);color:var(--ink-2);font-variant-numeric:tabular-nums}
+.m-tl-tags{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}
+.m-tag{font-size:var(--fs-xs,12px);padding:1px 8px;border-radius:var(--r-pill);background:var(--surface-2);color:var(--ink-2)}
+.m-tag-help{background:var(--warn-soft);color:var(--warn)}
+.m-tag-ind{background:var(--ok-soft);color:var(--ok)}
+.m-prov{display:block;color:var(--muted);font-size:var(--fs-xs,12px)}
+.m-cov{border-top:1px solid var(--rule);padding-top:6px}
+.m-cov-list{margin:4px 0;padding-left:20px;font-size:var(--fs-0)}
+@media (max-width:560px){.m-tl-item{grid-template-columns:1fr;gap:2px}}
 @media (max-width:560px){.m-shell{padding:16px 16px 48px}.m-card{padding:14px}}

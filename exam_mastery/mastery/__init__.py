@@ -31,12 +31,12 @@ LIBRARY_SCHEMA = "mastery-library-v1"
 STATE_SCHEMA = "mastery-state-v1"
 BACKUP_SCHEMA = "mastery-backup-v1"
 STORE_CONTEXT = "mastery"          # workbench storage namespace: localStorage em-tutor-v1, key "mastery|<track id>"
-STORAGE_KEYS = ("em-tutor-v1", "em-practice-v1", "em-motion-v1")  # em-motion-v1: Mastery Motion predictions (no evidence)
+STORAGE_KEYS = ("em-tutor-v1", "em-practice-v1", "em-motion-v1", "em-learn-v2")  # em-motion-v1: Mastery Motion predictions (no evidence); em-learn-v2: chapter app
 MOTION_EVENTS = {"predict", "reveal", "task_attempt"}
 MAX_STATE_BYTES = 4_000_000
 MAX_EVENTS = 20_000
 SLUG = re.compile(r"^[a-z0-9][a-z0-9-]{0,40}$")
-ASSETS = ("em_tokens.css", "mastery_home.css", "em_tutor.js", "mastery_home.js")
+ASSETS = ("em_tokens.css", "mastery_home.css", "em_tutor.js", "mastery_ledger.js", "mastery_home.js")
 OUT_DIR = re.compile(r"^courses/[a-z0-9][a-z0-9-]{0,40}/chapters/[a-z0-9][a-z0-9-]{0,60}/build$")
 
 
@@ -294,7 +294,8 @@ def _write_shell(root):
             '<a href="#sicherung">Sicherung</a></nav></header>'
             '<main id="app" class="m-shell"><noscript><p>Mastery braucht JavaScript. Die PDFs liegen im Ordner units/.</p>'
             '</noscript><p class="m-loading">Bibliothek wird geladen …</p></main>'
-            '<script src="assets/em_tutor.js"></script><script src="assets/mastery_home.js"></script></body></html>\n')
+            '<script src="assets/em_tutor.js"></script><script src="assets/mastery_ledger.js"></script>'
+            '<script src="assets/mastery_home.js"></script></body></html>\n')
     (Path(root) / "index.html").write_text(html, encoding="utf-8")
 
 
@@ -433,6 +434,11 @@ def validate_state(obj):
             _check_events(rec.get("events", []), "em-motion-v1/" + key)
             if any(e["type"] not in MOTION_EVENTS for e in rec.get("events", [])):
                 raise MasteryError("em-motion-v1: only predict, reveal and task_attempt events")
+    learn = storage.get("em-learn-v2")
+    if learn is not None:
+        if not isinstance(learn, dict) or learn.get("schema") != 2:
+            raise MasteryError("em-learn-v2: invalid")
+        _check_events(learn.get("events", []), "em-learn-v2")
     return obj
 
 
@@ -467,6 +473,18 @@ def state_meta(root):
             "workbench_events": tutor, "explorable_events": practice, "motion_events": motion}
 
 
+def _derived(root, storage):
+    """Ledger and progress summary rebuilt from the stored state (derived; an import ignores them)."""
+    from . import anki_stats, ledger as LG
+    try:
+        catalog = LG.load_catalog(root)
+    except (OSError, ValueError, KeyError):
+        catalog = {"units": []}
+    led = LG.build_ledger(storage, catalog)
+    return {"note": "Abgeleitet aus state.storage; bei einem Import ignoriert und neu berechnet.",
+            "ledger": led, "progress": LG.summarize(led, catalog), "anki_stats": anki_stats.load(root)}
+
+
 def export(home=None, out=None):
     """Backup of all learner state the server received, plus the library identity (no products, no paths)."""
     root = resolve_home(home)
@@ -478,7 +496,8 @@ def export(home=None, out=None):
     backup = {"schema": BACKUP_SCHEMA, "created": now(), "app": "Mastery",
               "library": [{"slug": u["slug"], "unit_id": u["unit_id"], "content_hash": u["content_hash"]}
                           for u in lib.get("units", [])],
-              "state": {k: latest[k] for k in ("schema", "saved_at", "received_at", "storage") if k in latest}}
+              "state": {k: latest[k] for k in ("schema", "saved_at", "received_at", "storage") if k in latest},
+              "derived": _derived(root, latest.get("storage") or {})}
     target = _guard_output(out) if out else root / "exports" / ("mastery-backup-" + now().replace(":", "").replace("-", "")
                                                           + "-" + uuid.uuid4().hex + ".json")
     _write_json(target, backup)
