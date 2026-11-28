@@ -113,3 +113,30 @@ class KnowledgeExport(unittest.TestCase):
         with self.assertRaises(MasteryError):
             self.export()
         self.assertEqual((folder / ".mastery-manifest.json").read_bytes(), original)
+
+    def test_course_reimport_changes_provenance_without_replacing_personal_notes(self):
+        from course_fixture import _pdf
+        from exam_mastery.mastery import courses
+        src = self.home / "input"
+        # Use sibling source and library directories under the disposable test root.
+        library = self.home / "library"
+        pdf = src / "Vorlesung/01 - Formeln.pdf"
+        quiet = lambda *_: None
+        _pdf(pdf, [("Formeln", ["Version eins"], False)])
+        imported = courses.import_course(src, slug="formeln", home=library, log=quiet)
+        cid = imported["chapters"][0]["id"]
+        courses.make_packet("formeln", cid, library, log=quiet)
+        chapter = library / "courses/formeln/chapters" / cid
+        (chapter / "unit.json").write_text(json.dumps(self.unit))
+        folder = export_course("formeln", library).parent
+        original_path = next(folder.glob("Quellumfang-*.md"))
+        before = original_path.read_bytes()
+        sidecar = folder.parent / "Mastery-Notizen/Fragestellung.md"
+        sidecar.write_text("Meine Frage")
+        _pdf(pdf, [("Formeln", ["Version zwei"], False)])
+        courses.reimport("formeln", library, log=quiet)
+        export_course("formeln", library)
+        self.assertNotEqual(before, original_path.read_bytes())
+        self.assertIn("Seite 1", original_path.read_text())
+        self.assertTrue(list(folder.glob("Quellenstand-*.md")))
+        self.assertEqual(sidecar.read_text(), "Meine Frage")
