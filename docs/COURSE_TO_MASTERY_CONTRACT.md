@@ -47,3 +47,13 @@ $MASTERY_HOME/library-spec.local.json   # gebaute Kapitel werden hier als privat
 3. **Anki:** Abruf von Prinzipien, Bedingungen und Zusammenhängen. Wo sinnvoll Kontext, Formel und Abbildung auf der Karte. Keine Definitionslisten.
 4. **Interaktiv:** Explorable, in dem eine Steuergröße eine Gleichung und ein Bild gemeinsam verändert und eine Vorhersage vor dem Aufdecken verlangt wird (Prinzipien wie bei 3Blue1Brown/Mathigon, ohne deren Inhalte zu kopieren).
 5. **Kennzeichnung:** `HUMAN_REVIEW_PENDING`, nie selbst freigegeben. Lernwirkung `NOT_RUN`.
+
+### Numerische Aussagen in Musterlösungen
+
+Die Prüfung liest die **gedruckten Felder** `solution`, `solution_approach` sowie Aussage und Begründung jedes `solution_steps`-Paars. Für zuverlässig prüfbare Rechnungen jeweils eine Behauptung pro Zeile schreiben. Der JSON-Bericht `worked_coverage` nennt Aufgabe, Feld, Zeile und Ergebnis. Unverstandene Zeilen zählen als ungeprüfte Lösungsstellen; eine Zeile kann mehrere natürlichsprachliche Behauptungen enthalten.
+
+- `2 * 3 = 6` und `1 / 3 ≈ 0,33` werden mit rationaler Arithmetik geprüft. `=` verlangt exakte Gleichheit, `≈` rundet auf die angegebenen Dezimalstellen (bei Gleichstand zur geraden Endziffer). Komma und Punkt sind Dezimaltrennzeichen; keine Tausendertrennzeichen verwenden.
+- `Bei a=2 und b=3 beträgt die Quadratfläche 25.` prüft die behauptete Fläche des Quadrats mit Seitenlänge **a+b**. Ohne explizite Bindung muss eine Flächenvariante derselben Aufgabenkompetenz diese beiden positiven Seitenabschnitte vorgeben.
+- Für strukturierte Zwischenwerte erhält die Aufgabe beispielsweise `"solution_oracle": {"interaction": "interaction/binomial-area", "variant": "a=2, b=3"}`. Die Variante muss eindeutig zu einem Modell `binomial_area_partition` gehören. Mit dessen kanonischen Parametern werden etwa `a² = 4`, `ab = 6`, `ba = 6`, `b² = 9`, `a + b = 5` und `Quadratfläche = 25` unabhängig berechnet. Schlüssel und Variantenlabel stammen aus dem jeweiligen Kapitel.
+- `Polynomidentität: (a-b)^2 = a^2-2*a*b+b^2` verwendet den vorhandenen exakten Polynomprüfer über den reellen Zahlen. Aussagen mit zusätzlicher Definitionsbereichsbedingung benötigen fachliche Prüfung.
+- Der Status `CHECKED` gilt für die bezeichnete Aussage. `UNVERIFIED` erfordert menschliche Prüfung. Ein belegter Widerspruch oder ein ungültiger expliziter Orakelverweis blockiert die Veröffentlichung. Antwortschlüssel, Rubriken und Autorenselbstauskunft verifizieren keinen Lösungstext. Bewusst falsche Beispiele gehören in `typical_errors`.

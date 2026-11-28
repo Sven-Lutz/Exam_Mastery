@@ -188,7 +188,14 @@ def book_model(unit):
     for index, task in enumerate(unit["assessments"], 1):
         rubric = [[x["criterion"], x["points"]] for x in task["rubric"]]
         stage = task.get("stage")
-        solution = {"answer": task["solution"], "rubric": rubric}
+        from .worked_numbers import coverage
+        checks = coverage(unit, task)
+        verified = sum(row["status"] == "CHECKED" for row in checks)
+        unknown = sum(row["status"] == "UNVERIFIED" for row in checks)
+        note = f"Rechnerisch geprüfte Aussagen: {verified}."
+        if unknown:
+            note += f" Ungeprüfte Lösungsstellen mit fachlichem Prüfbedarf: {unknown}."
+        solution = {"answer": task["solution"], "rubric": rubric, "verification_note": note}
         if task.get("solution_approach"):
             solution["approach"] = task["solution_approach"]
         if task.get("solution_steps"):
@@ -325,12 +332,12 @@ def publish(unit, output_dir):
     record_path = state_dir / f"books-{unit_key}.json"
     record = json.loads(record_path.read_text(encoding="utf-8")) if record_path.exists() else None
     from .experience_runtime import fingerprint, fonts
-    from . import experience_books, experience_proof_checks, experience_math, experience_graphics
+    from . import experience_books, experience_proof_checks, experience_math, experience_graphics, worked_numbers
     from ..labs import models
     from .. import math_publishing, motion
     from ..motion import models as motion_models, plane as motion_plane, embed as motion_embed
     runtime = fingerprint(
-        [experience_books, experience_proof_checks, experience_math, experience_graphics, models, math_publishing, typeset,
+        [experience_books, experience_proof_checks, experience_math, experience_graphics, worked_numbers, models, math_publishing, typeset,
          typeset.figures_svg, motion, motion_models, motion_plane, motion_embed],
         assets=[("mathjax", typeset.NODE / "mathjax-full/es5/tex-svg-full.js"),
                 *fonts(typeset.NODE, [(pkg, variants) for _, pkg, variants in typeset.FONTS])],

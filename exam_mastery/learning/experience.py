@@ -299,6 +299,10 @@ def validate(unit):
                 if source_mode == "grounded" and not item.get("claim_ids"):
                     errors.append(f"teaching.{key}: grounded explanation requires claim refs")
             elif section == "assessments":
+                from .worked_numbers import coverage as worked_coverage
+                for row in worked_coverage(unit, item):
+                    if row["status"] == "BLOCKER":
+                        errors.append(f"assessments.{key}.{row['field']}: {row['detail']}")
                 _references(item.get("claim_ids", []), claim_ids, f"assessments.{key}.claim_ids", errors)
                 if source_mode == "grounded" and not item.get("claim_ids"):
                     errors.append(f"assessments.{key}: grounded solution needs claim refs")
