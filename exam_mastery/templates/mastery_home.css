@@ -72,7 +72,12 @@ a{color:var(--accent)}
 .m-not{font-size:var(--fs-0);color:var(--ink-2)}
 .m-help{display:inline-block;margin-right:8px;white-space:nowrap}
 .m-filters{align-items:flex-end}
-.m-field-inline{display:inline-flex;gap:6px;align-items:center;font-size:var(--fs-0)}
+.m-field-inline{display:inline-flex;gap:6px;align-items:center;font-size:var(--fs-0);max-width:100%;min-width:0}
+.m-field-inline select{max-width:min(320px,100%);min-width:0;text-overflow:ellipsis}
+.m-kc th[scope=row]{min-width:170px}
+.m-kc td{white-space:nowrap}
+.m-kc td:nth-child(2),.m-kc td:nth-child(3){white-space:normal;min-width:150px}
+.m-kc td:nth-child(8){white-space:normal;min-width:120px}
 .m-tl{list-style:none;padding:0;margin:8px 0}
 .m-tl-item{display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:12px;padding:8px 0;border-bottom:1px solid var(--rule)}
 .m-tl-when{font-size:var(--fs-0);color:var(--ink-2);font-variant-numeric:tabular-nums}

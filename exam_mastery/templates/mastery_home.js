@@ -201,16 +201,17 @@ function taskTitles(lib) {
 /* A number with its "Woher?" button: data-num, data-why = rule key; refs = ledger ids behind it. */
 function num(value, why, refs, box) {
   const b = el('button', { type: 'button', class: 'm-n', 'data-num': String(value), 'data-why': why, 'aria-label': value + ' – Woher?', title: 'Woher?' }, String(value));
-  b.addEventListener('click', () => explain(box, why, refs || [], value)); return b;
+  b.addEventListener('click', () => explain(box, why, refs || [], value, b)); return b;
 }
 function stampText(iso) { return iso ? when(iso) : '–'; }
 function dateCell(iso, why, refs, box) {
   if (!iso) return '–';
   const b = el('button', { type: 'button', class: 'm-n m-date', 'data-num': iso, 'data-why': why, title: 'Woher?' }, stampText(iso));
-  b.addEventListener('click', () => explain(box, why, refs || [], stampText(iso))); return b;
+  b.addEventListener('click', () => explain(box, why, refs || [], stampText(iso), b)); return b;
 }
-function explain(box, why, refs, value) {
+function explain(box, why, refs, value, anchor) {
   const [title, rule, not] = WHY[why], byId = Object.fromEntries((LEDGER ? LEDGER.events : []).map(e => [e.id, e]));
+  const host = anchor && anchor.closest('.m-scroll'); if (host && host.nextElementSibling !== box) host.after(box);   // explanation right below the table that holds the number
   box.hidden = false;
   box.replaceChildren(el('p', { class: 'm-why-h' }, el('strong', {}, 'Woher? '), title + ': ' + value),
     el('p', {}, el('strong', {}, 'Regel: '), rule),
@@ -254,8 +255,8 @@ function competencyCards(lib, prog) {
             const helps = ['hint', 'solution', 'tutor', 'guided', 'support'].filter(h => n[h]).map(h => el('span', { class: 'm-help' }, num(n[h], h, r[h], box), ' ' + WHY[h][0]));
             return el('tr', { 'data-kc': c.competency, 'data-source': src, 'data-status': c.status, 'data-basis': c.basis, 'data-assisted': String(n.assisted), 'data-unassisted': String(n.unassisted), 'data-unverified': String(n.unverified), 'data-independent': String(n.independent), 'data-delayed': c.delayed ? c.delayed.at : '' },
               el('th', { scope: 'row' }, c.label),
-              el('td', {}, el('button', { type: 'button', class: 'm-n m-state', 'data-num': c.status, 'data-why': 'status', onclick: () => explain(box, 'status', r.independent.concat(r.assisted), STATUS[c.status] || c.status) }, STATUS[c.status] || c.status)),
-              el('td', {}, el('button', { type: 'button', class: 'm-n m-state', 'data-num': c.basis, 'data-why': 'basis', onclick: () => explain(box, 'basis', r.independent, BASIS[c.basis] || c.basis) }, BASIS[c.basis] || c.basis)),
+              el('td', {}, el('button', { type: 'button', class: 'm-n m-state', 'data-num': c.status, 'data-why': 'status', onclick: e => explain(box, 'status', r.independent.concat(r.assisted), STATUS[c.status] || c.status, e.currentTarget) }, STATUS[c.status] || c.status)),
+              el('td', {}, el('button', { type: 'button', class: 'm-n m-state', 'data-num': c.basis, 'data-why': 'basis', onclick: e => explain(box, 'basis', r.independent, BASIS[c.basis] || c.basis, e.currentTarget) }, BASIS[c.basis] || c.basis)),
               el('td', {}, num(n.unassisted, 'unassisted', r.unassisted, box)), el('td', {}, num(n.assisted, 'assisted', r.assisted, box)),
               el('td', {}, num(n.unverified, 'unverified', r.unverified, box)), el('td', {}, num(n.retries, 'retries', r.retries, box)),
               el('td', {}, helps.length ? helps : 'keine'), el('td', {}, num(n.independent, 'independent', r.independent, box)),
@@ -293,7 +294,7 @@ function timelineCard(lib, led) {
     const f = TL_FILTER, evs = led.events.filter(e => (!f.course || e.course === f.course) && (!f.unit || e.unit === f.unit) && (!f.product || e.product === f.product)).slice().reverse();
     count.replaceChildren(num(evs.length, 'timeline', [], box), ' Einträge');
     list.replaceChildren(...evs.slice(0, TL_LIMIT).map(e => {
-      const title = titles[e.store + '\u0000' + e.record + '\u0000' + e.task] || e.task, what = e.kind === 'help' ? HELPNAME[e.help] || e.type : LKIND[e.kind] || e.type;
+      const title = titles[e.store + '\u0000' + e.record + '\u0000' + e.task] || titles[e.store + '\u0000' + e.record.replace(/@[^@]*$/, '') + '\u0000' + e.task] || e.task, what = e.kind === 'help' ? HELPNAME[e.help] || e.type : LKIND[e.kind] || e.type;
       return el('li', { class: 'm-tl-item', 'data-id': e.id, 'data-product': e.product, 'data-kind': e.kind, 'data-course': e.course, 'data-unit': e.unit },
         el('div', { class: 'm-tl-when' }, e.at ? stampText(e.at) : '–', e.t_quality !== 'exact' ? el('small', { class: 'm-badge' }, TQ[e.t_quality]) : null),
         el('div', { class: 'm-tl-what' }, el('strong', {}, what), title ? ' · ' + title : '', e.result ? ' → ' + (RESULT[e.result] || e.result) : '',
