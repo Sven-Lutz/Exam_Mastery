@@ -5,7 +5,7 @@ shows a different (empty) learner state. POST /api/state accepts a size-limited,
 browser state as a backup into MASTERY_HOME/state; requests from other hosts or origins are refused (DNS rebinding,
 cross-site POST).
 
-Course import (wizard): GET /api/courses[/<slug>] and POST /api/import, /api/courses/<slug>/{reimport,materialize,plan},
+Course import (wizard): GET /api/courses[/<slug>] and POST /api/import, /api/courses/<slug>/{reimport,materialize,plan,author},
 /api/courses/<slug>/chapters/<id>/{packet,build}. Import accepts only absolute folders strictly inside the user's home
 folder, outside the repository and the library; source folders are only read. Operations run one at a time.
 """
@@ -34,7 +34,7 @@ ALLOWED = re.compile(
     r"|courses/[a-z0-9][a-z0-9-]*/chapters/[a-z0-9][a-z0-9-]*/build/(?:Lehrbuch\.pdf|Arbeitsbuch\.pdf|Anki\.apkg"
     r"|anki_report\.json|quality\.(?:html|json)|Interaktiv/index\.html|tracks/[A-Za-z0-9_.-]+\.(?:html|json)))$")
 COURSE_GET = re.compile(r"^/api/courses(?:/([a-z0-9][a-z0-9-]{0,40}))?$")
-COURSE_POST = re.compile(r"^/api/(?:import|courses/([a-z0-9][a-z0-9-]{0,40})/(reimport|materialize|plan"
+COURSE_POST = re.compile(r"^/api/(?:import|courses/([a-z0-9][a-z0-9-]{0,40})/(reimport|materialize|plan|author"
                          r"|chapters/([a-z0-9][a-z0-9-]{0,70})/(packet|build)))$")
 MAX_API_BYTES = 64_000
 MAX_ANKI_STATS_BYTES = 41_000_000   # base64 of an Anki export up to anki_stats.MAX_FILE_BYTES plus the JSON envelope
@@ -228,6 +228,8 @@ class Handler(BaseHTTPRequestHandler):
                     return self._send(200, C.reimport(slug, root, materialize_files=True, log=log))
                 if action == "plan":
                     return self._send(200, C.set_overrides(slug, body.get("overrides") or {}, root))
+                if action == "author":
+                    return self._send(200, self._author(slug, body, root))
                 if chapter_action == "packet":
                     C.make_packet(slug, chapter, root, log=log)
                     return self._send(200, C.course_status(slug, root))
@@ -241,6 +243,33 @@ class Handler(BaseHTTPRequestHandler):
                 traceback.print_exc()
             return self._send(500, {"error": f"{type(exc).__name__}: {str(exc)[:300]}"})
         return self._send(404, {"error": "not found"})
+
+    def _author(self, slug, body, root):
+        """Kurs erarbeiten: plan | authorize (explicit consent) | start (background runner) | stop | status."""
+        from . import authoring as A
+        act = body.get("action")
+        if act == "plan":
+            return A.plan(slug, root)
+        if act == "authorize":
+            if body.get("consent") is not True:
+                raise MasteryError("Freigabe nur mit ausdrücklicher Zustimmung (consent: true).")
+            if body.get("revoke") is True:
+                return A.authorize(slug, revoke=True, home=root)
+            runs = body.get("max_runs")
+            if not isinstance(runs, int) or isinstance(runs, bool):
+                raise MasteryError("max_runs: ganze Zahl")
+            if body.get("provider") not in ("claude_code_cli", "manual"):
+                raise MasteryError("Anbieter in der App: claude_code_cli oder manual (andere über die Kommandozeile).")
+            return A.authorize(slug, body["provider"], runs, root, allow_web=body.get("allow_web") is True,
+                               granted_via="app")
+        if act == "start":
+            A.spawn_background(slug, root, wait_for_reset=True)
+            return A.status(slug, root)
+        if act == "stop":
+            return A.stop(slug, root)
+        if act == "status":
+            return A.status(slug, root)
+        raise MasteryError("action: plan | authorize | start | stop | status")
 
     def do_OPTIONS(self):  # no CORS: cross-origin preflights fail closed
         self._send(405, {"error": "method"})

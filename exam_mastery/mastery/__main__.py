@@ -197,6 +197,52 @@ def cmd_reimport(args):
     return 0
 
 
+def cmd_author(args):
+    from . import authoring as A
+    if args.action == "plan":
+        p = A.plan(args.slug, args.home, args.chapters)
+        print(f"Plan für {args.slug}: " + ", ".join(f"{v} {k}" for k, v in p["counts"].items() if v) or "nichts zu tun")
+        for st in p["steps"]:
+            print(f"  {st['chapter']}: {st['action']}")
+        print(f"Modellaufrufe: mindestens {p['model_calls_min']}, höchstens {p['model_calls_max']} "
+              f"(je Kapitel bis {A.MAX_ATTEMPTS} Versuche, {A.MAX_REVISIONS} Überarbeitung). Bereits fertig: "
+              f"{len(p['chapters_done'])} Kapitel.")
+        return 0
+    if args.action == "authorize":
+        o = A.authorize(args.slug, args.provider, args.max_runs, args.home, model=args.model, effort=args.effort,
+                        timeout_min=args.timeout_min, command=args.command, allow_web=args.allow_web,
+                        revoke=args.revoke)
+        print((o["authorization"] or {}).get("statement") or "Freigabe widerrufen.")
+        return 0
+    if args.action == "check-draft":
+        if not args.chapters or len(args.chapters) != 1:
+            print("Mastery: check-draft braucht genau ein Kapitel: author <kurs> check-draft --chapter <id>", file=sys.stderr)
+            return 2
+        r = A.check_draft(args.slug, args.chapters[0], args.home)
+        for e in r["errors"]:
+            print("  Fehler: " + e)
+        for f in r["blockers"]:
+            print(f"  [blocker] {f['gate']} {f['location']}: {f['message']}")
+        for f in r["majors"]:
+            print(f"  [major] {f['gate']} {f['location']}: {f['message']}")
+        print("Entwurf: " + ("ohne Fehler und Blocker" if r["ok"] else "nicht übernehmbar"))
+        return 0 if r["ok"] else 3
+    if args.action == "stop":
+        A.stop(args.slug, args.home)
+        print("Anhalten angefordert.")
+        return 0
+    if args.action == "run":
+        if args.background:
+            print(f"Erarbeitung läuft im Hintergrund (Prozess {A.spawn_background(args.slug, args.home, args.wait_for_reset)}).")
+            return 0
+        o = A.run(args.slug, args.home, chapters=args.chapters, max_steps=args.max_steps, new=args.new,
+                  wait_for_reset=args.wait_for_reset)
+        return 0 if o["job"] and o["job"]["status"] in ("DONE", "READY") else 4
+    o = A.status(args.slug, args.home)
+    print(json.dumps(o, ensure_ascii=False, indent=1))
+    return 0
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="mastery", description="Mastery – lokale Lernumgebung (offline)")
     parser.add_argument("--home", help="Bibliotheksordner (Standard: $MASTERY_HOME oder ~/Mastery)")
@@ -243,6 +289,24 @@ def main(argv=None):
     r = sub.add_parser("reimport", help="Kursordner neu inventarisieren; betroffene Kapitel als veraltet markieren")
     r.add_argument("slug")
     r.add_argument("--materialize", action="store_true", help="Zustimmung: iCloud-Platzhalter herunterladen")
+    au = sub.add_parser("author", help="Kurs erarbeiten (KI, nur mit Freigabe): plan | authorize | run | status | stop "
+                                       "| check-draft")
+    au.add_argument("slug")
+    au.add_argument("action", choices=["plan", "authorize", "run", "status", "stop", "check-draft"])
+    au.add_argument("--chapter", dest="chapters", action="append", help="nur dieses Kapitel (mehrfach möglich)")
+    au.add_argument("--provider", default="claude_code_cli", choices=["claude_code_cli", "command", "manual"])
+    au.add_argument("--max-runs", type=int, default=0, help="authorize: Höchstzahl der Modellaufrufe")
+    au.add_argument("--model")
+    au.add_argument("--effort")
+    au.add_argument("--timeout-min", type=int, default=90)
+    au.add_argument("--command", help="authorize --provider command: lokales Programm (liest den Auftrag von stdin)")
+    au.add_argument("--allow-web", action="store_true", help="authorize: Websuche erlauben (Standard: aus)")
+    au.add_argument("--revoke", action="store_true", help="authorize: Freigabe widerrufen")
+    au.add_argument("--max-steps", type=int)
+    au.add_argument("--new", action="store_true", help="run: neuen Lauf statt Fortsetzen")
+    au.add_argument("--background", action="store_true", help="run: im Hintergrund")
+    au.add_argument("--wait-for-reset", action="store_true",
+                    help="run: bei Nutzungslimit bis zur vom Anbieter gemeldeten Freigabe warten und fortsetzen")
     args = parser.parse_args(argv)
     if not args.cmd:
         args = parser.parse_args([*(["--home", args.home] if args.home else []), "start"])
@@ -250,7 +314,7 @@ def main(argv=None):
         return {"start": cmd_start, "build": cmd_build, "status": cmd_status, "export": cmd_export,
                 "import": cmd_import, "courses": cmd_courses, "course": cmd_course, "plan": cmd_plan,
                 "packet": cmd_packet, "build-chapter": cmd_build_chapter, "reimport": cmd_reimport,
-                "quality": cmd_quality}[args.cmd](args)
+                "quality": cmd_quality, "author": cmd_author}[args.cmd](args)
     except MasteryError as exc:
         print(f"Mastery: {exc}", file=sys.stderr)
         return 1

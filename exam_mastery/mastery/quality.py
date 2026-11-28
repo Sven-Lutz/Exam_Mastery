@@ -210,7 +210,7 @@ def _strings(obj):
 
 
 class _Ctx:
-    def __init__(self, unit, build_dir=None, chapter_dir=None):
+    def __init__(self, unit, build_dir=None, chapter_dir=None, authoring=None):
         self.unit = unit
         self.build_dir = Path(build_dir) if build_dir else None
         self.chapter_dir = Path(chapter_dir) if chapter_dir else None
@@ -228,7 +228,8 @@ class _Ctx:
         self.claims = [c for c in u.get("claims") or [] if isinstance(c, dict)]
         self.math = {m.get("id"): m for m in u.get("mathematics") or [] if isinstance(m, dict)}
         self.packet = _read_json(self.chapter_dir / "packet.json") if self.chapter_dir else None
-        self.authoring = _read_json(self.chapter_dir / "authoring.json") if self.chapter_dir else None
+        self.authoring = authoring if authoring is not None else (
+            _read_json(self.chapter_dir / "authoring.json") if self.chapter_dir else None)
         self.record = _read_json(self.chapter_dir / "build-record.json") if self.chapter_dir else None
         self._scenes = None
 
@@ -859,9 +860,10 @@ CHECKS = (gate_chain, gate_proof, gate_figures, gate_locators, gate_divergence, 
 
 # ------------------------------------------------------------------ report
 
-def check(unit, build_dir=None, chapter_dir=None):
-    """Run every gate of the catalogue; returns the report dict (schema mastery-quality-report-v1)."""
-    ctx = _Ctx(unit, build_dir, chapter_dir)
+def check(unit, build_dir=None, chapter_dir=None, authoring=None):
+    """Run every gate of the catalogue; returns the report dict (schema mastery-quality-report-v1). ``authoring``
+    replaces chapter_dir/authoring.json (draft check: the draft's own record)."""
+    ctx = _Ctx(unit, build_dir, chapter_dir, authoring)
     for fn in CHECKS:
         fn(ctx)
     order = {g["id"]: i for i, g in enumerate(GATES)}

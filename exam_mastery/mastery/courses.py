@@ -1328,7 +1328,8 @@ def _author(chdir):
         return None, None
     a = rec.get("author")
     kind = a.get("kind") or a.get("type") if isinstance(a, dict) else a
-    label = {"claude_code_session": "KI: Claude-Code-Sitzung", "human": "Mensch"}.get(kind, "unbekannt")
+    label = {"claude_code_session": "KI: Claude-Code-Sitzung", "ai_cli": "KI: lokales Programm",
+             "human": "Mensch"}.get(kind, "unbekannt")
     return kind, label
 
 
@@ -1402,7 +1403,16 @@ def summary(cdir, course, home=None):
         "plan_overrides": course.get("plan_overrides", {"chapters": {}}),
         "pipeline": list(STATUSES),
         "model_calls": 0,
+        "authoring": _authoring_overview(cdir),
     }
+
+
+def _authoring_overview(cdir):
+    from . import authoring
+    try:
+        return authoring.overview(cdir)
+    except Exception as exc:  # noqa: BLE001 - the course view must open even with a damaged job file
+        return {"error": f"{type(exc).__name__}: {exc}"[:200]}
 
 
 def list_courses(home=None):
@@ -1448,8 +1458,8 @@ def build_chapter(slug, cid, home=None, log=print):
     if unit["unit_id"] != ch["unit_id"]:
         notes.append(f"unit_id {unit['unit_id']} weicht vom Paket ({ch['unit_id']}) ab.")
     kind, label = _author(chdir)
-    if kind not in ("claude_code_session", "human"):
-        notes.append("authoring.json fehlt oder nennt keinen Autor (claude_code_session|human).")
+    if kind not in ("claude_code_session", "ai_cli", "human"):
+        notes.append("authoring.json fehlt oder nennt keinen Autor (claude_code_session|ai_cli|human).")
     lib_slug = _lib_slug(slug, cid)
     entry = {"slug": lib_slug, "unit": str(unit_path.resolve()), "tracks": [], "out": _out_rel(slug, cid),
              "course": {"slug": slug, "title": course["title"]},

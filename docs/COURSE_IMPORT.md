@@ -57,14 +57,49 @@ bin/mastery reimport <kurs> [--materialize]               # Änderungen erkennen
 Alles liegt unter `~/Mastery/courses/<kurs>/` (Aufbau: Vertrag). Ein `packet.json`, das nicht vom Import stammt, wird
 nie überschrieben; das neue Paket heißt dann `packet.import.json` (`--force` ersetzt bewusst).
 
-## 3. Erarbeiten: KI-gestützt, nicht offline
+## 3. Erarbeiten: ganzer Kurs auf Knopfdruck (KI, nur mit Ihrer Freigabe)
 
-Import, Inventar, Vollständigkeit, Kapitelplan, Pakete, Validierung und Bau sind **offline und ohne Modell**.
-Das Schreiben eines Kapitels (`unit.json`: Lehrtext, Herleitungen, Aufgaben mit Lösungen, Karten, Explorable) ist es
-**nicht**: Es braucht eine **Claude-Code-Sitzung mit Ihrem Abo** (kein API-Schlüssel, keine bezahlten Aufrufe, keine
-versteckten Modellaufrufe durch Mastery) – oder einen Menschen. Die App zeigt dafür bei „Paket bereit“ den Befehl und
-den Auftrag zum Kopieren. Danach `authoring.json` (Autor `claude_code_session` oder `human`, Prüfprotokoll, offene
-Punkte) daneben legen und bauen. Ergebnisse bleiben `HUMAN_REVIEW_PENDING`; Lernwirkung `NOT_RUN`.
+Import, Inventar, Vollständigkeit, Kapitelplan, Pakete, Validierung und Bau sind **offline und ohne Modell**. Das
+Schreiben eines Kapitels (`unit.json`: Lehrtext, Herleitungen, Aufgaben mit Lösungen, Karten, Explorable) braucht ein
+Modell. Mastery orchestriert das für den **ganzen Kurs**; niemand muss je Kapitel einen Auftrag kopieren.
+
+**In der App** (Kurse → Kurs → „Kurs erarbeiten (KI)“):
+1. Anbieter wählen – **Claude Code (Ihr Abo)** oder **Manuell (Mensch)** –, Höchstzahl der Modellaufrufe eintragen,
+   Zustimmung ankreuzen, **Freigeben**. Ohne diese Freigabe startet Mastery keinen einzigen Aufruf.
+2. **Kurs erarbeiten** (bzw. **Fortsetzen** / **Kurs aktualisieren**) startet die Erarbeitung im Hintergrund.
+   Die Seite zeigt je Kapitel Schritt, Status, Versuche und den letzten Prüfbefund; **Anhalten** beendet sie.
+
+**Im Terminal:**
+```sh
+bin/mastery author <kurs> plan                                  # was zu tun ist und wie viele Aufrufe höchstens
+bin/mastery author <kurs> authorize --max-runs 20               # Freigabe: Claude Code (Abo), höchstens 20 Aufrufe
+bin/mastery author <kurs> run [--chapter <id>] [--max-steps N]  # erarbeiten / fortsetzen (Vordergrund)
+bin/mastery author <kurs> run --background --wait-for-reset     # im Hintergrund, wartet Limits ab
+bin/mastery author <kurs> status | stop
+bin/mastery author <kurs> check-draft --chapter <id>            # Entwurfsprüfung (nutzt auch der Autor selbst)
+```
+
+**Ablauf je Kapitel** (`exam_mastery/mastery/authoring.py`): Paket (neu, wenn Quellen geändert) → Auftrag an den
+Anbieter; er schreibt nur nach `chapters/<id>/draft/` → **Entwurfsprüfung**: Schema, `unit_id` (Anki-Identität),
+Prüfprotokoll in `authoring.json`, maschinelle Qualitätsgates; Fehler und Blocker gehen als Rückmeldung in einen
+zweiten Versuch → bisherige Fassung nach `versions/` archivieren → Entwurf atomar übernehmen → vier Produkte bauen →
+Qualitätsgates. Ein Bau mit Blockern oder schweren Befunden führt zu **einer** automatischen Überarbeitung mit den
+Befunden; bleibt ein Blocker, steht das Kapitel als „Qualitätsblocker“ offen und wird nicht als fertig gemeldet.
+Geänderte Quellen (`Neu einlesen`) ergeben den Schritt „aktualisieren“: der Autor ändert nur das Betroffene und behält
+die IDs (Lernverlauf in Anki bleibt).
+
+**Transparenz und Grenzen:**
+- Anbieter `claude_code_cli` ruft `claude -p` mit Ihrer Anmeldung auf. Der Prozess erhält keine Umgebungsvariable mit
+  Schlüssel oder Token; meldet Claude Code trotzdem einen API-Schlüssel als Anmeldung, bricht Mastery ab
+  (`paid_key_refused`). Keine Websuche (Standard), keine MCP-Server, Schreibzugriff nur im Kapitelordner.
+- Jeder Aufruf zählt gegen die Freigabe (`authoring/authorization.json`) und hinterlässt einen Laufbericht
+  (`chapters/<id>/authoring/runs/<lauf>/`: Auftrag, Protokoll, Dauer, Ergebnis der Entwurfsprüfung).
+- Meldet der Anbieter ein Nutzungslimit, pausiert der Lauf bis zur gemeldeten Freigabe; früher startet Mastery nicht
+  (`--wait-for-reset` wartet und setzt dann fort). Ein Kapitel braucht je nach Umfang einen erheblichen Teil eines
+  Nutzungsfensters; der Plan nennt die Höchstzahl der Aufrufe.
+- Die Qualität des Inhalts belegt das nicht: Ergebnisse bleiben `HUMAN_REVIEW_PENDING`, Lernwirkung `NOT_RUN`.
+- Anbieter `command` (nur Terminal) ruft ein von Ihnen genanntes lokales Programm auf, das den Auftrag von stdin liest;
+  `manual` legt den Auftrag als `authoring/ORDER.md` für einen Menschen ab.
 
 ## 4. Was funktioniert, was experimentell ist
 
@@ -77,6 +112,7 @@ Punkte) daneben legen und bauen. Ergebnisse bleiben `HUMAN_REVIEW_PENDING`; Lern
 | Mathematik-Kurse (zweiter Kurs, Lineare Algebra) | Dateinamen wie „Folien 12“, „Loesungsvorschlag 3“, „Blatt 1 (1)“ werden nummeriert; Kapiteltitel von der Titelfolie („Vorlesung 19: …“, abweichende Nummer wird gemeldet); ein langes Skript mit PDF-Inhaltsverzeichnis wird in Abschnitte geteilt und den Vorlesungen in Kursreihenfolge zugeordnet (Abschnitte ohne Vorlesung werden eigene Kapitel); Lösungen nur innerhalb ihrer Serie (Übungsblatt ≠ Tutorium); nummerierte Übungsserien werden monoton in Kursreihenfolge zugeordnet, Vorlagenwörter der Blätter zählen nicht; TeX-Textartefakte („Vektorr¨aume“, „̸ =“, „7→“, Ligaturen) werden repariert; Kompetenzvorschläge aus benannten Sätzen/Definitionen |
 | Kompetenzvorschläge | einfache Heuristik aus Lernzielen, benannten Sätzen/Definitionen und Folientiteln; nur Vorschlag |
 | Paket, Validierung, Bau, Eintrag in die Bibliothek, stabile Anki-Identität, Neuimport mit „veraltet“ | funktioniert, getestet |
+| Kursweite Erarbeitung (Freigabe, Entwurfsprüfung mit Rückmeldung, Versionen, Limit-Pause, Aktualisieren) | funktioniert, getestet mit Test-Autor; echter Claude-Code-Aufruf geprüft (Abo, Schreibrechte); ganzer realer Kurs noch nicht erarbeitet |
 | Folienbilder für PPTX | nicht verfügbar (kein Renderer); Folientext wird übernommen |
 | OCR für Scans | nicht verfügbar; Seiten ohne Textebene werden gemeldet und als Bild ins Paket gelegt (PDF) |
 | Inhaltliche Qualität eines Kapitels | hängt von der Erarbeitung ab; nicht automatisch belegt |

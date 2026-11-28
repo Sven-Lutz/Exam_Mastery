@@ -429,6 +429,48 @@ function chapterAction(c, ch) {
   box.append(msg);
   return box;
 }
+const JOBST = { READY: 'bereit', RUNNING: 'läuft', PAUSED_LIMIT: 'pausiert (Nutzungslimit des Anbieters)', NEEDS_AUTHORIZATION: 'wartet auf Ihre Freigabe', STOPPED: 'angehalten', INTERRUPTED: 'unterbrochen', DONE: 'fertig', DONE_WITH_BLOCKERS: 'fertig, mit offenen Kapiteln', FAILED: 'fehlgeschlagen' };
+const STEPST = { pending: 'offen', running: 'läuft', done: 'fertig', failed: 'fehlgeschlagen', blocked_quality: 'Qualitätsblocker', needs_human: 'Mensch erarbeitet' };
+const AUTHOR_ACT = { author: 'erarbeiten', update: 'aktualisieren (Quellen geändert)', revise: 'überarbeiten (Qualitätsbefunde)', build: 'bauen' };
+let AUTHOR_POLL = null;
+function authorPanel(c) {
+  const a = c.authoring || {}, job = a.job, auth = a.authorization, base = 'api/courses/' + c.slug + '/author';
+  const msg = el('p', { class: 'm-note', role: 'status', id: 'msg-author-' + c.slug });
+  const box = el('section', { class: 'm-author', 'data-author': c.slug, 'aria-labelledby': 'h-author-' + c.slug },
+    el('h3', { class: 'm-h3', id: 'h-author-' + c.slug }, 'Kurs erarbeiten (KI)'),
+    el('p', { class: 'm-note' }, 'Mastery erarbeitet Kapitel für Kapitel: Paket → Entwurf durch das freigegebene Modell → automatische Prüfung (Schema, Qualitätsgates) mit Rückmeldung an den Autor → Vorversion archivieren → übernehmen → vier Produkte bauen. Kapitel mit geänderten Quellen werden aktualisiert, Kapitel mit Blockern einmal überarbeitet. Ergebnisse bleiben „fachliche Prüfung ausstehend“.'));
+  const todo = c.chapters.filter(ch => !ch.skip && (ch.status === 'NICHT_ERARBEITET' || ch.status === 'PAKET_BEREIT')).length;
+  const stale = c.chapters.filter(ch => !ch.skip && ch.stale).length;
+  box.append(el('p', { 'data-author-todo': String(todo) }, todo + ' Kapitel nicht erarbeitet, ' + stale + ' mit geänderten Quellen.'));
+  if (auth) box.append(el('p', { class: 'm-note', 'data-author-auth': auth.provider }, el('strong', {}, 'Freigabe: '), auth.statement + ' Verbraucht: ' + auth.runs_used + ' von ' + auth.max_runs + '.'));
+  const form = el('div', { class: 'm-row' });
+  const runs = el('input', { type: 'number', class: 'm-input m-num', min: '1', max: '500', value: String(Math.max(2, todo * 2)), 'aria-label': 'Höchstzahl der Modellaufrufe', id: 'author-runs-' + c.slug });
+  const prov = el('select', { class: 'm-input', 'aria-label': 'Anbieter', id: 'author-provider-' + c.slug },
+    el('option', { value: 'claude_code_cli', disabled: a.providers && !a.providers.claude_code_cli, selected: !auth || auth.provider === 'claude_code_cli' }, 'Claude Code (Ihr Abo, kein API-Schlüssel)'), el('option', { value: 'manual', selected: !!auth && auth.provider === 'manual' }, 'Manuell (Mensch erarbeitet)'));
+  const consent = el('input', { type: 'checkbox', id: 'author-consent-' + c.slug });
+  const grant = el('button', { type: 'button', class: 'ds-btn', 'data-action': 'author-authorize', onclick: () => {
+    if (!consent.checked) { msg.textContent = 'Bitte die Zustimmung ankreuzen.'; msg.dataset.state = 'error'; return; }
+    busy(grant, msg, 'Freigabe wird gespeichert …', () => api(base, { action: 'authorize', consent: true, provider: prov.value, max_runs: parseInt(runs.value, 10) || 0 }));
+  } }, auth ? 'Freigabe erneuern' : 'Freigeben');
+  form.append(el('label', {}, 'Anbieter ', prov), el('label', {}, ' höchstens ', runs, ' Aufrufe'),
+    el('label', { class: 'm-check' }, consent, ' Ich erlaube Mastery, mit meiner Anmeldung so viele Erarbeitungsaufrufe zu starten. Kursinhalte gehen dabei an den Anbieter; keine Websuche.'), grant);
+  box.append(form);
+  const running = a.running || (job && job.status === 'RUNNING');
+  const row = el('div', { class: 'm-row' });
+  const label = !job || ['DONE', 'DONE_WITH_BLOCKERS', 'STOPPED', 'FAILED'].includes(job.status) ? (stale && !todo ? 'Kurs aktualisieren' : 'Kurs erarbeiten') : 'Fortsetzen';
+  const start = el('button', { type: 'button', class: 'ds-btn ds-btn-primary', 'data-action': 'author-start', disabled: !auth || running, onclick: () => busy(start, msg, 'Erarbeitung startet im Hintergrund …', () => api(base, { action: 'start' })) }, label);
+  const halt = el('button', { type: 'button', class: 'ds-btn', 'data-action': 'author-stop', disabled: !running, onclick: () => busy(halt, msg, 'Wird angehalten …', () => api(base, { action: 'stop' })) }, 'Anhalten');
+  row.append(start, halt); box.append(row);
+  if (job) {
+    box.append(el('p', { 'data-job-status': job.status }, el('strong', {}, 'Lauf: '), (JOBST[job.status] || job.status) + (job.message ? ' – ' + job.message : '') + ' (' + (job.runs_used || 0) + ' Modellaufrufe in diesem Lauf)'),
+      el('ol', { class: 'm-steps' }, job.steps.map(st => el('li', { 'data-step': st.chapter, 'data-step-status': st.status },
+        st.chapter + ': ' + (AUTHOR_ACT[st.action] || st.action) + ' – ' + (STEPST[st.status] || st.status) + (st.attempts ? ' (' + st.attempts + ' Versuch' + (st.attempts > 1 ? 'e' : '') + ')' : '') + (st.last_error ? ' – ' + st.last_error : '')))));
+  }
+  box.append(msg);
+  clearTimeout(AUTHOR_POLL);
+  if (running) AUTHOR_POLL = setTimeout(() => { if (location.hash === '#kurse') reload('#kurse'); }, 8000);
+  return box;
+}
 function coursePanel(c) {
   const n = c.counts, card = el('article', { class: 'm-card m-course', 'data-course': c.slug });
   card.append(el('p', { class: 'ds-eyebrow' }, 'Kurs · importiert ' + when(c.imported_at)), el('h2', { class: 'm-h2' }, c.title),
@@ -442,7 +484,7 @@ function coursePanel(c) {
     card.append(el('div', { class: 'm-icloud', 'data-not-local': String(n.not_local) }, el('p', {}, el('strong', {}, n.not_local + ' Datei(en) nicht lokal verfügbar. '), 'Sie liegen nur als iCloud-Platzhalter vor; Mastery hat sie nicht geöffnet. Auf Ihren Klick lädt macOS sie herunter (brctl download); nichts wird gelöscht oder verändert.'), b));
   }
   const re = el('button', { type: 'button', class: 'ds-btn', 'data-action': 'reimport', onclick: () => busy(re, msg, 'Kursordner wird neu eingelesen …', () => api('api/courses/' + c.slug + '/reimport')) }, 'Neu einlesen (Änderungen erkennen)');
-  row.append(re); card.append(row, msg);
+  row.append(re); card.append(row, msg, authorPanel(c));
   const main = c.warnings.filter(w => w.severity !== 'info'), info = c.warnings.filter(w => w.severity === 'info');
   card.append(el('h3', { class: 'm-h3' }, 'Vollständigkeit (' + main.length + ' Warnungen, ' + info.length + ' Hinweise)'),
     main.length ? el('ul', { class: 'm-warn' }, main.map(w => el('li', { 'data-code': w.code, class: 'sev-' + w.severity }, w.message))) : el('p', {}, 'Keine Warnungen.'),

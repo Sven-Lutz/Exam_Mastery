@@ -6,6 +6,10 @@ Stand 2026-11-27 · Auftrag: Issues #49, #51. Verbindlich für Import (`WP-C2M-I
 - Private Kursquellen und alles daraus Erzeugte liegen **nur** unter `$MASTERY_HOME` (Standard `~/Mastery`), nie im Repository.
 - Import, Inventar, Vollständigkeitsprüfung, Kapitelvorschlag, Validierung und Produktbau sind **deterministisch und offline**.
 - **Autorenschaft ist KI-gestützt und nicht offline:** Ein Kapitel wird von einer Claude-Code-Sitzung (Abo des Owners, kein API-Schlüssel, keine bezahlten Aufrufe) aus dem Authoring-Paket geschrieben, oder von einem Menschen. Die UI kennzeichnet das ausdrücklich. Es gibt keine stille Modellnutzung.
+- **Orchestrierung (M2, #58):** `bin/mastery author` bzw. „Kurs erarbeiten (KI)“ führt die Erarbeitung kursweit aus
+  (Freigabe mit Höchstzahl der Aufrufe, Entwurf in `draft/`, Entwurfsprüfung mit Rückmeldung, Versionen, Bau, Gates,
+  Pause bei Nutzungslimits, Aktualisieren geänderter Kapitel). Details: `docs/COURSE_IMPORT.md` §3. Zusätzliche
+  Dateien je Kurs: `authoring/{authorization,job}.json`; je Kapitel: `draft/`, `versions/`, `authoring/runs/`.
 - Jede fachliche Aussage trägt einen Quellenverweis auf Datei und Seite/Folie oder ist als eigene Herleitung markiert. Zahlen, Herleitungen und Lösungen werden rechnerisch geprüft (sympy/numpy), nicht nach sprachlicher Plausibilität.
 
 ## Ordnerstruktur
