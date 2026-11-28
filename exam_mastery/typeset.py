@@ -11,6 +11,7 @@ PDF gets bookmarks. Nothing here decides content; it only lays it out, and it re
 """
 import html
 import json
+import math
 import re
 import shutil
 from pathlib import Path
@@ -19,6 +20,46 @@ from .common import ContractError
 from . import figures_svg
 
 E = html.escape
+
+# Print geometry (A4, margins as in _pdf): the body measure beside the side-note column, and the full text block.
+PX_PER_MM = 96 / 25.4
+MEASURE_PX = (210 - 20 - 16 - 43 - 7) * PX_PER_MM      # main column (side column + gap reserved)
+WIDE_PX = (210 - 20 - 16 - 6) * PX_PER_MM               # full text block, minus a safety margin for nested boxes
+FIGURE_LABEL_FLOOR_PT = 6.4                              # print gate PG-FONT-FLOOR is 6 pt; keep a margin
+_VIEWBOX = re.compile(r'<svg\b[^>]*\bviewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)')
+_FONT_ATTR = re.compile(r'(font-size=")([\d.]+)(")')
+_FONT_CSS = re.compile(r'(font-size:\s*)([\d.]+)(px)?(?=[;"\s}])')
+
+
+def _label_pt(size, width, avail):
+    return size * min(1.0, avail / width) * 0.75
+
+
+def fit_figure_labels(svg):
+    """Keep every SVG label at or above the print floor once the figure is scaled to the page.
+
+    A figure wider than the body measure is scaled down by the browser, and its labels with it. First choice: let
+    the figure use the full text block (print class ``wide``, into the side-note column, which figure blocks never
+    use). Only if that is not enough are the remaining too-small font sizes raised to the floor; nothing else changes.
+    Returns (svg, wide)."""
+    m = _VIEWBOX.search(svg)
+    sizes = [float(x[1]) for x in _FONT_ATTR.findall(svg)] + [float(x[1]) for x in _FONT_CSS.findall(svg)]
+    if not m or not sizes:
+        return svg, False
+    width = float(m.group(1))
+    smallest = min(sizes)
+    if _label_pt(smallest, width, MEASURE_PX) >= FIGURE_LABEL_FLOOR_PT:
+        return svg, False
+    wide = width > MEASURE_PX
+    avail = WIDE_PX if wide else MEASURE_PX
+    if _label_pt(smallest, width, avail) >= FIGURE_LABEL_FLOOR_PT:
+        return svg, wide
+    floor = FIGURE_LABEL_FLOOR_PT / (0.75 * min(1.0, avail / width))
+
+    def lift(mm):
+        v = float(mm.group(2))
+        return mm.group(0) if v >= floor else f"{mm.group(1)}{math.ceil(floor * 100) / 100:g}{mm.group(3) or ''}"
+    return _FONT_CSS.sub(lift, _FONT_ATTR.sub(lift, svg)), wide
 NODE = Path.home() / '.cache/exam-mastery-v05-node/node_modules'
 FONTS = [('Source Serif 4', 'source-serif-4', ['400-normal', '400-italic', '600-normal', '700-normal']),
          ('Source Sans 3', 'source-sans-3', ['400-normal', '400-italic', '600-normal', '700-normal']),
@@ -196,6 +237,7 @@ mjx-container[display="true"]{display:block;max-width:100%}mjx-container[display
 .sum{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);padding:.6em 0 .2em}
 .sum .lab{color:var(--ink)}
 figure{margin:1.3em 0 1.4em;break-inside:avoid}
+@media print{figure.wide{margin-right:calc(-1 * (var(--side) + var(--gap)))}}
 figure .fig{text-align:center}
 figure .fig svg{max-width:100%}
 figcaption,.tcap{font-family:var(--sans);font-size:.8rem;color:var(--ink2);margin-top:.5em;line-height:1.42}
@@ -292,9 +334,9 @@ class Doc:
     def figure(self, b):
         spec = self.book['figures'][b['id']]
         self.fig_no += 1
-        svg = figures_svg.render(spec)
+        svg, wide = fit_figure_labels(figures_svg.render(spec))
         cap = f'<b>Abbildung {self.book["meta"]["chapter_no"]}.{self.fig_no}</b> {inline(b.get("caption") or spec.get("caption") or spec.get("title", ""))}'
-        return f'<figure id="fig-{E(b["id"])}"><div class="fig">{svg}</div><figcaption>{cap}{self._capsrc(b)}</figcaption></figure>'
+        return f'<figure id="fig-{E(b["id"])}"{" class=\"wide\"" if wide else ""}><div class="fig">{svg}</div><figcaption>{cap}{self._capsrc(b)}</figcaption></figure>'
 
     def table(self, b):
         self.tab_no += 1
@@ -346,7 +388,8 @@ class Doc:
             self.fig_no += 1
             cap = (f'<b>Abbildung {self.book["meta"]["chapter_no"]}.{self.fig_no}</b> {inline(b["title"])}{"" if b["title"].rstrip().endswith(("?", "!", ".")) else "."} {inline(b.get("caption", ""))} '
                    f'<i>Interaktiv</i> in der Lernumgebung (<a href="{E(b["href"])}">Lab öffnen</a>). Modellannahmen: {_mt(" ".join(a.rstrip(".") + "." for a in b.get("assumptions", [])))}')
-            return f'<figure class="lab-fig"><div class="fig">{b["svg"]}</div><figcaption>{cap}{self._capsrc(b)}</figcaption></figure>'
+            svg, wide = fit_figure_labels(b["svg"])
+            return f'<figure class="lab-fig{" wide" if wide else ""}"><div class="fig">{svg}</div><figcaption>{cap}{self._capsrc(b)}</figcaption></figure>'
         if t == 'misconception':
             return (f'<div class="mis"><span class="lab">Häufige Fehlvorstellung</span><div class="wrong">{md(b["wrong"])}</div>'
                     f'<div class="right">{md(b["right"])}</div>' + (f'<div class="why">{md(b["why"])}</div>' if b.get('why') else '') + '</div>')
