@@ -211,10 +211,16 @@ def main(argv=None):
     r = sub.add_parser("reimport", help="Kursordner neu inventarisieren; betroffene Kapitel als veraltet markieren")
     r.add_argument("slug")
     r.add_argument("--materialize", action="store_true", help="Zustimmung: iCloud-Platzhalter herunterladen")
+    knowledge = sub.add_parser("obsidian", help="vernetzten Markdown-Kursordner aktualisieren")
+    knowledge.add_argument("slug")
     args = parser.parse_args(argv)
     if not args.cmd:
         args = parser.parse_args([*(["--home", args.home] if args.home else []), "start"])
     try:
+        if args.cmd == "obsidian":
+            from .knowledge import export_course
+            print(export_course(args.slug, args.home))
+            return 0
         return {"start": cmd_start, "build": cmd_build, "status": cmd_status, "export": cmd_export,
                 "import": cmd_import, "courses": cmd_courses, "course": cmd_course, "plan": cmd_plan,
                 "packet": cmd_packet, "build-chapter": cmd_build_chapter, "reimport": cmd_reimport}[args.cmd](args)
