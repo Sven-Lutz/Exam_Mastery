@@ -41,6 +41,10 @@ MAX_PDF_BYTES = 300 * 1024 * 1024
 PAGE_DPI = 110
 # Pixel budget per rendered page (Codex review P1): DPI alone does not bound memory for oversized page boxes.
 # 8 MP ~ 24 MB RGB; larger pages are rendered at a lower zoom, degenerate pages not at all.
+MAX_PACKET_IMAGES = 100
+MAX_PACKET_PIXELS = 100_000_000
+MAX_COURSE_IMAGES = 500
+MAX_COURSE_PIXELS = 500_000_000
 MAX_PAGE_PIXELS = 8_000_000
 CHUNK_CHARS = 3500
 KINDS = ("lecture_slides", "script", "exercise", "solution", "exam", "literature", "notebook", "other")
@@ -552,6 +556,8 @@ def build_inventory(root, cdir, previous=None, log=print):
                 if not g["duplicate_of"]:
                     g["duplicate_of"], g["duplicate_basis"] = canon["file_id"], "Name und Größe (nicht lokal geprüft)"
     _canonical_duplicates(out)
+    for f in out:
+        f["render_candidates"] = len(f["vision_pages"]) if f["ext"] == ".pdf" and not f["duplicate_of"] else 0
     return out
 
 
@@ -605,6 +611,8 @@ def _prov(f, page=None):
 
 def completeness(files, chapters):
     warns = []
+    if sum(f.get("render_candidates", 0) for f in files) > MAX_COURSE_IMAGES:
+        warns.append(_warn("COURSE_IMAGE_BUDGET", "warning", "Bildbedarf übersteigt das Seitenbildbudget des Kurses."))
     live = [f for f in files if not f["duplicate_of"] and f["status"] not in ("ignored", "symlink_skipped")]
     for f in files:
         if f["status"] == "not_local":
@@ -1086,17 +1094,40 @@ def _refresh(cdir, course, root, previous, materialize_files, log):
     return summary(cdir, course)
 
 
-def _render_page(page, target):
-    """Render one PDF page within MAX_PAGE_PIXELS. Returns False for degenerate page boxes."""
+def _render_page(page, target, remaining=None):
+    """Return allocated pixels, zero for invalid geometry or None for exhausted budget."""
     import pymupdf
-    w, h = float(page.rect.width), float(page.rect.height)
-    if not (w > 0 and h > 0):
-        return False
     zoom = PAGE_DPI / 72
-    if w * h * zoom * zoom > MAX_PAGE_PIXELS:
-        zoom = (MAX_PAGE_PIXELS / (w * h)) ** 0.5
-    page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False).save(target)
-    return True
+    if page.rect.is_empty or page.rect.is_infinite:
+        return 0
+    while True:
+        matrix = pymupdf.Matrix(zoom, zoom)
+        rect = (page.rect * matrix).irect
+        pixels = rect.width * rect.height
+        if pixels <= MAX_PAGE_PIXELS:
+            break
+        zoom *= min(0.99, (MAX_PAGE_PIXELS / pixels) ** 0.5)
+    if remaining is not None and pixels > remaining:
+        return None
+    if pixels:
+        page.get_pixmap(matrix=matrix, alpha=False).save(target)
+    return pixels
+
+
+def _existing_images(cdir):
+    import struct
+    count = pixels = 0
+    for path in cdir.glob("chapters/*/pages/*.png"):
+        if any(node.is_symlink() for node in (path, path.parent, path.parent.parent)) or not path.is_file():
+            raise MasteryError("Ungültiger Seitenbildpfad")
+        with path.open("rb") as image:
+            header = image.read(24)
+        if len(header) != 24 or header[:8] != bytes.fromhex("89504e470d0a1a0a") or header[12:16] != b"IHDR":
+            raise MasteryError("Seitenbild mit ungültigem PNG-Header")
+        width, height = struct.unpack(">II", header[16:])
+        count += 1
+        pixels += width * height
+    return count, pixels
 
 
 def reimport(slug, home=None, materialize_files=False, log=print):
@@ -1204,6 +1235,12 @@ def authoring_instruction(cdir, course, ch, packet_name=None):
 
 def make_packet(slug, cid, home=None, log=print, force=False):
     """Write chapters/<id>/packet.json (mastery-authoring-packet-v1) and page images for pages that need vision."""
+    from ..learning.publication_lock import publication_lock
+    with publication_lock(course_dir(slug, home)):
+        return _make_packet(slug, cid, home, log, force)
+
+
+def _make_packet(slug, cid, home, log, force):
     import pymupdf
     cdir, course = load_course(slug, home)
     ch = _chapter(course, cid)
@@ -1222,9 +1259,11 @@ def make_packet(slug, cid, home=None, log=print, force=False):
     for src in (old_own or {}).get("sources", []) if (old_own or {}).get("generator") == GENERATOR else []:
         for pg in src.get("pages", []):  # remove only page images this generator wrote before
             img = chdir / pg.get("image", "")
-            if pg.get("image", "").startswith("pages/") and img.is_file() and not img.is_symlink():
+            if img.parent == pages_dir and img.suffix == ".png" and img.is_file() and not img.is_symlink():
                 img.unlink()
     pages_dir.mkdir(parents=True, exist_ok=True)
+    course_images, course_pixels = _existing_images(cdir)
+    packet_pixels = skipped = 0
     warnings, sources, rendered = [], [], 0
     title_terms = set(tokens(ch["title"])) | {t for c in ch.get("competencies_proposed", []) for t in tokens(c["text"])}
     order = [(fid, None) for fid in ch["sources"] + ch["exercises"] + ch["solutions"]] + [(fid, "exam") for fid in ch["exams"]]
@@ -1261,7 +1300,15 @@ def make_packet(slug, cid, home=None, log=print, force=False):
                         "formula_lines": p["formula_lines"]}
                 if p["needs_vision"] and doc is not None:
                     name = f"{fid}-p{p['n']:03d}.png"
-                    if _render_page(doc[p["n"] - 1], pages_dir / name):
+                    remaining = min(MAX_PACKET_PIXELS - packet_pixels, MAX_COURSE_PIXELS - course_pixels - packet_pixels)
+                    pixels = None
+                    if rendered < MAX_PACKET_IMAGES and course_images + rendered < MAX_COURSE_IMAGES:
+                        pixels = _render_page(doc[p["n"] - 1], pages_dir / name, remaining)
+                    if pixels is None:
+                        skipped += 1
+                        item["image_status"] = "budget_exhausted"
+                    elif pixels:
+                        packet_pixels += pixels
                         item["image"] = f"pages/{name}"
                         rendered += 1
                     else:
@@ -1285,6 +1332,9 @@ def make_packet(slug, cid, home=None, log=print, force=False):
         warnings.append("Keine Altklausur im Kursordner: Klausurniveau nicht aus Originalen belegbar.")
     idx = [c["id"] for c in course["chapters"] if not c.get("skip")]
     prereq = idx[: idx.index(cid)][-1:] if cid in idx else []
+    budget_warning = f"{skipped} Seitenbilder fehlen wegen des Paket- oder Kursbudgets." if skipped else None
+    if budget_warning:
+        warnings.append(budget_warning)
     packet = {
         "schema": PACKET_SCHEMA, "generator": GENERATOR, "generated_at": now(),
         "course": {"slug": course["slug"], "title": course["title"]},
@@ -1301,6 +1351,7 @@ def make_packet(slug, cid, home=None, log=print, force=False):
     }
     _write_json(target, packet)
     st = course.setdefault("chapter_state", {}).setdefault(cid, {})
+    st["render_warning"] = budget_warning
     st["packet_at"] = packet["generated_at"]
     st["packet_sources"] = [s["file_id"] for s in sources]
     if st.get("stale") and not (chdir / "unit.json").is_file():
@@ -1398,7 +1449,8 @@ def summary(cdir, course, home=None):
                                           "error")} | {"vision_pages": len(f["vision_pages"]),
                                                        "image_only_pages": len(f["image_only_pages"]),
                                                        "formula_pages": len(f["formula_pages"])} for f in files],
-        "warnings": course.get("warnings", []),
+        "warnings": course.get("warnings", []) + [_warn("RENDER_BUDGET", "warning", cid + ": " + st["render_warning"])
+            for cid, st in course.get("chapter_state", {}).items() if st.get("render_warning")],
         "chapters": chapters,
         "plan_overrides": course.get("plan_overrides", {"chapters": {}}),
         "pipeline": list(STATUSES),
@@ -1481,6 +1533,7 @@ def build_chapter(slug, cid, home=None, log=print):
         st.pop("stale")
     _save(cdir, course)
     report_anki = _read_json(chdir / "build" / "anki_report.json") or {}
+    restamped = report_anki.get("restamped", []) if result["built"] else []
     from . import quality as Q
     qrep = _read_json(chdir / "build" / "quality.json")
     if not qrep or qrep.get("catalogue") != Q.CATALOGUE or qrep.get("unit_id") != unit["unit_id"]:
@@ -1491,7 +1544,8 @@ def build_chapter(slug, cid, home=None, log=print):
     return {"library_slug": lib_slug, "built": result["built"], "notes": notes,
             "quality": {**Q.summary(qrep), "line": Q.summary_line(qrep), "report": str(chdir / "build" / "quality.html"),
                         "findings": qrep["findings"]},
-            "anki": {"notes": report_anki.get("notes"), "restamped": len(report_anki.get("restamped", [])),
+            "anki": {"notes": report_anki.get("notes"), "restamped": len(restamped),
+                     "restamped_keys": restamped,
                      "package_status": report_anki.get("package_status")},
             "products": {k: str(chdir / "build" / v) for k, v in PRODUCTS.items()}}
 

@@ -121,3 +121,11 @@ die IDs (Lernverlauf in Anki bleibt).
 
 Kursmaterial und alles daraus Erzeugte bleibt auf diesem Rechner unter `~/Mastery`. Ins Repository gelangt nichts
 davon; die Tests verwenden einen erzeugten Beispielkurs (`tests/course_fixture.py`).
+
+### Seitenbilder und Kartenfeedback
+
+Ein Paket erhält höchstens 100 gerenderte Seitenbilder und 100 Millionen Pixel, ein Kurs insgesamt 500 Bilder und 500 Millionen Pixel. Die Einzelgrenze beträgt acht Millionen Pixel. Seiten ohne Bild wegen eines erschöpften Budgets behalten ihren Text und erhalten im Paket den Status `budget_exhausted`. Paket und Kursansicht melden die Lücke.
+
+Unter **Kurse → gebautes Kapitel → Anki-Karten und Feedback** erscheinen Frage und Antwort aus dem gebauten Anki-Paket. Rückmeldungen beziehen sich auf Kartenschlüssel, Kartenordinal und Paketversion. Sie liegen unter `$MASTERY_HOME/state/card-feedback/`. Der Qualitätsbericht zählt Rückmeldungen und betroffene Karten. Lernfortschritt und Anki-Wiederholungsintervalle werden hier nicht gemessen.
+
+`bin/mastery export` sichert die Feedbackjournale zusammen mit dem serverseitigen Lernstand. Der Browserexport des Lernstands auf der Startseite erfasst den lokalen Browserzustand. Mit `bin/mastery card-feedback <kurs> <kapitel>` entsteht neben dem Paket eine aktuelle `feedback.json` für die nächste Autorenrunde. Freitext ist eine Rückmeldung von Lernenden. Nach fachlicher Prüfung die Karte in `unit.json` unter ihrem bisherigen Schlüssel überarbeiten. `bin/mastery build-chapter <kurs> <kapitel>` nennt die neu gestempelten Notizschlüssel. Beim Import in Anki aktualisiert eine solche Änderung die generierten Notizfelder. Persönliche Ergänzungen gehören in eigene Notizen.

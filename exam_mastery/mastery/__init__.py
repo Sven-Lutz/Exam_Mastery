@@ -498,15 +498,18 @@ def export(home=None, out=None):
     """Backup of all learner state the server received, plus the library identity (no products, no paths)."""
     root = resolve_home(home)
     latest = _read_json(root / "state" / "latest.json")
-    if not latest:
+    journals = [_read_json(p) for p in sorted((root / "state/card-feedback").glob("*/*.json"))
+                if p.resolve() == p]
+    if not latest and not journals:
         raise MasteryError("Noch kein Lernstand beim lokalen Server angekommen: `mastery start`, Startseite öffnen "
                            "(sie sichert automatisch) und dann erneut exportieren.")
     lib = _read_json(root / "library.json") or {}
     backup = {"schema": BACKUP_SCHEMA, "created": now(), "app": "Mastery",
               "library": [{"slug": u["slug"], "unit_id": u["unit_id"], "content_hash": u["content_hash"]}
                           for u in lib.get("units", [])],
-              "state": {k: latest[k] for k in ("schema", "saved_at", "received_at", "storage") if k in latest},
-              "derived": _derived(root, latest.get("storage") or {})}
+              "card_feedback": journals,
+              "state": {k: latest[k] for k in ("schema", "saved_at", "received_at", "storage") if k in (latest or {})},
+              "derived": _derived(root, (latest or {}).get("storage") or {})}
     target = _guard_output(out) if out else root / "exports" / ("mastery-backup-" + now().replace(":", "").replace("-", "")
                                                           + "-" + uuid.uuid4().hex + ".json")
     _write_json(target, backup)

@@ -245,32 +245,39 @@ def build_deck(cards, deck_name, course_slug, chapter_slug, out_dir, figures=Non
     return rep
 
 
-def preview_html(pkg, out_dir, limit_keys=None):
+def preview_html(pkg, out_dir, limit_keys=None, *, card_index=None):
     """Render the real card HTML (Anki's own template engine) to standalone pages: light/dark × question/answer."""
     from anki.collection import Collection, ImportAnkiPackageRequest, ImportAnkiPackageOptions
     out_dir = Path(out_dir); out_dir.mkdir(parents=True, exist_ok=True)
     from .typeset import NODE
     shutil.copy2(NODE / 'mathjax-full/es5/tex-svg-full.js', out_dir / 'tex-svg-full.js')
+    # Native Anki delimiters are supported by the bundled MathJax defaults.
+    config = '<script>window.MathJax={tex:{inlineMath:[["\\\\(","\\\\)"]]},svg:{fontCache:"global"}};</script>' if card_index is None else ""
     pages = []
     with tempfile.TemporaryDirectory() as td:
         col = Collection(str(Path(td) / 'p.anki2'))
         try:
             col.import_anki_package(ImportAnkiPackageRequest(package_path=str(pkg), options=ImportAnkiPackageOptions()))
             for f in Path(col.media.dir()).iterdir():
-                shutil.copy2(f, out_dir / f.name)
+                if card_index is None or f.suffix.lower() in {'.svg', '.png', '.jpg', '.jpeg', '.webp', '.gif', '.woff2'}:
+                    shutil.copy2(f, out_dir / f.name)
             for cid in col.db.list('select id from cards order by id'):
                 card = col.get_card(cid); note = card.note()
                 key = note['Key']
                 if limit_keys and key not in limit_keys:
                     continue
+                prefix = f'{slug(key)}-{card.ord}'
+                if card_index is not None:
+                    prefix = hashlib.sha256(key.encode()).hexdigest() + f'-{card.ord}'
+                    card_index.append({'key': key, 'ordinal': card.ord, 'prefix': prefix})
                 css = card.note_type()['css']
                 for side, body in (('q', card.question()), ('a', card.answer())):
                     for mode in ('light', 'dark'):
                         cls = 'card' + (' nightMode night_mode' if mode == 'dark' else '')
                         page = (f'<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-                                f'<style>{css}</style><script>window.MathJax={{tex:{{inlineMath:[["\\\\(","\\\\)"]]}},svg:{{fontCache:"global"}}}};</script>'
+                                f'<style>{css}</style>{config}'
                                 f'<script src="tex-svg-full.js"></script></head><body class="{cls}">{body}</body></html>')
-                        name = f'{slug(key)}-{card.ord}-{side}-{mode}.html'
+                        name = f'{prefix}-{side}-{mode}.html'
                         (out_dir / name).write_text(page, encoding='utf-8'); pages.append(name)
         finally:
             col.close()
