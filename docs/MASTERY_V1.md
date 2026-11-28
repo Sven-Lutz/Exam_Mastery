@@ -64,7 +64,7 @@ anderen, meist leeren Lernstand; Wechsel über *Sicherung → exportieren/import
    Nachweisaufgaben (Rollen *similar*, *transfer*, *retest*) enthält er **keine Musterlösung** (CD-7). In Claude oder
    ChatGPT einfügen – erst dann verlässt der Inhalt den Rechner. Ein Tutor-Brief zählt als Hilfe (`tutor`-Ereignis);
    die Lösung zu sehen bleibt die Entscheidung des Lernenden und wird als Hilfe vermerkt (OD-10/11/12/30).
-7. **Lernstand:** pro Kompetenz Zustand im Vokabular von `kc_status` (nie ein Prozentwert), Evidenzbasis
+7. **Lernstand** (Herkunft jeder Zahl: `docs/LERNSTAND.md`): pro Kompetenz Zustand im Vokabular von `kc_status` (nie ein Prozentwert), Evidenzbasis
    (`kc_evidence_basis`: keine / nur Wiedererkennen / selbst erzeugt), Zahl der Versuche ohne und mit Hilfe, davon
    Freitext (unbewertet), Hilfen. „Mit Hilfe“ heißt Hinweis, Lösung oder Tutor zu dieser Aufgabe oder bis 20 Stunden
    davor zur selben Kompetenz (CD-9). Behalten wird nur aus selbstständigen richtigen Lösungen mit ≥ 20 Stunden Abstand
@@ -82,7 +82,8 @@ anderen, meist leeren Lernstand; Wechsel über *Sicherung → exportieren/import
 | Produkte | `~/Mastery/units/<einheit>/` (`Lehrbuch.pdf`, `Arbeitsbuch.pdf`, `Anki.apkg`, `Interaktiv/index.html`, `tracks/…html`) |
 | Bibliotheksbeschreibung (öffentlich) | `exam_mastery/mastery/library.json` im Repository |
 | Private Einheiten | `~/Mastery/library-spec.local.json` (nie im Repository, nicht ausgeliefert) |
-| Lernstand | Browser, localStorage von `http://127.0.0.1:8765`: `em-tutor-v1` (Übungsstrecke, Schlüssel `mastery|<track>`), `em-practice-v1` (Explorable, je Einheit und Aufgabenfassung) |
+| Lernstand | Browser, localStorage von `http://127.0.0.1:8765`: `em-tutor-v1` (Übungsstrecke, Schlüssel `mastery|<track>`), `em-practice-v1` (Explorable, je Einheit und Aufgabenfassung), `em-motion-v1`, `em-learn-v2`; zusammengeführt im abgeleiteten Register `mastery-ledger-v1` (`docs/LERNSTAND.md`) |
+| Anki-Statistik (optional) | `~/Mastery/anki-stats/latest.json`, nur nach Freigabe aus einem selbst erstellten Anki-Export |
 | Server-Sicherung | `~/Mastery/state/latest.json` + `state/history/` (letzte 30); die Startseite sendet bei jedem Öffnen eine geprüfte Kopie |
 | Sicherungsdatei | `bin/mastery export` → `~/Mastery/exports/`; oder Startseite → Sicherung → *Als Datei exportieren* |
 
